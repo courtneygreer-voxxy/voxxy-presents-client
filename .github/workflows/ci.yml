@@ -1,0 +1,46 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, develop]
+  push:
+    branches: [develop]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SITE_URL: https://dev-voxxy-presents.onrender.com
+          NEXT_PUBLIC_SITE_NAME: "Voxxy Presents (Dev)"
+          NEXT_PUBLIC_SITE_DESCRIPTION: "Voxxy Presents Development Environment"
+
+      - name: Test build output
+        run: |
+          if [ ! -d ".next" ]; then
+            echo "Build failed - .next directory not found"
+            exit 1
+          fi
+          echo "Build successful"
