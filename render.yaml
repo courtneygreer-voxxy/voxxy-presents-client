@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: voxxy-presents-client
+    env: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://www.voxxypresents.com
+      - key: NEXT_PUBLIC_SITE_NAME
+        value: "Voxxy Presents"
+      - key: NEXT_PUBLIC_SITE_DESCRIPTION
+        value: "Welcome to Voxxy Presents"
+    domains:
+      - www.voxxypresents.com
+      - voxxypresents.com
+    healthCheckPath: /
+    autoDeploy: true
+    branch: main
+    rootDir: .
+    
+  # Staging environment
+  - type: web
+    name: voxxy-presents-client-staging
+    env: node
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: staging
+      - key: NEXT_PUBLIC_SITE_URL
+        value: https://staging-voxxy-presents.onrender.com
+      - key: NEXT_PUBLIC_SITE_NAME
+        value: "Voxxy Presents (Staging)"
+      - key: NEXT_PUBLIC_SITE_DESCRIPTION
+        value: "Voxxy Presents Staging Environment"
+    autoDeploy: true
+    branch: staging
+    rootDir: .
