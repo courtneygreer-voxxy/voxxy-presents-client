@@ -8,7 +8,16 @@ const nextConfig = {
   },
   images: {
     unoptimized: true,
-    domains: ['www.voxxypresents.com', 'voxxypresents.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'www.voxxypresents.com',
+      },
+      {
+        protocol: 'https', 
+        hostname: 'voxxypresents.com',
+      },
+    ],
   },
   async redirects() {
     return [
