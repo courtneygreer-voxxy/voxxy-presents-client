@@ -1,11 +1,10 @@
 services:
   - type: web
     name: voxxy-presents-client
-    env: static
+    env: node
     plan: starter
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    startCommand: ""
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -25,11 +24,10 @@ services:
   # Staging environment
   - type: web
     name: voxxy-presents-client-staging
-    env: static
+    env: node
     plan: starter
     buildCommand: npm ci && npm run build
-    staticPublishPath: ./dist
-    startCommand: ""
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
