@@ -3,7 +3,7 @@ services:
     name: voxxy-presents-client
     env: node
     plan: starter
-    buildCommand: npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
+    buildCommand: rm -rf .next && npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -47,11 +47,11 @@ services:
     name: voxxy-presents-client-dev
     env: node
     plan: starter
-    buildCommand: npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
+    buildCommand: rm -rf .next && npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
-        value: development
+        value: production
       - key: NEXT_PUBLIC_SITE_URL
         value: https://dev-voxxy-presents.onrender.com
       - key: NEXT_PUBLIC_SITE_NAME
