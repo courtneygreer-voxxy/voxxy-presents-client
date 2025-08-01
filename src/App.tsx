@@ -1,6 +1,5 @@
-"use client"
-
 import type React from "react"
+import { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -19,10 +18,8 @@ import {
   ExternalLink,
   DollarSign,
 } from "lucide-react"
-import Image from "next/image"
-import { useState } from "react"
 
-export default function ArtClubLanding() {
+export default function App() {
   const [expandedEvents, setExpandedEvents] = useState<number[]>([])
   const [presaleDialogOpen, setPresaleDialogOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<any>(null)
@@ -165,17 +162,15 @@ export default function ArtClubLanding() {
     <div className="min-h-screen bg-white">
       {/* Header Photo Section - Facebook Style */}
       <section id="home" className="relative h-80 overflow-hidden">
-        <Image
+        <img
           src="/placeholder.svg?height=320&width=1200"
           alt="Art Club Header"
-          fill
-          className="object-cover"
-          priority
+          className="absolute inset-0 w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/30" />
         <div className="absolute bottom-6 left-6 text-white">
           <div className="flex items-center space-x-4 mb-2">
-            <Image
+            <img
               src="/placeholder.svg?height=80&width=80"
               alt="Brooklyn Hearts club Logo"
               width={80}
@@ -198,7 +193,7 @@ export default function ArtClubLanding() {
             <p className="text-lg text-gray-700 leading-relaxed">
               An art club for adults that welcomes everyone. We aim to bring back whimsy and joy to the process of
               creating art in a shame-free, judgment-free zone where we can creatively express ourselves. Our events are
-              centered around bringing people together and encouraging the practice of art, regardless of each person&apos;s
+              centered around bringing people together and encouraging the practice of art, regardless of each person's
               skill level.
             </p>
           </div>
@@ -352,7 +347,7 @@ export default function ArtClubLanding() {
                   required
                 />
                 <p className="text-xs text-gray-500">
-                  We&apos;ll send your request to Brooklyn Hearts Club, and they&apos;ll contact you directly about presale
+                  We'll send your request to Brooklyn Hearts Club, and they'll contact you directly about presale
                   availability.
                 </p>
               </div>
@@ -360,9 +355,9 @@ export default function ArtClubLanding() {
               <div className="bg-gray-50 p-4 rounded-lg text-sm">
                 <p className="font-medium text-gray-900 mb-2">Message to Brooklyn Hearts Club:</p>
                 <p className="text-gray-700">
-                  &ldquo;Hi! I&apos;m interested in presale tickets for <strong>{selectedEvent?.title}</strong> on{" "}
+                  "Hi! I'm interested in presale tickets for <strong>{selectedEvent?.title}</strong> on{" "}
                   {selectedEvent?.date}. Please let me know when presale tickets become available and how to purchase
-                  them. Thanks!&rdquo;
+                  them. Thanks!"
                 </p>
               </div>
 
@@ -400,7 +395,7 @@ export default function ArtClubLanding() {
           <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">About Brooklyn Hearts club</h3>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <Image
+              <img
                 src="/placeholder.svg?height=400&width=600"
                 alt="Art Club Members"
                 width={600}
