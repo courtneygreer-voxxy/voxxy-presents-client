@@ -5,6 +5,7 @@ services:
     plan: starter
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
+    startCommand: ""
     envVars:
       - key: NODE_ENV
         value: production
@@ -28,6 +29,7 @@ services:
     plan: starter
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
+    startCommand: ""
     envVars:
       - key: NODE_ENV
         value: production
@@ -48,6 +50,7 @@ services:
     plan: starter
     buildCommand: npm ci && npm run build
     staticPublishPath: ./dist
+    startCommand: ""
     envVars:
       - key: NODE_ENV
         value: production
