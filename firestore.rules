@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(resource) {
+      return request.auth.uid == resource.data.ownerId;
+    }
+    
+    function isUser(userId) {
+      return request.auth.uid == userId;
+    }
+    
+    // Organizations - only authenticated users can read, only owners can write
+    match /organizations/{orgId} {
+      allow read: if true; // Public read for organization pages
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == resource.data.ownerId;
+      allow update, delete: if isAuthenticated() && 
+                               isOwner(resource);
+    }
+    
+    // Events - public read, only org owners can write
+    match /events/{eventId} {
+      allow read: if true; // Public read for event listings
+      allow create: if isAuthenticated() && 
+                       exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+                       get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && 
+                               exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+                               get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Registrations - users can create their own, org owners can read all for their events
+    match /registrations/{regId} {
+      allow read: if isAuthenticated() && 
+                     (request.auth.token.email == resource.data.email ||
+                      exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+                      get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid);
+      allow create: if true; // Anyone can register for events (we'll validate email)
+      allow update, delete: if isAuthenticated() && 
+                               exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+                               get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Users - users can read/write their own profile, admins can read all
+    match /users/{userId} {
+      allow read, write: if isAuthenticated() && isUser(userId);
+      allow read: if isAuthenticated() && 
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Email templates - only org owners can manage
+    match /emailTemplates/{templateId} {
+      allow read, write: if isAuthenticated() && 
+                            exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
+                            get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid;
+    }
+  }
+}
