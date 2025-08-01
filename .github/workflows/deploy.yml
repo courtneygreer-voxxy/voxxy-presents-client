@@ -31,14 +31,14 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          NEXT_PUBLIC_SITE_URL: https://www.voxxypresents.com
-          NEXT_PUBLIC_SITE_NAME: "Voxxy Presents"
-          NEXT_PUBLIC_SITE_DESCRIPTION: "Welcome to Voxxy Presents"
+          VITE_SITE_URL: https://www.voxxypresents.com
+          VITE_SITE_NAME: "Voxxy Presents"
+          VITE_SITE_DESCRIPTION: "Welcome to Voxxy Presents"
 
       - name: Test build output
         run: |
-          if [ ! -d ".next" ]; then
-            echo "Build failed - .next directory not found"
+          if [ ! -d "dist" ]; then
+            echo "Build failed - dist directory not found"
             exit 1
           fi
           echo "Production build successful"
