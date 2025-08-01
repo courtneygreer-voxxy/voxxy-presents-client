@@ -1,23 +1,22 @@
 services:
   - type: web
     name: voxxy-presents-client
-    env: node
+    env: static
     plan: starter
-    buildCommand: rm -rf .next && npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
-    startCommand: npm start
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NEXT_PUBLIC_SITE_URL
+      - key: VITE_SITE_URL
         value: https://www.voxxypresents.com
-      - key: NEXT_PUBLIC_SITE_NAME
+      - key: VITE_SITE_NAME
         value: "Voxxy Presents"
-      - key: NEXT_PUBLIC_SITE_DESCRIPTION
+      - key: VITE_SITE_DESCRIPTION
         value: "Welcome to Voxxy Presents"
     domains:
       - www.voxxypresents.com
       - voxxypresents.com
-    healthCheckPath: /
     autoDeploy: true
     branch: main
     rootDir: .
@@ -25,18 +24,18 @@ services:
   # Staging environment
   - type: web
     name: voxxy-presents-client-staging
-    env: node
+    env: static
     plan: starter
-    buildCommand: npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
-    startCommand: npm start
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_ENV
-        value: staging
-      - key: NEXT_PUBLIC_SITE_URL
+        value: production
+      - key: VITE_SITE_URL
         value: https://staging-voxxy-presents.onrender.com
-      - key: NEXT_PUBLIC_SITE_NAME
+      - key: VITE_SITE_NAME
         value: "Voxxy Presents (Staging)"
-      - key: NEXT_PUBLIC_SITE_DESCRIPTION
+      - key: VITE_SITE_DESCRIPTION
         value: "Voxxy Presents Staging Environment"
     autoDeploy: true
     branch: staging
@@ -45,18 +44,18 @@ services:
   # Development environment
   - type: web
     name: voxxy-presents-client-dev
-    env: node
+    env: static
     plan: starter
-    buildCommand: rm -rf .next && npm ci && NODE_OPTIONS="--max-old-space-size=1024" npm run build
-    startCommand: npm start
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NEXT_PUBLIC_SITE_URL
+      - key: VITE_SITE_URL
         value: https://dev-voxxy-presents.onrender.com
-      - key: NEXT_PUBLIC_SITE_NAME
+      - key: VITE_SITE_NAME
         value: "Voxxy Presents (Dev)"
-      - key: NEXT_PUBLIC_SITE_DESCRIPTION
+      - key: VITE_SITE_DESCRIPTION
         value: "Voxxy Presents Development Environment"
     autoDeploy: true
     branch: develop
