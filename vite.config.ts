@@ -10,4 +10,15 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  preview: {
+    host: '0.0.0.0',
+    port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
+    allowedHosts: [
+      'www.voxxypresents.com',
+      'voxxypresents.com',
+      'staging-voxxy-presents.onrender.com',
+      'dev-voxxy-presents.onrender.com',
+      'localhost'
+    ]
+  }
 })
