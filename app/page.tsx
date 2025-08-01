@@ -198,7 +198,7 @@ export default function ArtClubLanding() {
             <p className="text-lg text-gray-700 leading-relaxed">
               An art club for adults that welcomes everyone. We aim to bring back whimsy and joy to the process of
               creating art in a shame-free, judgment-free zone where we can creatively express ourselves. Our events are
-              centered around bringing people together and encouraging the practice of art, regardless of each person's
+              centered around bringing people together and encouraging the practice of art, regardless of each person&apos;s
               skill level.
             </p>
           </div>
@@ -352,7 +352,7 @@ export default function ArtClubLanding() {
                   required
                 />
                 <p className="text-xs text-gray-500">
-                  We'll send your request to Brooklyn Hearts Club, and they'll contact you directly about presale
+                  We&apos;ll send your request to Brooklyn Hearts Club, and they&apos;ll contact you directly about presale
                   availability.
                 </p>
               </div>
@@ -360,9 +360,9 @@ export default function ArtClubLanding() {
               <div className="bg-gray-50 p-4 rounded-lg text-sm">
                 <p className="font-medium text-gray-900 mb-2">Message to Brooklyn Hearts Club:</p>
                 <p className="text-gray-700">
-                  "Hi! I'm interested in presale tickets for <strong>{selectedEvent?.title}</strong> on{" "}
+                  &ldquo;Hi! I&apos;m interested in presale tickets for <strong>{selectedEvent?.title}</strong> on{" "}
                   {selectedEvent?.date}. Please let me know when presale tickets become available and how to purchase
-                  them. Thanks!"
+                  them. Thanks!&rdquo;
                 </p>
               </div>
 
