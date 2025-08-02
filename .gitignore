@@ -22,6 +22,11 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
+# Environment-specific configs (these contain real API keys)
+.env.development
+.env.staging
+.env.production
+
 # vercel
 .vercel
 
