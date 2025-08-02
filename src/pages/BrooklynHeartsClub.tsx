@@ -4,9 +4,6 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Calendar,
   MapPin,
@@ -17,146 +14,50 @@ import {
   Instagram,
   ExternalLink,
   DollarSign,
+  Loader,
 } from "lucide-react"
 
-export default function BrooklynHeartsClub() {
-  const [expandedEvents, setExpandedEvents] = useState<number[]>([])
-  const [presaleDialogOpen, setPresaleDialogOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<any>(null)
-  const [userEmail, setUserEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitSuccess, setSubmitSuccess] = useState(false)
+import { useBrooklynHeartsClub } from "@/hooks/useBrooklynHeartsClub"
+import EventRegistration from "@/components/EventRegistration"
 
-  const toggleEventDetails = (eventId: number) => {
+export default function BrooklynHeartsClub() {
+  const { organization, events, loading, error } = useBrooklynHeartsClub()
+  const [expandedEvents, setExpandedEvents] = useState<string[]>([])
+
+  const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
   }
 
-  const handlePresaleClick = (event: any) => {
-    setSelectedEvent(event)
-    setPresaleDialogOpen(true)
-    setUserEmail("")
-    setSubmitSuccess(false)
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
+          <p className="text-gray-600">Loading Brooklyn Hearts Club...</p>
+        </div>
+      </div>
+    )
   }
 
-  const handlePresaleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-
-    // Simulate email sending (in real implementation, this would call your email service)
-    try {
-      // Here you would integrate with your email service (e.g., EmailJS, Resend, etc.)
-      // For now, we'll simulate the process
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      setSubmitSuccess(true)
-      setTimeout(() => {
-        setPresaleDialogOpen(false)
-        setSubmitSuccess(false)
-      }, 2000)
-    } catch (error) {
-      console.error("Error sending presale request:", error)
-    } finally {
-      setIsSubmitting(false)
-    }
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Error loading data: {error}</p>
+          <Button onClick={() => window.location.reload()}>Try Again</Button>
+        </div>
+      </div>
+    )
   }
 
-  const events = [
-    {
-      id: 1,
-      title: "Sunday Stitch & B!tch",
-      date: "August 3rd",
-      time: "2:00 PM - 4:00 PM",
-      location: "Crystal Lake",
-      address: "647 Grand Street, Brooklyn, NY 11211",
-      description: "A casual meet up with no strings attached - apart from those you stitch ;)",
-      fullDescription:
-        "Bring your own supplies: yarn, needles, embroidery supplies, etc. Chat up fellow enthusiasts while you work on your latest project. Limited supplies available on loan. Bring patterns & supplies to share.",
-      category: "Workshop",
-      price: "Free",
-      series: null,
-      seriesDescription: null,
-      eventbriteAvailable: false,
-      isRecurring: false,
-    },
-    {
-      id: 2,
-      title: "Summer in New York Nude Session",
-      date: "August 13th",
-      time: "7:00 PM - 9:30 PM",
-      location: "Madeline's",
-      address: "113 Franklin St. Brooklyn New York 11222",
-      description: "21+ drawing event figure drawing session to celebrate the summer",
-      fullDescription:
-        "Life model sessions with themes celebrating the summer season. Bring your drawing supplies and join us for an evening of artistic expression.",
-      category: "Figure Drawing",
-      price: "Day of: $20 cash, $25 Venmo | Advance: 2 tickets for $35",
-      series: "Figure Drawing with a Twist Series",
-      seriesDescription: "Life model sessions with themes",
-      eventbriteAvailable: true,
-      isRecurring: false,
-    },
-    {
-      id: 3,
-      title: "Shibari",
-      date: "August 19th",
-      time: "7:00 PM - 9:30 PM",
-      location: "Crystal Lake",
-      address: "647 Grand Street, Brooklyn, NY 11211",
-      description: "21+ drawing event celebrating the art that is shibari and the rope artists",
-      fullDescription:
-        "An artistic exploration of shibari rope art through figure drawing. This session celebrates the beauty and artistry of rope work in a respectful, educational environment.",
-      category: "Figure Drawing",
-      price: "Day of: $20 cash, $25 Venmo | Advance: 2 tickets for $35",
-      series: "Figure Drawing with a Twist Series",
-      seriesDescription: "Life model sessions with themes",
-      eventbriteAvailable: true,
-      isRecurring: false,
-    },
-    {
-      id: 4,
-      title: "Rainbow Discoball Mirror Workshop",
-      date: "August 19th",
-      time: "7:00 PM - 9:30 PM",
-      location: "Crystal Lake",
-      address: "647 Grand Street, Brooklyn, NY 11211",
-      description:
-        "Limited spots available! Join us as we paint discoballs and create stunning rainbow colored mirrors.",
-      fullDescription:
-        "All supplies provided to create a 10 inch mirror with a fun disco ball border. This hands-on workshop will guide you through the process of creating your own unique decorative mirror.",
-      category: "Workshop",
-      price: "Advance tickets only: $35 each",
-      series: "Hobby Series",
-      seriesDescription: "Come and try a new hobby with other curious minds around the neighborhood",
-      eventbriteAvailable: true,
-      isRecurring: false,
-    },
-    {
-      id: 5,
-      title: "Free Art Social",
-      date: "Every Friday",
-      time: "6:00 PM - 7:30 PM",
-      location: "Crystal Lake",
-      address: "647 Grand Street, Brooklyn, NY 11211",
-      description: "Weekly social art sessions with rotating themes",
-      fullDescription: "Join us every Friday for themed art activities and social connection.",
-      category: "Social",
-      price: "Free",
-      series: "Free Art Social Series",
-      seriesDescription: "Weekly themed art socials",
-      eventbriteAvailable: false,
-      isRecurring: true,
-      recurringDates: [
-        { date: "8/8", theme: "Flower Power", description: "bring a set of flowers and swap stems together" },
-        { date: "8/15", theme: "Speed Portraits", description: "draw and be drawn by others" },
-        { date: "8/22", theme: "Flower Power", description: "bring a set of flowers and swap stems together" },
-        {
-          date: "8/29",
-          theme: "Collage Social",
-          description: "bring momentos for the month to create a monthly collage",
-        },
-      ],
-    },
-  ]
+  if (!organization) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <p className="text-gray-600">Organization not found</p>
+      </div>
+    )
+  }
+
 
   return (
     <div className="min-h-screen bg-white">
@@ -178,8 +79,8 @@ export default function BrooklynHeartsClub() {
               className="rounded-full border-4 border-white"
             />
             <div>
-              <h2 className="text-4xl font-bold">Brooklyn Hearts Club</h2>
-              <p className="text-lg text-gray-200">Art Club • Creative Community</p>
+              <h2 className="text-4xl font-bold">{organization.name}</h2>
+              <p className="text-lg text-gray-200">{organization.description}</p>
             </div>
           </div>
         </div>
@@ -189,12 +90,9 @@ export default function BrooklynHeartsClub() {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to Brooklyn Hearts Club</h3>
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to {organization.name}</h3>
             <p className="text-lg text-gray-700 leading-relaxed">
-              An art club for adults that welcomes everyone. We aim to bring back whimsy and joy to the process of
-              creating art in a shame-free, judgment-free zone where we can creatively express ourselves. Our events are
-              centered around bringing people together and encouraging the practice of art, regardless of each person's
-              skill level.
+              {organization.bio}
             </p>
           </div>
         </div>
@@ -204,8 +102,13 @@ export default function BrooklynHeartsClub() {
       <section id="events" className="py-16 bg-gray-50">
         <div className="container mx-auto px-4 max-w-4xl">
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">Upcoming Events</h3>
-          <div className="space-y-6">
-            {events.map((event) => (
+          {events.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600">No upcoming events at the moment. Check back soon!</p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {events.map((event) => (
               <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
                   <div className="flex flex-col">
@@ -227,7 +130,7 @@ export default function BrooklynHeartsClub() {
 
                         {event.series && (
                           <div className="mb-2">
-                            <span className="text-sm font-medium text-purple-600">Part of: {event.series}</span>
+                            <span className="text-sm font-medium text-purple-600">Part of: {event.series.name}</span>
                           </div>
                         )}
 
@@ -235,27 +138,18 @@ export default function BrooklynHeartsClub() {
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600 mb-3">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2" />
-                            {event.date} • {event.time}
+                            {new Date(event.date).toLocaleDateString()} • {event.time}
                           </div>
                           <div className="flex items-center">
                             <MapPin className="h-4 w-4 mr-2" />
                             {event.location}
                           </div>
                         </div>
-                        <div className="text-sm font-medium text-gray-900">Price: {event.price}</div>
+                        <div className="text-sm font-medium text-gray-900">Price: {event.price.description}</div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        {event.eventbriteAvailable ? (
-                          <Button className="bg-purple-600 hover:bg-purple-700">Event Link</Button>
-                        ) : (
-                          <Button
-                            className="bg-purple-600 hover:bg-purple-700"
-                            onClick={() => handlePresaleClick(event)}
-                          >
-                            Presale
-                          </Button>
-                        )}
+                        <EventRegistration event={event} />
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}
@@ -274,10 +168,10 @@ export default function BrooklynHeartsClub() {
                     {/* Expanded Details */}
                     {expandedEvents.includes(event.id) && (
                       <div className="border-t pt-4 mt-4 space-y-4">
-                        {event.series && event.seriesDescription && (
+                        {event.series && (
                           <div>
-                            <h5 className="font-semibold text-gray-900 mb-2">About {event.series}</h5>
-                            <p className="text-gray-600 text-sm">{event.seriesDescription}</p>
+                            <h5 className="font-semibold text-gray-900 mb-2">About {event.series.name}</h5>
+                            <p className="text-gray-600 text-sm">{event.series.description}</p>
                           </div>
                         )}
 
@@ -312,87 +206,17 @@ export default function BrooklynHeartsClub() {
                   </div>
                 </CardContent>
               </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* Presale Dialog */}
-      <Dialog open={presaleDialogOpen} onOpenChange={setPresaleDialogOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Mail className="h-5 w-5 text-purple-600" />
-              Request Presale Information
-            </DialogTitle>
-            <DialogDescription>
-              {selectedEvent && (
-                <>
-                  Get notified about presale tickets for <strong>{selectedEvent.title}</strong> on {selectedEvent.date}.
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-
-          {!submitSuccess ? (
-            <form onSubmit={handlePresaleSubmit} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Your Email Address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your.email@example.com"
-                  value={userEmail}
-                  onChange={(e) => setUserEmail(e.target.value)}
-                  required
-                />
-                <p className="text-xs text-gray-500">
-                  We'll send your request to Brooklyn Hearts Club, and they'll contact you directly about presale
-                  availability.
-                </p>
-              </div>
-
-              <div className="bg-gray-50 p-4 rounded-lg text-sm">
-                <p className="font-medium text-gray-900 mb-2">Message to Brooklyn Hearts Club:</p>
-                <p className="text-gray-700">
-                  "Hi! I'm interested in presale tickets for <strong>{selectedEvent?.title}</strong> on{" "}
-                  {selectedEvent?.date}. Please let me know when presale tickets become available and how to purchase
-                  them. Thanks!"
-                </p>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={() => setPresaleDialogOpen(false)} className="flex-1">
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !userEmail}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
-                >
-                  {isSubmitting ? "Sending..." : "Send Request"}
-                </Button>
-              </div>
-            </form>
-          ) : (
-            <div className="text-center py-6">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Request Sent!</h3>
-              <p className="text-gray-600">
-                Brooklyn Hearts Club will contact you directly at <strong>{userEmail}</strong> about presale
-                availability.
-              </p>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
 
       {/* About Section */}
       <section id="about" className="py-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">About Brooklyn Hearts Club</h3>
+          <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">About {organization.name}</h3>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <img

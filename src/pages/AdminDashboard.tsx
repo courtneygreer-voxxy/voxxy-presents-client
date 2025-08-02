@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { debugEnvVars } from '@/lib/firebase-debug'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -22,6 +23,11 @@ export default function AdminDashboard() {
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
   const [testResults, setTestResults] = useState<string[]>([])
+
+  // Debug environment variables on component mount
+  useEffect(() => {
+    debugEnvVars()
+  }, [])
 
   // Test organization creation
   const testCreateOrganization = async () => {
