@@ -12,19 +12,25 @@ import {
   BarChart3,
   Eye,
   Loader,
-  ExternalLink
+  ExternalLink,
+  Edit,
+  Plus
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
+import EventCreateForm from "@/components/EventCreateForm"
+import EventEditForm from "@/components/EventEditForm"
 import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
-import type { Organization } from '@/types/database'
+import type { Organization, Event } from '@/types/database'
 
 export default function OrganizationAdmin() {
   const { orgSlug } = useParams<{ orgSlug: string }>()
   const navigate = useNavigate()
-  const { organization, events, loading, error, updateOrganization } = useOrganization(orgSlug || '')
+  const { organization, events, loading, error, updateOrganization, refreshEvents } = useOrganization(orgSlug || '')
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
+  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
 
   const currentEnv = getCurrentEnvironment()
   const adminEnabled = isFeatureEnabled('adminControls')
@@ -45,6 +51,26 @@ export default function OrganizationAdmin() {
     } finally {
       setIsSaving(false)
     }
+  }
+
+  const handleEventCreated = (event: any) => {
+    setSaveMessage('✅ Event created successfully!')
+    setTimeout(() => setSaveMessage(null), 4000)
+    refreshEvents()
+  }
+
+  const handleEventUpdated = (event: any) => {
+    setSaveMessage('✅ Event updated successfully!')
+    setTimeout(() => setSaveMessage(null), 4000)
+    refreshEvents()
+    setEditingEvent(null)
+  }
+
+  const handleEventDeleted = (eventId: string) => {
+    setSaveMessage('✅ Event deleted successfully!')
+    setTimeout(() => setSaveMessage(null), 4000)
+    refreshEvents()
+    setEditingEvent(null)
   }
 
   if (!adminEnabled) {
@@ -185,8 +211,11 @@ export default function OrganizationAdmin() {
                   <h2 className="text-2xl font-bold text-gray-900">Events</h2>
                   <p className="text-gray-600">Manage your organization's events</p>
                 </div>
-                <Button className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
+                <Button 
+                  className="flex items-center gap-2"
+                  onClick={() => setIsCreateEventOpen(true)}
+                >
+                  <Plus className="h-4 w-4" />
                   Create Event
                 </Button>
               </div>
@@ -199,7 +228,9 @@ export default function OrganizationAdmin() {
                     <p className="text-gray-600 text-center mb-6">
                       Create your first event to start building your community.
                     </p>
-                    <Button>Create Your First Event</Button>
+                    <Button onClick={() => setIsCreateEventOpen(true)}>
+                      Create Your First Event
+                    </Button>
                   </CardContent>
                 </Card>
               ) : (
@@ -228,10 +259,19 @@ export default function OrganizationAdmin() {
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => setEditingEvent(event)}
+                            >
+                              <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </Button>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => window.open(`/${orgSlug}#events`, '_blank')}
+                            >
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </div>
@@ -287,6 +327,28 @@ export default function OrganizationAdmin() {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Event Management Modals */}
+      {organization && (
+        <>
+          <EventCreateForm
+            organization={organization}
+            isOpen={isCreateEventOpen}
+            onClose={() => setIsCreateEventOpen(false)}
+            onSuccess={handleEventCreated}
+          />
+          
+          {editingEvent && (
+            <EventEditForm
+              event={editingEvent}
+              isOpen={!!editingEvent}
+              onClose={() => setEditingEvent(null)}
+              onSuccess={handleEventUpdated}
+              onDelete={handleEventDeleted}
+            />
+          )}
+        </>
+      )}
     </div>
   )
 }
