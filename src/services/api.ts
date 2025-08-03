@@ -56,6 +56,13 @@ export const organizationsApi = {
       body: JSON.stringify(data),
     })
   },
+
+  async update(id: string, data: any) {
+    return fetchApi<any>(`/organizations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
 }
 
 // Events API
