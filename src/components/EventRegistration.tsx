@@ -118,7 +118,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
             className="bg-purple-600 hover:bg-purple-700"
             onClick={() => handleButtonClick('presale')}
           >
-            Request Presale Info
+            Presale
             <Mail className="ml-2 h-4 w-4" />
           </Button>
         )}
