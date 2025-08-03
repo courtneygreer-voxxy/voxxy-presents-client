@@ -61,6 +61,29 @@ export const getOrganizationBySlug = async (slug: string): Promise<Organization 
   return null
 }
 
+export const updateOrganization = async (id: string, updates: Partial<Organization>) => {
+  const docRef = doc(db, 'organizations', id)
+  const updateData = {
+    ...updates,
+    updatedAt: Timestamp.now()
+  }
+  
+  await updateDoc(docRef, updateData)
+  
+  // Return the updated organization
+  const updatedDoc = await getDoc(docRef)
+  if (updatedDoc.exists()) {
+    const data = updatedDoc.data()
+    return {
+      id: updatedDoc.id,
+      ...data,
+      createdAt: data.createdAt.toDate(),
+      updatedAt: data.updatedAt.toDate()
+    } as Organization
+  }
+  throw new Error('Failed to retrieve updated organization')
+}
+
 // Events
 export const createEvent = async (data: CreateEventData) => {
   const docRef = await addDoc(eventsRef, {

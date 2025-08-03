@@ -3,11 +3,7 @@ import { debugEnvVars } from '@/lib/firebase-debug'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Database, Users, Calendar, Settings } from "lucide-react"
+import { Database, Users, Calendar, Settings } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { 
   createOrganization, 
@@ -19,7 +15,6 @@ import type { Organization, Event } from '@/types/database'
 
 export default function AdminDashboard() {
   const { user } = useAuth()
-  const [organizations, setOrganizations] = useState<Organization[]>([])
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(false)
   const [testResults, setTestResults] = useState<string[]>([])
@@ -28,6 +23,27 @@ export default function AdminDashboard() {
   useEffect(() => {
     debugEnvVars()
   }, [])
+
+  // Test Voxxy Presents NYC organization
+  const testVoxxyPresentsNYC = async () => {
+    setLoading(true)
+    try {
+      const org = await getOrganizationBySlug("voxxy-presents-nyc")
+      if (org) {
+        setTestResults(prev => [...prev, `✅ Voxxy Presents NYC found: ${org.name}`])
+        
+        // Get events for this organization
+        const eventsList = await getEventsByOrganization(org.id)
+        setEvents(eventsList)
+        setTestResults(prev => [...prev, `✅ Found ${eventsList.length} events for Voxxy Presents NYC`])
+      } else {
+        setTestResults(prev => [...prev, `❌ Voxxy Presents NYC not found - run seed script first`])
+      }
+    } catch (error) {
+      setTestResults(prev => [...prev, `❌ Error testing Voxxy Presents NYC: ${error}`])
+    }
+    setLoading(false)
+  }
 
   // Test organization creation
   const testCreateOrganization = async () => {
@@ -184,6 +200,14 @@ export default function AdminDashboard() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
+                <Button 
+                  onClick={testVoxxyPresentsNYC} 
+                  disabled={loading}
+                  variant="outline"
+                  size="sm"
+                >
+                  Test Voxxy NYC
+                </Button>
                 <Button 
                   onClick={testCreateOrganization} 
                   disabled={loading}
