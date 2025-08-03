@@ -184,7 +184,7 @@ export default function OrganizationPage({
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">Upcoming Events</h3>
           {(() => {
             console.log('All events:', events.map(e => ({ id: e.id, title: e.title, status: e.status })))
-            const publishedEvents = events.filter(event => event.status === 'published' || !event.status)
+            const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
             console.log('Published events:', publishedEvents.map(e => ({ id: e.id, title: e.title, status: e.status })))
             return publishedEvents
           })().length === 0 ? (
@@ -193,7 +193,7 @@ export default function OrganizationPage({
             </div>
           ) : (
             <div className="space-y-6">
-              {events.filter(event => event.status === 'published' || !event.status).map((event) => (
+              {events.filter(event => (event.status || 'published') === 'published').map((event) => (
               <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
                   <div className="flex flex-col">
