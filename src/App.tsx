@@ -12,7 +12,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/brooklynheartsclub" element={<BrooklynHeartsClub />} />
+          <Route path="/brooklyn-hearts-club" element={<BrooklynHeartsClub />} />
           <Route path="/voxxy-presents-nyc" element={<VoxxyPresentsNYC />} />
           <Route path="/:orgSlug/admin" element={<OrganizationAdmin />} />
           <Route path="/admin" element={<AdminDashboard />} />

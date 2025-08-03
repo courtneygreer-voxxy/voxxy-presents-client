@@ -35,7 +35,7 @@ export default function HomePage() {
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
-              <Link to="/brooklynheartsclub">
+              <Link to="/brooklyn-hearts-club">
                 View Live Example
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
@@ -120,7 +120,7 @@ export default function HomePage() {
                   </p>
                   <div className="flex flex-col sm:flex-row gap-3">
                     <Button className="bg-purple-600 hover:bg-purple-700" asChild>
-                      <Link to="/brooklynheartsclub">
+                      <Link to="/brooklyn-hearts-club">
                         Visit Brooklyn Hearts Club
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Link>

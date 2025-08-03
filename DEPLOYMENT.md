@@ -251,7 +251,7 @@ npm run sync:staging
 ### Organization Management
 Each organization has a dedicated admin dashboard at `/{org-slug}/admin`:
 
-**Brooklyn Hearts Club**: `/brooklynheartsclub/admin`
+**Brooklyn Hearts Club**: `/brooklyn-hearts-club/admin`
 **Voxxy Presents NYC**: `/voxxy-presents-nyc/admin`
 
 ### Admin Capabilities by Environment
