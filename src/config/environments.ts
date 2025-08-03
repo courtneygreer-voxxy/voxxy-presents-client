@@ -24,21 +24,26 @@ interface EnvironmentConfig {
   }
 }
 
+// Get Firebase config from environment variables
+function getFirebaseConfigFromEnv() {
+  return {
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+    appId: import.meta.env.VITE_FIREBASE_APP_ID,
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
+  }
+}
+
 // Environment configurations
 const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
     dataSource: 'firebase', // Direct Firebase for fast iteration
-    firebaseConfig: {
-      apiKey: "AIzaSyDZ1_PgIRsVjHc7N2unw_AgTfvdP3yuCp4",
-      authDomain: "voxxy-presents-dev.firebaseapp.com",
-      databaseURL: "https://voxxy-presents-dev-default-rtdb.firebaseio.com",
-      projectId: "voxxy-presents-dev",
-      storageBucket: "voxxy-presents-dev.firebasestorage.app",
-      messagingSenderId: "21877606291",
-      appId: "1:21877606291:web:4a3cf58073acd5e2d84a66",
-      measurementId: "G-FTKDVEVRNK"
-    },
+    firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
       debugMode: true,
@@ -50,17 +55,8 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   staging: {
     name: 'staging',
     dataSource: 'api', // API with production data mirror
-    apiBaseUrl: 'https://voxxy-presents-api-staging.run.app/api', // TODO: Set up staging API
-    firebaseConfig: {
-      apiKey: "AIzaSyDZ1_PgIRsVjHc7N2unw_AgTfvdP3yuCp4", // Same as dev for fallback
-      authDomain: "voxxy-presents-staging.firebaseapp.com",
-      databaseURL: "https://voxxy-presents-staging-default-rtdb.firebaseio.com",
-      projectId: "voxxy-presents-staging",
-      storageBucket: "voxxy-presents-staging.firebasestorage.app",
-      messagingSenderId: "21877606291",
-      appId: "1:21877606291:web:4a3cf58073acd5e2d84a66",
-      measurementId: "G-FTKDVEVRNK"
-    },
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-staging.run.app/api',
+    firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
       debugMode: true,
@@ -72,17 +68,8 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   production: {
     name: 'production',
     dataSource: 'api', // Production API
-    apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
-    firebaseConfig: {
-      apiKey: "AIzaSyCllC4e-OZWJLdu97cgmEyuxpq75_ln5Ms",
-      authDomain: "voxxy-presents.firebaseapp.com",
-      databaseURL: "https://voxxy-presents-default-rtdb.firebaseio.com",
-      projectId: "voxxy-presents",
-      storageBucket: "voxxy-presents.firebasestorage.app",
-      messagingSenderId: "267601188129",
-      appId: "1:267601188129:web:ce80873298d39444ac1a60",
-      measurementId: "G-Q74Z0C9R28"
-    },
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
+    firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true, // Controlled admin access
       debugMode: false,
@@ -94,16 +81,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   sandbox: {
     name: 'sandbox',
     dataSource: 'firebase', // Direct Firebase for experimentation
-    firebaseConfig: {
-      apiKey: "AIzaSyDZ1_PgIRsVjHc7N2unw_AgTfvdP3yuCp4", // TODO: Create sandbox Firebase project
-      authDomain: "voxxy-presents-sandbox.firebaseapp.com",
-      databaseURL: "https://voxxy-presents-sandbox-default-rtdb.firebaseio.com",
-      projectId: "voxxy-presents-sandbox",
-      storageBucket: "voxxy-presents-sandbox.firebasestorage.app",
-      messagingSenderId: "21877606291",
-      appId: "1:21877606291:web:4a3cf58073acd5e2d84a66",
-      measurementId: "G-FTKDVEVRNK"
-    },
+    firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
       debugMode: true,
