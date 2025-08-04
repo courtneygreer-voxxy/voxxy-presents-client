@@ -20,7 +20,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import EventCreateForm from "@/components/EventCreateForm"
 import EventEditForm from "@/components/EventEditForm"
-import EventRegistrationSection from "@/components/EventRegistrationSection"
+import EventRegistrationModal from "@/components/EventRegistrationModal"
 import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -32,7 +32,7 @@ export default function OrganizationAdmin() {
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
-  const [expandedRegistrations, setExpandedRegistrations] = useState<Set<string>>(new Set())
+  const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
 
   const currentEnv = getCurrentEnvironment()
   const adminEnabled = isFeatureEnabled('adminControls')
@@ -75,16 +75,8 @@ export default function OrganizationAdmin() {
     setEditingEvent(null)
   }
 
-  const toggleRegistrationExpansion = (eventId: string) => {
-    setExpandedRegistrations(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(eventId)) {
-        newSet.delete(eventId)
-      } else {
-        newSet.add(eventId)
-      }
-      return newSet
-    })
+  const openRegistrationModal = (event: Event) => {
+    setRegistrationModalEvent(event)
   }
 
   if (!adminEnabled) {
@@ -292,11 +284,14 @@ export default function OrganizationAdmin() {
                                 <Edit className="h-4 w-4 mr-2" />
                                 Edit
                               </Button>
-                              <EventRegistrationSection 
-                                event={event} 
-                                isExpanded={expandedRegistrations.has(event.id)}
-                                onToggle={() => toggleRegistrationExpansion(event.id)}
-                              />
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => openRegistrationModal(event)}
+                              >
+                                <Users className="h-4 w-4 mr-2" />
+                                Manage
+                              </Button>
                             </div>
                           </div>
                         </div>
@@ -349,6 +344,14 @@ export default function OrganizationAdmin() {
               onClose={() => setEditingEvent(null)}
               onSuccess={handleEventUpdated}
               onDelete={handleEventDeleted}
+            />
+          )}
+
+          {registrationModalEvent && (
+            <EventRegistrationModal
+              event={registrationModalEvent}
+              isOpen={!!registrationModalEvent}
+              onClose={() => setRegistrationModalEvent(null)}
             />
           )}
         </>
