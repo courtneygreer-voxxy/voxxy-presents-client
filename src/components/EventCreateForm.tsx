@@ -40,7 +40,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
     title: '',
     description: '',
     fullDescription: '',
-    category: 'Workshop',
     time: '',
     duration: '',
     location: organization.settings.defaultLocation || '',
@@ -126,7 +125,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
         title: '',
         description: '',
         fullDescription: '',
-        category: 'Workshop',
         time: '',
         duration: '',
         location: organization.settings.defaultLocation || '',
@@ -187,24 +185,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
               />
             </div>
 
-            <div>
-              <Label htmlFor="category">Category *</Label>
-              <Select
-                value={formData.category}
-                onValueChange={(value) => handleInputChange('category', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Workshop">Workshop</SelectItem>
-                  <SelectItem value="Figure Drawing">Figure Drawing</SelectItem>
-                  <SelectItem value="Social">Social</SelectItem>
-                  <SelectItem value="Exhibition">Exhibition</SelectItem>
-                  <SelectItem value="Other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
 
             <div>
               <Label htmlFor="status">Status</Label>
