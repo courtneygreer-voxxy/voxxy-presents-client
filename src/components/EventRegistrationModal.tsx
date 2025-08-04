@@ -32,7 +32,8 @@ interface Registration {
   phone?: string
   registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
   notes?: string
-  createdAt: string
+  createdAt?: string
+  registeredAt?: string
 }
 
 interface RegistrationStats {
@@ -106,13 +107,15 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         console.log('Object values:', JSON.stringify(values, null, 2))
         console.log('Values length:', values.length)
         
-        // Handle nested array structure where real data is in first element
-        if (values.length > 0 && Array.isArray(values[0]) && values[0].length > 0) {
-          console.log('Found nested array structure, using first element')
-          registrationData = values[0] as Registration[]
-        } else {
-          registrationData = values as Registration[]
-        }
+        // Flatten all registration arrays into one list
+        const flattenedRegistrations: Registration[] = []
+        values.forEach((value) => {
+          if (Array.isArray(value)) {
+            flattenedRegistrations.push(...value)
+          }
+        })
+        console.log('Flattened registrations:', flattenedRegistrations.length)
+        registrationData = flattenedRegistrations
       } else {
         console.warn('No registrations found or unexpected format')
         console.log('Response structure check:')
@@ -211,7 +214,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         r.phone || '',
         getRegistrationTypeLabel(r.registrationType),
         r.notes || '',
-        new Date(r.createdAt).toLocaleDateString()
+        new Date(r.registeredAt || r.createdAt || '').toLocaleDateString()
       ])
     ]
     
@@ -452,7 +455,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                                   </div>
                                 </TableCell>
                                 <TableCell className="text-sm text-gray-600">
-                                  {formatDate(registration?.createdAt || '')}
+                                  {formatDate(registration?.registeredAt || registration?.createdAt || '')}
                                 </TableCell>
                                 <TableCell>
                                   {registration?.notes ? (
