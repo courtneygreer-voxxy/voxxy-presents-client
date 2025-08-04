@@ -112,7 +112,7 @@ export function getCurrentEnvironment(): EnvironmentType {
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     console.log('Detected environment: development')
     return 'development'
-  } else if (hostname.includes('staging') || hostname.includes('dev')) {
+  } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging')) {
     console.log('Detected environment: staging')
     return 'staging'
   } else if (hostname.includes('sandbox') || hostname.includes('experimental')) {
