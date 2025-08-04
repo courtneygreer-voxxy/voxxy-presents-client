@@ -98,6 +98,12 @@ export default function EventRegistrationSection({ event, isExpanded, onToggle }
       } else if (response && response.registrations && Array.isArray(response.registrations)) {
         console.log('Response has registrations property that is array')
         registrationData = response.registrations
+      } else if (response && response.registrations && typeof response.registrations === 'object') {
+        console.log('Response has registrations property that is object - converting to array')
+        console.log('Registrations object:', response.registrations)
+        // Convert object values to array
+        registrationData = Object.values(response.registrations)
+        console.log('Converted to array:', registrationData)
       } else if (response === null || response === undefined) {
         console.log('Response is null/undefined - no registrations found')
         registrationData = []
