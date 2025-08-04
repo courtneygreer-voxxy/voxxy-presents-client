@@ -21,6 +21,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   const url = `${API_BASE_URL}${endpoint}`
   
   try {
+    console.log('API Request:', { url, method: options?.method || 'GET', timestamp: new Date().toISOString() })
+    
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -29,18 +31,42 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
       ...options,
     })
 
-    const data = await response.json()
-
     if (!response.ok) {
-      throw new ApiError(data.message || 'API request failed', response.status)
+      let errorData: any = {}
+      try {
+        errorData = await response.json()
+      } catch {
+        errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
+      }
+      
+      console.error('API Error Response:', {
+        url,
+        status: response.status,
+        statusText: response.statusText,
+        errorData,
+        timestamp: new Date().toISOString()
+      })
+      
+      const errorMessage = errorData.message || errorData.error || `API request failed (${response.status})`
+      throw new ApiError(errorMessage, response.status)
     }
 
+    const data = await response.json()
+    console.log('API Success:', { url, dataKeys: Object.keys(data || {}), timestamp: new Date().toISOString() })
     return data
+    
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
     }
-    throw new ApiError('Network error', 0)
+    
+    console.error('Network Error:', {
+      url,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
+    })
+    
+    throw new ApiError(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`, 0)
   }
 }
 

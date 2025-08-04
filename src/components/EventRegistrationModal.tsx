@@ -60,6 +60,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
   const [manualSales, setManualSales] = useState<number>(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [retryCount, setRetryCount] = useState(0)
 
   // Load registration data when modal opens
   useEffect(() => {
@@ -142,10 +143,32 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
       
     } catch (err) {
       console.error('Failed to load registrations:', err)
-      setError(`Failed to load registration data: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      
+      let errorMessage = 'Failed to load registration data'
+      if (err instanceof Error) {
+        errorMessage = err.message
+      }
+      
+      // Add context to error message
+      const contextMessage = `${errorMessage} (Event: ${event.id}, Attempt: ${retryCount + 1})`
+      setError(contextMessage)
+      
+      console.error('Registration Load Error Details:', {
+        eventId: event.id,
+        eventTitle: event.title,
+        error: err,
+        retryCount,
+        timestamp: new Date().toISOString()
+      })
+      
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1)
+    loadRegistrations()
   }
 
   const handleManualSalesChange = (value: string) => {
@@ -261,12 +284,64 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
           )}
           
           {error && (
-            <div className="flex items-center gap-2 text-red-600 bg-red-50 p-4 rounded-lg">
-              <AlertCircle className="h-5 w-5" />
-              {error}
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h3 className="font-medium text-red-800 mb-1">Unable to Load Registration Data</h3>
+                  <p className="text-sm text-red-700 mb-3">{error}</p>
+                  <div className="flex gap-3">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={handleRetry}
+                      disabled={loading}
+                      className="text-red-700 border-red-300 hover:bg-red-100"
+                    >
+                      {loading ? (
+                        <>
+                          <Loader className="h-4 w-4 animate-spin mr-2" />
+                          Retrying...
+                        </>
+                      ) : (
+                        'Retry'
+                      )}
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="ghost" 
+                      onClick={() => setError(null)}
+                      className="text-red-700 hover:bg-red-100"
+                    >
+                      Dismiss
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           
+          {/* Event Info - Always show */}
+          {error && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg flex items-center gap-2">
+                  <Calendar className="h-5 w-5" />
+                  Event Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <p><span className="font-medium">Event:</span> {event.title}</p>
+                  <p><span className="font-medium">Date:</span> {new Date(event.date).toLocaleDateString()}</p>
+                  {event.capacity && (
+                    <p><span className="font-medium">Capacity:</span> {event.capacity}</p>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           {!loading && !error && (
             <>
               {/* Quick Stats */}
