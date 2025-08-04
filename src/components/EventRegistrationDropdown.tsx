@@ -74,15 +74,31 @@ export default function EventRegistrationDropdown({ event }: EventRegistrationDr
     setError(null)
     
     try {
-      const data = await registrationsApi.getByEvent(event.id)
-      setRegistrations(Array.isArray(data) ? data : [])
+      const response = await registrationsApi.getByEvent(event.id)
+      console.log('API Response:', response) // Debug log
+      
+      // Handle different response formats
+      let registrationData: Registration[] = []
+      
+      if (Array.isArray(response)) {
+        registrationData = response
+      } else if (response && Array.isArray(response.data)) {
+        registrationData = response.data
+      } else if (response && response.registrations && Array.isArray(response.registrations)) {
+        registrationData = response.registrations
+      } else {
+        console.warn('Unexpected API response format:', response)
+        registrationData = []
+      }
+      
+      setRegistrations(registrationData)
       
       // Calculate stats
       const newStats = {
-        rsvpYes: data.filter((r: Registration) => r.registrationType === 'rsvp_yes').length,
-        rsvpMaybe: data.filter((r: Registration) => r.registrationType === 'rsvp_maybe').length,
-        presaleRequests: data.filter((r: Registration) => r.registrationType === 'presale_request').length,
-        totalRegistrations: data.length
+        rsvpYes: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_yes').length,
+        rsvpMaybe: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_maybe').length,
+        presaleRequests: registrationData.filter((r: Registration) => r.registrationType === 'presale_request').length,
+        totalRegistrations: registrationData.length
       }
       setStats(newStats)
       
