@@ -105,7 +105,14 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         const values = Object.values(response.registrations)
         console.log('Object values:', JSON.stringify(values, null, 2))
         console.log('Values length:', values.length)
-        registrationData = values as Registration[]
+        
+        // Handle nested array structure where real data is in first element
+        if (values.length > 0 && Array.isArray(values[0]) && values[0].length > 0) {
+          console.log('Found nested array structure, using first element')
+          registrationData = values[0] as Registration[]
+        } else {
+          registrationData = values as Registration[]
+        }
       } else {
         console.warn('No registrations found or unexpected format')
         console.log('Response structure check:')
