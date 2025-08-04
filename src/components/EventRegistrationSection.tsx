@@ -80,23 +80,34 @@ export default function EventRegistrationSection({ event, isExpanded, onToggle }
     setError(null)
     
     try {
+      console.log('Loading registrations for event:', event.id)
       const response = await registrationsApi.getByEvent(event.id)
-      console.log('API Response:', response) // Debug log
+      console.log('Raw API Response:', response)
+      console.log('Response type:', typeof response)
+      console.log('Is array:', Array.isArray(response))
       
       // Handle different response formats
       let registrationData: Registration[] = []
       
       if (Array.isArray(response)) {
+        console.log('Response is direct array')
         registrationData = response
       } else if (response && Array.isArray(response.data)) {
+        console.log('Response has data property that is array')
         registrationData = response.data
       } else if (response && response.registrations && Array.isArray(response.registrations)) {
+        console.log('Response has registrations property that is array')
         registrationData = response.registrations
+      } else if (response === null || response === undefined) {
+        console.log('Response is null/undefined - no registrations found')
+        registrationData = []
       } else {
         console.warn('Unexpected API response format:', response)
+        console.log('Response keys:', Object.keys(response || {}))
         registrationData = []
       }
       
+      console.log('Final registration data:', registrationData)
       setRegistrations(registrationData)
       
       // Calculate stats
@@ -106,11 +117,13 @@ export default function EventRegistrationSection({ event, isExpanded, onToggle }
         presaleRequests: registrationData.filter((r: Registration) => r.registrationType === 'presale_request').length,
         totalRegistrations: registrationData.length
       }
+      console.log('Calculated stats:', newStats)
       setStats(newStats)
       
     } catch (err) {
       console.error('Failed to load registrations:', err)
-      setError('Failed to load registration data')
+      console.error('Error details:', err)
+      setError(`Failed to load registration data: ${err instanceof Error ? err.message : 'Unknown error'}`)
     } finally {
       setLoading(false)
     }

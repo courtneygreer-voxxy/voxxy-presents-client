@@ -13,7 +13,8 @@ import {
   Eye,
   Loader,
   Edit,
-  Plus
+  Plus,
+  MapPin
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
@@ -251,40 +252,52 @@ export default function OrganizationAdmin() {
                   {events.map((event) => (
                     <Card key={event.id}>
                       <CardContent className="p-6">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <h3 className="text-lg font-semibold text-gray-900">{event.title}</h3>
-                              <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
-                                {event.status}
-                              </Badge>
+                        <div className="flex flex-col">
+                          {/* Main Event Info */}
+                          <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
+                            <div className="flex-1 mb-4 md:mb-0">
+                              <div className="flex items-center gap-3 mb-2">
+                                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                                  {event.category}
+                                </Badge>
+                                <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
+                                  {event.status}
+                                </Badge>
+                                <h4 className="text-xl font-semibold text-gray-900">{event.title}</h4>
+                              </div>
+
+                              <p className="text-gray-600 mb-3">{event.description}</p>
+                              <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600 mb-3">
+                                <div className="flex items-center">
+                                  <Calendar className="h-4 w-4 mr-2" />
+                                  {event.date instanceof Date 
+                                    ? event.date.toLocaleDateString() 
+                                    : new Date(event.date).toLocaleDateString()
+                                  } • {event.time}
+                                </div>
+                                <div className="flex items-center">
+                                  <MapPin className="h-4 w-4 mr-2" />
+                                  {event.location}
+                                </div>
+                              </div>
+                              <div className="text-sm font-medium text-gray-900">Price: {event.price.description}</div>
                             </div>
-                            <p className="text-gray-600 mb-3">{event.description}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>
-                                {event.date instanceof Date 
-                                  ? event.date.toLocaleDateString() 
-                                  : new Date(event.date).toLocaleDateString()
-                                } • {event.time}
-                              </span>
-                              <span>{event.location}</span>
-                              <span>{event.price.description}</span>
+
+                            <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => setEditingEvent(event)}
+                              >
+                                <Edit className="h-4 w-4 mr-2" />
+                                Edit
+                              </Button>
+                              <EventRegistrationSection 
+                                event={event} 
+                                isExpanded={expandedRegistrations.has(event.id)}
+                                onToggle={() => toggleRegistrationExpansion(event.id)}
+                              />
                             </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => setEditingEvent(event)}
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit
-                            </Button>
-                            <EventRegistrationSection 
-                              event={event} 
-                              isExpanded={expandedRegistrations.has(event.id)}
-                              onToggle={() => toggleRegistrationExpansion(event.id)}
-                            />
                           </div>
                         </div>
                       </CardContent>
