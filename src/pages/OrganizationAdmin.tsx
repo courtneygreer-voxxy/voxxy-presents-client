@@ -19,7 +19,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import EventCreateForm from "@/components/EventCreateForm"
 import EventEditForm from "@/components/EventEditForm"
-import EventRegistrationDropdown from "@/components/EventRegistrationDropdown"
+import EventRegistrationSection from "@/components/EventRegistrationSection"
 import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -31,6 +31,7 @@ export default function OrganizationAdmin() {
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [expandedRegistrations, setExpandedRegistrations] = useState<Set<string>>(new Set())
 
   const currentEnv = getCurrentEnvironment()
   const adminEnabled = isFeatureEnabled('adminControls')
@@ -71,6 +72,18 @@ export default function OrganizationAdmin() {
     setTimeout(() => setSaveMessage(null), 4000)
     refreshEvents()
     setEditingEvent(null)
+  }
+
+  const toggleRegistrationExpansion = (eventId: string) => {
+    setExpandedRegistrations(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(eventId)) {
+        newSet.delete(eventId)
+      } else {
+        newSet.add(eventId)
+      }
+      return newSet
+    })
   }
 
   if (!adminEnabled) {
@@ -162,21 +175,25 @@ export default function OrganizationAdmin() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="organization" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="organization" className="flex items-center gap-2">
-              <Settings className="h-4 w-4" />
-              Organization
-            </TabsTrigger>
-            <TabsTrigger value="events" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Events
-            </TabsTrigger>
-            <TabsTrigger value="analytics" className="flex items-center gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Analytics
-            </TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="organization" className="flex gap-8" orientation="vertical">
+          <div className="w-64 flex-shrink-0">
+            <TabsList className="flex flex-col h-fit w-full">
+              <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start">
+                <Settings className="h-4 w-4" />
+                Organization
+              </TabsTrigger>
+              <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start">
+                <Calendar className="h-4 w-4" />
+                Events
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2 w-full justify-start">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
+          </div>
+          
+          <div className="flex-1 min-w-0">
 
           {/* Organization Settings Tab */}
           <TabsContent value="organization">
@@ -263,7 +280,11 @@ export default function OrganizationAdmin() {
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </Button>
-                            <EventRegistrationDropdown event={event} />
+                            <EventRegistrationSection 
+                              event={event} 
+                              isExpanded={expandedRegistrations.has(event.id)}
+                              onToggle={() => toggleRegistrationExpansion(event.id)}
+                            />
                           </div>
                         </div>
                       </CardContent>
@@ -294,6 +315,7 @@ export default function OrganizationAdmin() {
               </CardContent>
             </Card>
           </TabsContent>
+          </div>
         </Tabs>
       </div>
 
