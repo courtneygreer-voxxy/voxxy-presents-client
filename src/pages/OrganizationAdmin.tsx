@@ -14,7 +14,8 @@ import {
   Loader,
   Edit,
   Plus,
-  MapPin
+  MapPin,
+  Mail
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
@@ -179,6 +180,10 @@ export default function OrganizationAdmin() {
                 <Calendar className="h-4 w-4" />
                 Events
               </TabsTrigger>
+              <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start">
+                <Mail className="h-4 w-4" />
+                Subscribers
+              </TabsTrigger>
               <TabsTrigger value="analytics" className="flex items-center gap-2 w-full justify-start">
                 <BarChart3 className="h-4 w-4" />
                 Analytics
@@ -301,6 +306,95 @@ export default function OrganizationAdmin() {
                 </div>
               )}
             </div>
+          </TabsContent>
+
+          {/* Subscribers Tab */}
+          <TabsContent value="subscribers">
+            <Card>
+              <CardHeader>
+                <CardTitle>Subscriber Management</CardTitle>
+                <CardDescription>
+                  Manage email subscribers and send newsletters to your audience.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {/* Subscriber Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <Card>
+                      <CardContent className="flex items-center gap-3 p-4">
+                        <Mail className="h-8 w-8 text-blue-600" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Event Updates</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="flex items-center gap-3 p-4">
+                        <Users className="h-8 w-8 text-green-600" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Newsletter</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <Card>
+                      <CardContent className="flex items-center gap-3 p-4">
+                        <BarChart3 className="h-8 w-8 text-purple-600" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
+                          <p className="text-2xl font-bold">0</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Email Blast Section */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Send Email Blast</CardTitle>
+                      <CardDescription>
+                        Send newsletters or updates to your subscribers
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-center justify-center py-12">
+                        <Mail className="h-12 w-12 text-gray-400 mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Management</h3>
+                        <p className="text-gray-600 text-center mb-4">
+                          Email blast functionality will be available soon. Subscribers from event registrations will appear here automatically.
+                        </p>
+                        <Button disabled variant="outline">
+                          Compose Email
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Subscriber List */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-lg">Subscriber List</CardTitle>
+                      <CardDescription>
+                        View and manage your email subscribers
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex flex-col items-center justify-center py-12">
+                        <Users className="h-12 w-12 text-gray-400 mb-4" />
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Subscribers Yet</h3>
+                        <p className="text-gray-600 text-center">
+                          Subscribers will appear here when people opt-in during event registration.
+                        </p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}

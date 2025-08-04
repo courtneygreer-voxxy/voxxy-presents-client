@@ -22,7 +22,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import { isFeatureEnabled } from '@/config/environments'
-import type { Organization, Event } from "@/types/database"
+import type { Organization } from "@/types/database"
 
 interface OrganizationPageProps {
   organizationSlug: string
@@ -186,14 +186,25 @@ export default function OrganizationPage({
             console.log('All events:', events.map(e => ({ id: e.id, title: e.title, status: e.status })))
             const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
             console.log('Published events:', publishedEvents.map(e => ({ id: e.id, title: e.title, status: e.status })))
-            return publishedEvents
-          })().length === 0 ? (
+            
+            // Split events into main events and recurring events
+            const mainEvents = publishedEvents.filter(event => !event.isRecurring)
+            const recurringEvents = publishedEvents.filter(event => event.isRecurring)
+            
+            return { publishedEvents, mainEvents, recurringEvents }
+          })().publishedEvents.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600">No upcoming events at the moment. Check back soon!</p>
             </div>
           ) : (
-            <div className="space-y-6">
-              {events.filter(event => (event.status || 'published') === 'published').map((event) => (
+            <div className="space-y-12">
+              {/* Main Events Section */}
+              {(() => {
+                const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
+                const mainEvents = publishedEvents.filter(event => !event.isRecurring)
+                return mainEvents.length > 0 && (
+                  <div className="space-y-6">
+                      {mainEvents.map((event) => (
               <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
                   <div className="flex flex-col">
@@ -210,7 +221,7 @@ export default function OrganizationPage({
                               Recurring
                             </Badge>
                           )}
-                          <h4 className="text-xl font-semibold text-gray-900">{event.title}</h4>
+                          <h4 className="text-2xl font-bold text-gray-900">{event.title}</h4>
                         </div>
 
                         {event.series && (
@@ -296,7 +307,131 @@ export default function OrganizationPage({
                   </div>
                 </CardContent>
               </Card>
-              ))}
+                      ))}
+                  </div>
+                )
+              })()}
+
+              {/* Recurring Events Section */}
+              {(() => {
+                const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
+                const recurringEvents = publishedEvents.filter(event => event.isRecurring)
+                return recurringEvents.length > 0 && (
+                  <div>
+                    <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                      <Repeat className="h-6 w-6" />
+                      Recurring Events
+                    </h4>
+                    <div className="space-y-6">
+                      {recurringEvents.map((event) => (
+                        <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
+                          <CardContent className="p-6">
+                            <div className="flex flex-col">
+                              {/* Main Event Info */}
+                              <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
+                                <div className="flex-1 mb-4 md:mb-0">
+                                  <div className="flex items-center gap-3 mb-2">
+                                    <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                                      {event.category}
+                                    </Badge>
+                                    <Badge variant="outline" className="flex items-center gap-1">
+                                      <Repeat className="h-3 w-3" />
+                                      Recurring
+                                    </Badge>
+                                    <h4 className="text-2xl font-bold text-gray-900">{event.title}</h4>
+                                  </div>
+
+                                  {event.series && (
+                                    <div className="mb-2">
+                                      <span className="text-sm font-medium text-purple-600">Part of: {event.series.name}</span>
+                                    </div>
+                                  )}
+
+                                  <p className="text-gray-600 mb-3">{event.description}</p>
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600 mb-3">
+                                    <div className="flex items-center">
+                                      <Calendar className="h-4 w-4 mr-2" />
+                                      {event.time}
+                                    </div>
+                                    <div className="flex items-center">
+                                      <MapPin className="h-4 w-4 mr-2" />
+                                      {event.location}
+                                    </div>
+                                  </div>
+                                  <div className="text-sm font-medium text-gray-900">Price: {event.price.description}</div>
+                                </div>
+
+                                <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
+                                  <EventRegistration event={{
+                                    ...event,
+                                    date: event.date instanceof Date ? event.date.toISOString() : event.date,
+                                    createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt,
+                                    updatedAt: event.updatedAt instanceof Date ? event.updatedAt.toISOString() : event.updatedAt
+                                  }} />
+                                  <Button
+                                    variant="outline"
+                                    onClick={() => toggleEventDetails(event.id)}
+                                    className="flex items-center gap-2"
+                                  >
+                                    Details & Schedule
+                                    {expandedEvents.includes(event.id) ? (
+                                      <ChevronUp className="h-4 w-4" />
+                                    ) : (
+                                      <ChevronDown className="h-4 w-4" />
+                                    )}
+                                  </Button>
+                                </div>
+                              </div>
+
+                            {/* Expanded Details */}
+                            {expandedEvents.includes(event.id) && (
+                              <div className="border-t pt-4 mt-4 space-y-4">
+                                {event.series && (
+                                  <div>
+                                    <h5 className="font-semibold text-gray-900 mb-2">About {event.series.name}</h5>
+                                    <p className="text-gray-700">{event.series.description}</p>
+                                  </div>
+                                )}
+
+                                {event.fullDescription && (
+                                  <div>
+                                    <h5 className="font-semibold text-gray-900 mb-2">Description</h5>
+                                    <p className="text-gray-700 leading-relaxed">{event.fullDescription}</p>
+                                  </div>
+                                )}
+
+                                <div>
+                                  <h5 className="font-semibold text-gray-900 mb-2">Location</h5>
+                                  <p className="text-gray-700">{event.address}</p>
+                                </div>
+
+                                {/* Recurring Schedule */}
+                                {event.isRecurring && event.recurringDates && (
+                                  <div>
+                                    <h5 className="font-semibold text-gray-900 mb-3">Upcoming Schedule</h5>
+                                    <div className="space-y-2">
+                                      {event.recurringDates.map((recurringDate, index) => (
+                                        <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
+                                          <span className="font-medium text-purple-600 min-w-[2rem]">{recurringDate.date}</span>
+                                          <div>
+                                            <span className="font-medium text-gray-900">{recurringDate.theme}:</span>
+                                            <span className="text-gray-600 ml-1">{recurringDate.description}</span>
+                                          </div>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      ))}
+                    </div>
+                  </div>
+                )
+              })()}
             </div>
           )}
         </div>

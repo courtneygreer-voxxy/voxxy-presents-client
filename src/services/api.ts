@@ -135,6 +135,8 @@ export const registrationsApi = {
     registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
     phone?: string
     notes?: string
+    subscribeToUpdates?: boolean
+    subscribeToNewsletter?: boolean
   }) {
     return fetchApi<any>('/registrations', {
       method: 'POST',

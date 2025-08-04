@@ -4,8 +4,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, ExternalLink, Calendar, CheckCircle } from "lucide-react"
 import { registrationsApi, ApiError } from '@/services/api'
+import HowDidYouHearPopup from './HowDidYouHearPopup'
 import type { Event } from '@/hooks/useBrooklynHeartsClub'
 
 interface EventRegistrationProps {
@@ -20,11 +22,14 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     email: '',
     phone: '',
     rsvpType: 'rsvp_yes' as 'rsvp_yes' | 'rsvp_maybe',
-    notes: ''
+    notes: '',
+    subscribeToUpdates: false,
+    subscribeToNewsletter: false
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [showHowDidYouHear, setShowHowDidYouHear] = useState(false)
 
   // Determine which button to show based on event properties
   const getButtonType = () => {
@@ -48,7 +53,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
       email: '',
       phone: '',
       rsvpType: 'rsvp_yes',
-      notes: ''
+      notes: '',
+      subscribeToUpdates: false,
+      subscribeToNewsletter: false
     })
   }
 
@@ -72,13 +79,17 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         email: formData.email || undefined,
         phone: formData.phone || undefined,
         registrationType,
-        notes: formData.notes || undefined
+        notes: formData.notes || undefined,
+        subscribeToUpdates: formData.subscribeToUpdates,
+        subscribeToNewsletter: formData.subscribeToNewsletter
       })
 
       setSubmitSuccess(true)
       setTimeout(() => {
         setDialogOpen(false)
         setSubmitSuccess(false)
+        // Show "How did you hear about us?" popup after successful registration
+        setShowHowDidYouHear(true)
       }, 2000)
 
     } catch (error) {
@@ -223,6 +234,43 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 />
               </div>
 
+              {/* Email Subscription Options */}
+              {formData.email && (
+                <div className="space-y-3 border-t pt-4">
+                  <Label className="text-sm font-medium">Email Alerts (optional)</Label>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="subscribe-updates"
+                      checked={formData.subscribeToUpdates}
+                      onCheckedChange={(checked) => 
+                        setFormData(prev => ({ ...prev, subscribeToUpdates: !!checked }))
+                      }
+                    />
+                    <Label htmlFor="subscribe-updates" className="text-sm font-normal cursor-pointer">
+                      Get updates about this event
+                    </Label>
+                  </div>
+                  
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="subscribe-newsletter"
+                      checked={formData.subscribeToNewsletter}
+                      onCheckedChange={(checked) => 
+                        setFormData(prev => ({ ...prev, subscribeToNewsletter: !!checked }))
+                      }
+                    />
+                    <Label htmlFor="subscribe-newsletter" className="text-sm font-normal cursor-pointer">
+                      Subscribe to organization newsletter
+                    </Label>
+                  </div>
+                  
+                  <p className="text-xs text-gray-500">
+                    Managed by event organizers. You can unsubscribe at any time.
+                  </p>
+                </div>
+              )}
+
               {submitError && (
                 <div className="text-sm text-red-600 bg-red-50 p-2 rounded">
                   {submitError}
@@ -260,6 +308,13 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* How Did You Hear About Us Popup */}
+      <HowDidYouHearPopup
+        isOpen={showHowDidYouHear}
+        onClose={() => setShowHowDidYouHear(false)}
+        eventTitle={event.title}
+      />
     </>
   )
 }
