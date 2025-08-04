@@ -31,8 +31,12 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      - key: VITE_ENVIRONMENT
+        value: staging
+      - key: VITE_API_BASE_URL
+        value: https://voxxy-presents-api-staging.run.app/api
       - key: VITE_SITE_URL
-        value: https://staging-voxxy-presents.onrender.com
+        value: https://voxxy-presents-client-staging.onrender.com
       - key: VITE_SITE_NAME
         value: "Voxxy Presents (Staging)"
       - key: VITE_SITE_DESCRIPTION
