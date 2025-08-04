@@ -55,7 +55,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   staging: {
     name: 'staging',
     dataSource: 'api', // API with production data mirror
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-staging.run.app/api',
+    apiBaseUrl: 'https://voxxy-presents-api-staging.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -145,6 +145,10 @@ export function getDataSource(): DataSourceType {
 // Get API URL for current environment (if using API)
 export function getApiUrl(): string | undefined {
   const config = getEnvironmentConfig()
+  console.log('getApiUrl called:', { 
+    currentEnv: getCurrentEnvironment(), 
+    apiBaseUrl: config.apiBaseUrl 
+  })
   return config.apiBaseUrl
 }
 
