@@ -82,7 +82,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
     try {
       console.log('Loading registrations for event:', event.id)
       const response = await registrationsApi.getByEvent(event.id)
-      console.log('Raw API Response:', response)
+      console.log('Raw API Response:', JSON.stringify(response, null, 2))
       console.log('Response type:', typeof response)
       console.log('Response keys:', response ? Object.keys(response) : 'none')
       
@@ -100,10 +100,10 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         registrationData = response.registrations
       } else if (response && response.registrations && typeof response.registrations === 'object') {
         console.log('Converting registrations object to array')
-        console.log('Registrations object:', response.registrations)
+        console.log('Registrations object:', JSON.stringify(response.registrations, null, 2))
         console.log('Object keys:', Object.keys(response.registrations))
         const values = Object.values(response.registrations)
-        console.log('Object values:', values)
+        console.log('Object values:', JSON.stringify(values, null, 2))
         console.log('Values length:', values.length)
         registrationData = values as Registration[]
       } else {
