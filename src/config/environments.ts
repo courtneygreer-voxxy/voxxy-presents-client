@@ -95,14 +95,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 export function getCurrentEnvironment(): EnvironmentType {
   // Check for explicit environment override
   const envOverride = import.meta.env.VITE_ENVIRONMENT as EnvironmentType
-  console.log('Environment detection:', { 
-    envOverride, 
-    hostname: window.location.hostname,
-    href: window.location.href 
-  })
-  
   if (envOverride && environments[envOverride]) {
-    console.log('Using environment override:', envOverride)
     return envOverride
   }
 
@@ -110,16 +103,12 @@ export function getCurrentEnvironment(): EnvironmentType {
   const hostname = window.location.hostname
   
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    console.log('Detected environment: development')
     return 'development'
   } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging')) {
-    console.log('Detected environment: staging')
     return 'staging'
   } else if (hostname.includes('sandbox') || hostname.includes('experimental')) {
-    console.log('Detected environment: sandbox')
     return 'sandbox'
   } else {
-    console.log('Detected environment: production (default)')
     return 'production'
   }
 }
@@ -145,10 +134,6 @@ export function getDataSource(): DataSourceType {
 // Get API URL for current environment (if using API)
 export function getApiUrl(): string | undefined {
   const config = getEnvironmentConfig()
-  console.log('getApiUrl called:', { 
-    currentEnv: getCurrentEnvironment(), 
-    apiBaseUrl: config.apiBaseUrl 
-  })
   return config.apiBaseUrl
 }
 
