@@ -14,7 +14,7 @@ interface EventRegistrationProps {
 
 export default function EventRegistration({ event }: EventRegistrationProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState<'rsvp' | 'presale'>('rsvp')
+  const [dialogType, setDialogType] = useState<'interest' | 'presale'>('interest')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,12 +33,12 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     } else if (event.presaleEnabled) {
       return 'presale'
     } else if (event.registrationRequired || event.price.type === 'free') {
-      return 'rsvp'
+      return 'interest'
     }
     return null
   }
 
-  const handleButtonClick = (type: 'rsvp' | 'presale') => {
+  const handleButtonClick = (type: 'interest' | 'presale') => {
     setDialogType(type)
     setDialogOpen(true)
     setSubmitSuccess(false)
@@ -123,12 +123,12 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
           </Button>
         )}
         
-        {buttonType === 'rsvp' && (
+        {buttonType === 'interest' && (
           <Button
             className="bg-purple-600 hover:bg-purple-700"
-            onClick={() => handleButtonClick('rsvp')}
+            onClick={() => handleButtonClick('interest')}
           >
-            RSVP
+            I'm Interested
             <Calendar className="ml-2 h-4 w-4" />
           </Button>
         )}
@@ -147,7 +147,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
               ) : (
                 <>
                   <Calendar className="h-5 w-5 text-purple-600" />
-                  RSVP for Event
+                  Express Interest
                 </>
               )}
             </DialogTitle>
@@ -155,7 +155,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
               {dialogType === 'presale' ? (
                 <>Get notified when tickets become available for <strong>{event.title}</strong></>
               ) : (
-                <>Let us know if you're planning to attend <strong>{event.title}</strong></>
+                <>Let us know your level of interest in <strong>{event.title}</strong></>
               )}
             </DialogDescription>
           </DialogHeader>
@@ -188,9 +188,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 />
               </div>
 
-              {dialogType === 'rsvp' && (
+              {dialogType === 'interest' && (
                 <div className="space-y-2">
-                  <Label>Will you attend?</Label>
+                  <Label>How interested are you?</Label>
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -198,7 +198,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                       size="sm"
                       onClick={() => setFormData(prev => ({ ...prev, rsvpType: 'rsvp_yes' }))}
                     >
-                      Yes
+                      Very Interested
                     </Button>
                     <Button
                       type="button"
@@ -206,7 +206,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                       size="sm"
                       onClick={() => setFormData(prev => ({ ...prev, rsvpType: 'rsvp_maybe' }))}
                     >
-                      Maybe
+                      Somewhat Interested
                     </Button>
                   </div>
                 </div>
@@ -238,7 +238,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                   disabled={isSubmitting || !formData.name || (dialogType === 'presale' && !formData.email)}
                   className="flex-1 bg-purple-600 hover:bg-purple-700"
                 >
-                  {isSubmitting ? 'Submitting...' : dialogType === 'presale' ? 'Send Request' : 'Submit RSVP'}
+                  {isSubmitting ? 'Submitting...' : dialogType === 'presale' ? 'Send Request' : 'Submit Interest'}
                 </Button>
               </div>
             </form>
@@ -248,12 +248,12 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {dialogType === 'presale' ? 'Request Sent!' : 'RSVP Submitted!'}
+                {dialogType === 'presale' ? 'Request Sent!' : 'Interest Submitted!'}
               </h3>
               <p className="text-gray-600">
                 {dialogType === 'presale' 
                   ? 'The organizer will contact you when tickets are available.'
-                  : 'Thanks for letting us know! See you at the event.'
+                  : 'Thanks for expressing your interest! This helps the organizer gauge event popularity.'
                 }
               </p>
             </div>

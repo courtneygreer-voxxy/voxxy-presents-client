@@ -36,8 +36,8 @@ interface Registration {
 }
 
 interface RegistrationStats {
-  rsvpYes: number
-  rsvpMaybe: number
+  veryInterested: number
+  somewhatInterested: number
   presaleRequests: number
   totalRegistrations: number
 }
@@ -51,8 +51,8 @@ interface EventRegistrationModalProps {
 export default function EventRegistrationModal({ event, isOpen, onClose }: EventRegistrationModalProps) {
   const [registrations, setRegistrations] = useState<Registration[]>([])
   const [stats, setStats] = useState<RegistrationStats>({
-    rsvpYes: 0,
-    rsvpMaybe: 0,
+    veryInterested: 0,
+    somewhatInterested: 0,
     presaleRequests: 0,
     totalRegistrations: 0
   })
@@ -83,32 +83,48 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
       console.log('Loading registrations for event:', event.id)
       const response = await registrationsApi.getByEvent(event.id)
       console.log('Raw API Response:', response)
+      console.log('Response type:', typeof response)
+      console.log('Response keys:', response ? Object.keys(response) : 'none')
       
       // Handle different response formats
       let registrationData: Registration[] = []
       
       if (Array.isArray(response)) {
+        console.log('Response is array, length:', response.length)
         registrationData = response
       } else if (response && Array.isArray(response.data)) {
+        console.log('Response.data is array, length:', response.data.length)
         registrationData = response.data
       } else if (response && response.registrations && Array.isArray(response.registrations)) {
+        console.log('Response.registrations is array, length:', response.registrations.length)
         registrationData = response.registrations
       } else if (response && response.registrations && typeof response.registrations === 'object') {
         console.log('Converting registrations object to array')
-        registrationData = Object.values(response.registrations)
+        console.log('Registrations object:', response.registrations)
+        console.log('Object keys:', Object.keys(response.registrations))
+        const values = Object.values(response.registrations)
+        console.log('Object values:', values)
+        console.log('Values length:', values.length)
+        registrationData = values as Registration[]
       } else {
         console.warn('No registrations found or unexpected format')
+        console.log('Response structure check:')
+        console.log('- response exists:', !!response)
+        console.log('- response.registrations exists:', !!(response && response.registrations))
+        console.log('- response.registrations type:', response && response.registrations ? typeof response.registrations : 'none')
         registrationData = []
       }
       
       console.log('Final registration data:', registrationData)
+      console.log('Final data length:', registrationData.length)
       console.log('Sample registration:', registrationData[0])
+      console.log('All registrations mapped:', registrationData.map((r, i) => ({ index: i, id: r?.id, name: r?.name, type: r?.registrationType })))
       setRegistrations(registrationData)
       
       // Calculate stats
       const newStats = {
-        rsvpYes: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_yes').length,
-        rsvpMaybe: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_maybe').length,
+        veryInterested: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_yes').length,
+        somewhatInterested: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_maybe').length,
         presaleRequests: registrationData.filter((r: Registration) => r.registrationType === 'presale_request').length,
         totalRegistrations: registrationData.length
       }
@@ -157,8 +173,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
 
   const getRegistrationTypeLabel = (type: string) => {
     switch (type) {
-      case 'rsvp_yes': return 'RSVP Yes'
-      case 'rsvp_maybe': return 'RSVP Maybe'
+      case 'rsvp_yes': return 'Very Interested'
+      case 'rsvp_maybe': return 'Somewhat Interested'
       case 'presale_request': return 'Presale Request'
       default: return type
     }
@@ -167,9 +183,9 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
   const getRegistrationTypeBadge = (type: string) => {
     switch (type) {
       case 'rsvp_yes':
-        return <Badge className="bg-green-600">Yes</Badge>
+        return <Badge className="bg-green-600">Very Interested</Badge>
       case 'rsvp_maybe':
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Maybe</Badge>
+        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Somewhat Interested</Badge>
       case 'presale_request':
         return <Badge variant="outline" className="border-blue-500 text-blue-700">Presale</Badge>
       default:
@@ -249,8 +265,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                   <CardContent className="flex items-center gap-3 p-4">
                     <CheckCircle className="h-8 w-8 text-green-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-600">RSVP Yes</p>
-                      <p className="text-2xl font-bold">{stats.rsvpYes}</p>
+                      <p className="text-sm font-medium text-gray-600">Very Interested</p>
+                      <p className="text-2xl font-bold">{stats.veryInterested}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -259,8 +275,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                   <CardContent className="flex items-center gap-3 p-4">
                     <Calendar className="h-8 w-8 text-yellow-600" />
                     <div>
-                      <p className="text-sm font-medium text-gray-600">RSVP Maybe</p>
-                      <p className="text-2xl font-bold">{stats.rsvpMaybe}</p>
+                      <p className="text-sm font-medium text-gray-600">Somewhat Interested</p>
+                      <p className="text-2xl font-bold">{stats.somewhatInterested}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -365,7 +381,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                       <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
                       <p className="text-gray-500 mb-2">No registrations yet</p>
                       <p className="text-sm text-gray-400">
-                        Registrations will appear here when people RSVP or request presale info.
+                        Registrations will appear here when people express interest or request presale info.
                       </p>
                     </div>
                   ) : (
@@ -381,22 +397,27 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {registrations.map((registration) => {
-                            console.log('Rendering registration:', registration)
+                          {registrations.map((registration, index) => {
+                            console.log(`Rendering registration ${index}:`, registration)
+                            console.log(`- ID: ${registration?.id}`)
+                            console.log(`- Name: ${registration?.name}`)
+                            console.log(`- Email: ${registration?.email}`)
+                            console.log(`- Type: ${registration?.registrationType}`)
+                            console.log(`- Created: ${registration?.createdAt}`)
                             return (
-                              <TableRow key={registration.id}>
+                              <TableRow key={registration?.id || `reg-${index}`}>
                                 <TableCell>
                                   <div className="flex items-center gap-2">
-                                    {getRegistrationTypeIcon(registration.registrationType)}
-                                    {getRegistrationTypeBadge(registration.registrationType)}
+                                    {getRegistrationTypeIcon(registration?.registrationType || '')}
+                                    {getRegistrationTypeBadge(registration?.registrationType || '')}
                                   </div>
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                  {registration.name || 'No name provided'}
+                                  {registration?.name || 'No name provided'}
                                 </TableCell>
                                 <TableCell>
                                   <div className="space-y-1">
-                                    {registration.email && (
+                                    {registration?.email && (
                                       <div className="flex items-center gap-1 text-sm">
                                         <Mail className="h-3 w-3" />
                                         <a 
@@ -407,7 +428,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                                         </a>
                                       </div>
                                     )}
-                                    {registration.phone && (
+                                    {registration?.phone && (
                                       <div className="flex items-center gap-1 text-sm">
                                         <Phone className="h-3 w-3" />
                                         <a 
@@ -418,16 +439,16 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                                         </a>
                                       </div>
                                     )}
-                                    {!registration.email && !registration.phone && (
+                                    {!registration?.email && !registration?.phone && (
                                       <span className="text-gray-400 text-sm">No contact info</span>
                                     )}
                                   </div>
                                 </TableCell>
                                 <TableCell className="text-sm text-gray-600">
-                                  {formatDate(registration.createdAt)}
+                                  {formatDate(registration?.createdAt || '')}
                                 </TableCell>
                                 <TableCell>
-                                  {registration.notes ? (
+                                  {registration?.notes ? (
                                     <div className="flex items-start gap-1">
                                       <FileText className="h-3 w-3 mt-0.5 text-gray-400" />
                                       <span className="text-sm">{registration.notes}</span>
