@@ -12,7 +12,6 @@ import {
   BarChart3,
   Eye,
   Loader,
-  ExternalLink,
   Edit,
   Plus
 } from "lucide-react"
@@ -20,6 +19,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import EventCreateForm from "@/components/EventCreateForm"
 import EventEditForm from "@/components/EventEditForm"
+import EventRegistrationDropdown from "@/components/EventRegistrationDropdown"
 import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -163,7 +163,7 @@ export default function OrganizationAdmin() {
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="organization" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="organization" className="flex items-center gap-2">
               <Settings className="h-4 w-4" />
               Organization
@@ -171,10 +171,6 @@ export default function OrganizationAdmin() {
             <TabsTrigger value="events" className="flex items-center gap-2">
               <Calendar className="h-4 w-4" />
               Events
-            </TabsTrigger>
-            <TabsTrigger value="registrations" className="flex items-center gap-2">
-              <Users className="h-4 w-4" />
-              Registrations
             </TabsTrigger>
             <TabsTrigger value="analytics" className="flex items-center gap-2">
               <BarChart3 className="h-4 w-4" />
@@ -267,13 +263,7 @@ export default function OrganizationAdmin() {
                               <Edit className="h-4 w-4 mr-2" />
                               Edit
                             </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => window.open(`/${orgSlug}#events`, '_blank')}
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                            </Button>
+                            <EventRegistrationDropdown event={event} />
                           </div>
                         </div>
                       </CardContent>
@@ -282,27 +272,6 @@ export default function OrganizationAdmin() {
                 </div>
               )}
             </div>
-          </TabsContent>
-
-          {/* Registrations Tab */}
-          <TabsContent value="registrations">
-            <Card>
-              <CardHeader>
-                <CardTitle>Registrations</CardTitle>
-                <CardDescription>
-                  View and manage event registrations and attendee information.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-12">
-                  <Users className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Registration Management</h3>
-                  <p className="text-gray-600 text-center">
-                    Registration management features will be available soon.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
           </TabsContent>
 
           {/* Analytics Tab */}
