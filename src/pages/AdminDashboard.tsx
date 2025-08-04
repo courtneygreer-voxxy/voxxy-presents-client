@@ -21,7 +21,8 @@ export default function AdminDashboard() {
 
   // Debug environment variables on component mount
   useEffect(() => {
-    debugEnvVars()
+    // SECURITY: Removed debugEnvVars() call - was exposing API keys in production
+    // debugEnvVars()
   }, [])
 
   // Test Voxxy Presents NYC organization

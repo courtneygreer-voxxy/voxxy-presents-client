@@ -1,24 +1,16 @@
 // Temporary debug file to check environment variables
-console.log('Environment Variables Debug:')
-console.log('VITE_FIREBASE_API_KEY:', import.meta.env.VITE_FIREBASE_API_KEY)
-console.log('VITE_FIREBASE_PROJECT_ID:', import.meta.env.VITE_FIREBASE_PROJECT_ID)
-console.log('All env vars:', import.meta.env)
+// SECURITY: Removed API key logging - was exposing sensitive data in production console
 
 export const debugEnvVars = () => {
-  const config = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  }
-  
-  console.log('Firebase config being used:', config)
-  
-  // Check for missing values
-  Object.entries(config).forEach(([key, value]) => {
-    if (!value || value === 'undefined') {
-      console.error(`❌ Missing environment variable for ${key}`)
-    } else {
-      console.log(`✅ ${key}: ${value.substring(0, 10)}...`)
+  // SECURITY: Disabled - was logging sensitive API keys to production console
+  // Only enable in development if needed for debugging
+  if (import.meta.env.DEV) {
+    const config = {
+      apiKey: import.meta.env.VITE_FIREBASE_API_KEY ? '***CONFIGURED***' : 'MISSING',
+      authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ? '***CONFIGURED***' : 'MISSING',
+      projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ? '***CONFIGURED***' : 'MISSING',
     }
-  })
+    
+    console.log('Firebase config status:', config)
+  }
 }
