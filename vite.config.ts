@@ -16,6 +16,7 @@ export default defineConfig({
     allowedHosts: [
       'www.voxxypresents.com',
       'voxxypresents.com',
+      'voxxy-presents-client-staging.onrender.com',
       'staging-voxxy-presents.onrender.com',
       'dev-voxxy-presents.onrender.com',
       'localhost'
