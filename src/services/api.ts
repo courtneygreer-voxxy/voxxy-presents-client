@@ -1,6 +1,7 @@
 // API service for connecting to voxxy-presents-api backend
+import { getApiUrl } from '@/config/environments'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 interface ApiResponse<T> {
   data?: T
