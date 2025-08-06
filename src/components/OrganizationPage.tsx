@@ -184,7 +184,10 @@ export default function OrganizationPage({
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">Upcoming Events</h3>
           {(() => {
             console.log('All events:', events.map(e => ({ id: e.id, title: e.title, status: e.status })))
-            const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
+            const publishedEvents = events.filter(event => {
+              const status = event.status || 'published'
+              return ['published', 'presale', 'sold_out'].includes(status)
+            })
             console.log('Published events:', publishedEvents.map(e => ({ id: e.id, title: e.title, status: e.status })))
             
             // Split events into main events and recurring events
@@ -200,7 +203,10 @@ export default function OrganizationPage({
             <div className="space-y-12">
               {/* Main Events Section */}
               {(() => {
-                const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
+                const publishedEvents = events.filter(event => {
+              const status = event.status || 'published'
+              return ['published', 'presale', 'sold_out'].includes(status)
+            })
                 const mainEvents = publishedEvents.filter(event => !event.isRecurring)
                 return mainEvents.length > 0 && (
                   <div className="space-y-6">
@@ -247,12 +253,7 @@ export default function OrganizationPage({
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        <EventRegistration event={{
-                          ...event,
-                          date: event.date instanceof Date ? event.date.toISOString() : event.date,
-                          createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt,
-                          updatedAt: event.updatedAt instanceof Date ? event.updatedAt.toISOString() : event.updatedAt
-                        }} />
+                        <EventRegistration event={event as any} />
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}
@@ -316,7 +317,10 @@ export default function OrganizationPage({
 
               {/* Recurring Events Section */}
               {(() => {
-                const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
+                const publishedEvents = events.filter(event => {
+              const status = event.status || 'published'
+              return ['published', 'presale', 'sold_out'].includes(status)
+            })
                 const recurringEvents = publishedEvents.filter(event => event.isRecurring)
                 return recurringEvents.length > 0 && (
                   <div>
@@ -366,12 +370,7 @@ export default function OrganizationPage({
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                  <EventRegistration event={{
-                                    ...event,
-                                    date: event.date instanceof Date ? event.date.toISOString() : event.date,
-                                    createdAt: event.createdAt instanceof Date ? event.createdAt.toISOString() : event.createdAt,
-                                    updatedAt: event.updatedAt instanceof Date ? event.updatedAt.toISOString() : event.updatedAt
-                                  }} />
+                                  <EventRegistration event={event as any} />
                                   <Button
                                     variant="outline"
                                     onClick={() => toggleEventDetails(event.id)}

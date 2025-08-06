@@ -79,7 +79,7 @@ export interface Event {
   images?: string[]
   
   // Status
-  status: 'draft' | 'published' | 'cancelled' | 'completed'
+  status: 'draft' | 'presale' | 'published' | 'sold_out' | 'cancelled' | 'completed'
   
   createdAt: Date
   updatedAt: Date

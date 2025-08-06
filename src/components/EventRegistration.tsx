@@ -8,7 +8,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, ExternalLink, Calendar, CheckCircle } from "lucide-react"
 import { registrationsApi, ApiError } from '@/services/api'
 import HowDidYouHearPopup from './HowDidYouHearPopup'
-import type { Event } from '@/hooks/useBrooklynHeartsClub'
+import type { Event } from '@/types/database'
 
 interface EventRegistrationProps {
   event: Event

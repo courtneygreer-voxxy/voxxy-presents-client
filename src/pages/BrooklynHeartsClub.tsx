@@ -154,7 +154,7 @@ export default function BrooklynHeartsClub() {
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        <EventRegistration event={event} />
+                        <EventRegistration event={event as any} />
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}

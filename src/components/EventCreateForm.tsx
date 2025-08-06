@@ -197,7 +197,11 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="presale">PreSale</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
+                  <SelectItem value="sold_out">Sold Out</SelectItem>
+                  <SelectItem value="cancelled">Canceled</SelectItem>
+                  <SelectItem value="completed">Complete</SelectItem>
                 </SelectContent>
               </Select>
             </div>

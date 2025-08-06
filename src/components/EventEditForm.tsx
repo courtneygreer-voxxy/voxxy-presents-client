@@ -198,9 +198,11 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="presale">PreSale</SelectItem>
                   <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
+                  <SelectItem value="sold_out">Sold Out</SelectItem>
+                  <SelectItem value="cancelled">Canceled</SelectItem>
+                  <SelectItem value="completed">Complete</SelectItem>
                 </SelectContent>
               </Select>
             </div>

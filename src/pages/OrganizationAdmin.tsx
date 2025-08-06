@@ -259,8 +259,21 @@ export default function OrganizationAdmin() {
                                     {event.category}
                                   </Badge>
                                 )}
-                                <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
-                                  {event.status}
+                                <Badge variant={
+                                  event.status === 'published' ? 'default' :
+                                  event.status === 'presale' ? 'secondary' :
+                                  event.status === 'sold_out' ? 'destructive' :
+                                  event.status === 'cancelled' ? 'destructive' :
+                                  event.status === 'completed' ? 'outline' :
+                                  'secondary'
+                                }>
+                                  {event.status === 'presale' ? 'PreSale' :
+                                   event.status === 'sold_out' ? 'Sold Out' :
+                                   event.status === 'cancelled' ? 'Canceled' :
+                                   event.status === 'completed' ? 'Complete' :
+                                   event.status === 'published' ? 'Published' :
+                                   event.status === 'draft' ? 'Draft' :
+                                   event.status}
                                 </Badge>
                                 <h4 className="text-xl font-semibold text-gray-900">{event.title}</h4>
                               </div>
