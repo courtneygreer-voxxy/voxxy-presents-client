@@ -104,16 +104,22 @@ export default function BrooklynHeartsClub() {
           <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">Upcoming Events</h3>
           {(() => {
             console.log('Brooklyn Hearts Club - All events:', events.map(e => ({ id: e.id, title: e.title, status: e.status })))
-            const publishedEvents = events.filter(event => (event.status || 'published') === 'published')
-            console.log('Brooklyn Hearts Club - Published events:', publishedEvents.map(e => ({ id: e.id, title: e.title, status: e.status })))
-            return publishedEvents
+            const publicEvents = events.filter(event => {
+              const status = event.status || 'published'
+              return ['presale', 'published', 'sold_out'].includes(status)
+            })
+            console.log('Brooklyn Hearts Club - Public events:', publicEvents.map(e => ({ id: e.id, title: e.title, status: e.status })))
+            return publicEvents
           })().length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-600">No upcoming events at the moment. Check back soon!</p>
             </div>
           ) : (
             <div className="space-y-6">
-              {events.filter(event => (event.status || 'published') === 'published').map((event) => (
+              {events.filter(event => {
+                const status = event.status || 'published'
+                return ['presale', 'published', 'sold_out'].includes(status)
+              }).map((event) => (
               <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
                 <CardContent className="p-6">
                   <div className="flex flex-col">
