@@ -48,17 +48,22 @@ export interface Event {
   
   // Pricing
   price: {
-    type: 'free' | 'paid' | 'donation'
+    type: 'free' | 'paid' | 'group_deal'
     amount?: number
     description: string // e.g., "Day of: $20 cash, $25 Venmo"
     advancePrice?: number
+    groupDealDetails?: {
+      minimumPeople: number
+      pricePerPerson: number
+      normalPricePerPerson: number
+    }
   }
   
   // Capacity and registration
   capacity?: number
   registrationRequired: boolean
   eventbriteUrl?: string
-  presaleEnabled: boolean
+  presaleEnabled?: boolean // Deprecated: Use status 'presale' instead
   
   // Series information
   series?: {

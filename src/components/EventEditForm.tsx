@@ -51,9 +51,7 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
         address: event.address,
         price: { ...event.price },
         capacity: event.capacity,
-        registrationRequired: event.registrationRequired,
         eventbriteUrl: event.eventbriteUrl,
-        presaleEnabled: event.presaleEnabled,
         series: event.series ? { ...event.series } : undefined,
         isRecurring: event.isRecurring,
         imageUrl: event.imageUrl,
@@ -67,7 +65,19 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
   }, [event])
 
   const handleInputChange = (field: string, value: any) => {
-    if (field.startsWith('price.')) {
+    if (field.startsWith('price.groupDealDetails.')) {
+      const dealField = field.split('.')[2]
+      setFormData(prev => ({
+        ...prev,
+        price: {
+          ...prev.price!,
+          groupDealDetails: {
+            ...prev.price?.groupDealDetails!,
+            [dealField]: value
+          }
+        }
+      }))
+    } else if (field.startsWith('price.')) {
       const priceField = field.split('.')[1]
       setFormData(prev => ({
         ...prev,
@@ -174,7 +184,7 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
           )}
 
           {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="md:col-span-2">
               <Label htmlFor="title">Event Title *</Label>
               <Input
@@ -185,7 +195,6 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                 required
               />
             </div>
-
 
             <div>
               <Label htmlFor="status">Status</Label>
@@ -303,10 +312,10 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
             </div>
           </div>
 
-          {/* Pricing */}
+          {/* Ticketing */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Pricing</CardTitle>
+              <CardTitle className="text-lg">Ticketing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -321,37 +330,103 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                   <SelectContent>
                     <SelectItem value="free">Free</SelectItem>
                     <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="donation">Donation</SelectItem>
+                    <SelectItem value="group_deal">Group Ticket Deal</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {formData.price?.type === 'paid' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="amount">Price Amount</Label>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      value={formData.price?.amount || ''}
-                      onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
-                      placeholder="20.00"
-                    />
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="amount">Price Amount</Label>
+                      <Input
+                        id="amount"
+                        type="number"
+                        step="0.01"
+                        value={formData.price?.amount || ''}
+                        onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
+                        placeholder="20.00"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="advancePrice">Advance Price</Label>
+                      <Input
+                        id="advancePrice"
+                        type="number"
+                        step="0.01"
+                        value={formData.price?.advancePrice || ''}
+                        onChange={(e) => handleInputChange('price.advancePrice', parseFloat(e.target.value) || undefined)}
+                        placeholder="15.00"
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <Label htmlFor="advancePrice">Advance Price</Label>
+                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="advancePrice"
-                      type="number"
-                      step="0.01"
-                      value={formData.price?.advancePrice || ''}
-                      onChange={(e) => handleInputChange('price.advancePrice', parseFloat(e.target.value) || undefined)}
-                      placeholder="15.00"
+                      id="eventbriteUrl"
+                      value={formData.eventbriteUrl || ''}
+                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
+                      placeholder="https://eventbrite.com/... or https://venmo.com/..."
+                      required={formData.status === 'published'}
                     />
                   </div>
-                </div>
+                </>
+              )}
+
+              {formData.price?.type === 'group_deal' && (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="minimumPeople">Minimum People *</Label>
+                      <Input
+                        id="minimumPeople"
+                        type="number"
+                        value={formData.price?.groupDealDetails?.minimumPeople || ''}
+                        onChange={(e) => handleInputChange('price.groupDealDetails.minimumPeople', parseInt(e.target.value) || undefined)}
+                        placeholder="4"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="pricePerPerson">Group Price Per Person</Label>
+                      <Input
+                        id="pricePerPerson"
+                        type="number"
+                        step="0.01"
+                        value={formData.price?.groupDealDetails?.pricePerPerson || ''}
+                        onChange={(e) => handleInputChange('price.groupDealDetails.pricePerPerson', parseFloat(e.target.value) || undefined)}
+                        placeholder="15.00"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="normalPricePerPerson">Normal Price Per Person</Label>
+                      <Input
+                        id="normalPricePerPerson"
+                        type="number"
+                        step="0.01"
+                        value={formData.price?.groupDealDetails?.normalPricePerPerson || ''}
+                        onChange={(e) => handleInputChange('price.groupDealDetails.normalPricePerPerson', parseFloat(e.target.value) || undefined)}
+                        placeholder="20.00"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
+                    <Input
+                      id="eventbriteUrl"
+                      value={formData.eventbriteUrl || ''}
+                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
+                      placeholder="https://eventbrite.com/... or https://venmo.com/..."
+                      required={formData.status === 'published'}
+                    />
+                  </div>
+                </>
               )}
 
               <div>
@@ -363,57 +438,20 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                   placeholder="e.g., Day of: $20 cash, $25 Venmo"
                 />
               </div>
+
+              <div>
+                <Label htmlFor="capacity">Capacity</Label>
+                <Input
+                  id="capacity"
+                  type="number"
+                  value={formData.capacity || ''}
+                  onChange={(e) => handleInputChange('capacity', parseInt(e.target.value) || undefined)}
+                  placeholder="Maximum attendees"
+                />
+              </div>
             </CardContent>
           </Card>
 
-          {/* Registration Options */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Registration</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="registrationRequired"
-                  checked={formData.registrationRequired || false}
-                  onCheckedChange={(checked) => handleInputChange('registrationRequired', checked)}
-                />
-                <Label htmlFor="registrationRequired">Registration Required</Label>
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="presaleEnabled"
-                  checked={formData.presaleEnabled || false}
-                  onCheckedChange={(checked) => handleInputChange('presaleEnabled', checked)}
-                />
-                <Label htmlFor="presaleEnabled">Enable Presale</Label>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="capacity">Capacity</Label>
-                  <Input
-                    id="capacity"
-                    type="number"
-                    value={formData.capacity || ''}
-                    onChange={(e) => handleInputChange('capacity', parseInt(e.target.value) || undefined)}
-                    placeholder="Maximum attendees"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="eventbriteUrl">Eventbrite URL</Label>
-                  <Input
-                    id="eventbriteUrl"
-                    value={formData.eventbriteUrl || ''}
-                    onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
-                    placeholder="https://eventbrite.com/..."
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
           {/* Series Info */}
           <Card>

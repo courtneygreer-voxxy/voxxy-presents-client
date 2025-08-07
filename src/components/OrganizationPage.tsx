@@ -249,7 +249,12 @@ export default function OrganizationPage({
                             {event.location}
                           </div>
                         </div>
-                        <div className="text-sm font-medium text-gray-900">Price: {event.price.description}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          Price: {event.price.type === 'group_deal' && event.price.groupDealDetails ? 
+                            `${event.price.groupDealDetails.minimumPeople}+ people: $${event.price.groupDealDetails.pricePerPerson}/person (reg. $${event.price.groupDealDetails.normalPricePerPerson}/person)` :
+                            event.price.description
+                          }
+                        </div>
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
@@ -366,7 +371,12 @@ export default function OrganizationPage({
                                       {event.location}
                                     </div>
                                   </div>
-                                  <div className="text-sm font-medium text-gray-900">Price: {event.price.description}</div>
+                                  <div className="text-sm font-medium text-gray-900">
+                                    Price: {event.price.type === 'group_deal' && event.price.groupDealDetails ? 
+                                      `${event.price.groupDealDetails.minimumPeople}+ people: $${event.price.groupDealDetails.pricePerPerson}/person (reg. $${event.price.groupDealDetails.normalPricePerPerson}/person)` :
+                                      event.price.description
+                                    }
+                                  </div>
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">

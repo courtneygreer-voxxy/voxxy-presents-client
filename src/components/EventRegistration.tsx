@@ -35,7 +35,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
   const getButtonType = () => {
     if (event.eventbriteUrl) {
       return 'eventbrite'
-    } else if (event.presaleEnabled) {
+    } else if (event.status === 'presale') {
       return 'presale'
     } else if (event.registrationRequired || event.price.type === 'free') {
       return 'interest'
