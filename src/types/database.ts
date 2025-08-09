@@ -5,7 +5,7 @@ export interface Organization {
   name: string
   slug: string // URL-friendly name (e.g., 'brooklyn-hearts-club')
   description: string
-  bio: string
+  background: string
   logoUrl?: string
   bannerUrl?: string
   contactEmail: string
@@ -14,6 +14,7 @@ export interface Organization {
     website?: string
     eventbrite?: string
     venmo?: string
+    other?: string
   }
   settings: {
     defaultLocation: string
@@ -126,7 +127,7 @@ export interface User {
   
   // Profile
   profilePicture?: string
-  bio?: string
+  background?: string
   
   // Permissions
   organizationIds: string[] // Organizations they can manage

@@ -48,7 +48,7 @@ export default function AdminDashboard() {
         name: "Brooklyn Hearts Club",
         slug: "brooklyn-hearts-club",
         description: "An art club for adults that welcomes everyone",
-        bio: "We aim to bring back whimsy and joy to the process of creating art in a shame-free, judgment-free zone where we can creatively express ourselves.",
+        background: "We aim to bring back whimsy and joy to the process of creating art in a shame-free, judgment-free zone where we can creatively express ourselves.",
         contactEmail: "info@brooklynheartsclub.com",
         socialLinks: {
           instagram: "@brooklynheartsclub",

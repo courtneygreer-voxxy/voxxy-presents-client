@@ -86,13 +86,13 @@ export default function BrooklynHeartsClub() {
         </div>
       </section>
 
-      {/* Quick Bio Section */}
+      {/* Quick Background Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to {organization.name}</h3>
             <p className="text-lg text-gray-700 leading-relaxed">
-              {organization.bio}
+              {organization.background}
             </p>
           </div>
         </div>

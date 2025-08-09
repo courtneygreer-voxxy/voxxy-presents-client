@@ -15,14 +15,11 @@ import {
   ExternalLink,
   DollarSign,
   Loader,
-  Edit,
-  X
+  Edit
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
-import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import { isFeatureEnabled } from '@/config/environments'
-import type { Organization } from "@/types/database"
 
 interface OrganizationPageProps {
   organizationSlug: string
@@ -44,23 +41,13 @@ export default function OrganizationPage({
   showAdminControls = false,
   customContent
 }: OrganizationPageProps) {
-  const { organization, events, loading, error, updateOrganization } = useOrganization(organizationSlug)
+  const { organization, events, loading, error } = useOrganization(organizationSlug)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
-  const [isEditMode, setIsEditMode] = useState(false)
 
   const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
   }
 
-  const handleSaveOrganization = async (updates: Partial<Organization>) => {
-    try {
-      await updateOrganization(updates)
-      setIsEditMode(false)
-    } catch (error) {
-      console.error('Failed to save organization:', error)
-      // TODO: Show error toast
-    }
-  }
 
   if (loading) {
     return (
@@ -106,40 +93,9 @@ export default function OrganizationPage({
               Admin Dashboard
             </Button>
           </Link>
-          {!isEditMode ? (
-            <Button
-              onClick={() => setIsEditMode(true)}
-              variant="outline"
-              size="sm"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Quick Edit
-            </Button>
-          ) : (
-            <Button
-              onClick={() => setIsEditMode(false)}
-              variant="outline"
-              size="sm"
-            >
-              <X className="h-4 w-4 mr-2" />
-              Cancel
-            </Button>
-          )}
         </div>
       )}
 
-      {/* Edit Mode Form */}
-      {isEditMode && (
-        <div className="fixed inset-0 bg-black/50 z-40 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <OrganizationEditForm
-              organization={organization}
-              onSave={handleSaveOrganization}
-              onCancel={() => setIsEditMode(false)}
-            />
-          </div>
-        </div>
-      )}
 
       {/* Header Photo Section */}
       <section id="home" className="relative h-80 overflow-hidden">
@@ -166,13 +122,13 @@ export default function OrganizationPage({
         </div>
       </section>
 
-      {/* Quick Bio Section */}
+      {/* Quick Background Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
             <h3 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to {organization.name}</h3>
             <p className="text-lg text-gray-700 leading-relaxed">
-              {organization.bio}
+              {organization.background}
             </p>
           </div>
         </div>
@@ -540,6 +496,17 @@ export default function OrganizationPage({
                       rel="noopener noreferrer"
                     >
                       <DollarSign className="h-6 w-6" />
+                    </a>
+                  )}
+                  {organization.socialLinks.other && (
+                    <a 
+                      href={organization.socialLinks.other} 
+                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      aria-label="Other Social Link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="h-6 w-6" />
                     </a>
                   )}
                   <a 
