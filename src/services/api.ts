@@ -90,6 +90,13 @@ export const organizationsApi = {
       body: JSON.stringify(data),
     })
   },
+
+  async updateBySlug(slug: string, data: any) {
+    return fetchApi<any>(`/organizations/${slug}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
 }
 
 // Events API

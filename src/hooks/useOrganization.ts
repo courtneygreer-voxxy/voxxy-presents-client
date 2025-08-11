@@ -96,7 +96,7 @@ export function useOrganization(organizationSlug: string) {
       } else if (dataSource === 'api' && apiUrl) {
         // Staging/Production mode: API update
         console.log(`Updating organization via API: ${apiUrl}`)
-        const updatedOrg = await organizationsApi.update(organization.id, updates)
+        const updatedOrg = await organizationsApi.updateBySlug(organizationSlug, updates)
         setOrganization(updatedOrg)
         
       } else {

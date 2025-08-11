@@ -237,7 +237,6 @@ export function OrganizationEditForm({
       const cleanedOfferings = formData.aboutOfferings.filter(offering => offering.trim() !== '')
       const saveData = {
         ...formData,
-        aboutOfferings: cleanedOfferings.length > 0 ? cleanedOfferings : undefined,
         settings: {
           ...formData.settings,
           theme: {
@@ -246,7 +245,31 @@ export function OrganizationEditForm({
           }
         }
       }
-      await onSave(saveData)
+      
+      // Only include aboutOfferings if there are valid entries (Firebase doesn't allow undefined)
+      if (cleanedOfferings.length > 0) {
+        saveData.aboutOfferings = cleanedOfferings
+      }
+      
+      // Filter out any undefined values from the entire object to prevent Firebase errors
+      const removeUndefined = (obj: any): any => {
+        if (obj === null || typeof obj !== 'object') return obj
+        
+        const cleaned = {} as any
+        for (const [key, value] of Object.entries(obj)) {
+          if (value !== undefined) {
+            if (typeof value === 'object' && value !== null) {
+              cleaned[key] = removeUndefined(value)
+            } else {
+              cleaned[key] = value
+            }
+          }
+        }
+        return cleaned
+      }
+      
+      const filteredSaveData = removeUndefined(saveData)
+      await onSave(filteredSaveData)
     } catch (error) {
       console.error('Failed to save organization:', error)
       // Error handling will be done by parent component
