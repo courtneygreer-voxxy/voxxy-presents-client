@@ -30,6 +30,9 @@ export function OrganizationEditForm({
     contactEmail: organization.contactEmail,
     logoUrl: organization.logoUrl || '',
     bannerUrl: organization.bannerUrl || '',
+    aboutImageUrl: organization.aboutImageUrl || '',
+    aboutStory: organization.aboutStory || '',
+    aboutOfferings: organization.aboutOfferings || [''],
     socialLinks: {
       instagram: organization.socialLinks.instagram || '',
       website: organization.socialLinks.website || '',
@@ -46,6 +49,7 @@ export function OrganizationEditForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadingHero, setUploadingHero] = useState(false)
+  const [uploadingAbout, setUploadingAbout] = useState(false)
   
   // Use external saving state if provided (for full page mode)
   const submitting = isSaving || isSubmitting
@@ -153,6 +157,71 @@ export function OrganizationEditForm({
     }
   }
 
+  const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG or PNG)')
+      return
+    }
+
+    // Validate file size (10MB max)
+    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+    if (file.size > maxSize) {
+      alert('File size must be less than 10MB')
+      return
+    }
+
+    setUploadingAbout(true)
+    
+    try {
+      // Convert file to data URL for preview/storage
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string
+        setFormData(prev => ({
+          ...prev,
+          aboutImageUrl: dataUrl
+        }))
+        setUploadingAbout(false)
+      }
+      reader.onerror = () => {
+        alert('Error reading file')
+        setUploadingAbout(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Error uploading about image:', error)
+      alert('Error uploading file')
+      setUploadingAbout(false)
+    }
+  }
+
+  const addOffering = () => {
+    setFormData(prev => ({
+      ...prev,
+      aboutOfferings: [...prev.aboutOfferings, '']
+    }))
+  }
+
+  const removeOffering = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      aboutOfferings: prev.aboutOfferings.filter((_, i) => i !== index)
+    }))
+  }
+
+  const updateOffering = (index: number, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      aboutOfferings: prev.aboutOfferings.map((offering, i) => 
+        i === index ? value : offering
+      )
+    }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -164,8 +233,11 @@ export function OrganizationEditForm({
 
     try {
       // Include default theme values since we removed the UI but the schema requires it
+      // Filter out empty offerings
+      const cleanedOfferings = formData.aboutOfferings.filter(offering => offering.trim() !== '')
       const saveData = {
         ...formData,
+        aboutOfferings: cleanedOfferings.length > 0 ? cleanedOfferings : undefined,
         settings: {
           ...formData.settings,
           theme: {
@@ -259,7 +331,38 @@ export function OrganizationEditForm({
           </CardContent>
         </Card>
 
-        {/* Media */}
+        {/* Default Location */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Default Location</CardTitle>
+            <CardDescription>
+              Default venue information for events
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="defaultLocation">Venue Name</Label>
+              <Input
+                id="defaultLocation"
+                value={formData.settings.defaultLocation}
+                onChange={(e) => handleNestedInputChange('settings', 'defaultLocation', e.target.value)}
+                placeholder="Venue Name"
+              />
+            </div>
+            
+            <div>
+              <Label htmlFor="defaultAddress">Address</Label>
+              <Input
+                id="defaultAddress"
+                value={formData.settings.defaultAddress}
+                onChange={(e) => handleNestedInputChange('settings', 'defaultAddress', e.target.value)}
+                placeholder="123 Main St, City, State 12345"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Media & Branding */}
         <Card>
           <CardHeader>
             <CardTitle>Media & Branding</CardTitle>
@@ -338,37 +441,97 @@ export function OrganizationEditForm({
                 )}
               </div>
             </div>
-
           </CardContent>
         </Card>
 
-        {/* Location */}
+        {/* Club Background */}
         <Card>
           <CardHeader>
-            <CardTitle>Default Location</CardTitle>
+            <CardTitle>About Section</CardTitle>
             <CardDescription>
-              Default venue information for events
+              Content and images for your organization's about section
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="defaultLocation">Venue Name</Label>
-              <Input
-                id="defaultLocation"
-                value={formData.settings.defaultLocation}
-                onChange={(e) => handleNestedInputChange('settings', 'defaultLocation', e.target.value)}
-                placeholder="Venue Name"
+              <Label htmlFor="aboutImageFile">About Image Upload</Label>
+              <div className="space-y-2">
+                <input
+                  id="aboutImageFile"
+                  type="file"
+                  accept=".jpeg,.jpg,.png"
+                  onChange={handleAboutImageUpload}
+                  disabled={uploadingAbout}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                {uploadingAbout && (
+                  <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <span className="animate-spin">⭐</span>
+                    Uploading about image...
+                  </p>
+                )}
+                <p className="text-xs text-gray-500">
+                  Supported formats: JPEG, PNG. Max size: 10MB. Recommended: 600x400px or larger
+                </p>
+                {formData.aboutImageUrl && !uploadingAbout && (
+                  <div className="mt-3">
+                    <Label className="text-sm text-gray-600">Preview:</Label>
+                    <div className="mt-1 relative h-32 rounded-lg overflow-hidden border border-gray-200">
+                      <img 
+                        src={formData.aboutImageUrl} 
+                        alt="About image preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="aboutStory">Our Story</Label>
+              <Textarea
+                id="aboutStory"
+                value={formData.aboutStory}
+                onChange={(e) => handleInputChange('aboutStory', e.target.value)}
+                placeholder="Tell the story of your organization - how it started, your mission, and what makes you unique..."
+                rows={6}
               />
             </div>
-            
+
             <div>
-              <Label htmlFor="defaultAddress">Address</Label>
-              <Input
-                id="defaultAddress"
-                value={formData.settings.defaultAddress}
-                onChange={(e) => handleNestedInputChange('settings', 'defaultAddress', e.target.value)}
-                placeholder="123 Main St, City, State 12345"
-              />
+              <Label>What We Offer</Label>
+              <div className="space-y-2">
+                {formData.aboutOfferings.map((offering, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <Input
+                      value={offering}
+                      onChange={(e) => updateOffering(index, e.target.value)}
+                      placeholder="e.g., Weekly open studio sessions with shared materials"
+                      className="flex-1"
+                    />
+                    {formData.aboutOfferings.length > 1 && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeOffering(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={addOffering}
+                  className="mt-2"
+                >
+                  Add Offering
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

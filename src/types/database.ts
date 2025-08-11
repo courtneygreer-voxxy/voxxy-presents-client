@@ -8,6 +8,9 @@ export interface Organization {
   background: string
   logoUrl?: string
   bannerUrl?: string
+  aboutImageUrl?: string
+  aboutStory?: string
+  aboutOfferings?: string[]
   contactEmail: string
   socialLinks: {
     instagram?: string
