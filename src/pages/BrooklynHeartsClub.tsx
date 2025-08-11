@@ -127,9 +127,6 @@ export default function BrooklynHeartsClub() {
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                       <div className="flex-1 mb-4 md:mb-0">
                         <div className="flex items-center gap-3 mb-2">
-                          <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                            {event.category}
-                          </Badge>
                           {event.isRecurring && (
                             <Badge variant="outline" className="flex items-center gap-1">
                               <Repeat className="h-3 w-3" />
