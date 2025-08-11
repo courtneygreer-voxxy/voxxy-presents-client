@@ -7,45 +7,6 @@ import { Textarea } from "@/components/ui/textarea"
 import { Save, X } from "lucide-react"
 import type { Organization } from '@/types/database'
 
-// Curated stock images for hero backgrounds
-const curatedBackgrounds = [
-  {
-    id: 'art-studio',
-    name: 'Art Studio',
-    url: '/curated/art-studio-hero.jpg',
-    thumbnail: '/curated/art-studio-thumb.jpg'
-  },
-  {
-    id: 'gallery-space',
-    name: 'Gallery Space', 
-    url: '/curated/gallery-space-hero.jpg',
-    thumbnail: '/curated/gallery-space-thumb.jpg'
-  },
-  {
-    id: 'creative-workspace',
-    name: 'Creative Workspace',
-    url: '/curated/creative-workspace-hero.jpg', 
-    thumbnail: '/curated/creative-workspace-thumb.jpg'
-  },
-  {
-    id: 'art-supplies',
-    name: 'Art Supplies',
-    url: '/curated/art-supplies-hero.jpg',
-    thumbnail: '/curated/art-supplies-thumb.jpg'
-  },
-  {
-    id: 'community-event',
-    name: 'Community Event',
-    url: '/curated/community-event-hero.jpg',
-    thumbnail: '/curated/community-event-thumb.jpg'
-  },
-  {
-    id: 'abstract-art',
-    name: 'Abstract Art',
-    url: '/curated/abstract-art-hero.jpg',
-    thumbnail: '/curated/abstract-art-thumb.jpg'
-  }
-]
 
 interface OrganizationEditFormProps {
   organization: Organization
@@ -84,6 +45,7 @@ export function OrganizationEditForm({
 
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [uploadingHero, setUploadingHero] = useState(false)
   
   // Use external saving state if provided (for full page mode)
   const submitting = isSaving || isSubmitting
@@ -145,6 +107,49 @@ export function OrganizationEditForm({
       console.error('Error uploading logo:', error)
       alert('Error uploading file')
       setUploadingLogo(false)
+    }
+  }
+
+  const handleHeroUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG or PNG)')
+      return
+    }
+
+    // Validate file size (10MB max for hero images)
+    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
+    if (file.size > maxSize) {
+      alert('File size must be less than 10MB')
+      return
+    }
+
+    setUploadingHero(true)
+    
+    try {
+      // Convert file to data URL for preview/storage
+      const reader = new FileReader()
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string
+        setFormData(prev => ({
+          ...prev,
+          bannerUrl: dataUrl
+        }))
+        setUploadingHero(false)
+      }
+      reader.onerror = () => {
+        alert('Error reading file')
+        setUploadingHero(false)
+      }
+      reader.readAsDataURL(file)
+    } catch (error) {
+      console.error('Error uploading hero image:', error)
+      alert('Error uploading file')
+      setUploadingHero(false)
     }
   }
 
@@ -297,56 +302,32 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="heroBackground">Hero Background</Label>
-              <div className="space-y-3">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {curatedBackgrounds.map((bg) => (
-                    <div 
-                      key={bg.id}
-                      className={`relative rounded-lg border-2 cursor-pointer transition-all ${
-                        formData.bannerUrl === bg.url 
-                          ? 'border-purple-500 ring-2 ring-purple-200' 
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                      onClick={() => handleInputChange('bannerUrl', bg.url)}
-                    >
-                      <img 
-                        src={bg.thumbnail} 
-                        alt={bg.name}
-                        className="w-full h-24 object-cover rounded-md"
-                      />
-                      <div className="absolute inset-0 bg-black/20 rounded-md flex items-center justify-center">
-                        <span className="text-white text-xs font-medium bg-black/50 px-2 py-1 rounded">
-                          {bg.name}
-                        </span>
-                      </div>
-                      {formData.bannerUrl === bg.url && (
-                        <div className="absolute top-1 right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center">
-                          <span className="text-white text-xs">✓</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-                
-                <div className="pt-2 border-t">
-                  <Label htmlFor="customBannerUrl" className="text-sm text-gray-600">Or use custom URL:</Label>
-                  <Input
-                    id="customBannerUrl"
-                    value={formData.bannerUrl.startsWith('/curated/') ? '' : formData.bannerUrl}
-                    onChange={(e) => handleInputChange('bannerUrl', e.target.value)}
-                    placeholder="https://example.com/banner.jpg"
-                    className="mt-1"
-                  />
-                </div>
-                
-                {formData.bannerUrl && (
+              <Label htmlFor="heroFile">Hero Background Upload</Label>
+              <div className="space-y-2">
+                <input
+                  id="heroFile"
+                  type="file"
+                  accept=".jpeg,.jpg,.png"
+                  onChange={handleHeroUpload}
+                  disabled={uploadingHero}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                {uploadingHero && (
+                  <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <span className="animate-spin">⭐</span>
+                    Uploading hero background...
+                  </p>
+                )}
+                <p className="text-xs text-gray-500">
+                  Supported formats: JPEG, PNG. Max size: 10MB. Recommended: 1200x400px or larger
+                </p>
+                {formData.bannerUrl && !uploadingHero && (
                   <div className="mt-3">
                     <Label className="text-sm text-gray-600">Preview:</Label>
                     <div className="mt-1 relative h-32 rounded-lg overflow-hidden border border-gray-200">
                       <img 
                         src={formData.bannerUrl} 
-                        alt="Banner preview" 
+                        alt="Hero background preview" 
                         className="w-full h-full object-cover"
                       />
                       <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
