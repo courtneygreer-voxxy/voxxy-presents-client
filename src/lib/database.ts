@@ -160,22 +160,25 @@ export const deleteEvent = async (id: string) => {
 
 // Registrations
 export const createRegistration = async (data: CreateRegistrationData) => {
-  // Get current waitlist position
-  const q = query(
-    registrationsRef,
-    where('eventId', '==', data.eventId),
-    where('registrationType', '==', 'waitlist'),
-    orderBy('registeredAt', 'desc'),
-    limit(1)
-  )
+  let waitlistPosition: number | undefined = undefined
   
-  const querySnapshot = await getDocs(q)
-  const lastWaitlistPosition = querySnapshot.empty ? 0 : querySnapshot.docs[0].data().waitlistPosition || 0
+  // Only calculate waitlist position if this is a waitlist registration
+  if (data.registrationType === 'waitlist') {
+    // Get all waitlist registrations for this event to calculate position
+    const q = query(
+      registrationsRef,
+      where('eventId', '==', data.eventId),
+      where('registrationType', '==', 'waitlist')
+    )
+    
+    const querySnapshot = await getDocs(q)
+    waitlistPosition = querySnapshot.size + 1 // Next position in line
+  }
   
   const docRef = await addDoc(registrationsRef, {
     ...data,
     registeredAt: Timestamp.now(),
-    waitlistPosition: data.registrationType === 'waitlist' ? lastWaitlistPosition + 1 : undefined
+    waitlistPosition
   })
   
   return docRef.id
