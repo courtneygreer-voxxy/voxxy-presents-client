@@ -164,15 +164,20 @@ export const createRegistration = async (data: CreateRegistrationData) => {
   
   // Only calculate waitlist position if this is a waitlist registration
   if (data.registrationType === 'waitlist') {
-    // Get all waitlist registrations for this event to calculate position
+    // Get all registrations for this event (simple query with only eventId)
     const q = query(
       registrationsRef,
-      where('eventId', '==', data.eventId),
-      where('registrationType', '==', 'waitlist')
+      where('eventId', '==', data.eventId)
     )
     
     const querySnapshot = await getDocs(q)
-    waitlistPosition = querySnapshot.size + 1 // Next position in line
+    
+    // Filter for waitlist registrations in memory to avoid composite index
+    const waitlistRegistrations = querySnapshot.docs.filter(doc => 
+      doc.data().registrationType === 'waitlist'
+    )
+    
+    waitlistPosition = waitlistRegistrations.length + 1 // Next position in line
   }
   
   const docRef = await addDoc(registrationsRef, {
