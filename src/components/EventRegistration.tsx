@@ -7,6 +7,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, ExternalLink, Calendar, CheckCircle } from "lucide-react"
 import { registrationsApi, ApiError } from '@/services/api'
+import { createRegistration, createWaitlistEntry } from '@/lib/database'
+import { getDataSource } from '@/config/environments'
 import HowDidYouHearPopup from './HowDidYouHearPopup'
 import type { Event } from '@/types/database'
 
@@ -16,7 +18,7 @@ interface EventRegistrationProps {
 
 export default function EventRegistration({ event }: EventRegistrationProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState<'interest' | 'presale'>('interest')
+  const [dialogType, setDialogType] = useState<'interest' | 'presale' | 'waitlist'>('interest')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,7 +35,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
 
   // Determine which button to show based on event properties
   const getButtonType = () => {
-    if (event.eventbriteUrl) {
+    if (event.status === 'sold_out') {
+      return 'waitlist'
+    } else if (event.eventbriteUrl) {
       return 'eventbrite'
     } else if (event.status === 'presale') {
       return 'presale'
@@ -43,7 +47,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     return null
   }
 
-  const handleButtonClick = (type: 'interest' | 'presale') => {
+  const handleButtonClick = (type: 'interest' | 'presale' | 'waitlist') => {
     setDialogType(type)
     setDialogOpen(true)
     setSubmitSuccess(false)
@@ -65,24 +69,80 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     setSubmitError(null)
 
     try {
-      let registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
+      let registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'waitlist'
       
-      if (dialogType === 'presale') {
+      if (dialogType === 'waitlist') {
+        registrationType = 'waitlist'
+      } else if (dialogType === 'presale') {
         registrationType = 'presale_request'
       } else {
         registrationType = formData.rsvpType
       }
 
-      await registrationsApi.create({
-        eventId: event.id,
-        name: formData.name,
-        email: formData.email || undefined,
-        phone: formData.phone || undefined,
-        registrationType,
-        notes: formData.notes || undefined,
-        subscribeToUpdates: formData.subscribeToUpdates,
-        subscribeToNewsletter: formData.subscribeToNewsletter
-      })
+      const dataSource = getDataSource()
+      
+      if (dataSource === 'firebase') {
+        // Development mode: Use Firebase directly
+        console.log(`Creating ${registrationType} via Firebase (development)`)
+        
+        if (registrationType === 'waitlist') {
+          // Use separate waitlists collection
+          const waitlistData: any = {
+            eventId: event.id,
+            organizationId: event.organizationId,
+            name: formData.name,
+            email: formData.email || '',
+            source: 'website'
+          }
+          
+          // Only include phone and notes if they have values
+          if (formData.phone && formData.phone.trim()) {
+            waitlistData.phone = formData.phone.trim()
+          }
+          if (formData.notes && formData.notes.trim()) {
+            waitlistData.notes = formData.notes.trim()
+          }
+          
+          const result = await createWaitlistEntry(waitlistData)
+          console.log(`✅ Waitlist entry created successfully in Firebase (position ${result.position})`)
+        } else {
+          // Use registrations collection for other types
+          const firebaseRegistrationType: 'confirmed' | 'cancelled' = 'confirmed'
+          const registrationData: any = {
+            eventId: event.id,
+            organizationId: event.organizationId,
+            name: formData.name,
+            email: formData.email || '',
+            registrationType: firebaseRegistrationType,
+            emailSent: false,
+            source: 'website'
+          }
+          
+          // Only include phone and notes if they have values
+          if (formData.phone && formData.phone.trim()) {
+            registrationData.phone = formData.phone.trim()
+          }
+          if (formData.notes && formData.notes.trim()) {
+            registrationData.notes = formData.notes.trim()
+          }
+          
+          await createRegistration(registrationData)
+          console.log('✅ Registration created successfully in Firebase')
+        }
+      } else {
+        // Production/Staging mode: Use API
+        console.log('Creating registration via API')
+        await registrationsApi.create({
+          eventId: event.id,
+          name: formData.name,
+          email: formData.email || undefined,
+          phone: formData.phone || undefined,
+          registrationType,
+          notes: formData.notes || undefined,
+          subscribeToUpdates: formData.subscribeToUpdates,
+          subscribeToNewsletter: formData.subscribeToNewsletter
+        })
+      }
 
       setSubmitSuccess(true)
       setTimeout(() => {
@@ -134,6 +194,16 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
           </Button>
         )}
         
+        {buttonType === 'waitlist' && (
+          <Button
+            className="bg-orange-600 hover:bg-orange-700"
+            onClick={() => handleButtonClick('waitlist')}
+          >
+            Join Waitlist
+            <Calendar className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+        
         {buttonType === 'interest' && (
           <Button
             className="bg-purple-600 hover:bg-purple-700"
@@ -150,7 +220,12 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {dialogType === 'presale' ? (
+              {dialogType === 'waitlist' ? (
+                <>
+                  <Calendar className="h-5 w-5 text-orange-600" />
+                  Join Waitlist
+                </>
+              ) : dialogType === 'presale' ? (
                 <>
                   <Mail className="h-5 w-5 text-purple-600" />
                   Request Presale Information
@@ -163,7 +238,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
               )}
             </DialogTitle>
             <DialogDescription>
-              {dialogType === 'presale' ? (
+              {dialogType === 'waitlist' ? (
+                <>Join the waitlist for <strong>{event.title}</strong>. You'll be contacted in order if spots become available.</>
+              ) : dialogType === 'presale' ? (
                 <>Get notified when tickets become available for <strong>{event.title}</strong></>
               ) : (
                 <>Let us know your level of interest in <strong>{event.title}</strong></>
@@ -187,7 +264,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  Email {dialogType === 'presale' ? '*' : '(optional)'}
+                  Email {(dialogType === 'presale' || dialogType === 'waitlist') ? '*' : '(optional)'}
                 </Label>
                 <Input
                   id="email"
@@ -195,7 +272,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                   placeholder="your.email@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required={dialogType === 'presale'}
+                  required={dialogType === 'presale' || dialogType === 'waitlist'}
                 />
               </div>
 
@@ -283,10 +360,10 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !formData.name || (dialogType === 'presale' && !formData.email)}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  disabled={isSubmitting || !formData.name || ((dialogType === 'presale' || dialogType === 'waitlist') && !formData.email)}
+                  className={`flex-1 ${dialogType === 'waitlist' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-purple-600 hover:bg-purple-700'}`}
                 >
-                  {isSubmitting ? 'Submitting...' : dialogType === 'presale' ? 'Send Request' : 'Submit Interest'}
+                  {isSubmitting ? 'Submitting...' : dialogType === 'waitlist' ? 'Join Waitlist' : dialogType === 'presale' ? 'Send Request' : 'Submit Interest'}
                 </Button>
               </div>
             </form>
@@ -296,12 +373,14 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {dialogType === 'presale' ? 'Request Sent!' : 'Interest Submitted!'}
+                {dialogType === 'waitlist' ? 'Added to Waitlist!' : dialogType === 'presale' ? 'Request Sent!' : 'Interest Submitted!'}
               </h3>
               <p className="text-gray-600">
-                {dialogType === 'presale' 
-                  ? 'The organizer will contact you when tickets are available.'
-                  : 'Thanks for expressing your interest! This helps the organizer gauge event popularity.'
+                {dialogType === 'waitlist'
+                  ? 'You\'ve been added to the waitlist. The organizer will contact you in order if spots become available.'
+                  : dialogType === 'presale' 
+                    ? 'The organizer will contact you when tickets are available.'
+                    : 'Thanks for expressing your interest! This helps the organizer gauge event popularity.'
                 }
               </p>
             </div>

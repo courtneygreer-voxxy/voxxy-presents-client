@@ -22,6 +22,7 @@ import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import EventCreateForm from "@/components/EventCreateForm"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
+import SubscribersList from "@/components/SubscribersList"
 import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -324,104 +325,34 @@ export default function OrganizationAdmin() {
               <CardHeader>
                 <CardTitle>Subscriber Management</CardTitle>
                 <CardDescription>
-                  Manage email subscribers and send newsletters to your audience.
+                  Manage waitlists, email subscribers, and audience engagement.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-6">
-                  {/* Subscriber Stats */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <Card>
-                      <CardContent className="flex items-center gap-3 p-4">
-                        <Mail className="h-8 w-8 text-blue-600" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Event Updates</p>
-                          <p className="text-2xl font-bold">0</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardContent className="flex items-center gap-3 p-4">
-                        <Users className="h-8 w-8 text-green-600" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Newsletter</p>
-                          <p className="text-2xl font-bold">0</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <Card>
-                      <CardContent className="flex items-center gap-3 p-4">
-                        <BarChart3 className="h-8 w-8 text-purple-600" />
-                        <div>
-                          <p className="text-sm font-medium text-gray-600">Total Subscribers</p>
-                          <p className="text-2xl font-bold">0</p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  {/* Email Blast Section */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Send Email Blast</CardTitle>
-                      <CardDescription>
-                        Send newsletters or updates to your subscribers
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-col items-center justify-center py-12">
-                        <Mail className="h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Email Management</h3>
-                        <p className="text-gray-600 text-center mb-4">
-                          Email blast functionality will be available soon. Subscribers from event registrations will appear here automatically.
-                        </p>
-                        <Button disabled variant="outline">
-                          Compose Email
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  {/* Subscriber List */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-lg">Subscriber List</CardTitle>
-                      <CardDescription>
-                        View and manage your email subscribers
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex flex-col items-center justify-center py-12">
-                        <Users className="h-12 w-12 text-gray-400 mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Subscribers Yet</h3>
-                        <p className="text-gray-600 text-center">
-                          Subscribers will appear here when people opt-in during event registration.
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                {organization && (
+                  <SubscribersList 
+                    organizationId={organization.id}
+                    events={events}
+                  />
+                )}
               </CardContent>
             </Card>
           </TabsContent>
-
           {/* Analytics Tab */}
           <TabsContent value="analytics">
             <Card>
               <CardHeader>
-                <CardTitle>Analytics</CardTitle>
+                <CardTitle>Analytics Dashboard</CardTitle>
                 <CardDescription>
-                  Track your organization's performance and audience engagement.
+                  View insights about your events and audience engagement.
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col items-center justify-center py-12">
-                  <BarChart3 className="h-12 w-12 text-gray-400 mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Analytics Dashboard</h3>
-                  <p className="text-gray-600 text-center">
-                    Analytics and insights will be available soon.
+                <div className="flex flex-col items-center justify-center py-16">
+                  <BarChart3 className="h-16 w-16 text-gray-400 mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics Coming Soon</h3>
+                  <p className="text-gray-600 text-center max-w-md">
+                    Detailed analytics and insights about your events, registrations, and audience engagement will be available here.
                   </p>
                 </div>
               </CardContent>
@@ -431,34 +362,33 @@ export default function OrganizationAdmin() {
         </Tabs>
       </div>
 
-      {/* Event Management Modals */}
-      {organization && (
-        <>
-          <EventCreateForm
-            organization={organization}
-            isOpen={isCreateEventOpen}
-            onClose={() => setIsCreateEventOpen(false)}
-            onSuccess={handleEventCreated}
-          />
-          
-          {editingEvent && (
-            <EventEditForm
-              event={editingEvent}
-              isOpen={!!editingEvent}
-              onClose={() => setEditingEvent(null)}
-              onSuccess={handleEventUpdated}
-              onDelete={handleEventDeleted}
-            />
-          )}
+      {/* Create Event Modal */}
+      {isCreateEventOpen && organization && (
+        <EventCreateForm
+          organization={organization}
+          isOpen={isCreateEventOpen}
+          onClose={() => setIsCreateEventOpen(false)}
+          onSuccess={handleEventCreated}
+        />
+      )}
 
-          {registrationModalEvent && (
-            <EventRegistrationModal
-              event={registrationModalEvent}
-              isOpen={!!registrationModalEvent}
-              onClose={() => setRegistrationModalEvent(null)}
-            />
-          )}
-        </>
+      {/* Edit Event Modal */}
+      {editingEvent && (
+        <EventEditForm
+          event={editingEvent}
+          isOpen={!!editingEvent}
+          onClose={() => setEditingEvent(null)}
+          onSuccess={handleEventUpdated}
+          onDelete={handleEventDeleted}
+        />
+      )}
+
+      {registrationModalEvent && (
+        <EventRegistrationModal
+          event={registrationModalEvent}
+          isOpen={!!registrationModalEvent}
+          onClose={() => setRegistrationModalEvent(null)}
+        />
       )}
     </div>
   )

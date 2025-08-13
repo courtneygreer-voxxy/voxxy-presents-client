@@ -121,6 +121,26 @@ export interface Registration {
   source: 'website' | 'eventbrite' | 'manual'
 }
 
+export interface Waitlist {
+  id: string
+  eventId: string // References events collection
+  organizationId: string // References organizations collection
+  
+  // User info
+  name: string
+  email: string
+  phone?: string
+  
+  // Waitlist details
+  position: number
+  joinedAt: Date
+  notifiedAt?: Date
+  
+  // Additional data
+  notes?: string
+  source: 'website' | 'eventbrite' | 'manual'
+}
+
 export interface User {
   id: string // Firebase Auth UID
   email: string
@@ -158,3 +178,4 @@ export interface EmailTemplate {
 export type CreateEventData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 export type UpdateEventData = Partial<CreateEventData>
 export type CreateRegistrationData = Omit<Registration, 'id' | 'registeredAt' | 'waitlistPosition'>
+export type CreateWaitlistData = Omit<Waitlist, 'id' | 'position' | 'joinedAt'>

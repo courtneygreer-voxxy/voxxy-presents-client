@@ -22,7 +22,9 @@ import {
   FileText
 } from "lucide-react"
 import { registrationsApi } from "@/services/api"
-import type { Event } from "@/types/database"
+import { getRegistrationsByEvent, getWaitlistByEvent } from '@/lib/database'
+import { getDataSource } from '@/config/environments'
+import type { Event, Registration as DBRegistration, Waitlist } from "@/types/database"
 
 interface Registration {
   id: string
@@ -30,16 +32,18 @@ interface Registration {
   name: string
   email?: string
   phone?: string
-  registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
+  registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'waitlist'
   notes?: string
   createdAt?: string
   registeredAt?: string
+  position?: number // For waitlist entries
 }
 
 interface RegistrationStats {
   veryInterested: number
   somewhatInterested: number
   presaleRequests: number
+  waitlistCount: number
   totalRegistrations: number
 }
 
@@ -55,6 +59,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
     veryInterested: 0,
     somewhatInterested: 0,
     presaleRequests: 0,
+    waitlistCount: 0,
     totalRegistrations: 0
   })
   const [manualSales, setManualSales] = useState<number>(0)
@@ -83,60 +88,83 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
     
     try {
       console.log('Loading registrations for event:', event.id)
-      const response = await registrationsApi.getByEvent(event.id)
-      console.log('Raw API Response:', JSON.stringify(response, null, 2))
-      console.log('Response type:', typeof response)
-      console.log('Response keys:', response ? Object.keys(response) : 'none')
-      
-      // Handle different response formats
+      const dataSource = getDataSource()
       let registrationData: Registration[] = []
       
-      if (Array.isArray(response)) {
-        console.log('Response is array, length:', response.length)
-        registrationData = response
-      } else if (response && Array.isArray(response.data)) {
-        console.log('Response.data is array, length:', response.data.length)
-        registrationData = response.data
-      } else if (response && response.registrations && Array.isArray(response.registrations)) {
-        console.log('Response.registrations is array, length:', response.registrations.length)
-        registrationData = response.registrations
-      } else if (response && response.registrations && typeof response.registrations === 'object') {
-        console.log('Converting registrations object to array')
-        console.log('Registrations object:', JSON.stringify(response.registrations, null, 2))
-        console.log('Object keys:', Object.keys(response.registrations))
-        const values = Object.values(response.registrations)
-        console.log('Object values:', JSON.stringify(values, null, 2))
-        console.log('Values length:', values.length)
+      if (dataSource === 'firebase') {
+        // Development mode: Use Firebase directly
+        console.log('Loading from Firebase (development mode)')
         
-        // Flatten all registration arrays into one list
-        const flattenedRegistrations: Registration[] = []
-        values.forEach((value) => {
-          if (Array.isArray(value)) {
-            flattenedRegistrations.push(...value)
-          }
-        })
-        console.log('Flattened registrations:', flattenedRegistrations.length)
-        registrationData = flattenedRegistrations
+        // Load regular registrations
+        const dbRegistrations = await getRegistrationsByEvent(event.id)
+        console.log('DB Registrations:', dbRegistrations.length)
+        
+        // Convert DB registrations to component format
+        const formattedRegistrations: Registration[] = dbRegistrations.map(reg => ({
+          id: reg.id,
+          eventId: reg.eventId,
+          name: reg.name,
+          email: reg.email,
+          phone: reg.phone,
+          registrationType: reg.registrationType === 'confirmed' ? 'rsvp_yes' : 'rsvp_maybe',
+          notes: reg.notes,
+          registeredAt: reg.registeredAt.toISOString()
+        }))
+        
+        // Load waitlist entries
+        const waitlistEntries = await getWaitlistByEvent(event.id)
+        console.log('Waitlist entries:', waitlistEntries.length)
+        
+        // Convert waitlist entries to component format
+        const formattedWaitlist: Registration[] = waitlistEntries.map(entry => ({
+          id: entry.id,
+          eventId: entry.eventId,
+          name: entry.name,
+          email: entry.email,
+          phone: entry.phone,
+          registrationType: 'waitlist' as const,
+          notes: entry.notes,
+          registeredAt: entry.joinedAt.toISOString(),
+          position: entry.position
+        }))
+        
+        registrationData = [...formattedRegistrations, ...formattedWaitlist]
+        console.log('Total combined data:', registrationData.length)
+        
       } else {
-        console.warn('No registrations found or unexpected format')
-        console.log('Response structure check:')
-        console.log('- response exists:', !!response)
-        console.log('- response.registrations exists:', !!(response && response.registrations))
-        console.log('- response.registrations type:', response && response.registrations ? typeof response.registrations : 'none')
-        registrationData = []
+        // Production/Staging mode: Use API
+        console.log('Loading from API (production/staging mode)')
+        const response = await registrationsApi.getByEvent(event.id)
+        
+        // Handle different response formats
+        if (Array.isArray(response)) {
+          registrationData = response
+        } else if (response && Array.isArray(response.data)) {
+          registrationData = response.data
+        } else if (response && response.registrations && Array.isArray(response.registrations)) {
+          registrationData = response.registrations
+        } else if (response && response.registrations && typeof response.registrations === 'object') {
+          const flattenedRegistrations: Registration[] = []
+          Object.values(response.registrations).forEach((value) => {
+            if (Array.isArray(value)) {
+              flattenedRegistrations.push(...value)
+            }
+          })
+          registrationData = flattenedRegistrations
+        } else {
+          registrationData = []
+        }
       }
       
-      console.log('Final registration data:', registrationData)
-      console.log('Final data length:', registrationData.length)
-      console.log('Sample registration:', registrationData[0])
-      console.log('All registrations mapped:', registrationData.map((r, i) => ({ index: i, id: r?.id, name: r?.name, type: r?.registrationType })))
+      console.log('Final registration data:', registrationData.length)
       setRegistrations(registrationData)
       
       // Calculate stats
       const newStats = {
-        veryInterested: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_yes').length,
-        somewhatInterested: registrationData.filter((r: Registration) => r.registrationType === 'rsvp_maybe').length,
-        presaleRequests: registrationData.filter((r: Registration) => r.registrationType === 'presale_request').length,
+        veryInterested: registrationData.filter(r => r.registrationType === 'rsvp_yes').length,
+        somewhatInterested: registrationData.filter(r => r.registrationType === 'rsvp_maybe').length,
+        presaleRequests: registrationData.filter(r => r.registrationType === 'presale_request').length,
+        waitlistCount: registrationData.filter(r => r.registrationType === 'waitlist').length,
         totalRegistrations: registrationData.length
       }
       setStats(newStats)
@@ -149,17 +177,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         errorMessage = err.message
       }
       
-      // Add context to error message
       const contextMessage = `${errorMessage} (Event: ${event.id}, Attempt: ${retryCount + 1})`
       setError(contextMessage)
-      
-      console.error('Registration Load Error Details:', {
-        eventId: event.id,
-        eventTitle: event.title,
-        error: err,
-        retryCount,
-        timestamp: new Date().toISOString()
-      })
       
     } finally {
       setLoading(false)
@@ -199,6 +218,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         return <User className="h-4 w-4 text-yellow-600" />
       case 'presale_request':
         return <MailOpen className="h-4 w-4 text-blue-600" />
+      case 'waitlist':
+        return <Clock className="h-4 w-4 text-orange-600" />
       default:
         return <Users className="h-4 w-4 text-gray-400" />
     }
@@ -209,6 +230,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
       case 'rsvp_yes': return 'Very Interested'
       case 'rsvp_maybe': return 'Somewhat Interested'
       case 'presale_request': return 'Presale Request'
+      case 'waitlist': return 'Waitlist'
       default: return type
     }
   }
@@ -221,6 +243,8 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Somewhat Interested</Badge>
       case 'presale_request':
         return <Badge variant="outline" className="border-blue-500 text-blue-700">Presale</Badge>
+      case 'waitlist':
+        return <Badge className="bg-orange-600">Waitlist</Badge>
       default:
         return <Badge variant="outline">{type}</Badge>
     }
@@ -345,7 +369,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
           {!loading && !error && (
             <>
               {/* Quick Stats */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
                 <Card>
                   <CardContent className="flex items-center gap-3 p-4">
                     <CheckCircle className="h-8 w-8 text-green-600" />
@@ -372,6 +396,16 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                     <div>
                       <p className="text-sm font-medium text-gray-600">Presale Requests</p>
                       <p className="text-2xl font-bold">{stats.presaleRequests}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="flex items-center gap-3 p-4">
+                    <Clock className="h-8 w-8 text-orange-600" />
+                    <div>
+                      <p className="text-sm font-medium text-gray-600">Waitlist</p>
+                      <p className="text-2xl font-bold">{stats.waitlistCount}</p>
                     </div>
                   </CardContent>
                 </Card>
@@ -498,7 +532,14 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                                   </div>
                                 </TableCell>
                                 <TableCell className="font-medium">
-                                  {registration?.name || 'No name provided'}
+                                  <div className="flex items-center gap-2">
+                                    {registration?.name || 'No name provided'}
+                                    {registration?.registrationType === 'waitlist' && registration?.position && (
+                                      <Badge variant="outline" className="text-xs">
+                                        #{registration.position}
+                                      </Badge>
+                                    )}
+                                  </div>
                                 </TableCell>
                                 <TableCell>
                                   <div className="space-y-1">

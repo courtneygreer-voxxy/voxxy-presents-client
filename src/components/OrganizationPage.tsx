@@ -174,6 +174,16 @@ export default function OrganizationPage({
                     <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                       <div className="flex-1 mb-4 md:mb-0">
                         <div className="flex items-center gap-3 mb-2">
+                          {event.status === 'sold_out' && (
+                            <Badge className="bg-red-600 text-white">
+                              SOLD OUT
+                            </Badge>
+                          )}
+                          {event.status === 'presale' && (
+                            <Badge className="bg-purple-600 text-white">
+                              PRESALE
+                            </Badge>
+                          )}
                           {event.isRecurring && (
                             <Badge variant="outline" className="flex items-center gap-1">
                               <Repeat className="h-3 w-3" />
@@ -293,6 +303,16 @@ export default function OrganizationPage({
                               <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                                 <div className="flex-1 mb-4 md:mb-0">
                                   <div className="flex items-center gap-3 mb-2">
+                                    {event.status === 'sold_out' && (
+                                      <Badge className="bg-red-600 text-white">
+                                        SOLD OUT
+                                      </Badge>
+                                    )}
+                                    {event.status === 'presale' && (
+                                      <Badge className="bg-purple-600 text-white">
+                                        PRESALE
+                                      </Badge>
+                                    )}
                                     <Badge variant="outline" className="flex items-center gap-1">
                                       <Repeat className="h-3 w-3" />
                                       Recurring
