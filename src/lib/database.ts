@@ -18,16 +18,19 @@ import type {
   Organization, 
   Event, 
   Registration, 
+  Waitlist,
   User, 
   CreateEventData, 
   UpdateEventData,
-  CreateRegistrationData 
+  CreateRegistrationData,
+  CreateWaitlistData 
 } from '@/types/database'
 
 // Collection references
 export const organizationsRef = collection(db, 'organizations')
 export const eventsRef = collection(db, 'events')
 export const registrationsRef = collection(db, 'registrations')
+export const waitlistsRef = collection(db, 'waitlists')
 export const usersRef = collection(db, 'users')
 
 // Organizations
@@ -158,39 +161,69 @@ export const deleteEvent = async (id: string) => {
   await deleteDoc(docRef)
 }
 
-// Registrations
-export const createRegistration = async (data: CreateRegistrationData) => {
-  // Get current waitlist position
+// Waitlists
+export const createWaitlistEntry = async (data: CreateWaitlistData) => {
+  // Get current waitlist size for this event (simple single-field query)
   const q = query(
-    registrationsRef,
-    where('eventId', '==', data.eventId),
-    where('registrationType', '==', 'waitlist'),
-    orderBy('registeredAt', 'desc'),
-    limit(1)
+    waitlistsRef,
+    where('eventId', '==', data.eventId)
   )
   
   const querySnapshot = await getDocs(q)
-  const lastWaitlistPosition = querySnapshot.empty ? 0 : querySnapshot.docs[0].data().waitlistPosition || 0
+  const position = querySnapshot.size + 1 // Next position in line
   
+  const docRef = await addDoc(waitlistsRef, {
+    ...data,
+    position,
+    joinedAt: Timestamp.now()
+  })
+  
+  return { id: docRef.id, position }
+}
+
+export const getWaitlistByEvent = async (eventId: string): Promise<Waitlist[]> => {
+  // Use simple single-field query to avoid index requirements
+  const q = query(
+    waitlistsRef,
+    where('eventId', '==', eventId)
+  )
+  
+  const querySnapshot = await getDocs(q)
+  
+  const waitlist = querySnapshot.docs.map(doc => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      ...data,
+      joinedAt: data.joinedAt.toDate(),
+      notifiedAt: data.notifiedAt?.toDate()
+    }
+  }) as Waitlist[]
+  
+  // Sort by position in memory
+  return waitlist.sort((a, b) => a.position - b.position)
+}
+
+// Registrations (simplified - no waitlist logic)
+export const createRegistration = async (data: CreateRegistrationData) => {
   const docRef = await addDoc(registrationsRef, {
     ...data,
-    registeredAt: Timestamp.now(),
-    waitlistPosition: data.registrationType === 'waitlist' ? lastWaitlistPosition + 1 : undefined
+    registeredAt: Timestamp.now()
   })
   
   return docRef.id
 }
 
 export const getRegistrationsByEvent = async (eventId: string): Promise<Registration[]> => {
+  // Use simple single-field query to avoid index requirements
   const q = query(
     registrationsRef,
-    where('eventId', '==', eventId),
-    orderBy('registeredAt', 'asc')
+    where('eventId', '==', eventId)
   )
   
   const querySnapshot = await getDocs(q)
   
-  return querySnapshot.docs.map(doc => {
+  const registrations = querySnapshot.docs.map(doc => {
     const data = doc.data()
     return {
       id: doc.id,
@@ -201,6 +234,9 @@ export const getRegistrationsByEvent = async (eventId: string): Promise<Registra
       lastEmailSent: data.lastEmailSent?.toDate()
     }
   }) as Registration[]
+  
+  // Sort by registration date in memory
+  return registrations.sort((a, b) => a.registeredAt.getTime() - b.registeredAt.getTime())
 }
 
 // Users
