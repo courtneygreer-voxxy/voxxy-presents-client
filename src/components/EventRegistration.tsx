@@ -16,7 +16,7 @@ interface EventRegistrationProps {
 
 export default function EventRegistration({ event }: EventRegistrationProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [dialogType, setDialogType] = useState<'interest' | 'presale'>('interest')
+  const [dialogType, setDialogType] = useState<'interest' | 'presale' | 'waitlist'>('interest')
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -33,7 +33,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
 
   // Determine which button to show based on event properties
   const getButtonType = () => {
-    if (event.eventbriteUrl) {
+    if (event.status === 'sold_out') {
+      return 'waitlist'
+    } else if (event.eventbriteUrl) {
       return 'eventbrite'
     } else if (event.status === 'presale') {
       return 'presale'
@@ -43,7 +45,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     return null
   }
 
-  const handleButtonClick = (type: 'interest' | 'presale') => {
+  const handleButtonClick = (type: 'interest' | 'presale' | 'waitlist') => {
     setDialogType(type)
     setDialogOpen(true)
     setSubmitSuccess(false)
@@ -65,9 +67,11 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
     setSubmitError(null)
 
     try {
-      let registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
+      let registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'waitlist'
       
-      if (dialogType === 'presale') {
+      if (dialogType === 'waitlist') {
+        registrationType = 'waitlist'
+      } else if (dialogType === 'presale') {
         registrationType = 'presale_request'
       } else {
         registrationType = formData.rsvpType
@@ -134,6 +138,16 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
           </Button>
         )}
         
+        {buttonType === 'waitlist' && (
+          <Button
+            className="bg-orange-600 hover:bg-orange-700"
+            onClick={() => handleButtonClick('waitlist')}
+          >
+            Join Waitlist
+            <Calendar className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+        
         {buttonType === 'interest' && (
           <Button
             className="bg-purple-600 hover:bg-purple-700"
@@ -150,7 +164,12 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              {dialogType === 'presale' ? (
+              {dialogType === 'waitlist' ? (
+                <>
+                  <Calendar className="h-5 w-5 text-orange-600" />
+                  Join Waitlist
+                </>
+              ) : dialogType === 'presale' ? (
                 <>
                   <Mail className="h-5 w-5 text-purple-600" />
                   Request Presale Information
@@ -163,7 +182,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
               )}
             </DialogTitle>
             <DialogDescription>
-              {dialogType === 'presale' ? (
+              {dialogType === 'waitlist' ? (
+                <>Join the waitlist for <strong>{event.title}</strong>. You'll be contacted in order if spots become available.</>
+              ) : dialogType === 'presale' ? (
                 <>Get notified when tickets become available for <strong>{event.title}</strong></>
               ) : (
                 <>Let us know your level of interest in <strong>{event.title}</strong></>
@@ -187,7 +208,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
 
               <div className="space-y-2">
                 <Label htmlFor="email">
-                  Email {dialogType === 'presale' ? '*' : '(optional)'}
+                  Email {(dialogType === 'presale' || dialogType === 'waitlist') ? '*' : '(optional)'}
                 </Label>
                 <Input
                   id="email"
@@ -195,7 +216,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                   placeholder="your.email@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                  required={dialogType === 'presale'}
+                  required={dialogType === 'presale' || dialogType === 'waitlist'}
                 />
               </div>
 
@@ -283,10 +304,10 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !formData.name || (dialogType === 'presale' && !formData.email)}
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                  disabled={isSubmitting || !formData.name || ((dialogType === 'presale' || dialogType === 'waitlist') && !formData.email)}
+                  className={`flex-1 ${dialogType === 'waitlist' ? 'bg-orange-600 hover:bg-orange-700' : 'bg-purple-600 hover:bg-purple-700'}`}
                 >
-                  {isSubmitting ? 'Submitting...' : dialogType === 'presale' ? 'Send Request' : 'Submit Interest'}
+                  {isSubmitting ? 'Submitting...' : dialogType === 'waitlist' ? 'Join Waitlist' : dialogType === 'presale' ? 'Send Request' : 'Submit Interest'}
                 </Button>
               </div>
             </form>
@@ -296,12 +317,14 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                 <CheckCircle className="h-8 w-8 text-green-600" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {dialogType === 'presale' ? 'Request Sent!' : 'Interest Submitted!'}
+                {dialogType === 'waitlist' ? 'Added to Waitlist!' : dialogType === 'presale' ? 'Request Sent!' : 'Interest Submitted!'}
               </h3>
               <p className="text-gray-600">
-                {dialogType === 'presale' 
-                  ? 'The organizer will contact you when tickets are available.'
-                  : 'Thanks for expressing your interest! This helps the organizer gauge event popularity.'
+                {dialogType === 'waitlist'
+                  ? 'You\'ve been added to the waitlist. The organizer will contact you in order if spots become available.'
+                  : dialogType === 'presale' 
+                    ? 'The organizer will contact you when tickets are available.'
+                    : 'Thanks for expressing your interest! This helps the organizer gauge event popularity.'
                 }
               </p>
             </div>

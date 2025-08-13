@@ -140,7 +140,7 @@ export const registrationsApi = {
     eventId: string
     name: string
     email?: string
-    registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
+    registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'waitlist'
     phone?: string
     notes?: string
     subscribeToUpdates?: boolean
