@@ -28,11 +28,6 @@ import type { Organization, Event } from '@/types/database'
 export default function OrganizationAdmin() {
   const { orgSlug } = useParams<{ orgSlug: string }>()
   const navigate = useNavigate()
-  
-  // Debug logging for orgSlug
-  console.log('OrganizationAdmin - orgSlug from useParams:', orgSlug)
-  console.log('OrganizationAdmin - window.location.pathname:', window.location.pathname)
-  
   const { organization, events, loading, error, updateOrganization, refreshEvents } = useOrganization(orgSlug || '')
   const [isSaving, setIsSaving] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
