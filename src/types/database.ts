@@ -38,7 +38,6 @@ export interface Event {
   title: string
   description: string
   fullDescription: string
-  category?: 'Workshop' | 'Figure Drawing' | 'Social' | 'Exhibition' | 'Other'
   
   // Date and time
   date: Date

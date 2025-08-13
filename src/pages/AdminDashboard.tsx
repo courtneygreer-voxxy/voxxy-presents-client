@@ -109,7 +109,6 @@ export default function AdminDashboard() {
         title: "Sunday Stitch & B!tch",
         description: "A casual meet up with no strings attached - apart from those you stitch ;)",
         fullDescription: "Bring your own supplies: yarn, needles, embroidery supplies, etc. Chat up fellow enthusiasts while you work on your latest project.",
-        category: "Workshop",
         date: new Date("2024-08-03T14:00:00"),
         time: "2:00 PM - 4:00 PM",
         location: "Crystal Lake",
@@ -288,9 +287,6 @@ export default function AdminDashboard() {
                           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                             <span>{event.date.toLocaleDateString()}</span>
                             <span>{event.time}</span>
-                            <Badge variant="secondary" className="text-xs">
-                              {event.category}
-                            </Badge>
                           </div>
                         </div>
                         <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>

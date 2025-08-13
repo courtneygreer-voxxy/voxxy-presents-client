@@ -254,11 +254,6 @@ export default function OrganizationAdmin() {
                           <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
                             <div className="flex-1 mb-4 md:mb-0">
                               <div className="flex items-center gap-3 mb-2">
-                                {event.category && (
-                                  <Badge variant="secondary" className="bg-purple-100 text-purple-800">
-                                    {event.category}
-                                  </Badge>
-                                )}
                                 <Badge variant={
                                   event.status === 'published' ? 'default' :
                                   event.status === 'presale' ? 'secondary' :
