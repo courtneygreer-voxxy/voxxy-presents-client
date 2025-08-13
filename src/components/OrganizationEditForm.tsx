@@ -32,7 +32,7 @@ export function OrganizationEditForm({
     bannerUrl: organization.bannerUrl || '',
     aboutImageUrl: organization.aboutImageUrl || '',
     aboutStory: organization.aboutStory || '',
-    aboutOfferings: organization.aboutOfferings || [''],
+    aboutOfferings: organization.aboutOfferings && organization.aboutOfferings.length > 0 ? organization.aboutOfferings : [''] as string[],
     socialLinks: {
       instagram: organization.socialLinks.instagram || '',
       website: organization.socialLinks.website || '',
@@ -203,21 +203,21 @@ export function OrganizationEditForm({
   const addOffering = () => {
     setFormData(prev => ({
       ...prev,
-      aboutOfferings: [...(prev.aboutOfferings || []), '']
+      aboutOfferings: [...prev.aboutOfferings, '']
     }))
   }
 
   const removeOffering = (index: number) => {
     setFormData(prev => ({
       ...prev,
-      aboutOfferings: (prev.aboutOfferings || []).filter((_, i) => i !== index)
+      aboutOfferings: prev.aboutOfferings.filter((_, i) => i !== index)
     }))
   }
 
   const updateOffering = (index: number, value: string) => {
     setFormData(prev => ({
       ...prev,
-      aboutOfferings: (prev.aboutOfferings || []).map((offering, i) => 
+      aboutOfferings: prev.aboutOfferings.map((offering, i) => 
         i === index ? value : offering
       )
     }))
@@ -234,7 +234,7 @@ export function OrganizationEditForm({
     try {
       // Include default theme values since we removed the UI but the schema requires it
       // Filter out empty offerings
-      const cleanedOfferings = (formData.aboutOfferings || []).filter(offering => offering.trim() !== '')
+      const cleanedOfferings = formData.aboutOfferings.filter(offering => offering.trim() !== '')
       const saveData = {
         ...formData,
         settings: {
@@ -342,7 +342,7 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="background">Background</Label>
+              <Label htmlFor="background">Short Description</Label>
               <Textarea
                 id="background"
                 value={formData.background}
@@ -525,7 +525,7 @@ export function OrganizationEditForm({
             <div>
               <Label>What We Offer</Label>
               <div className="space-y-2">
-                {(formData.aboutOfferings || ['']).map((offering, index) => (
+                {formData.aboutOfferings.map((offering, index) => (
                   <div key={index} className="flex gap-2 items-center">
                     <Input
                       value={offering}
