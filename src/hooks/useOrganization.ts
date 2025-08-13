@@ -83,14 +83,25 @@ export function useOrganization(organizationSlug: string) {
       
       console.log(`Updating organization in ${currentEnv} environment using ${dataSource}`)
       
-      // Temporary workaround: Use Firebase for all updates until API endpoint is ready
-      console.log(`Updating organization via Firebase (${currentEnv} - temporary workaround)`)
-      
-      // Update directly in Firebase for all environments
-      const updatedOrg = await updateOrganizationInFirebase(organization.id, updates)
-      setOrganization(updatedOrg)
-      
-      console.log(`✅ Organization updated successfully in Firebase (${currentEnv})`)
+      if (dataSource === 'firebase') {
+        // Development/Staging/Sandbox mode: Firebase direct update
+        console.log(`Updating organization via Firebase (${currentEnv})`)
+        
+        // Update directly in Firebase
+        const updatedOrg = await updateOrganizationInFirebase(organization.id, updates)
+        setOrganization(updatedOrg)
+        
+        console.log(`✅ Organization updated successfully in Firebase (${currentEnv})`)
+        
+      } else if (dataSource === 'api' && apiUrl) {
+        // Production mode: API update
+        console.log(`Updating organization via API: ${apiUrl}`)
+        const updatedOrg = await organizationsApi.update(organization.id, updates)
+        setOrganization(updatedOrg)
+        
+      } else {
+        throw new Error(`Invalid update configuration for ${currentEnv} environment`)
+      }
       
     } catch (err) {
       console.error('Error updating organization:', err)

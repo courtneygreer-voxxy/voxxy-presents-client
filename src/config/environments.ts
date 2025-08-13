@@ -54,7 +54,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   staging: {
     name: 'staging',
-    dataSource: 'api', // API with production data mirror
+    dataSource: 'firebase', // Firebase with synced production data
     apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api', // TODO: Update to actual staging API URL
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
