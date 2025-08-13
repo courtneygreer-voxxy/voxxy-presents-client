@@ -103,7 +103,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         const formattedRegistrations: Registration[] = dbRegistrations.map(reg => ({
           id: reg.id,
           eventId: reg.eventId,
-          name: reg.name,
+          name: reg.name || 'No name',
           email: reg.email,
           phone: reg.phone,
           registrationType: reg.registrationType === 'confirmed' ? 'rsvp_yes' : 'rsvp_maybe',
@@ -119,7 +119,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
         const formattedWaitlist: Registration[] = waitlistEntries.map(entry => ({
           id: entry.id,
           eventId: entry.eventId,
-          name: entry.name,
+          name: entry.name || 'No name',
           email: entry.email,
           phone: entry.phone,
           registrationType: 'waitlist' as const,
