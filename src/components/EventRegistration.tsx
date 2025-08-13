@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Mail, ExternalLink, Calendar, CheckCircle } from "lucide-react"
 import { registrationsApi, ApiError } from '@/services/api'
-import { createRegistration } from '@/lib/database'
+import { createRegistration, createWaitlistEntry } from '@/lib/database'
 import { getDataSource } from '@/config/environments'
 import HowDidYouHearPopup from './HowDidYouHearPopup'
 import type { Event } from '@/types/database'
@@ -83,30 +83,36 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
       
       if (dataSource === 'firebase') {
         // Development mode: Use Firebase directly
-        console.log('Creating registration via Firebase (development)')
+        console.log(`Creating ${registrationType} via Firebase (development)`)
         
-        // Convert API registration type to Firebase registration type
-        let firebaseRegistrationType: 'waitlist' | 'confirmed' | 'cancelled'
         if (registrationType === 'waitlist') {
-          firebaseRegistrationType = 'waitlist'
+          // Use separate waitlists collection
+          const result = await createWaitlistEntry({
+            eventId: event.id,
+            organizationId: event.organizationId,
+            name: formData.name,
+            email: formData.email || '',
+            phone: formData.phone || undefined,
+            notes: formData.notes || undefined,
+            source: 'website'
+          })
+          console.log(`✅ Waitlist entry created successfully in Firebase (position ${result.position})`)
         } else {
-          // For other types (rsvp_yes, rsvp_maybe, presale_request), treat as confirmed
-          firebaseRegistrationType = 'confirmed'
+          // Use registrations collection for other types
+          const firebaseRegistrationType: 'confirmed' | 'cancelled' = 'confirmed'
+          await createRegistration({
+            eventId: event.id,
+            organizationId: event.organizationId,
+            name: formData.name,
+            email: formData.email || '',
+            phone: formData.phone || undefined,
+            registrationType: firebaseRegistrationType,
+            notes: formData.notes || undefined,
+            emailSent: false,
+            source: 'website'
+          })
+          console.log('✅ Registration created successfully in Firebase')
         }
-        
-        await createRegistration({
-          eventId: event.id,
-          organizationId: event.organizationId,
-          name: formData.name,
-          email: formData.email || '',
-          phone: formData.phone || undefined,
-          registrationType: firebaseRegistrationType,
-          notes: formData.notes || undefined,
-          emailSent: false,
-          source: 'website'
-        })
-        
-        console.log('✅ Registration created successfully in Firebase')
       } else {
         // Production/Staging mode: Use API
         console.log('Creating registration via API')

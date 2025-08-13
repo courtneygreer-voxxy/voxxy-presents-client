@@ -18,16 +18,19 @@ import type {
   Organization, 
   Event, 
   Registration, 
+  Waitlist,
   User, 
   CreateEventData, 
   UpdateEventData,
-  CreateRegistrationData 
+  CreateRegistrationData,
+  CreateWaitlistData 
 } from '@/types/database'
 
 // Collection references
 export const organizationsRef = collection(db, 'organizations')
 export const eventsRef = collection(db, 'events')
 export const registrationsRef = collection(db, 'registrations')
+export const waitlistsRef = collection(db, 'waitlists')
 export const usersRef = collection(db, 'users')
 
 // Organizations
@@ -158,32 +161,51 @@ export const deleteEvent = async (id: string) => {
   await deleteDoc(docRef)
 }
 
-// Registrations
+// Waitlists
+export const createWaitlistEntry = async (data: CreateWaitlistData) => {
+  // Get current waitlist size for this event (simple single-field query)
+  const q = query(
+    waitlistsRef,
+    where('eventId', '==', data.eventId)
+  )
+  
+  const querySnapshot = await getDocs(q)
+  const position = querySnapshot.size + 1 // Next position in line
+  
+  const docRef = await addDoc(waitlistsRef, {
+    ...data,
+    position,
+    joinedAt: Timestamp.now()
+  })
+  
+  return { id: docRef.id, position }
+}
+
+export const getWaitlistByEvent = async (eventId: string): Promise<Waitlist[]> => {
+  const q = query(
+    waitlistsRef,
+    where('eventId', '==', eventId),
+    orderBy('position', 'asc')
+  )
+  
+  const querySnapshot = await getDocs(q)
+  
+  return querySnapshot.docs.map(doc => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      ...data,
+      joinedAt: data.joinedAt.toDate(),
+      notifiedAt: data.notifiedAt?.toDate()
+    }
+  }) as Waitlist[]
+}
+
+// Registrations (simplified - no waitlist logic)
 export const createRegistration = async (data: CreateRegistrationData) => {
-  let waitlistPosition: number | undefined = undefined
-  
-  // Only calculate waitlist position if this is a waitlist registration
-  if (data.registrationType === 'waitlist') {
-    // Get all registrations for this event (simple query with only eventId)
-    const q = query(
-      registrationsRef,
-      where('eventId', '==', data.eventId)
-    )
-    
-    const querySnapshot = await getDocs(q)
-    
-    // Filter for waitlist registrations in memory to avoid composite index
-    const waitlistRegistrations = querySnapshot.docs.filter(doc => 
-      doc.data().registrationType === 'waitlist'
-    )
-    
-    waitlistPosition = waitlistRegistrations.length + 1 // Next position in line
-  }
-  
   const docRef = await addDoc(registrationsRef, {
     ...data,
-    registeredAt: Timestamp.now(),
-    waitlistPosition
+    registeredAt: Timestamp.now()
   })
   
   return docRef.id
