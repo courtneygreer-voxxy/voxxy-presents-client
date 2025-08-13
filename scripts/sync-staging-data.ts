@@ -66,9 +66,9 @@ async function syncCollection(collectionName: string) {
     });
     
     // Add production documents to staging
-    productionSnapshot.docs.forEach((doc) => {
-      const stagingDocRef = doc(stagingDb, collectionName, doc.id);
-      batch.set(stagingDocRef, doc.data());
+    productionSnapshot.docs.forEach((docSnapshot) => {
+      const stagingDocRef = doc(stagingDb, collectionName, docSnapshot.id);
+      batch.set(stagingDocRef, docSnapshot.data());
     });
     
     await batch.commit();
