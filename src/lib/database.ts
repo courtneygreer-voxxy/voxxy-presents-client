@@ -182,15 +182,15 @@ export const createWaitlistEntry = async (data: CreateWaitlistData) => {
 }
 
 export const getWaitlistByEvent = async (eventId: string): Promise<Waitlist[]> => {
+  // Use simple single-field query to avoid index requirements
   const q = query(
     waitlistsRef,
-    where('eventId', '==', eventId),
-    orderBy('position', 'asc')
+    where('eventId', '==', eventId)
   )
   
   const querySnapshot = await getDocs(q)
   
-  return querySnapshot.docs.map(doc => {
+  const waitlist = querySnapshot.docs.map(doc => {
     const data = doc.data()
     return {
       id: doc.id,
@@ -199,6 +199,9 @@ export const getWaitlistByEvent = async (eventId: string): Promise<Waitlist[]> =
       notifiedAt: data.notifiedAt?.toDate()
     }
   }) as Waitlist[]
+  
+  // Sort by position in memory
+  return waitlist.sort((a, b) => a.position - b.position)
 }
 
 // Registrations (simplified - no waitlist logic)
@@ -212,15 +215,15 @@ export const createRegistration = async (data: CreateRegistrationData) => {
 }
 
 export const getRegistrationsByEvent = async (eventId: string): Promise<Registration[]> => {
+  // Use simple single-field query to avoid index requirements
   const q = query(
     registrationsRef,
-    where('eventId', '==', eventId),
-    orderBy('registeredAt', 'asc')
+    where('eventId', '==', eventId)
   )
   
   const querySnapshot = await getDocs(q)
   
-  return querySnapshot.docs.map(doc => {
+  const registrations = querySnapshot.docs.map(doc => {
     const data = doc.data()
     return {
       id: doc.id,
@@ -231,6 +234,9 @@ export const getRegistrationsByEvent = async (eventId: string): Promise<Registra
       lastEmailSent: data.lastEmailSent?.toDate()
     }
   }) as Registration[]
+  
+  // Sort by registration date in memory
+  return registrations.sort((a, b) => a.registeredAt.getTime() - b.registeredAt.getTime())
 }
 
 // Users

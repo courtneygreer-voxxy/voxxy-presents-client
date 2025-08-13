@@ -87,30 +87,46 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         
         if (registrationType === 'waitlist') {
           // Use separate waitlists collection
-          const result = await createWaitlistEntry({
+          const waitlistData: any = {
             eventId: event.id,
             organizationId: event.organizationId,
             name: formData.name,
             email: formData.email || '',
-            phone: formData.phone || undefined,
-            notes: formData.notes || undefined,
             source: 'website'
-          })
+          }
+          
+          // Only include phone and notes if they have values
+          if (formData.phone && formData.phone.trim()) {
+            waitlistData.phone = formData.phone.trim()
+          }
+          if (formData.notes && formData.notes.trim()) {
+            waitlistData.notes = formData.notes.trim()
+          }
+          
+          const result = await createWaitlistEntry(waitlistData)
           console.log(`✅ Waitlist entry created successfully in Firebase (position ${result.position})`)
         } else {
           // Use registrations collection for other types
           const firebaseRegistrationType: 'confirmed' | 'cancelled' = 'confirmed'
-          await createRegistration({
+          const registrationData: any = {
             eventId: event.id,
             organizationId: event.organizationId,
             name: formData.name,
             email: formData.email || '',
-            phone: formData.phone || undefined,
             registrationType: firebaseRegistrationType,
-            notes: formData.notes || undefined,
             emailSent: false,
             source: 'website'
-          })
+          }
+          
+          // Only include phone and notes if they have values
+          if (formData.phone && formData.phone.trim()) {
+            registrationData.phone = formData.phone.trim()
+          }
+          if (formData.notes && formData.notes.trim()) {
+            registrationData.notes = formData.notes.trim()
+          }
+          
+          await createRegistration(registrationData)
           console.log('✅ Registration created successfully in Firebase')
         }
       } else {
