@@ -3,38 +3,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import CreateClubBasicInfo from './CreateClubBasicInfo'
-import CreateClubBranding from './CreateClubBranding'
-import CreateClubSocialAbout from './CreateClubSocialAbout'
+import CreateClubName from './CreateClubName'
+import CreateClubDescription from './CreateClubDescription'
+import CreateClubContact from './CreateClubContact'
+import CreateClubLocation from './CreateClubLocation'
+import CreateClubAbout from './CreateClubAbout'
+import CreateClubSocial from './CreateClubSocial'
 import CreateClubPreview from './CreateClubPreview'
 import type { Organization } from '@/types/database'
-
-interface CreateClubData {
-  // Basic Info
-  name: string
-  description: string
-  contactEmail: string
-  defaultLocation: string
-  defaultAddress: string
-  
-  // Branding
-  logoUrl?: string
-  bannerUrl?: string
-  aboutImageUrl?: string
-  primaryColor: string
-  backgroundColor: string
-  
-  // Social & About
-  socialLinks: {
-    instagram?: string
-    website?: string
-    eventbrite?: string
-    venmo?: string
-    other?: string
-  }
-  aboutStory?: string
-  aboutOfferings?: string[]
-}
+import type { CreateClubData } from '@/types/createClub'
 
 const INITIAL_DATA: CreateClubData = {
   name: '',
@@ -42,8 +19,6 @@ const INITIAL_DATA: CreateClubData = {
   contactEmail: '',
   defaultLocation: '',
   defaultAddress: '',
-  primaryColor: '#8B5CF6', // Purple
-  backgroundColor: '#FFFFFF',
   socialLinks: {},
   aboutOfferings: ['']
 }
@@ -54,10 +29,13 @@ export default function CreateClubFlow() {
   const [isCreating, setIsCreating] = useState(false)
 
   const steps = [
-    { id: 1, title: 'Basic Information', component: CreateClubBasicInfo },
-    { id: 2, title: 'Branding & Style', component: CreateClubBranding },
-    { id: 3, title: 'Social & About', component: CreateClubSocialAbout },
-    { id: 4, title: 'Preview & Create', component: CreateClubPreview }
+    { id: 1, title: "What's your club called?", component: CreateClubName },
+    { id: 2, title: 'Tell us about your club', component: CreateClubDescription },
+    { id: 3, title: 'How can people reach you?', component: CreateClubContact },
+    { id: 4, title: 'Where do you usually meet?', component: CreateClubLocation },
+    { id: 5, title: 'Tell your story', component: CreateClubAbout },
+    { id: 6, title: 'Connect your socials', component: CreateClubSocial },
+    { id: 7, title: 'Preview & Create', component: CreateClubPreview }
   ]
 
   const progress = (currentStep / steps.length) * 100
@@ -81,12 +59,18 @@ export default function CreateClubFlow() {
   const canProceed = () => {
     switch (currentStep) {
       case 1:
-        return formData.name && formData.description && formData.contactEmail
+        return formData.name.trim().length > 0
       case 2:
-        return true // Branding is optional
+        return formData.description.trim().length > 0
       case 3:
-        return true // Social links are optional
+        return formData.contactEmail.trim().length > 0
       case 4:
+        return true // Location is optional
+      case 5:
+        return true // About story is optional
+      case 6:
+        return true // Social links are optional
+      case 7:
         return true // Ready to create
       default:
         return false
@@ -119,8 +103,8 @@ export default function CreateClubFlow() {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Your Club</h1>
-          <p className="text-gray-600">Let's set up your organization in just a few steps</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Let's create your club! 🎉</h1>
+          <p className="text-gray-600">We'll get you set up in just a few quick steps</p>
         </div>
 
         {/* Progress Bar */}
@@ -134,15 +118,7 @@ export default function CreateClubFlow() {
 
         {/* Step Content */}
         <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <span className="bg-purple-100 text-purple-600 w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold">
-                {currentStep}
-              </span>
-              {steps[currentStep - 1].title}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <CurrentStepComponent 
               data={formData}
               updateData={updateFormData}

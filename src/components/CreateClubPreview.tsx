@@ -3,36 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Eye, Mail, MapPin, Instagram, Globe, Calendar, DollarSign, Link } from "lucide-react"
-
-interface CreateClubData {
-  name: string
-  description: string
-  contactEmail: string
-  defaultLocation: string
-  defaultAddress: string
-  logoUrl?: string
-  bannerUrl?: string
-  aboutImageUrl?: string
-  primaryColor: string
-  backgroundColor: string
-  socialLinks: {
-    instagram?: string
-    website?: string
-    eventbrite?: string
-    venmo?: string
-    other?: string
-  }
-  aboutStory?: string
-  aboutOfferings?: string[]
-}
-
-interface CreateClubPreviewProps {
-  data: CreateClubData
-  updateData: (updates: Partial<CreateClubData>) => void
-  onNext: () => void
-  isCreating: boolean
-  onCreate: () => void
-}
+import type { CreateClubPreviewProps } from '@/types/createClub'
 
 export default function CreateClubPreview({ data, isCreating, onCreate }: CreateClubPreviewProps) {
   const generateSlug = (name: string) => {
@@ -61,8 +32,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
     { label: 'Club name', completed: !!data.name, required: true },
     { label: 'Description', completed: !!data.description, required: true },
     { label: 'Contact email', completed: !!data.contactEmail, required: true },
-    { label: 'Logo uploaded', completed: !!data.logoUrl, required: false },
-    { label: 'Banner image', completed: !!data.bannerUrl, required: false },
+    { label: 'Location info', completed: !!data.defaultLocation, required: false },
     { label: 'About story', completed: !!data.aboutStory, required: false },
     { label: 'Social links', completed: Object.values(data.socialLinks).some(link => link?.trim()), required: false },
   ]
@@ -124,35 +94,20 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div 
-            className="border rounded-lg overflow-hidden"
-            style={{ backgroundColor: data.backgroundColor }}
-          >
-            {/* Banner */}
-            {data.bannerUrl && (
-              <img 
-                src={data.bannerUrl} 
-                alt="Banner" 
-                className="w-full h-48 object-cover"
-              />
-            )}
+          <div className="border rounded-lg overflow-hidden bg-white">
+            {/* Header with default styling */}
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-32">
+            </div>
             
             {/* Main Content */}
             <div className="p-6">
               {/* Header */}
-              <div className="flex items-center gap-4 mb-6">
-                {data.logoUrl && (
-                  <img 
-                    src={data.logoUrl} 
-                    alt="Logo" 
-                    className="w-16 h-16 object-contain rounded-lg border"
-                  />
-                )}
-                <div>
-                  <h1 className="text-3xl font-bold" style={{ color: data.primaryColor }}>
+              <div className="mb-6 -mt-8">
+                <div className="bg-white rounded-lg p-6 shadow-sm border">
+                  <h1 className="text-3xl font-bold text-purple-600 mb-2">
                     {data.name}
                   </h1>
-                  <p className="text-gray-600 mt-1">{data.description}</p>
+                  <p className="text-gray-600">{data.description}</p>
                 </div>
               </div>
 
@@ -183,8 +138,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                           <Badge 
                             key={platform} 
                             variant="outline" 
-                            className="flex items-center gap-1"
-                            style={{ borderColor: data.primaryColor, color: data.primaryColor }}
+                            className="flex items-center gap-1 border-purple-300 text-purple-600"
                           >
                             <Icon className="h-3 w-3" />
                             {platform.charAt(0).toUpperCase() + platform.slice(1)}
@@ -212,10 +166,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                       .filter(offering => offering.trim())
                       .map((offering, index) => (
                         <li key={index} className="flex items-center gap-2">
-                          <div 
-                            className="w-2 h-2 rounded-full"
-                            style={{ backgroundColor: data.primaryColor }}
-                          />
+                          <div className="w-2 h-2 rounded-full bg-purple-500" />
                           <span>{offering}</span>
                         </li>
                       ))}
@@ -232,8 +183,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                 </div>
                 <Button 
                   size="sm" 
-                  className="mt-3"
-                  style={{ backgroundColor: data.primaryColor }}
+                  className="mt-3 bg-purple-600 hover:bg-purple-700"
                 >
                   I'm Interested
                 </Button>
@@ -249,7 +199,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
           <div className="text-center">
             <h3 className="font-semibold text-blue-900 mb-2">Your Club URL</h3>
             <div className="bg-white p-3 rounded-lg border font-mono text-lg">
-              voxxypresents.com/<span style={{ color: data.primaryColor }}>{clubSlug}</span>
+              voxxypresents.com/<span className="text-purple-600">{clubSlug}</span>
             </div>
             <p className="text-sm text-blue-700 mt-2">
               This is where people will find your club online
@@ -262,9 +212,9 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
       <Card className="bg-purple-50 border-purple-200">
         <CardContent className="pt-6">
           <div className="text-center">
-            <h3 className="text-xl font-bold text-purple-900 mb-2">Ready to Launch?</h3>
+            <h3 className="text-xl font-bold text-purple-900 mb-2">Ready to launch your club? 🚀</h3>
             <p className="text-purple-700 mb-4">
-              Once created, you can start adding events and inviting members to your club.
+              Once created, you can start planning events and building your community!
             </p>
             <Button
               size="lg"
