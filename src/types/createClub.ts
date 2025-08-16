@@ -6,6 +6,10 @@ export interface CreateClubData {
   defaultLocation: string
   defaultAddress: string
   
+  // Branding
+  logoUrl?: string
+  bannerUrl?: string
+  
   // Social & About
   socialLinks: {
     instagram?: string

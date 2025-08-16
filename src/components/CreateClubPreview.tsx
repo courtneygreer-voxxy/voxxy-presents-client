@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Eye, Mail, MapPin, Instagram, Globe, Calendar, DollarSign, Link } from "lucide-react"
 import type { CreateClubPreviewProps } from '@/types/createClub'
+import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
 export default function CreateClubPreview({ data, isCreating, onCreate }: CreateClubPreviewProps) {
   const generateSlug = (name: string) => {
@@ -34,6 +35,8 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
     { label: 'Contact email', completed: !!data.contactEmail, required: true },
     { label: 'Location info', completed: !!data.defaultLocation, required: false },
     { label: 'About story', completed: !!data.aboutStory, required: false },
+    { label: 'Logo uploaded', completed: !!data.logoUrl, required: false },
+    { label: 'Header photo', completed: !!data.bannerUrl, required: false },
     { label: 'Social links', completed: Object.values(data.socialLinks).some(link => link?.trim()), required: false },
   ]
 
@@ -94,20 +97,47 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="border rounded-lg overflow-hidden bg-white">
-            {/* Header with default styling */}
-            <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-32">
-            </div>
+          <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+            {/* Header Banner */}
+            {data.bannerUrl ? (
+              <img 
+                src={data.bannerUrl} 
+                alt="Club banner" 
+                className="w-full h-48 object-cover"
+              />
+            ) : (
+              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-48 flex items-center justify-center">
+                <div className="text-white text-center">
+                  <h3 className="text-lg font-semibold opacity-75">Your header photo will appear here</h3>
+                  <p className="text-sm opacity-60">Upload one in the branding step</p>
+                </div>
+              </div>
+            )}
             
             {/* Main Content */}
             <div className="p-6">
-              {/* Header */}
-              <div className="mb-6 -mt-8">
-                <div className="bg-white rounded-lg p-6 shadow-sm border">
-                  <h1 className="text-3xl font-bold text-purple-600 mb-2">
-                    {data.name}
-                  </h1>
-                  <p className="text-gray-600">{data.description}</p>
+              {/* Club Header Info */}
+              <div className="mb-6 -mt-12">
+                <div className="bg-white rounded-lg p-6 shadow-lg border mx-4">
+                  <div className="flex items-start gap-4">
+                    {data.logoUrl ? (
+                      <img 
+                        src={data.logoUrl} 
+                        alt="Club logo" 
+                        className="w-20 h-20 object-cover rounded-full border-2 border-white shadow-md flex-shrink-0"
+                      />
+                    ) : (
+                      <div className="w-20 h-20 bg-gray-100 rounded-full border-2 border-white shadow-md flex items-center justify-center flex-shrink-0">
+                        <span className="text-gray-400 text-xs text-center">Logo<br/>Here</span>
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                        {data.name}
+                      </h1>
+                      <p className="text-gray-600 text-sm md:text-base">{data.description}</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -149,43 +179,58 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                 </div>
               )}
 
-              {/* About Story */}
-              {data.aboutStory && (
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-3">Our Story</h3>
-                  <p className="text-gray-700 leading-relaxed">{data.aboutStory}</p>
-                </div>
-              )}
+              {/* About Story - Always show with default if empty */}
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3">Our Story</h3>
+                <p className={`leading-relaxed ${
+                  isDefaultContent(data.aboutStory || '', data.name) 
+                    ? 'text-gray-500 italic' 
+                    : 'text-gray-700'
+                }`}>
+                  {getDisplayAboutStory(data.aboutStory, data.name)}
+                </p>
+              </div>
 
-              {/* Offerings */}
-              {data.aboutOfferings && data.aboutOfferings.some(offering => offering.trim()) && (
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-3">What We Offer</h3>
-                  <ul className="space-y-2">
-                    {data.aboutOfferings
-                      .filter(offering => offering.trim())
-                      .map((offering, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <div className="w-2 h-2 rounded-full bg-purple-500" />
-                          <span>{offering}</span>
-                        </li>
-                      ))}
-                  </ul>
+              {/* Offerings - Always show with defaults if empty */}
+              <div className="mb-6">
+                <h3 className="font-semibold mb-3 text-lg">What We Offer</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {getDisplayOfferings(data.aboutOfferings).map((offering, index) => (
+                    <div key={index} className={`flex items-center gap-3 rounded-lg p-3 ${
+                      (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
+                        ? 'bg-purple-50'
+                        : 'bg-gray-50'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
+                        (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
+                          ? 'bg-purple-500'
+                          : 'bg-gray-400'
+                      }`} />
+                      <span className={`text-sm font-medium ${
+                        (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
+                          ? 'text-gray-800'
+                          : 'text-gray-500 italic'
+                      }`}>
+                        {offering}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              )}
+              </div>
 
-              {/* Sample Event */}
-              <div className="border rounded-lg p-4 bg-gray-50">
-                <h3 className="font-semibold mb-2">Sample Event</h3>
-                <div className="text-sm text-gray-600 space-y-1">
-                  <p>Your upcoming events will appear here once you start creating them.</p>
-                  <p>Members will be able to register and get event updates.</p>
+              {/* Sample Event Preview */}
+              <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 bg-gray-50 text-center">
+                <h3 className="font-semibold mb-2 text-gray-700">Your Events Will Appear Here</h3>
+                <div className="text-sm text-gray-500 space-y-1 mb-4">
+                  <p>Once you create your club, you can start adding events.</p>
+                  <p>Members will see event details and registration options right here!</p>
                 </div>
                 <Button 
                   size="sm" 
-                  className="mt-3 bg-purple-600 hover:bg-purple-700"
+                  className="bg-purple-600 hover:bg-purple-700"
+                  disabled
                 >
-                  I'm Interested
+                  Sample Registration Button
                 </Button>
               </div>
             </div>

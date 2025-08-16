@@ -20,6 +20,7 @@ import {
 import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import { isFeatureEnabled } from '@/config/environments'
+// import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
 interface OrganizationPageProps {
   organizationSlug: string
@@ -112,7 +113,7 @@ export default function OrganizationPage({
               alt={`${organization.name} Logo`}
               width={80}
               height={80}
-              className="rounded-full border-4 border-white"
+              className="rounded-full border-4 border-white object-cover"
             />
             <div>
               <h2 className="text-4xl font-bold">{organization.name}</h2>
@@ -433,33 +434,47 @@ export default function OrganizationPage({
             <div className="space-y-6">
               <h4 className="text-2xl font-semibold text-gray-900">Our Story</h4>
               <div className="text-gray-700 leading-relaxed space-y-4">
-                {customContent?.story ? (
-                  <div dangerouslySetInnerHTML={{ __html: customContent.story }} />
+                {organization?.aboutStory ? (
+                  <div>
+                    {organization.aboutStory.split('\n').map((paragraph, index) => (
+                      <p key={index} className={paragraph.trim() === '' ? 'h-4' : ''}>
+                        {paragraph.trim() === '' ? '\u00A0' : paragraph}
+                      </p>
+                    ))}
+                  </div>
                 ) : (
-                  <>
-                    <p>
-                      {organization.name} is a vibrant community dedicated to bringing people together through shared experiences and creativity.
-                    </p>
-                    <p>
-                      Our mission is to create meaningful connections and foster a sense of belonging in our local community.
-                    </p>
-                  </>
+                  <p className="italic text-gray-600">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
                 )}
               </div>
               
-              {customContent?.offerings && (
-                <>
-                  <h4 className="text-2xl font-semibold text-gray-900 pt-4">What We Offer</h4>
-                  <ul className="space-y-2 text-gray-700">
-                    {customContent.offerings.map((offering, index) => (
+              <div>
+                <h4 className="text-2xl font-semibold text-gray-900 pt-4">What We Offer</h4>
+                <ul className="space-y-2 text-gray-700">
+                  {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
+                    organization.aboutOfferings.map((offering, index) => (
                       <li key={index} className="flex items-center">
-                        <div className="w-2 h-2 bg-purple-600 rounded-full mr-3"></div>
+                        <div className="w-2 h-2 rounded-full mr-3 bg-purple-600"></div>
                         {offering}
                       </li>
-                    ))}
-                  </ul>
-                </>
-              )}
+                    )) : (
+                      <>
+                        <li className="flex items-center italic text-gray-600">
+                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          Community building
+                        </li>
+                        <li className="flex items-center italic text-gray-600">
+                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          Regular meetups
+                        </li>
+                        <li className="flex items-center italic text-gray-600">
+                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          Fun activities
+                        </li>
+                      </>
+                    )
+                  }
+                </ul>
+              </div>
               
               <div className="pt-6">
                 <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>

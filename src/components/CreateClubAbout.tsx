@@ -55,6 +55,10 @@ export default function CreateClubAbout({ data, updateData }: CreateClubAboutPro
 
         {/* What You Offer */}
         <div>
+          <div className="text-center mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">What do you offer?</h3>
+            <p className="text-sm text-gray-500">List the types of activities or experiences your club provides</p>
+          </div>
           <div className="space-y-2">
             {offerings.map((offering, index) => (
               <div key={index} className="flex gap-2">

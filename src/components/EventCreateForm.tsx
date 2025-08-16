@@ -13,6 +13,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { CalendarIcon, X, Plus, Loader } from "lucide-react"
 import { format } from "date-fns"
 import { eventsApi } from "@/services/api"
+import { createEvent } from "@/lib/database"
+import { getDataSource } from "@/config/environments"
 import type { CreateEventData, Organization } from "@/types/database"
 
 interface EventCreateFormProps {
@@ -125,7 +127,22 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
         recurringDates: formData.isRecurring && recurringDates.length > 0 ? recurringDates : undefined
       }
 
-      const response = await eventsApi.create(eventData)
+      // Use appropriate data source based on environment
+      const dataSource = getDataSource()
+      let response: any
+
+      if (dataSource === 'firebase') {
+        console.log('Creating event via Firebase (development)')
+        const eventId = await createEvent(eventData)
+        response = { id: eventId, ...eventData }
+        console.log('✅ Event created successfully:', { id: eventId, title: eventData.title })
+      } else {
+        console.log('Creating event via API')
+        response = await eventsApi.create(eventData)
+        console.log('✅ Event created via API:', response)
+      }
+      
+      console.log('Calling onSuccess callback to refresh events list')
       onSuccess(response)
       onClose()
       

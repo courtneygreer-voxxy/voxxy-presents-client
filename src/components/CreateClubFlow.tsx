@@ -8,10 +8,13 @@ import CreateClubDescription from './CreateClubDescription'
 import CreateClubContact from './CreateClubContact'
 import CreateClubLocation from './CreateClubLocation'
 import CreateClubAbout from './CreateClubAbout'
+import CreateClubBranding from './CreateClubBranding'
 import CreateClubSocial from './CreateClubSocial'
 import CreateClubPreview from './CreateClubPreview'
+import { useNavigate } from 'react-router-dom'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
+import { createClub } from '@/services/clubCreation'
 
 const INITIAL_DATA: CreateClubData = {
   name: '',
@@ -19,6 +22,8 @@ const INITIAL_DATA: CreateClubData = {
   contactEmail: '',
   defaultLocation: '',
   defaultAddress: '',
+  logoUrl: undefined,
+  bannerUrl: undefined,
   socialLinks: {},
   aboutOfferings: ['']
 }
@@ -34,8 +39,9 @@ export default function CreateClubFlow() {
     { id: 3, title: 'How can people reach you?', component: CreateClubContact },
     { id: 4, title: 'Where do you usually meet?', component: CreateClubLocation },
     { id: 5, title: 'Tell your story', component: CreateClubAbout },
-    { id: 6, title: 'Connect your socials', component: CreateClubSocial },
-    { id: 7, title: 'Preview & Create', component: CreateClubPreview }
+    { id: 6, title: 'Make it yours', component: CreateClubBranding },
+    { id: 7, title: 'Connect your socials', component: CreateClubSocial },
+    { id: 8, title: 'Preview & Create', component: CreateClubPreview }
   ]
 
   const progress = (currentStep / steps.length) * 100
@@ -69,28 +75,32 @@ export default function CreateClubFlow() {
       case 5:
         return true // About story is optional
       case 6:
-        return true // Social links are optional
+        return true // Branding is optional
       case 7:
+        return true // Social links are optional
+      case 8:
         return true // Ready to create
       default:
         return false
     }
   }
 
+  const navigate = useNavigate()
+
   const handleCreate = async () => {
     setIsCreating(true)
     try {
-      // TODO: Implement club creation logic
       console.log('Creating club with data:', formData)
       
-      // For now, just simulate creation
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      const result = await createClub(formData)
+      console.log('Club created successfully!', result)
       
-      // TODO: Navigate to new club
-      console.log('Club created successfully!')
+      // Navigate to the new club's admin page
+      navigate(`/${result.slug}/admin`)
       
     } catch (error) {
       console.error('Failed to create club:', error)
+      alert('Failed to create club. Please try again.')
     } finally {
       setIsCreating(false)
     }

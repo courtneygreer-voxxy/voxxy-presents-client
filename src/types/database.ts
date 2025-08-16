@@ -16,6 +16,8 @@ export interface Organization {
     instagram?: string
     website?: string
     eventbrite?: string
+    meetup?: string
+    linktree?: string
     venmo?: string
     other?: string
   }

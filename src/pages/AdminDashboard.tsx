@@ -1,158 +1,55 @@
 import React, { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Database, Users, Calendar, Settings } from "lucide-react"
+import { Plus, Settings, Eye, Users, Calendar, ExternalLink } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
-import { 
-  createOrganization, 
-  createEvent, 
-  getEventsByOrganization,
-  getOrganizationBySlug 
-} from '@/lib/database'
-import type { Organization, Event } from '@/types/database'
+import { organizationsRef } from '@/lib/database'
+import { getDocs, query, where } from 'firebase/firestore'
+import type { Organization } from '@/types/database'
 
 export default function AdminDashboard() {
   const { user } = useAuth()
-  const [events, setEvents] = useState<Event[]>([])
-  const [loading, setLoading] = useState(false)
-  const [testResults, setTestResults] = useState<string[]>([])
+  const navigate = useNavigate()
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [loading, setLoading] = useState(true)
 
 
-  // Test Voxxy Presents NYC organization
-  const testVoxxyPresentsNYC = async () => {
-    setLoading(true)
-    try {
-      const org = await getOrganizationBySlug("voxxy-presents-nyc")
-      if (org) {
-        setTestResults(prev => [...prev, `✅ Voxxy Presents NYC found: ${org.name}`])
-        
-        // Get events for this organization
-        const eventsList = await getEventsByOrganization(org.id)
-        setEvents(eventsList)
-        setTestResults(prev => [...prev, `✅ Found ${eventsList.length} events for Voxxy Presents NYC`])
-      } else {
-        setTestResults(prev => [...prev, `❌ Voxxy Presents NYC not found - run seed script first`])
-      }
-    } catch (error) {
-      setTestResults(prev => [...prev, `❌ Error testing Voxxy Presents NYC: ${error}`])
-    }
-    setLoading(false)
-  }
-
-  // Test organization creation
-  const testCreateOrganization = async () => {
-    setLoading(true)
-    try {
-      const orgId = await createOrganization({
-        name: "Brooklyn Hearts Club",
-        slug: "brooklyn-hearts-club",
-        description: "An art club for adults that welcomes everyone",
-        background: "We aim to bring back whimsy and joy to the process of creating art in a shame-free, judgment-free zone where we can creatively express ourselves.",
-        contactEmail: "info@brooklynheartsclub.com",
-        socialLinks: {
-          instagram: "@brooklynheartsclub",
-          eventbrite: "https://eventbrite.com/brooklyn-hearts-club"
-        },
-        settings: {
-          defaultLocation: "Crystal Lake",
-          defaultAddress: "647 Grand Street, Brooklyn, NY 11211",
-          theme: {
-            primaryColor: "#7c3aed",
-            backgroundColor: "#ffffff"
-          }
-        },
-        ownerId: user?.uid || "test-user"
-      })
-      
-      setTestResults(prev => [...prev, `✅ Organization created with ID: ${orgId}`])
-    } catch (error) {
-      setTestResults(prev => [...prev, `❌ Error creating organization: ${error}`])
-    }
-    setLoading(false)
-  }
-
-  // Test organization retrieval
-  const testGetOrganization = async () => {
-    setLoading(true)
-    try {
-      const org = await getOrganizationBySlug("brooklyn-hearts-club")
-      if (org) {
-        setTestResults(prev => [...prev, `✅ Organization found: ${org.name}`])
-        return org
-      } else {
-        setTestResults(prev => [...prev, `❌ Organization not found`])
-        return null
-      }
-    } catch (error) {
-      setTestResults(prev => [...prev, `❌ Error retrieving organization: ${error}`])
-      return null
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Test event creation
-  const testCreateEvent = async () => {
-    setLoading(true)
-    try {
-      // First get the organization
-      const org = await getOrganizationBySlug("brooklyn-hearts-club")
-      if (!org) {
-        setTestResults(prev => [...prev, `❌ Need to create organization first`])
+  // Load user's organizations
+  useEffect(() => {
+    const loadOrganizations = async () => {
+      setLoading(true)
+      try {
+        // For now, get all organizations since we don't have auth yet
+        // Later this will filter by user.uid
+        const querySnapshot = await getDocs(organizationsRef)
+        const orgs = querySnapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          createdAt: doc.data().createdAt?.toDate(),
+          updatedAt: doc.data().updatedAt?.toDate()
+        })) as Organization[]
+        setOrganizations(orgs)
+      } catch (error) {
+        console.error('Failed to load organizations:', error)
+      } finally {
         setLoading(false)
-        return
       }
-
-      const eventId = await createEvent({
-        organizationId: org.id,
-        title: "Sunday Stitch & B!tch",
-        description: "A casual meet up with no strings attached - apart from those you stitch ;)",
-        fullDescription: "Bring your own supplies: yarn, needles, embroidery supplies, etc. Chat up fellow enthusiasts while you work on your latest project.",
-        date: new Date("2024-08-03T14:00:00"),
-        time: "2:00 PM - 4:00 PM",
-        location: "Crystal Lake",
-        address: "647 Grand Street, Brooklyn, NY 11211",
-        price: {
-          type: "free",
-          description: "Free"
-        },
-        registrationRequired: false,
-        presaleEnabled: false,
-        isRecurring: false,
-        status: "published"
-      })
-      
-      setTestResults(prev => [...prev, `✅ Event created with ID: ${eventId}`])
-    } catch (error) {
-      setTestResults(prev => [...prev, `❌ Error creating event: ${error}`])
     }
-    setLoading(false)
-  }
 
-  // Test events retrieval
-  const testGetEvents = async () => {
-    setLoading(true)
-    try {
-      const org = await getOrganizationBySlug("brooklyn-hearts-club")
-      if (!org) {
-        setTestResults(prev => [...prev, `❌ Need to create organization first`])
-        setLoading(false)
-        return
-      }
+    loadOrganizations()
+  }, [])
 
-      const eventsList = await getEventsByOrganization(org.id)
-      setEvents(eventsList)
-      setTestResults(prev => [...prev, `✅ Found ${eventsList.length} events`])
-    } catch (error) {
-      setTestResults(prev => [...prev, `❌ Error retrieving events: ${error}`])
-    }
-    setLoading(false)
-  }
-
-  const clearTestResults = () => {
-    setTestResults([])
-    setEvents([])
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your clubs...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -162,197 +59,158 @@ export default function AdminDashboard() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-              <p className="text-gray-600 mt-1">Manage your events and organizations</p>
+              <h1 className="text-3xl font-bold text-gray-900">My Clubs</h1>
+              <p className="text-gray-600 mt-1">Manage your clubs and create new ones</p>
             </div>
-            {user && (
-              <div className="flex items-center gap-4">
-                <Badge variant="secondary">
-                  {user.email}
-                </Badge>
-                <Button variant="outline" size="sm">
-                  Sign Out
-                </Button>
-              </div>
-            )}
+            <Button onClick={() => navigate('/create-club')} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Create New Club
+            </Button>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Database Testing Panel */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Database Testing
-              </CardTitle>
-              <CardDescription>
-                Test Firebase Firestore connection and basic operations
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <Button 
-                  onClick={testVoxxyPresentsNYC} 
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                >
-                  Test Voxxy NYC
-                </Button>
-                <Button 
-                  onClick={testCreateOrganization} 
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                >
-                  Create Org
-                </Button>
-                <Button 
-                  onClick={testGetOrganization} 
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                >
-                  Get Org
-                </Button>
-                <Button 
-                  onClick={testCreateEvent} 
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                >
-                  Create Event
-                </Button>
-                <Button 
-                  onClick={testGetEvents} 
-                  disabled={loading}
-                  variant="outline"
-                  size="sm"
-                >
-                  Get Events
-                </Button>
-              </div>
-              
-              <Button 
-                onClick={clearTestResults} 
-                variant="secondary" 
-                size="sm"
-                className="w-full"
-              >
-                Clear Results
+        {organizations.length === 0 ? (
+          /* No Clubs State */
+          <Card className="max-w-2xl mx-auto">
+            <CardContent className="flex flex-col items-center justify-center py-16">
+              <Users className="h-16 w-16 text-gray-400 mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">No clubs yet</h3>
+              <p className="text-gray-600 text-center mb-6 max-w-md">
+                Create your first club to start building your community and organizing events.
+              </p>
+              <Button onClick={() => navigate('/create-club')} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create Your First Club
               </Button>
-
-              {/* Test Results */}
-              <div className="bg-gray-900 text-green-400 p-4 rounded-lg font-mono text-sm max-h-60 overflow-y-auto">
-                {testResults.length === 0 ? (
-                  <div className="text-gray-500">Ready to test database operations...</div>
-                ) : (
-                  testResults.map((result, index) => (
-                    <div key={index} className="mb-1">
-                      {result}
-                    </div>
-                  ))
-                )}
-              </div>
             </CardContent>
           </Card>
-
-          {/* Events List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5" />
-                Events
-              </CardTitle>
-              <CardDescription>
-                Events retrieved from database
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {events.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  No events found. Click "Get Events" to load them.
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {events.map((event) => (
-                    <div key={event.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-semibold">{event.title}</h3>
-                          <p className="text-sm text-gray-600 mt-1">{event.description}</p>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
-                            <span>{event.date.toLocaleDateString()}</span>
-                            <span>{event.time}</span>
-                          </div>
+        ) : (
+          /* Clubs Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {organizations.map((org) => (
+              <Card key={org.id} className="hover:shadow-lg transition-shadow cursor-pointer group">
+                <CardContent className="p-0">
+                  {/* Club Banner */}
+                  {org.bannerUrl ? (
+                    <img 
+                      src={org.bannerUrl} 
+                      alt={`${org.name} banner`}
+                      className="w-full h-32 object-cover rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="w-full h-32 bg-gradient-to-r from-purple-500 to-pink-500 rounded-t-lg flex items-center justify-center">
+                      <span className="text-white font-semibold">{org.name}</span>
+                    </div>
+                  )}
+                  
+                  {/* Club Info */}
+                  <div className="p-6">
+                    <div className="flex items-start gap-3 mb-3">
+                      {org.logoUrl ? (
+                        <img 
+                          src={org.logoUrl} 
+                          alt={`${org.name} logo`}
+                          className="w-12 h-12 object-cover rounded-full border-2 border-white shadow-sm flex-shrink-0 -mt-8"
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-100 rounded-full border-2 border-white shadow-sm flex items-center justify-center flex-shrink-0 -mt-8">
+                          <span className="text-gray-600 text-xs font-bold">{org.name.charAt(0)}</span>
                         </div>
-                        <Badge variant={event.status === 'published' ? 'default' : 'secondary'}>
-                          {event.status}
-                        </Badge>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-lg text-gray-900 mb-1">{org.name}</h3>
+                        <p className="text-sm text-gray-600 line-clamp-2">{org.description}</p>
                       </div>
                     </div>
-                  ))}
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm text-gray-500">
+                        /{org.slug}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            window.open(`/${org.slug}`, '_blank')
+                          }}
+                          className="flex items-center gap-1"
+                        >
+                          <Eye className="h-3 w-3" />
+                          View
+                        </Button>
+                        <Button 
+                          size="sm"
+                          onClick={() => navigate(`/${org.slug}/admin`)}
+                          className="flex items-center gap-1"
+                        >
+                          <Settings className="h-3 w-3" />
+                          Manage
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+            
+            {/* Create New Club Card */}
+            <Card 
+              className="hover:shadow-lg transition-shadow cursor-pointer group border-dashed border-2 border-gray-300 hover:border-purple-400"
+              onClick={() => navigate('/create-club')}
+            >
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <Plus className="h-12 w-12 text-gray-400 group-hover:text-purple-500 mb-4 transition-colors" />
+                <h3 className="font-semibold text-gray-900 mb-2">Create New Club</h3>
+                <p className="text-sm text-gray-600">Start building your community</p>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+        
+        {/* Stats */}
+        {organizations.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Users className="h-8 w-8 text-purple-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">My Clubs</p>
+                    <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Users className="h-8 w-8 text-blue-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Organizations</p>
-                  <p className="text-2xl font-bold text-gray-900">1</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <Calendar className="h-8 w-8 text-green-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Total Events</p>
+                    <p className="text-2xl font-bold text-gray-900">-</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Calendar className="h-8 w-8 text-green-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Total Events</p>
-                  <p className="text-2xl font-bold text-gray-900">{events.length}</p>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center">
+                  <ExternalLink className="h-8 w-8 text-blue-600" />
+                  <div className="ml-4">
+                    <p className="text-sm font-medium text-gray-600">Active Pages</p>
+                    <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
+                  </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Database className="h-8 w-8 text-purple-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Database Status</p>
-                  <p className="text-2xl font-bold text-green-600">Connected</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center">
-                <Settings className="h-8 w-8 text-orange-600" />
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Auth Status</p>
-                  <p className="text-2xl font-bold text-green-600">
-                    {user ? 'Signed In' : 'Anonymous'}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
       </div>
     </div>
   )
