@@ -59,12 +59,24 @@ export const signUp = async ({ email, password, displayName }: SignUpData): Prom
       emailNotifications: true
     })
     
-    // Send email verification with action URL
-    const actionCodeSettings = {
-      url: `${window.location.origin}/profile`, // Redirect to profile after verification
-      handleCodeInApp: true
+    // Send email verification with allowlisted domain or fallback to default
+    try {
+      // Try with custom action URL first
+      const actionCodeSettings = {
+        url: `${window.location.origin}/profile`, // Redirect to profile after verification
+        handleCodeInApp: true
+      }
+      await sendEmailVerification(user, actionCodeSettings)
+    } catch (error) {
+      // If unauthorized domain, fallback to default Firebase email verification
+      const authError = error as AuthError
+      if (authError.code === 'auth/unauthorized-continue-uri') {
+        console.warn('Domain not allowlisted, using default email verification')
+        await sendEmailVerification(user) // No custom URL, uses Firebase default
+      } else {
+        throw error // Re-throw other errors
+      }
     }
-    await sendEmailVerification(user, actionCodeSettings)
     
     return { user, isNewUser: true }
   } catch (error) {
@@ -121,11 +133,23 @@ export const resetPassword = async (email: string): Promise<void> => {
 // Resend email verification
 export const resendEmailVerification = async (user: FirebaseUser): Promise<void> => {
   try {
-    const actionCodeSettings = {
-      url: `${window.location.origin}/profile`, // Redirect to profile after verification
-      handleCodeInApp: true
+    // Try with custom action URL first
+    try {
+      const actionCodeSettings = {
+        url: `${window.location.origin}/profile`, // Redirect to profile after verification
+        handleCodeInApp: true
+      }
+      await sendEmailVerification(user, actionCodeSettings)
+    } catch (error) {
+      // If unauthorized domain, fallback to default Firebase email verification
+      const authError = error as AuthError
+      if (authError.code === 'auth/unauthorized-continue-uri') {
+        console.warn('Domain not allowlisted, using default email verification')
+        await sendEmailVerification(user) // No custom URL, uses Firebase default
+      } else {
+        throw error // Re-throw other errors
+      }
     }
-    await sendEmailVerification(user, actionCodeSettings)
   } catch (error) {
     console.error('Email verification error:', error)
     throw new AuthServiceError(
