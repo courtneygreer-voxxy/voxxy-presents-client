@@ -29,8 +29,8 @@ export function EmailVerificationPrompt({ onResendSuccess, onContinue }: EmailVe
       setResendSuccess(true)
       onResendSuccess?.()
       
-      // Start cooldown timer (60 seconds)
-      setResendCooldown(60)
+      // Start cooldown timer (120 seconds to reduce Firebase rate limiting)
+      setResendCooldown(120)
       const timer = setInterval(() => {
         setResendCooldown(prev => {
           if (prev <= 1) {
