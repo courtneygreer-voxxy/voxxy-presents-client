@@ -21,8 +21,8 @@ export const transformClubData = (data: CreateClubData): Omit<Organization, 'id'
   const organizationData: any = {
     name: data.name,
     slug,
-    description: data.description,
-    background: '', // Will be used for future design themes
+    description: '', // Short tagline - not set in create club flow for now
+    background: data.description, // Club description maps to background field
     aboutStory: getDisplayAboutStory(data.aboutStory, data.name),
     aboutOfferings: getDisplayOfferings(data.aboutOfferings),
     contactEmail: data.contactEmail,

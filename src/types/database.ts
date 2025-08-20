@@ -8,7 +8,8 @@ export interface Organization {
   background: string
   logoUrl?: string
   bannerUrl?: string
-  aboutImageUrl?: string
+  aboutImageUrl?: string // Legacy single image field (for backwards compatibility)
+  aboutImages?: string[] // New multiple images field
   aboutStory?: string
   aboutOfferings?: string[]
   contactEmail: string

@@ -19,7 +19,8 @@ import {
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
-import EventCreateForm from "@/components/EventCreateForm"
+import AboutImagesManager from "@/components/AboutImagesManager"
+import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
@@ -196,23 +197,31 @@ export default function OrganizationAdmin() {
 
           {/* Organization Settings Tab */}
           <TabsContent value="organization">
-            <Card>
-              <CardHeader>
-                <CardTitle>Organization Settings</CardTitle>
-                <CardDescription>
-                  Update your organization's information, branding, and contact details.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <OrganizationEditForm
-                  organization={organization}
-                  onSave={handleSaveOrganization}
-                  onCancel={() => {}} // No cancel in full page mode
-                  isFullPage={true}
-                  isSaving={isSaving}
-                />
-              </CardContent>
-            </Card>
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Organization Settings</CardTitle>
+                  <CardDescription>
+                    Update your organization's information, branding, and contact details.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <OrganizationEditForm
+                    organization={organization}
+                    onSave={handleSaveOrganization}
+                    onCancel={() => {}} // No cancel in full page mode
+                    isFullPage={true}
+                    isSaving={isSaving}
+                  />
+                </CardContent>
+              </Card>
+
+              <AboutImagesManager
+                organization={organization}
+                onSave={handleSaveOrganization}
+                isSaving={isSaving}
+              />
+            </div>
           </TabsContent>
 
           {/* Events Tab */}
@@ -362,9 +371,9 @@ export default function OrganizationAdmin() {
         </Tabs>
       </div>
 
-      {/* Create Event Modal */}
+      {/* Create Event Flow */}
       {isCreateEventOpen && organization && (
-        <EventCreateForm
+        <EventCreateFlow
           organization={organization}
           isOpen={isCreateEventOpen}
           onClose={() => setIsCreateEventOpen(false)}

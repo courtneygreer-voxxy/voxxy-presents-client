@@ -35,7 +35,7 @@ export default function CreateClubFlow() {
 
   const steps = [
     { id: 1, title: "What's your club called?", component: CreateClubName },
-    { id: 2, title: 'Tell us about your club', component: CreateClubDescription },
+    { id: 2, title: 'Describe your club', component: CreateClubDescription },
     { id: 3, title: 'How can people reach you?', component: CreateClubContact },
     { id: 4, title: 'Where do you usually meet?', component: CreateClubLocation },
     { id: 5, title: 'Tell your story', component: CreateClubAbout },

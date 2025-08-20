@@ -31,7 +31,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
 
   const completionChecks = [
     { label: 'Club name', completed: !!data.name, required: true },
-    { label: 'Description', completed: !!data.description, required: true },
+    { label: 'Club description', completed: !!data.description, required: true },
     { label: 'Contact email', completed: !!data.contactEmail, required: true },
     { label: 'Location info', completed: !!data.defaultLocation, required: false },
     { label: 'About story', completed: !!data.aboutStory, required: false },

@@ -89,6 +89,11 @@ export const updateOrganization = async (id: string, updates: Partial<Organizati
 
 // Events
 export const createEvent = async (data: CreateEventData) => {
+  // Validate required date field
+  if (!data.date || !(data.date instanceof Date)) {
+    throw new Error('Event date is required and must be a valid Date object')
+  }
+  
   // Filter out undefined values to prevent Firebase errors
   const cleanData: any = {}
   
