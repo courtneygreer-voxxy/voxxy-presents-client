@@ -10,7 +10,7 @@ import { getDocs, query, where } from 'firebase/firestore'
 import type { Organization } from '@/types/database'
 
 export default function AdminDashboard() {
-  const { user } = useAuth()
+  const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [loading, setLoading] = useState(true)

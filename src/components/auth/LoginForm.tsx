@@ -25,6 +25,7 @@ interface FormErrors {
   email?: string
   password?: string
   submit?: string
+  rememberMe?: string
 }
 
 export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: LoginFormProps) {
@@ -60,7 +61,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
     setFormData(prev => ({ ...prev, [field]: value }))
     
     // Clear previous errors for this field
-    if (errors[field]) {
+    if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
     }
     
