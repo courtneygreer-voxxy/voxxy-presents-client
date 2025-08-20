@@ -1,21 +1,57 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
+import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import OrganizationPublic from './pages/OrganizationPublic'
 import OrganizationAdmin from './pages/OrganizationAdmin'
 import AdminDashboard from './pages/AdminDashboard'
 import CreateClubPage from './pages/CreateClubPage'
+import SignUpPage from './pages/SignUpPage'
+import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
 
 export default function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/create-club" element={<CreateClubPage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
-          <Route path="/:orgSlug/admin" element={<OrganizationAdmin />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          
+          {/* Authentication routes - redirect if already logged in */}
+          <Route path="/sign-up" element={
+            <RedirectIfAuthenticated>
+              <SignUpPage />
+            </RedirectIfAuthenticated>
+          } />
+          <Route path="/login" element={
+            <RedirectIfAuthenticated>
+              <LoginPage />
+            </RedirectIfAuthenticated>
+          } />
+          
+          {/* Protected routes - require authentication */}
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/create-club" element={
+            <ProtectedRoute requireEmailVerification={true}>
+              <CreateClubPage />
+            </ProtectedRoute>
+          } />
+          <Route path="/:orgSlug/admin" element={
+            <ProtectedRoute>
+              <OrganizationAdmin />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
         </Routes>
       </Router>
     </AuthProvider>

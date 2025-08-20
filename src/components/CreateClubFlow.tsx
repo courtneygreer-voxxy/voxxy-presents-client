@@ -12,7 +12,7 @@ import CreateClubBranding from './CreateClubBranding'
 import CreateClubSocial from './CreateClubSocial'
 import CreateClubPreview from './CreateClubPreview'
 import { useNavigate } from 'react-router-dom'
-import { useAuth } from '@/contexts/AuthContext'
+import { useAuth } from '@/hooks/useAuth'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
 import { createClub } from '@/services/clubCreation'
@@ -87,17 +87,24 @@ export default function CreateClubFlow() {
   }
 
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { currentUser, userProfile, refreshUserProfile } = useAuth()
 
   const handleCreate = async () => {
+    if (!currentUser) {
+      console.error('User must be authenticated to create a club')
+      alert('You must be signed in to create a club.')
+      return
+    }
+
     setIsCreating(true)
     try {
       console.log('Creating club with data:', formData)
       
-      // Use authenticated user ID if available, otherwise use temp ID
-      const ownerId = user?.uid || 'temp-owner-id'
-      const result = await createClub(formData, ownerId)
+      const result = await createClub(formData, currentUser.uid)
       console.log('Club created successfully!', result)
+      
+      // Refresh user profile to include the new club
+      await refreshUserProfile()
       
       // Navigate to the new club's admin page
       navigate(`/${result.slug}/admin`)

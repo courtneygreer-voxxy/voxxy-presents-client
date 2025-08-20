@@ -29,7 +29,7 @@ The create club flow UI is complete and functional at `/create-club`. The next p
 
 **1.3 Location Enhancement**
 - [ ] Integrate Google Places API for address autocomplete
-- [ ] Add address validation and standardization
+- [ ] Add address validation and standardizationick
 - [ ] Implement location coordinates storage
 - [ ] Create location picker map interface
 
