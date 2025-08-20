@@ -13,7 +13,7 @@ export default function OrganizationPublic() {
   }
   
   // Show admin controls if the current user owns this organization
-  const isOwner = currentUser && organization && organization.ownerId === currentUser.uid
+  const isOwner = !!(currentUser && organization && organization.ownerId === currentUser.uid)
   
   return (
     <OrganizationPage 
