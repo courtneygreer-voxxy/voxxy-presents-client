@@ -73,6 +73,12 @@ export const signUp = async ({ email, password, displayName }: SignUpData): Prom
       if (authError.code === 'auth/unauthorized-continue-uri') {
         console.warn('Domain not allowlisted, using default email verification')
         await sendEmailVerification(user) // No custom URL, uses Firebase default
+      } else if (authError.code === 'auth/too-many-requests') {
+        // Don't retry on rate limiting - just throw with better message
+        throw new AuthServiceError(
+          authError.code,
+          'Too many verification attempts. Please wait a few minutes before trying again.'
+        )
       } else {
         throw error // Re-throw other errors
       }
@@ -146,6 +152,12 @@ export const resendEmailVerification = async (user: FirebaseUser): Promise<void>
       if (authError.code === 'auth/unauthorized-continue-uri') {
         console.warn('Domain not allowlisted, using default email verification')
         await sendEmailVerification(user) // No custom URL, uses Firebase default
+      } else if (authError.code === 'auth/too-many-requests') {
+        // Don't retry on rate limiting - just throw with better message
+        throw new AuthServiceError(
+          authError.code,
+          'Too many verification attempts. Please wait a few minutes before trying again.'
+        )
       } else {
         throw error // Re-throw other errors
       }
@@ -225,7 +237,7 @@ export const getAuthErrorMessage = (errorCode: string): string => {
     'auth/user-not-found': 'No account found with this email address. Please check your email or sign up.',
     'auth/wrong-password': 'Incorrect password. Please try again or reset your password.',
     'auth/invalid-credential': 'Invalid email or password. Please check your credentials and try again.',
-    'auth/too-many-requests': 'Too many failed attempts. Please try again later.',
+    'auth/too-many-requests': 'Too many requests. Please wait a few minutes before trying again.',
     'auth/network-request-failed': 'Network error. Please check your connection and try again.',
     'auth/requires-recent-login': 'This operation requires recent authentication. Please sign in again.',
     'auth/invalid-verification-code': 'Invalid verification code. Please try again.',
