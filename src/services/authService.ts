@@ -39,11 +39,81 @@ export class AuthServiceError extends Error {
   }
 }
 
+// Rate limiting tracker for email verification
+class EmailVerificationLimiter {
+  private attempts: Map<string, { count: number; lastAttempt: number; blocked: boolean }> = new Map()
+  private readonly maxAttempts = 3
+  private readonly cooldownPeriod = 5 * 60 * 1000 // 5 minutes
+  private readonly blockPeriod = 15 * 60 * 1000 // 15 minutes
+
+  canAttempt(email: string): boolean {
+    const record = this.attempts.get(email)
+    if (!record) return true
+
+    const now = Date.now()
+    
+    // If blocked, check if block period has passed
+    if (record.blocked) {
+      if (now - record.lastAttempt > this.blockPeriod) {
+        this.attempts.delete(email)
+        return true
+      }
+      return false
+    }
+
+    // If cooldown period has passed, reset attempts
+    if (now - record.lastAttempt > this.cooldownPeriod) {
+      this.attempts.delete(email)
+      return true
+    }
+
+    // Check if under limit
+    return record.count < this.maxAttempts
+  }
+
+  recordAttempt(email: string, success: boolean): void {
+    const now = Date.now()
+    const record = this.attempts.get(email) || { count: 0, lastAttempt: now, blocked: false }
+    
+    if (success) {
+      // Success - remove any record
+      this.attempts.delete(email)
+      return
+    }
+
+    // Failed attempt
+    record.count += 1
+    record.lastAttempt = now
+    
+    // Block if too many attempts
+    if (record.count >= this.maxAttempts) {
+      record.blocked = true
+    }
+    
+    this.attempts.set(email, record)
+  }
+
+  getTimeUntilNextAttempt(email: string): number {
+    const record = this.attempts.get(email)
+    if (!record) return 0
+
+    const now = Date.now()
+    const waitPeriod = record.blocked ? this.blockPeriod : this.cooldownPeriod
+    const timeLeft = (record.lastAttempt + waitPeriod) - now
+    
+    return Math.max(0, Math.ceil(timeLeft / 1000))
+  }
+}
+
+const emailVerificationLimiter = new EmailVerificationLimiter()
+
 // Sign up with email and password
 export const signUp = async ({ email, password, displayName }: SignUpData): Promise<AuthResult> => {
+  let user: FirebaseUser | null = null
+  
   try {
     const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password)
-    const { user } = userCredential
+    user = userCredential.user
     
     // Update the user's display name
     await updateProfile(user, {
@@ -59,39 +129,19 @@ export const signUp = async ({ email, password, displayName }: SignUpData): Prom
       emailNotifications: true
     })
     
-    // Send email verification with allowlisted domain or fallback to default
-    try {
-      // Try with custom action URL first
-      const actionCodeSettings = {
-        url: `${window.location.origin}/profile`, // Redirect to profile after verification
-        handleCodeInApp: true
-      }
-      await sendEmailVerification(user, actionCodeSettings)
-    } catch (error) {
-      // If unauthorized domain, fallback to default Firebase email verification
-      const authError = error as AuthError
-      if (authError.code === 'auth/unauthorized-continue-uri') {
-        console.warn('Domain not allowlisted, using default email verification')
-        await sendEmailVerification(user) // No custom URL, uses Firebase default
-      } else if (authError.code === 'auth/too-many-requests') {
-        // Don't retry on rate limiting - let outer catch handle it
-        throw error
-      } else {
-        throw error // Re-throw other errors
-      }
-    }
+    // Send email verification with rate limiting protection
+    await sendEmailVerificationSafe(user)
     
     return { user, isNewUser: true }
   } catch (error) {
     console.error('Sign up error:', error)
     const authError = error as AuthError
     
-    // Handle rate limiting specifically with better message
-    if (authError.code === 'auth/too-many-requests') {
-      throw new AuthServiceError(
-        authError.code,
-        'Too many signup attempts. Please wait a few minutes before trying again.'
-      )
+    // Handle rate limiting specifically - if user was created successfully
+    if (authError.code === 'auth/too-many-requests' && user) {
+      // User account is created successfully, just email verification failed
+      console.warn('Email verification rate limited during signup, but user account created')
+      return { user, isNewUser: true }
     }
     
     throw new AuthServiceError(
@@ -143,46 +193,62 @@ export const resetPassword = async (email: string): Promise<void> => {
   }
 }
 
-// Resend email verification
-export const resendEmailVerification = async (user: FirebaseUser): Promise<void> => {
+// Send email verification with rate limiting protection
+const sendEmailVerificationSafe = async (user: FirebaseUser): Promise<void> => {
+  if (!user.email) throw new Error('User email is required')
+  
+  // Check rate limiting
+  if (!emailVerificationLimiter.canAttempt(user.email)) {
+    const waitTime = emailVerificationLimiter.getTimeUntilNextAttempt(user.email)
+    throw new AuthServiceError(
+      'auth/too-many-requests',
+      `Too many verification attempts. Please wait ${Math.ceil(waitTime / 60)} minutes before trying again.`
+    )
+  }
+
   try {
     // Try with custom action URL first
     try {
       const actionCodeSettings = {
-        url: `${window.location.origin}/profile`, // Redirect to profile after verification
+        url: `${window.location.origin}/profile`,
         handleCodeInApp: true
       }
       await sendEmailVerification(user, actionCodeSettings)
     } catch (error) {
-      // If unauthorized domain, fallback to default Firebase email verification
       const authError = error as AuthError
       if (authError.code === 'auth/unauthorized-continue-uri') {
         console.warn('Domain not allowlisted, using default email verification')
-        await sendEmailVerification(user) // No custom URL, uses Firebase default
-      } else if (authError.code === 'auth/too-many-requests') {
-        // Don't retry on rate limiting - let outer catch handle it
-        throw error
+        await sendEmailVerification(user)
       } else {
-        throw error // Re-throw other errors
+        throw error
       }
     }
+    
+    // Record successful attempt
+    emailVerificationLimiter.recordAttempt(user.email, true)
+    
   } catch (error) {
-    console.error('Email verification error:', error)
     const authError = error as AuthError
     
-    // Handle rate limiting specifically with better message
+    // Record failed attempt
+    emailVerificationLimiter.recordAttempt(user.email, false)
+    
+    // Handle specific error cases
     if (authError.code === 'auth/too-many-requests') {
+      const waitTime = emailVerificationLimiter.getTimeUntilNextAttempt(user.email)
       throw new AuthServiceError(
         authError.code,
-        'Too many verification attempts. Please wait a few minutes before trying again.'
+        `Firebase is temporarily rate limiting verification emails. Please wait ${Math.ceil(waitTime / 60)} minutes before trying again.`
       )
     }
     
-    throw new AuthServiceError(
-      authError.code,
-      'Failed to send verification email. Please try again.'
-    )
+    throw error
   }
+}
+
+// Resend email verification
+export const resendEmailVerification = async (user: FirebaseUser): Promise<void> => {
+  await sendEmailVerificationSafe(user)
 }
 
 // Handle email verification action code
