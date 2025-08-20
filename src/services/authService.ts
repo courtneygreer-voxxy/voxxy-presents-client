@@ -5,6 +5,8 @@ import {
   sendPasswordResetEmail,
   sendEmailVerification,
   updateProfile,
+  applyActionCode,
+  checkActionCode,
   User as FirebaseUser,
   UserCredential,
   AuthError
@@ -57,8 +59,12 @@ export const signUp = async ({ email, password, displayName }: SignUpData): Prom
       emailNotifications: true
     })
     
-    // Send email verification
-    await sendEmailVerification(user)
+    // Send email verification with action URL
+    const actionCodeSettings = {
+      url: `${window.location.origin}/profile`, // Redirect to profile after verification
+      handleCodeInApp: true
+    }
+    await sendEmailVerification(user, actionCodeSettings)
     
     return { user, isNewUser: true }
   } catch (error) {
@@ -115,7 +121,11 @@ export const resetPassword = async (email: string): Promise<void> => {
 // Resend email verification
 export const resendEmailVerification = async (user: FirebaseUser): Promise<void> => {
   try {
-    await sendEmailVerification(user)
+    const actionCodeSettings = {
+      url: `${window.location.origin}/profile`, // Redirect to profile after verification
+      handleCodeInApp: true
+    }
+    await sendEmailVerification(user, actionCodeSettings)
   } catch (error) {
     console.error('Email verification error:', error)
     throw new AuthServiceError(
@@ -123,6 +133,51 @@ export const resendEmailVerification = async (user: FirebaseUser): Promise<void>
       'Failed to send verification email. Please try again.'
     )
   }
+}
+
+// Handle email verification action code
+export const handleEmailVerification = async (actionCode: string): Promise<boolean> => {
+  try {
+    // Verify the action code is valid and not expired
+    await checkActionCode(auth, actionCode)
+    
+    // Apply the action code to verify the email
+    await applyActionCode(auth, actionCode)
+    
+    // Reload the current user to get updated emailVerified status
+    if (auth.currentUser) {
+      await auth.currentUser.reload()
+    }
+    
+    return true
+  } catch (error) {
+    console.error('Email verification error:', error)
+    const authError = error as AuthError
+    
+    // Handle specific error cases
+    if (authError.code === 'auth/expired-action-code') {
+      throw new AuthServiceError(authError.code, 'This verification link has expired. Please request a new one.')
+    } else if (authError.code === 'auth/invalid-action-code') {
+      throw new AuthServiceError(authError.code, 'This verification link is invalid. Please request a new one.')
+    } else if (authError.code === 'auth/user-disabled') {
+      throw new AuthServiceError(authError.code, 'This account has been disabled.')
+    } else {
+      throw new AuthServiceError(authError.code, 'Failed to verify email. Please try again.')
+    }
+  }
+}
+
+// Check if URL contains email verification parameters
+export const checkForEmailVerificationInURL = (): string | null => {
+  const urlParams = new URLSearchParams(window.location.search)
+  const mode = urlParams.get('mode')
+  const actionCode = urlParams.get('oobCode')
+  
+  if (mode === 'verifyEmail' && actionCode) {
+    return actionCode
+  }
+  
+  return null
 }
 
 // Get user profile from Firestore
