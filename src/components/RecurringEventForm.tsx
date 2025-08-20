@@ -5,22 +5,21 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
-import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CalendarIcon, X, Plus, Loader } from "lucide-react"
+import { CalendarIcon, X, Plus, ArrowLeft, Loader } from "lucide-react"
 import { format } from "date-fns"
 import { eventsApi } from "@/services/api"
 import { createEvent } from "@/lib/database"
 import { getDataSource } from "@/config/environments"
 import type { CreateEventData, Organization } from "@/types/database"
 
-interface EventCreateFormProps {
+interface RecurringEventFormProps {
   organization: Organization
   isOpen: boolean
   onClose: () => void
+  onBack: () => void
   onSuccess: (event: any) => void
 }
 
@@ -30,11 +29,10 @@ interface RecurringDate {
   description: string
 }
 
-export default function EventCreateForm({ organization, isOpen, onClose, onSuccess }: EventCreateFormProps) {
+export default function RecurringEventForm({ organization, isOpen, onClose, onBack, onSuccess }: RecurringEventFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date>()
-  const [endDate, setEndDate] = useState<Date>()
   const [recurringDates, setRecurringDates] = useState<RecurringDate[]>([])
   
   const [formData, setFormData] = useState<Partial<CreateEventData>>({
@@ -51,7 +49,11 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
       description: ''
     },
     eventbriteUrl: '',
-    isRecurring: false,
+    series: {
+      name: '',
+      description: ''
+    },
+    isRecurring: true,
     imageUrl: '',
     status: 'draft'
   })
@@ -128,7 +130,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
 
   const cleanObject = (obj: any): any => {
     if (obj === null || obj === undefined) return undefined
-    if (obj instanceof Date) return obj // Preserve Date objects
+    if (obj instanceof Date) return obj
     if (Array.isArray(obj)) return obj.map(cleanObject).filter(item => item !== undefined)
     if (typeof obj === 'object') {
       const cleaned: any = {}
@@ -153,37 +155,35 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
         throw new Error('Please select an event date')
       }
 
+      if (recurringDates.length === 0) {
+        throw new Error('Please add at least one recurring date')
+      }
+
       const rawEventData: CreateEventData = {
         ...formData as CreateEventData,
         date: selectedDate,
-        endDate: endDate,
-        recurringDates: formData.isRecurring && recurringDates.length > 0 ? recurringDates : undefined
+        isRecurring: true,
+        recurringDates: recurringDates.filter(date => date.date.trim() && date.theme.trim())
       }
-
-      console.log('🔍 Debug - rawEventData.date:', rawEventData.date, 'Type:', typeof rawEventData.date)
-      console.log('🔍 Debug - selectedDate:', selectedDate, 'Type:', typeof selectedDate)
 
       // Clean the data to remove any undefined values
       const eventData = cleanObject(rawEventData) as CreateEventData
-      
-      console.log('🔍 Debug - eventData.date after cleaning:', eventData.date, 'Type:', typeof eventData.date)
 
       // Use appropriate data source based on environment
       const dataSource = getDataSource()
       let response: any
 
       if (dataSource === 'firebase') {
-        console.log('Creating event via Firebase (development)')
+        console.log('Creating recurring event via Firebase (development)')
         const eventId = await createEvent(eventData)
         response = { id: eventId, ...eventData }
-        console.log('✅ Event created successfully:', { id: eventId, title: eventData.title })
+        console.log('✅ Recurring event created successfully:', { id: eventId, title: eventData.title })
       } else {
-        console.log('Creating event via API')
+        console.log('Creating recurring event via API')
         response = await eventsApi.create(eventData)
-        console.log('✅ Event created via API:', response)
+        console.log('✅ Recurring event created via API:', response)
       }
       
-      console.log('Calling onSuccess callback to refresh events list')
       onSuccess(response)
       onClose()
       
@@ -202,15 +202,18 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
           description: ''
         },
         eventbriteUrl: '',
-        isRecurring: false,
+        series: {
+          name: '',
+          description: ''
+        },
+        isRecurring: true,
         imageUrl: '',
         status: 'draft'
       })
       setSelectedDate(undefined)
-      setEndDate(undefined)
       setRecurringDates([])
     } catch (err) {
-      console.error('Failed to create event:', err)
+      console.error('Failed to create recurring event:', err)
       setError(err instanceof Error ? err.message : 'Failed to create event')
     } finally {
       setIsLoading(false)
@@ -221,10 +224,17 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Event</DialogTitle>
-          <DialogDescription>
-            Create a new event for {organization.name}. Fill out the details below.
-          </DialogDescription>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" onClick={onBack}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <DialogTitle>Create Recurring Event</DialogTitle>
+              <DialogDescription>
+                Create an event series for {organization.name}
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -234,139 +244,246 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
             </div>
           )}
 
-          {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="md:col-span-2">
-              <Label htmlFor="title">Event Title *</Label>
-              <Input
-                id="title"
-                value={formData.title}
-                onChange={(e) => handleInputChange('title', e.target.value)}
-                placeholder="Enter event title"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="status">Status</Label>
-              <Select
-                value={formData.status}
-                onValueChange={(value) => handleInputChange('status', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="draft">Draft</SelectItem>
-                  <SelectItem value="presale">PreSale</SelectItem>
-                  <SelectItem value="published">Published</SelectItem>
-                  <SelectItem value="sold_out">Sold Out</SelectItem>
-                  <SelectItem value="cancelled">Canceled</SelectItem>
-                  <SelectItem value="completed">Complete</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="description">Short Description *</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              placeholder="Brief description of the event"
-              rows={2}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="fullDescription">Full Description</Label>
-            <Textarea
-              id="fullDescription"
-              value={formData.fullDescription}
-              onChange={(e) => handleInputChange('fullDescription', e.target.value)}
-              placeholder="Detailed description of the event"
-              rows={4}
-            />
-          </div>
-
-          {/* Date & Time */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <Label>Event Date *</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div>
-              <Label htmlFor="time">Time *</Label>
-              <Input
-                id="time"
-                type="time"
-                value={formData.time}
-                onChange={(e) => handleInputChange('time', e.target.value)}
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="duration">Duration</Label>
-              <Input
-                id="duration"
-                value={formData.duration}
-                onChange={(e) => handleInputChange('duration', e.target.value)}
-                placeholder="e.g., 2 hours"
-              />
-            </div>
-          </div>
-
-          {/* Location */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="location">Location *</Label>
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="Venue name"
-                required
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="address">Address *</Label>
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => handleInputChange('address', e.target.value)}
-                placeholder="Full address"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Ticketing */}
+          {/* Series Info */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Ticketing</CardTitle>
+              <CardTitle className="text-lg">Event Series</CardTitle>
+              <CardDescription>
+                Define the overall series that this recurring event belongs to
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div>
+                <Label htmlFor="seriesName">Series Name *</Label>
+                <Input
+                  id="seriesName"
+                  value={formData.series?.name || ''}
+                  onChange={(e) => handleInputChange('series.name', e.target.value)}
+                  placeholder="e.g., Weekly Figure Drawing"
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="seriesDescription">Series Description</Label>
+                <Textarea
+                  id="seriesDescription"
+                  value={formData.series?.description || ''}
+                  onChange={(e) => handleInputChange('series.description', e.target.value)}
+                  placeholder="Description of the event series"
+                  rows={2}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Basic Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Event Details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="md:col-span-2">
+                  <Label htmlFor="title">Event Title *</Label>
+                  <Input
+                    id="title"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="Enter event title"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="status">Status</Label>
+                  <Select
+                    value={formData.status}
+                    onValueChange={(value) => handleInputChange('status', value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="draft">Draft</SelectItem>
+                      <SelectItem value="presale">PreSale</SelectItem>
+                      <SelectItem value="published">Published</SelectItem>
+                      <SelectItem value="sold_out">Sold Out</SelectItem>
+                      <SelectItem value="cancelled">Canceled</SelectItem>
+                      <SelectItem value="completed">Complete</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="description">Short Description *</Label>
+                <Textarea
+                  id="description"
+                  value={formData.description}
+                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  placeholder="Brief description of the event"
+                  rows={2}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="fullDescription">Full Description</Label>
+                <Textarea
+                  id="fullDescription"
+                  value={formData.fullDescription}
+                  onChange={(e) => handleInputChange('fullDescription', e.target.value)}
+                  placeholder="Detailed description of the event"
+                  rows={4}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Date & Time */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Schedule</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <Label>First Event Date *</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal"
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        initialFocus
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div>
+                  <Label htmlFor="time">Time *</Label>
+                  <Input
+                    id="time"
+                    type="time"
+                    value={formData.time}
+                    onChange={(e) => handleInputChange('time', e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="duration">Duration</Label>
+                  <Input
+                    id="duration"
+                    value={formData.duration}
+                    onChange={(e) => handleInputChange('duration', e.target.value)}
+                    placeholder="e.g., 2 hours"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Location */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Where</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="location">Location *</Label>
+                  <Input
+                    id="location"
+                    value={formData.location}
+                    onChange={(e) => handleInputChange('location', e.target.value)}
+                    placeholder="Venue name"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="address">Address *</Label>
+                  <Input
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => handleInputChange('address', e.target.value)}
+                    placeholder="Full address"
+                    required
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Recurring Dates */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Recurring Schedule</CardTitle>
+              <CardDescription>
+                Add upcoming dates and themes for this recurring event
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label>Upcoming Dates & Themes *</Label>
+                <Button type="button" variant="outline" size="sm" onClick={addRecurringDate}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Date
+                </Button>
+              </div>
+
+              {recurringDates.length === 0 && (
+                <div className="text-center py-8 text-gray-500 border-2 border-dashed border-gray-200 rounded-lg">
+                  <p>No recurring dates added yet</p>
+                  <p className="text-sm">Click "Add Date" to start building your event schedule</p>
+                </div>
+              )}
+
+              {recurringDates.map((item, index) => (
+                <div key={index} className="flex items-start gap-2 p-3 border rounded-lg">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <Input
+                      placeholder="Date (e.g., Jan 15)"
+                      value={item.date}
+                      onChange={(e) => updateRecurringDate(index, 'date', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Theme *"
+                      value={item.theme}
+                      onChange={(e) => updateRecurringDate(index, 'theme', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Description"
+                      value={item.description}
+                      onChange={(e) => updateRecurringDate(index, 'description', e.target.value)}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeRecurringDate(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Pricing */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Pricing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
@@ -400,7 +517,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                         placeholder="20.00"
                       />
                     </div>
-
                     <div>
                       <Label htmlFor="advancePrice">Advance Price</Label>
                       <Input
@@ -441,7 +557,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                         required
                       />
                     </div>
-
                     <div>
                       <Label htmlFor="pricePerPerson">Group Price Per Person</Label>
                       <Input
@@ -453,7 +568,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                         placeholder="15.00"
                       />
                     </div>
-
                     <div>
                       <Label htmlFor="normalPricePerPerson">Normal Price Per Person</Label>
                       <Input
@@ -503,100 +617,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
             </CardContent>
           </Card>
 
-
-          {/* Series Info */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Series (Optional)</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="seriesName">Series Name</Label>
-                <Input
-                  id="seriesName"
-                  value={formData.series?.name || ''}
-                  onChange={(e) => handleInputChange('series.name', e.target.value)}
-                  placeholder="e.g., Weekly Figure Drawing"
-                />
-              </div>
-
-              <div>
-                <Label htmlFor="seriesDescription">Series Description</Label>
-                <Textarea
-                  id="seriesDescription"
-                  value={formData.series?.description || ''}
-                  onChange={(e) => handleInputChange('series.description', e.target.value)}
-                  placeholder="Description of the event series"
-                  rows={2}
-                />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recurring Events */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Recurring Event</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <Switch
-                  id="isRecurring"
-                  checked={formData.isRecurring}
-                  onCheckedChange={(checked) => {
-                    handleInputChange('isRecurring', checked)
-                    if (!checked) {
-                      setRecurringDates([])
-                    }
-                  }}
-                />
-                <Label htmlFor="isRecurring">This is a recurring event</Label>
-              </div>
-
-              {formData.isRecurring && (
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label>Recurring Dates & Themes</Label>
-                    <Button type="button" variant="outline" size="sm" onClick={addRecurringDate}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Date
-                    </Button>
-                  </div>
-
-                  {recurringDates.map((item, index) => (
-                    <div key={index} className="flex items-start gap-2 p-3 border rounded-lg">
-                      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                        <Input
-                          placeholder="Date (e.g., Jan 15)"
-                          value={item.date}
-                          onChange={(e) => updateRecurringDate(index, 'date', e.target.value)}
-                        />
-                        <Input
-                          placeholder="Theme"
-                          value={item.theme}
-                          onChange={(e) => updateRecurringDate(index, 'theme', e.target.value)}
-                        />
-                        <Input
-                          placeholder="Description"
-                          value={item.description}
-                          onChange={(e) => updateRecurringDate(index, 'description', e.target.value)}
-                        />
-                      </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => removeRecurringDate(index)}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
           <div>
             <Label htmlFor="imageUrl">Image URL</Label>
             <Input
@@ -609,12 +629,12 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
 
           {/* Submit Actions */}
           <div className="flex items-center justify-end space-x-2 pt-4 border-t">
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
+            <Button type="button" variant="outline" onClick={onBack}>
+              Back
             </Button>
             <Button type="submit" disabled={isLoading}>
               {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
-              Create Event
+              Create Recurring Event
             </Button>
           </div>
         </form>

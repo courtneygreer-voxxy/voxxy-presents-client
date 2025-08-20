@@ -63,13 +63,31 @@ export function useOrganization(organizationSlug: string) {
   }, [organizationSlug, loadData])
 
   const refreshEvents = async () => {
-    if (!organization) return
+    if (!organization) {
+      console.log('⚠️ Cannot refresh events: no organization loaded')
+      return
+    }
+    
+    console.log(`🔄 Refreshing events for organization: ${organization.name} (${organization.id})`)
     
     try {
-      const eventsList = await eventsApi.getByOrganization(organization.id)
+      const dataSource = getDataSource()
+      let eventsList: Event[]
+
+      if (dataSource === 'firebase') {
+        console.log('Refreshing events via Firebase')
+        eventsList = await getEventsByOrganization(organization.id)
+        console.log(`✅ Found ${eventsList.length} events via Firebase`)
+      } else {
+        console.log('Refreshing events via API')
+        eventsList = await eventsApi.getByOrganization(organization.id)
+        console.log(`✅ Found ${eventsList.length} events via API`)
+      }
+      
       setEvents(eventsList)
+      console.log('📋 Events list updated in state')
     } catch (err) {
-      console.error('Error refreshing events:', err)
+      console.error('❌ Error refreshing events:', err)
     }
   }
 
