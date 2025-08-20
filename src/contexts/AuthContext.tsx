@@ -8,6 +8,8 @@ import {
   resetPassword, 
   resendEmailVerification,
   getUserProfile,
+  handleEmailVerification,
+  checkForEmailVerificationInURL,
   AuthServiceError,
   type SignUpData,
   type SignInData
@@ -63,6 +65,28 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Clear error helper
   const clearError = () => setError(null)
+
+  // Handle email verification from URL parameters
+  useEffect(() => {
+    const actionCode = checkForEmailVerificationInURL()
+    if (actionCode) {
+      handleEmailVerification(actionCode)
+        .then(() => {
+          // Clear URL parameters after successful verification
+          const url = new URL(window.location.href)
+          url.searchParams.delete('mode')
+          url.searchParams.delete('oobCode')
+          window.history.replaceState({}, '', url.toString())
+          
+          // Show success message or redirect
+          console.log('Email verified successfully!')
+        })
+        .catch((error) => {
+          console.error('Email verification failed:', error)
+          setError(error.message)
+        })
+    }
+  }, [])
 
   // Handle auth state changes
   useEffect(() => {
