@@ -1,4 +1,6 @@
-import { createOrganization } from '@/lib/database'
+import { createOrganization, getUser } from '@/lib/database'
+import { doc, updateDoc, arrayUnion } from 'firebase/firestore'
+import { db } from '@/lib/firebase'
 import type { CreateClubData } from '@/types/createClub'
 import type { Organization } from '@/types/database'
 import { getDefaultAboutStory, getDefaultOfferings, getDisplayAboutStory, getDisplayOfferings } from '@/utils/defaultContent'
@@ -60,6 +62,18 @@ export const createClub = async (data: CreateClubData, ownerId: string): Promise
   try {
     const organizationData = transformClubData(data, ownerId)
     const id = await createOrganization(organizationData)
+    
+    // Update the user's organizationIds array to include the new club
+    try {
+      const userDocRef = doc(db, 'users', ownerId)
+      await updateDoc(userDocRef, {
+        organizationIds: arrayUnion(id),
+        updatedAt: new Date()
+      })
+    } catch (userUpdateError) {
+      console.error('Failed to update user organizationIds:', userUpdateError)
+      // Don't throw here - club creation was successful, just log the error
+    }
     
     return {
       id,

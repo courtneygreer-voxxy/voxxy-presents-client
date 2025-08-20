@@ -1,24 +1,44 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { 
-  User, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged 
-} from 'firebase/auth'
+import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
+import { 
+  signUp, 
+  signIn, 
+  signOutUser, 
+  resetPassword, 
+  resendEmailVerification,
+  getUserProfile,
+  AuthServiceError,
+  type SignUpData,
+  type SignInData
+} from '@/services/authService'
+import type { User } from '@/types/database'
 
 interface AuthContextType {
-  user: User | null
-  login: (email: string, password: string) => Promise<void>
-  register: (email: string, password: string) => Promise<void>
-  logout: () => Promise<void>
+  // Current user state
+  currentUser: FirebaseUser | null
+  userProfile: User | null
   loading: boolean
+  error: string | null
+  
+  // Auth actions
+  signUp: (data: SignUpData) => Promise<void>
+  signIn: (data: SignInData) => Promise<void>
+  signOut: () => Promise<void>
+  resetPassword: (email: string) => Promise<void>
+  resendVerification: () => Promise<void>
+  clearError: () => void
+  refreshUserProfile: () => Promise<void>
+  
+  // Helper methods
+  isAuthenticated: boolean
+  isEmailVerified: boolean
+  needsEmailVerification: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
-export const useAuth = () => {
+export function useAuth() {
   const context = useContext(AuthContext)
   if (context === undefined) {
     throw new Error('useAuth must be used within an AuthProvider')
@@ -26,42 +46,174 @@ export const useAuth = () => {
   return context
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+interface AuthProviderProps {
+  children: React.ReactNode
+}
 
+export function AuthProvider({ children }: AuthProviderProps) {
+  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null)
+  const [userProfile, setUserProfile] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Derived state
+  const isAuthenticated = !!currentUser
+  const isEmailVerified = !!currentUser?.emailVerified
+  const needsEmailVerification = isAuthenticated && !isEmailVerified
+
+  // Clear error helper
+  const clearError = () => setError(null)
+
+  // Handle auth state changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user)
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setCurrentUser(user)
+      
+      if (user) {
+        // Load user profile from Firestore
+        try {
+          const profile = await getUserProfile(user.uid)
+          setUserProfile(profile)
+        } catch (err) {
+          console.error('Failed to load user profile:', err)
+          setError('Failed to load user profile')
+        }
+      } else {
+        setUserProfile(null)
+      }
+      
       setLoading(false)
     })
 
     return unsubscribe
   }, [])
 
-  const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password)
+  // Sign up function
+  const handleSignUp = async (data: SignUpData) => {
+    try {
+      setLoading(true)
+      setError(null)
+      await signUp(data)
+      // Note: onAuthStateChanged will handle setting the user state
+    } catch (err) {
+      if (err instanceof AuthServiceError) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred during sign up')
+      }
+      throw err
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const register = async (email: string, password: string) => {
-    await createUserWithEmailAndPassword(auth, email, password)
+  // Sign in function
+  const handleSignIn = async (data: SignInData) => {
+    try {
+      setLoading(true)
+      setError(null)
+      await signIn(data)
+      // Note: onAuthStateChanged will handle setting the user state
+    } catch (err) {
+      if (err instanceof AuthServiceError) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred during sign in')
+      }
+      throw err
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const logout = async () => {
-    await signOut(auth)
+  // Sign out function
+  const handleSignOut = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+      await signOutUser()
+      // Note: onAuthStateChanged will handle clearing the user state
+    } catch (err) {
+      if (err instanceof AuthServiceError) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred during sign out')
+      }
+      throw err
+    } finally {
+      setLoading(false)
+    }
   }
 
-  const value = {
-    user,
-    login,
-    register,
-    logout,
-    loading
+  // Reset password function
+  const handleResetPassword = async (email: string) => {
+    try {
+      setError(null)
+      await resetPassword(email)
+    } catch (err) {
+      if (err instanceof AuthServiceError) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred while resetting password')
+      }
+      throw err
+    }
+  }
+
+  // Resend email verification
+  const handleResendVerification = async () => {
+    if (!currentUser) {
+      setError('No user is currently signed in')
+      return
+    }
+
+    try {
+      setError(null)
+      await resendEmailVerification(currentUser)
+    } catch (err) {
+      if (err instanceof AuthServiceError) {
+        setError(err.message)
+      } else {
+        setError('An unexpected error occurred while sending verification email')
+      }
+      throw err
+    }
+  }
+
+  // Refresh user profile from Firestore
+  const handleRefreshUserProfile = async () => {
+    if (!currentUser) return
+
+    try {
+      const profile = await getUserProfile(currentUser.uid)
+      setUserProfile(profile)
+    } catch (err) {
+      console.error('Failed to refresh user profile:', err)
+    }
+  }
+
+  const value: AuthContextType = {
+    currentUser,
+    userProfile,
+    loading,
+    error,
+    signUp: handleSignUp,
+    signIn: handleSignIn,
+    signOut: handleSignOut,
+    resetPassword: handleResetPassword,
+    resendVerification: handleResendVerification,
+    clearError,
+    refreshUserProfile: handleRefreshUserProfile,
+    isAuthenticated,
+    isEmailVerified,
+    needsEmailVerification
   }
 
   return (
     <AuthContext.Provider value={value}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   )
 }
+
+export { AuthContext }

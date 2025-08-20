@@ -1,12 +1,52 @@
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Users, MapPin, ArrowRight, Sparkles } from "lucide-react"
+import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus } from "lucide-react"
 import { Link } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
 
 export default function HomePage() {
+  const { isAuthenticated, currentUser } = useAuth()
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+      {/* Navigation */}
+      <nav className="relative z-10 px-4 py-6">
+        <div className="container mx-auto max-w-6xl flex justify-between items-center">
+          <div className="text-2xl font-bold text-purple-600">
+            Voxxy Presents
+          </div>
+          <div className="flex items-center gap-4">
+            {isAuthenticated ? (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/profile">
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/create-club">Create Club</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" asChild>
+                  <Link to="/login">
+                    <LogIn className="mr-2 h-4 w-4" />
+                    Sign In
+                  </Link>
+                </Button>
+                <Button asChild>
+                  <Link to="/sign-up">
+                    <UserPlus className="mr-2 h-4 w-4" />
+                    Sign Up
+                  </Link>
+                </Button>
+              </>
+            )}
+          </div>
+        </div>
+      </nav>
       {/* Hero Section */}
       <section className="relative py-20 px-4">
         <div className="container mx-auto max-w-6xl text-center">
@@ -30,9 +70,11 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 py-6">
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
+            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 py-6" asChild>
+              <Link to={isAuthenticated ? "/profile" : "/sign-up"}>
+                {isAuthenticated ? "Go to Dashboard" : "Get Started"}
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
               <Link to="/brooklyn-hearts-club">
