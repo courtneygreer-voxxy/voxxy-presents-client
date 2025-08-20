@@ -59,10 +59,11 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
         if (!validateEmail(value)) return 'Please enter a valid email address'
         return undefined
 
-      case 'password':
+      case 'password': {
         if (!value) return ['Password is required']
         const passwordValidation = validatePassword(value)
         return passwordValidation.isValid ? undefined : passwordValidation.errors
+      }
 
       case 'confirmPassword':
         if (!value) return 'Please confirm your password'
