@@ -90,16 +90,13 @@ export default function CreateClubFlow() {
   const { user } = useAuth()
 
   const handleCreate = async () => {
-    if (!user) {
-      alert('You must be logged in to create a club.')
-      return
-    }
-
     setIsCreating(true)
     try {
       console.log('Creating club with data:', formData)
       
-      const result = await createClub(formData, user.uid)
+      // Use authenticated user ID if available, otherwise use temp ID
+      const ownerId = user?.uid || 'temp-owner-id'
+      const result = await createClub(formData, ownerId)
       console.log('Club created successfully!', result)
       
       // Navigate to the new club's admin page

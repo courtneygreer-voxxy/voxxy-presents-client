@@ -16,10 +16,10 @@ service cloud.firestore {
     }
     
     // Organizations - only authenticated users can read, only owners can write
+    // TODO: Re-enable auth protection when login is implemented
     match /organizations/{orgId} {
       allow read: if true; // Public read for organization pages
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == resource.data.ownerId;
+      allow create: if true; // Temporarily allow unauthenticated creation
       allow update, delete: if isAuthenticated() && 
                                isOwner(resource);
     }
