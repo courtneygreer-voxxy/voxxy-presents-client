@@ -9,6 +9,11 @@ import CreateClubPage from './pages/CreateClubPage'
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
+import PricingPage from './pages/PricingPage'
+import FeaturesPage from './pages/FeaturesPage'
+import HelpPage from './pages/HelpPage'
+import ContactPage from './pages/ContactPage'
+import ProductsPage from './pages/ProductsPage'
 
 export default function App() {
   return (
@@ -17,6 +22,11 @@ export default function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/help" element={<HelpPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/products" element={<ProductsPage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
