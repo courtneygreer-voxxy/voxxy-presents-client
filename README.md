@@ -14,11 +14,14 @@ A modern event management platform that simplifies recurring community events wi
 
 Voxxy Presents is a comprehensive event management solution designed for creative communities, clubs, and recurring event organizers. The platform provides:
 
-- **Custom Organization Pages**: Branded landing pages for each community
+- **Custom Organization Pages**: Branded landing pages with image carousels and rich content
 - **Admin Dashboard**: Full-featured management interface for organization owners
+- **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series
 - **Dynamic Event Management**: Support for free events, paid tickets, and presale systems
 - **Registration Workflows**: RSVP tracking, presale requests, and external ticketing integration
-- **Series & Recurring Events**: Organized event collections with themed variations
+- **Series & Recurring Events**: Advanced management with individual event customization
+- **Image Management**: File upload system with automatic compression and carousel display
+- **Club Creation Wizard**: Guided 7-step setup for new organizations
 - **Real-time Data**: Live event updates and registration management
 - **Multi-Environment Support**: Development, staging, production, and sandbox environments
 
@@ -152,6 +155,29 @@ Multi-tenant architecture supporting:
 - Individual organization settings
 - Flexible event categorization
 - Social media integration
+
+### Event Creation Flows
+Streamlined event creation with dedicated workflows:
+- **One-Time Events**: Simple form for workshops, parties, and special events
+- **Recurring Event Series**: Advanced management for ongoing programs with individual event customization
+- **Smart Event Types**: Guided selection process to choose the right flow
+- **Event Details Cards**: Individual customization for each event in a series (date, theme, description, location overrides)
+
+### Image Carousel System
+Rich visual storytelling for organization about sections:
+- **Multiple Image Support**: Upload up to 5 images per organization
+- **File Upload Interface**: Direct image upload with automatic compression
+- **Carousel Navigation**: Click-through gallery with arrows, dots, and counter
+- **Storage Optimization**: Aggressive compression (150KB per image) to stay within database limits
+- **Backwards Compatibility**: Seamless upgrade from single image to carousel
+
+### Club Creation Wizard
+Complete 7-step guided setup for new organizations:
+- **Basic Information**: Name, description, contact details with auto-generated URL slugs
+- **Branding Customization**: Logo, header image, and color scheme selection
+- **Social Integration**: Connect Instagram, website, and other platforms
+- **Location Setup**: Default venue information for recurring events
+- **Story & Offerings**: Rich about section with custom content
 
 ## 🌐 API Integration
 
