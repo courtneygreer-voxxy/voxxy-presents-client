@@ -240,7 +240,7 @@ export function OrganizationEditForm({
         saveData.aboutOfferings = cleanedOfferings
       } else {
         // Don't save anything for aboutOfferings so it uses defaults
-        delete saveData.aboutOfferings
+        delete (saveData as any).aboutOfferings
       }
       
       // Filter out any undefined values from the entire object to prevent Firebase errors

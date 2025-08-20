@@ -54,9 +54,15 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       setFormData(prev => {
         const newPrice = { ...prev.price! }
         if (value === undefined || value === '') {
-          delete newPrice[priceField]
+          if (priceField === 'amount' || priceField === 'advancePrice') {
+            delete (newPrice as any)[priceField]
+          } else if (priceField === 'type') {
+            newPrice.type = 'free'
+          } else if (priceField === 'description') {
+            newPrice.description = ''
+          }
         } else {
-          newPrice[priceField] = value
+          (newPrice as any)[priceField] = value
         }
         return { ...prev, price: newPrice }
       })
@@ -64,7 +70,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       setFormData(prev => {
         if (value === undefined || value === '') {
           const newData = { ...prev }
-          delete newData[field]
+          delete (newData as any)[field]
           return newData
         } else {
           return { ...prev, [field]: value }

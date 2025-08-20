@@ -89,7 +89,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
     setEvents(prev => prev.filter((_, i) => i !== index))
   }
 
-  const handleSeriesChange = (field: keyof SeriesData, value: any) => {
+  const handleSeriesChange = (field: keyof SeriesData | string, value: any) => {
     if (field.startsWith('price.groupDealDetails.')) {
       const dealField = field.split('.')[2] as string
       setSeriesData(prev => ({
@@ -107,14 +107,14 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       setSeriesData(prev => {
         const newPrice = { ...prev.price }
         if (value === undefined || value === '') {
-          delete newPrice[priceField as keyof typeof newPrice]
+          delete (newPrice as any)[priceField]
         } else {
           (newPrice as any)[priceField] = value
         }
         return { ...prev, price: newPrice }
       })
     } else {
-      setSeriesData(prev => ({ ...prev, [field]: value }))
+      setSeriesData(prev => ({ ...prev, [field as keyof SeriesData]: value }))
     }
   }
 
@@ -172,6 +172,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
           address: seriesData.address,
           price: cleanObject(seriesData.price),
           capacity: seriesData.capacity,
+          registrationRequired: false,
           eventbriteUrl: seriesData.eventbriteUrl,
           series: {
             name: seriesData.name,

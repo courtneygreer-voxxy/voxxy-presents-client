@@ -64,12 +64,20 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       setFormData(prev => {
         const newPrice = { ...prev.price! }
         if (!newPrice.groupDealDetails) {
-          newPrice.groupDealDetails = {} as any
+          newPrice.groupDealDetails = {
+            minimumPeople: 0,
+            pricePerPerson: 0,
+            normalPricePerPerson: 0
+          }
         }
         if (value === undefined || value === '') {
-          delete newPrice.groupDealDetails[dealField]
+          if (dealField === 'minimumPeople' || dealField === 'pricePerPerson' || dealField === 'normalPricePerPerson') {
+            newPrice.groupDealDetails[dealField] = 0
+          }
         } else {
-          newPrice.groupDealDetails[dealField] = value
+          if (dealField === 'minimumPeople' || dealField === 'pricePerPerson' || dealField === 'normalPricePerPerson') {
+            newPrice.groupDealDetails[dealField] = value as number
+          }
         }
         return { ...prev, price: newPrice }
       })
@@ -78,9 +86,15 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       setFormData(prev => {
         const newPrice = { ...prev.price! }
         if (value === undefined || value === '') {
-          delete newPrice[priceField]
+          if (priceField === 'amount' || priceField === 'advancePrice') {
+            delete (newPrice as any)[priceField]
+          } else if (priceField === 'type') {
+            newPrice.type = 'free'
+          } else if (priceField === 'description') {
+            newPrice.description = ''
+          }
         } else {
-          newPrice[priceField] = value
+          (newPrice as any)[priceField] = value
         }
         return { ...prev, price: newPrice }
       })
@@ -89,7 +103,9 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       setFormData(prev => {
         if (value === undefined || value === '') {
           const newSeries = { ...prev.series! }
-          delete newSeries[seriesField]
+          if (seriesField === 'name' || seriesField === 'description') {
+            delete (newSeries as any)[seriesField]
+          }
           return { ...prev, series: Object.keys(newSeries).length > 0 ? newSeries : undefined }
         } else {
           return {
@@ -105,7 +121,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       setFormData(prev => {
         if (value === undefined || value === '') {
           const newData = { ...prev }
-          delete newData[field]
+          delete (newData as any)[field]
           return newData
         } else {
           return { ...prev, [field]: value }
