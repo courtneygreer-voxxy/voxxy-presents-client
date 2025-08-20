@@ -15,7 +15,8 @@ import {
   ExternalLink,
   DollarSign,
   Loader,
-  Edit
+  Edit,
+  User
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
@@ -86,13 +87,23 @@ export default function OrganizationPage({
       {/* Admin Controls */}
       {showAdminControls && isFeatureEnabled('adminControls') && (
         <div className="fixed top-4 right-4 z-50 flex gap-2">
+          <Link to="/profile">
+            <Button
+              variant="outline"
+              className="bg-white hover:bg-gray-50"
+              size="sm"
+            >
+              <User className="h-4 w-4 mr-2" />
+              Dashboard
+            </Button>
+          </Link>
           <Link to={`/${organizationSlug}/admin`}>
             <Button
               className="bg-purple-600 hover:bg-purple-700 text-white"
               size="sm"
             >
               <Edit className="h-4 w-4 mr-2" />
-              Admin Dashboard
+              Admin
             </Button>
           </Link>
         </div>

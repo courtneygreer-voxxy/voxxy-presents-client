@@ -15,7 +15,8 @@ import {
   Edit,
   Plus,
   MapPin,
-  Mail
+  Mail,
+  User
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
@@ -24,7 +25,7 @@ import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
-import { getCurrentEnvironment, isFeatureEnabled } from '@/config/environments'
+import { isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
 export default function OrganizationAdmin() {
@@ -37,7 +38,6 @@ export default function OrganizationAdmin() {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
 
-  const currentEnv = getCurrentEnvironment()
   const adminEnabled = isFeatureEnabled('adminControls')
 
   const handleSaveOrganization = async (updates: Partial<Organization>) => {
@@ -87,7 +87,7 @@ export default function OrganizationAdmin() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Admin Access Disabled</h1>
-          <p className="text-gray-600 mb-6">Admin controls are not available in the {currentEnv} environment.</p>
+          <p className="text-gray-600 mb-6">Admin controls are not available in this environment.</p>
           <Button onClick={() => navigate('/')}>Return Home</Button>
         </div>
       </div>
@@ -123,35 +123,29 @@ export default function OrganizationAdmin() {
       <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">{organization.name} Admin</h1>
+              <p className="text-gray-600 mt-1">Manage your organization and events</p>
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/profile')}
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Dashboard
+              </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => navigate(`/${orgSlug}`)}
                 className="flex items-center gap-2"
               >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Public Page
-              </Button>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">{organization.name} Admin</h1>
-                <p className="text-gray-600 mt-1">Manage your organization and events</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                {currentEnv}
-              </Badge>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => window.open(`/${orgSlug}`, '_blank')}
-                className="flex items-center gap-2"
-              >
                 <Eye className="h-4 w-4" />
-                Preview
+                Public Page
               </Button>
             </div>
           </div>
