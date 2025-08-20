@@ -94,6 +94,15 @@ export function EmailVerificationPrompt({ onResendSuccess, onContinue }: EmailVe
             <p className="text-xs">
               If you don't see the email, check your spam folder.
             </p>
+            {error && error.includes('rate limiting') && (
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-md">
+                <p className="text-xs text-amber-800">
+                  <strong>Temporary Issue:</strong> Our email system is experiencing high volume. 
+                  Your verification email will be sent as soon as possible. You can still use 
+                  the platform in the meantime!
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Resend Email Button */}
@@ -130,10 +139,16 @@ export function EmailVerificationPrompt({ onResendSuccess, onContinue }: EmailVe
               className="w-full"
               onClick={handleContinue}
             >
-              I'll Verify Later - Continue
+              {error && error.includes('rate limiting') 
+                ? 'Continue - Verify Email Later' 
+                : 'I\'ll Verify Later - Continue'
+              }
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              Note: Email verification is required before creating a club
+              {error && error.includes('rate limiting') 
+                ? 'You can explore the platform now. Email verification can be completed later.'
+                : 'Note: Email verification is required before creating a club'
+              }
             </p>
           </div>
         </div>
