@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Save, X } from "lucide-react"
 import type { Organization } from '@/types/database'
+import { getDefaultAboutStory, getDefaultOfferings } from '@/utils/defaultContent'
+import { compressImage, validateImageFile } from '@/utils/imageCompression'
 
 
 interface OrganizationEditFormProps {
@@ -32,7 +34,7 @@ export function OrganizationEditForm({
     bannerUrl: organization.bannerUrl || '',
     aboutImageUrl: organization.aboutImageUrl || '',
     aboutStory: organization.aboutStory || '',
-    aboutOfferings: organization.aboutOfferings && organization.aboutOfferings.length > 0 ? organization.aboutOfferings : [''] as string[],
+    aboutOfferings: organization.aboutOfferings && organization.aboutOfferings.length > 0 ? organization.aboutOfferings : getDefaultOfferings(),
     socialLinks: {
       instagram: organization.socialLinks.instagram || '',
       website: organization.socialLinks.website || '',
@@ -75,41 +77,44 @@ export function OrganizationEditForm({
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
-    const validTypes = ['image/svg+xml', 'image/jpeg', 'image/jpg', 'image/png']
-    if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid image file (SVG, JPEG, or PNG)')
-      return
-    }
-
-    // Validate file size (5MB max)
-    const maxSize = 5 * 1024 * 1024 // 5MB in bytes
-    if (file.size > maxSize) {
-      alert('File size must be less than 5MB')
+    // Validate file
+    const validation = validateImageFile(file)
+    if (!validation.valid) {
+      alert(validation.error)
       return
     }
 
     setUploadingLogo(true)
     
     try {
-      // Convert file to data URL for preview/storage
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
+      // Handle SVG files differently (no compression needed)
+      if (file.type === 'image/svg+xml') {
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          const dataUrl = event.target?.result as string
+          setFormData(prev => ({
+            ...prev,
+            logoUrl: dataUrl
+          }))
+          setUploadingLogo(false)
+        }
+        reader.onerror = () => {
+          alert('Error reading SVG file')
+          setUploadingLogo(false)
+        }
+        reader.readAsDataURL(file)
+      } else {
+        // Compress and crop logos to square format
+        const compressedDataUrl = await compressImage(file, 800, true) // 800KB target, crop to square
         setFormData(prev => ({
           ...prev,
-          logoUrl: dataUrl
+          logoUrl: compressedDataUrl
         }))
         setUploadingLogo(false)
       }
-      reader.onerror = () => {
-        alert('Error reading file')
-        setUploadingLogo(false)
-      }
-      reader.readAsDataURL(file)
     } catch (error) {
-      console.error('Error uploading logo:', error)
-      alert('Error uploading file')
+      console.error('Error processing logo:', error)
+      alert('Error processing image. Please try a different file.')
       setUploadingLogo(false)
     }
   }
@@ -118,41 +123,30 @@ export function OrganizationEditForm({
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
-    if (!validTypes.includes(file.type)) {
+    // Validate file (excluding SVG for hero images)
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
       alert('Please upload a valid image file (JPEG or PNG)')
       return
     }
 
-    // Validate file size (10MB max for hero images)
-    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
-    if (file.size > maxSize) {
-      alert('File size must be less than 10MB')
+    if (file.size > 20 * 1024 * 1024) { // 20MB source limit
+      alert('Source file must be less than 20MB')
       return
     }
 
     setUploadingHero(true)
     
     try {
-      // Convert file to data URL for preview/storage
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
-        setFormData(prev => ({
-          ...prev,
-          bannerUrl: dataUrl
-        }))
-        setUploadingHero(false)
-      }
-      reader.onerror = () => {
-        alert('Error reading file')
-        setUploadingHero(false)
-      }
-      reader.readAsDataURL(file)
+      // Compress hero images to larger size since they need more detail
+      const compressedDataUrl = await compressImage(file, 900) // 900KB target for hero images
+      setFormData(prev => ({
+        ...prev,
+        bannerUrl: compressedDataUrl
+      }))
+      setUploadingHero(false)
     } catch (error) {
-      console.error('Error uploading hero image:', error)
-      alert('Error uploading file')
+      console.error('Error processing hero image:', error)
+      alert('Error processing image. Please try a different file.')
       setUploadingHero(false)
     }
   }
@@ -161,41 +155,30 @@ export function OrganizationEditForm({
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png']
-    if (!validTypes.includes(file.type)) {
+    // Validate file (excluding SVG for about images)
+    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
       alert('Please upload a valid image file (JPEG or PNG)')
       return
     }
 
-    // Validate file size (10MB max)
-    const maxSize = 10 * 1024 * 1024 // 10MB in bytes
-    if (file.size > maxSize) {
-      alert('File size must be less than 10MB')
+    if (file.size > 20 * 1024 * 1024) { // 20MB source limit
+      alert('Source file must be less than 20MB')
       return
     }
 
     setUploadingAbout(true)
     
     try {
-      // Convert file to data URL for preview/storage
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        const dataUrl = event.target?.result as string
-        setFormData(prev => ({
-          ...prev,
-          aboutImageUrl: dataUrl
-        }))
-        setUploadingAbout(false)
-      }
-      reader.onerror = () => {
-        alert('Error reading file')
-        setUploadingAbout(false)
-      }
-      reader.readAsDataURL(file)
+      // Compress about images
+      const compressedDataUrl = await compressImage(file, 850) // 850KB target for about images
+      setFormData(prev => ({
+        ...prev,
+        aboutImageUrl: compressedDataUrl
+      }))
+      setUploadingAbout(false)
     } catch (error) {
-      console.error('Error uploading about image:', error)
-      alert('Error uploading file')
+      console.error('Error processing about image:', error)
+      alert('Error processing image. Please try a different file.')
       setUploadingAbout(false)
     }
   }
@@ -235,6 +218,12 @@ export function OrganizationEditForm({
       // Include default theme values since we removed the UI but the schema requires it
       // Filter out empty offerings
       const cleanedOfferings = formData.aboutOfferings.filter(offering => offering.trim() !== '')
+      
+      // Check if the current offerings are the same as default offerings
+      const defaultOfferings = getDefaultOfferings()
+      const isUsingDefaults = cleanedOfferings.length === defaultOfferings.length && 
+        cleanedOfferings.every((offering, index) => offering === defaultOfferings[index])
+      
       const saveData = {
         ...formData,
         settings: {
@@ -246,9 +235,12 @@ export function OrganizationEditForm({
         }
       }
       
-      // Only include aboutOfferings if there are valid entries (Firebase doesn't allow undefined)
-      if (cleanedOfferings.length > 0) {
+      // Only include aboutOfferings if there are valid entries that aren't just the defaults
+      if (cleanedOfferings.length > 0 && !isUsingDefaults) {
         saveData.aboutOfferings = cleanedOfferings
+      } else {
+        // Don't save anything for aboutOfferings so it uses defaults
+        delete saveData.aboutOfferings
       }
       
       // Filter out any undefined values from the entire object to prevent Firebase errors
@@ -412,7 +404,7 @@ export function OrganizationEditForm({
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
-                  Supported formats: SVG, JPEG, PNG. Max size: 5MB
+                  Supported formats: SVG, JPEG, PNG. Max source file: 20MB (will be cropped to square and compressed automatically)
                 </p>
                 {formData.logoUrl && !uploadingLogo && (
                   <div className="flex items-center gap-2 mt-2">
@@ -445,7 +437,7 @@ export function OrganizationEditForm({
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
-                  Supported formats: JPEG, PNG. Max size: 10MB. Recommended: 1200x400px or larger
+                  Supported formats: JPEG, PNG. Max source file: 20MB (will be compressed automatically). Recommended: 1200x400px or larger
                 </p>
                 {formData.bannerUrl && !uploadingHero && (
                   <div className="mt-3">
@@ -494,7 +486,7 @@ export function OrganizationEditForm({
                   </p>
                 )}
                 <p className="text-xs text-gray-500">
-                  Supported formats: JPEG, PNG. Max size: 10MB. Recommended: 600x400px or larger
+                  Supported formats: JPEG, PNG. Max source file: 20MB (will be compressed automatically). Recommended: 600x400px or larger
                 </p>
                 {formData.aboutImageUrl && !uploadingAbout && (
                   <div className="mt-3">
@@ -517,9 +509,12 @@ export function OrganizationEditForm({
                 id="aboutStory"
                 value={formData.aboutStory}
                 onChange={(e) => handleInputChange('aboutStory', e.target.value)}
-                placeholder="Tell the story of your organization - how it started, your mission, and what makes you unique..."
+                placeholder={getDefaultAboutStory(organization.name)}
                 rows={6}
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Leave empty to use default text shown above
+              </p>
             </div>
 
             <div>
@@ -530,7 +525,7 @@ export function OrganizationEditForm({
                     <Input
                       value={offering}
                       onChange={(e) => updateOffering(index, e.target.value)}
-                      placeholder="e.g., Weekly open studio sessions with shared materials"
+                      placeholder={getDefaultOfferings()[index] || "e.g., Fun activities and networking"}
                       className="flex-1"
                     />
                     {formData.aboutOfferings.length > 1 && (
@@ -554,6 +549,9 @@ export function OrganizationEditForm({
                 >
                   Add Offering
                 </Button>
+                <p className="text-xs text-gray-500 mt-2">
+                  Leave empty to use default offerings: {getDefaultOfferings().join(', ')}
+                </p>
               </div>
             </div>
           </CardContent>
