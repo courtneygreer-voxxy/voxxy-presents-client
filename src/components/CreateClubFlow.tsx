@@ -12,6 +12,7 @@ import CreateClubBranding from './CreateClubBranding'
 import CreateClubSocial from './CreateClubSocial'
 import CreateClubPreview from './CreateClubPreview'
 import { useNavigate } from 'react-router-dom'
+import { useAuth } from '@/contexts/AuthContext'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
 import { createClub } from '@/services/clubCreation'
@@ -86,13 +87,19 @@ export default function CreateClubFlow() {
   }
 
   const navigate = useNavigate()
+  const { user } = useAuth()
 
   const handleCreate = async () => {
+    if (!user) {
+      alert('You must be logged in to create a club.')
+      return
+    }
+
     setIsCreating(true)
     try {
       console.log('Creating club with data:', formData)
       
-      const result = await createClub(formData)
+      const result = await createClub(formData, user.uid)
       console.log('Club created successfully!', result)
       
       // Navigate to the new club's admin page

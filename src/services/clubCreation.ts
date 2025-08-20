@@ -14,7 +14,7 @@ export const generateSlug = (name: string): string => {
 }
 
 // Transform create club data to organization format
-export const transformClubData = (data: CreateClubData): Omit<Organization, 'id' | 'createdAt' | 'updatedAt'> => {
+export const transformClubData = (data: CreateClubData, ownerId: string): Omit<Organization, 'id' | 'createdAt' | 'updatedAt'> => {
   const slug = generateSlug(data.name)
   
   // Filter out undefined values - Firebase doesn't accept them
@@ -35,7 +35,7 @@ export const transformClubData = (data: CreateClubData): Omit<Organization, 'id'
         backgroundColor: '#FFFFFF'
       }
     },
-    ownerId: 'temp-owner-id' // Temporary until auth is implemented
+    ownerId: ownerId
   }
 
   // Only add optional fields if they have values
@@ -56,9 +56,9 @@ export const transformClubData = (data: CreateClubData): Omit<Organization, 'id'
 }
 
 // Main club creation function
-export const createClub = async (data: CreateClubData): Promise<{ id: string; slug: string }> => {
+export const createClub = async (data: CreateClubData, ownerId: string): Promise<{ id: string; slug: string }> => {
   try {
-    const organizationData = transformClubData(data)
+    const organizationData = transformClubData(data, ownerId)
     const id = await createOrganization(organizationData)
     
     return {
