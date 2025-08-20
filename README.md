@@ -121,6 +121,17 @@ src/
 └── styles/             # Global styles
 ```
 
+## 🐛 Known Issues
+
+### Image Upload on Organization Pages
+- **Issue**: Error when trying to add images to organization about section
+- **Error**: `Route /api/organizations/{id} not found` in production
+- **Status**: API endpoint exists but still debugging routing issue
+- **Workaround**: None currently
+- **Priority**: High - blocking organization customization
+
+---
+
 ## 🔧 Key Features
 
 ### Admin Dashboard
