@@ -310,7 +310,7 @@ export default function ProductsPage() {
             Ready to start your journey?
           </h2>
           <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
-            Begin with Voxxy Presents and build the creative community of your dreams with your AI planner friend
+            Begin with Voxxy Presents and build the creative community of your dreams with your planner friend
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
