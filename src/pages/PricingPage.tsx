@@ -85,7 +85,7 @@ export default function PricingPage() {
                 </div>
                 <p className="text-sm text-purple-600 mt-2">
                   Special beta pricing - Limited time
-                </div>
+                </p>
 
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-center">
