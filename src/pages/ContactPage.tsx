@@ -4,53 +4,75 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { Checkbox } from "@/components/ui/checkbox"
 import { 
   Mail, 
-  MessageCircle, 
-  Calendar, 
   ArrowRight, 
   CheckCircle,
   Users,
   Rocket,
-  Heart
+  Sparkles,
+  MessageCircle
 } from "lucide-react"
 import { Link } from "react-router-dom"
 
-interface FormData {
+interface BetaFormData {
   name: string
   email: string
-  organization: string
-  contactReason: string
-  message: string
-  joinNewsletter: boolean
+  organizationName: string
+  description: string
+}
+
+interface UpdatesFormData {
+  name: string
+  email: string
 }
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState<FormData>({
+  const [betaFormData, setBetaFormData] = useState<BetaFormData>({
     name: '',
     email: '',
-    organization: '',
-    contactReason: '',
-    message: '',
-    joinNewsletter: false
+    organizationName: '',
+    description: ''
+  })
+  
+  const [updatesFormData, setUpdatesFormData] = useState<UpdatesFormData>({
+    name: '',
+    email: ''
   })
   
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submissionType, setSubmissionType] = useState('')
 
-  const handleInputChange = (field: keyof FormData, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const handleBetaInputChange = (field: keyof BetaFormData, value: string) => {
+    setBetaFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleUpdatesInputChange = (field: keyof UpdatesFormData, value: string) => {
+    setUpdatesFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleBetaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setSubmissionType('beta')
     
     // Simulate form submission
     await new Promise(resolve => setTimeout(resolve, 2000))
+    
+    setIsSubmitting(false)
+    setIsSubmitted(true)
+  }
+
+  const handleUpdatesSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmissionType('updates')
+    
+    // Simulate form submission
+    await new Promise(resolve => setTimeout(resolve, 1500))
     
     setIsSubmitting(false)
     setIsSubmitted(true)
@@ -72,8 +94,10 @@ export default function ContactPage() {
           <CardContent>
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
-                {formData.contactReason === 'pilot' 
-                  ? "We're excited to learn more about your community and will prioritize your pilot application."
+                {submissionType === 'beta' 
+                  ? "We're excited to learn more about your community and will prioritize your beta application."
+                  : submissionType === 'updates'
+                  ? "You'll receive updates about Voxxy Presents and new features as they become available."
                   : "Our team is reviewing your message and will respond soon."}
               </p>
               <Button className="w-full" asChild>
@@ -115,7 +139,8 @@ export default function ContactPage() {
       <section className="relative py-16 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium mb-6">
-            Let's Build Together
+            <Sparkles className="h-4 w-4 mr-2" />
+            Join the Voxxy Community
           </Badge>
           
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6 tracking-tight">
@@ -126,8 +151,8 @@ export default function ContactPage() {
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join NYC's creative community organizers in our pilot program. 
-            Let's build something amazing together.
+            Join community organizers everywhere who are building with Voxxy. 
+            Let's create something amazing together.
           </p>
         </div>
       </section>
@@ -140,152 +165,168 @@ export default function ContactPage() {
             {/* Contact Form */}
             <Card className="border-0 shadow-xl">
               <CardHeader>
-                <CardTitle className="text-2xl">Get In Touch</CardTitle>
+                <CardTitle className="text-2xl">Choose Your Path</CardTitle>
                 <CardDescription>
-                  Tell us about your community and how we can help you succeed
+                  Select the option that best fits your needs
                 </CardDescription>
               </CardHeader>
               
               <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Name *</Label>
-                      <Input
-                        id="name"
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => handleInputChange('name', e.target.value)}
-                        placeholder="Your full name"
-                      />
+                <Tabs defaultValue="beta" className="space-y-6">
+                  <TabsList className="grid w-full grid-cols-3">
+                    <TabsTrigger value="beta">Beta Access</TabsTrigger>
+                    <TabsTrigger value="updates">Updates</TabsTrigger>
+                    <TabsTrigger value="contact">Contact Team</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="beta">
+                    <form onSubmit={handleBetaSubmit} className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="beta-name">Name *</Label>
+                          <Input
+                            id="beta-name"
+                            type="text"
+                            required
+                            value={betaFormData.name}
+                            onChange={(e) => handleBetaInputChange('name', e.target.value)}
+                            placeholder="Your full name"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="beta-email">Email *</Label>
+                          <Input
+                            id="beta-email"
+                            type="email"
+                            required
+                            value={betaFormData.email}
+                            onChange={(e) => handleBetaInputChange('email', e.target.value)}
+                            placeholder="your@email.com"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="beta-organization">Organization/Club Name *</Label>
+                          <Input
+                            id="beta-organization"
+                            type="text"
+                            required
+                            value={betaFormData.organizationName}
+                            onChange={(e) => handleBetaInputChange('organizationName', e.target.value)}
+                            placeholder="Your community or organization name"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="beta-description">Brief Description *</Label>
+                          <Textarea
+                            id="beta-description"
+                            required
+                            value={betaFormData.description}
+                            onChange={(e) => handleBetaInputChange('description', e.target.value)}
+                            placeholder="Tell us about your community and what you're looking to achieve"
+                            rows={3}
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-purple-600 hover:bg-purple-700"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Submitting..." : "Request Paid Beta Access"}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="updates">
+                    <form onSubmit={handleUpdatesSubmit} className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <Label htmlFor="updates-name">Name *</Label>
+                          <Input
+                            id="updates-name"
+                            type="text"
+                            required
+                            value={updatesFormData.name}
+                            onChange={(e) => handleUpdatesInputChange('name', e.target.value)}
+                            placeholder="Your full name"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                        
+                        <div>
+                          <Label htmlFor="updates-email">Email *</Label>
+                          <Input
+                            id="updates-email"
+                            type="email"
+                            required
+                            value={updatesFormData.email}
+                            onChange={(e) => handleUpdatesInputChange('email', e.target.value)}
+                            placeholder="your@email.com"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-gray-600">
+                        Stay updated on Voxxy Presents features, community building tips, and product announcements.
+                      </p>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-purple-600 hover:bg-purple-700"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? "Subscribing..." : "Get Product Updates"}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="contact">
+                    <div className="space-y-4">
+                      <div className="text-center py-8">
+                        <Mail className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+                        <h3 className="text-lg font-semibold mb-2">Contact Our Team Directly</h3>
+                        <p className="text-gray-600 mb-6">
+                          Have questions or need personalized support? Reach out to our team directly.
+                        </p>
+                        <Button asChild className="bg-purple-600 hover:bg-purple-700">
+                          <a href="mailto:team@voxxyai.com">
+                            Email team@voxxyai.com
+                            <Mail className="ml-2 h-4 w-4" />
+                          </a>
+                        </Button>
+                      </div>
+                      
+                      <div className="border-t pt-4">
+                        <p className="text-sm text-gray-500 text-center">
+                          We typically respond within 24 hours during business days.
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => handleInputChange('email', e.target.value)}
-                        placeholder="your@email.com"
-                      />
-                    </div>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="organization">Community/Organization</Label>
-                    <Input
-                      id="organization"
-                      type="text"
-                      value={formData.organization}
-                      onChange={(e) => handleInputChange('organization', e.target.value)}
-                      placeholder="Your community or organization name"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="contactReason">I'm interested in *</Label>
-                    <Select 
-                      value={formData.contactReason} 
-                      onValueChange={(value) => handleInputChange('contactReason', value)}
-                      required
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select your primary interest" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="pilot">Joining the Pilot Program</SelectItem>
-                        <SelectItem value="demo">Booking a Demo</SelectItem>
-                        <SelectItem value="partnership">Partnership Opportunities</SelectItem>
-                        <SelectItem value="support">Support & Technical Help</SelectItem>
-                        <SelectItem value="general">General Inquiry</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="message">Tell us about your community *</Label>
-                    <Textarea
-                      id="message"
-                      required
-                      value={formData.message}
-                      onChange={(e) => handleInputChange('message', e.target.value)}
-                      placeholder="What type of community do you organize? What are your biggest challenges? How can we help?"
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="newsletter"
-                      checked={formData.joinNewsletter}
-                      onCheckedChange={(checked) => handleInputChange('joinNewsletter', !!checked)}
-                    />
-                    <Label htmlFor="newsletter" className="text-sm">
-                      Subscribe to updates about Voxxy Presents and community building tips
-                    </Label>
-                  </div>
-
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-lg py-6"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? (
-                      "Sending..."
-                    ) : formData.contactReason === 'pilot' ? (
-                      "Apply for Pilot Program"
-                    ) : formData.contactReason === 'demo' ? (
-                      "Request Demo"
-                    ) : (
-                      "Send Message"
-                    )}
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Button>
-                </form>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 
             {/* Contact Info & Benefits */}
             <div className="space-y-8">
               
-              {/* Quick Contact */}
-              <Card className="border-0 shadow-lg">
-                <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <MessageCircle className="h-5 w-5 mr-2 text-purple-600" />
-                    Quick Contact
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center space-x-3">
-                    <Mail className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="font-medium">Email</p>
-                      <a 
-                        href="mailto:hello@voxxypresents.com" 
-                        className="text-purple-600 hover:text-purple-700"
-                      >
-                        hello@voxxypresents.com
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Calendar className="h-5 w-5 text-gray-400" />
-                    <div>
-                      <p className="font-medium">Response Time</p>
-                      <p className="text-gray-600">Within 24 hours</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Pilot Program Benefits */}
+              {/* Beta Program Benefits */}
               <Card className="border-2 border-purple-200 shadow-lg">
                 <CardHeader>
                   <Badge className="bg-purple-600 text-white w-fit mb-3">
-                    Pilot Program
+                    <Rocket className="h-4 w-4 mr-2" />
+                    Paid Beta Program
                   </Badge>
                   <CardTitle>What's Included</CardTitle>
                   <CardDescription>
@@ -295,10 +336,10 @@ export default function ContactPage() {
                 <CardContent>
                   <ul className="space-y-3">
                     <li className="flex items-start">
-                      <Rocket className="h-5 w-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" />
+                      <Sparkles className="h-5 w-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Full Platform Access</p>
-                        <p className="text-sm text-gray-600">All features at pilot pricing</p>
+                        <p className="text-sm text-gray-600">All features at beta pricing</p>
                       </div>
                     </li>
                     <li className="flex items-start">
@@ -309,7 +350,7 @@ export default function ContactPage() {
                       </div>
                     </li>
                     <li className="flex items-start">
-                      <Heart className="h-5 w-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" />
+                      <MessageCircle className="h-5 w-5 text-purple-600 mr-3 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium">Direct Product Input</p>
                         <p className="text-sm text-gray-600">Help shape the platform's future</p>
@@ -332,16 +373,39 @@ export default function ContactPage() {
                     </p>
                   </div>
                   <div>
-                    <p className="font-medium mb-1">Is there a cost for the pilot?</p>
+                    <p className="font-medium mb-1">Is there a cost for the beta?</p>
                     <p className="text-sm text-gray-600">
-                      Pilot pricing starts at $15/month with special early-adopter benefits.
+                      Beta pricing starts at $15/month with special early-adopter benefits.
                     </p>
                   </div>
                   <div>
                     <p className="font-medium mb-1">What if I need help getting started?</p>
                     <p className="text-sm text-gray-600">
-                      Every pilot member gets 1-on-1 onboarding and ongoing support.
+                      Every beta member gets 1-on-1 onboarding and ongoing support.
                     </p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Contact */}
+              <Card className="border-0 shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Mail className="h-5 w-5 mr-2 text-purple-600" />
+                    Need Help?
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="text-center">
+                    <p className="text-sm text-gray-600 mb-4">
+                      Questions about Voxxy or need support?
+                    </p>
+                    <Button variant="outline" asChild>
+                      <a href="mailto:team@voxxyai.com">
+                        <Mail className="h-4 w-4 mr-2" />
+                        team@voxxyai.com
+                      </a>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -378,7 +442,7 @@ export default function ContactPage() {
             </Button>
 
             <Button variant="outline" size="lg" className="h-16" asChild>
-              <a href="mailto:support@voxxypresents.com">
+              <a href="mailto:team@voxxyai.com">
                 <div className="flex items-center">
                   <div className="mr-4">
                     <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
@@ -387,7 +451,7 @@ export default function ContactPage() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium">Direct Email</p>
-                    <p className="text-sm text-gray-500">support@voxxypresents.com</p>
+                    <p className="text-sm text-gray-500">team@voxxyai.com</p>
                   </div>
                 </div>
               </a>
