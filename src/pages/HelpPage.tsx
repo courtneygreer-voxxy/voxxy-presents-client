@@ -30,8 +30,8 @@ export default function HelpPage() {
 
   const faqItems: FAQItem[] = [
     {
-      question: "What is included in the pilot program?",
-      answer: "The pilot program includes full access to all Voxxy Presents features, priority customer support, direct input on product development, and special pilot pricing. You'll work closely with our team to ensure the platform meets your community's specific needs.",
+      question: "What is included in the beta program?",
+      answer: "The beta program includes full access to all Voxxy Presents features, priority customer support, direct input on product development, and special beta pricing. You'll work closely with our team to ensure the platform meets your community's specific needs.",
       category: "Getting Started"
     },
     {
@@ -66,12 +66,12 @@ export default function HelpPage() {
     },
     {
       question: "What kind of support do you provide?",
-      answer: "Pilot members get priority support via email and scheduled calls. We also provide comprehensive documentation, video tutorials, and a getting-started guide. Most questions are answered within 4 hours during business days.",
+      answer: "Beta members get priority support via email and scheduled calls. We also provide comprehensive documentation, video tutorials, and a getting-started guide. Most questions are answered within 4 hours during business days.",
       category: "Support"
     },
     {
       question: "Is there a minimum commitment?",
-      answer: "No long-term contracts required during the pilot program. You can cancel at any time. We believe in earning your business through great service and results, not binding contracts.",
+      answer: "No long-term contracts required during the beta program. You can cancel at any time. We believe in earning your business through great service and results, not binding contracts.",
       category: "Billing"
     },
     {
@@ -100,17 +100,16 @@ export default function HelpPage() {
           <Link to="/" className="text-2xl font-bold text-purple-600">
             Voxxy Presents
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/features">Features</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/pricing">Pricing</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/contact">Contact</Link>
-            </Button>
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/features" className="text-gray-600 hover:text-purple-600 transition-colors">Features</Link>
+            <Link to="/pricing" className="text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
+            <Link to="/products" className="text-gray-600 hover:text-purple-600 transition-colors">Products</Link>
+            <Link to="/help" className="text-purple-600 font-medium">Help Center</Link>
+            <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
           </div>
+          <Button asChild>
+            <Link to="/contact">Request Beta Access</Link>
+          </Button>
         </div>
       </nav>
 
@@ -201,7 +200,7 @@ export default function HelpPage() {
               </CardHeader>
               <CardContent className="text-center">
                 <Button variant="outline" className="w-full" asChild>
-                  <a href="mailto:support@voxxypresents.com">
+                  <a href="mailto:team@voxxyai.com">
                     Email Us
                     <Mail className="ml-2 h-4 w-4" />
                   </a>
@@ -220,7 +219,7 @@ export default function HelpPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-gray-600">
-              Quick answers to common questions from creative community organizers
+              Quick answers to common questions from community organizers
             </p>
           </div>
 
@@ -366,7 +365,7 @@ export default function HelpPage() {
               className="border-white text-white hover:bg-white hover:text-purple-600"
               asChild
             >
-              <a href="mailto:support@voxxypresents.com">
+              <a href="mailto:team@voxxyai.com">
                 Email Us
                 <Mail className="ml-2 h-5 w-5" />
               </a>
