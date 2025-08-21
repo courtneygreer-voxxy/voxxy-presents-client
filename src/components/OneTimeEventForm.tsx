@@ -52,7 +52,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       setFormData(prev => {
         const newPrice = { ...prev.price! }
         if (value === undefined || value === '') {
-          if (priceField === 'amount' || priceField === 'advancePrice') {
+          if (priceField === 'amount') {
             delete (newPrice as any)[priceField]
           } else if (priceField === 'type') {
             newPrice.type = 'free'
@@ -347,29 +347,16 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
 
               {formData.price?.type === 'paid' && (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="amount">Price Amount</Label>
-                      <Input
-                        id="amount"
-                        type="number"
-                        step="0.01"
-                        value={formData.price?.amount || ''}
-                        onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
-                        placeholder="20.00"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="advancePrice">Advance Price</Label>
-                      <Input
-                        id="advancePrice"
-                        type="number"
-                        step="0.01"
-                        value={formData.price?.advancePrice || ''}
-                        onChange={(e) => handleInputChange('price.advancePrice', parseFloat(e.target.value) || undefined)}
-                        placeholder="15.00"
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="amount">Price Amount</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      value={formData.price?.amount || ''}
+                      onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
+                      placeholder="20.00"
+                    />
                   </div>
 
                   <div>
