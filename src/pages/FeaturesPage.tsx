@@ -15,7 +15,8 @@ import {
   Shield,
   Zap,
   ArrowRight,
-  CheckCircle
+  CheckCircle,
+  Sparkles
 } from "lucide-react"
 import { Link } from "react-router-dom"
 
@@ -28,14 +29,16 @@ export default function FeaturesPage() {
           <Link to="/" className="text-2xl font-bold text-purple-600">
             Voxxy Presents
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/pricing">Pricing</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/contact">Book Demo</Link>
-            </Button>
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/features" className="text-purple-600 font-medium">Features</Link>
+            <Link to="/pricing" className="text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
+            <Link to="/products" className="text-gray-600 hover:text-purple-600 transition-colors">Products</Link>
+            <Link to="/help" className="text-gray-600 hover:text-purple-600 transition-colors">Help Center</Link>
+            <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
           </div>
+          <Button asChild>
+            <Link to="/contact">Request Beta Access</Link>
+          </Button>
         </div>
       </nav>
 
@@ -43,7 +46,8 @@ export default function FeaturesPage() {
       <section className="relative py-20 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium mb-6">
-            Professional Tools for Creative Communities
+            <Sparkles className="h-4 w-4 mr-2" />
+            AI-Powered Community Tools
           </Badge>
           
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
@@ -55,13 +59,13 @@ export default function FeaturesPage() {
           
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
             From community management to revenue generation, Voxxy Presents provides all the tools 
-            NYC's creative organizers need to build sustainable, thriving communities.
+            creative organizers everywhere need to build sustainable, thriving communities with their AI planner friend.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" className="bg-purple-600 hover:bg-purple-700" asChild>
               <Link to="/contact">
-                Start Free Trial
+                Request Beta Access
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -82,7 +86,7 @@ export default function FeaturesPage() {
               Core Community Management Features
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Built specifically for creative community organizers who want professional tools without the complexity
+              Built specifically for community organizers who want their AI planner friend to handle coordination
             </p>
           </div>
 
@@ -167,10 +171,10 @@ export default function FeaturesPage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Built for NYC's Creative Scene
+              Built for Creative Communities
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Features designed specifically for the unique needs of creative community organizers
+              Features designed specifically for community organizers who want to focus on creativity, not coordination
             </p>
           </div>
 
@@ -178,13 +182,13 @@ export default function FeaturesPage() {
             {/* Venue Partnerships */}
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="bg-purple-100 text-purple-800 mb-4">NYC Exclusive</Badge>
+                <Badge className="bg-purple-100 text-purple-800 mb-4">Partnership Network</Badge>
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
                   Venue Partnership Network
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Access to exclusive partnerships with NYC's creative spaces. From art studios in Bushwick 
-                  to event spaces in Manhattan - we've negotiated special rates for our community organizers.
+                  Access to partnerships with creative spaces and venues. We're building a network of 
+                  community-friendly venues with special rates for our organizers.
                 </p>
                 <ul className="space-y-2">
                   <li className="flex items-center">
@@ -204,7 +208,7 @@ export default function FeaturesPage() {
               <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-8 text-center">
                 <MapPin className="h-16 w-16 text-purple-600 mx-auto mb-4" />
                 <p className="text-gray-700 font-medium">
-                  "Having venue partnerships built-in saves us hours of research and negotiation for every event."
+                  "Having venue partnerships built-in saves us hours of research and coordination for every event."
                 </p>
               </div>
             </div>
@@ -333,12 +337,12 @@ export default function FeaturesPage() {
             Ready to see Voxxy Presents in action?
           </h2>
           <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
-            Book a personalized demo and see how these features can transform your community
+            Join our beta program and see how these features can transform your community with your AI planner friend
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
               <Link to="/contact">
-                Book Your Demo
+                Request Beta Access
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

@@ -22,17 +22,16 @@ export default function ProductsPage() {
           <Link to="/" className="text-2xl font-bold text-purple-600">
             Voxxy Presents
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/features">Features</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/pricing">Pricing</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/contact">Contact</Link>
-            </Button>
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/features" className="text-gray-600 hover:text-purple-600 transition-colors">Features</Link>
+            <Link to="/pricing" className="text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
+            <Link to="/products" className="text-purple-600 font-medium">Products</Link>
+            <Link to="/help" className="text-gray-600 hover:text-purple-600 transition-colors">Help Center</Link>
+            <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
           </div>
+          <Button asChild>
+            <Link to="/contact">Request Beta Access</Link>
+          </Button>
         </div>
       </nav>
 
@@ -70,8 +69,8 @@ export default function ProductsPage() {
                   Voxxy Presents
                 </h2>
                 <p className="text-lg text-gray-600 mb-6">
-                  The complete community management platform for NYC's creative organizers. 
-                  White-labeled event pages, automated billing, and venue partnerships - 
+                  The complete community management platform for creative organizers everywhere. 
+                  Your AI planner friend handles white-labeled event pages, automated billing, and partnerships - 
                   everything you need to scale your community.
                 </p>
                 
@@ -94,7 +93,7 @@ export default function ProductsPage() {
                     <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="font-medium">Venue Network</p>
-                      <p className="text-sm text-gray-600">NYC partnership access</p>
+                      <p className="text-sm text-gray-600">Partnership network access</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
@@ -114,7 +113,7 @@ export default function ProductsPage() {
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
-                    <Link to="/contact">Join Pilot</Link>
+                    <Link to="/contact">Join Beta</Link>
                   </Button>
                 </div>
               </div>
@@ -125,8 +124,8 @@ export default function ProductsPage() {
                     <Users className="h-16 w-16 text-purple-600 mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2">Community First</h3>
                     <p className="text-gray-600 text-sm">
-                      Built specifically for creative community organizers who want professional tools 
-                      without losing the personal touch that makes their communities special.
+                      Built specifically for creative community organizers who want their AI planner friend to handle 
+                      coordination without losing the personal touch that makes their communities special.
                     </p>
                   </div>
                 </CardContent>
@@ -311,12 +310,12 @@ export default function ProductsPage() {
             Ready to start your journey?
           </h2>
           <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
-            Begin with Voxxy Presents and build the creative community of your dreams
+            Begin with Voxxy Presents and build the creative community of your dreams with your AI planner friend
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
               <Link to="/contact">
-                Join Pilot Program
+                Join Beta Program
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
