@@ -59,7 +59,7 @@ export default function FeaturesPage() {
           
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
             From community management to revenue generation, Voxxy Presents provides all the tools 
-            creative organizers everywhere need to build sustainable, thriving communities with their AI planner friend.
+            creative organizers everywhere need to build sustainable, thriving communities.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -86,7 +86,7 @@ export default function FeaturesPage() {
               Core Community Management Features
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Built specifically for community organizers who want their AI planner friend to handle coordination
+              Built specifically for community organizers who want professional coordination tools
             </p>
           </div>
 
@@ -337,7 +337,7 @@ export default function FeaturesPage() {
             Ready to see Voxxy Presents in action?
           </h2>
           <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
-            Join our beta program and see how these features can transform your community with your AI planner friend
+            Join our beta program and see how these features can transform your community
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>

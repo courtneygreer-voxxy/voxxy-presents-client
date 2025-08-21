@@ -46,7 +46,7 @@ export default function HelpPage() {
     },
     {
       question: "How does the venue partnership network work?",
-      answer: "We've pre-negotiated rates with creative spaces across NYC. Through your dashboard, you can browse available venues, check availability, and book directly. Venues include art studios, event spaces, galleries, and community centers in all five boroughs.",
+      answer: "We're building partnerships with creative spaces and venues. Through your dashboard, you can browse available venues, check availability, and book directly. Our network includes art studios, event spaces, galleries, and community centers.",
       category: "Features"
     },
     {
