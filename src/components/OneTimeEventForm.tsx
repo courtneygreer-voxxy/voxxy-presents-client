@@ -43,8 +43,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       description: ''
     },
     eventbriteUrl: '',
-    isRecurring: false,
-    imageUrl: '',
     status: 'draft'
   })
 
@@ -54,7 +52,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       setFormData(prev => {
         const newPrice = { ...prev.price! }
         if (value === undefined || value === '') {
-          if (priceField === 'amount' || priceField === 'advancePrice') {
+          if (priceField === 'amount') {
             delete (newPrice as any)[priceField]
           } else if (priceField === 'type') {
             newPrice.type = 'free'
@@ -102,15 +100,14 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
     setError(null)
 
     try {
-      if (!selectedDate) {
+      if (!selectedDate && formData.status !== 'draft') {
         throw new Error('Please select an event date')
       }
 
       const rawEventData: CreateEventData = {
         ...formData as CreateEventData,
         date: selectedDate,
-        endDate: endDate,
-        isRecurring: false
+        endDate: endDate
       }
 
       // Clean the data to remove any undefined values
@@ -149,8 +146,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
           description: ''
         },
         eventbriteUrl: '',
-        isRecurring: false,
-        imageUrl: '',
         status: 'draft'
       })
       setSelectedDate(undefined)
@@ -196,7 +191,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="Enter event title"
-                required
+                required={formData.status !== 'draft'}
               />
             </div>
             <div>
@@ -228,7 +223,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Brief description of the event"
               rows={2}
-              required
+              required={formData.status !== 'draft'}
             />
           </div>
 
@@ -280,7 +275,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     type="time"
                     value={formData.time}
                     onChange={(e) => handleInputChange('time', e.target.value)}
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
 
@@ -311,7 +306,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     value={formData.location}
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="Venue name"
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
                 <div>
@@ -321,7 +316,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     placeholder="Full address"
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
               </div>
@@ -352,29 +347,16 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
 
               {formData.price?.type === 'paid' && (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="amount">Price Amount</Label>
-                      <Input
-                        id="amount"
-                        type="number"
-                        step="0.01"
-                        value={formData.price?.amount || ''}
-                        onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
-                        placeholder="20.00"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="advancePrice">Advance Price</Label>
-                      <Input
-                        id="advancePrice"
-                        type="number"
-                        step="0.01"
-                        value={formData.price?.advancePrice || ''}
-                        onChange={(e) => handleInputChange('price.advancePrice', parseFloat(e.target.value) || undefined)}
-                        placeholder="15.00"
-                      />
-                    </div>
+                  <div>
+                    <Label htmlFor="amount">Price Amount</Label>
+                    <Input
+                      id="amount"
+                      type="number"
+                      step="0.01"
+                      value={formData.price?.amount || ''}
+                      onChange={(e) => handleInputChange('price.amount', parseFloat(e.target.value) || undefined)}
+                      placeholder="20.00"
+                    />
                   </div>
 
                   <div>

@@ -9,7 +9,6 @@ import { Mail, ExternalLink, Calendar, CheckCircle } from "lucide-react"
 import { registrationsApi, ApiError } from '@/services/api'
 import { createRegistration, createWaitlistEntry } from '@/lib/database'
 import { getDataSource } from '@/config/environments'
-import HowDidYouHearPopup from './HowDidYouHearPopup'
 import type { Event } from '@/types/database'
 
 interface EventRegistrationProps {
@@ -31,7 +30,6 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitSuccess, setSubmitSuccess] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [showHowDidYouHear, setShowHowDidYouHear] = useState(false)
 
   // Determine which button to show based on event properties
   const getButtonType = () => {
@@ -149,7 +147,6 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         setDialogOpen(false)
         setSubmitSuccess(false)
         // Show "How did you hear about us?" popup after successful registration
-        setShowHowDidYouHear(true)
       }, 2000)
 
     } catch (error) {
@@ -388,12 +385,6 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
         </DialogContent>
       </Dialog>
 
-      {/* How Did You Hear About Us Popup */}
-      <HowDidYouHearPopup
-        isOpen={showHowDidYouHear}
-        onClose={() => setShowHowDidYouHear(false)}
-        eventTitle={event.title}
-      />
     </>
   )
 }
