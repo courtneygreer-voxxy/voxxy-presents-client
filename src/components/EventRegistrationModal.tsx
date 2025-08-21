@@ -37,6 +37,8 @@ interface Registration {
   createdAt?: string
   registeredAt?: string
   position?: number // For waitlist entries
+  subscribeToUpdates?: boolean
+  subscribeToNewsletter?: boolean
 }
 
 interface RegistrationStats {
@@ -108,7 +110,9 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
           phone: reg.phone,
           registrationType: reg.registrationType === 'confirmed' ? 'rsvp_yes' : 'rsvp_maybe',
           notes: reg.notes,
-          registeredAt: reg.registeredAt.toISOString()
+          registeredAt: reg.registeredAt.toISOString(),
+          subscribeToUpdates: reg.subscribeToUpdates || false,
+          subscribeToNewsletter: reg.subscribeToNewsletter || false
         }))
         
         // Load waitlist entries
@@ -511,6 +515,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                             <TableHead>Type</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Contact</TableHead>
+                            <TableHead>Updates</TableHead>
                             <TableHead>Registered</TableHead>
                             <TableHead>Notes</TableHead>
                           </TableRow>
@@ -567,6 +572,25 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
                                     )}
                                     {!registration?.email && !registration?.phone && (
                                       <span className="text-gray-400 text-sm">No contact info</span>
+                                    )}
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="space-y-1">
+                                    {registration?.subscribeToUpdates && (
+                                      <div className="flex items-center gap-1 text-xs">
+                                        <Mail className="h-3 w-3 text-blue-600" />
+                                        <span className="text-gray-600">Event</span>
+                                      </div>
+                                    )}
+                                    {registration?.subscribeToNewsletter && (
+                                      <div className="flex items-center gap-1 text-xs">
+                                        <Mail className="h-3 w-3 text-green-600" />
+                                        <span className="text-gray-600">Newsletter</span>
+                                      </div>
+                                    )}
+                                    {!registration?.subscribeToUpdates && !registration?.subscribeToNewsletter && (
+                                      <span className="text-gray-400 text-xs">None</span>
                                     )}
                                   </div>
                                 </TableCell>

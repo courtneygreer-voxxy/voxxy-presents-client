@@ -399,8 +399,8 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-12">
         <div className="container mx-auto max-w-6xl px-4">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="md:col-span-2">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-1">
               <h3 className="text-2xl font-bold text-purple-400 mb-4">Voxxy Presents</h3>
               <p className="text-gray-300 mb-4 max-w-md">
                 Community management tools for organizers everywhere. 
@@ -423,9 +423,8 @@ export default function HomePage() {
                 <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
                 <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
               </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Legal</h4>
+              
+              <h4 className="font-semibold mt-6 mb-4">Legal</h4>
               <ul className="space-y-2 text-gray-300">
                 <li><a href="https://www.heyvoxxy.com/#/terms" className="hover:text-white transition-colors">Terms</a></li>
                 <li><a href="https://www.heyvoxxy.com/#/privacy" className="hover:text-white transition-colors">Privacy</a></li>

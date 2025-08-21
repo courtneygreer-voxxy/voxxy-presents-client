@@ -122,6 +122,10 @@ export interface Registration {
   // Additional data
   notes?: string
   source: 'website' | 'eventbrite' | 'manual'
+  
+  // Subscription preferences
+  subscribeToUpdates?: boolean
+  subscribeToNewsletter?: boolean
 }
 
 export interface Waitlist {

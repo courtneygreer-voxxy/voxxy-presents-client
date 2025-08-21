@@ -10,9 +10,9 @@ import {
   Download,
   Filter
 } from "lucide-react"
-import { getWaitlistByEvent } from '@/lib/database'
+import { getWaitlistByEvent, getRegistrationsByEvent } from '@/lib/database'
 import { getDataSource } from '@/config/environments'
-import type { Event, Waitlist } from '@/types/database'
+import type { Event, Waitlist, Registration } from '@/types/database'
 
 interface SubscribersListProps {
   organizationId: string
@@ -20,14 +20,15 @@ interface SubscribersListProps {
 }
 
 export default function SubscribersList({ organizationId, events }: SubscribersListProps) {
-  const [waitlists, setWaitlists] = useState<Record<string, Waitlist[]>>({})
+  const [newsletterSubscribers, setNewsletterSubscribers] = useState<any[]>([])
+  const [requestUpdates, setRequestUpdates] = useState<Record<string, any[]>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const dataSource = getDataSource()
 
   useEffect(() => {
-    const loadWaitlists = async () => {
+    const loadSubscriberData = async () => {
       if (dataSource !== 'firebase') {
         setLoading(false)
         return
@@ -35,44 +36,74 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
 
       try {
         setLoading(true)
-        const waitlistData: Record<string, Waitlist[]> = {}
-
-        // Load waitlists for all events
+        
+        const allNewsletterSubscribers: any[] = []
+        const allRequestUpdates: Record<string, any[]> = {}
+        
+        // Load registrations for all events to find newsletter subscribers and update requests
         for (const event of events) {
-          if (event.status === 'sold_out') {
-            const eventWaitlist = await getWaitlistByEvent(event.id)
-            if (eventWaitlist.length > 0) {
-              waitlistData[event.id] = eventWaitlist
+          try {
+            const registrations = await getRegistrationsByEvent(event.id)
+            
+            // Find newsletter subscribers
+            const newsletterSubs = registrations.filter(reg => reg.subscribeToNewsletter)
+            allNewsletterSubscribers.push(...newsletterSubs.map(reg => ({
+              id: reg.id,
+              name: reg.name,
+              email: reg.email,
+              eventId: event.id,
+              eventTitle: event.title,
+              subscribedAt: reg.registeredAt
+            })))
+            
+            // Find event update requests
+            const updateRequests = registrations.filter(reg => reg.subscribeToUpdates)
+            if (updateRequests.length > 0) {
+              allRequestUpdates[event.id] = updateRequests.map(reg => ({
+                id: reg.id,
+                name: reg.name,
+                email: reg.email,
+                subscribedAt: reg.registeredAt
+              }))
             }
+          } catch (eventErr) {
+            console.warn(`Failed to load registrations for event ${event.id}:`, eventErr)
           }
         }
+        
+        // Remove duplicates from newsletter subscribers based on email
+        const uniqueNewsletterSubscribers = allNewsletterSubscribers.filter((sub, index, self) => 
+          index === self.findIndex(s => s.email === sub.email)
+        )
+        
+        setNewsletterSubscribers(uniqueNewsletterSubscribers)
+        setRequestUpdates(allRequestUpdates)
 
-        setWaitlists(waitlistData)
       } catch (err) {
-        console.error('Error loading waitlists:', err)
-        setError('Failed to load waitlists')
+        console.error('Error loading subscriber data:', err)
+        setError('Failed to load subscriber data')
       } finally {
         setLoading(false)
       }
     }
 
-    loadWaitlists()
+    loadSubscriberData()
   }, [events, dataSource])
 
   // Calculate stats
-  const totalWaitlistCount = Object.values(waitlists).reduce((total, list) => total + list.length, 0)
-  const eventsWithWaitlists = Object.keys(waitlists).length
+  const totalNewsletterSubscribers = newsletterSubscribers.length
+  const totalRequestUpdates = Object.values(requestUpdates).reduce((total, list) => total + list.length, 0)
 
   if (dataSource !== 'firebase') {
     return (
       <div className="space-y-6">
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardContent className="flex items-center gap-3 p-4">
               <Mail className="h-8 w-8 text-blue-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Email Subscribers</p>
+                <p className="text-sm font-medium text-gray-600">Newsletter Subscribers</p>
                 <p className="text-2xl font-bold">-</p>
                 <p className="text-xs text-gray-500">API Mode</p>
               </div>
@@ -80,19 +111,9 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
           </Card>
           <Card>
             <CardContent className="flex items-center gap-3 p-4">
-              <Users className="h-8 w-8 text-green-600" />
+              <Calendar className="h-8 w-8 text-green-600" />
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Waitlists</p>
-                <p className="text-2xl font-bold">-</p>
-                <p className="text-xs text-gray-500">API Mode</p>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="flex items-center gap-3 p-4">
-              <Calendar className="h-8 w-8 text-orange-600" />
-              <div>
-                <p className="text-sm font-medium text-gray-600">Events with Interest</p>
+                <p className="text-sm font-medium text-gray-600">Event Update Requests</p>
                 <p className="text-2xl font-bold">-</p>
                 <p className="text-xs text-gray-500">API Mode</p>
               </div>
@@ -116,8 +137,8 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
   if (loading) {
     return (
       <div className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {[1, 2, 3].map(i => (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[1, 2].map(i => (
             <Card key={i}>
               <CardContent className="flex items-center gap-3 p-4">
                 <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
@@ -131,7 +152,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
         </div>
         <Card>
           <CardContent className="py-12">
-            <div className="text-center">Loading waitlists...</div>
+            <div className="text-center">Loading subscriber data...</div>
           </CardContent>
         </Card>
       </div>
@@ -141,65 +162,93 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
             <Mail className="h-8 w-8 text-blue-600" />
             <div>
-              <p className="text-sm font-medium text-gray-600">Email Subscribers</p>
-              <p className="text-2xl font-bold">-</p>
-              <p className="text-xs text-gray-500">Coming soon</p>
+              <p className="text-sm font-medium text-gray-600">Newsletter Subscribers</p>
+              <p className="text-2xl font-bold">{totalNewsletterSubscribers}</p>
+              <p className="text-xs text-gray-500">Overall organization</p>
             </div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="flex items-center gap-3 p-4">
-            <Users className="h-8 w-8 text-green-600" />
+            <Calendar className="h-8 w-8 text-green-600" />
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Waitlists</p>
-              <p className="text-2xl font-bold">{totalWaitlistCount}</p>
-              <p className="text-xs text-gray-500">{eventsWithWaitlists} events</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="flex items-center gap-3 p-4">
-            <Calendar className="h-8 w-8 text-orange-600" />
-            <div>
-              <p className="text-sm font-medium text-gray-600">Event Interests</p>
-              <p className="text-2xl font-bold">-</p>
-              <p className="text-xs text-gray-500">Coming soon</p>
+              <p className="text-sm font-medium text-gray-600">Event Update Requests</p>
+              <p className="text-2xl font-bold">{totalRequestUpdates}</p>
+              <p className="text-xs text-gray-500">Across all events</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Waitlist Data */}
-      {totalWaitlistCount > 0 ? (
+      {/* Newsletter Subscribers */}
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Newsletter Subscribers</CardTitle>
+            <CardDescription>
+              People subscribed to your organization's newsletter
+            </CardDescription>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm">
+              <Filter className="h-4 w-4 mr-2" />
+              Filter
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {totalNewsletterSubscribers > 0 ? (
+            <div className="space-y-4">
+              {newsletterSubscribers.map((subscriber) => (
+                <div key={subscriber.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <p className="font-medium text-sm">{subscriber.name || 'No name'}</p>
+                      <p className="text-xs text-gray-600">{subscriber.email}</p>
+                      <p className="text-xs text-gray-500">From: {subscriber.eventTitle}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(subscriber.subscribedAt).toLocaleDateString()}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Mail className="h-12 w-12 text-gray-400 mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No Newsletter Subscribers Yet</h3>
+              <p className="text-gray-600 text-center">
+                When people subscribe to get alerts about your events, they'll appear here.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Event Update Requests */}
+      {Object.keys(requestUpdates).length > 0 ? (
         <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">Event Waitlists</CardTitle>
-              <CardDescription>
-                People waiting for sold-out events
-              </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Filter className="h-4 w-4 mr-2" />
-                Filter
-              </Button>
-              <Button variant="outline" size="sm">
-                <Download className="h-4 w-4 mr-2" />
-                Export
-              </Button>
-            </div>
+          <CardHeader>
+            <CardTitle className="text-lg">Event Update Requests</CardTitle>
+            <CardDescription>
+              People who want updates about specific events
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              {Object.entries(waitlists).map(([eventId, waitlist]) => {
+              {Object.entries(requestUpdates).map(([eventId, requests]) => {
                 const event = events.find(e => e.id === eventId)
                 if (!event) return null
 
@@ -207,40 +256,36 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
                   <div key={eventId} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-4">
                       <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold">{event.title}</h3>
-                          <Badge className="bg-red-600 text-white text-xs">SOLD OUT</Badge>
-                        </div>
+                        <h3 className="font-semibold">{event.title}</h3>
                         <p className="text-sm text-gray-600">
-                          {event.date instanceof Date ? event.date.toLocaleDateString() : new Date(event.date).toLocaleDateString()} • {waitlist.length} on waitlist
+                          {event.date instanceof Date ? event.date.toLocaleDateString() : new Date(event.date).toLocaleDateString()} • {requests.length} requesting updates
                         </p>
                       </div>
                       <Button variant="outline" size="sm">
-                        Contact Waitlist
+                        Contact Subscribers
                       </Button>
                     </div>
                     
                     <div className="space-y-2">
-                      {waitlist.slice(0, 5).map((person, index) => (
+                      {requests.slice(0, 5).map((person) => (
                         <div key={person.id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded">
                           <div className="flex items-center gap-3">
-                            <Badge variant="outline" className="text-xs">#{person.position}</Badge>
                             <div>
-                              <p className="font-medium text-sm">{person.name}</p>
+                              <p className="font-medium text-sm">{person.name || 'No name'}</p>
                               <p className="text-xs text-gray-600">{person.email}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 text-xs text-gray-500">
-                            <Clock className="h-3 w-3" />
-                            {person.joinedAt.toLocaleDateString()}
+                            <Calendar className="h-3 w-3" />
+                            {new Date(person.subscribedAt).toLocaleDateString()}
                           </div>
                         </div>
                       ))}
                       
-                      {waitlist.length > 5 && (
+                      {requests.length > 5 && (
                         <div className="text-center py-2">
                           <Button variant="ghost" size="sm">
-                            Show {waitlist.length - 5} more
+                            Show {requests.length - 5} more
                           </Button>
                         </div>
                       )}
@@ -251,17 +296,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             </div>
           </CardContent>
         </Card>
-      ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <Users className="h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Waitlists Yet</h3>
-            <p className="text-gray-600 text-center">
-              When events are sold out and people join waitlists, they'll appear here.
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      ) : null}
 
       {error && (
         <Card>

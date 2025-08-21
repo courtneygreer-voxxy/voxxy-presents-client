@@ -13,9 +13,10 @@ import type { Event } from '@/types/database'
 
 interface EventRegistrationProps {
   event: Event
+  organizationName?: string
 }
 
-export default function EventRegistration({ event }: EventRegistrationProps) {
+export default function EventRegistration({ event, organizationName }: EventRegistrationProps) {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [dialogType, setDialogType] = useState<'interest' | 'presale' | 'waitlist'>('interest')
   const [formData, setFormData] = useState({
@@ -113,7 +114,9 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
             email: formData.email || '',
             registrationType: firebaseRegistrationType,
             emailSent: false,
-            source: 'website'
+            source: 'website',
+            subscribeToUpdates: formData.subscribeToUpdates,
+            subscribeToNewsletter: formData.subscribeToNewsletter
           }
           
           // Only include phone and notes if they have values
@@ -335,7 +338,7 @@ export default function EventRegistration({ event }: EventRegistrationProps) {
                       }
                     />
                     <Label htmlFor="subscribe-newsletter" className="text-sm font-normal cursor-pointer">
-                      Subscribe to organization newsletter
+                      Get alerts on more {organizationName || 'organization'} events
                     </Label>
                   </div>
                   
