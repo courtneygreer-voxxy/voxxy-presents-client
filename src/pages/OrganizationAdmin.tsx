@@ -328,7 +328,7 @@ export default function OrganizationAdmin() {
               <CardHeader>
                 <CardTitle>Subscriber Management</CardTitle>
                 <CardDescription>
-                  Manage waitlists, email subscribers, and audience engagement.
+                  Manage newsletter subscribers and event update requests.
                 </CardDescription>
               </CardHeader>
               <CardContent>

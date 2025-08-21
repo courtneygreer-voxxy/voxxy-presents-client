@@ -247,7 +247,7 @@ export default function OrganizationPage({
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        <EventRegistration event={event as any} />
+                        <EventRegistration event={event as any} organizationName={organization.name} />
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}
@@ -389,7 +389,7 @@ export default function OrganizationPage({
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                  <EventRegistration event={event as any} />
+                                  <EventRegistration event={event as any} organizationName={organization.name} />
                                   <Button
                                     variant="outline"
                                     onClick={() => toggleEventDetails(event.id)}
