@@ -70,7 +70,7 @@ export default function ProductsPage() {
                 </h2>
                 <p className="text-lg text-gray-600 mb-6">
                   The complete community management platform for creative organizers everywhere. 
-                  Your AI planner friend handles white-labeled event pages, automated billing, and partnerships - 
+                  Professional tools handle white-labeled event pages, automated billing, and partnerships - 
                   everything you need to scale your community.
                 </p>
                 
@@ -124,7 +124,7 @@ export default function ProductsPage() {
                     <Users className="h-16 w-16 text-purple-600 mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2">Community First</h3>
                     <p className="text-gray-600 text-sm">
-                      Built specifically for creative community organizers who want their AI planner friend to handle 
+                      Built specifically for creative community organizers who want professional tools to handle 
                       coordination without losing the personal touch that makes their communities special.
                     </p>
                   </div>
@@ -310,7 +310,7 @@ export default function ProductsPage() {
             Ready to start your journey?
           </h2>
           <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
-            Begin with Voxxy Presents and build the creative community of your dreams with your AI planner friend
+            Begin with Voxxy Presents and build the creative community of your dreams with your planner friend
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>

@@ -1,17 +1,19 @@
+import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus } from "lucide-react"
+import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus, Menu, X } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 
 export default function HomePage() {
   const { isAuthenticated, currentUser } = useAuth()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
       {/* Navigation */}
-      <nav className="relative z-10 px-4 py-6">
+      <nav className="relative z-50 px-4 py-6">
         <div className="container mx-auto max-w-6xl flex justify-between items-center">
           <div className="text-2xl font-bold text-purple-600">
             Voxxy Presents
@@ -24,35 +26,129 @@ export default function HomePage() {
             <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
           </div>
           <div className="flex items-center gap-4">
-            {isAuthenticated ? (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link to="/profile">
-                    Dashboard
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/create-club">Create Club</Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link to="/login">
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Sign In
-                  </Link>
-                </Button>
-                <Button asChild>
-                  <Link to="/contact">
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Request Beta Access
-                  </Link>
-                </Button>
-              </>
-            )}
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-4">
+              {isAuthenticated ? (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/profile">
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/create-club">Create Club</Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="ghost" asChild>
+                    <Link to="/login">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Sign In
+                    </Link>
+                  </Button>
+                  <Button asChild>
+                    <Link to="/contact">
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Request Beta Access
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+            
+            {/* Mobile Menu Button */}
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="md:hidden"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="absolute top-full left-0 right-0 bg-white shadow-lg border-t md:hidden">
+            <div className="container mx-auto px-4 py-4 space-y-4">
+              <Link 
+                to="/features" 
+                className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Features
+              </Link>
+              <Link 
+                to="/pricing" 
+                className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Pricing
+              </Link>
+              <Link 
+                to="/products" 
+                className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Products
+              </Link>
+              <Link 
+                to="/help" 
+                className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Help Center
+              </Link>
+              <Link 
+                to="/contact" 
+                className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Contact
+              </Link>
+              
+              <div className="border-t pt-4 space-y-2">
+                {isAuthenticated ? (
+                  <>
+                    <Link 
+                      to="/profile" 
+                      className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Dashboard
+                    </Link>
+                    <Link 
+                      to="/create-club" 
+                      className="block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Create Club
+                    </Link>
+                  </>
+                ) : (
+                  <>
+                    <Link 
+                      to="/login" 
+                      className="block text-gray-600 hover:text-purple-600 transition-colors py-2"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Sign In
+                    </Link>
+                    <Link 
+                      to="/contact" 
+                      className="block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Request Beta Access
+                    </Link>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </nav>
       {/* Hero Section */}
       <section className="relative py-20 px-4">
@@ -60,19 +156,19 @@ export default function HomePage() {
           <div className="mb-6">
             <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium">
               <Sparkles className="h-4 w-4 mr-2" />
-              Your AI Planner Friend
+              Private Beta
             </Badge>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
-            Voxxy IS{" "}
+            Community{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-              Your Planner Friend
+              Management for Organizers
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            The AI assistant that takes on the heavy coordination tasks so you can focus on building community
+            Handle event coordination, member engagement, and ticketing from one platform so you can focus on creating meaningful experiences
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -167,7 +263,7 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Meet Your AI Planning Assistant
+              Meet Your Community Assistant
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Designed for community organizers everywhere. Voxxy does the work, not just provides tools.
@@ -289,7 +385,7 @@ export default function HomePage() {
             Ready to let AI handle your event coordination?
           </h2>
           <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Join community organizers everywhere who are building sustainable businesses with their AI planner friend
+            Join community organizers everywhere who are building sustainable businesses with Voxxy
           </p>
           <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
             <Link to="/contact">
@@ -307,7 +403,7 @@ export default function HomePage() {
             <div className="md:col-span-2">
               <h3 className="text-2xl font-bold text-purple-400 mb-4">Voxxy Presents</h3>
               <p className="text-gray-300 mb-4 max-w-md">
-                Your AI planner friend for community organizers everywhere. 
+                Community management tools for organizers everywhere. 
                 Focus on building community, we'll handle the coordination.
               </p>
             </div>
