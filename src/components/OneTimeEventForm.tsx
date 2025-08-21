@@ -104,10 +104,10 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
         throw new Error('Please select an event date')
       }
 
-      const rawEventData: CreateEventData = {
+      const rawEventData = {
         ...formData as CreateEventData,
-        date: selectedDate,
-        endDate: endDate
+        ...(selectedDate && { date: selectedDate }),
+        ...(endDate && { endDate: endDate })
       }
 
       // Clean the data to remove any undefined values
