@@ -97,6 +97,18 @@ export const organizationsApi = {
       body: JSON.stringify(data),
     })
   },
+
+  async delete(id: string) {
+    return fetchApi<any>(`/organizations/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  async deleteBySlug(slug: string) {
+    return fetchApi<any>(`/organizations/${slug}`, {
+      method: 'DELETE',
+    })
+  },
 }
 
 // Events API

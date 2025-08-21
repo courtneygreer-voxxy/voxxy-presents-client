@@ -21,6 +21,7 @@ import {
 import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import ImageCarousel from "@/components/ImageCarousel"
+import { ShareButton } from "@/components/ShareButton"
 import { isFeatureEnabled } from '@/config/environments'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
@@ -84,30 +85,40 @@ export default function OrganizationPage({
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Admin Controls */}
-      {showAdminControls && isFeatureEnabled('adminControls') && (
-        <div className="fixed top-4 right-4 z-50 flex gap-2">
-          <Link to="/profile">
-            <Button
-              variant="outline"
-              className="bg-white hover:bg-gray-50"
-              size="sm"
-            >
-              <User className="h-4 w-4 mr-2" />
-              Dashboard
-            </Button>
-          </Link>
-          <Link to={`/${organizationSlug}/admin`}>
-            <Button
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-              size="sm"
-            >
-              <Edit className="h-4 w-4 mr-2" />
-              Admin
-            </Button>
-          </Link>
-        </div>
-      )}
+      {/* Top Controls */}
+      <div className="fixed top-4 right-4 z-50 flex gap-2">
+        <ShareButton
+          url={`${window.location.origin}/${organizationSlug}`}
+          title={organization.name}
+          description={organization.description}
+          variant="outline"
+          size="sm"
+          className="bg-white hover:bg-gray-50"
+        />
+        {showAdminControls && isFeatureEnabled('adminControls') && (
+          <>
+            <Link to="/profile">
+              <Button
+                variant="outline"
+                className="bg-white hover:bg-gray-50"
+                size="sm"
+              >
+                <User className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            </Link>
+            <Link to={`/${organizationSlug}/admin`}>
+              <Button
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                size="sm"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Admin
+              </Button>
+            </Link>
+          </>
+        )}
+      </div>
 
 
       {/* Header Photo Section */}

@@ -20,6 +20,8 @@ import {
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
+import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
+import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
 import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
@@ -31,8 +33,9 @@ import type { Organization, Event } from '@/types/database'
 export default function OrganizationAdmin() {
   const { orgSlug } = useParams<{ orgSlug: string }>()
   const navigate = useNavigate()
-  const { organization, events, loading, error, updateOrganization, refreshEvents } = useOrganization(orgSlug || '')
+  const { organization, events, loading, error, updateOrganization, deleteOrganization, refreshEvents } = useOrganization(orgSlug || '')
   const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
@@ -82,6 +85,29 @@ export default function OrganizationAdmin() {
     setRegistrationModalEvent(event)
   }
 
+  const handleDeleteOrganization = async () => {
+    setIsDeleting(true)
+    setSaveMessage(null)
+
+    try {
+      await deleteOrganization()
+      setSaveMessage('✅ Organization deleted successfully!')
+      
+      // Redirect to home page after successful deletion
+      setTimeout(() => {
+        navigate('/')
+      }, 2000)
+      
+    } catch (error) {
+      console.error('Failed to delete organization:', error)
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
+      setSaveMessage(`❌ Failed to delete organization: ${errorMessage}. Please try again.`)
+      setTimeout(() => setSaveMessage(null), 7000)
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   if (!adminEnabled) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -129,6 +155,13 @@ export default function OrganizationAdmin() {
             </div>
             
             <div className="flex items-center gap-2">
+              <ShareButton
+                url={`${window.location.origin}/${orgSlug}`}
+                title={organization.name}
+                description={organization.description}
+                variant="outline"
+                size="sm"
+              />
               <Button
                 variant="outline"
                 size="sm"
@@ -214,6 +247,12 @@ export default function OrganizationAdmin() {
                 organization={organization}
                 onSave={handleSaveOrganization}
                 isSaving={isSaving}
+              />
+
+              <OrganizationDangerZone
+                organization={organization}
+                onDelete={handleDeleteOrganization}
+                isDeleting={isDeleting}
               />
             </div>
           </TabsContent>

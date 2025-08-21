@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { organizationsApi, eventsApi } from '@/services/api'
-import { getOrganizationBySlug, getEventsByOrganization, updateOrganization as updateOrganizationInFirebase } from '@/lib/database'
+import { getOrganizationBySlug, getEventsByOrganization, updateOrganization as updateOrganizationInFirebase, deleteOrganization as deleteOrganizationInFirebase } from '@/lib/database'
 import { getDataSource, getApiUrl, getCurrentEnvironment } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -127,6 +127,41 @@ export function useOrganization(organizationSlug: string) {
     }
   }
 
+  const deleteOrganization = async () => {
+    if (!organization) return
+
+    try {
+      const currentEnv = getCurrentEnvironment()
+      const dataSource = getDataSource()
+      const apiUrl = getApiUrl()
+      
+      console.log(`Deleting organization in ${currentEnv} environment using ${dataSource}`)
+      
+      if (dataSource === 'firebase') {
+        // Development/Staging/Sandbox mode: Firebase direct delete
+        console.log(`Deleting organization via Firebase (${currentEnv})`)
+        await deleteOrganizationInFirebase(organization.id)
+        console.log(`✅ Organization deleted successfully in Firebase (${currentEnv})`)
+        
+      } else if (dataSource === 'api' && apiUrl) {
+        // Production mode: API delete
+        console.log(`Deleting organization via API: ${apiUrl}`)
+        await organizationsApi.delete(organization.id)
+        
+      } else {
+        throw new Error(`Invalid delete configuration for ${currentEnv} environment`)
+      }
+      
+      // Clear local state after successful deletion
+      setOrganization(null)
+      setEvents([])
+      
+    } catch (err) {
+      console.error('Error deleting organization:', err)
+      throw err
+    }
+  }
+
   return {
     organization,
     events,
@@ -134,6 +169,7 @@ export function useOrganization(organizationSlug: string) {
     error,
     refreshEvents,
     updateOrganization,
+    deleteOrganization,
     reload: loadData
   }
 }

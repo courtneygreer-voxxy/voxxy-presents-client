@@ -43,6 +43,11 @@ export const createOrganization = async (data: Omit<Organization, 'id' | 'create
   return docRef.id
 }
 
+export const deleteOrganization = async (id: string) => {
+  const docRef = doc(db, 'organizations', id)
+  await deleteDoc(docRef)
+}
+
 export const getOrganization = async (id: string): Promise<Organization | null> => {
   const docRef = doc(db, 'organizations', id)
   const docSnap = await getDoc(docRef)
