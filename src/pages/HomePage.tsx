@@ -16,6 +16,13 @@ export default function HomePage() {
           <div className="text-2xl font-bold text-purple-600">
             Voxxy Presents
           </div>
+          <div className="hidden md:flex items-center gap-6">
+            <Link to="/features" className="text-gray-600 hover:text-purple-600 transition-colors">Features</Link>
+            <Link to="/pricing" className="text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
+            <Link to="/products" className="text-gray-600 hover:text-purple-600 transition-colors">Products</Link>
+            <Link to="/help" className="text-gray-600 hover:text-purple-600 transition-colors">Help Center</Link>
+            <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
+          </div>
           <div className="flex items-center gap-4">
             {isAuthenticated ? (
               <>
@@ -37,9 +44,9 @@ export default function HomePage() {
                   </Link>
                 </Button>
                 <Button asChild>
-                  <Link to="/sign-up">
+                  <Link to="/contact">
                     <UserPlus className="mr-2 h-4 w-4" />
-                    Sign Up
+                    Request Beta Access
                   </Link>
                 </Button>
               </>
@@ -53,32 +60,31 @@ export default function HomePage() {
           <div className="mb-6">
             <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium">
               <Sparkles className="h-4 w-4 mr-2" />
-              Connecting Communities Through Events
+              Your AI Planner Friend
             </Badge>
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 tracking-tight">
-            Build Your Community,{" "}
+            Voxxy IS{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-              We'll Handle the Rest
+              Your Planner Friend
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Professional tools for NYC's creative community organizers. From hobby to hustle - 
-            build sustainable income from your recurring events with your brand, your community.
+            The AI assistant that takes on the heavy coordination tasks so you can focus on building community
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-lg px-8 py-6" asChild>
               <Link to="/contact">
-                Book a Demo
+                Request Paid Beta Access
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button variant="outline" size="lg" className="text-lg px-8 py-6" asChild>
-              <Link to="/pricing">
-                View Pricing
+              <Link to="/contact">
+                Get Product Updates
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
@@ -86,27 +92,109 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Problem Section */}
+      <section className="py-20 bg-gray-50">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Community Building is Broken
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Organizers everywhere face the same challenges
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Breaking Through the Noise</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Crowded social platforms and event sites make it impossible to reach your community effectively
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Complex Event Management</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Managing event series without Eventbrite's overwhelming complexity and fees
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Lightweight Ticketing</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Need simple ticket management for individuals and groups without enterprise overhead
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Platform Juggling</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Managing events across multiple platforms creates confusion and missed opportunities
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Member Engagement</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Keeping recurring members engaged between events without constant manual outreach
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg text-red-600">Last-Minute Dropoffs</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Unpredictable attendance affecting revenue and venue planning
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Solution Section */}
       <section className="py-20 bg-white">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              Your Brand, Your Community
+              Meet Your AI Planning Assistant
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              White-labeled tools that showcase your identity while building sustainable recurring revenue
+              Designed for community organizers everywhere. Voxxy does the work, not just provides tools.
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <Sparkles className="h-6 w-6 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Branded Community Pages</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Showcase your unique identity with custom pages that reflect your community's personality
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <Calendar className="h-6 w-6 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl">Community Management</CardTitle>
+                <CardTitle className="text-xl">Cross-Platform Management</CardTitle>
                 <CardDescription className="text-gray-600">
-                  Professional tools to manage your creative community with member engagement and recurring event automation
+                  Manage all your events from one place, no more juggling multiple platforms
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -116,9 +204,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
                   <Users className="h-6 w-6 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl">Recurring Revenue</CardTitle>
+                <CardTitle className="text-xl">Smart Ticket Management</CardTitle>
                 <CardDescription className="text-gray-600">
-                  Turn your passion into sustainable income with automated billing and member subscription management
+                  Easy purchasing for individuals and groups with intelligent pricing and automation
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -126,11 +214,23 @@ export default function HomePage() {
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
                 <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                  <MapPin className="h-6 w-6 text-purple-600" />
+                  <Users className="h-6 w-6 text-purple-600" />
                 </div>
-                <CardTitle className="text-xl">Venue Partnerships</CardTitle>
+                <CardTitle className="text-xl">Member Engagement Tools</CardTitle>
                 <CardDescription className="text-gray-600">
-                  Access to NYC's creative spaces and venues through our partnership network - perfect for your events
+                  Keep your community connected between events with automated engagement features
+                </CardDescription>
+              </CardHeader>
+            </Card>
+            
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
+              <CardHeader>
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                  <ArrowRight className="h-6 w-6 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl">Revenue Optimization</CardTitle>
+                <CardDescription className="text-gray-600">
+                  Turn your passion into sustainable income with AI-powered revenue insights
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -143,10 +243,10 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              NYC's Creative Communities Choose Voxxy
+              Community Organizers Choose Voxxy
             </h2>
             <p className="text-xl text-gray-600">
-              Join the creative community organizers already building with Voxxy Presents
+              Join the community organizers everywhere already building with Voxxy Presents
             </p>
           </div>
           
@@ -186,14 +286,14 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to turn your passion into sustainable income?
+            Ready to let AI handle your event coordination?
           </h2>
           <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Join NYC's creative community organizers who are building sustainable businesses with Voxxy Presents
+            Join community organizers everywhere who are building sustainable businesses with their AI planner friend
           </p>
           <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
             <Link to="/contact">
-              Sign Up for Pilot
+              Request Paid Beta Access
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
@@ -207,8 +307,8 @@ export default function HomePage() {
             <div className="md:col-span-2">
               <h3 className="text-2xl font-bold text-purple-400 mb-4">Voxxy Presents</h3>
               <p className="text-gray-300 mb-4 max-w-md">
-                Professional tools for NYC's creative community organizers. Build your community, 
-                we'll handle the rest.
+                Your AI planner friend for community organizers everywhere. 
+                Focus on building community, we'll handle the coordination.
               </p>
             </div>
             <div>
@@ -220,11 +320,19 @@ export default function HomePage() {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+              <h4 className="font-semibold mb-4">Company</h4>
               <ul className="space-y-2 text-gray-300">
+                <li><a href="https://www.heyvoxxy.com/#/about-us" className="hover:text-white transition-colors">About Us</a></li>
+                <li><Link to="/products" className="hover:text-white transition-colors">Products</Link></li>
                 <li><Link to="/help" className="hover:text-white transition-colors">Help Center</Link></li>
                 <li><Link to="/contact" className="hover:text-white transition-colors">Contact</Link></li>
-                <li><a href="https://www.heyvoxxy.com/#/about-us" className="hover:text-white transition-colors">About Us</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Legal</h4>
+              <ul className="space-y-2 text-gray-300">
+                <li><a href="https://www.heyvoxxy.com/#/terms" className="hover:text-white transition-colors">Terms</a></li>
+                <li><a href="https://www.heyvoxxy.com/#/privacy" className="hover:text-white transition-colors">Privacy</a></li>
               </ul>
             </div>
           </div>
