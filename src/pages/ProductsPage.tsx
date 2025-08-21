@@ -45,13 +45,13 @@ export default function ProductsPage() {
           <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
             Complete Solutions for{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
-              Creative Communities
+            Communities
             </span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
-            From event management to mobile apps and planning tools - discover the full suite 
-            of products designed to help creative communities thrive.
+            From social outings to community planning tools - discover the full suite 
+            of products designed to help communities thrive.
           </p>
         </div>
       </section>

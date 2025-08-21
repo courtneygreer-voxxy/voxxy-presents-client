@@ -43,8 +43,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       description: ''
     },
     eventbriteUrl: '',
-    isRecurring: false,
-    imageUrl: '',
     status: 'draft'
   })
 
@@ -102,15 +100,14 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
     setError(null)
 
     try {
-      if (!selectedDate) {
+      if (!selectedDate && formData.status !== 'draft') {
         throw new Error('Please select an event date')
       }
 
       const rawEventData: CreateEventData = {
         ...formData as CreateEventData,
         date: selectedDate,
-        endDate: endDate,
-        isRecurring: false
+        endDate: endDate
       }
 
       // Clean the data to remove any undefined values
@@ -149,8 +146,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
           description: ''
         },
         eventbriteUrl: '',
-        isRecurring: false,
-        imageUrl: '',
         status: 'draft'
       })
       setSelectedDate(undefined)
@@ -196,7 +191,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                 value={formData.title}
                 onChange={(e) => handleInputChange('title', e.target.value)}
                 placeholder="Enter event title"
-                required
+                required={formData.status !== 'draft'}
               />
             </div>
             <div>
@@ -228,7 +223,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Brief description of the event"
               rows={2}
-              required
+              required={formData.status !== 'draft'}
             />
           </div>
 
@@ -280,7 +275,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     type="time"
                     value={formData.time}
                     onChange={(e) => handleInputChange('time', e.target.value)}
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
 
@@ -311,7 +306,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     value={formData.location}
                     onChange={(e) => handleInputChange('location', e.target.value)}
                     placeholder="Venue name"
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
                 <div>
@@ -321,7 +316,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     value={formData.address}
                     onChange={(e) => handleInputChange('address', e.target.value)}
                     placeholder="Full address"
-                    required
+                    required={formData.status !== 'draft'}
                   />
                 </div>
               </div>
