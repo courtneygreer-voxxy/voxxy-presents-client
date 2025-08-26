@@ -1,7 +1,15 @@
 // API service for connecting to voxxy-presents-api backend
-import { getApiUrl } from '@/config/environments'
+import { getApiUrl, getCurrentEnvironment } from '@/config/environments'
 
 const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+
+console.log('🔧 API Service Configuration:', {
+  environment: getCurrentEnvironment(),
+  apiBaseUrl: API_BASE_URL,
+  fromEnvConfig: getApiUrl(),
+  fromEnvVar: import.meta.env.VITE_API_BASE_URL,
+  timestamp: new Date().toISOString()
+})
 
 interface ApiResponse<T> {
   data?: T
@@ -92,7 +100,8 @@ export const organizationsApi = {
   },
 
   async updateBySlug(slug: string, data: any) {
-    return fetchApi<any>(`/organizations/${slug}`, {
+    console.log('🔄 Updating organization by slug:', { slug, dataKeys: Object.keys(data) })
+    return fetchApi<any>(`/organizations/slug/${slug}`, {
       method: 'PUT',
       body: JSON.stringify(data),
     })
@@ -105,7 +114,8 @@ export const organizationsApi = {
   },
 
   async deleteBySlug(slug: string) {
-    return fetchApi<any>(`/organizations/${slug}`, {
+    console.log('🗑️ Deleting organization by slug:', { slug })
+    return fetchApi<any>(`/organizations/slug/${slug}`, {
       method: 'DELETE',
     })
   },
@@ -118,7 +128,8 @@ export const eventsApi = {
   },
 
   async getByOrganization(organizationId: string) {
-    return fetchApi<any[]>(`/events?organization=${organizationId}`)
+    console.log('📅 Getting events for organization:', { organizationId })
+    return fetchApi<any[]>(`/events?organizationId=${organizationId}`)
   },
 
   async getAll() {

@@ -72,7 +72,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true, // Controlled admin access
-      debugMode: false,
+      debugMode: true, // Temporarily enable debug for troubleshooting
       experimentalFeatures: false,
       dataSyncFromProduction: false
     }
