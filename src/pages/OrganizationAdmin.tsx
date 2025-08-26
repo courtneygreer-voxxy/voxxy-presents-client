@@ -367,7 +367,7 @@ export default function OrganizationAdmin() {
               <CardHeader>
                 <CardTitle>Subscriber Management</CardTitle>
                 <CardDescription>
-                  Manage newsletter subscribers and event update requests.
+                  Manage club subscribers and event update requests.
                 </CardDescription>
               </CardHeader>
               <CardContent>

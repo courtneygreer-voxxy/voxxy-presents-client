@@ -1,15 +1,55 @@
-import React from 'react'
+import React, { useRef, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Upload, Palette, Sparkles } from "lucide-react"
+import { compressImage, validateImageFile } from '@/utils/imageCompression'
 import type { CreateClubStepProps } from '@/types/createClub'
 
 interface CreateClubBrandingProps extends CreateClubStepProps {}
 
 export default function CreateClubBranding({ data, updateData }: CreateClubBrandingProps) {
+  const logoInputRef = useRef<HTMLInputElement>(null)
+  const bannerInputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState<'logo' | 'banner' | null>(null)
+
   const handleFileUpload = (type: 'logo' | 'banner') => {
-    // TODO: Implement file upload logic
-    console.log(`Upload ${type} file`)
+    if (type === 'logo') {
+      logoInputRef.current?.click()
+    } else {
+      bannerInputRef.current?.click()
+    }
+  }
+
+  const processFile = async (file: File, type: 'logo' | 'banner') => {
+    // Validate file
+    const validation = validateImageFile(file)
+    if (!validation.valid) {
+      alert(validation.error)
+      return
+    }
+
+    setUploading(type)
+    
+    try {
+      // Compress image based on type
+      const maxSize = type === 'logo' ? 200 : 400 // Logo: 200KB, Banner: 400KB
+      const cropToSquare = type === 'logo' // Crop logo to square, keep banner aspect ratio
+      
+      const compressedDataUrl = await compressImage(file, maxSize, cropToSquare)
+      
+      // Update the data
+      if (type === 'logo') {
+        updateData({ logoUrl: compressedDataUrl })
+      } else {
+        updateData({ bannerUrl: compressedDataUrl })
+      }
+      
+    } catch (error) {
+      console.error(`Error processing ${type}:`, error)
+      alert(`Error processing ${type}. Please try a different file.`)
+    } finally {
+      setUploading(null)
+    }
   }
 
   return (
@@ -33,7 +73,12 @@ export default function CreateClubBranding({ data, updateData }: CreateClubBrand
               <p className="text-sm text-gray-500 mb-2">
                 Upload a square image (recommended: 300x300px)
               </p>
-              {data.logoUrl ? (
+              {uploading === 'logo' ? (
+                <div className="mt-3">
+                  <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-xs text-blue-600">Processing image...</p>
+                </div>
+              ) : data.logoUrl ? (
                 <div className="mt-3">
                   <img 
                     src={data.logoUrl} 
@@ -59,7 +104,12 @@ export default function CreateClubBranding({ data, updateData }: CreateClubBrand
               <p className="text-sm text-gray-500 mb-2">
                 Upload a wide image (recommended: 1200x400px)
               </p>
-              {data.bannerUrl ? (
+              {uploading === 'banner' ? (
+                <div className="mt-3">
+                  <div className="animate-spin w-6 h-6 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-2"></div>
+                  <p className="text-xs text-blue-600">Processing image...</p>
+                </div>
+              ) : data.bannerUrl ? (
                 <div className="mt-3">
                   <img 
                     src={data.bannerUrl} 
@@ -114,6 +164,34 @@ export default function CreateClubBranding({ data, updateData }: CreateClubBrand
           <p>High-quality images make your club look more professional and help attract members!</p>
         </div>
       </div>
+
+      {/* Hidden file inputs */}
+      <input
+        ref={logoInputRef}
+        type="file"
+        accept=".svg,.jpeg,.jpg,.png"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) {
+            processFile(file, 'logo')
+            e.target.value = '' // Reset input
+          }
+        }}
+        className="hidden"
+      />
+      <input
+        ref={bannerInputRef}
+        type="file"
+        accept=".svg,.jpeg,.jpg,.png"
+        onChange={(e) => {
+          const file = e.target.files?.[0]
+          if (file) {
+            processFile(file, 'banner')
+            e.target.value = '' // Reset input
+          }
+        }}
+        className="hidden"
+      />
     </div>
   )
 }

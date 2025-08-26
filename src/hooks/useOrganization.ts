@@ -4,10 +4,17 @@ import { getOrganizationBySlug, getEventsByOrganization, updateOrganization as u
 import { getDataSource, getApiUrl, getCurrentEnvironment } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
-export function useOrganization(organizationSlug: string) {
+interface UseOrganizationOptions {
+  loadEvents?: boolean // Whether to automatically load events (default: true for backward compatibility)
+}
+
+export function useOrganization(organizationSlug: string, options: UseOrganizationOptions = {}) {
+  const { loadEvents = true } = options
+  
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
+  const [eventsLoading, setEventsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const loadData = useCallback(async () => {
@@ -19,30 +26,44 @@ export function useOrganization(organizationSlug: string) {
       const dataSource = getDataSource()
       const apiUrl = getApiUrl()
       
-      console.log(`Loading data for ${organizationSlug} in ${currentEnv} environment using ${dataSource}`)
+      console.log(`Loading organization ${organizationSlug} in ${currentEnv} environment using ${dataSource}${loadEvents ? ' (with events)' : ' (org only)'}`)
       
       if (dataSource === 'firebase') {
         // Direct Firebase access (development/sandbox)
         console.log('Using Firebase directly')
         
+        // Always load organization first
         const org = await getOrganizationBySlug(organizationSlug)
         if (!org) {
           throw new Error(`Organization '${organizationSlug}' not found in ${currentEnv} environment`)
         }
         setOrganization(org)
-
-        const eventsList = await getEventsByOrganization(org.id)
-        setEvents(eventsList)
+        
+        if (loadEvents) {
+          // Load events after organization is loaded and available in UI
+          console.log('Loading events...')
+          const eventsList = await getEventsByOrganization(org.id)
+          setEvents(eventsList)
+        }
         
       } else if (dataSource === 'api' && apiUrl) {
         // API access (staging/production)
         console.log(`Using API: ${apiUrl}`)
         
-        const org = await organizationsApi.getBySlug(organizationSlug)
-        setOrganization(org)
-
-        const eventsList = await eventsApi.getByOrganization(org.id)
-        setEvents(eventsList)
+        if (loadEvents) {
+          // Load organization first, then events (API doesn't support parallel org+events by slug)
+          console.log('Loading organization, then events...')
+          const org = await organizationsApi.getBySlug(organizationSlug)
+          setOrganization(org)
+          
+          const eventsList = await eventsApi.getByOrganization(org.id)
+          setEvents(eventsList)
+        } else {
+          // Load only organization
+          console.log('Loading organization only...')
+          const org = await organizationsApi.getBySlug(organizationSlug)
+          setOrganization(org)
+        }
         
       } else {
         throw new Error(`Invalid data source configuration for ${currentEnv} environment`)
@@ -54,13 +75,50 @@ export function useOrganization(organizationSlug: string) {
     } finally {
       setLoading(false)
     }
-  }, [organizationSlug])
+  }, [organizationSlug, loadEvents])
 
   useEffect(() => {
     if (organizationSlug) {
       loadData()
     }
   }, [organizationSlug, loadData])
+
+  const loadEventsOnDemand = async () => {
+    if (!organization) {
+      console.log('⚠️ Cannot load events: no organization loaded')
+      return
+    }
+    
+    if (events.length > 0) {
+      console.log('⚡ Events already loaded, skipping...')
+      return
+    }
+    
+    console.log(`🔄 Loading events on demand for: ${organization.name} (${organization.id})`)
+    setEventsLoading(true)
+    
+    try {
+      const dataSource = getDataSource()
+      let eventsList: Event[]
+
+      if (dataSource === 'firebase') {
+        console.log('Loading events via Firebase')
+        eventsList = await getEventsByOrganization(organization.id)
+        console.log(`✅ Found ${eventsList.length} events via Firebase`)
+      } else {
+        console.log('Loading events via API')
+        eventsList = await eventsApi.getByOrganization(organization.id)
+        console.log(`✅ Found ${eventsList.length} events via API`)
+      }
+      
+      setEvents(eventsList)
+      console.log('📋 Events loaded into state')
+    } catch (err) {
+      console.error('❌ Error loading events:', err)
+    } finally {
+      setEventsLoading(false)
+    }
+  }
 
   const refreshEvents = async () => {
     if (!organization) {
@@ -69,6 +127,7 @@ export function useOrganization(organizationSlug: string) {
     }
     
     console.log(`🔄 Refreshing events for organization: ${organization.name} (${organization.id})`)
+    setEventsLoading(true)
     
     try {
       const dataSource = getDataSource()
@@ -88,6 +147,8 @@ export function useOrganization(organizationSlug: string) {
       console.log('📋 Events list updated in state')
     } catch (err) {
       console.error('❌ Error refreshing events:', err)
+    } finally {
+      setEventsLoading(false)
     }
   }
 
@@ -112,9 +173,9 @@ export function useOrganization(organizationSlug: string) {
         console.log(`✅ Organization updated successfully in Firebase (${currentEnv})`)
         
       } else if (dataSource === 'api' && apiUrl) {
-        // Production mode: API update
+        // Production mode: API update (use slug instead of ID)
         console.log(`Updating organization via API: ${apiUrl}`)
-        const updatedOrg = await organizationsApi.update(organization.id, updates)
+        const updatedOrg = await organizationsApi.updateBySlug(organization.slug, updates)
         setOrganization(updatedOrg)
         
       } else {
@@ -144,9 +205,9 @@ export function useOrganization(organizationSlug: string) {
         console.log(`✅ Organization deleted successfully in Firebase (${currentEnv})`)
         
       } else if (dataSource === 'api' && apiUrl) {
-        // Production mode: API delete
+        // Production mode: API delete (use slug instead of ID)
         console.log(`Deleting organization via API: ${apiUrl}`)
-        await organizationsApi.delete(organization.id)
+        await organizationsApi.deleteBySlug(organization.slug)
         
       } else {
         throw new Error(`Invalid delete configuration for ${currentEnv} environment`)
@@ -166,7 +227,9 @@ export function useOrganization(organizationSlug: string) {
     organization,
     events,
     loading,
+    eventsLoading,
     error,
+    loadEventsOnDemand,
     refreshEvents,
     updateOrganization,
     deleteOrganization,

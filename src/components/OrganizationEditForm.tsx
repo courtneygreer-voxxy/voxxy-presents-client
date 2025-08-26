@@ -324,7 +324,7 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="description">Short Description</Label>
+              <Label htmlFor="description">Tagline</Label>
               <Input
                 id="description"
                 value={formData.description}

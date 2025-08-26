@@ -45,7 +45,7 @@ export default function OrganizationPage({
   showAdminControls = false,
   customContent
 }: OrganizationPageProps) {
-  const { organization, events, loading, error } = useOrganization(organizationSlug)
+  const { organization, events, loading, eventsLoading, loadEventsOnDemand, error } = useOrganization(organizationSlug)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
 
   const toggleEventDetails = (eventId: string) => {
