@@ -129,7 +129,7 @@ export const eventsApi = {
 
   async getByOrganization(organizationId: string) {
     console.log('📅 Getting events for organization:', { organizationId })
-    return fetchApi<any[]>(`/events?organizationId=${organizationId}`)
+    return fetchApi<any[]>(`/events?organization=${organizationId}`)
   },
 
   async getAll() {
