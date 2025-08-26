@@ -102,13 +102,19 @@ export function getCurrentEnvironment(): EnvironmentType {
   // Detect based on hostname
   const hostname = window.location.hostname
   
+  console.log(`🔍 Hostname detection: ${hostname}`)
+  
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
+    console.log('✅ Detected: development')
     return 'development'
-  } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging')) {
+  } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging') || hostname.includes('onrender.com')) {
+    console.log('✅ Detected: staging')
     return 'staging'
   } else if (hostname.includes('sandbox') || hostname.includes('experimental')) {
+    console.log('✅ Detected: sandbox')
     return 'sandbox'
   } else {
+    console.log('✅ Detected: production')
     return 'production'
   }
 }
@@ -116,7 +122,15 @@ export function getCurrentEnvironment(): EnvironmentType {
 // Get current environment configuration
 export function getEnvironmentConfig(): EnvironmentConfig {
   const currentEnv = getCurrentEnvironment()
-  return environments[currentEnv]
+  const config = environments[currentEnv]
+  
+  console.log(`🔧 Environment Config: ${currentEnv}`, {
+    dataSource: config.dataSource,
+    firebaseProject: config.firebaseConfig.projectId,
+    apiUrl: config.apiBaseUrl
+  })
+  
+  return config
 }
 
 // Check if feature is enabled in current environment
