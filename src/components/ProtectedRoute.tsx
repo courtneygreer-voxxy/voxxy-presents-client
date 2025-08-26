@@ -3,6 +3,7 @@ import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/hooks/useAuth'
 import { Loader2 } from 'lucide-react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { getCurrentEnvironment } from '@/config/environments'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
@@ -40,8 +41,12 @@ export function ProtectedRoute({
     )
   }
 
-  // If email verification is required but user hasn't verified
-  if (requireEmailVerification && !isEmailVerified) {
+  // Check for staging environment bypass
+  const currentEnv = getCurrentEnvironment()
+  const isStagingBypass = currentEnv === 'staging'
+  
+  // If email verification is required but user hasn't verified (unless staging bypass)
+  if (requireEmailVerification && !isEmailVerified && !isStagingBypass) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full">
@@ -83,8 +88,22 @@ export function ProtectedRoute({
     )
   }
 
+  // Add staging bypass indicator
+  const showBypassIndicator = isStagingBypass && requireEmailVerification && !isEmailVerified
+
   // User is authenticated (and email verified if required)
-  return <>{children}</>
+  return (
+    <>
+      {showBypassIndicator && (
+        <div className="fixed top-0 left-0 right-0 bg-orange-500 text-white text-center py-2 text-sm z-50">
+          ⚠️ STAGING: Email verification bypassed for testing
+        </div>
+      )}
+      <div className={showBypassIndicator ? 'pt-10' : ''}>
+        {children}
+      </div>
+    </>
+  )
 }
 
 // Component for routes that should redirect authenticated users away
