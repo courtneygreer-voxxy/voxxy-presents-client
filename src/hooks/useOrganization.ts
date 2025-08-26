@@ -173,9 +173,9 @@ export function useOrganization(organizationSlug: string, options: UseOrganizati
         console.log(`✅ Organization updated successfully in Firebase (${currentEnv})`)
         
       } else if (dataSource === 'api' && apiUrl) {
-        // Production mode: API update (use slug instead of ID)
+        // Production mode: API update (use ID for API compatibility)
         console.log(`Updating organization via API: ${apiUrl}`)
-        const updatedOrg = await organizationsApi.updateBySlug(organization.slug, updates)
+        const updatedOrg = await organizationsApi.update(organization.id, updates)
         setOrganization(updatedOrg)
         
       } else {
@@ -205,9 +205,9 @@ export function useOrganization(organizationSlug: string, options: UseOrganizati
         console.log(`✅ Organization deleted successfully in Firebase (${currentEnv})`)
         
       } else if (dataSource === 'api' && apiUrl) {
-        // Production mode: API delete (use slug instead of ID)
+        // Production mode: API delete (use ID for API compatibility)
         console.log(`Deleting organization via API: ${apiUrl}`)
-        await organizationsApi.deleteBySlug(organization.slug)
+        await organizationsApi.delete(organization.id)
         
       } else {
         throw new Error(`Invalid delete configuration for ${currentEnv} environment`)
