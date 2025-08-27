@@ -541,7 +541,7 @@ export default function OrganizationPage({
               <div className="pt-6">
                 <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>
                 <div className="flex items-center gap-4">
-                  {organization.socialLinks.instagram && (
+                  {organization.socialLinks?.instagram && (
                     <a 
                       href={`https://instagram.com/${organization.socialLinks.instagram.replace('@', '')}`} 
                       className="text-gray-600 hover:text-purple-600 transition-colors" 
@@ -552,7 +552,7 @@ export default function OrganizationPage({
                       <Instagram className="h-6 w-6" />
                     </a>
                   )}
-                  {organization.socialLinks.website && (
+                  {organization.socialLinks?.website && (
                     <a 
                       href={organization.socialLinks.website} 
                       className="text-gray-600 hover:text-purple-600 transition-colors" 
@@ -563,7 +563,7 @@ export default function OrganizationPage({
                       <ExternalLink className="h-6 w-6" />
                     </a>
                   )}
-                  {organization.socialLinks.eventbrite && (
+                  {organization.socialLinks?.eventbrite && (
                     <a 
                       href={organization.socialLinks.eventbrite} 
                       className="text-gray-600 hover:text-purple-600 transition-colors" 
@@ -574,7 +574,7 @@ export default function OrganizationPage({
                       <Calendar className="h-6 w-6" />
                     </a>
                   )}
-                  {organization.socialLinks.venmo && (
+                  {organization.socialLinks?.venmo && (
                     <a 
                       href={`https://venmo.com/${organization.socialLinks.venmo.replace('@', '')}`} 
                       className="text-gray-600 hover:text-purple-600 transition-colors" 
@@ -585,7 +585,7 @@ export default function OrganizationPage({
                       <DollarSign className="h-6 w-6" />
                     </a>
                   )}
-                  {organization.socialLinks.other && (
+                  {organization.socialLinks?.other && (
                     <a 
                       href={organization.socialLinks.other} 
                       className="text-gray-600 hover:text-purple-600 transition-colors" 
@@ -626,7 +626,7 @@ export default function OrganizationPage({
               <div className="group relative">
                 <MapPin className="h-5 w-5 hover:text-purple-400 transition-colors cursor-pointer" />
                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {organization.settings.defaultAddress}
+                  {organization.settings?.defaultAddress}
                 </div>
               </div>
               <div className="group relative">

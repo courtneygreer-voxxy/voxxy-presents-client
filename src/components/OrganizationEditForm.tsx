@@ -36,15 +36,15 @@ export function OrganizationEditForm({
     aboutStory: organization.aboutStory || '',
     aboutOfferings: organization.aboutOfferings && organization.aboutOfferings.length > 0 ? organization.aboutOfferings : getDefaultOfferings(),
     socialLinks: {
-      instagram: organization.socialLinks.instagram || '',
-      website: organization.socialLinks.website || '',
-      eventbrite: organization.socialLinks.eventbrite || '',
-      venmo: organization.socialLinks.venmo || '',
-      other: organization.socialLinks.other || ''
+      instagram: organization.socialLinks?.instagram || '',
+      website: organization.socialLinks?.website || '',
+      eventbrite: organization.socialLinks?.eventbrite || '',
+      venmo: organization.socialLinks?.venmo || '',
+      other: organization.socialLinks?.other || ''
     },
     settings: {
-      defaultLocation: organization.settings.defaultLocation,
-      defaultAddress: organization.settings.defaultAddress
+      defaultLocation: organization.settings?.defaultLocation || '',
+      defaultAddress: organization.settings?.defaultAddress || ''
     }
   })
 
