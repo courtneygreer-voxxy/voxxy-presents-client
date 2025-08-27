@@ -3,14 +3,6 @@ import { getApiUrl, getCurrentEnvironment } from '@/config/environments'
 
 const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
-console.log('🔧 API Service Configuration:', {
-  environment: getCurrentEnvironment(),
-  apiBaseUrl: API_BASE_URL,
-  fromEnvConfig: getApiUrl(),
-  fromEnvVar: import.meta.env.VITE_API_BASE_URL,
-  timestamp: new Date().toISOString()
-})
-
 interface ApiResponse<T> {
   data?: T
   error?: string
@@ -30,8 +22,6 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   const url = `${API_BASE_URL}${endpoint}`
   
   try {
-    console.log('API Request:', { url, method: options?.method || 'GET', timestamp: new Date().toISOString() })
-    
     const response = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
@@ -48,12 +38,10 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
       }
       
-      console.error('API Error Response:', {
+      console.error('API Error:', {
         url,
         status: response.status,
-        statusText: response.statusText,
-        errorData,
-        timestamp: new Date().toISOString()
+        message: errorData.message || errorData.error
       })
       
       const errorMessage = errorData.message || errorData.error || `API request failed (${response.status})`
@@ -61,7 +49,6 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     }
 
     const data = await response.json()
-    console.log('API Success:', { url, dataKeys: Object.keys(data || {}), timestamp: new Date().toISOString() })
     return data
     
   } catch (error) {
@@ -71,8 +58,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     
     console.error('Network Error:', {
       url,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
+      error: error instanceof Error ? error.message : 'Unknown error'
     })
     
     throw new ApiError(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`, 0)
@@ -100,7 +86,6 @@ export const organizationsApi = {
   },
 
   async updateBySlug(slug: string, data: any) {
-    console.log('🔄 Updating organization by slug:', { slug, dataKeys: Object.keys(data) })
     return fetchApi<any>(`/organizations/slug/${slug}`, {
       method: 'PUT',
       body: JSON.stringify(data),
@@ -114,7 +99,6 @@ export const organizationsApi = {
   },
 
   async deleteBySlug(slug: string) {
-    console.log('🗑️ Deleting organization by slug:', { slug })
     return fetchApi<any>(`/organizations/slug/${slug}`, {
       method: 'DELETE',
     })
@@ -128,7 +112,6 @@ export const eventsApi = {
   },
 
   async getByOrganization(organizationId: string) {
-    console.log('📅 Getting events for organization:', { organizationId })
     return fetchApi<any[]>(`/events?organization=${organizationId}`)
   },
 

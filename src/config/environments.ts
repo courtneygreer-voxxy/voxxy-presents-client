@@ -72,7 +72,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true, // Controlled admin access
-      debugMode: true, // Temporarily enable debug for troubleshooting
+      debugMode: false, // Debug mode disabled
       experimentalFeatures: false,
       dataSyncFromProduction: false
     }
@@ -91,44 +91,57 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   }
 }
 
+// Cache environment detection to avoid repeated hostname checks
+let cachedEnvironment: EnvironmentType | null = null
+
 // Detect current environment
 export function getCurrentEnvironment(): EnvironmentType {
+  // Return cached result if available
+  if (cachedEnvironment !== null) {
+    return cachedEnvironment
+  }
+
   // Check for explicit environment override
   const envOverride = import.meta.env.VITE_ENVIRONMENT as EnvironmentType
   if (envOverride && environments[envOverride]) {
+    cachedEnvironment = envOverride
     return envOverride
   }
 
   // Detect based on hostname
   const hostname = window.location.hostname
   
-  console.log(`🔍 Hostname detection: ${hostname}`)
-  
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    console.log('✅ Detected: development')
-    return 'development'
+    cachedEnvironment = 'development'
   } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging') || hostname.includes('onrender.com')) {
-    console.log('✅ Detected: staging')
-    return 'staging'
+    cachedEnvironment = 'staging'
   } else if (hostname.includes('sandbox') || hostname.includes('experimental')) {
-    console.log('✅ Detected: sandbox')
-    return 'sandbox'
+    cachedEnvironment = 'sandbox'
   } else {
-    console.log('✅ Detected: production')
-    return 'production'
+    cachedEnvironment = 'production'
   }
+
+  // Log only once when first detected
+  console.log(`🔧 Environment detected: ${cachedEnvironment} (${hostname})`)
+  
+  return cachedEnvironment
 }
+
+// Cache environment config to avoid repeated lookups
+let cachedConfig: EnvironmentConfig | null = null
 
 // Get current environment configuration
 export function getEnvironmentConfig(): EnvironmentConfig {
+  // Return cached config if available
+  if (cachedConfig !== null) {
+    return cachedConfig
+  }
+
   const currentEnv = getCurrentEnvironment()
   const config = environments[currentEnv]
   
-  console.log(`🔧 Environment Config: ${currentEnv}`, {
-    dataSource: config.dataSource,
-    firebaseProject: config.firebaseConfig.projectId,
-    apiUrl: config.apiBaseUrl
-  })
+  // Cache the config
+  cachedConfig = config
   
   return config
 }

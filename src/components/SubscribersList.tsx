@@ -48,16 +48,13 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             } else {
               // API mode (staging/production) - using registrationsApi
               try {
-                console.log(`📊 Loading registrations via API for event: ${event.id}`)
                 registrations = await registrationsApi.getByEvent(event.id)
-                console.log(`✅ API returned ${registrations.length} registrations for event ${event.id}`)
               } catch (apiErr) {
-                console.warn(`❌ API call failed for event ${event.id}, trying Firebase as fallback:`, apiErr)
+                console.warn(`API call failed for event ${event.id}, trying Firebase fallback:`, apiErr)
                 try {
                   registrations = await getRegistrationsByEvent(event.id)
-                  console.log(`✅ Firebase fallback returned ${registrations.length} registrations for event ${event.id}`)
                 } catch (firebaseErr) {
-                  console.error(`❌ Firebase fallback also failed for event ${event.id}:`, firebaseErr)
+                  console.error(`Firebase fallback also failed for event ${event.id}:`, firebaseErr)
                   registrations = []
                 }
               }
