@@ -11,7 +11,7 @@ export default function CreateClubDescription({ data, updateData }: CreateClubDe
   }
 
   const charCount = data.description.length
-  const maxChars = 200
+  const maxChars = 600
 
   return (
     <div className="space-y-6">

@@ -23,7 +23,7 @@ export const transformClubData = (data: CreateClubData, ownerId: string): Omit<O
   const organizationData: any = {
     name: data.name,
     slug,
-    description: '', // Short tagline - not set in create club flow for now
+    description: data.tagline, // Tagline maps to description (short tagline field)
     background: data.description, // Club description maps to background field
     aboutStory: getDisplayAboutStory(data.aboutStory, data.name),
     aboutOfferings: getDisplayOfferings(data.aboutOfferings),

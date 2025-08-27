@@ -7,8 +7,12 @@ import type { CreateClubStepProps } from '@/types/createClub'
 interface CreateClubNameProps extends CreateClubStepProps {}
 
 export default function CreateClubName({ data, updateData }: CreateClubNameProps) {
-  const handleInputChange = (value: string) => {
+  const handleNameChange = (value: string) => {
     updateData({ name: value })
+  }
+
+  const handleTaglineChange = (value: string) => {
+    updateData({ tagline: value })
   }
 
   // Generate URL-friendly slug from name
@@ -28,20 +32,41 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
           <Sparkles className="h-6 w-6 text-purple-500" />
-          <h2 className="text-2xl font-bold text-gray-900">What should we call your club?</h2>
+          <h2 className="text-2xl font-bold text-gray-900">Let's name your club!</h2>
         </div>
-        <p className="text-gray-600">Pick something memorable that captures your vibe ✨</p>
+        <p className="text-gray-600">Pick a memorable name and add a catchy tagline ✨</p>
       </div>
 
-      <div className="max-w-md mx-auto">
-        <Input
-          id="name"
-          placeholder="Brooklyn Hearts Club"
-          value={data.name}
-          onChange={(e) => handleInputChange(e.target.value)}
-          className="text-lg py-3 text-center"
-          autoFocus
-        />
+      <div className="max-w-md mx-auto space-y-4">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+            Club Name
+          </label>
+          <Input
+            id="name"
+            placeholder="Brooklyn Hearts Club"
+            value={data.name}
+            onChange={(e) => handleNameChange(e.target.value)}
+            className="text-lg py-3 text-center"
+            autoFocus
+          />
+        </div>
+        
+        <div>
+          <label htmlFor="tagline" className="block text-sm font-medium text-gray-700 mb-2">
+            Tagline
+          </label>
+          <Input
+            id="tagline"
+            placeholder="Where music meets community"
+            value={data.tagline}
+            onChange={(e) => handleTaglineChange(e.target.value)}
+            className="text-base py-2 text-center"
+          />
+          <p className="text-xs text-gray-500 mt-1 text-center">
+            A short phrase that captures what you're all about
+          </p>
+        </div>
       </div>
 
       {/* Preview URL */}

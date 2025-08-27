@@ -1,6 +1,7 @@
 export interface CreateClubData {
   // Basic Info
   name: string
+  tagline: string
   description: string
   contactEmail: string
   defaultLocation: string
