@@ -169,6 +169,39 @@ function DesignSettingsPanelInner({ organization }: { organization: Organization
                   </div>
                 </div>
               </div>
+              
+              {/* Button Color Selector */}
+              <div className="border-t pt-6">
+                <h4 className="text-lg font-medium mb-4">Button Color</h4>
+                <div className="flex items-center gap-4">
+                  <div 
+                    className="w-12 h-12 rounded-lg border-2 border-gray-200"
+                    style={{ backgroundColor: designState.preview.theme.primaryColor }}
+                  />
+                  <div className="flex-1 space-y-2">
+                    <label className="text-sm font-medium">Color</label>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={designState.preview.theme.primaryColor}
+                        onChange={(e) => updatePreviewDesign({ 
+                          theme: { ...designState.preview.theme, primaryColor: e.target.value }
+                        })}
+                        className="w-16 h-10"
+                      />
+                      <input
+                        type="text"
+                        value={designState.preview.theme.primaryColor}
+                        onChange={(e) => updatePreviewDesign({ 
+                          theme: { ...designState.preview.theme, primaryColor: e.target.value }
+                        })}
+                        placeholder="#2563eb"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
 

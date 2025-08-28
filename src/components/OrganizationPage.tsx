@@ -131,7 +131,8 @@ export default function OrganizationPage({
             </Link>
             <Link to={`/${organizationSlug}/admin`}>
               <Button
-                className="bg-purple-600 hover:bg-purple-700 text-white"
+                className="text-white hover:opacity-90"
+                style={{ backgroundColor: design.theme.primaryColor }}
                 size="sm"
               >
                 <Edit className="h-4 w-4 mr-2" />
