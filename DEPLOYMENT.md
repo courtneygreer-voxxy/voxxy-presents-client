@@ -103,13 +103,22 @@ npm run build:sandbox    # Build for sandbox
    # Develop and test locally
    ```
 
-2. **Submit PR to Staging**
+2. **Pre-Deployment Checks**
    ```bash
+   npm run precheck          # Run TypeScript + ESLint checks
+   npm run build            # Ensure build passes
+   npm run lint -- --fix   # Auto-fix linting issues
+   ```
+
+3. **Submit PR to Staging**
+   ```bash
+   git add -A
+   git commit -m "feat: your feature description"
    git push origin feature/your-feature
    # Create PR targeting 'staging' branch
    ```
 
-3. **Auto-Deploy to Staging**
+4. **Auto-Deploy to Staging**
    - Staging auto-deploys from `staging` branch
    - Sync production data for testing
    - Test admin functionality

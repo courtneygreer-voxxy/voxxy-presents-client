@@ -22,9 +22,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
-import { DEFAULT_DESIGN } from "@/contexts/DesignContext"
 import { isFeatureEnabled } from '@/config/environments'
-import type { OrganizationDesign } from '@/types/design'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
 interface OrganizationPageProps {
@@ -50,19 +48,6 @@ export default function OrganizationPage({
   const { organization, events, loading, eventsLoading, loadEventsOnDemand, error } = useOrganization(organizationSlug)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
 
-  // Get design settings from organization or use defaults
-  const design: OrganizationDesign = organization?.settings?.design || DEFAULT_DESIGN
-
-  // Create CSS variables from design
-  const designStyles = {
-    '--org-primary-color': design.theme.primaryColor,
-    '--org-secondary-color': design.theme.secondaryColor,
-    '--org-text-color': design.theme.textColor,
-    '--org-accent-color': design.theme.accentColor,
-    '--org-background': design.background.type === 'color' 
-      ? design.background.value 
-      : '#ffffff'
-  } as React.CSSProperties
 
   const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
@@ -100,13 +85,7 @@ export default function OrganizationPage({
   }
 
   return (
-    <div 
-      className="min-h-screen"
-      style={{
-        ...designStyles,
-        backgroundColor: design.background.value
-      }}
-    >
+    <div className="min-h-screen bg-white">
       {/* Top Controls */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <ShareButton
@@ -131,8 +110,7 @@ export default function OrganizationPage({
             </Link>
             <Link to={`/${organizationSlug}/admin`}>
               <Button
-                className="text-white hover:opacity-90"
-                style={{ backgroundColor: design.theme.primaryColor }}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
                 size="sm"
               >
                 <Edit className="h-4 w-4 mr-2" />
@@ -173,10 +151,7 @@ export default function OrganizationPage({
       <section className="py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
-            <h3 
-              className="text-2xl font-semibold mb-4"
-              style={{ color: design.theme.textColor }}
-            >
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
               Welcome to {organization.name}
             </h3>
             <p className="text-lg leading-relaxed text-gray-700">
@@ -192,10 +167,7 @@ export default function OrganizationPage({
       {/* Upcoming Events - List Style */}
       <section id="events" className="py-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h3 
-            className="text-3xl font-bold text-center mb-10"
-            style={{ color: design.theme.textColor }}
-          >
+          <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">
             Upcoming Events
           </h3>
           {(() => {
@@ -509,10 +481,7 @@ export default function OrganizationPage({
       {/* About Section */}
       <section id="about" className="py-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h3 
-            className="text-4xl font-bold text-center mb-12"
-            style={{ color: design.theme.textColor }}
-          >
+          <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">
             About {organization.name}
           </h3>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -535,7 +504,7 @@ export default function OrganizationPage({
               />
             </div>
             <div className="space-y-6">
-              <h4 className="text-2xl font-semibold" style={{ color: design.theme.textColor }}>Our Story</h4>
+              <h4 className="text-2xl font-semibold text-gray-900">Our Story</h4>
               <div className="text-gray-700 leading-relaxed space-y-4">
                 {organization?.aboutStory ? (
                   <div>
@@ -551,7 +520,7 @@ export default function OrganizationPage({
               </div>
               
               <div>
-                <h4 className="text-2xl font-semibold pt-4" style={{ color: design.theme.textColor }}>What We Offer</h4>
+                <h4 className="text-2xl font-semibold text-gray-900 pt-4">What We Offer</h4>
                 <ul className="space-y-2 text-gray-700">
                   {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
                     organization.aboutOfferings.map((offering, index) => (
@@ -580,7 +549,7 @@ export default function OrganizationPage({
               </div>
               
               <div className="pt-6">
-                <h4 className="text-2xl font-semibold mb-4" style={{ color: design.theme.textColor }}>Connect With Us</h4>
+                <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>
                 <div className="flex items-center gap-4">
                   {organization.socialLinks?.instagram && (
                     <a 

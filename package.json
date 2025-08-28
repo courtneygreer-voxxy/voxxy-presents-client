@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives",
+    "typecheck": "tsc --noEmit",
+    "precheck": "npm run typecheck && npm run lint",
     "preview": "vite preview",
     "start": "vite preview --host 0.0.0.0 --port ${PORT:-3000}",
     "seed:dev": "tsx scripts/seed-dev-data.ts",

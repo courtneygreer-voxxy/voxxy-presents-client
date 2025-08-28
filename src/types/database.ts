@@ -29,7 +29,6 @@ export interface Organization {
       primaryColor: string
       backgroundColor: string
     }
-    design?: import('./design').OrganizationDesign
   }
   ownerId: string // References users collection
   createdAt: Date

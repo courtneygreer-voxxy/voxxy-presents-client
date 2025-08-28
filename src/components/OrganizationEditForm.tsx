@@ -8,6 +8,7 @@ import { Save, X } from "lucide-react"
 import type { Organization } from '@/types/database'
 import { getDefaultAboutStory, getDefaultOfferings } from '@/utils/defaultContent'
 import { compressImage, validateImageFile } from '@/utils/imageCompression'
+import { HeaderImageSelector } from '@/components/HeaderImageSelector'
 
 
 interface OrganizationEditFormProps {
@@ -419,43 +420,11 @@ export function OrganizationEditForm({
               </div>
             </div>
             
-            <div>
-              <Label htmlFor="heroFile">Hero Background Upload</Label>
-              <div className="space-y-2">
-                <input
-                  id="heroFile"
-                  type="file"
-                  accept=".jpeg,.jpg,.png"
-                  onChange={handleHeroUpload}
-                  disabled={uploadingHero}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {uploadingHero && (
-                  <p className="text-xs text-blue-600 flex items-center gap-1">
-                    <span className="animate-spin">⭐</span>
-                    Uploading hero background...
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  Supported formats: JPEG, PNG. Max source file: 20MB (will be compressed automatically). Recommended: 1200x400px or larger
-                </p>
-                {formData.bannerUrl && !uploadingHero && (
-                  <div className="mt-3">
-                    <Label className="text-sm text-gray-600">Preview:</Label>
-                    <div className="mt-1 relative h-32 rounded-lg overflow-hidden border border-gray-200">
-                      <img 
-                        src={formData.bannerUrl} 
-                        alt="Hero background preview" 
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <span className="text-white font-medium">Hero Background Preview</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+            <HeaderImageSelector
+              currentImage={formData.bannerUrl}
+              onImageSelect={(imageUrl) => handleInputChange('bannerUrl', imageUrl)}
+              isSaving={isSubmitting}
+            />
           </CardContent>
         </Card>
 

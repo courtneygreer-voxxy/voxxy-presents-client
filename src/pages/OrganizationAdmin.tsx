@@ -16,8 +16,7 @@ import {
   Plus,
   MapPin,
   Mail,
-  User,
-  Palette
+  User
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { OrganizationEditForm } from "@/components/OrganizationEditForm"
@@ -28,7 +27,6 @@ import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
-import { DesignSettingsPanel } from "@/components/admin/design/DesignSettingsPanel"
 import { isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -63,35 +61,6 @@ export default function OrganizationAdmin() {
     }
   }
 
-  const handleSaveDesign = async (design: any) => {
-    setIsSaving(true)
-    setSaveMessage(null)
-
-    try {
-      const updates = {
-        settings: {
-          defaultLocation: organization?.settings?.defaultLocation || '',
-          defaultAddress: organization?.settings?.defaultAddress || '',
-          theme: organization?.settings?.theme || {
-            primaryColor: '#000000',
-            backgroundColor: '#ffffff'
-          },
-          design: design
-        }
-      }
-      await updateOrganization(updates)
-      setSaveMessage('✅ Design saved successfully! Visit your public page to see changes.')
-      setTimeout(() => setSaveMessage(null), 4000)
-    } catch (error) {
-      console.error('Failed to save design:', error)
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred'
-      setSaveMessage(`❌ Failed to save design: ${errorMessage}. Please try again.`)
-      setTimeout(() => setSaveMessage(null), 7000)
-      throw error // Re-throw to let the design context handle it
-    } finally {
-      setIsSaving(false)
-    }
-  }
 
   const handleEventCreated = (event: any) => {
     setSaveMessage('✅ Event created successfully!')
@@ -240,10 +209,6 @@ export default function OrganizationAdmin() {
               <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start">
                 <Calendar className="h-4 w-4" />
                 Events
-              </TabsTrigger>
-              <TabsTrigger value="design" className="flex items-center gap-2 w-full justify-start">
-                <Palette className="h-4 w-4" />
-                Design
               </TabsTrigger>
               <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start">
                 <Mail className="h-4 w-4" />
@@ -397,13 +362,6 @@ export default function OrganizationAdmin() {
             </div>
           </TabsContent>
 
-          {/* Design Tab */}
-          <TabsContent value="design">
-            <DesignSettingsPanel
-              organization={organization}
-              onSave={handleSaveDesign}
-            />
-          </TabsContent>
 
           {/* Subscribers Tab */}
           <TabsContent value="subscribers">
