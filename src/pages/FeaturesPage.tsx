@@ -346,7 +346,7 @@ export default function FeaturesPage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-purple-600" asChild>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-white text-purple hover:bg-white hover:text-purple-600" asChild>
               <Link to="/pricing">
                 View Pricing
               </Link>

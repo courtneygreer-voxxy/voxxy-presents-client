@@ -322,7 +322,7 @@ export default function ProductsPage() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="text-lg px-8 py-6 border-white text-white hover:bg-white hover:text-purple-600"
+              className="text-lg px-8 py-6 border-white text-purple hover:bg-white hover:text-purple-600"
               asChild
             >
               <Link to="/features">

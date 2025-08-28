@@ -196,7 +196,7 @@ export default function PricingPage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 text-white border-white hover:bg-white hover:text-purple-600" asChild>
+            <Button size="lg" variant="outline" className="text-lg px-8 py-6 text-purple border-white hover:bg-white hover:text-purple-600" asChild>
               <a href="mailto:team@voxxyai.com">
                 <Mail className="mr-2 h-5 w-5" />
                 Ask Questions

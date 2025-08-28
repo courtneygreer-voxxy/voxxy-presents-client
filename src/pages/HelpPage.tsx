@@ -362,7 +362,7 @@ export default function HelpPage() {
             <Button 
               size="lg" 
               variant="outline" 
-              className="border-white text-white hover:bg-white hover:text-purple-600"
+              className="border-white text-purple hover:bg-white hover:text-purple-600"
               asChild
             >
               <a href="mailto:team@voxxyai.com">

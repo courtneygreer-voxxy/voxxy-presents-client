@@ -203,7 +203,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Breaking Through the Noise</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Breaking Through the Noise</CardTitle>
                 <CardDescription className="text-gray-600">
                   Crowded social platforms and event sites make it impossible to reach your community effectively
                 </CardDescription>
@@ -212,7 +212,7 @@ export default function HomePage() {
             
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Complex Event Management</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Complex Event Management</CardTitle>
                 <CardDescription className="text-gray-600">
                   Managing event series without Eventbrite's overwhelming complexity and fees
                 </CardDescription>
@@ -221,7 +221,7 @@ export default function HomePage() {
             
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Lightweight Ticketing</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Lightweight Ticketing</CardTitle>
                 <CardDescription className="text-gray-600">
                   Need simple ticket management for individuals and groups without enterprise overhead
                 </CardDescription>
@@ -230,7 +230,7 @@ export default function HomePage() {
             
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Platform Juggling</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Platform Juggling</CardTitle>
                 <CardDescription className="text-gray-600">
                   Managing events across multiple platforms creates confusion and missed opportunities
                 </CardDescription>
@@ -239,7 +239,7 @@ export default function HomePage() {
             
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Member Engagement</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Member Engagement</CardTitle>
                 <CardDescription className="text-gray-600">
                   Keeping recurring members engaged between events without constant manual outreach
                 </CardDescription>
@@ -248,7 +248,7 @@ export default function HomePage() {
             
             <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow duration-300">
               <CardHeader>
-                <CardTitle className="text-lg text-red-600">Last-Minute Dropoffs</CardTitle>
+                <CardTitle className="text-lg text-purple-600">Last-Minute Dropoffs</CardTitle>
                 <CardDescription className="text-gray-600">
                   Unpredictable attendance affecting revenue and venue planning
                 </CardDescription>
