@@ -1,0 +1,106 @@
+/* Design Preview Grid Overlay */
+.grid-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.grid-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 100%;
+  background: rgba(239, 68, 68, 0.3);
+  z-index: 1001;
+  pointer-events: none;
+  transform: translateX(-50%);
+}
+
+/* Performance optimizations for image backgrounds */
+.design-preview-bg {
+  will-change: background-image;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+/* Smooth transitions for design changes */
+.design-preview-content {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.design-preview-content * {
+  transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Loading state animations */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
+}
+
+.loading-pulse {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Responsive device frame styles */
+.device-frame {
+  box-shadow: 
+    0 0 0 1px rgba(0, 0, 0, 0.05),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.device-frame.mobile {
+  border-radius: 16px;
+}
+
+.device-frame.tablet {
+  border-radius: 12px;
+}
+
+/* Accessibility indicators */
+.accessibility-warning {
+  border-left: 4px solid #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .grid-overlay::before {
+    background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 0, 0, 0.3) 1px, transparent 1px);
+  }
+  
+  .grid-overlay::after {
+    background: rgba(239, 68, 68, 0.8);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .grid-overlay::before {
+    background-image: 
+      linear-gradient(rgba(147, 197, 253, 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(147, 197, 253, 0.2) 1px, transparent 1px);
+  }
+}

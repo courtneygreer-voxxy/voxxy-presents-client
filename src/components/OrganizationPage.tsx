@@ -22,7 +22,9 @@ import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
+import { DEFAULT_DESIGN } from "@/contexts/DesignContext"
 import { isFeatureEnabled } from '@/config/environments'
+import type { OrganizationDesign } from '@/types/design'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
 interface OrganizationPageProps {
@@ -48,6 +50,20 @@ export default function OrganizationPage({
   const { organization, events, loading, eventsLoading, loadEventsOnDemand, error } = useOrganization(organizationSlug)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
 
+  // Get design settings from organization or use defaults
+  const design: OrganizationDesign = organization?.settings?.design || DEFAULT_DESIGN
+
+  // Create CSS variables from design
+  const designStyles = {
+    '--org-primary-color': design.theme.primaryColor,
+    '--org-secondary-color': design.theme.secondaryColor,
+    '--org-text-color': design.theme.textColor,
+    '--org-accent-color': design.theme.accentColor,
+    '--org-background': design.background.type === 'color' 
+      ? design.background.value 
+      : '#ffffff'
+  } as React.CSSProperties
+
   const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
   }
@@ -55,7 +71,7 @@ export default function OrganizationPage({
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
           <p className="text-gray-600">Loading {organizationSlug}...</p>
@@ -66,7 +82,7 @@ export default function OrganizationPage({
 
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-600 mb-4">Error loading data: {error}</p>
           <Button onClick={() => window.location.reload()}>Try Again</Button>
@@ -77,14 +93,21 @@ export default function OrganizationPage({
 
   if (!organization) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-600">Organization not found</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div 
+      className="min-h-screen"
+      style={{
+        ...designStyles,
+        backgroundColor: design.background.value,
+        color: design.theme.textColor
+      }}
+    >
       {/* Top Controls */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <ShareButton
@@ -93,14 +116,14 @@ export default function OrganizationPage({
           description={organization.description}
           variant="outline"
           size="sm"
-          className="bg-white hover:bg-gray-50"
+          className="bg-white/90 hover:bg-white/95 backdrop-blur-sm"
         />
         {showAdminControls && isFeatureEnabled('adminControls') && (
           <>
             <Link to="/profile">
               <Button
                 variant="outline"
-                className="bg-white hover:bg-gray-50"
+                className="bg-white/90 hover:bg-white/95 backdrop-blur-sm"
                 size="sm"
               >
                 <User className="h-4 w-4 mr-2" />
@@ -147,21 +170,37 @@ export default function OrganizationPage({
       </section>
 
       {/* Quick Background Section */}
-      <section className="py-12 bg-white">
+      <section className="py-12">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">Welcome to {organization.name}</h3>
-            <p className="text-lg text-gray-700 leading-relaxed">
-              {organization.background}
+            <h3 
+              className="text-2xl font-semibold mb-4"
+              style={{ color: design.theme.primaryColor }}
+            >
+              Welcome to {organization.name}
+            </h3>
+            <p 
+              className="text-lg leading-relaxed"
+              style={{ color: design.theme.textColor }}
+            >
+              {typeof organization.background === 'string' 
+                ? organization.background 
+                : organization.description || 'Welcome to our community!'
+              }
             </p>
           </div>
         </div>
       </section>
 
       {/* Upcoming Events - List Style */}
-      <section id="events" className="py-16 bg-gray-50">
+      <section id="events" className="py-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">Upcoming Events</h3>
+          <h3 
+            className="text-3xl font-bold text-center mb-10"
+            style={{ color: design.theme.primaryColor }}
+          >
+            Upcoming Events
+          </h3>
           {(() => {
             console.log('All events:', events.map(e => ({ id: e.id, title: e.title, status: e.status })))
             const publishedEvents = events.filter(event => {
@@ -473,7 +512,12 @@ export default function OrganizationPage({
       {/* About Section */}
       <section id="about" className="py-20">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">About {organization.name}</h3>
+          <h3 
+            className="text-4xl font-bold text-center mb-12"
+            style={{ color: design.theme.primaryColor }}
+          >
+            About {organization.name}
+          </h3>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <ImageCarousel
@@ -494,7 +538,7 @@ export default function OrganizationPage({
               />
             </div>
             <div className="space-y-6">
-              <h4 className="text-2xl font-semibold text-gray-900">Our Story</h4>
+              <h4 className="text-2xl font-semibold" style={{ color: design.theme.textColor }}>Our Story</h4>
               <div className="text-gray-700 leading-relaxed space-y-4">
                 {organization?.aboutStory ? (
                   <div>
@@ -510,7 +554,7 @@ export default function OrganizationPage({
               </div>
               
               <div>
-                <h4 className="text-2xl font-semibold text-gray-900 pt-4">What We Offer</h4>
+                <h4 className="text-2xl font-semibold pt-4" style={{ color: design.theme.textColor }}>What We Offer</h4>
                 <ul className="space-y-2 text-gray-700">
                   {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
                     organization.aboutOfferings.map((offering, index) => (
@@ -610,36 +654,10 @@ export default function OrganizationPage({
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
+      {/* Minimal Footer */}
+      <footer className="bg-gray-50 text-gray-400 py-3 border-t">
         <div className="container mx-auto px-4 text-center">
-          <div className="mb-4">
-            <p className="text-sm text-gray-400 mb-2">Proudly presented by</p>
-            <h5 className="text-2xl font-bold text-purple-400">voxxypresents</h5>
-          </div>
-          <div className="max-w-2xl mx-auto">
-            <p className="text-gray-300 mb-4">
-              Voxxy Presents simplifies recurring club events with custom pages, automated waitlists, and seamless
-              messaging that keeps your community connected and your calendar full.
-            </p>
-            <div className="flex justify-center items-center gap-6 text-sm text-gray-400">
-              <div className="group relative">
-                <MapPin className="h-5 w-5 hover:text-purple-400 transition-colors cursor-pointer" />
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {organization.settings?.defaultAddress}
-                </div>
-              </div>
-              <div className="group relative">
-                <Mail className="h-5 w-5 hover:text-purple-400 transition-colors cursor-pointer" />
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {organization.contactEmail}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 mt-6 pt-6">
-            <p className="text-sm text-gray-500">&copy; 2025 Voxxy AI, Inc. All rights reserved.</p>
-          </div>
+          <p className="text-xs">Powered by <span className="text-purple-500 font-medium">voxxypresents</span></p>
         </div>
       </footer>
     </div>

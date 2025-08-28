@@ -52,10 +52,10 @@ export interface ImageSource {
 }
 
 export interface AssetProvider {
-  search(query: string, page?: number): Promise<ImageSource[]>
-  getById(id: string): Promise<ImageSource>
-  getPresets(category?: string): Promise<ImageSource[]>
-  getCategories(): Promise<string[]>
+  name: string
+  searchImages(query: string, options?: any): Promise<ImageSource[]>
+  getImageDetails(imageId: string): Promise<ImageSource | null>
+  uploadAsset?(asset: AssetUpload): Promise<UploadResult>
 }
 
 // Design preset categories
@@ -85,6 +85,15 @@ export interface ColorPalette {
   category: 'warm' | 'cool' | 'neutral' | 'bold' | 'pastel'
 }
 
+// Design preferences
+export interface DesignPreferences {
+  autoSave: boolean
+  autoOptimize: boolean
+  previewDelay: number // ms
+  showGridOverlay: boolean
+  highContrastPreview: boolean
+}
+
 // Design state management
 export interface DesignState {
   current: OrganizationDesign
@@ -92,7 +101,8 @@ export interface DesignState {
   isPreviewMode: boolean
   unsavedChanges: boolean
   isLoading: boolean
-  error?: string
+  error: string | null
+  preferences: DesignPreferences
 }
 
 // Form data for design updates
