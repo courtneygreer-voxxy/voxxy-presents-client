@@ -15,6 +15,7 @@ A modern event management platform that simplifies recurring community events wi
 Voxxy Presents is a comprehensive event management solution designed for creative communities, clubs, and recurring event organizers. The platform provides:
 
 - **Custom Organization Pages**: Branded landing pages with image carousels and rich content
+- **Design Customization**: Background color, text color, and button color personalization
 - **Admin Dashboard**: Full-featured management interface for organization owners
 - **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series
 - **Dynamic Event Management**: Support for free events, paid tickets, and presale systems
@@ -173,6 +174,14 @@ Streamlined event creation with dedicated workflows:
 - **Recurring Event Series**: Advanced management for ongoing programs with individual event customization
 - **Smart Event Types**: Guided selection process to choose the right flow
 - **Event Details Cards**: Individual customization for each event in a series (date, theme, description, location overrides)
+
+### Design Customization System
+Simple yet powerful branding controls for organization pages:
+- **Background Colors**: Full-page background color customization with preset options and custom hex input
+- **Text Color Control**: Customize color of key headings ("Welcome to [Club]", "Upcoming Events", "About [Club]", etc.)
+- **Button Color Theming**: Custom button colors for consistent branding across public pages
+- **Real-time Updates**: Changes save instantly and apply to public organization pages
+- **Minimal Interface**: Clean, focused design controls without overwhelming options
 
 ### Image Carousel System
 Rich visual storytelling for organization about sections:
