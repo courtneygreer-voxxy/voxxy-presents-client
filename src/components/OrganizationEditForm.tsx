@@ -28,7 +28,7 @@ export function OrganizationEditForm({
   const [formData, setFormData] = useState({
     name: organization.name,
     description: organization.description,
-    background: organization.background,
+    background: typeof organization.background === 'string' ? organization.background : '',
     contactEmail: organization.contactEmail,
     logoUrl: organization.logoUrl || '',
     bannerUrl: organization.bannerUrl || '',

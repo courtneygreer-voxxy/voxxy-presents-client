@@ -104,8 +104,7 @@ export default function OrganizationPage({
       className="min-h-screen"
       style={{
         ...designStyles,
-        backgroundColor: design.background.value,
-        color: design.theme.textColor
+        backgroundColor: design.background.value
       }}
     >
       {/* Top Controls */}
@@ -175,14 +174,11 @@ export default function OrganizationPage({
           <div className="text-center">
             <h3 
               className="text-2xl font-semibold mb-4"
-              style={{ color: design.theme.primaryColor }}
+              style={{ color: design.theme.textColor }}
             >
               Welcome to {organization.name}
             </h3>
-            <p 
-              className="text-lg leading-relaxed"
-              style={{ color: design.theme.textColor }}
-            >
+            <p className="text-lg leading-relaxed text-gray-700">
               {typeof organization.background === 'string' 
                 ? organization.background 
                 : organization.description || 'Welcome to our community!'
@@ -197,7 +193,7 @@ export default function OrganizationPage({
         <div className="container mx-auto px-4 max-w-4xl">
           <h3 
             className="text-3xl font-bold text-center mb-10"
-            style={{ color: design.theme.primaryColor }}
+            style={{ color: design.theme.textColor }}
           >
             Upcoming Events
           </h3>
@@ -514,7 +510,7 @@ export default function OrganizationPage({
         <div className="container mx-auto px-4 max-w-6xl">
           <h3 
             className="text-4xl font-bold text-center mb-12"
-            style={{ color: design.theme.primaryColor }}
+            style={{ color: design.theme.textColor }}
           >
             About {organization.name}
           </h3>
@@ -583,7 +579,7 @@ export default function OrganizationPage({
               </div>
               
               <div className="pt-6">
-                <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>
+                <h4 className="text-2xl font-semibold mb-4" style={{ color: design.theme.textColor }}>Connect With Us</h4>
                 <div className="flex items-center gap-4">
                   {organization.socialLinks?.instagram && (
                     <a 
