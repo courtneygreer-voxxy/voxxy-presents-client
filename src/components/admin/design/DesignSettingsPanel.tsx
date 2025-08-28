@@ -62,12 +62,6 @@ function DesignSettingsPanelInner({ organization }: { organization: Organization
           </Badge>
         )}
 
-        {designState.isPreviewMode && (
-          <Badge className="flex items-center gap-1">
-            <Eye className="w-3 h-3" />
-            Preview Mode Active
-          </Badge>
-        )}
       </div>
 
       {/* Validation Errors */}
