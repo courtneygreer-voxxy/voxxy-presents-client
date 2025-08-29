@@ -93,55 +93,68 @@ npm run build:sandbox    # Build for sandbox
 # Deploy to sandbox environment
 ```
 
-## 🚀 Deployment Workflows
+## 🚀 CRITICAL DEPLOYMENT WORKFLOWS
 
-### Development → Staging
+⚠️ **NEVER SKIP STAGING** - Always test in staging before production to prevent downtime.
 
-1. **Create Feature Branch**
+### Development → Staging → Production (REQUIRED SEQUENCE)
+
+### 1. Development → Staging
+
+1. **Work on Feature Branch**
    ```bash
    git checkout -b feature/your-feature
-   # Develop and test locally
+   # Develop and test locally first
+   npm run dev  # Test locally
    ```
 
-2. **Pre-Deployment Checks**
+2. **Pre-Staging Checks**
    ```bash
-   npm run precheck          # Run TypeScript + ESLint checks
    npm run build            # Ensure build passes
-   npm run lint -- --fix   # Auto-fix linting issues
+   npm run lint             # Check for errors
+   # Test thoroughly in local development
    ```
 
-3. **Submit PR to Staging**
+3. **Deploy to Staging**
    ```bash
-   git add -A
-   git commit -m "feat: your feature description"
-   git push origin feature/your-feature
-   # Create PR targeting 'staging' branch
+   git checkout staging
+   git merge feature/your-feature
+   git push origin staging  # This triggers Render staging deployment
    ```
 
-4. **Auto-Deploy to Staging**
-   - Staging auto-deploys from `staging` branch
-   - Sync production data for testing
-   - Test admin functionality
+4. **WAIT & VERIFY STAGING**
+   - ⏳ **Wait 2-3 minutes** for Render deployment
+   - 🧪 **Test ALL functionality** in staging environment
+   - 🔍 **Verify no errors** in staging before proceeding
 
-### Staging → Production
+### 2. Staging → Production (ONLY AFTER STAGING TESTS PASS)
 
-1. **Validate in Staging**
-   - Test all functionality
-   - Verify data transformations
-   - Confirm admin operations
+1. **Validate Staging First**
+   - ✅ All features work correctly
+   - ✅ No console errors
+   - ✅ Admin functions operational
+   - ✅ API integrations working
 
-2. **Promote to Production**
+2. **Deploy to Production**
    ```bash
    git checkout main
-   git merge staging
-   npm run deploy:production
+   git merge staging        # Only merge after staging validation
+   git push origin main     # Deploy to production
    ```
 
-3. **Production Deployment**
-   - Runs full test suite
-   - Builds optimized bundle
-   - Requires manual confirmation
-   - Creates git tags for releases
+3. **Production Monitoring**
+   - Monitor for errors immediately
+   - Verify critical paths working
+   - Be ready to rollback if needed
+
+### 🚨 EMERGENCY ROLLBACK
+
+If production breaks:
+```bash
+git checkout main
+git revert HEAD~1        # Revert last commit
+git push origin main     # Emergency rollback
+```
 
 ### Experimental → Sandbox
 
