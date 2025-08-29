@@ -255,7 +255,7 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
               </div>
             </div>
             
-            <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+            <p className="text-sm text-gray-600 mb-3 truncate">
               {event.description}
             </p>
             

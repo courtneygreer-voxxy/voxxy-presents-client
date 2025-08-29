@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle, ExternalLink, ArrowRight, Skip } from "lucide-react"
+import { CheckCircle, ExternalLink, ArrowRight, SkipForward } from "lucide-react"
 import type { PlatformType } from '@/types/platformIntegration'
 
 interface PlatformConnectionStepProps {
@@ -206,7 +206,7 @@ export function PlatformConnectionStep({
           onClick={onSkip}
           className="flex items-center gap-2 text-gray-600"
         >
-          <Skip className="h-4 w-4" />
+          <SkipForward className="h-4 w-4" />
           Skip for now
         </Button>
         
