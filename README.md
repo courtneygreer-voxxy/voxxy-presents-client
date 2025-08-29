@@ -319,4 +319,16 @@ For development questions or technical support, please refer to:
 
 ---
 
+## 📚 Documentation
+
+**📖 [Complete Documentation Index](docs/README.md)** - Navigate all project docs
+
+**🚀 Quick Links:**
+- [Contributing Guidelines](CONTRIBUTING.md) - Development workflow
+- [Operations Runbook](RUNBOOK.md) - Emergency procedures  
+- [Customer Guide](CUSTOMER-ONBOARDING.md) - Email system usage
+- [Deployment Guide](DEPLOYMENT.md) - Staging → Production workflow
+- [Current Status](DEVELOPMENT-STATUS.md) - Project progress
+
+---
 Built with ❤️ by the Voxxy team
