@@ -87,7 +87,7 @@ export default function PricingPage() {
                   Special beta pricing - Limited time
                 </p>
 
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-5 mb-10">
                   <li className="flex items-center">
                     <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
                     <span>Unlimited events and attendees</span>
@@ -98,16 +98,9 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
-                    <span>Smart ticketing and group management</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
                     <span>Cross-platform event publishing</span>
                   </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
-                    <span>AI-powered engagement tools</span>
-                  </li>
+              
                   <li className="flex items-center">
                     <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
                     <span>Revenue optimization insights</span>
@@ -197,7 +190,7 @@ export default function PricingPage() {
               </Link>
             </Button>
             <Button size="lg" variant="outline" className="text-lg px-8 py-6 text-purple border-white hover:bg-white hover:text-purple-600" asChild>
-              <a href="mailto:team@voxxyai.com">
+              <a href="mailto:team@voxxypresents.com">
                 <Mail className="mr-2 h-5 w-5" />
                 Ask Questions
               </a>

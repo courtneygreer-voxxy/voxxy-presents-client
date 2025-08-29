@@ -14,6 +14,7 @@ import FeaturesPage from './pages/FeaturesPage'
 import HelpPage from './pages/HelpPage'
 import ContactPage from './pages/ContactPage'
 import ProductsPage from './pages/ProductsPage'
+import AdminLogin from './pages/AdminLogin'
 
 export default function App() {
   return (
@@ -57,11 +58,10 @@ export default function App() {
               <OrganizationAdmin />
             </ProtectedRoute>
           } />
-          <Route path="/admin" element={
-            <ProtectedRoute>
-              <AdminDashboard />
-            </ProtectedRoute>
-          } />
+          {/* Admin routes */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin" element={<AdminDashboard />} />
         </Routes>
       </Router>
     </AuthProvider>

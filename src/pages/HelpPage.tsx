@@ -200,7 +200,7 @@ export default function HelpPage() {
               </CardHeader>
               <CardContent className="text-center">
                 <Button variant="outline" className="w-full" asChild>
-                  <a href="mailto:team@voxxyai.com">
+                  <a href="mailto:team@voxxypresents.com">
                     Email Us
                     <Mail className="ml-2 h-4 w-4" />
                   </a>
@@ -365,7 +365,7 @@ export default function HelpPage() {
               className="border-white text-purple hover:bg-white hover:text-purple-600"
               asChild
             >
-              <a href="mailto:team@voxxyai.com">
+              <a href="mailto:team@voxxypresents.com">
                 Email Us
                 <Mail className="ml-2 h-5 w-5" />
               </a>

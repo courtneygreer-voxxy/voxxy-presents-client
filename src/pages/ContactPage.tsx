@@ -16,6 +16,8 @@ import {
   MessageCircle
 } from "lucide-react"
 import { Link } from "react-router-dom"
+import { contactFormApi, EmailServiceError } from "@/services/emailService"
+import { CreateContactSubmissionData } from "@/types/database"
 
 interface BetaFormData {
   name: string
@@ -45,6 +47,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submissionType, setSubmissionType] = useState('')
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const handleBetaInputChange = (field: keyof BetaFormData, value: string) => {
     setBetaFormData(prev => ({ ...prev, [field]: value }))
@@ -54,28 +57,96 @@ export default function ContactPage() {
     setUpdatesFormData(prev => ({ ...prev, [field]: value }))
   }
 
+  const handleGeneralContactSubmit = async () => {
+    setIsSubmitting(true)
+    setSubmissionType('contact')
+    setSubmissionError(null)
+    
+    try {
+      const submissionData: CreateContactSubmissionData = {
+        type: 'general_contact',
+        name: 'Contact Page User',
+        email: 'team@voxxypresents.com',
+        source: 'contact_page'
+      }
+
+      await contactFormApi.submitForm(submissionData)
+      setIsSubmitted(true)
+      
+    } catch (error) {
+      console.error('General contact submission failed:', error)
+      if (error instanceof EmailServiceError) {
+        setSubmissionError(`Failed to submit: ${error.message}`)
+      } else {
+        setSubmissionError('An unexpected error occurred. Please try again or contact us directly.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleTabChange = () => {
+    setSubmissionError(null)
+  }
+
   const handleBetaSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmissionType('beta')
+    setSubmissionError(null)
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    try {
+      const submissionData: CreateContactSubmissionData = {
+        type: 'beta_request',
+        name: betaFormData.name,
+        email: betaFormData.email,
+        organizationName: betaFormData.organizationName,
+        description: betaFormData.description,
+        source: 'contact_page'
+      }
+
+      await contactFormApi.submitForm(submissionData)
+      setIsSubmitted(true)
+      
+    } catch (error) {
+      console.error('Beta form submission failed:', error)
+      if (error instanceof EmailServiceError) {
+        setSubmissionError(`Failed to submit: ${error.message}`)
+      } else {
+        setSubmissionError('An unexpected error occurred. Please try again or contact us directly.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleUpdatesSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmissionType('updates')
+    setSubmissionError(null)
     
-    // Simulate form submission
-    await new Promise(resolve => setTimeout(resolve, 1500))
-    
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    try {
+      const submissionData: CreateContactSubmissionData = {
+        type: 'newsletter_signup',
+        name: updatesFormData.name,
+        email: updatesFormData.email,
+        source: 'contact_page'
+      }
+
+      await contactFormApi.submitForm(submissionData)
+      setIsSubmitted(true)
+      
+    } catch (error) {
+      console.error('Updates form submission failed:', error)
+      if (error instanceof EmailServiceError) {
+        setSubmissionError(`Failed to submit: ${error.message}`)
+      } else {
+        setSubmissionError('An unexpected error occurred. Please try again or contact us directly.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (isSubmitted) {
@@ -172,7 +243,7 @@ export default function ContactPage() {
               </CardHeader>
               
               <CardContent>
-                <Tabs defaultValue="beta" className="space-y-6">
+                <Tabs defaultValue="beta" className="space-y-6" onValueChange={handleTabChange}>
                   <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="beta">Beta Access</TabsTrigger>
                     <TabsTrigger value="updates">Updates</TabsTrigger>
@@ -180,6 +251,11 @@ export default function ContactPage() {
                   </TabsList>
                   
                   <TabsContent value="beta">
+                    {submissionError && (
+                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-800">{submissionError}</p>
+                      </div>
+                    )}
                     <form onSubmit={handleBetaSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
@@ -247,6 +323,11 @@ export default function ContactPage() {
                   </TabsContent>
                   
                   <TabsContent value="updates">
+                    {submissionError && (
+                      <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-sm text-red-800">{submissionError}</p>
+                      </div>
+                    )}
                     <form onSubmit={handleUpdatesSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
@@ -300,8 +381,8 @@ export default function ContactPage() {
                           Have questions or need personalized support? Reach out to our team directly.
                         </p>
                         <Button asChild className="bg-purple-600 hover:bg-purple-700">
-                          <a href="mailto:team@voxxyai.com">
-                            Email team@voxxyai.com
+                          <a href="mailto:team@voxxypresents.com">
+                            Email team@voxxypresents.com
                             <Mail className="ml-2 h-4 w-4" />
                           </a>
                         </Button>
@@ -401,9 +482,9 @@ export default function ContactPage() {
                       Questions about Voxxy or need support?
                     </p>
                     <Button variant="outline" asChild>
-                      <a href="mailto:team@voxxyai.com">
+                      <a href="mailto:team@voxxypresents.com">
                         <Mail className="h-4 w-4 mr-2" />
-                        team@voxxyai.com
+                        team@voxxypresents.com
                       </a>
                     </Button>
                   </div>
@@ -442,7 +523,7 @@ export default function ContactPage() {
             </Button>
 
             <Button variant="outline" size="lg" className="h-16" asChild>
-              <a href="mailto:team@voxxyai.com">
+              <a href="mailto:team@voxxypresents.com">
                 <div className="flex items-center">
                   <div className="mr-4">
                     <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
@@ -451,7 +532,7 @@ export default function ContactPage() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium">Direct Email</p>
-                    <p className="text-sm text-gray-500">team@voxxyai.com</p>
+                    <p className="text-sm text-gray-500">team@voxxypresents.com</p>
                   </div>
                 </div>
               </a>

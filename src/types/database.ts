@@ -29,6 +29,18 @@ export interface Organization {
       primaryColor: string
       backgroundColor: string
     }
+    emailConfiguration?: {
+      fromEmail?: string
+      fromName?: string
+      replyToEmail?: string
+      autoResponseEnabled?: boolean
+      notificationSettings?: {
+        adminEmails: string[]
+        notifyOnRegistration: boolean
+        notifyOnEventUpdate: boolean
+        forwardToAdmin: boolean
+      }
+    }
   }
   ownerId: string // References users collection
   createdAt: Date
@@ -171,12 +183,89 @@ export interface User {
 export interface EmailTemplate {
   id: string
   organizationId: string
-  type: 'waitlist_confirmation' | 'spot_available' | 'event_reminder' | 'event_cancelled'
+  name: string
+  type: 'waitlist_confirmation' | 'spot_available' | 'event_reminder' | 'event_cancelled' | 'contact_inquiry' | 'beta_request' | 'newsletter_signup' | 'registration_confirmation' | 'event_update' | 'event_notification' | 'waitlist_notification' | 'organization_communication'
   subject: string
   htmlContent: string
   textContent: string
+  htmlTemplate: string // Template content with variables
+  textTemplate: string // Template content with variables
   variables: string[] // e.g., ['eventTitle', 'eventDate', 'userName']
   isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface EmailThread {
+  id: string
+  subject: string
+  participants: string[]
+  messageIds: string[]
+  organizationId?: string
+  eventId?: string
+  type: 'waitlist_confirmation' | 'spot_available' | 'event_reminder' | 'event_cancelled' | 'contact_inquiry' | 'beta_request' | 'newsletter_signup' | 'registration_confirmation' | 'event_update' | 'event_notification' | 'waitlist_notification' | 'organization_communication'
+  status: 'active' | 'closed'
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface EmailMessage {
+  id: string
+  threadId: string
+  messageId: string // RFC 2822 Message-ID
+  references: string[] // Email threading headers
+  inReplyTo?: string
+  from: string
+  to: string[]
+  cc?: string[]
+  bcc?: string[]
+  replyTo?: string
+  subject: string
+  htmlContent: string
+  textContent: string
+  templateId?: string
+  templateData?: Record<string, any>
+  status: 'queued' | 'sent' | 'delivered' | 'failed' | 'bounced'
+  sentAt?: Date
+  deliveredAt?: Date
+  failureReason?: string
+  retryCount: number
+  organizationId?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface ContactFormSubmission {
+  id: string
+  type: 'beta_request' | 'newsletter_signup' | 'general_contact'
+  name: string
+  email: string
+  organizationName?: string
+  description?: string
+  source: 'contact_page' | 'organization_page' | 'event_page'
+  status: 'received' | 'processing' | 'responded' | 'closed'
+  emailThreadId?: string
+  submittedAt: Date
+  respondedAt?: Date
+  notes?: string
+}
+
+export interface EmailRecipient {
+  id: string
+  email: string
+  name?: string
+  role: 'admin' | 'organizer' | 'guest' | 'subscriber'
+  organizationId?: string
+  userId?: string
+  preferences: {
+    eventUpdates: boolean
+    newsletters: boolean
+    adminNotifications: boolean
+    marketingEmails: boolean
+  }
+  unsubscribedAt?: Date
+  bounceCount: number
+  lastEmailSent?: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -186,3 +275,10 @@ export type CreateEventData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 export type UpdateEventData = Partial<CreateEventData>
 export type CreateRegistrationData = Omit<Registration, 'id' | 'registeredAt' | 'waitlistPosition'>
 export type CreateWaitlistData = Omit<Waitlist, 'id' | 'position' | 'joinedAt'>
+
+// Email system utility types
+export type CreateEmailThreadData = Omit<EmailThread, 'id' | 'createdAt' | 'updatedAt'>
+export type CreateEmailMessageData = Omit<EmailMessage, 'id' | 'createdAt' | 'updatedAt' | 'sentAt' | 'deliveredAt'>
+export type CreateContactSubmissionData = Omit<ContactFormSubmission, 'id' | 'submittedAt' | 'status'>
+export type CreateEmailRecipientData = Omit<EmailRecipient, 'id' | 'createdAt' | 'updatedAt' | 'bounceCount'>
+export type UpdateEmailTemplateData = Partial<Omit<EmailTemplate, 'id' | 'organizationId' | 'createdAt' | 'updatedAt'>>

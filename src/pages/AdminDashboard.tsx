@@ -3,26 +3,69 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Settings, Eye, Users, Calendar, ExternalLink } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { organizationsRef } from '@/lib/database'
 import { getDocs, query, where } from 'firebase/firestore'
 import type { Organization } from '@/types/database'
 
+interface ContactSubmission {
+  id: string
+  type: 'beta_request' | 'newsletter_signup' | 'general_contact'
+  name: string
+  email: string
+  organizationName?: string
+  description?: string
+  source: string
+  status: string
+  submittedAt: string
+  emailThreadId?: string
+}
+
+interface AdminStats {
+  beta_requests: number
+  newsletter_signups: number
+  general_contacts: number
+}
+
+interface EmailDashboardData {
+  submissions: ContactSubmission[]
+  total: number
+  stats: AdminStats
+}
+
 export default function AdminDashboard() {
   const { currentUser } = useAuth()
   const navigate = useNavigate()
   const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [emailData, setEmailData] = useState<EmailDashboardData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [emailLoading, setEmailLoading] = useState(true)
+  const [isAdmin, setIsAdmin] = useState(false)
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
 
+
+  // Check admin authentication
+  useEffect(() => {
+    const adminSession = localStorage.getItem('voxxy_admin_session')
+    const adminEmail = localStorage.getItem('voxxy_admin_email')
+    
+    if (adminSession === 'true' && adminEmail === 'team@voxxypresents.com') {
+      setIsAdmin(true)
+    } else {
+      navigate('/admin/login')
+      return
+    }
+  }, [navigate])
 
   // Load user's organizations
   useEffect(() => {
+    if (!isAdmin) return
+    
     const loadOrganizations = async () => {
       setLoading(true)
       try {
-        // For now, get all organizations since we don't have auth yet
-        // Later this will filter by user.uid
         const querySnapshot = await getDocs(organizationsRef)
         const orgs = querySnapshot.docs.map(doc => ({
           id: doc.id,
@@ -39,7 +82,78 @@ export default function AdminDashboard() {
     }
 
     loadOrganizations()
-  }, [])
+  }, [isAdmin])
+
+  // Load email dashboard data
+  useEffect(() => {
+    if (!isAdmin) return
+    
+    const loadEmailData = async () => {
+      setEmailLoading(true)
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/email/contact`)
+        if (response.ok) {
+          const data = await response.json()
+          setEmailData(data)
+          setLastRefresh(new Date())
+        }
+      } catch (error) {
+        console.error('Failed to load email data:', error)
+      } finally {
+        setEmailLoading(false)
+      }
+    }
+
+    loadEmailData()
+    
+    // Auto-refresh email data every 30 seconds
+    const interval = setInterval(loadEmailData, 30000)
+    return () => clearInterval(interval)
+  }, [isAdmin])
+
+  const handleLogout = () => {
+    localStorage.removeItem('voxxy_admin_session')
+    localStorage.removeItem('voxxy_admin_email')
+    navigate('/admin/login')
+  }
+
+  const handleRefreshEmailData = async () => {
+    setEmailLoading(true)
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/email/contact`)
+      if (response.ok) {
+        const data = await response.json()
+        setEmailData(data)
+        setLastRefresh(new Date())
+      }
+    } catch (error) {
+      console.error('Failed to refresh email data:', error)
+    } finally {
+      setEmailLoading(false)
+    }
+  }
+
+  const getTypeColor = (type: string) => {
+    switch (type) {
+      case 'beta_request': return 'bg-purple-100 text-purple-800'
+      case 'newsletter_signup': return 'bg-blue-100 text-blue-800'
+      case 'general_contact': return 'bg-gray-100 text-gray-800'
+      default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getTypeLabel = (type: string) => {
+    switch (type) {
+      case 'beta_request': return 'Beta Request'
+      case 'newsletter_signup': return 'Newsletter'
+      case 'general_contact': return 'Email Click'
+      default: return type
+    }
+  }
+
+  if (!isAdmin) {
+    return null // Will redirect to login
+  }
 
   if (loading) {
     return (
@@ -54,23 +168,185 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+      {/* Admin Header */}
       <div className="bg-white border-b">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">My Clubs</h1>
-              <p className="text-gray-600 mt-1">Manage your clubs and create new ones</p>
+            <div className="flex items-center gap-3">
+              <Shield className="h-8 w-8 text-purple-600" />
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Voxxy Presents Admin</h1>
+                <p className="text-gray-600 mt-1">Platform administration and analytics</p>
+              </div>
             </div>
-            <Button onClick={() => navigate('/create-club')} className="flex items-center gap-2">
-              <Plus className="h-4 w-4" />
-              Create New Club
-            </Button>
+            <div className="flex items-center gap-4">
+              <Badge variant="outline" className="text-xs">
+                team@voxxypresents.com
+              </Badge>
+              <Button onClick={handleLogout} variant="outline" size="sm">
+                <LogOut className="h-4 w-4 mr-2" />
+                Logout
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        <Tabs defaultValue="email" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="email">Email Analytics</TabsTrigger>
+            <TabsTrigger value="clubs">Club Management</TabsTrigger>
+          </TabsList>
+
+          {/* Email Analytics Tab */}
+          <TabsContent value="email" className="space-y-6">
+            {/* Email Stats Overview */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Submissions</CardTitle>
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{emailData?.total || 0}</div>
+                  <p className="text-xs text-muted-foreground">All contact forms</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Beta Requests</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-purple-600">{emailData?.stats.beta_requests || 0}</div>
+                  <p className="text-xs text-muted-foreground">Paid beta interest</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Product Updates</CardTitle>
+                  <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-blue-600">{emailData?.stats.newsletter_signups || 0}</div>
+                  <p className="text-xs text-muted-foreground">Newsletter signups</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Email Button Clicks</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-gray-600">{emailData?.stats.general_contacts || 0}</div>
+                  <p className="text-xs text-muted-foreground">Direct contact clicks</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Contact Submissions */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Recent Contact Submissions</CardTitle>
+                    <CardDescription>All contact form submissions and email interactions</CardDescription>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <p className="text-sm text-gray-500">
+                      Last updated: {lastRefresh.toLocaleTimeString()}
+                    </p>
+                    <Button 
+                      onClick={handleRefreshEmailData} 
+                      variant="outline" 
+                      size="sm"
+                      disabled={emailLoading}
+                    >
+                      <RefreshCw className={`h-4 w-4 mr-2 ${emailLoading ? 'animate-spin' : ''}`} />
+                      {emailLoading ? 'Syncing...' : 'Sync Data'}
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {emailLoading ? (
+                  <div className="text-center py-12">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Loading email data...</p>
+                  </div>
+                ) : emailData?.submissions && emailData.submissions.length > 0 ? (
+                  <div className="space-y-4">
+                    {emailData.submissions
+                      .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
+                      .map((submission) => (
+                      <div key={submission.id} className="border rounded-lg p-4 space-y-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3 mb-2">
+                              <h3 className="font-semibold text-gray-900">{submission.name}</h3>
+                              <Badge className={getTypeColor(submission.type)}>
+                                {getTypeLabel(submission.type)}
+                              </Badge>
+                              <Badge variant="outline" className="text-xs">
+                                {submission.status}
+                              </Badge>
+                            </div>
+                            <p className="text-sm text-gray-600 mb-1">
+                              <Mail className="h-3 w-3 inline mr-1" />
+                              {submission.email}
+                            </p>
+                            {submission.organizationName && (
+                              <p className="text-sm text-gray-600 mb-1">
+                                <strong>Organization:</strong> {submission.organizationName}
+                              </p>
+                            )}
+                            {submission.description && (
+                              <p className="text-sm text-gray-600 mb-1">
+                                <strong>Message:</strong> {submission.description}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right text-sm text-gray-500">
+                            <p>{new Date(submission.submittedAt).toLocaleDateString()}</p>
+                            <p>{new Date(submission.submittedAt).toLocaleTimeString()}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between text-xs text-gray-400">
+                          <span>ID: {submission.id}</span>
+                          {submission.emailThreadId && (
+                            <span>Thread: {submission.emailThreadId}</span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-12">
+                    <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No email submissions yet</p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Club Management Tab */}
+          <TabsContent value="clubs" className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Club Management</h2>
+                <p className="text-gray-600">Manage all clubs on the platform</p>
+              </div>
+              <Button onClick={() => navigate('/create-club')} className="flex items-center gap-2">
+                <Plus className="h-4 w-4" />
+                Create New Club
+              </Button>
+            </div>
+
         {organizations.length === 0 ? (
           /* No Clubs State */
           <Card className="max-w-2xl mx-auto">
@@ -170,47 +446,49 @@ export default function AdminDashboard() {
             </Card>
           </div>
         )}
-        
-        {/* Stats */}
-        {organizations.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <Users className="h-8 w-8 text-purple-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">My Clubs</p>
-                    <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
             
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <Calendar className="h-8 w-8 text-green-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Total Events</p>
-                    <p className="text-2xl font-bold text-gray-900">-</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center">
-                  <ExternalLink className="h-8 w-8 text-blue-600" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Active Pages</p>
-                    <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+            {/* Stats for Clubs */}
+            {organizations.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center">
+                      <Users className="h-8 w-8 text-purple-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Total Clubs</p>
+                        <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center">
+                      <Calendar className="h-8 w-8 text-green-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Total Events</p>
+                        <p className="text-2xl font-bold text-gray-900">-</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-6">
+                    <div className="flex items-center">
+                      <ExternalLink className="h-8 w-8 text-blue-600" />
+                      <div className="ml-4">
+                        <p className="text-sm font-medium text-gray-600">Active Pages</p>
+                        <p className="text-2xl font-bold text-gray-900">{organizations.length}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   )

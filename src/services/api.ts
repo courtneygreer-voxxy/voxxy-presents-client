@@ -169,4 +169,48 @@ export const registrationsApi = {
   },
 }
 
+// Email API endpoints
+export const emailApi = {
+  async submitContactForm(data: {
+    type: 'beta_request' | 'newsletter_signup' | 'general_contact'
+    name: string
+    email: string
+    organizationName?: string
+    description?: string
+    source: 'contact_page' | 'organization_page' | 'event_page'
+  }) {
+    return fetchApi<any>('/email/contact', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async getContactSubmissions() {
+    return fetchApi<any[]>('/email/contact')
+  },
+
+  async sendEmail(data: {
+    to: string[]
+    subject: string
+    htmlContent?: string
+    textContent?: string
+    templateId?: string
+    templateData?: Record<string, any>
+  }) {
+    return fetchApi<any>('/email/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async getEmailTemplates() {
+    return fetchApi<any[]>('/email/templates')
+  },
+
+  async getEmailThreads(organizationId?: string) {
+    const endpoint = organizationId ? `/email/threads?organization=${organizationId}` : '/email/threads'
+    return fetchApi<any[]>(endpoint)
+  }
+}
+
 export { ApiError }
