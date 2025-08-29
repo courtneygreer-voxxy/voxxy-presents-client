@@ -1,6 +1,6 @@
 import React from 'react'
-import CreateClubFlow from '@/components/CreateClubFlow'
+import CreateClubFlowEnhanced from '@/components/CreateClubFlowEnhanced'
 
 export default function CreateClubPage() {
-  return <CreateClubFlow />
+  return <CreateClubFlowEnhanced />
 }

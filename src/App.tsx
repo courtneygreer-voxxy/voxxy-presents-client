@@ -3,7 +3,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import OrganizationPublic from './pages/OrganizationPublic'
-import OrganizationAdmin from './pages/OrganizationAdmin'
+import OrganizationAdminEnhanced from './pages/OrganizationAdminEnhanced'
 import AdminDashboard from './pages/AdminDashboard'
 import CreateClubPage from './pages/CreateClubPage'
 import SignUpPage from './pages/SignUpPage'
@@ -55,7 +55,7 @@ export default function App() {
           } />
           <Route path="/:orgSlug/admin" element={
             <ProtectedRoute>
-              <OrganizationAdmin />
+              <OrganizationAdminEnhanced />
             </ProtectedRoute>
           } />
           {/* Admin routes */}
