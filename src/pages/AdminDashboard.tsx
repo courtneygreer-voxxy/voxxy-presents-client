@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw, Search, Filter, X } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { organizationsRef } from '@/lib/database'
 import { getDocs, query, where } from 'firebase/firestore'
@@ -44,6 +46,31 @@ export default function AdminDashboard() {
   const [emailLoading, setEmailLoading] = useState(true)
   const [isAdmin, setIsAdmin] = useState(false)
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
+  
+  // Filter and search state
+  const [searchQuery, setSearchQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState('all')
+  const [statusFilter, setStatusFilter] = useState('all')
+
+  // Filter submissions based on search and filters
+  const filteredSubmissions = emailData?.submissions ? emailData.submissions.filter(submission => {
+    const matchesSearch = searchQuery === '' || 
+      submission.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      submission.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (submission.organizationName && submission.organizationName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (submission.description && submission.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    
+    const matchesType = typeFilter === 'all' || submission.type === typeFilter
+    const matchesStatus = statusFilter === 'all' || submission.status === statusFilter
+    
+    return matchesSearch && matchesType && matchesStatus
+  }) : []
+
+  const clearFilters = () => {
+    setSearchQuery('')
+    setTypeFilter('all')
+    setStatusFilter('all')
+  }
 
 
   // Check admin authentication
@@ -273,14 +300,80 @@ export default function AdminDashboard() {
                 </div>
               </CardHeader>
               <CardContent>
+                {/* Filter Controls */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Filter className="h-4 w-4 text-gray-600" />
+                      <span className="text-sm font-medium text-gray-700">Filters</span>
+                    </div>
+                    {(searchQuery || typeFilter !== 'all' || statusFilter !== 'all') && (
+                      <Button
+                        onClick={clearFilters}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                      >
+                        <X className="h-3 w-3 mr-1" />
+                        Clear
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Search Input */}
+                    <div className="relative">
+                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        placeholder="Search name, email, organization..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                    
+                    {/* Type Filter */}
+                    <Select value={typeFilter} onValueChange={setTypeFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="beta_request">Beta Requests</SelectItem>
+                        <SelectItem value="newsletter_signup">Product Updates</SelectItem>
+                        <SelectItem value="general_contact">Email Clicks</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    
+                    {/* Status Filter */}
+                    <Select value={statusFilter} onValueChange={setStatusFilter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Filter by status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Status</SelectItem>
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="sent">Sent</SelectItem>
+                        <SelectItem value="delivered">Delivered</SelectItem>
+                        <SelectItem value="failed">Failed</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Results Count */}
+                  <div className="text-sm text-gray-600">
+                    Showing {filteredSubmissions.length} of {emailData?.total || 0} submissions
+                  </div>
+                </div>
+
                 {emailLoading ? (
                   <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
                     <p className="text-gray-600">Loading email data...</p>
                   </div>
-                ) : emailData?.submissions && emailData.submissions.length > 0 ? (
+                ) : filteredSubmissions.length > 0 ? (
                   <div className="space-y-4">
-                    {emailData.submissions
+                    {filteredSubmissions
                       .sort((a, b) => new Date(b.submittedAt).getTime() - new Date(a.submittedAt).getTime())
                       .map((submission) => (
                       <div key={submission.id} className="border rounded-lg p-4 space-y-3">
@@ -323,6 +416,19 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                ) : emailData?.submissions && emailData.submissions.length > 0 ? (
+                  <div className="text-center py-12">
+                    <Filter className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600">No submissions match your filters</p>
+                    <Button 
+                      onClick={clearFilters}
+                      variant="outline"
+                      size="sm"
+                      className="mt-4"
+                    >
+                      Clear Filters
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-center py-12">
