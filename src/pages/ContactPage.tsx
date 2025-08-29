@@ -380,11 +380,16 @@ export default function ContactPage() {
                         <p className="text-gray-600 mb-6">
                           Have questions or need personalized support? Reach out to our team directly.
                         </p>
-                        <Button asChild className="bg-purple-600 hover:bg-purple-700">
-                          <a href="mailto:team@voxxypresents.com">
-                            Email team@voxxypresents.com
-                            <Mail className="ml-2 h-4 w-4" />
-                          </a>
+                        <Button 
+                          className="bg-purple-600 hover:bg-purple-700"
+                          onClick={async () => {
+                            await handleGeneralContactSubmit()
+                            window.open('mailto:team@voxxypresents.com', '_self')
+                          }}
+                          disabled={isSubmitting}
+                        >
+                          {isSubmitting && submissionType === 'contact' ? 'Recording...' : 'Email team@voxxypresents.com'}
+                          <Mail className="ml-2 h-4 w-4" />
                         </Button>
                       </div>
                       
@@ -522,20 +527,27 @@ export default function ContactPage() {
               </Link>
             </Button>
 
-            <Button variant="outline" size="lg" className="h-16" asChild>
-              <a href="mailto:team@voxxypresents.com">
-                <div className="flex items-center">
-                  <div className="mr-4">
-                    <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-green-600" />
-                    </div>
-                  </div>
-                  <div className="text-left">
-                    <p className="font-medium">Direct Email</p>
-                    <p className="text-sm text-gray-500">team@voxxypresents.com</p>
+            <Button 
+              variant="outline" 
+              size="lg" 
+              className="h-16"
+              onClick={async () => {
+                await handleGeneralContactSubmit()
+                window.open('mailto:team@voxxypresents.com', '_self')
+              }}
+              disabled={isSubmitting}
+            >
+              <div className="flex items-center">
+                <div className="mr-4">
+                  <div className="w-8 h-8 bg-green-100 rounded flex items-center justify-center">
+                    <Mail className="h-4 w-4 text-green-600" />
                   </div>
                 </div>
-              </a>
+                <div className="text-left">
+                  <p className="font-medium">Direct Email</p>
+                  <p className="text-sm text-gray-500">team@voxxypresents.com</p>
+                </div>
+              </div>
             </Button>
           </div>
         </div>
