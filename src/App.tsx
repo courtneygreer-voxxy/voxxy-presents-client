@@ -15,6 +15,7 @@ import HelpPage from './pages/HelpPage'
 import ContactPage from './pages/ContactPage'
 import ProductsPage from './pages/ProductsPage'
 import AdminLogin from './pages/AdminLogin'
+import PlatformTestPage from './pages/PlatformTestPage'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/platform-test" element={<PlatformTestPage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
