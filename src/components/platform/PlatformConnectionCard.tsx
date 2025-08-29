@@ -260,7 +260,8 @@ export function PlatformConnectionCard({
             <Button 
               onClick={handleConnect}
               disabled={isConnecting || isLoading}
-              className="flex-1"
+              size="sm"
+              className="w-auto px-3"
             >
               {isConnecting ? (
                 <>
@@ -268,7 +269,7 @@ export function PlatformConnectionCard({
                   Connecting...
                 </>
               ) : (
-                `Connect ${config.name}`
+                'Connect'
               )}
             </Button>
           ) : (

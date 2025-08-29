@@ -1,19 +1,15 @@
 import React, { useState, useEffect } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
-  BarChart3, 
   DollarSign, 
-  Users, 
   TrendingUp, 
   Calendar,
   ExternalLink,
   RefreshCw,
   AlertTriangle,
-  CheckCircle,
   Ticket
 } from "lucide-react"
 import { format } from 'date-fns'
@@ -54,7 +50,7 @@ export function TicketManagementCenter({ organizationId, connectedPlatforms }: T
   const [ticketSales, setTicketSales] = useState<TicketSalesData>({})
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
-  const [activeTab, setActiveTab] = useState<'overview' | 'events' | 'platforms'>('overview')
+  const [activeTab, setActiveTab] = useState<'overview' | 'events'>('overview')
   
   const { toast } = useToast()
 
@@ -139,15 +135,7 @@ export function TicketManagementCenter({ organizationId, connectedPlatforms }: T
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Ticket Command Center</h2>
-          <p className="text-gray-600">
-            Track ticket sales and event performance across all platforms
-          </p>
-        </div>
-        
+      <div className="flex justify-end">
         <Button
           variant="outline"
           onClick={handleRefresh}
@@ -220,57 +208,9 @@ export function TicketManagementCenter({ organizationId, connectedPlatforms }: T
         </Card>
       </div>
 
-      {/* Detailed Analytics */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Platform Overview</TabsTrigger>
-          <TabsTrigger value="events">Event Performance</TabsTrigger>
-          <TabsTrigger value="platforms">Platform Comparison</TabsTrigger>
-        </TabsList>
+      {/* Recent Events */}
 
-        <TabsContent value="overview" className="space-y-6">
-          {/* Platform Breakdown */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Platform Performance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {analytics.platformBreakdown.map(platform => {
-                  const config = platformConfig[platform.platform]
-                  const revenuePercentage = analytics.totalRevenue > 0 
-                    ? (platform.revenue / analytics.totalRevenue) * 100 
-                    : 0
-                  
-                  return (
-                    <div key={platform.platform} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-6 h-6 rounded ${config.color} flex items-center justify-center text-white text-xs`}>
-                            {config.icon}
-                          </div>
-                          <span className="font-medium">{config.name}</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-semibold">${platform.revenue.toLocaleString()}</div>
-                          <div className="text-sm text-gray-600">
-                            {platform.events} events • {platform.ticketsSold} tickets
-                          </div>
-                        </div>
-                      </div>
-                      <Progress value={revenuePercentage} className="h-2" />
-                      <div className="text-xs text-gray-500">
-                        {revenuePercentage.toFixed(1)}% of total revenue
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="events" className="space-y-4">
+      <div className="space-y-4">
           {/* Recent Events Performance */}
           {analytics.recentEvents.map(event => {
             const eventSales = ticketSales[event.id] || []
@@ -364,74 +304,7 @@ export function TicketManagementCenter({ organizationId, connectedPlatforms }: T
               </Card>
             )
           })}
-        </TabsContent>
-
-        <TabsContent value="platforms" className="space-y-6">
-          {/* Platform Comparison Chart */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Platform Comparison</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {/* Revenue Comparison */}
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Revenue by Platform</h4>
-                  <div className="space-y-3">
-                    {analytics.platformBreakdown.map(platform => {
-                      const config = platformConfig[platform.platform]
-                      const maxRevenue = Math.max(...analytics.platformBreakdown.map(p => p.revenue))
-                      const percentage = maxRevenue > 0 ? (platform.revenue / maxRevenue) * 100 : 0
-                      
-                      return (
-                        <div key={platform.platform} className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-4 h-4 rounded ${config.color}`}></div>
-                              <span className="text-sm font-medium">{config.name}</span>
-                            </div>
-                            <span className="text-sm font-semibold">
-                              ${platform.revenue.toLocaleString()}
-                            </span>
-                          </div>
-                          <Progress value={percentage} className="h-2" />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Ticket Sales Comparison */}
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-4">Tickets Sold by Platform</h4>
-                  <div className="space-y-3">
-                    {analytics.platformBreakdown.map(platform => {
-                      const config = platformConfig[platform.platform]
-                      const maxTickets = Math.max(...analytics.platformBreakdown.map(p => p.ticketsSold))
-                      const percentage = maxTickets > 0 ? (platform.ticketsSold / maxTickets) * 100 : 0
-                      
-                      return (
-                        <div key={platform.platform} className="space-y-1">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className={`w-4 h-4 rounded ${config.color}`}></div>
-                              <span className="text-sm font-medium">{config.name}</span>
-                            </div>
-                            <span className="text-sm font-semibold">
-                              {platform.ticketsSold.toLocaleString()}
-                            </span>
-                          </div>
-                          <Progress value={percentage} className="h-2" />
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      </div>
     </div>
   )
 }

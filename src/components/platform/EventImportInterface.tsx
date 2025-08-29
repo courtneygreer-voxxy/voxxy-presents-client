@@ -319,15 +319,8 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
 
   return (
     <div className="space-y-6">
-      {/* Header */}
+      {/* Action Bar */}
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900">Import Events</h2>
-          <p className="text-gray-600">
-            Select events from your connected platforms to import into Voxxy
-          </p>
-        </div>
-        
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -376,13 +369,7 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
       {/* Import Jobs Status */}
       {importJobs.length > 0 && (
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Import Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <div className="space-y-3">
               {importJobs.map(job => (
                 <div key={job.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -450,23 +437,20 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
 
           return (
             <TabsContent key={connection.platform} value={connection.platform} className="space-y-4">
-              {/* Platform Controls */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Checkbox
-                    checked={unimportedEvents.length > 0 && unimportedEvents.every(e => selectedEvents.has(e.id))}
-                    onCheckedChange={(checked) => handleSelectAll(connection.platform, !!checked)}
-                    disabled={unimportedEvents.length === 0}
-                  />
-                  <span className="text-sm text-gray-600">
-                    Select all ({unimportedEvents.length} available)
-                  </span>
-                  {platformSelectedCount > 0 && (
-                    <Badge variant="outline">
-                      {platformSelectedCount} selected
-                    </Badge>
-                  )}
-                </div>
+              <div className="flex items-center gap-4">
+                <Checkbox
+                  checked={unimportedEvents.length > 0 && unimportedEvents.every(e => selectedEvents.has(e.id))}
+                  onCheckedChange={(checked) => handleSelectAll(connection.platform, !!checked)}
+                  disabled={unimportedEvents.length === 0}
+                />
+                <span className="text-sm text-gray-600">
+                  Select all ({unimportedEvents.length} available)
+                </span>
+                {platformSelectedCount > 0 && (
+                  <Badge variant="outline">
+                    {platformSelectedCount} selected
+                  </Badge>
+                )}
               </div>
 
               {/* Events List */}

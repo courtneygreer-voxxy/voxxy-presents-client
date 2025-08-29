@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { CheckCircle, ExternalLink, ArrowRight, SkipForward } from "lucide-react"
 import type { PlatformType } from '@/types/platformIntegration'
+import { PlatformAuthModal } from './PlatformAuthModal'
 
 interface PlatformConnectionStepProps {
   onConnect: (platform: PlatformType) => Promise<void>
@@ -53,10 +54,27 @@ export function PlatformConnectionStep({
 }: PlatformConnectionStepProps) {
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformType | null>(null)
   const [showAllPlatforms, setShowAllPlatforms] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authModalPlatform, setAuthModalPlatform] = useState<PlatformType | null>(null)
 
   const handleConnect = async (platform: PlatformType) => {
-    setSelectedPlatform(platform)
-    await onConnect(platform)
+    setAuthModalPlatform(platform)
+    setAuthModalOpen(true)
+  }
+
+  const handleAuthSuccess = async () => {
+    if (authModalPlatform) {
+      setSelectedPlatform(authModalPlatform)
+      await onConnect(authModalPlatform)
+      setSelectedPlatform(null)
+    }
+    setAuthModalOpen(false)
+    setAuthModalPlatform(null)
+  }
+
+  const handleAuthClose = () => {
+    setAuthModalOpen(false)
+    setAuthModalPlatform(null)
   }
 
   const hasAnyConnection = connectedPlatforms.length > 0
@@ -124,31 +142,32 @@ export function PlatformConnectionStep({
                           </Badge>
                         ))}
                       </div>
-                    </div>
-                    
-                    {/* Action Button */}
-                    <div className="flex-shrink-0">
-                      {isConnected ? (
-                        <Button variant="outline" size="sm" disabled>
-                          <CheckCircle className="h-4 w-4 mr-2" />
-                          Connected
-                        </Button>
-                      ) : (
-                        <Button
-                          onClick={() => handleConnect(option.platform)}
-                          disabled={isConnecting}
-                          size="sm"
-                        >
-                          {isConnecting ? (
-                            'Connecting...'
-                          ) : (
-                            <>
-                              Connect
-                              <ExternalLink className="h-4 w-4 ml-2" />
-                            </>
-                          )}
-                        </Button>
-                      )}
+                      
+                      {/* Action Button - moved under content, smaller size */}
+                      <div className="flex justify-start">
+                        {isConnected ? (
+                          <Button variant="outline" size="sm" disabled className="h-8 px-3 text-xs">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Connected
+                          </Button>
+                        ) : (
+                          <Button
+                            onClick={() => handleConnect(option.platform)}
+                            disabled={isConnecting}
+                            size="sm"
+                            className="h-8 px-3 text-xs"
+                          >
+                            {isConnecting ? (
+                              'Connecting...'
+                            ) : (
+                              <>
+                                Connect
+                                <ExternalLink className="h-3 w-3 ml-1" />
+                              </>
+                            )}
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -228,6 +247,16 @@ export function PlatformConnectionStep({
       <div className="text-center text-sm text-gray-500">
         You can always connect platforms later in your club settings
       </div>
+
+      {/* Platform Auth Modal */}
+      {authModalPlatform && (
+        <PlatformAuthModal
+          platform={authModalPlatform}
+          isOpen={authModalOpen}
+          onClose={handleAuthClose}
+          onSuccess={handleAuthSuccess}
+        />
+      )}
     </div>
   )
 }

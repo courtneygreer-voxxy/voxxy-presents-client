@@ -503,52 +503,56 @@ export default function OrganizationPage({
                 className="w-full h-96"
               />
             </div>
-            <div className="space-y-6">
-              <h4 className="text-2xl font-semibold text-gray-900">Our Story</h4>
-              <div className="text-gray-700 leading-relaxed space-y-4">
-                {organization?.aboutStory ? (
-                  <div>
-                    {organization.aboutStory.split('\n').map((paragraph, index) => (
-                      <p key={index} className={paragraph.trim() === '' ? 'h-4' : ''}>
-                        {paragraph.trim() === '' ? '\u00A0' : paragraph}
-                      </p>
-                    ))}
+            <div className="h-96 flex flex-col">
+              <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+                <div>
+                  <h4 className="text-2xl font-semibold text-gray-900 mb-4">Our Story</h4>
+                  <div className="text-gray-700 leading-relaxed space-y-4">
+                    {organization?.aboutStory ? (
+                      <div>
+                        {organization.aboutStory.split('\n').map((paragraph, index) => (
+                          <p key={index} className={paragraph.trim() === '' ? 'h-4' : ''}>
+                            {paragraph.trim() === '' ? '\u00A0' : paragraph}
+                          </p>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="italic text-gray-600">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
+                    )}
                   </div>
-                ) : (
-                  <p className="italic text-gray-600">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
-                )}
+                </div>
+                
+                <div>
+                  <h4 className="text-2xl font-semibold text-gray-900 mb-4">What We Offer</h4>
+                  <ul className="space-y-2 text-gray-700">
+                    {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
+                      organization.aboutOfferings.map((offering, index) => (
+                        <li key={index} className="flex items-center">
+                          <div className="w-2 h-2 rounded-full mr-3 bg-purple-600"></div>
+                          {offering}
+                        </li>
+                      )) : (
+                        <>
+                          <li className="flex items-center italic text-gray-600">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                            Community building
+                          </li>
+                          <li className="flex items-center italic text-gray-600">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                            Regular meetups
+                          </li>
+                          <li className="flex items-center italic text-gray-600">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                            Fun activities
+                          </li>
+                        </>
+                      )
+                    }
+                  </ul>
+                </div>
               </div>
               
-              <div>
-                <h4 className="text-2xl font-semibold text-gray-900 pt-4">What We Offer</h4>
-                <ul className="space-y-2 text-gray-700">
-                  {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
-                    organization.aboutOfferings.map((offering, index) => (
-                      <li key={index} className="flex items-center">
-                        <div className="w-2 h-2 rounded-full mr-3 bg-purple-600"></div>
-                        {offering}
-                      </li>
-                    )) : (
-                      <>
-                        <li className="flex items-center italic text-gray-600">
-                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
-                          Community building
-                        </li>
-                        <li className="flex items-center italic text-gray-600">
-                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
-                          Regular meetups
-                        </li>
-                        <li className="flex items-center italic text-gray-600">
-                          <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
-                          Fun activities
-                        </li>
-                      </>
-                    )
-                  }
-                </ul>
-              </div>
-              
-              <div className="pt-6">
+              <div className="pt-4 border-t">
                 <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>
                 <div className="flex items-center gap-4">
                   {organization.socialLinks?.instagram && (

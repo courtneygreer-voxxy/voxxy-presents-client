@@ -5,6 +5,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RefreshCw, Plus, AlertCircle } from "lucide-react"
 import { PlatformConnectionCard } from './PlatformConnectionCard'
+import { PlatformAuthModal } from './PlatformAuthModal'
 import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 import type { PlatformConnection, PlatformType } from '@/types/platformIntegration'
@@ -34,6 +35,8 @@ export function PlatformConnectionManager({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [refreshing, setRefreshing] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authModalPlatform, setAuthModalPlatform] = useState<PlatformType | null>(null)
   
   const { currentUser } = useAuth()
   const { toast } = useToast()
@@ -96,40 +99,29 @@ export function PlatformConnectionManager({
   }
 
   const handleConnect = async (platform: PlatformType) => {
-    if (!currentUser) return
+    setAuthModalPlatform(platform)
+    setAuthModalOpen(true)
+  }
 
-    try {
-      // Initiate OAuth flow
-      const authData = await initiatePlatformAuth(platform, currentUser.uid)
-      
-      // In a real implementation, this would redirect to the OAuth URL
-      // For now, we'll simulate a successful connection
-      if (authData.authUrl.includes('mock-')) {
-        toast({
-          title: "Mock Connection",
-          description: `Simulated connection to ${platform}. In production, this would open the OAuth flow.`
-        })
-        
-        // Simulate successful connection after a delay
-        setTimeout(() => {
-          loadConnections()
-          toast({
-            title: "Connected",
-            description: `Successfully connected to ${platform}!`
-          })
-        }, 2000)
-      } else {
-        // Real OAuth flow - redirect to auth URL
-        window.location.href = authData.authUrl
-      }
-    } catch (err) {
-      console.error(`Failed to connect to ${platform}:`, err)
+  const handleAuthSuccess = async () => {
+    if (authModalPlatform) {
+      // Simulate successful connection
       toast({
-        variant: "destructive",
-        title: "Connection Failed",
-        description: `Failed to connect to ${platform}. Please try again.`
+        title: "Connected",
+        description: `Successfully connected to ${authModalPlatform}!`
       })
+      
+      setTimeout(() => {
+        loadConnections()
+      }, 1000)
     }
+    setAuthModalOpen(false)
+    setAuthModalPlatform(null)
+  }
+
+  const handleAuthClose = () => {
+    setAuthModalOpen(false)
+    setAuthModalPlatform(null)
   }
 
   const handleDisconnect = async (connectionId: string) => {
@@ -278,55 +270,53 @@ export function PlatformConnectionManager({
     <div className="space-y-6">
       {/* Header */}
       {!compact && (
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Platform Connections</h2>
-            <p className="text-gray-600">
-              Connect your Eventbrite, Luma, and Meetup accounts to sync events and data
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={handleRefresh}
-              disabled={refreshing}
-              size="sm"
-            >
-              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-          </div>
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={handleRefresh}
+            disabled={refreshing}
+            size="sm"
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh All
+          </Button>
         </div>
       )}
 
-      {/* Status Summary */}
+      {/* System Health Overview */}
       {!compact && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardContent className="p-4">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${errorCount > 0 ? 'bg-red-500' : connectedCount > 0 ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+              Platform Health Status
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{connectedCount}</div>
                 <div className="text-sm text-gray-600">Connected</div>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-red-600">{errorCount}</div>
-                <div className="text-sm text-gray-600">Errors</div>
+                <div className="text-sm text-gray-600">Issues</div>
               </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{supportedPlatforms.length}</div>
-                <div className="text-sm text-gray-600">Platforms</div>
+                <div className="text-2xl font-bold text-blue-600">{supportedPlatforms.length - connectedCount}</div>
+                <div className="text-sm text-gray-600">Not Connected</div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+            {errorCount > 0 && (
+              <Alert className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {errorCount} platform{errorCount > 1 ? 's have' : ' has'} connection issues that need attention.
+                </AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Connection Cards */}
@@ -367,6 +357,16 @@ export function PlatformConnectionManager({
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Platform Auth Modal */}
+      {authModalPlatform && (
+        <PlatformAuthModal
+          platform={authModalPlatform}
+          isOpen={authModalOpen}
+          onClose={handleAuthClose}
+          onSuccess={handleAuthSuccess}
+        />
       )}
     </div>
   )
