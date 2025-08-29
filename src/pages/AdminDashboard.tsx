@@ -50,7 +50,6 @@ export default function AdminDashboard() {
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
 
   // Filter submissions based on search and filters
   const filteredSubmissions = emailData?.submissions ? emailData.submissions.filter(submission => {
@@ -61,15 +60,13 @@ export default function AdminDashboard() {
       (submission.description && submission.description.toLowerCase().includes(searchQuery.toLowerCase()))
     
     const matchesType = typeFilter === 'all' || submission.type === typeFilter
-    const matchesStatus = statusFilter === 'all' || submission.status === statusFilter
     
-    return matchesSearch && matchesType && matchesStatus
+    return matchesSearch && matchesType
   }) : []
 
   const clearFilters = () => {
     setSearchQuery('')
     setTypeFilter('all')
-    setStatusFilter('all')
   }
 
 
@@ -307,7 +304,7 @@ export default function AdminDashboard() {
                       <Filter className="h-4 w-4 text-gray-600" />
                       <span className="text-sm font-medium text-gray-700">Filters</span>
                     </div>
-                    {(searchQuery || typeFilter !== 'all' || statusFilter !== 'all') && (
+                    {(searchQuery || typeFilter !== 'all') && (
                       <Button
                         onClick={clearFilters}
                         variant="outline"
@@ -320,7 +317,7 @@ export default function AdminDashboard() {
                     )}
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Search Input */}
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -342,20 +339,6 @@ export default function AdminDashboard() {
                         <SelectItem value="beta_request">Beta Requests</SelectItem>
                         <SelectItem value="newsletter_signup">Product Updates</SelectItem>
                         <SelectItem value="general_contact">Email Clicks</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    {/* Status Filter */}
-                    <Select value={statusFilter} onValueChange={setStatusFilter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Filter by status" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">All Status</SelectItem>
-                        <SelectItem value="pending">Pending</SelectItem>
-                        <SelectItem value="sent">Sent</SelectItem>
-                        <SelectItem value="delivered">Delivered</SelectItem>
-                        <SelectItem value="failed">Failed</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
