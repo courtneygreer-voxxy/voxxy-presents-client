@@ -222,9 +222,9 @@ export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
             </Button>
 
             <Button asChild className="w-full justify-start" variant="outline">
-              <Link to="/">
+              <Link to="/voxxy-shop">
                 <Building2 className="h-4 w-4 mr-3" />
-                Browse All Clubs
+                Browse Voxxy Shop
                 <ArrowRight className="h-4 w-4 ml-auto" />
               </Link>
             </Button>
