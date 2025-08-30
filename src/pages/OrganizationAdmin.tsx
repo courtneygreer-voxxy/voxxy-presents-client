@@ -23,6 +23,7 @@ import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
 import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
+import { PlatformConnectionManager } from "@/components/platform/PlatformConnectionManager"
 import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
@@ -211,12 +212,12 @@ export default function OrganizationAdmin() {
                 Events
               </TabsTrigger>
               <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start">
-                <Mail className="h-4 w-4" />
+                <Users className="h-4 w-4" />
                 Subscribers
               </TabsTrigger>
-              <TabsTrigger value="analytics" className="flex items-center gap-2 w-full justify-start">
-                <BarChart3 className="h-4 w-4" />
-                Analytics
+              <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start">
+                <Settings className="h-4 w-4" />
+                Settings
               </TabsTrigger>
             </TabsList>
           </div>
@@ -248,12 +249,6 @@ export default function OrganizationAdmin() {
                 organization={organization}
                 onSave={handleSaveOrganization}
                 isSaving={isSaving}
-              />
-
-              <OrganizationDangerZone
-                organization={organization}
-                onDelete={handleDeleteOrganization}
-                isDeleting={isDeleting}
               />
             </div>
           </TabsContent>
@@ -382,25 +377,33 @@ export default function OrganizationAdmin() {
               </CardContent>
             </Card>
           </TabsContent>
-          {/* Analytics Tab */}
-          <TabsContent value="analytics">
-            <Card>
-              <CardHeader>
-                <CardTitle>Analytics Dashboard</CardTitle>
-                <CardDescription>
-                  View insights about your events and audience engagement.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col items-center justify-center py-16">
-                  <BarChart3 className="h-16 w-16 text-gray-400 mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Analytics Coming Soon</h3>
-                  <p className="text-gray-600 text-center max-w-md">
-                    Detailed analytics and insights about your events, registrations, and audience engagement will be available here.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          {/* Settings Tab */}
+          <TabsContent value="settings">
+            <div className="space-y-6">
+              {/* Platform Connections */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Platform Connections</CardTitle>
+                  <CardDescription>
+                    Connect your event platforms to sync events, attendees, and data.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PlatformConnectionManager
+                    organizationId={organization.id}
+                    showAddConnection={true}
+                    compact={false}
+                  />
+                </CardContent>
+              </Card>
+
+              {/* Danger Zone */}
+              <OrganizationDangerZone
+                organization={organization}
+                onDelete={handleDeleteOrganization}
+                isDeleting={isDeleting}
+              />
+            </div>
           </TabsContent>
           </div>
         </Tabs>
