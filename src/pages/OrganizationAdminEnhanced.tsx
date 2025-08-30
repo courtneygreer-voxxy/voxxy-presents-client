@@ -34,6 +34,7 @@ import SubscribersList from "@/components/SubscribersList"
 import { PlatformConnectionManager } from "@/components/platform/PlatformConnectionManager"
 import { EventImportInterface } from "@/components/platform/EventImportInterface"
 import { TicketManagementCenter } from "@/components/platform/TicketManagementCenter"
+import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
 import { getUserPlatformConnections } from '@/services/platformIntegrationService'
 import type { Organization, Event } from '@/types/database'
@@ -48,6 +49,12 @@ export default function OrganizationAdminEnhanced() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
+  
+  // Feature flags for platform integration
+  const isPreviewMode = isFeatureEnabled('platformIntegrationPreview')
+  const isBetaMode = isFeatureEnabled('platformIntegrationBeta')
+  const previewMode = isBetaMode ? 'beta' : 'preview'
+  const isComingSoonMode = !isPreviewMode && !isBetaMode
   const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
@@ -260,22 +267,58 @@ export default function OrganizationAdminEnhanced() {
                 <Calendar className="h-4 w-4" />
                 Events
               </TabsTrigger>
-              <TabsTrigger value="platforms" className="flex items-center gap-2 w-full justify-start">
+              <TabsTrigger 
+                value="platforms" 
+                className="flex items-center gap-2 w-full justify-start"
+                disabled={isComingSoonMode}
+              >
                 <Link2 className="h-4 w-4" />
-                Platform Connections
+                <div className="flex items-center gap-2 flex-1">
+                  Platform Connections
+                  {(isPreviewMode || isBetaMode) && (
+                    <PreviewBadge variant={previewMode} size="sm" />
+                  )}
+                  {isComingSoonMode && (
+                    <PreviewBadge variant="coming-soon" size="sm" />
+                  )}
+                </div>
                 {connectionCount > 0 && (
                   <Badge variant="secondary" className="ml-auto">
                     {connectionCount}
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="import" className="flex items-center gap-2 w-full justify-start">
+              <TabsTrigger 
+                value="import" 
+                className="flex items-center gap-2 w-full justify-start"
+                disabled={isComingSoonMode}
+              >
                 <Download className="h-4 w-4" />
-                Import Events
+                <div className="flex items-center gap-2 flex-1">
+                  Import Events
+                  {(isPreviewMode || isBetaMode) && (
+                    <PreviewBadge variant={previewMode} size="sm" />
+                  )}
+                  {isComingSoonMode && (
+                    <PreviewBadge variant="coming-soon" size="sm" />
+                  )}
+                </div>
               </TabsTrigger>
-              <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start">
+              <TabsTrigger 
+                value="tickets" 
+                className="flex items-center gap-2 w-full justify-start"
+                disabled={isComingSoonMode}
+              >
                 <Ticket className="h-4 w-4" />
-                Ticket Management
+                <div className="flex items-center gap-2 flex-1">
+                  Ticket Management
+                  {(isPreviewMode || isBetaMode) && (
+                    <PreviewBadge variant={previewMode} size="sm" />
+                  )}
+                  {isComingSoonMode && (
+                    <PreviewBadge variant="coming-soon" size="sm" />
+                  )}
+                </div>
               </TabsTrigger>
               <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start">
                 <Mail className="h-4 w-4" />
@@ -430,61 +473,177 @@ export default function OrganizationAdminEnhanced() {
 
             {/* Platform Connections Tab */}
             <TabsContent value="platforms">
-              <PlatformConnectionManager 
-                organizationId={organization.id}
-                showAddConnection={true}
-                compact={false}
-              />
+              {isComingSoonMode ? (
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-16">
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <Link2 className="h-12 w-12 text-gray-400" />
+                        <PreviewBadge variant="coming-soon" size="lg" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900">Platform Integrations Coming Soon!</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        We're building seamless integrations with Eventbrite, Luma, and Meetup. 
+                        Connect your existing platforms to automatically sync events, attendees, and ticket sales.
+                      </p>
+                      <div className="grid grid-cols-3 gap-4 mt-6 max-w-sm mx-auto">
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <div className="text-2xl mb-1">🎫</div>
+                          <div className="text-xs text-gray-600">Eventbrite</div>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <div className="text-2xl mb-1">✨</div>
+                          <div className="text-xs text-gray-600">Luma</div>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <div className="text-2xl mb-1">👥</div>
+                          <div className="text-xs text-gray-600">Meetup</div>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-4">
+                  {(isPreviewMode || isBetaMode) && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <PreviewBadge variant={previewMode} size="sm" />
+                        <span className="text-sm font-medium text-blue-900">
+                          {isBetaMode ? 'Beta Testing Mode' : 'Preview Mode'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        {isBetaMode 
+                          ? 'You have early access to test platform integrations. All connections use simulated data for now.'
+                          : 'This is a preview of upcoming platform integrations. Connections are simulated to show the user experience.'
+                        }
+                      </p>
+                    </div>
+                  )}
+                  <PlatformConnectionManager 
+                    organizationId={organization.id}
+                    showAddConnection={true}
+                    compact={false}
+                  />
+                </div>
+              )}
             </TabsContent>
 
             {/* Event Import Tab */}
             <TabsContent value="import">
-              {platformConnections.filter(conn => conn.status === 'connected').length > 0 ? (
-                <EventImportInterface 
-                  connections={platformConnections.filter(conn => conn.status === 'connected')}
-                  organizationId={organization.id}
-                  onEventImported={() => {
-                    refreshEvents()
-                    setSaveMessage('✅ Events imported successfully!')
-                    setTimeout(() => setSaveMessage(null), 4000)
-                  }}
-                />
-              ) : (
+              {isComingSoonMode ? (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-16">
-                    <Link2 className="h-16 w-16 text-gray-400 mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Connected Platforms</h3>
-                    <p className="text-gray-600 text-center max-w-md mb-6">
-                      Connect to Eventbrite, Luma, or Meetup first to import your existing events.
-                    </p>
-                    <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
-                      Go to Platform Connections
-                    </Button>
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <Download className="h-12 w-12 text-gray-400" />
+                        <PreviewBadge variant="coming-soon" size="lg" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900">Event Import Coming Soon!</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Automatically import your existing events from connected platforms. 
+                        Save hours of manual entry and keep everything in sync.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
+              ) : (
+                <>
+                  {(isPreviewMode || isBetaMode) && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <PreviewBadge variant={previewMode} size="sm" />
+                        <span className="text-sm font-medium text-blue-900">
+                          {isBetaMode ? 'Beta Testing Mode' : 'Preview Mode'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        Event import uses simulated data from connected platforms. Real integration coming soon!
+                      </p>
+                    </div>
+                  )}
+                  {platformConnections.filter(conn => conn.status === 'connected').length > 0 ? (
+                    <EventImportInterface 
+                      connections={platformConnections.filter(conn => conn.status === 'connected')}
+                      organizationId={organization.id}
+                      onEventImported={() => {
+                        refreshEvents()
+                        setSaveMessage('✅ Events imported successfully!')
+                        setTimeout(() => setSaveMessage(null), 4000)
+                      }}
+                    />
+                  ) : (
+                    <Card>
+                      <CardContent className="flex flex-col items-center justify-center py-16">
+                        <Link2 className="h-16 w-16 text-gray-400 mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Connected Platforms</h3>
+                        <p className="text-gray-600 text-center max-w-md mb-6">
+                          Connect to Eventbrite, Luma, or Meetup first to import your existing events.
+                        </p>
+                        <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
+                          Go to Platform Connections
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
               )}
             </TabsContent>
 
             {/* Ticket Management Tab */}
             <TabsContent value="tickets">
-              {connectedPlatforms.length > 0 ? (
-                <TicketManagementCenter 
-                  organizationId={organization.id}
-                  connectedPlatforms={connectedPlatforms}
-                />
-              ) : (
+              {isComingSoonMode ? (
                 <Card>
                   <CardContent className="flex flex-col items-center justify-center py-16">
-                    <Ticket className="h-16 w-16 text-gray-400 mb-4" />
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No Platform Connections</h3>
-                    <p className="text-gray-600 text-center max-w-md mb-6">
-                      Connect your event platforms to track ticket sales and analytics across all your events.
-                    </p>
-                    <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
-                      Connect Platforms
-                    </Button>
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <Ticket className="h-12 w-12 text-gray-400" />
+                        <PreviewBadge variant="coming-soon" size="lg" />
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-900">Ticket Analytics Coming Soon!</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Track ticket sales, revenue, and attendance across all your connected platforms. 
+                        Get unified analytics and insights in one dashboard.
+                      </p>
+                    </div>
                   </CardContent>
                 </Card>
+              ) : (
+                <>
+                  {(isPreviewMode || isBetaMode) && (
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <PreviewBadge variant={previewMode} size="sm" />
+                        <span className="text-sm font-medium text-blue-900">
+                          {isBetaMode ? 'Beta Testing Mode' : 'Preview Mode'}
+                        </span>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        Ticket analytics show simulated data from connected platforms. Real-time data sync coming soon!
+                      </p>
+                    </div>
+                  )}
+                  {connectedPlatforms.length > 0 ? (
+                    <TicketManagementCenter 
+                      organizationId={organization.id}
+                      connectedPlatforms={connectedPlatforms}
+                    />
+                  ) : (
+                    <Card>
+                      <CardContent className="flex flex-col items-center justify-center py-16">
+                        <Ticket className="h-16 w-16 text-gray-400 mb-4" />
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">No Platform Connections</h3>
+                        <p className="text-gray-600 text-center max-w-md mb-6">
+                          Connect your event platforms to track ticket sales and analytics across all your events.
+                        </p>
+                        <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
+                          Connect Platforms
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  )}
+                </>
               )}
             </TabsContent>
 
