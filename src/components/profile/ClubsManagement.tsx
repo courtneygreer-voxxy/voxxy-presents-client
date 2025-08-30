@@ -147,39 +147,6 @@ export function ClubsManagement() {
         </Button>
       </div>
 
-      {/* Quick Stats */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Stats</CardTitle>
-          <CardDescription>
-            Overview of your clubs and their performance
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{clubs.length}</div>
-              <div className="text-sm text-gray-600">Total Clubs</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
-                {clubs.reduce((acc, club) => {
-                  return acc + (club.socialLinks ? Object.keys(club.socialLinks).length : 0)
-                }, 0)}
-              </div>
-              <div className="text-sm text-gray-600">Social Connections</div>
-            </div>
-            
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">
-                {clubs.filter(club => club.aboutImages?.length || club.aboutImageUrl).length}
-              </div>
-              <div className="text-sm text-gray-600">Clubs with Images</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Clubs List - Single Column */}
       <div className="space-y-4">
