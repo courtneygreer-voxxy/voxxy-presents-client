@@ -206,7 +206,7 @@ export default function OrganizationAdmin() {
           <div className="w-64 flex-shrink-0">
             <TabsList className="flex flex-col h-fit w-full">
               <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start">
-                <Settings className="h-4 w-4" />
+                <Edit className="h-4 w-4" />
                 Organization
               </TabsTrigger>
               <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start">
