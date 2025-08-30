@@ -28,6 +28,8 @@ import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
+import { ImportEventsManager } from "@/components/ImportEventsManager"
+import { TicketManagementManager } from "@/components/TicketManagementManager"
 import { isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
 
@@ -259,7 +261,7 @@ export default function OrganizationAdmin() {
               <div className="flex items-center justify-between">
                 <div>
                   <h2 className="text-2xl font-bold text-gray-900">Events</h2>
-                  <p className="text-gray-600">Manage your organization's events</p>
+                  <p className="text-gray-600">Create, import, and manage your organization's events</p>
                 </div>
                 <Button 
                   className="flex items-center gap-2"
@@ -269,6 +271,15 @@ export default function OrganizationAdmin() {
                   Create Event
                 </Button>
               </div>
+
+              {/* Import Events Section */}
+              <ImportEventsManager 
+                organization={organization}
+                onEventImported={handleEventCreated}
+              />
+
+              {/* Ticket Management Section */}
+              <TicketManagementManager />
 
               {events.length === 0 ? (
                 <Card>
