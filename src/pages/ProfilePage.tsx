@@ -189,7 +189,7 @@ export default function ProfilePage() {
 
               <div className="mt-6">
                 <TabsContent value="overview">
-                  <ProfileOverview />
+                  <ProfileOverview onTabChange={setActiveTab} />
                 </TabsContent>
                 
                 <TabsContent value="clubs">

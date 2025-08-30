@@ -17,7 +17,11 @@ import {
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
-export function ProfileOverview() {
+interface ProfileOverviewProps {
+  onTabChange?: (tab: 'clubs' | 'settings') => void
+}
+
+export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
   const { currentUser, userProfile, isEmailVerified, resendVerification } = useAuth()
   const [isResendingVerification, setIsResendingVerification] = React.useState(false)
 
@@ -77,11 +81,9 @@ export function ProfileOverview() {
                     Create Another Club
                   </Link>
                 </Button>
-                <Button variant="outline" asChild>
-                  <Link to="#clubs">
-                    <Building2 className="h-4 w-4 mr-2" />
-                    Manage Existing Clubs
-                  </Link>
+                <Button variant="outline" onClick={() => onTabChange?.('clubs')}>
+                  <Building2 className="h-4 w-4 mr-2" />
+                  Manage Existing Clubs
                 </Button>
               </div>
             </div>
@@ -198,21 +200,25 @@ export function ProfileOverview() {
             </Button>
 
             {clubCount > 0 && (
-              <Button asChild className="w-full justify-start" variant="outline">
-                <Link to="#clubs">
-                  <Building2 className="h-4 w-4 mr-3" />
-                  Manage Clubs
-                  <ArrowRight className="h-4 w-4 ml-auto" />
-                </Link>
+              <Button 
+                className="w-full justify-start" 
+                variant="outline"
+                onClick={() => onTabChange?.('clubs')}
+              >
+                <Building2 className="h-4 w-4 mr-3" />
+                Manage Clubs
+                <ArrowRight className="h-4 w-4 ml-auto" />
               </Button>
             )}
 
-            <Button asChild className="w-full justify-start" variant="outline">
-              <Link to="#settings">
-                <Users className="h-4 w-4 mr-3" />
-                Profile Settings
-                <ArrowRight className="h-4 w-4 ml-auto" />
-              </Link>
+            <Button 
+              className="w-full justify-start" 
+              variant="outline"
+              onClick={() => onTabChange?.('settings')}
+            >
+              <Users className="h-4 w-4 mr-3" />
+              Profile Settings
+              <ArrowRight className="h-4 w-4 ml-auto" />
             </Button>
 
             <Button asChild className="w-full justify-start" variant="outline">
