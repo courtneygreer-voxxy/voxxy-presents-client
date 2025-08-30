@@ -3,14 +3,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { CheckCircle, ExternalLink, ArrowRight, SkipForward } from "lucide-react"
+import { CheckCircle, ExternalLink, ArrowRight, SkipForward, ArrowLeft } from "lucide-react"
 import type { PlatformType } from '@/types/platformIntegration'
 import { PlatformAuthModal } from './PlatformAuthModal'
+import { PreviewBadge } from '@/components/ui/preview-badge'
+import { PreviewDisclaimerModal } from '@/components/ui/preview-disclaimer-modal'
+import { isFeatureEnabled } from '@/config/environments'
 
 interface PlatformConnectionStepProps {
   onConnect: (platform: PlatformType) => Promise<void>
   onSkip: () => void
   onContinue: () => void
+  onCancel?: () => void
   isConnecting?: boolean
   connectedPlatforms?: PlatformType[]
 }
@@ -49,6 +53,7 @@ export function PlatformConnectionStep({
   onConnect, 
   onSkip, 
   onContinue,
+  onCancel,
   isConnecting = false,
   connectedPlatforms = []
 }: PlatformConnectionStepProps) {
@@ -56,16 +61,48 @@ export function PlatformConnectionStep({
   const [showAllPlatforms, setShowAllPlatforms] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalPlatform, setAuthModalPlatform] = useState<PlatformType | null>(null)
+  const [previewDisclaimerOpen, setPreviewDisclaimerOpen] = useState(false)
+  const [pendingPlatform, setPendingPlatform] = useState<PlatformType | null>(null)
+  
+  // Check if we're in preview or beta mode
+  const isPreviewMode = isFeatureEnabled('platformIntegrationPreview')
+  const isBetaMode = isFeatureEnabled('platformIntegrationBeta')
+  const previewMode = isBetaMode ? 'beta' : 'preview'
+  const isComingSoonMode = !isPreviewMode && !isBetaMode // Production mode with teasers
 
   const handleConnect = async (platform: PlatformType) => {
-    setAuthModalPlatform(platform)
-    setAuthModalOpen(true)
+    // If in preview/beta mode, show disclaimer first
+    if (isPreviewMode || isBetaMode) {
+      setPendingPlatform(platform)
+      setPreviewDisclaimerOpen(true)
+    } else {
+      // Normal flow for production
+      setAuthModalPlatform(platform)
+      setAuthModalOpen(true)
+    }
+  }
+
+  const handlePreviewContinue = () => {
+    setPreviewDisclaimerOpen(false)
+    if (pendingPlatform) {
+      setAuthModalPlatform(pendingPlatform)
+      setAuthModalOpen(true)
+      setPendingPlatform(null)
+    }
+  }
+
+  const handlePreviewCancel = () => {
+    setPreviewDisclaimerOpen(false)
+    setPendingPlatform(null)
   }
 
   const handleAuthSuccess = async () => {
     if (authModalPlatform) {
       setSelectedPlatform(authModalPlatform)
+      
+      // Call the parent's onConnect function
       await onConnect(authModalPlatform)
+      
       setSelectedPlatform(null)
     }
     setAuthModalOpen(false)
@@ -82,14 +119,57 @@ export function PlatformConnectionStep({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Connect Your Event Platform
-        </h2>
-        <p className="text-gray-600 max-w-md mx-auto">
-          Speed up club creation by importing information from your existing event platform.
-          You can always connect more platforms later.
-        </p>
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            {onCancel && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onCancel}
+                className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back
+              </Button>
+            )}
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              Connect Your Event Platform
+              {(isPreviewMode || isBetaMode) && (
+                <PreviewBadge 
+                  variant={previewMode}
+                  size="md"
+                />
+              )}
+              {isComingSoonMode && (
+                <PreviewBadge 
+                  variant="coming-soon"
+                  size="md"
+                />
+              )}
+            </h2>
+          </div>
+        </div>
+        <div className="text-center">
+          <p className="text-gray-600 max-w-md mx-auto">
+            {(isPreviewMode || isBetaMode) ? (
+              <>
+                Experience our upcoming platform integrations in {isBetaMode ? 'beta' : 'preview'} mode. 
+                See how you'll be able to import information from your existing event platform.
+              </>
+            ) : isComingSoonMode ? (
+              <>
+                Platform integrations are coming soon! You'll be able to automatically import 
+                information from your existing event platforms to speed up club creation.
+              </>
+            ) : (
+              <>
+                Speed up club creation by importing information from your existing event platform.
+                You can always connect more platforms later.
+              </>
+            )}
+          </p>
+        </div>
       </div>
 
       {/* Platform Options */}
@@ -116,57 +196,80 @@ export function PlatformConnectionStep({
                     
                     {/* Platform Info */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          {option.name}
-                        </h3>
-                        {option.popular && (
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                            Most Popular
-                          </Badge>
-                        )}
-                        {isConnected && (
-                          <Badge variant="default" className="bg-green-100 text-green-800">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Connected
-                          </Badge>
-                        )}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-lg font-semibold text-gray-900">
+                            {option.name}
+                          </h3>
+                          {option.popular && (
+                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                              Most Popular
+                            </Badge>
+                          )}
+                          {(isPreviewMode || isBetaMode) && (
+                            <PreviewBadge 
+                              variant={previewMode}
+                              size="sm"
+                            />
+                          )}
+                          {isComingSoonMode && (
+                            <PreviewBadge 
+                              variant="coming-soon"
+                              size="sm"
+                            />
+                          )}
+                          {isConnected && (
+                            <Badge variant="default" className="bg-green-100 text-green-800">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Connected
+                            </Badge>
+                          )}
+                        </div>
+                        
+                        {/* Action Button - moved to title level, right side */}
+                        <div>
+                          {isConnected ? (
+                            <Button variant="outline" size="sm" disabled className="h-8 px-3 text-xs">
+                              <CheckCircle className="h-3 w-3 mr-1" />
+                              Connected
+                            </Button>
+                          ) : isComingSoonMode ? (
+                            <Button
+                              disabled
+                              variant="outline"
+                              size="sm"
+                              className="h-8 px-3 text-xs cursor-not-allowed opacity-60"
+                            >
+                              Coming Soon
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => handleConnect(option.platform)}
+                              disabled={isConnecting}
+                              size="sm"
+                              className="h-8 px-3 text-xs"
+                            >
+                              {isConnecting ? (
+                                'Connecting...'
+                              ) : (
+                                <>
+                                  Connect
+                                  <ExternalLink className="h-3 w-3 ml-1" />
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       
                       <p className="text-gray-600 mb-3">{option.description}</p>
                       
-                      <div className="flex flex-wrap gap-1 mb-4">
+                      <div className="flex flex-wrap gap-1">
                         {option.features.map(feature => (
                           <Badge key={feature} variant="outline" className="text-xs">
                             {feature}
                           </Badge>
                         ))}
-                      </div>
-                      
-                      {/* Action Button - moved under content, smaller size */}
-                      <div className="flex justify-start">
-                        {isConnected ? (
-                          <Button variant="outline" size="sm" disabled className="h-8 px-3 text-xs">
-                            <CheckCircle className="h-3 w-3 mr-1" />
-                            Connected
-                          </Button>
-                        ) : (
-                          <Button
-                            onClick={() => handleConnect(option.platform)}
-                            disabled={isConnecting}
-                            size="sm"
-                            className="h-8 px-3 text-xs"
-                          >
-                            {isConnecting ? (
-                              'Connecting...'
-                            ) : (
-                              <>
-                                Connect
-                                <ExternalLink className="h-3 w-3 ml-1" />
-                              </>
-                            )}
-                          </Button>
-                        )}
                       </div>
                     </div>
                   </div>
@@ -218,29 +321,23 @@ export function PlatformConnectionStep({
         </CardContent>
       </Card>
 
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center pt-6">
-        <Button
-          variant="ghost"
-          onClick={onSkip}
-          className="flex items-center gap-2 text-gray-600"
-        >
-          <SkipForward className="h-4 w-4" />
-          Skip for now
-        </Button>
-        
-        <div className="flex items-center gap-2">
-          {hasAnyConnection ? (
-            <Button onClick={onContinue} className="flex items-center gap-2">
-              Continue with connected platforms
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          ) : (
-            <p className="text-sm text-gray-500">
-              Connect a platform or skip to continue
-            </p>
-          )}
-        </div>
+      {/* Action Button */}
+      <div className="flex justify-end pt-6">
+        {hasAnyConnection ? (
+          <Button onClick={onContinue} className="flex items-center gap-2">
+            Continue with connected platforms
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button
+            variant="outline"
+            onClick={onSkip}
+            className="flex items-center gap-2"
+          >
+            <SkipForward className="h-4 w-4" />
+            Skip for now
+          </Button>
+        )}
       </div>
 
       {/* Skip Info */}
@@ -257,6 +354,14 @@ export function PlatformConnectionStep({
           onSuccess={handleAuthSuccess}
         />
       )}
+
+      {/* Preview Disclaimer Modal */}
+      <PreviewDisclaimerModal
+        isOpen={previewDisclaimerOpen}
+        onClose={handlePreviewCancel}
+        onContinue={handlePreviewContinue}
+        mode={previewMode}
+      />
     </div>
   )
 }

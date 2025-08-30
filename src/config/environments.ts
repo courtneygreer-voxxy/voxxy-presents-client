@@ -1,5 +1,5 @@
 // Environment configuration and data source routing
-export type EnvironmentType = 'development' | 'staging' | 'production' | 'sandbox'
+export type EnvironmentType = 'development' | 'staging' | 'production'
 export type DataSourceType = 'firebase' | 'api' | 'hybrid'
 
 interface EnvironmentConfig {
@@ -21,6 +21,8 @@ interface EnvironmentConfig {
     debugMode: boolean
     experimentalFeatures: boolean
     dataSyncFromProduction: boolean
+    platformIntegrationPreview: boolean
+    platformIntegrationBeta: boolean
   }
 }
 
@@ -48,7 +50,9 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true,
       debugMode: true,
       experimentalFeatures: true,
-      dataSyncFromProduction: false
+      dataSyncFromProduction: false,
+      platformIntegrationPreview: true, // Full preview mode in development
+      platformIntegrationBeta: true
     }
   },
 
@@ -61,7 +65,9 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true,
       debugMode: true,
       experimentalFeatures: false,
-      dataSyncFromProduction: true // Sync data from production for testing
+      dataSyncFromProduction: true, // Sync data from production for testing
+      platformIntegrationPreview: true, // Available in staging for demos
+      platformIntegrationBeta: false // Only in development for now
     }
   },
 
@@ -74,19 +80,9 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true, // Controlled admin access
       debugMode: false, // Debug mode disabled
       experimentalFeatures: false,
-      dataSyncFromProduction: false
-    }
-  },
-
-  sandbox: {
-    name: 'sandbox',
-    dataSource: 'firebase', // Direct Firebase for experimentation
-    firebaseConfig: getFirebaseConfigFromEnv(),
-    features: {
-      adminControls: true,
-      debugMode: true,
-      experimentalFeatures: true, // All experimental features enabled
-      dataSyncFromProduction: false // Independent data for experimentation
+      dataSyncFromProduction: false,
+      platformIntegrationPreview: false, // Disabled - show "coming soon" instead
+      platformIntegrationBeta: false // Disabled - show "coming soon" instead
     }
   }
 }
@@ -115,8 +111,6 @@ export function getCurrentEnvironment(): EnvironmentType {
     cachedEnvironment = 'development'
   } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging') || hostname.includes('onrender.com')) {
     cachedEnvironment = 'staging'
-  } else if (hostname.includes('sandbox') || hostname.includes('experimental')) {
-    cachedEnvironment = 'sandbox'
   } else {
     cachedEnvironment = 'production'
   }

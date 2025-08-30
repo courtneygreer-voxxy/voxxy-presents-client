@@ -19,13 +19,11 @@ export default function PlatformTestPage() {
   const handleConnect = async (platform: PlatformType) => {
     console.log(`Connecting to ${platform}...`)
     
-    // Simulate connection success
-    setTimeout(() => {
-      setConnectedPlatforms(prev => [...prev, platform])
-      // Load mock connections
-      setConnections(getAllMockConnections())
-      console.log(`Connected to ${platform}!`)
-    }, 1000)
+    // Update connected platforms immediately since popup handles the delay
+    setConnectedPlatforms(prev => [...prev, platform])
+    // Load mock connections
+    setConnections(getAllMockConnections())
+    console.log(`Connected to ${platform}!`)
   }
 
   const handleSkip = () => {
@@ -34,6 +32,12 @@ export default function PlatformTestPage() {
 
   const handleContinue = () => {
     console.log('Continuing with connected platforms')
+  }
+
+  const handleCancel = () => {
+    console.log('Going back to dashboard')
+    // In a real app, this would navigate back to the user dashboard
+    window.history.back()
   }
 
   return (
@@ -70,6 +74,7 @@ export default function PlatformTestPage() {
                   onConnect={handleConnect}
                   onSkip={handleSkip}
                   onContinue={handleContinue}
+                  onCancel={handleCancel}
                   connectedPlatforms={connectedPlatforms}
                 />
               </CardContent>

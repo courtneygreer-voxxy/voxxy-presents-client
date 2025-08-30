@@ -255,59 +255,67 @@ export function PlatformConnectionCard({
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 pt-4">
-          {connection.status === 'disconnected' || connection.status === 'error' ? (
-            <Button 
-              onClick={handleConnect}
-              disabled={isConnecting || isLoading}
-              size="sm"
-              className="w-auto px-3"
-            >
-              {isConnecting ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Connecting...
-                </>
-              ) : (
-                'Connect'
-              )}
-            </Button>
-          ) : (
-            <>
-              <Button
-                variant="outline"
-                onClick={handleTest}
-                disabled={isTesting || isLoading}
+        <div className="flex justify-between items-center pt-4">
+          {/* Left side - connected tools */}
+          <div className="flex gap-2">
+            {connection.status === 'connected' && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleTest}
+                  disabled={isTesting || isLoading}
+                  size="sm"
+                >
+                  {isTesting ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Test'
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={handleSync}
+                  disabled={isSyncing || isLoading}
+                  size="sm"
+                >
+                  {isSyncing ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    'Sync Now'
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  onClick={() => setShowSettings(!showSettings)}
+                  size="sm"
+                >
+                  <Settings className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+          
+          {/* Right side - connect/disconnect */}
+          <div>
+            {connection.status === 'disconnected' || connection.status === 'error' ? (
+              <Button 
+                onClick={handleConnect}
+                disabled={isConnecting || isLoading}
                 size="sm"
+                className="w-auto px-3"
               >
-                {isTesting ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
+                {isConnecting ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Connecting...
+                  </>
                 ) : (
-                  'Test'
+                  'Connect'
                 )}
               </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleSync}
-                disabled={isSyncing || isLoading}
-                size="sm"
-              >
-                {isSyncing ? (
-                  <RefreshCw className="h-4 w-4 animate-spin" />
-                ) : (
-                  'Sync Now'
-                )}
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={() => setShowSettings(!showSettings)}
-                size="sm"
-              >
-                <Settings className="h-4 w-4" />
-              </Button>
-              
+            ) : (
               <Button
                 variant="outline"
                 onClick={handleDisconnect}
@@ -318,11 +326,11 @@ export function PlatformConnectionCard({
                 {isDisconnecting ? (
                   <RefreshCw className="h-4 w-4 animate-spin" />
                 ) : (
-                  <Trash2 className="h-4 w-4" />
+                  'Disconnect'
                 )}
               </Button>
-            </>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Advanced Settings (collapsed by default) */}

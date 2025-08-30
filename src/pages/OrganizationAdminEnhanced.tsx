@@ -457,7 +457,7 @@ export default function OrganizationAdminEnhanced() {
                     <p className="text-gray-600 text-center max-w-md mb-6">
                       Connect to Eventbrite, Luma, or Meetup first to import your existing events.
                     </p>
-                    <Button onClick={() => document.querySelector('[value="platforms"]')?.click()}>
+                    <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
                       Go to Platform Connections
                     </Button>
                   </CardContent>
@@ -480,7 +480,7 @@ export default function OrganizationAdminEnhanced() {
                     <p className="text-gray-600 text-center max-w-md mb-6">
                       Connect your event platforms to track ticket sales and analytics across all your events.
                     </p>
-                    <Button onClick={() => document.querySelector('[value="platforms"]')?.click()}>
+                    <Button onClick={() => (document.querySelector('[value="platforms"]') as HTMLElement)?.click()}>
                       Connect Platforms
                     </Button>
                   </CardContent>

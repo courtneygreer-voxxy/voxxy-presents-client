@@ -79,63 +79,64 @@ export default function CreateClubFlowEnhanced() {
     setCurrentStep(1) // Skip to the name step
   }
 
+  const handleCancel = () => {
+    // Navigate back to dashboard/profile
+    navigate('/profile')
+  }
+
   const handlePlatformConnect = async (platform: PlatformType) => {
     if (!currentUser) return
 
     try {
-      const authData = await initiatePlatformAuth(platform, currentUser.uid)
+      // Simulate successful connection (popup modal handles the auth flow)
+      toast({
+        title: "Connected",
+        description: `Successfully connected to ${platform}!`
+      })
       
-      // In development mode with mock data, simulate successful connection
-      if (authData.authUrl.includes('mock-')) {
-        toast({
-          title: "Mock Connection Successful",
-          description: `Connected to ${platform}. Importing organization data...`
-        })
+      // Get platform organizations (mock data) and import data
+      try {
+        const platformOrgs = await getPlatformOrganizations(`mock-${platform}-connection`)
         
-        // Simulate importing organization data
-        setTimeout(async () => {
-          try {
-            // Get platform organizations (mock data)
-            const platformOrgs = await getPlatformOrganizations(`mock-${platform}-connection`)
-            
-            if (platformOrgs.length > 0) {
-              const org = platformOrgs[0]
-              
-              // Auto-fill form data from platform
-              updateFormData({
-                name: org.name || '',
-                description: org.description || org.shortDescription || '',
-                contactEmail: org.email || '',
-                defaultLocation: org.location || '',
-                logoUrl: org.logoUrl || undefined,
-                bannerUrl: org.bannerUrl || undefined,
-                socialLinks: {
-                  ...org.socialLinks,
-                  [platform]: org.platformUrl
-                }
-              })
-              
-              setConnectedPlatforms([...connectedPlatforms, platform])
-              setPlatformDataImported(true)
-              
-              toast({
-                title: "Data Imported",
-                description: `Successfully imported club information from ${platform}!`
-              })
+        if (platformOrgs.length > 0) {
+          const org = platformOrgs[0]
+          
+          // Auto-fill form data from platform
+          updateFormData({
+            name: org.name || '',
+            description: org.description || org.shortDescription || '',
+            contactEmail: org.email || '',
+            defaultLocation: org.location || '',
+            logoUrl: org.logoUrl || undefined,
+            bannerUrl: org.bannerUrl || undefined,
+            socialLinks: {
+              ...org.socialLinks,
+              [platform]: org.platformUrl
             }
-          } catch (error) {
-            console.error('Failed to import platform data:', error)
-            toast({
-              variant: "destructive",
-              title: "Import Failed",
-              description: "Failed to import data from platform, but connection was successful."
-            })
-          }
-        }, 2000)
-      } else {
-        // Real OAuth flow would redirect
-        window.location.href = authData.authUrl
+          })
+          
+          setPlatformDataImported(true)
+          
+          toast({
+            title: "Data Imported",
+            description: `Successfully imported club information from ${platform}!`
+          })
+        }
+        
+        // Add platform to connected list
+        setConnectedPlatforms([...connectedPlatforms, platform])
+        
+      } catch (error) {
+        console.error('Failed to import platform data:', error)
+        toast({
+          variant: "destructive",
+          title: "Import Failed",
+          description: "Failed to import data from platform, but connection was successful."
+        })
+        // Still add the platform as connected even if data import failed
+        setConnectedPlatforms([...connectedPlatforms, platform])
       }
+      
     } catch (error) {
       console.error(`Failed to connect to ${platform}:`, error)
       toast({
@@ -219,6 +220,7 @@ export default function CreateClubFlowEnhanced() {
           onConnect={handlePlatformConnect}
           onSkip={skipPlatformStep}
           onContinue={nextStep}
+          onCancel={handleCancel}
           connectedPlatforms={connectedPlatforms}
         />
       )
@@ -227,15 +229,15 @@ export default function CreateClubFlowEnhanced() {
     // Regular form steps
     const CurrentStepComponent = currentStepConfig.component
     
-    return (
-      <CurrentStepComponent 
-        data={formData}
-        updateData={updateFormData}
-        onNext={nextStep}
-        isCreating={isCreating}
-        onCreate={handleCreate}
-      />
-    )
+    const props: any = {
+      data: formData,
+      updateData: updateFormData,
+      onNext: nextStep,
+      isCreating: isCreating,
+      onCreate: handleCreate
+    }
+    
+    return <CurrentStepComponent {...props} />
   }
 
   return (

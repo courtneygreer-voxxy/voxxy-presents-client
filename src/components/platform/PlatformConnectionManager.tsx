@@ -104,16 +104,43 @@ export function PlatformConnectionManager({
   }
 
   const handleAuthSuccess = async () => {
-    if (authModalPlatform) {
-      // Simulate successful connection
+    if (authModalPlatform && currentUser) {
+      // Simulate successful connection by updating the connection state directly
+      const mockConnectedConnection: PlatformConnection = {
+        id: `connected-${authModalPlatform}-${Date.now()}`,
+        userId: currentUser.uid,
+        organizationId,
+        platform: authModalPlatform,
+        status: 'connected',
+        connectedAt: new Date(),
+        lastSyncAt: new Date(),
+        platformAccountName: `Demo ${authModalPlatform.charAt(0).toUpperCase() + authModalPlatform.slice(1)} Account`,
+        platformAccountEmail: `demo@${authModalPlatform}.com`,
+        platformAccountUrl: `https://${authModalPlatform}.com/profile/demo`,
+        syncSettings: {
+          autoSync: true,
+          syncFrequency: 'daily',
+          syncEvents: true,
+          syncOrganizationInfo: true,
+          syncAttendees: false
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      // Update the connections state immediately
+      setConnections(prev => 
+        prev.map(conn => 
+          conn.platform === authModalPlatform 
+            ? mockConnectedConnection 
+            : conn
+        )
+      )
+
       toast({
         title: "Connected",
         description: `Successfully connected to ${authModalPlatform}!`
       })
-      
-      setTimeout(() => {
-        loadConnections()
-      }, 1000)
     }
     setAuthModalOpen(false)
     setAuthModalPlatform(null)
@@ -126,12 +153,42 @@ export function PlatformConnectionManager({
 
   const handleDisconnect = async (connectionId: string) => {
     try {
-      await disconnectPlatform(connectionId)
+      // Find the connection to get the platform type
+      const connectionToDisconnect = connections.find(conn => conn.id === connectionId)
+      if (!connectionToDisconnect) return
+
+      // Simulate successful disconnection by reverting to placeholder state
+      const disconnectedConnection: PlatformConnection = {
+        id: `placeholder-${connectionToDisconnect.platform}`,
+        userId: currentUser?.uid || '',
+        organizationId,
+        platform: connectionToDisconnect.platform,
+        status: 'disconnected',
+        connectedAt: new Date(),
+        syncSettings: {
+          autoSync: false,
+          syncFrequency: 'manual',
+          syncEvents: true,
+          syncOrganizationInfo: true,
+          syncAttendees: false
+        },
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      // Update the connections state immediately
+      setConnections(prev => 
+        prev.map(conn => 
+          conn.id === connectionId 
+            ? disconnectedConnection 
+            : conn
+        )
+      )
+
       toast({
         title: "Disconnected",
         description: "Platform connection removed successfully."
       })
-      await loadConnections()
     } catch (err) {
       console.error('Failed to disconnect platform:', err)
       toast({
