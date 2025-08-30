@@ -306,7 +306,6 @@ export function PlatformConnectionManager({
   if (error) {
     return (
       <Alert>
-        <AlertCircle className="h-4 w-4" />
         <AlertDescription>
           {error}
           <Button
@@ -324,10 +323,10 @@ export function PlatformConnectionManager({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       {!compact && (
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-2">
           <Button
             variant="outline"
             onClick={handleRefresh}
@@ -335,18 +334,18 @@ export function PlatformConnectionManager({
             size="sm"
           >
             <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh All
+            Refresh
           </Button>
         </div>
       )}
 
       {/* System Health Overview */}
       {!compact && (
-        <Card className="mb-6">
+        <Card className="mb-4">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <div className={`w-3 h-3 rounded-full ${errorCount > 0 ? 'bg-red-500' : connectedCount > 0 ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-              Platform Health Status
+              Connection Status
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -366,7 +365,6 @@ export function PlatformConnectionManager({
             </div>
             {errorCount > 0 && (
               <Alert className="mt-4">
-                <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
                   {errorCount} platform{errorCount > 1 ? 's have' : ' has'} connection issues that need attention.
                 </AlertDescription>
