@@ -16,6 +16,7 @@ import ContactPage from './pages/ContactPage'
 import ProductsPage from './pages/ProductsPage'
 import AdminLogin from './pages/AdminLogin'
 import PlatformTestPage from './pages/PlatformTestPage'
+import VoxxyShop from './pages/VoxxyShop'
 
 export default function App() {
   return (
@@ -48,6 +49,11 @@ export default function App() {
           <Route path="/profile" element={
             <ProtectedRoute>
               <ProfilePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/voxxy-shop" element={
+            <ProtectedRoute>
+              <VoxxyShop />
             </ProtectedRoute>
           } />
           <Route path="/create-club" element={
