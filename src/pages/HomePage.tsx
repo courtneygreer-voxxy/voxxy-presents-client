@@ -413,6 +413,7 @@ export default function HomePage() {
                 <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link to="/products" className="hover:text-white transition-colors">Products</Link></li>
+                <li><Link to="/voxxy-shop" className="hover:text-white transition-colors">Voxxy Shop</Link></li>
               </ul>
             </div>
             <div>

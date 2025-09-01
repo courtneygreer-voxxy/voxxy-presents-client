@@ -47,7 +47,7 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
         <div className="md:col-span-2 md:row-span-2">
           <button
             onClick={() => openLightbox(0)}
-            className="relative w-full aspect-square md:aspect-video overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
+            className="relative w-full h-64 md:h-96 overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
           >
             <img
               src={photos[0]}
@@ -63,7 +63,7 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
           <button
             key={index + 1}
             onClick={() => openLightbox(index + 1)}
-            className="relative aspect-square overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
+            className="relative h-32 md:h-[11.5rem] overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
           >
             <img
               src={photo}

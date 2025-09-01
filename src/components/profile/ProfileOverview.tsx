@@ -57,17 +57,19 @@ export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
         </CardHeader>
         <CardContent>
           {isNewUser ? (
-            <div className="space-y-4">
+            <div className="space-y-4 text-center">
               <p className="text-gray-600">
                 Ready to create your first club? Our platform makes it easy to manage 
                 recurring events, track registrations, and keep your community connected.
               </p>
-              <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700">
-                <Link to="/create-club">
-                  <Plus className="h-4 w-4 mr-2" />
-                  Create Your First Club
-                </Link>
-              </Button>
+              <div className="flex justify-center">
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/create-club">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create Your First Club
+                  </Link>
+                </Button>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -114,14 +116,12 @@ export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
       )}
 
       {/* Account Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Account Stats */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Account Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Account Overview</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-purple-100 rounded-lg">
@@ -182,55 +182,9 @@ export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
                 </span>
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <Button asChild className="w-full justify-start" variant="outline">
-              <Link to="/create-club">
-                <Plus className="h-4 w-4 mr-3" />
-                Create New Club
-                <ArrowRight className="h-4 w-4 ml-auto" />
-              </Link>
-            </Button>
-
-            {clubCount > 0 && (
-              <Button 
-                className="w-full justify-start" 
-                variant="outline"
-                onClick={() => onTabChange?.('clubs')}
-              >
-                <Building2 className="h-4 w-4 mr-3" />
-                Manage Clubs
-                <ArrowRight className="h-4 w-4 ml-auto" />
-              </Button>
-            )}
-
-            <Button 
-              className="w-full justify-start" 
-              variant="outline"
-              onClick={() => onTabChange?.('settings')}
-            >
-              <Users className="h-4 w-4 mr-3" />
-              Profile Settings
-              <ArrowRight className="h-4 w-4 ml-auto" />
-            </Button>
-
-            <Button asChild className="w-full justify-start" variant="outline">
-              <Link to="/voxxy-shop">
-                <Building2 className="h-4 w-4 mr-3" />
-                Browse Voxxy Shop
-                <ArrowRight className="h-4 w-4 ml-auto" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Getting Started Guide for New Users */}
       {isNewUser && (

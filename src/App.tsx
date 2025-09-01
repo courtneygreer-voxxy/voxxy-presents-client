@@ -18,6 +18,7 @@ import AdminLogin from './pages/AdminLogin'
 import PlatformTestPage from './pages/PlatformTestPage'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
+import VenueSearchPortal from './pages/VenueSearchPortal'
 
 export default function App() {
   return (
@@ -56,6 +57,11 @@ export default function App() {
           <Route path="/voxxy-shop" element={
             <ProtectedRoute>
               <VoxxyShop />
+            </ProtectedRoute>
+          } />
+          <Route path="/voxxy-shop/venues" element={
+            <ProtectedRoute>
+              <VenueSearchPortal />
             </ProtectedRoute>
           } />
           <Route path="/create-club" element={

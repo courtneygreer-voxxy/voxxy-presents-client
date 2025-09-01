@@ -158,11 +158,29 @@ export default function ProfilePage() {
                       Create New Club
                     </Link>
                   </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => setActiveTab('clubs')}
+                  >
+                    <Building2 className="h-4 w-4 mr-2" />
+                    My Clubs
+                  </Button>
                   <Button variant="outline" size="sm" className="w-full" asChild>
-                    <Link to="/">
+                    <Link to="/voxxy-shop">
                       <ExternalLink className="h-4 w-4 mr-2" />
-                      Browse Clubs
+                      Browse Voxxy Shop
                     </Link>
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full" 
+                    onClick={() => setActiveTab('settings')}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Settings
                   </Button>
                 </div>
               </CardContent>

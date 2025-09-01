@@ -5,9 +5,9 @@ import {
   VenueOwnerSignup, 
   VenueContactRequest 
 } from '@/types/venue'
-import { getCurrentEnvironment } from '@/config/environments'
+import { getApiUrl } from '@/config/environments'
 
-const API_BASE_URL = getCurrentEnvironment().apiUrl
+const API_BASE_URL = getApiUrl()
 
 class VenueService {
   

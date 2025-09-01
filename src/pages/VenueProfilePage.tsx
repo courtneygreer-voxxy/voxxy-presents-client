@@ -25,7 +25,6 @@ import {
 import { VenueGallery } from '@/components/venue/VenueGallery'
 import { VenueContactModal } from '@/components/venue/VenueContactModal'
 import { Venue, VenueType } from '@/types/venue'
-import { venueService } from '@/services/venueService'
 
 // Mock data for development - replace with API call
 import { getDevVenues } from '../../scripts/seed-dev-venues'
@@ -166,22 +165,14 @@ export default function VenueProfilePage() {
             </div>
 
             {venue.claimStatus === 'unclaimed' && (
-              <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-200">
-                <CardContent className="p-4 text-center">
-                  <Crown className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                  <h3 className="font-semibold text-gray-900 mb-1">Own this venue?</h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    Claim ownership to manage your listing
-                  </p>
-                  <Button 
-                    size="sm" 
-                    className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                    onClick={handleClaimOwnership}
-                  >
-                    Claim Ownership
-                  </Button>
-                </CardContent>
-              </Card>
+              <Button 
+                variant="outline" 
+                className="flex items-center gap-2"
+                onClick={handleClaimOwnership}
+              >
+                <Crown className="h-4 w-4" />
+                Claim Ownership
+              </Button>
             )}
           </div>
         </div>
@@ -199,7 +190,7 @@ export default function VenueProfilePage() {
               </CardContent>
             </Card>
 
-            {/* Description */}
+            {/* About */}
             <Card>
               <CardHeader>
                 <CardTitle>About {venue.name}</CardTitle>
@@ -229,7 +220,27 @@ export default function VenueProfilePage() {
 
           {/* Right Column - Booking and Details */}
           <div className="space-y-6">
-            {/* Contact & Booking */}
+            {/* Location */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4" />
+                  Location
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-gray-700 mb-4">{venue.address}</p>
+                
+                {/* Placeholder for Google Maps integration */}
+                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center">
+                  <p className="text-gray-500 text-sm">
+                    Interactive map coming soon
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Book This Venue */}
             <Card>
               <CardHeader>
                 <CardTitle>Book This Venue</CardTitle>
@@ -251,23 +262,28 @@ export default function VenueProfilePage() {
                     </p>
                   </div>
                 </div>
+              </CardContent>
+            </Card>
 
-                <Separator />
-
-                {/* Quick Contact Info */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-sm">
+            {/* Contact */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Contact Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-gray-500" />
                     <span className="break-all">{venue.contactInfo.email}</span>
                   </div>
                   {venue.contactInfo.phone && (
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-gray-500" />
                       <span>{venue.contactInfo.phone}</span>
                     </div>
                   )}
                   {venue.contactInfo.website && (
-                    <div className="flex items-center gap-2 text-sm">
+                    <div className="flex items-center gap-2">
                       <ExternalLink className="h-4 w-4 text-gray-500" />
                       <a 
                         href={venue.contactInfo.website}
@@ -301,26 +317,6 @@ export default function VenueProfilePage() {
                       </span>
                     </div>
                   ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Location */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4" />
-                  Location
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-700 mb-4">{venue.address}</p>
-                
-                {/* Placeholder for Google Maps integration */}
-                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center">
-                  <p className="text-gray-500 text-sm">
-                    Interactive map coming soon
-                  </p>
                 </div>
               </CardContent>
             </Card>

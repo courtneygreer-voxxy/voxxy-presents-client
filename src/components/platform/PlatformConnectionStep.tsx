@@ -71,15 +71,8 @@ export function PlatformConnectionStep({
   const isComingSoonMode = !isPreviewMode && !isBetaMode // Production mode with teasers
 
   const handleConnect = async (platform: PlatformType) => {
-    // If in preview/beta mode, show disclaimer first
-    if (isPreviewMode || isBetaMode) {
-      setPendingPlatform(platform)
-      setPreviewDisclaimerOpen(true)
-    } else {
-      // Normal flow for production
-      setAuthModalPlatform(platform)
-      setAuthModalOpen(true)
-    }
+    // Disabled for production - convert to infographic mode
+    return
   }
 
   const handlePreviewContinue = () => {
@@ -119,55 +112,33 @@ export function PlatformConnectionStep({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            {onCancel && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onCancel}
-                className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
-              >
-                <ArrowLeft className="h-4 w-4" />
-                Back
-              </Button>
-            )}
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              Connect Your Event Platform
-              {(isPreviewMode || isBetaMode) && (
-                <PreviewBadge 
-                  variant={previewMode}
-                  size="md"
-                />
-              )}
-              {isComingSoonMode && (
-                <PreviewBadge 
-                  variant="coming-soon"
-                  size="md"
-                />
-              )}
-            </h2>
-          </div>
+      <div className="mb-8 text-center">
+        <div className="flex items-center justify-between mb-6">
+          {onCancel && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onCancel}
+              className="flex items-center gap-1 text-gray-600 hover:text-gray-900"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+          )}
+          <div className="flex-1" />
         </div>
-        <div className="text-center">
-          <p className="text-gray-600 max-w-md mx-auto">
-            {(isPreviewMode || isBetaMode) ? (
-              <>
-                Experience our upcoming platform integrations in {isBetaMode ? 'beta' : 'preview'} mode. 
-                See how you'll be able to import information from your existing event platform.
-              </>
-            ) : isComingSoonMode ? (
-              <>
-                Platform integrations are coming soon! You'll be able to automatically import 
-                information from your existing event platforms to speed up club creation.
-              </>
-            ) : (
-              <>
-                Speed up club creation by importing information from your existing event platform.
-                You can always connect more platforms later.
-              </>
-            )}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center justify-center gap-3 mb-4">
+            Connect Your Event Platform
+            <PreviewBadge 
+              variant="coming-soon"
+              size="md"
+            />
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Platform integrations are coming soon! In the future, you'll be able to automatically import 
+            information from your existing event platforms to speed up club creation. For now, take a look 
+            at what's planned and continue to manually set up your club information.
           </p>
         </div>
       </div>
@@ -226,39 +197,16 @@ export function PlatformConnectionStep({
                           )}
                         </div>
                         
-                        {/* Action Button - moved to title level, right side */}
+                        {/* Action Button - disabled for infographic mode */}
                         <div>
-                          {isConnected ? (
-                            <Button variant="outline" size="sm" disabled className="h-8 px-3 text-xs">
-                              <CheckCircle className="h-3 w-3 mr-1" />
-                              Connected
-                            </Button>
-                          ) : isComingSoonMode ? (
-                            <Button
-                              disabled
-                              variant="outline"
-                              size="sm"
-                              className="h-8 px-3 text-xs cursor-not-allowed opacity-60"
-                            >
-                              Coming Soon
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => handleConnect(option.platform)}
-                              disabled={isConnecting}
-                              size="sm"
-                              className="h-8 px-3 text-xs"
-                            >
-                              {isConnecting ? (
-                                'Connecting...'
-                              ) : (
-                                <>
-                                  Connect
-                                  <ExternalLink className="h-3 w-3 ml-1" />
-                                </>
-                              )}
-                            </Button>
-                          )}
+                          <Button
+                            disabled
+                            variant="outline"
+                            size="sm"
+                            className="h-8 px-3 text-xs cursor-not-allowed opacity-60"
+                          >
+                            Coming Soon
+                          </Button>
                         </div>
                       </div>
                       
@@ -323,26 +271,18 @@ export function PlatformConnectionStep({
 
       {/* Action Button */}
       <div className="flex justify-end pt-6">
-        {hasAnyConnection ? (
-          <Button onClick={onContinue} className="flex items-center gap-2">
-            Continue with connected platforms
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        ) : (
-          <Button
-            variant="outline"
-            onClick={onSkip}
-            className="flex items-center gap-2"
-          >
-            <SkipForward className="h-4 w-4" />
-            Skip for now
-          </Button>
-        )}
+        <Button
+          onClick={onSkip}
+          className="flex items-center gap-2"
+        >
+          Next
+          <ArrowRight className="h-4 w-4" />
+        </Button>
       </div>
 
-      {/* Skip Info */}
+      {/* Info */}
       <div className="text-center text-sm text-gray-500">
-        You can always connect platforms later in your club settings
+        Platform connections will be available in future updates
       </div>
 
       {/* Platform Auth Modal */}
