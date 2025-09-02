@@ -173,6 +173,9 @@ export interface User {
   // Permissions
   organizationIds: string[] // Organizations they can manage
   
+  // Platform Integrations
+  platformConnections?: string[] // IDs of connected platform integrations
+  
   // Settings
   emailNotifications: boolean
   

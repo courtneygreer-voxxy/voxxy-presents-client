@@ -18,11 +18,13 @@ import {
   Save,
   AlertTriangle,
   CheckCircle,
-  Loader2
+  Loader2,
+  ExternalLink
 } from 'lucide-react'
 import { updateProfile } from 'firebase/auth'
 import { updateDoc, doc } from 'firebase/firestore'
 import { db } from '@/lib/firebase'
+import { PlatformIntegrations } from './PlatformIntegrations'
 
 export function ProfileSettings() {
   const { currentUser, userProfile, isEmailVerified, resendVerification } = useAuth()
@@ -30,6 +32,7 @@ export function ProfileSettings() {
   const [isSaving, setSaving] = useState(false)
   const [isResendingVerification, setIsResendingVerification] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null)
+  const [activeSection, setActiveSection] = useState<'general' | 'integrations'>('general')
   
   const [formData, setFormData] = useState({
     displayName: currentUser?.displayName || '',
@@ -108,8 +111,34 @@ export function ProfileSettings() {
         <p className="text-gray-200">Manage your account information and preferences</p>
       </div>
 
+      {/* Section Navigation */}
+      <div className="flex space-x-1 bg-white/5 p-1 rounded-lg">
+        <button
+          onClick={() => setActiveSection('general')}
+          className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded transition-all duration-200 text-sm font-medium ${
+            activeSection === 'general'
+              ? 'bg-white/20 text-white'
+              : 'text-gray-300 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          <User className="h-4 w-4" />
+          <span>General Settings</span>
+        </button>
+        <button
+          onClick={() => setActiveSection('integrations')}
+          className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded transition-all duration-200 text-sm font-medium ${
+            activeSection === 'integrations'
+              ? 'bg-white/20 text-white'
+              : 'text-gray-300 hover:text-white hover:bg-white/10'
+          }`}
+        >
+          <ExternalLink className="h-4 w-4" />
+          <span>Platform Integrations</span>
+        </button>
+      </div>
+
       {/* Success/Error Messages */}
-      {message && (
+      {message && activeSection === 'general' && (
         <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
           {message.type === 'success' ? (
             <CheckCircle className="h-4 w-4" />
@@ -119,6 +148,10 @@ export function ProfileSettings() {
           <AlertDescription>{message.text}</AlertDescription>
         </Alert>
       )}
+
+      {/* General Settings Section */}
+      {activeSection === 'general' && (
+        <div className="space-y-6">
 
       {/* Profile Information */}
       <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
@@ -361,6 +394,13 @@ export function ProfileSettings() {
           </div>
         </CardContent>
       </Card>
+        </div>
+      )}
+
+      {/* Platform Integrations Section */}
+      {activeSection === 'integrations' && (
+        <PlatformIntegrations />
+      )}
     </div>
   )
 }

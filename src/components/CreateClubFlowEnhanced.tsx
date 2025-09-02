@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { PlatformConnectionStep } from './platform/PlatformConnectionStep'
 import CreateClubName from './CreateClubName'
 import CreateClubDescription from './CreateClubDescription'
 import CreateClubContact from './CreateClubContact'
@@ -17,9 +16,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
-import type { PlatformType } from '@/types/platformIntegration'
 import { createClub } from '@/services/clubCreation'
-import { initiatePlatformAuth, getPlatformOrganizations } from '@/services/platformIntegrationService'
 
 const INITIAL_DATA: CreateClubData = {
   name: '',
@@ -35,26 +32,23 @@ const INITIAL_DATA: CreateClubData = {
 }
 
 export default function CreateClubFlowEnhanced() {
-  const [currentStep, setCurrentStep] = useState(0) // Start at 0 for platform step
+  const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<CreateClubData>(INITIAL_DATA)
   const [isCreating, setIsCreating] = useState(false)
-  const [connectedPlatforms, setConnectedPlatforms] = useState<PlatformType[]>([])
-  const [platformDataImported, setPlatformDataImported] = useState(false)
   
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const { toast } = useToast()
 
   const steps = [
-    { id: 0, title: "Connect your platform (optional)", component: PlatformConnectionStep, optional: true },
-    { id: 1, title: "What's your club called?", component: CreateClubName },
-    { id: 2, title: 'Describe your club', component: CreateClubDescription },
-    { id: 3, title: 'How can people reach you?', component: CreateClubContact },
-    { id: 4, title: 'Where do you usually meet?', component: CreateClubLocation },
-    { id: 5, title: 'Tell your story', component: CreateClubAbout },
-    { id: 6, title: 'Make it yours', component: CreateClubBranding },
-    { id: 7, title: 'Connect your socials', component: CreateClubSocial },
-    { id: 8, title: 'Preview & Create', component: CreateClubPreview }
+    { id: 0, title: "What's your club called?", component: CreateClubName },
+    { id: 1, title: 'Describe your club', component: CreateClubDescription },
+    { id: 2, title: 'How can people reach you?', component: CreateClubContact },
+    { id: 3, title: 'Where do you usually meet?', component: CreateClubLocation },
+    { id: 4, title: 'Tell your story', component: CreateClubAbout },
+    { id: 5, title: 'Make it yours', component: CreateClubBranding },
+    { id: 6, title: 'Connect your socials', component: CreateClubSocial },
+    { id: 7, title: 'Preview & Create', component: CreateClubPreview }
   ]
 
   const progress = ((currentStep + 1) / steps.length) * 100
@@ -75,97 +69,30 @@ export default function CreateClubFlowEnhanced() {
     }
   }
 
-  const skipPlatformStep = () => {
-    setCurrentStep(1) // Skip to the name step
-  }
 
   const handleCancel = () => {
     // Navigate back to dashboard/profile
     navigate('/profile')
   }
 
-  const handlePlatformConnect = async (platform: PlatformType) => {
-    if (!currentUser) return
-
-    try {
-      // Simulate successful connection (popup modal handles the auth flow)
-      toast({
-        title: "Connected",
-        description: `Successfully connected to ${platform}!`
-      })
-      
-      // Get platform organizations (mock data) and import data
-      try {
-        const platformOrgs = await getPlatformOrganizations(`mock-${platform}-connection`)
-        
-        if (platformOrgs.length > 0) {
-          const org = platformOrgs[0]
-          
-          // Auto-fill form data from platform
-          updateFormData({
-            name: org.name || '',
-            description: org.description || org.shortDescription || '',
-            contactEmail: org.email || '',
-            defaultLocation: org.location || '',
-            logoUrl: org.logoUrl || undefined,
-            bannerUrl: org.bannerUrl || undefined,
-            socialLinks: {
-              ...org.socialLinks,
-              [platform]: org.platformUrl
-            }
-          })
-          
-          setPlatformDataImported(true)
-          
-          toast({
-            title: "Data Imported",
-            description: `Successfully imported club information from ${platform}!`
-          })
-        }
-        
-        // Add platform to connected list
-        setConnectedPlatforms([...connectedPlatforms, platform])
-        
-      } catch (error) {
-        console.error('Failed to import platform data:', error)
-        toast({
-          variant: "destructive",
-          title: "Import Failed",
-          description: "Failed to import data from platform, but connection was successful."
-        })
-        // Still add the platform as connected even if data import failed
-        setConnectedPlatforms([...connectedPlatforms, platform])
-      }
-      
-    } catch (error) {
-      console.error(`Failed to connect to ${platform}:`, error)
-      toast({
-        variant: "destructive",
-        title: "Connection Failed",
-        description: `Failed to connect to ${platform}. You can try again later.`
-      })
-    }
-  }
 
   const canProceed = () => {
     switch (currentStep) {
-      case 0: // Platform step is always optional
-        return true
-      case 1:
+      case 0:
         return formData.name.trim().length > 0
-      case 2:
+      case 1:
         return formData.description.trim().length > 0
-      case 3:
+      case 2:
         return formData.contactEmail.trim().length > 0
-      case 4:
+      case 3:
         return true // Location is optional
-      case 5:
+      case 4:
         return true // About story is optional
-      case 6:
+      case 5:
         return true // Branding is optional
-      case 7:
+      case 6:
         return true // Social links are optional
-      case 8:
+      case 7:
         return true // Ready to create
       default:
         return false
@@ -211,22 +138,8 @@ export default function CreateClubFlowEnhanced() {
   }
 
   const renderCurrentStep = () => {
-    const currentStepConfig = steps[currentStep]
-    
-    if (currentStep === 0) {
-      // Platform connection step
-      return (
-        <PlatformConnectionStep
-          onConnect={handlePlatformConnect}
-          onSkip={skipPlatformStep}
-          onContinue={nextStep}
-          onCancel={handleCancel}
-          connectedPlatforms={connectedPlatforms}
-        />
-      )
-    }
-    
     // Regular form steps
+    const currentStepConfig = steps[currentStep]
     const CurrentStepComponent = currentStepConfig.component
     
     const props: any = {
@@ -256,10 +169,7 @@ export default function CreateClubFlowEnhanced() {
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Let's create your club! 🎉</h1>
           <p className="text-gray-200">
-            {currentStep === 0 
-              ? "First, let's see if we can speed things up by importing from your existing event platform"
-              : "We'll get you set up in just a few quick steps"
-            }
+            We'll get you set up in just a few quick steps
           </p>
         </div>
 
@@ -277,11 +187,6 @@ export default function CreateClubFlowEnhanced() {
               style={{ width: `${progress}%` }}
             />
           </div>
-          {platformDataImported && currentStep > 0 && (
-            <div className="text-xs text-green-400 mt-2 flex items-center gap-1">
-              ✨ Data imported from connected platform
-            </div>
-          )}
         </div>
 
         {/* Step Content */}
