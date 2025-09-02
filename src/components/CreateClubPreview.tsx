@@ -1,6 +1,5 @@
 import React from 'react'
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Eye, Mail, MapPin, Instagram, Globe, Calendar, DollarSign, Link } from "lucide-react"
 import type { CreateClubPreviewProps } from '@/types/createClub'
@@ -47,20 +46,20 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
   return (
     <div className="space-y-6">
       {/* Completion Status */}
-      <Card className="bg-green-50 border-green-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-green-800">
+      <div className="bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg">
+        <div className="p-6">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-green-300 mb-2">
             <CheckCircle className="h-5 w-5" />
             Setup Complete ({completionPercentage}%)
-          </CardTitle>
-          <CardDescription className="text-green-700">
+          </h3>
+          <p className="text-green-200 mb-4">
             {requiredCompleted 
               ? "Your club is ready to be created! Optional items can be added later."
               : "Please complete all required fields before creating your club."
             }
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+          </p>
+        </div>
+        <div className="px-6 pb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
             {completionChecks.map((check, index) => (
               <div key={index} className="flex items-center gap-2">
@@ -74,7 +73,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                   {check.completed && <CheckCircle className="h-3 w-3" />}
                 </div>
                 <span className={`text-sm ${
-                  check.completed ? 'text-green-800' : check.required ? 'text-red-700' : 'text-gray-600'
+                  check.completed ? 'text-green-200' : check.required ? 'text-red-300' : 'text-gray-300'
                 }`}>
                   {check.label}
                   {check.required && !check.completed && ' *'}
@@ -82,22 +81,22 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               </div>
             ))}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Club Preview */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+        <div className="p-6">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-white mb-2">
             <Eye className="h-5 w-5" />
             Club Preview
-          </CardTitle>
-          <CardDescription>
+          </h3>
+          <p className="text-gray-200 mb-4">
             This is how your club page will look to visitors
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="border rounded-lg overflow-hidden bg-white shadow-sm">
+          </p>
+        </div>
+        <div className="px-6 pb-6">
+          <div className="border border-white/20 rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm">
             {/* Header Banner */}
             {data.bannerUrl ? (
               <img 
@@ -118,24 +117,24 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
             <div className="p-6">
               {/* Club Header Info */}
               <div className="mb-6 -mt-12">
-                <div className="bg-white rounded-lg p-6 shadow-lg border mx-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 mx-4">
                   <div className="flex items-start gap-4">
                     {data.logoUrl ? (
                       <img 
                         src={data.logoUrl} 
                         alt="Club logo" 
-                        className="w-20 h-20 object-cover rounded-full border-2 border-white shadow-md flex-shrink-0"
+                        className="w-20 h-20 object-cover rounded-full border-2 border-white/20 shadow-md flex-shrink-0"
                       />
                     ) : (
-                      <div className="w-20 h-20 bg-gray-100 rounded-full border-2 border-white shadow-md flex items-center justify-center flex-shrink-0">
-                        <span className="text-gray-400 text-xs text-center">Logo<br/>Here</span>
+                      <div className="w-20 h-20 bg-white/10 rounded-full border-2 border-white/20 shadow-md flex items-center justify-center flex-shrink-0">
+                        <span className="text-gray-300 text-xs text-center">Logo<br/>Here</span>
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
-                      <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                      <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
                         {data.name}
                       </h1>
-                      <p className="text-gray-600 text-sm md:text-base">{data.description}</p>
+                      <p className="text-gray-200 text-sm md:text-base">{data.description}</p>
                     </div>
                   </div>
                 </div>
@@ -143,12 +142,12 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
 
               {/* Contact Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center gap-2 text-gray-700">
+                <div className="flex items-center gap-2 text-gray-200">
                   <Mail className="h-4 w-4" />
                   <span className="text-sm">{data.contactEmail}</span>
                 </div>
                 {data.defaultLocation && (
-                  <div className="flex items-center gap-2 text-gray-700">
+                  <div className="flex items-center gap-2 text-gray-200">
                     <MapPin className="h-4 w-4" />
                     <span className="text-sm">{data.defaultLocation}</span>
                   </div>
@@ -158,7 +157,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               {/* Social Links */}
               {Object.values(data.socialLinks).some(link => link?.trim()) && (
                 <div className="mb-6">
-                  <h3 className="font-semibold mb-3">Connect With Us</h3>
+                  <h3 className="font-semibold mb-3 text-white">Connect With Us</h3>
                   <div className="flex flex-wrap gap-2">
                     {Object.entries(data.socialLinks)
                       .filter(([_, link]) => link?.trim())
@@ -181,11 +180,11 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
 
               {/* About Story - Always show with default if empty */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3">Our Story</h3>
+                <h3 className="font-semibold mb-3 text-white">Our Story</h3>
                 <p className={`leading-relaxed ${
                   isDefaultContent(data.aboutStory || '', data.name) 
-                    ? 'text-gray-500 italic' 
-                    : 'text-gray-700'
+                    ? 'text-gray-400 italic' 
+                    : 'text-gray-200'
                 }`}>
                   {getDisplayAboutStory(data.aboutStory, data.name)}
                 </p>
@@ -193,7 +192,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
 
               {/* Offerings - Always show with defaults if empty */}
               <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-lg">What We Offer</h3>
+                <h3 className="font-semibold mb-3 text-lg text-white">What We Offer</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                   {getDisplayOfferings(data.aboutOfferings).map((offering, index) => (
                     <div key={index} className={`flex items-center gap-3 rounded-lg p-3 ${
@@ -208,8 +207,8 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                       }`} />
                       <span className={`text-sm font-medium ${
                         (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                          ? 'text-gray-800'
-                          : 'text-gray-500 italic'
+                          ? 'text-gray-200'
+                          : 'text-gray-400 italic'
                       }`}>
                         {offering}
                       </span>
@@ -219,9 +218,9 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               </div>
 
               {/* Sample Event Preview */}
-              <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 bg-gray-50 text-center">
-                <h3 className="font-semibold mb-2 text-gray-700">Your Events Will Appear Here</h3>
-                <div className="text-sm text-gray-500 space-y-1 mb-4">
+              <div className="border-2 border-dashed border-white/20 rounded-lg p-6 bg-white/5 text-center">
+                <h3 className="font-semibold mb-2 text-gray-200">Your Events Will Appear Here</h3>
+                <div className="text-sm text-gray-300 space-y-1 mb-4">
                   <p>Once you create your club, you can start adding events.</p>
                   <p>Members will see event details and registration options right here!</p>
                 </div>
@@ -235,30 +234,30 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* URL Preview */}
-      <Card className="bg-blue-50 border-blue-200">
-        <CardContent className="pt-6">
+      <div className="bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg">
+        <div className="p-6">
           <div className="text-center">
-            <h3 className="font-semibold text-blue-900 mb-2">Your Club URL</h3>
-            <div className="bg-white p-3 rounded-lg border font-mono text-lg">
-              voxxypresents.com/<span className="text-purple-600">{clubSlug}</span>
+            <h3 className="font-semibold text-blue-300 mb-2">Your Club URL</h3>
+            <div className="bg-white/10 backdrop-blur-sm p-3 rounded-lg border border-white/20 font-mono text-lg text-white">
+              voxxypresents.com/<span className="text-purple-400">{clubSlug}</span>
             </div>
-            <p className="text-sm text-blue-700 mt-2">
+            <p className="text-sm text-blue-200 mt-2">
               This is where people will find your club online
             </p>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Create Button */}
-      <Card className="bg-purple-50 border-purple-200">
-        <CardContent className="pt-6">
+      <div className="bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg">
+        <div className="p-6">
           <div className="text-center">
-            <h3 className="text-xl font-bold text-purple-900 mb-2">Ready to launch your club? 🚀</h3>
-            <p className="text-purple-700 mb-4">
+            <h3 className="text-xl font-bold text-purple-300 mb-2">Ready to launch your club? 🚀</h3>
+            <p className="text-purple-200 mb-4">
               Once created, you can start planning events and building your community!
             </p>
             <Button
@@ -277,13 +276,13 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               )}
             </Button>
             {!requiredCompleted && (
-              <p className="text-sm text-red-600 mt-2">
+              <p className="text-sm text-red-300 mt-2">
                 Please complete all required fields (marked with *) before creating your club.
               </p>
             )}
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   )
 }

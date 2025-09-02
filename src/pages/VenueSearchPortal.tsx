@@ -161,33 +161,41 @@ export default function VenueSearchPortal() {
   const displayVenues = sortVenues(venues, sortBy)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'pulse 8s ease-in-out infinite'
+        }}
+      />
+      
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gray-800 border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-4 mb-4">
-            <Button
-              variant="outline"
+            <button
               onClick={() => navigate('/voxxy-shop')}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Shop
-            </Button>
+            </button>
           </div>
           
           <div className="flex items-center gap-3">
-            <Store className="h-8 w-8 text-purple-600" />
+            <Store className="h-8 w-8 text-purple-400" />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Venue Marketplace</h1>
-              <p className="text-gray-600">Find the perfect space for your next event</p>
+              <h1 className="text-3xl font-bold text-white">Venue Marketplace</h1>
+              <p className="text-gray-200">Find the perfect space for your next event</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <div className="lg:col-span-1">
@@ -202,20 +210,20 @@ export default function VenueSearchPortal() {
           {/* Results */}
           <div className="lg:col-span-3">
             {/* Results Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
               <div className="flex items-center gap-2">
                 {loading ? (
                   <div className="flex items-center gap-2">
-                    <Loader className="h-4 w-4 animate-spin" />
-                    <span className="text-gray-600">Searching venues...</span>
+                    <Loader className="h-4 w-4 animate-spin text-purple-400" />
+                    <span className="text-gray-200">Searching venues...</span>
                   </div>
                 ) : (
                   <div>
-                    <p className="text-gray-900 font-semibold">
+                    <p className="text-white font-semibold">
                       {venues.length} {venues.length === 1 ? 'venue' : 'venues'} found
                     </p>
                     {(filters.query || filters.location) && (
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-300">
                         {filters.query && `"${filters.query}"`}
                         {filters.query && filters.location && ' in '}
                         {filters.location && `${filters.location}`}
@@ -227,70 +235,75 @@ export default function VenueSearchPortal() {
 
               <div className="flex items-center gap-3">
                 {/* Sort Dropdown */}
-                <Select value={sortBy} onValueChange={(value: SortOption) => setSortBy(value)}>
-                  <SelectTrigger className="w-48">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {SORT_OPTIONS.map((option) => (
-                      <SelectItem key={option.value} value={option.value}>
-                        {option.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortOption)}
+                  className="px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+                >
+                  {SORT_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value} className="bg-gray-800">
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
 
                 {/* View Mode Toggle */}
-                <div className="flex items-center border border-gray-200 rounded-lg">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="sm"
+                <div className="flex items-center bg-white/10 border border-white/20 rounded-lg">
+                  <button
                     onClick={() => setViewMode('grid')}
-                    className="rounded-r-none"
+                    className={`p-2 transition-all duration-200 rounded-l-lg ${
+                      viewMode === 'grid'
+                        ? 'bg-white/20 text-white'
+                        : 'text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     <Grid3X3 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="sm"
+                  </button>
+                  <button
                     onClick={() => setViewMode('list')}
-                    className="rounded-l-none"
+                    className={`p-2 transition-all duration-200 rounded-r-lg ${
+                      viewMode === 'list'
+                        ? 'bg-white/20 text-white'
+                        : 'text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
                   >
                     <List className="h-4 w-4" />
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
 
             {/* Error State */}
             {error && (
-              <Card className="mb-6">
-                <CardContent className="p-6 text-center">
-                  <p className="text-red-600 mb-4">{error}</p>
-                  <Button onClick={loadVenues} variant="outline">
-                    Try Again
-                  </Button>
-                </CardContent>
-              </Card>
+              <div className="mb-6 bg-red-500/20 backdrop-blur-sm border border-red-400/30 rounded-lg p-6 text-center">
+                <p className="text-red-200 mb-4">{error}</p>
+                <button
+                  onClick={loadVenues}
+                  className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
+                >
+                  Try Again
+                </button>
+              </div>
             )}
 
             {/* Empty State */}
             {!loading && !error && venues.length === 0 && (
-              <Card>
-                <CardContent className="p-12 text-center">
-                  <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">No venues found</h3>
-                  <p className="text-gray-600 mb-6">
-                    Try adjusting your search criteria or browse all available venues.
-                  </p>
-                  <Button onClick={() => {
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-12 text-center">
+                <Search className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-xl font-semibold text-white mb-2">No venues found</h3>
+                <p className="text-gray-300 mb-6">
+                  Try adjusting your search criteria or browse all available venues.
+                </p>
+                <button
+                  onClick={() => {
                     setFilters({ query: '' })
                     handleSearch()
-                  }}>
-                    View All Venues
-                  </Button>
-                </CardContent>
-              </Card>
+                  }}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg"
+                >
+                  View All Venues
+                </button>
+              </div>
             )}
 
             {/* Venues Grid/List */}
@@ -311,17 +324,15 @@ export default function VenueSearchPortal() {
 
             {/* Coming Soon Features */}
             {!loading && venues.length > 0 && (
-              <Card className="mt-8 bg-blue-50 border-blue-200">
-                <CardContent className="p-6 text-center">
-                  <h3 className="font-semibold text-blue-900 mb-2">Coming Soon</h3>
-                  <p className="text-blue-800 text-sm mb-4">
-                    Interactive map view, availability calendar, and direct booking
-                  </p>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                    v1.5.0 Features
-                  </Badge>
-                </CardContent>
-              </Card>
+              <div className="mt-8 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg p-6 text-center">
+                <h3 className="font-semibold text-blue-200 mb-2">Coming Soon</h3>
+                <p className="text-blue-300 text-sm mb-4">
+                  Interactive map view, availability calendar, and direct booking
+                </p>
+                <div className="inline-flex px-3 py-1 bg-blue-600/30 border border-blue-400/40 text-blue-200 text-xs rounded-full">
+                  v1.5.0 Features
+                </div>
+              </div>
             )}
           </div>
         </div>

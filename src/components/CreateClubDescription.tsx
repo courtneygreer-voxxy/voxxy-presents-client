@@ -17,24 +17,24 @@ export default function CreateClubDescription({ data, updateData }: CreateClubDe
     <div className="space-y-6">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <MessageCircle className="h-6 w-6 text-purple-500" />
-          <h2 className="text-2xl font-bold text-gray-900">Describe your club</h2>
+          <MessageCircle className="h-6 w-6 text-purple-400" />
+          <h2 className="text-2xl font-bold text-white">Describe your club</h2>
         </div>
-        <p className="text-gray-600">Tell people what your club is all about and what they can expect 🌟</p>
+        <p className="text-gray-200">Tell people what your club is all about and what they can expect 🌟</p>
       </div>
 
       <div className="max-w-lg mx-auto">
-        <Textarea
+        <textarea
           id="description"
           placeholder="We're a vibrant community bringing together music lovers and creative souls in the heart of Brooklyn. Come for the beats, stay for the friendships! 🎵"
           value={data.description}
           onChange={(e) => handleInputChange(e.target.value)}
-          className="min-h-[120px] text-base"
+          className="w-full min-h-[120px] text-base p-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200 resize-none"
           maxLength={maxChars}
           autoFocus
         />
         <div className="flex justify-end mt-2">
-          <span className={`text-sm ${charCount > maxChars * 0.9 ? 'text-orange-500' : 'text-gray-400'}`}>
+          <span className={`text-sm ${charCount > maxChars * 0.9 ? 'text-orange-400' : 'text-gray-300'}`}>
             {charCount}/{maxChars}
           </span>
         </div>

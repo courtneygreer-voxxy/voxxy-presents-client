@@ -106,10 +106,17 @@ export default function VenueProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
-          <p className="text-gray-600">Loading venue...</p>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center relative overflow-hidden">
+        {/* Animated Background */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
+        <div className="text-center relative z-10">
+          <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-400" />
+          <p className="text-gray-300">Loading venue...</p>
         </div>
       </div>
     )
@@ -117,42 +124,59 @@ export default function VenueProfilePage() {
 
   if (error || !venue) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Venue Not Found</h1>
-          <p className="text-gray-600 mb-6">{error || 'The requested venue could not be found.'}</p>
-          <Button onClick={() => navigate('/voxxy-shop/venues')}>
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center relative overflow-hidden">
+        {/* Animated Background */}
+        <div 
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          }}
+        />
+        <div className="text-center relative z-10">
+          <h1 className="text-2xl font-bold text-white mb-4">Venue Not Found</h1>
+          <p className="text-gray-300 mb-6">{error || 'The requested venue could not be found.'}</p>
+          <button
+            onClick={() => navigate('/voxxy-shop/venues')}
+            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg"
+          >
             Browse All Venues
-          </Button>
+          </button>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}
+      />
+      
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-gray-800 border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-4">
-          <Button
-            variant="outline"
+          <button
             onClick={() => navigate('/voxxy-shop/venues')}
-            className="flex items-center gap-2 mb-4"
+            className="flex items-center gap-2 mb-4 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
           >
             <ArrowLeft className="h-4 w-4" />
             Back to Venues
-          </Button>
+          </button>
 
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{venue.name}</h1>
-                <Badge variant="secondary">
+                <h1 className="text-3xl font-bold text-white">{venue.name}</h1>
+                <div className="px-3 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 text-sm rounded-full">
                   {VENUE_TYPE_LABELS[venue.venueType]}
-                </Badge>
+                </div>
               </div>
               
-              <div className="flex items-center gap-4 text-gray-600 mb-4">
+              <div className="flex items-center gap-4 text-gray-300 mb-4">
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   <span>{venue.address}</span>
@@ -165,161 +189,159 @@ export default function VenueProfilePage() {
             </div>
 
             {venue.claimStatus === 'unclaimed' && (
-              <Button 
-                variant="outline" 
-                className="flex items-center gap-2"
+              <button
+                className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
                 onClick={handleClaimOwnership}
               >
                 <Crown className="h-4 w-4" />
                 Claim Ownership
-              </Button>
+              </button>
             )}
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Gallery and Description */}
           <div className="lg:col-span-2 space-y-6">
             {/* Photo Gallery */}
-            <Card>
-              <CardContent className="p-6">
-                <VenueGallery photos={venue.photos} venueName={venue.name} />
-              </CardContent>
-            </Card>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+              <VenueGallery photos={venue.photos} venueName={venue.name} />
+            </div>
 
             {/* About */}
-            <Card>
-              <CardHeader>
-                <CardTitle>About {venue.name}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 leading-relaxed">{venue.description}</p>
-              </CardContent>
-            </Card>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white">About {venue.name}</h2>
+              </div>
+              <div className="px-6 pb-6">
+                <p className="text-gray-200 leading-relaxed">{venue.description}</p>
+              </div>
+            </div>
 
             {/* Amenities */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Amenities & Features</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white">Amenities & Features</h2>
+              </div>
+              <div className="px-6 pb-6">
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {venue.amenities.map((amenity, index) => (
-                    <div key={index} className="flex items-center gap-2 text-sm">
-                      {AMENITY_ICONS[amenity] || <Star className="h-4 w-4" />}
+                    <div key={index} className="flex items-center gap-2 text-sm text-gray-200">
+                      <div className="text-purple-400">
+                        {AMENITY_ICONS[amenity] || <Star className="h-4 w-4" />}
+                      </div>
                       <span>{amenity}</span>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
 
           {/* Right Column - Booking and Details */}
           <div className="space-y-6">
             {/* Location */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
                   Location
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-700 mb-4">{venue.address}</p>
+                </h2>
+              </div>
+              <div className="px-6 pb-6">
+                <p className="text-sm text-gray-200 mb-4">{venue.address}</p>
                 
                 {/* Placeholder for Google Maps integration */}
-                <div className="bg-gray-100 rounded-lg h-48 flex items-center justify-center">
-                  <p className="text-gray-500 text-sm">
+                <div className="bg-white/5 border border-white/10 rounded-lg h-48 flex items-center justify-center">
+                  <p className="text-gray-400 text-sm">
                     Interactive map coming soon
                   </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Book This Venue */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Book This Venue</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button 
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white">Book This Venue</h2>
+              </div>
+              <div className="px-6 pb-6 space-y-4">
+                <button 
                   onClick={() => setIsContactModalOpen(true)}
-                  className="w-full"
-                  size="lg"
+                  className="w-full px-4 py-3 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg font-medium flex items-center justify-center gap-2"
                 >
-                  <Mail className="h-4 w-4 mr-2" />
+                  <Mail className="h-4 w-4" />
                   Contact for Booking
-                </Button>
+                </button>
                 
                 <div className="text-center">
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p className="text-sm text-blue-800">
+                  <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-3">
+                    <p className="text-sm text-blue-200">
                       <strong>Coming Soon:</strong> Direct booking and availability calendar
                     </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Contact */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Contact Information</CardTitle>
-              </CardHeader>
-              <CardContent>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white">Contact Information</h2>
+              </div>
+              <div className="px-6 pb-6">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-gray-500" />
-                    <span className="break-all">{venue.contactInfo.email}</span>
+                    <Mail className="h-4 w-4 text-gray-400" />
+                    <span className="break-all text-gray-200">{venue.contactInfo.email}</span>
                   </div>
                   {venue.contactInfo.phone && (
                     <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <span>{venue.contactInfo.phone}</span>
+                      <Phone className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-200">{venue.contactInfo.phone}</span>
                     </div>
                   )}
                   {venue.contactInfo.website && (
                     <div className="flex items-center gap-2">
-                      <ExternalLink className="h-4 w-4 text-gray-500" />
+                      <ExternalLink className="h-4 w-4 text-gray-400" />
                       <a 
                         href={venue.contactInfo.website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline break-all"
+                        className="text-blue-400 hover:text-blue-300 transition-colors break-all"
                       >
                         Visit Website
                       </a>
                     </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
 
             {/* Hours */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg">
+              <div className="p-6 pb-4">
+                <h2 className="text-xl font-semibold text-white flex items-center gap-2">
                   <Clock className="h-4 w-4" />
                   Hours
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
+                </h2>
+              </div>
+              <div className="px-6 pb-6">
                 <div className="space-y-2">
                   {formatHours(venue.hours).map((dayHours, index) => (
                     <div key={index} className="flex justify-between items-center text-sm">
-                      <span className="font-medium">{dayHours.day}</span>
-                      <span className={dayHours.hours === 'Closed' ? 'text-gray-500' : 'text-gray-700'}>
+                      <span className="font-medium text-white">{dayHours.day}</span>
+                      <span className={dayHours.hours === 'Closed' ? 'text-gray-400' : 'text-gray-200'}>
                         {dayHours.hours}
                       </span>
                     </div>
                   ))}
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

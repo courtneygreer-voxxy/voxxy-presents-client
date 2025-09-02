@@ -241,12 +241,21 @@ export default function CreateClubFlowEnhanced() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden py-8">
+      {/* Animated Background */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'pulse 8s ease-in-out infinite'
+        }}
+      />
+      
+      <div className="container mx-auto px-4 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Let's create your club! 🎉</h1>
-          <p className="text-gray-600">
+          <h1 className="text-3xl font-bold text-white mb-2">Let's create your club! 🎉</h1>
+          <p className="text-gray-200">
             {currentStep === 0 
               ? "First, let's see if we can speed things up by importing from your existing event platform"
               : "We'll get you set up in just a few quick steps"
@@ -255,58 +264,62 @@ export default function CreateClubFlowEnhanced() {
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-600">
+        <div className="mb-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+          <div className="flex justify-between items-center mb-3">
+            <span className="text-sm font-medium text-gray-200">
               Step {currentStep + 1} of {steps.length}
             </span>
-            <span className="text-sm text-gray-500">{steps[currentStep].title}</span>
+            <span className="text-sm text-gray-300">{steps[currentStep].title}</span>
           </div>
-          <Progress value={progress} className="h-2" />
+          <div className="w-full bg-gray-700/50 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
           {platformDataImported && currentStep > 0 && (
-            <div className="text-xs text-green-600 mt-1">
+            <div className="text-xs text-green-400 mt-2 flex items-center gap-1">
               ✨ Data imported from connected platform
             </div>
           )}
         </div>
 
         {/* Step Content */}
-        <Card className="mb-8">
-          <CardContent className="pt-6">
+        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg mb-8">
+          <div className="p-6">
             {renderCurrentStep()}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         {/* Navigation */}
         {currentStep > 0 && (
           <div className="flex justify-between">
-            <Button
-              variant="outline"
+            <button
               onClick={prevStep}
               disabled={currentStep === 0}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 rounded-lg"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
-            </Button>
+            </button>
 
             {currentStep < steps.length - 1 ? (
-              <Button
+              <button
                 onClick={nextStep}
                 disabled={!canProceed()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg"
               >
                 Next
                 <ChevronRight className="h-4 w-4" />
-              </Button>
+              </button>
             ) : (
-              <Button
+              <button
                 onClick={handleCreate}
                 disabled={!canProceed() || isCreating}
-                className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg"
               >
                 {isCreating ? 'Creating...' : 'Create Club'}
-              </Button>
+              </button>
             )}
           </div>
         )}

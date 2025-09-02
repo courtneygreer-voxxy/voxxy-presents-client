@@ -30,40 +30,40 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
   return (
     <div className="max-w-lg mx-auto space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-3">Name your club</h2>
-        <p className="text-gray-500 text-lg">Choose a memorable name and tagline</p>
+        <h2 className="text-3xl font-bold text-white mb-3">Name your club</h2>
+        <p className="text-gray-200 text-lg">Choose a memorable name and tagline</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <Input
+          <input
             id="name"
             placeholder="Brooklyn Hearts Club"
             value={data.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="text-xl py-4 px-6 text-center border-2 focus:border-purple-500 transition-colors"
+            className="w-full text-xl py-4 px-6 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
             autoFocus
           />
-          <p className="text-sm text-gray-400 text-center">Club name</p>
+          <p className="text-sm text-gray-300 text-center">Club name</p>
         </div>
         
         <div className="space-y-3">
-          <Input
+          <input
             id="tagline"
             placeholder="Where music meets community"
             value={data.tagline}
             onChange={(e) => handleTaglineChange(e.target.value)}
-            className="text-lg py-3 px-6 text-center border-2 focus:border-purple-500 transition-colors"
+            className="w-full text-lg py-3 px-6 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
           />
-          <p className="text-sm text-gray-400 text-center">Tagline</p>
+          <p className="text-sm text-gray-300 text-center">Tagline</p>
         </div>
       </div>
 
       {/* Preview URL */}
       {data.name && (
-        <div className="text-center py-4 px-6 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600 mb-2">Your club URL</p>
-          <div className="font-mono bg-white px-4 py-2 rounded-md border text-purple-600 text-base">
+        <div className="text-center py-4 px-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+          <p className="text-sm text-gray-300 mb-2">Your club URL</p>
+          <div className="font-mono bg-white/10 px-4 py-2 rounded-md border border-white/20 text-purple-300 text-base">
             voxxypresents.com/{clubSlug}
           </div>
         </div>

@@ -18,34 +18,34 @@ export default function CreateClubContact({ data, updateData }: CreateClubContac
     <div className="space-y-6">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 mb-4">
-          <Mail className="h-6 w-6 text-purple-500" />
-          <h2 className="text-2xl font-bold text-gray-900">How can people reach you?</h2>
+          <Mail className="h-6 w-6 text-purple-400" />
+          <h2 className="text-2xl font-bold text-white">How can people reach you?</h2>
         </div>
-        <p className="text-gray-600">We'll use this for important updates and member questions 📧</p>
+        <p className="text-gray-200">We'll use this for important updates and member questions 📧</p>
       </div>
 
       <div className="max-w-md mx-auto">
-        <Input
+        <input
           id="contactEmail"
           type="email"
           placeholder="hello@brooklynhearts.com"
           value={data.contactEmail}
           onChange={(e) => handleInputChange(e.target.value)}
-          className="text-lg py-3 text-center"
+          className="w-full text-lg py-3 px-4 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
           autoFocus
         />
         {data.contactEmail && !isValidEmail(data.contactEmail) && (
-          <p className="text-orange-500 text-sm mt-2 text-center">
+          <p className="text-orange-400 text-sm mt-2 text-center">
             Hmm, that doesn't look like a valid email address
           </p>
         )}
       </div>
 
       {/* Privacy note */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-md mx-auto">
+      <div className="bg-blue-500/20 border border-blue-400/30 rounded-lg p-4 max-w-md mx-auto">
         <div className="flex items-start gap-2">
-          <Shield className="h-4 w-4 text-blue-500 mt-0.5 flex-shrink-0" />
-          <div className="text-sm text-blue-800">
+          <Shield className="h-4 w-4 text-blue-300 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-blue-200">
             <p className="font-medium mb-1">Privacy first</p>
             <p>This email will be public on your club page. Members can use it to ask questions about events.</p>
           </div>
