@@ -28,24 +28,6 @@ const platformOptions = [
     description: 'Import your events, attendees, and ticket sales',
     features: ['Event details', 'Ticket sales data', 'Attendee lists', 'Venue information'],
     popular: true
-  },
-  {
-    platform: 'luma' as PlatformType,
-    name: 'Luma',
-    icon: '✨',
-    color: 'bg-purple-500',
-    description: 'Sync your Luma events and communities',
-    features: ['Event details', 'Community data', 'RSVP information', 'Online event links'],
-    popular: false
-  },
-  {
-    platform: 'meetup' as PlatformType,
-    name: 'Meetup',
-    icon: '👥',
-    color: 'bg-red-500',
-    description: 'Connect your Meetup groups and events',
-    features: ['Group information', 'Event details', 'Member data', 'Venue details'],
-    popular: false
   }
 ]
 
@@ -58,7 +40,6 @@ export function PlatformConnectionStep({
   connectedPlatforms = []
 }: PlatformConnectionStepProps) {
   const [selectedPlatform, setSelectedPlatform] = useState<PlatformType | null>(null)
-  const [showAllPlatforms, setShowAllPlatforms] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authModalPlatform, setAuthModalPlatform] = useState<PlatformType | null>(null)
   const [previewDisclaimerOpen, setPreviewDisclaimerOpen] = useState(false)
@@ -145,9 +126,7 @@ export function PlatformConnectionStep({
 
       {/* Platform Options */}
       <div className="space-y-4">
-        {platformOptions
-          .filter((_, index) => showAllPlatforms || index === 0)
-          .map(option => {
+        {platformOptions.map(option => {
             const isConnected = connectedPlatforms.includes(option.platform)
             const isConnecting = selectedPlatform === option.platform
 
@@ -227,18 +206,6 @@ export function PlatformConnectionStep({
           })}
       </div>
 
-      {/* Show More Platforms */}
-      {!showAllPlatforms && platformOptions.length > 1 && (
-        <div className="text-center">
-          <Button
-            variant="ghost"
-            onClick={() => setShowAllPlatforms(true)}
-            className="text-blue-600 hover:text-blue-700"
-          >
-            Show all platforms ({platformOptions.length - 1} more)
-          </Button>
-        </div>
-      )}
 
       <Separator />
 

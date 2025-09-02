@@ -24,7 +24,7 @@ interface PlatformConnectionManagerProps {
   compact?: boolean
 }
 
-const supportedPlatforms: PlatformType[] = ['eventbrite', 'luma', 'meetup']
+const supportedPlatforms: PlatformType[] = ['eventbrite']
 
 export function PlatformConnectionManager({ 
   organizationId, 

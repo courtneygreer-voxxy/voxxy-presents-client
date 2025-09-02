@@ -44,9 +44,7 @@ interface ImportJob {
 
 export function EventImportInterface({ connections, organizationId, onEventImported }: EventImportInterfaceProps) {
   const [eventsByPlatform, setEventsByPlatform] = useState<Record<PlatformType, PlatformEvent[]>>({
-    eventbrite: [],
-    luma: [],
-    meetup: []
+    eventbrite: []
   })
   const [loading, setLoading] = useState(true)
   const [selectedEvents, setSelectedEvents] = useState<Set<string>>(new Set())
@@ -138,9 +136,7 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
 
     // Group selected events by platform
     const eventsByPlatformToImport: Record<PlatformType, string[]> = {
-      eventbrite: [],
-      luma: [],
-      meetup: []
+      eventbrite: []
     }
 
     // Categorize selected events by platform
@@ -293,7 +289,7 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
       <Alert>
         <AlertCircle className="h-4 w-4" />
         <AlertDescription>
-          No platform connections found. Please connect to Eventbrite, Luma, or Meetup first.
+          No platform connections found. Please connect to Eventbrite first.
         </AlertDescription>
       </Alert>
     )
@@ -417,8 +413,6 @@ export function EventImportInterface({ connections, organizationId, onEventImpor
             return (
               <TabsTrigger key={connection.platform} value={connection.platform} className="flex items-center gap-2">
                 {connection.platform === 'eventbrite' && '🎫'}
-                {connection.platform === 'luma' && '✨'}
-                {connection.platform === 'meetup' && '👥'}
                 {connection.platform.charAt(0).toUpperCase() + connection.platform.slice(1)}
                 {unimportedCount > 0 && (
                   <Badge variant="secondary" className="ml-1">

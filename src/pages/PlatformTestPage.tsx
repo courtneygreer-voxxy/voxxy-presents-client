@@ -133,7 +133,7 @@ export default function PlatformTestPage() {
               <CardContent>
                 <TicketManagementCenter 
                   organizationId={mockOrgId}
-                  connectedPlatforms={connectedPlatforms.length > 0 ? connectedPlatforms : ['eventbrite', 'luma', 'meetup']}
+                  connectedPlatforms={connectedPlatforms.length > 0 ? connectedPlatforms : ['eventbrite']}
                 />
               </CardContent>
             </Card>

@@ -352,13 +352,11 @@ export async function getCrossPlatformEventAnalytics(organizationId: string): Pr
   recentEvents: PlatformEvent[]
 }> {
   return {
-    totalEvents: 12,
-    totalTicketsSold: 847,
-    totalRevenue: 18925,
+    totalEvents: 8,
+    totalTicketsSold: 623,
+    totalRevenue: 13475,
     platformBreakdown: [
-      { platform: 'eventbrite', events: 8, ticketsSold: 623, revenue: 13475 },
-      { platform: 'luma', events: 3, ticketsSold: 124, revenue: 2450 },
-      { platform: 'meetup', events: 1, ticketsSold: 100, revenue: 3000 }
+      { platform: 'eventbrite', events: 8, ticketsSold: 623, revenue: 13475 }
     ],
     recentEvents: getAllMockEvents().slice(0, 5)
   }

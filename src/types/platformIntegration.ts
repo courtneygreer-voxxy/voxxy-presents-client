@@ -1,6 +1,6 @@
 // Platform Integration Types for Third-Party Event Platform System
 
-export type PlatformType = 'eventbrite' | 'luma' | 'meetup'
+export type PlatformType = 'eventbrite'
 
 export interface PlatformConnection {
   id: string
@@ -271,14 +271,10 @@ export interface SyncJob {
 // Mock data interfaces for development
 export interface MockPlatformEventData {
   eventbrite: PlatformEvent[]
-  luma: PlatformEvent[]
-  meetup: PlatformEvent[]
 }
 
 export interface MockPlatformOrgData {
   eventbrite: PlatformOrganization[]
-  luma: PlatformOrganization[]
-  meetup: PlatformOrganization[]
 }
 
 // API Response types
