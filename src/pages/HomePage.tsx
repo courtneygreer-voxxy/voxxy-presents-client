@@ -385,7 +385,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="bg-gray-900 text-white py-12 relative z-10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="md:col-span-1">

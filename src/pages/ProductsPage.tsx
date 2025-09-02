@@ -15,41 +15,49 @@ import { Link } from "react-router-dom"
 
 export default function ProductsPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-indigo-50">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}
+      />
+      
       {/* Navigation */}
-      <nav className="relative z-10 px-4 py-6">
+      <nav className="bg-gray-800 border-b border-white/10 relative z-10 px-4 py-6">
         <div className="container mx-auto max-w-6xl flex justify-between items-center">
-          <Link to="/" className="text-2xl font-bold text-purple-600">
+          <Link to="/" className="text-2xl font-bold text-white">
             Voxxy Presents
           </Link>
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/features" className="text-gray-600 hover:text-purple-600 transition-colors">Features</Link>
-            <Link to="/pricing" className="text-gray-600 hover:text-purple-600 transition-colors">Pricing</Link>
-            <Link to="/products" className="text-purple-600 font-medium">Products</Link>
-            <Link to="/help" className="text-gray-600 hover:text-purple-600 transition-colors">Help Center</Link>
-            <Link to="/contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</Link>
+            <Link to="/features" className="text-gray-300 hover:text-white transition-colors">Features</Link>
+            <Link to="/pricing" className="text-gray-300 hover:text-white transition-colors">Pricing</Link>
+            <Link to="/products" className="text-purple-400 font-medium">Products</Link>
+            <Link to="/help" className="text-gray-300 hover:text-white transition-colors">Help Center</Link>
+            <Link to="/contact" className="text-gray-300 hover:text-white transition-colors">Contact</Link>
           </div>
-          <Button asChild>
+          <Button className="bg-purple-600 hover:bg-purple-700 text-white" asChild>
             <Link to="/contact">Request Beta Access</Link>
           </Button>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section className="relative py-20 px-4 z-10">
         <div className="container mx-auto max-w-4xl text-center">
-          <Badge variant="secondary" className="bg-purple-100 text-purple-800 px-4 py-2 text-sm font-medium mb-6">
+          <Badge className="bg-purple-500/20 border border-purple-400/30 text-purple-300 px-4 py-2 text-sm font-medium mb-6">
             The Voxxy Ecosystem
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6 tracking-tight">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
             Complete Solutions for{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
             Communities
             </span>
           </h1>
           
-          <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-200 mb-12 max-w-3xl mx-auto">
             From social outings to community planning tools - discover the full suite 
             of products designed to help communities thrive.
           </p>
@@ -57,18 +65,18 @@ export default function ProductsPage() {
       </section>
 
       {/* Products Overview */}
-      <section className="py-20 bg-white">
+      <section className="py-20 relative z-10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="space-y-16">
             
             {/* Voxxy Presents */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
-                <Badge className="bg-green-100 text-green-800 mb-4">Available Now - Beta</Badge>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <Badge className="bg-green-500/20 border border-green-400/30 text-green-300 mb-4">Available Now - Beta</Badge>
+                <h2 className="text-3xl font-bold text-white mb-4">
                   Voxxy Presents
                 </h2>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-lg text-gray-200 mb-6">
                   The complete community management platform for creative organizers everywhere. 
                   Professional tools handle white-labeled event pages, automated billing, and partnerships - 
                   everything you need to scale your community.
@@ -76,31 +84,31 @@ export default function ProductsPage() {
                 
                 <div className="grid md:grid-cols-2 gap-4 mb-8">
                   <div className="flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Custom Event Pages</p>
-                      <p className="text-sm text-gray-600">White-labeled community presence</p>
+                      <p className="font-medium text-white">Custom Event Pages</p>
+                      <p className="text-sm text-gray-300">White-labeled community presence</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Revenue Tools</p>
-                      <p className="text-sm text-gray-600">Subscriptions & payments</p>
+                      <p className="font-medium text-white">Revenue Tools</p>
+                      <p className="text-sm text-gray-300">Subscriptions & payments</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Venue Network</p>
-                      <p className="text-sm text-gray-600">Partnership network access</p>
+                      <p className="font-medium text-white">Venue Network</p>
+                      <p className="text-sm text-gray-300">Partnership network access</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
-                    <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                    <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium">Analytics</p>
-                      <p className="text-sm text-gray-600">Growth insights & reporting</p>
+                      <p className="font-medium text-white">Analytics</p>
+                      <p className="text-sm text-gray-300">Growth insights & reporting</p>
                     </div>
                   </div>
                 </div>
@@ -112,18 +120,18 @@ export default function ProductsPage() {
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button variant="outline" asChild>
+                  <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30" asChild>
                     <Link to="/contact">Join Beta</Link>
                   </Button>
                 </div>
               </div>
               
-              <Card className="border-2 border-purple-200 shadow-2xl">
+              <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-2xl">
                 <CardContent className="p-8">
-                  <div className="bg-gradient-to-br from-purple-100 to-indigo-100 rounded-lg p-6 text-center">
-                    <Users className="h-16 w-16 text-purple-600 mx-auto mb-4" />
-                    <h3 className="font-bold text-lg mb-2">Community First</h3>
-                    <p className="text-gray-600 text-sm">
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center">
+                    <Users className="h-16 w-16 text-purple-400 mx-auto mb-4" />
+                    <h3 className="font-bold text-lg mb-2 text-white">Community First</h3>
+                    <p className="text-gray-200 text-sm">
                       Built specifically for creative community organizers who want professional tools to handle 
                       coordination without losing the personal touch that makes their communities special.
                     </p>
@@ -134,12 +142,12 @@ export default function ProductsPage() {
 
             {/* Voxxy Mobile */}
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <Card className="border-2 border-blue-200 shadow-2xl order-2 lg:order-1">
+              <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-2xl order-2 lg:order-1">
                 <CardContent className="p-8">
-                  <div className="bg-gradient-to-br from-blue-100 to-cyan-100 rounded-lg p-6 text-center">
-                    <Smartphone className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-                    <h3 className="font-bold text-lg mb-2">Mobile Experience</h3>
-                    <p className="text-gray-600 text-sm">
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center">
+                    <Smartphone className="h-16 w-16 text-blue-300 mx-auto mb-4" />
+                    <h3 className="font-bold text-lg mb-2 text-white">Mobile Experience</h3>
+                    <p className="text-gray-200 text-sm">
                       Native mobile apps for iOS and Android that bring your community 
                       experience directly to your members' pockets.
                     </p>
@@ -149,16 +157,16 @@ export default function ProductsPage() {
 
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <Badge className="bg-blue-100 text-blue-800">Coming Soon</Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className="bg-blue-500/20 border border-blue-400/30 text-blue-300">Coming Soon</Badge>
+                  <Badge className="bg-white/10 backdrop-blur-sm border border-white/20 text-gray-200 text-xs">
                     <Clock className="h-3 w-3 mr-1" />
                     2025 Q2
                   </Badge>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl font-bold text-white mb-4">
                   Voxxy Mobile
                 </h2>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-lg text-gray-200 mb-6">
                   Dedicated mobile apps that give your community members a seamless, 
                   native experience for event registration, community messaging, 
                   and staying connected on the go.
@@ -166,24 +174,24 @@ export default function ProductsPage() {
                 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700">Push notifications for events and updates</span>
+                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                    <span className="text-gray-200">Push notifications for events and updates</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700">Offline event information and schedules</span>
+                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                    <span className="text-gray-200">Offline event information and schedules</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700">In-app community messaging and forums</span>
+                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                    <span className="text-gray-200">In-app community messaging and forums</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
-                    <span className="text-gray-700">Quick event check-ins and QR codes</span>
+                    <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
+                    <span className="text-gray-200">Quick event check-ins and QR codes</span>
                   </div>
                 </div>
 
-                <Button variant="outline" disabled>
+                <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white cursor-not-allowed opacity-50" disabled>
                   <Clock className="mr-2 h-4 w-4" />
                   Coming Q2 2025
                 </Button>
@@ -194,16 +202,16 @@ export default function ProductsPage() {
             <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <Badge className="bg-orange-100 text-orange-800">Coming Soon</Badge>
-                  <Badge variant="outline" className="text-xs">
+                  <Badge className="bg-orange-500/20 border border-orange-400/30 text-orange-300">Coming Soon</Badge>
+                  <Badge className="bg-white/10 backdrop-blur-sm border border-white/20 text-gray-200 text-xs">
                     <Clock className="h-3 w-3 mr-1" />
                     2025 Q3
                   </Badge>
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                <h2 className="text-3xl font-bold text-white mb-4">
                   Voxxy Planner
                 </h2>
-                <p className="text-lg text-gray-600 mb-6">
+                <p className="text-lg text-gray-200 mb-6">
                   Advanced event planning and resource management tools for larger 
                   creative organizations. Budget tracking, vendor management, 
                   and collaborative planning workflows.
@@ -211,35 +219,35 @@ export default function ProductsPage() {
                 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                    <span className="text-gray-700">Budget planning and expense tracking</span>
+                    <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
+                    <span className="text-gray-200">Budget planning and expense tracking</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                    <span className="text-gray-700">Vendor and supplier relationship management</span>
+                    <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
+                    <span className="text-gray-200">Vendor and supplier relationship management</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                    <span className="text-gray-700">Team collaboration and task assignment</span>
+                    <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
+                    <span className="text-gray-200">Team collaboration and task assignment</span>
                   </div>
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-orange-600 rounded-full"></div>
-                    <span className="text-gray-700">Advanced analytics and ROI reporting</span>
+                    <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
+                    <span className="text-gray-200">Advanced analytics and ROI reporting</span>
                   </div>
                 </div>
 
-                <Button variant="outline" disabled>
+                <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white cursor-not-allowed opacity-50" disabled>
                   <Clock className="mr-2 h-4 w-4" />
                   Coming Q3 2025
                 </Button>
               </div>
               
-              <Card className="border-2 border-orange-200 shadow-2xl">
+              <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-2xl">
                 <CardContent className="p-8">
-                  <div className="bg-gradient-to-br from-orange-100 to-yellow-100 rounded-lg p-6 text-center">
-                    <Calendar className="h-16 w-16 text-orange-600 mx-auto mb-4" />
-                    <h3 className="font-bold text-lg mb-2">Enterprise Planning</h3>
-                    <p className="text-gray-600 text-sm">
+                  <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center">
+                    <Calendar className="h-16 w-16 text-orange-300 mx-auto mb-4" />
+                    <h3 className="font-bold text-lg mb-2 text-white">Enterprise Planning</h3>
+                    <p className="text-gray-200 text-sm">
                       For established creative organizations that need advanced planning tools 
                       and want to scale their operations professionally.
                     </p>
@@ -252,45 +260,45 @@ export default function ProductsPage() {
       </section>
 
       {/* Integration Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-800/50 backdrop-blur-sm relative z-10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-white mb-4">
               Better Together
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-gray-200 max-w-2xl mx-auto">
               Each Voxxy product works seamlessly with the others, creating a complete 
               ecosystem for your creative community.
             </p>
           </div>
 
-          <Card className="border-0 shadow-2xl overflow-hidden">
+          <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-2xl overflow-hidden">
             <CardContent className="p-12">
               <div className="grid md:grid-cols-3 gap-8 text-center">
                 <div>
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Users className="h-8 w-8 text-purple-600" />
+                  <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-purple-300" />
                   </div>
-                  <h3 className="font-bold mb-2">Start with Presents</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-bold mb-2 text-white">Start with Presents</h3>
+                  <p className="text-gray-200 text-sm">
                     Build your community foundation with event management and member engagement
                   </p>
                 </div>
                 <div>
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Smartphone className="h-8 w-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Smartphone className="h-8 w-8 text-blue-300" />
                   </div>
-                  <h3 className="font-bold mb-2">Add Mobile</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-bold mb-2 text-white">Add Mobile</h3>
+                  <p className="text-gray-200 text-sm">
                     Enhance engagement with native mobile apps for your community members
                   </p>
                 </div>
                 <div>
-                  <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="h-8 w-8 text-orange-600" />
+                  <div className="w-16 h-16 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="h-8 w-8 text-orange-300" />
                   </div>
-                  <h3 className="font-bold mb-2">Scale with Planner</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-bold mb-2 text-white">Scale with Planner</h3>
+                  <p className="text-gray-200 text-sm">
                     Grow into advanced planning tools as your organization expands
                   </p>
                 </div>
@@ -301,15 +309,15 @@ export default function ProductsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 to-indigo-600">
+      <section className="py-20 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="flex justify-center mb-6">
-            <Sparkles className="h-12 w-12 text-purple-200" />
+            <Sparkles className="h-12 w-12 text-purple-300" />
           </div>
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to start your journey?
           </h2>
-          <p className="text-lg text-purple-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
             Begin with Voxxy Presents and build the creative community of your dreams with your planner friend
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -321,8 +329,7 @@ export default function ProductsPage() {
             </Button>
             <Button 
               size="lg" 
-              variant="outline" 
-              className="text-lg px-8 py-6 border-white text-purple hover:bg-white hover:text-purple-600"
+              className="text-lg px-8 py-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30"
               asChild
             >
               <Link to="/features">

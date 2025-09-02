@@ -104,8 +104,8 @@ export function ProfileSettings() {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold">Profile Settings</h2>
-        <p className="text-gray-600">Manage your account information and preferences</p>
+        <h2 className="text-2xl font-bold text-white">Profile Settings</h2>
+        <p className="text-gray-200">Manage your account information and preferences</p>
       </div>
 
       {/* Success/Error Messages */}
@@ -121,13 +121,13 @@ export function ProfileSettings() {
       )}
 
       {/* Profile Information */}
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 text-white">
             <User className="h-5 w-5" />
             <span>Profile Information</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-200">
             Update your profile details and display information
           </CardDescription>
         </CardHeader>
@@ -141,11 +141,11 @@ export function ProfileSettings() {
               </AvatarFallback>
             </Avatar>
             <div className="space-y-2">
-              <h4 className="font-medium">Profile Photo</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-white">Profile Photo</h4>
+              <p className="text-sm text-gray-200">
                 Profile photos are currently managed through Google or other OAuth providers.
               </p>
-              <Button size="sm" variant="outline" disabled>
+              <Button size="sm" variant="outline" disabled className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
                 <Camera className="h-4 w-4 mr-2" />
                 Change Photo (Coming Soon)
               </Button>
@@ -156,7 +156,7 @@ export function ProfileSettings() {
 
           {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="displayName">Display Name</Label>
+            <Label htmlFor="displayName" className="text-white">Display Name</Label>
             <div className="flex space-x-2">
               <Input
                 id="displayName"
@@ -166,26 +166,26 @@ export function ProfileSettings() {
                 placeholder="Enter your display name"
               />
               {!isEditing && (
-                <Button onClick={() => setIsEditing(true)} variant="outline">
+                <Button onClick={() => setIsEditing(true)} variant="outline" className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
                   Edit
                 </Button>
               )}
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-200">
               This name will be displayed on your clubs and in communications.
             </p>
           </div>
 
           {/* Email (read-only) */}
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email" className="text-white">Email Address</Label>
             <Input
               id="email"
               value={currentUser?.email || ''}
               disabled
-              className="bg-gray-50"
+              className="bg-white/10 border-white/20 text-white placeholder:text-gray-400"
             />
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-200">
               Email address cannot be changed. Contact support if you need to update this.
             </p>
           </div>
@@ -193,7 +193,7 @@ export function ProfileSettings() {
           {/* Save/Cancel buttons */}
           {isEditing && (
             <div className="flex space-x-2">
-              <Button onClick={handleSaveProfile} disabled={isSaving}>
+              <Button onClick={handleSaveProfile} disabled={isSaving} className="bg-purple-600 hover:bg-purple-700 text-white">
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -206,7 +206,7 @@ export function ProfileSettings() {
                   </>
                 )}
               </Button>
-              <Button onClick={handleCancel} variant="outline" disabled={isSaving}>
+              <Button onClick={handleCancel} variant="outline" disabled={isSaving} className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
                 Cancel
               </Button>
             </div>
@@ -215,13 +215,13 @@ export function ProfileSettings() {
       </Card>
 
       {/* Account Security */}
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 text-white">
             <Shield className="h-5 w-5" />
             <span>Account Security</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-200">
             Manage your account security and verification status
           </CardDescription>
         </CardHeader>
@@ -229,8 +229,8 @@ export function ProfileSettings() {
           {/* Email Verification */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h4 className="font-medium">Email Verification</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-white">Email Verification</h4>
+              <p className="text-sm text-gray-200">
                 {isEmailVerified 
                   ? 'Your email address has been verified.'
                   : 'Please verify your email address to access all features.'
@@ -248,6 +248,7 @@ export function ProfileSettings() {
                   size="sm"
                   onClick={handleResendVerification}
                   disabled={isResendingVerification}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
                 >
                   {isResendingVerification ? (
                     <>
@@ -270,13 +271,13 @@ export function ProfileSettings() {
           {/* Password */}
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h4 className="font-medium">Password</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-white">Password</h4>
+              <p className="text-sm text-gray-200">
                 Last updated: {currentUser?.metadata.lastSignInTime && 
                   new Date(currentUser.metadata.lastSignInTime).toLocaleDateString()}
               </p>
             </div>
-            <Button size="sm" variant="outline" disabled>
+            <Button size="sm" variant="outline" disabled className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
               Change Password (Coming Soon)
             </Button>
           </div>
@@ -284,21 +285,21 @@ export function ProfileSettings() {
       </Card>
 
       {/* Preferences */}
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
+          <CardTitle className="flex items-center space-x-2 text-white">
             <Bell className="h-5 w-5" />
             <span>Preferences</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-200">
             Configure your notification and communication preferences
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-1">
-              <h4 className="font-medium">Email Notifications</h4>
-              <p className="text-sm text-gray-600">
+              <h4 className="font-medium text-white">Email Notifications</h4>
+              <p className="text-sm text-gray-200">
                 Receive email updates about your clubs and events
               </p>
             </div>
@@ -313,7 +314,7 @@ export function ProfileSettings() {
           {/* Auto-save preferences */}
           {formData.emailNotifications !== (userProfile?.emailNotifications ?? true) && !isEditing && (
             <div className="pt-2">
-              <Button onClick={handleSaveProfile} disabled={isSaving}>
+              <Button onClick={handleSaveProfile} disabled={isSaving} className="bg-purple-600 hover:bg-purple-700 text-white">
                 {isSaving ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -332,13 +333,13 @@ export function ProfileSettings() {
       </Card>
 
       {/* Account Management */}
-      <Card>
+      <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-destructive">
+          <CardTitle className="flex items-center space-x-2 text-red-400">
             <AlertTriangle className="h-5 w-5" />
             <span>Danger Zone</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-200">
             Irreversible account actions
           </CardDescription>
         </CardHeader>

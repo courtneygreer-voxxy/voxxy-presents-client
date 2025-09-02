@@ -68,14 +68,14 @@ export function ClubsManagement() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold">My Clubs</h2>
-            <p className="text-gray-600">Manage your clubs and events</p>
+            <h2 className="text-2xl font-bold text-white">My Clubs</h2>
+            <p className="text-gray-200">Manage your clubs and events</p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
-            <Card key={i}>
+            <Card key={i} className="bg-white/10 backdrop-blur-sm border border-white/20">
               <CardHeader>
                 <Skeleton className="h-4 w-3/4" />
                 <Skeleton className="h-3 w-1/2" />
@@ -99,10 +99,10 @@ export function ClubsManagement() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-2xl font-bold">My Clubs</h2>
-            <p className="text-gray-600">Manage your clubs and events</p>
+            <h2 className="text-2xl font-bold text-white">My Clubs</h2>
+            <p className="text-gray-200">Manage your clubs and events</p>
           </div>
-          <Button asChild>
+          <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
             <Link to="/create-club">
               <Plus className="h-4 w-4 mr-2" />
               Create Club
@@ -111,14 +111,14 @@ export function ClubsManagement() {
         </div>
 
         {/* Empty State */}
-        <Card>
+        <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
           <CardContent className="text-center py-12">
             <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No clubs yet</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
+            <h3 className="text-lg font-medium text-white mb-2">No clubs yet</h3>
+            <p className="text-gray-200 mb-6 max-w-md mx-auto">
               Create your first club to start building your community and managing events.
             </p>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="bg-purple-600 hover:bg-purple-700 text-white">
               <Link to="/create-club">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Your First Club
@@ -134,12 +134,12 @@ export function ClubsManagement() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">My Clubs</h2>
-          <p className="text-gray-600">
+          <h2 className="text-2xl font-bold text-white">My Clubs</h2>
+          <p className="text-gray-200">
             You're managing {clubs.length} club{clubs.length !== 1 ? 's' : ''}
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white">
           <Link to="/create-club">
             <Plus className="h-4 w-4 mr-2" />
             Create Club
@@ -151,7 +151,7 @@ export function ClubsManagement() {
       {/* Clubs List - Single Column */}
       <div className="space-y-4">
         {clubs.map((club) => (
-          <Card key={club.id} className="hover:shadow-lg transition-shadow">
+          <Card key={club.id} className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
             <CardContent className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1 min-w-0">
@@ -164,8 +164,8 @@ export function ClubsManagement() {
                       />
                     )}
                     <div>
-                      <h3 className="text-xl font-semibold text-gray-900">{club.name}</h3>
-                      <p className="text-gray-600 text-sm mt-1">
+                      <h3 className="text-xl font-semibold text-white">{club.name}</h3>
+                      <p className="text-gray-200 text-sm mt-1">
                         {club.description}
                       </p>
                     </div>
@@ -176,25 +176,25 @@ export function ClubsManagement() {
               {/* Club Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                 {club.settings?.defaultLocation && (
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-200">
                     <MapPin className="h-4 w-4 mr-3 text-gray-400" />
                     <span>{club.settings.defaultLocation}</span>
                   </div>
                 )}
                 
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-200">
                   <Palette className="h-4 w-4 mr-3 text-gray-400" />
                   <span>Theme: {club.settings?.theme?.primaryColor || 'Default'}</span>
                 </div>
                 
                 {club.contactEmail && (
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-200">
                     <Mail className="h-4 w-4 mr-3 text-gray-400" />
                     <span>{club.contactEmail}</span>
                   </div>
                 )}
 
-                <div className="flex items-center text-sm text-gray-600">
+                <div className="flex items-center text-sm text-gray-200">
                   <Calendar className="h-4 w-4 mr-3 text-gray-400" />
                   <span>Created {new Date(club.createdAt).toLocaleDateString()}</span>
                 </div>
@@ -202,21 +202,21 @@ export function ClubsManagement() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3">
-                <Button asChild className="flex-1 min-w-[140px]">
+                <Button asChild className="flex-1 min-w-[140px] bg-purple-600 hover:bg-purple-700 text-white">
                   <Link to={`/${club.slug}/admin`}>
                     <Settings className="h-4 w-4 mr-2" />
                     Manage Club
                   </Link>
                 </Button>
                 
-                <Button variant="outline" asChild className="flex-1 min-w-[120px]">
+                <Button variant="outline" asChild className="flex-1 min-w-[120px] bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
                   <Link to={`/${club.slug}`} target="_blank" rel="noopener noreferrer">
                     <ExternalLink className="h-4 w-4 mr-2" />
                     View Public
                   </Link>
                 </Button>
                 
-                <Button variant="outline" asChild className="flex-1 min-w-[100px]">
+                <Button variant="outline" asChild className="flex-1 min-w-[100px] bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30">
                   <Link to={`/${club.slug}/admin`}>
                     <Calendar className="h-4 w-4 mr-2" />
                     Events

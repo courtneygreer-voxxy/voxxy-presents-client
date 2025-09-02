@@ -1,6 +1,5 @@
 import React from 'react'
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Eye, Mail, MapPin, Instagram, Globe, Calendar, DollarSign, Link } from "lucide-react"
 import type { CreateClubPreviewProps } from '@/types/createClub'
 import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
@@ -164,14 +163,13 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                       .map(([platform, link]) => {
                         const Icon = getSocialIcon(platform)
                         return (
-                          <Badge 
+                          <div 
                             key={platform} 
-                            variant="outline" 
-                            className="flex items-center gap-1 border-purple-300 text-purple-600"
+                            className="flex items-center gap-1 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-purple-300 rounded-full text-sm"
                           >
                             <Icon className="h-3 w-3" />
                             {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                          </Badge>
+                          </div>
                         )
                       })}
                   </div>
@@ -197,12 +195,12 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
                   {getDisplayOfferings(data.aboutOfferings).map((offering, index) => (
                     <div key={index} className={`flex items-center gap-3 rounded-lg p-3 ${
                       (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                        ? 'bg-purple-50'
-                        : 'bg-gray-50'
+                        ? 'bg-white/10 backdrop-blur-sm border border-white/20'
+                        : 'bg-white/5 backdrop-blur-sm border border-white/10'
                     }`}>
                       <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
                         (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                          ? 'bg-purple-500'
+                          ? 'bg-purple-400'
                           : 'bg-gray-400'
                       }`} />
                       <span className={`text-sm font-medium ${
