@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -30,6 +30,13 @@ import {
   initiateProfileAuth
 } from '@/services/profilePlatformService'
 import { PlatformAuthModal } from '../platform/PlatformAuthModal'
+import { SyncStatusIndicator } from './SyncStatusIndicator'
+import { 
+  initializeSyncService,
+  cleanupSyncService,
+  subscribeToSyncUpdates,
+  startBackgroundSync
+} from '@/services/eventSyncService'
 import { useToast } from '@/hooks/use-toast'
 
 interface ConnectionStats {
@@ -50,13 +57,7 @@ export function PlatformIntegrations() {
   const [testingConnection, setTestingConnection] = useState<string | null>(null)
   const [syncingConnection, setSyncingConnection] = useState<string | null>(null)
 
-  useEffect(() => {
-    if (currentUser) {
-      loadConnections()
-    }
-  }, [currentUser])
-
-  const loadConnections = async () => {
+  const loadConnections = useCallback(async () => {
     if (!currentUser) return
     
     try {
@@ -85,7 +86,68 @@ export function PlatformIntegrations() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentUser, toast])
+
+  useEffect(() => {
+    if (currentUser) {
+      loadConnections()
+      // Initialize sync service for real-time updates
+      initializeSyncService(currentUser.uid)
+    }
+
+    // Cleanup sync service on unmount
+    return () => {
+      cleanupSyncService()
+    }
+  }, [currentUser, loadConnections])
+
+  useEffect(() => {
+    // Subscribe to sync updates for real-time status
+    const unsubscribe = subscribeToSyncUpdates((event) => {
+      // Update connection stats based on sync events
+      if (event.type === 'sync_completed') {
+        setConnectionStats(prev => ({
+          ...prev,
+          [event.connectionId]: {
+            ...prev[event.connectionId],
+            status: 'connected',
+            lastSyncAt: new Date()
+          }
+        }))
+        setSyncingConnection(null)
+        toast({
+          title: "Sync Complete",
+          description: "Platform data has been synchronized successfully."
+        })
+        // Refresh connections to get updated sync times
+        loadConnections()
+      } else if (event.type === 'sync_failed') {
+        setConnectionStats(prev => ({
+          ...prev,
+          [event.connectionId]: {
+            ...prev[event.connectionId],
+            status: 'error'
+          }
+        }))
+        setSyncingConnection(null)
+        toast({
+          variant: "destructive",
+          title: "Sync Failed",
+          description: event.data?.error || "Failed to synchronize platform data."
+        })
+      } else if (event.type === 'sync_started') {
+        setConnectionStats(prev => ({
+          ...prev,
+          [event.connectionId]: {
+            ...prev[event.connectionId],
+            status: 'syncing'
+          }
+        }))
+      }
+    })
+
+    return unsubscribe
+  }, [toast, loadConnections])
 
   const handleConnect = (platform: PlatformType) => {
     setAuthModalPlatform(platform)
@@ -150,22 +212,24 @@ export function PlatformIntegrations() {
   }
 
   const handleSyncData = async (connectionId: string) => {
+    const connection = connections.find(c => c.id === connectionId)
+    if (!connection) return
+
     try {
       setSyncingConnection(connectionId)
-      await syncProfileConnection(connectionId, 'incremental_sync')
-      await loadConnections() // Refresh to update last sync time
-      toast({
-        title: "Sync Complete",
-        description: "Platform data has been synchronized successfully."
+      await startBackgroundSync(connectionId, connection.platform, {
+        syncType: 'incremental_sync',
+        forceSync: true
       })
+      // Note: The toast notifications for sync completion/failure 
+      // will be handled by the real-time sync event listeners
     } catch (error) {
       console.error('Sync failed:', error)
       toast({
         variant: "destructive",
         title: "Sync Failed",
-        description: "Failed to synchronize platform data."
+        description: "Failed to start synchronization process."
       })
-    } finally {
       setSyncingConnection(null)
     }
   }
@@ -202,7 +266,9 @@ export function PlatformIntegrations() {
         <p className="text-gray-200">Connect your event platforms to sync events and manage your community</p>
       </div>
 
-      {/* Eventbrite Connection */}
+      {/* Platform Connections */}
+        <div className="space-y-6">
+          {/* Eventbrite Connection */}
       <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center justify-between text-white">
@@ -245,6 +311,19 @@ export function PlatformIntegrations() {
                     {format(new Date(eventbriteConnection.connectedAt), 'MMM d, yyyy')}
                   </p>
                 </div>
+              </div>
+
+              {/* Real-time Sync Status */}
+              <div className="bg-white/5 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-white mb-3">Sync Status</h4>
+                <SyncStatusIndicator
+                  connectionId={eventbriteConnection.id}
+                  platform={eventbriteConnection.platform}
+                  lastSyncAt={eventbriteConnection.lastSyncAt}
+                  onSyncComplete={() => {
+                    loadConnections() // Refresh connections after sync
+                  }}
+                />
               </div>
 
               {/* Stats */}
@@ -460,6 +539,7 @@ export function PlatformIntegrations() {
           </p>
         </CardContent>
       </Card>
+        </div>
 
       {/* Platform Auth Modal */}
       {authModalPlatform && (

@@ -34,7 +34,7 @@ import SubscribersList from "@/components/SubscribersList"
 import { PlatformConnectionManager } from "@/components/platform/PlatformConnectionManager"
 import { EventImportInterface } from "@/components/platform/EventImportInterface"
 import { TicketManagementCenter } from "@/components/platform/TicketManagementCenter"
-import { ImportEventsManager } from "@/components/ImportEventsManager"
+import { ClubEventSyncManager } from "@/components/ClubEventSyncManager"
 import { TicketManagementManager } from "@/components/TicketManagementManager"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
@@ -329,11 +329,11 @@ export default function OrganizationAdminEnhanced() {
                   </Button>
                 </div>
 
-                {/* Import Events Section */}
-                <ImportEventsManager 
+                {/* Event Sync Section */}
+                <ClubEventSyncManager 
                   organization={organization}
-                  onEventImported={(events) => {
-                    setSaveMessage('✅ Events imported successfully!')
+                  onEventsImported={(events) => {
+                    setSaveMessage('✅ Events synced successfully!')
                     setTimeout(() => setSaveMessage(null), 4000)
                     refreshEvents()
                   }}

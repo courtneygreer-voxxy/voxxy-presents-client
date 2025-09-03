@@ -2,6 +2,7 @@ import React from 'react'
 import { Textarea } from "@/components/ui/textarea"
 import { MessageCircle } from "lucide-react"
 import type { CreateClubStepProps } from '@/types/createClub'
+import { FORM_STYLES } from '@/styles/forms'
 
 interface CreateClubDescriptionProps extends CreateClubStepProps {}
 
@@ -23,13 +24,13 @@ export default function CreateClubDescription({ data, updateData }: CreateClubDe
         <p className="text-gray-200">Tell people what your club is all about and what they can expect 🌟</p>
       </div>
 
-      <div className="max-w-lg mx-auto">
+      <div className={FORM_STYLES.container.centered}>
         <textarea
           id="description"
           placeholder="We're a vibrant community bringing together music lovers and creative souls in the heart of Brooklyn. Come for the beats, stay for the friendships! 🎵"
           value={data.description}
           onChange={(e) => handleInputChange(e.target.value)}
-          className="w-full min-h-[120px] text-base p-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200 resize-none"
+          className={`${FORM_STYLES.textarea} min-h-[120px]`}
           maxLength={maxChars}
           autoFocus
         />

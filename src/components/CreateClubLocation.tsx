@@ -2,6 +2,7 @@ import React from 'react'
 import { Input } from "@/components/ui/input"
 import { MapPin, Info } from "lucide-react"
 import type { CreateClubStepProps } from '@/types/createClub'
+import { FORM_STYLES } from '@/styles/forms'
 
 interface CreateClubLocationProps extends CreateClubStepProps {}
 
@@ -24,14 +25,14 @@ export default function CreateClubLocation({ data, updateData }: CreateClubLocat
         <p className="text-gray-200">Help people know what to expect (you can always change this later) 📍</p>
       </div>
 
-      <div className="max-w-lg mx-auto space-y-4">
+      <div className={FORM_STYLES.container.centered}>
         <div>
           <input
             id="defaultLocation"
             placeholder="Brooklyn Community Center"
             value={data.defaultLocation}
             onChange={(e) => handleLocationChange(e.target.value)}
-            className="w-full text-base py-3 px-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+            className={FORM_STYLES.input}
             autoFocus
           />
         </div>
@@ -42,7 +43,7 @@ export default function CreateClubLocation({ data, updateData }: CreateClubLocat
             placeholder="123 Community St, Brooklyn, NY 11201 (optional)"
             value={data.defaultAddress}
             onChange={(e) => handleAddressChange(e.target.value)}
-            className="w-full text-base py-3 px-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+            className={FORM_STYLES.input}
           />
         </div>
       </div>

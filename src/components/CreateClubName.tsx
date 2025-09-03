@@ -3,6 +3,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
 import { Sparkles } from "lucide-react"
 import type { CreateClubStepProps } from '@/types/createClub'
+import { FORM_STYLES } from '@/styles/forms'
 
 interface CreateClubNameProps extends CreateClubStepProps {}
 
@@ -28,7 +29,7 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
   const clubSlug = generateSlug(data.name)
 
   return (
-    <div className="max-w-lg mx-auto space-y-8">
+    <div className={FORM_STYLES.container.centered}>
       <div className="text-center">
         <h2 className="text-3xl font-bold text-white mb-3">Name your club</h2>
         <p className="text-gray-200 text-lg">Choose a memorable name and tagline</p>
@@ -41,10 +42,10 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
             placeholder="Brooklyn Hearts Club"
             value={data.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className="w-full text-xl py-4 px-6 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+            className={`${FORM_STYLES.inputLargeCentered} text-xl`}
             autoFocus
           />
-          <p className="text-sm text-gray-300 text-center">Club name</p>
+          <p className={FORM_STYLES.helperCentered}>Club name</p>
         </div>
         
         <div className="space-y-3">
@@ -53,9 +54,9 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
             placeholder="Where music meets community"
             value={data.tagline}
             onChange={(e) => handleTaglineChange(e.target.value)}
-            className="w-full text-lg py-3 px-6 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+            className={FORM_STYLES.inputLargeCentered}
           />
-          <p className="text-sm text-gray-300 text-center">Tagline</p>
+          <p className={FORM_STYLES.helperCentered}>Tagline</p>
         </div>
       </div>
 

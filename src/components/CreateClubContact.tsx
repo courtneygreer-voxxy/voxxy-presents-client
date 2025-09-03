@@ -2,6 +2,7 @@ import React from 'react'
 import { Input } from "@/components/ui/input"
 import { Mail, Shield } from "lucide-react"
 import type { CreateClubStepProps } from '@/types/createClub'
+import { FORM_STYLES } from '@/styles/forms'
 
 interface CreateClubContactProps extends CreateClubStepProps {}
 
@@ -24,14 +25,14 @@ export default function CreateClubContact({ data, updateData }: CreateClubContac
         <p className="text-gray-200">We'll use this for important updates and member questions 📧</p>
       </div>
 
-      <div className="max-w-md mx-auto">
+      <div className={FORM_STYLES.container.narrow}>
         <input
           id="contactEmail"
           type="email"
           placeholder="hello@brooklynhearts.com"
           value={data.contactEmail}
           onChange={(e) => handleInputChange(e.target.value)}
-          className="w-full text-lg py-3 px-4 text-center bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+          className={`${FORM_STYLES.inputLargeCentered}`}
           autoFocus
         />
         {data.contactEmail && !isValidEmail(data.contactEmail) && (

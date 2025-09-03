@@ -16,6 +16,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
+import type { PlatformConnection } from '@/types/platformIntegration'
 import { createClub } from '@/services/clubCreation'
 
 const INITIAL_DATA: CreateClubData = {
@@ -31,9 +32,19 @@ const INITIAL_DATA: CreateClubData = {
   aboutOfferings: ['']
 }
 
-export default function CreateClubFlowEnhanced() {
+interface CreateClubFlowEnhancedProps {
+  initialData?: CreateClubData
+  isImportedFromEventbrite?: boolean
+  eventbriteConnection?: PlatformConnection | null
+}
+
+export default function CreateClubFlowEnhanced({ 
+  initialData,
+  isImportedFromEventbrite = false,
+  eventbriteConnection 
+}: CreateClubFlowEnhancedProps = {}) {
   const [currentStep, setCurrentStep] = useState(0)
-  const [formData, setFormData] = useState<CreateClubData>(INITIAL_DATA)
+  const [formData, setFormData] = useState<CreateClubData>(initialData || INITIAL_DATA)
   const [isCreating, setIsCreating] = useState(false)
   
   const navigate = useNavigate()
@@ -167,9 +178,22 @@ export default function CreateClubFlowEnhanced() {
       <div className="container mx-auto px-4 max-w-4xl relative z-10">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">Let's create your club! 🎉</h1>
+          <div className="flex items-center justify-center space-x-3 mb-2">
+            <h1 className="text-3xl font-bold text-white">
+              {isImportedFromEventbrite ? "Let's set up your Eventbrite club!" : "Let's create your club!"} 🎉
+            </h1>
+            {isImportedFromEventbrite && (
+              <div className="flex items-center space-x-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-3 py-1">
+                <div className="text-lg">🎫</div>
+                <span className="text-sm font-medium text-orange-200">Imported from Eventbrite</span>
+              </div>
+            )}
+          </div>
           <p className="text-gray-200">
-            We'll get you set up in just a few quick steps
+            {isImportedFromEventbrite 
+              ? "We've pre-filled some details from your Eventbrite account - feel free to customize anything!"
+              : "We'll get you set up in just a few quick steps"
+            }
           </p>
         </div>
 
@@ -197,37 +221,38 @@ export default function CreateClubFlowEnhanced() {
         </div>
 
         {/* Navigation */}
-        {currentStep > 0 && (
-          <div className="flex justify-between">
+        <div className="flex justify-between">
+          {currentStep > 0 ? (
             <button
               onClick={prevStep}
-              disabled={currentStep === 0}
-              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 rounded-lg"
+              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg font-medium"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
             </button>
+          ) : (
+            <div></div>
+          )}
 
-            {currentStep < steps.length - 1 ? (
-              <button
-                onClick={nextStep}
-                disabled={!canProceed()}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg"
-              >
-                Next
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            ) : (
-              <button
-                onClick={handleCreate}
-                disabled={!canProceed() || isCreating}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg"
-              >
-                {isCreating ? 'Creating...' : 'Create Club'}
-              </button>
-            )}
-          </div>
-        )}
+          {currentStep < steps.length - 1 ? (
+            <button
+              onClick={nextStep}
+              disabled={!canProceed()}
+              className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+            >
+              Next
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleCreate}
+              disabled={!canProceed() || isCreating}
+              className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+            >
+              {isCreating ? 'Creating...' : 'Create Club'}
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )
