@@ -63,7 +63,9 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
     contactInfo: {
       email: 'events@crystallake.bar',
       phone: '(718) 555-0123',
-      website: 'https://crystallake.bar'
+      website: 'https://crystallake.bar',
+      instagram: 'crystallakebrooklyn',
+      tiktok: 'crystallakebar'
     },
     claimStatus: 'unclaimed',
     ownerId: undefined
@@ -132,7 +134,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
     contactInfo: {
       email: 'hello@rooftopgarden.cafe',
       phone: '(718) 555-0321',
-      website: 'https://rooftopgarden.cafe'
+      website: 'https://rooftopgarden.cafe',
+      instagram: 'rooftopgardencafe'
     },
     claimStatus: 'unclaimed',
     ownerId: undefined
@@ -177,7 +180,9 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
     contactInfo: {
       email: 'events@bklynbeergarden.com',
       phone: '(718) 555-5670',
-      website: 'https://brooklynbeergarden.com'
+      website: 'https://brooklynbeergarden.com',
+      instagram: 'bklynbeergarden',
+      tiktok: 'brooklynbeergarden'
     },
     claimStatus: 'unclaimed',
     ownerId: undefined

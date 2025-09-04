@@ -17,6 +17,8 @@ export interface VenueContactInfo {
   email: string
   phone?: string
   website?: string
+  instagram?: string
+  tiktok?: string
 }
 
 export type VenueType = 'bar' | 'restaurant' | 'community_center' | 'outdoor' | 'event_space' | 'other'

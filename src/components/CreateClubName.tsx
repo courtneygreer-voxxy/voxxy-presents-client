@@ -31,40 +31,39 @@ export default function CreateClubName({ data, updateData }: CreateClubNameProps
   return (
     <div className={FORM_STYLES.container.centered}>
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-white mb-3">Name your club</h2>
-        <p className="text-gray-200 text-lg">Choose a memorable name and tagline</p>
+        <h2 className="text-2xl font-bold text-white mb-2">Name your club</h2>
+        <p className="text-gray-200">Choose a memorable name and tagline</p>
       </div>
 
-      <div className="space-y-6">
-        <div className="space-y-3">
+      <div className="space-y-4">
+        <div>
           <input
             id="name"
             placeholder="Brooklyn Hearts Club"
             value={data.name}
             onChange={(e) => handleNameChange(e.target.value)}
-            className={`${FORM_STYLES.inputLargeCentered} text-xl`}
+            className={FORM_STYLES.inputCentered}
             autoFocus
           />
-          <p className={FORM_STYLES.helperCentered}>Club name</p>
         </div>
         
-        <div className="space-y-3">
+        <div className="space-y-2">
+          <p className={FORM_STYLES.labelCentered}>Tagline</p>
           <input
             id="tagline"
             placeholder="Where music meets community"
             value={data.tagline}
             onChange={(e) => handleTaglineChange(e.target.value)}
-            className={FORM_STYLES.inputLargeCentered}
+            className={FORM_STYLES.inputCentered}
           />
-          <p className={FORM_STYLES.helperCentered}>Tagline</p>
         </div>
       </div>
 
       {/* Preview URL */}
       {data.name && (
-        <div className="text-center py-4 px-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-          <p className="text-sm text-gray-300 mb-2">Your club URL</p>
-          <div className="font-mono bg-white/10 px-4 py-2 rounded-md border border-white/20 text-purple-300 text-base">
+        <div className="text-center py-3 px-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
+          <p className="text-xs text-gray-300 mb-2">Your club URL</p>
+          <div className="font-mono bg-white/10 px-3 py-2 rounded-md border border-white/20 text-purple-300 text-sm">
             voxxypresents.com/{clubSlug}
           </div>
         </div>

@@ -41,52 +41,46 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
 
   return (
     <>
-      {/* Main Gallery Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
-        {/* Primary Photo */}
-        <div className="md:col-span-2 md:row-span-2">
+      {/* Main Gallery Grid - 2x2 Equal Sizing */}
+      <div className="grid grid-cols-2 gap-3">
+        {photos.slice(0, 4).map((photo, index) => (
           <button
-            onClick={() => openLightbox(0)}
-            className="relative w-full h-64 md:h-96 overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
-          >
-            <img
-              src={photos[0]}
-              alt={`${venueName} - Main photo`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-          </button>
-        </div>
-
-        {/* Additional Photos */}
-        {photos.slice(1, 5).map((photo, index) => (
-          <button
-            key={index + 1}
-            onClick={() => openLightbox(index + 1)}
-            className="relative h-32 md:h-[11.5rem] overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
+            key={index}
+            onClick={() => openLightbox(index)}
+            className="relative aspect-square overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
           >
             <img
               src={photo}
-              alt={`${venueName} - Photo ${index + 2}`}
+              alt={`${venueName} - Photo ${index + 1}`}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             />
             <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
             
-            {/* Show "View All" overlay on last visible photo if there are more */}
-            {index === 3 && photos.length > 5 && (
+            {/* Show "View All" overlay on last photo if there are more than 4 */}
+            {index === 3 && photos.length > 4 && (
               <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <span className="text-white font-semibold">+{photos.length - 5} more</span>
+                <span className="text-white font-semibold text-sm">+{photos.length - 4} more</span>
               </div>
             )}
           </button>
         ))}
+        
+        {/* Fill remaining spots if less than 4 photos */}
+        {photos.length < 4 && Array.from({ length: 4 - photos.length }).map((_, index) => (
+          <div
+            key={`placeholder-${index}`}
+            className="aspect-square bg-white/5 border border-white/10 rounded-lg flex items-center justify-center"
+          >
+            <span className="text-gray-400 text-sm">No photo</span>
+          </div>
+        ))}
       </div>
 
-      {/* Show all photos button if more than 5 */}
-      {photos.length > 5 && (
+      {/* Show all photos button if more than 4 */}
+      {photos.length > 4 && (
         <Button 
           variant="outline" 
-          className="mt-4 w-full md:w-auto"
+          className="mt-4 w-full bg-white/10 border-white/20 text-white hover:bg-white/15"
           onClick={() => openLightbox(0)}
         >
           View All {photos.length} Photos

@@ -127,69 +127,75 @@ export function ProfileOverview({ onTabChange }: ProfileOverviewProps) {
           <h2 className="text-lg font-semibold text-white">Account Overview</h2>
         </div>
         <div className="px-6 pb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-purple-500/20 backdrop-blur-sm rounded-lg border border-purple-400/30">
-                  <Building2 className="h-4 w-4 text-purple-300" />
+          <div className="space-y-4">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-purple-500/20 backdrop-blur-sm rounded-lg border border-purple-400/30">
+                    <Building2 className="h-5 w-5 text-purple-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white text-base">Clubs Created</p>
+                    <p className="text-sm text-gray-300 mt-1">Organizations you manage</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-white">Clubs Created</p>
-                  <p className="text-sm text-gray-300">Organizations you manage</p>
+                <div className="bg-purple-500/20 text-purple-200 px-4 py-2 rounded-lg text-lg font-semibold border border-purple-400/30">
+                  {clubCount}
                 </div>
-              </div>
-              <div className="bg-white/20 text-white px-3 py-2 rounded text-lg font-medium">
-                {clubCount}
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <div className="p-3 bg-blue-500/20 backdrop-blur-sm rounded-lg border border-blue-400/30">
-                  <Mail className="h-4 w-4 text-blue-300" />
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="p-3 bg-purple-500/20 backdrop-blur-sm rounded-lg border border-purple-400/30">
+                    <Mail className="h-5 w-5 text-purple-300" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-white text-base">Email Status</p>
+                    <p className="text-sm text-gray-300 mt-1">Account verification</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="font-medium text-white">Email Status</p>
-                  <p className="text-sm text-gray-300">Verification status</p>
+                <div className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center ${
+                  isEmailVerified 
+                    ? 'bg-purple-500/20 text-purple-200 border border-purple-400/30' 
+                    : 'bg-purple-500/10 text-purple-300 border border-purple-400/20'
+                }`}>
+                  {isEmailVerified ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Verified
+                    </>
+                  ) : (
+                    <>
+                      <AlertCircle className="h-4 w-4 mr-2" />
+                      Pending
+                    </>
+                  )}
                 </div>
-              </div>
-              <div className={`px-3 py-1 rounded-full text-xs flex items-center ${
-                isEmailVerified 
-                  ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
-                  : 'bg-red-500/20 text-red-300 border border-red-400/30'
-              }`}>
-                {isEmailVerified ? (
-                  <>
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Verified
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="h-3 w-3 mr-1" />
-                    Unverified
-                  </>
-                )}
               </div>
             </div>
 
             {joinDate && (
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-green-500/20 backdrop-blur-sm rounded-lg border border-green-400/30">
-                    <Calendar className="h-4 w-4 text-green-300" />
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="p-3 bg-purple-500/20 backdrop-blur-sm rounded-lg border border-purple-400/30">
+                      <Calendar className="h-5 w-5 text-purple-300" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-white text-base">Member Since</p>
+                      <p className="text-sm text-gray-300 mt-1">Account created</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium text-white">Member Since</p>
-                    <p className="text-sm text-gray-300">Account created</p>
-                  </div>
+                  <span className="text-sm font-medium text-purple-200 bg-purple-500/20 px-4 py-2 rounded-lg border border-purple-400/30">
+                    {joinDate.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
                 </div>
-                <span className="text-sm font-medium text-gray-200">
-                  {joinDate.toLocaleDateString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                </span>
               </div>
             )}
           </div>
