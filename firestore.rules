@@ -50,6 +50,10 @@ service cloud.firestore {
     // Users - users can read/write their own profile, admins can read all
     match /users/{userId} {
       allow read, write: if isAuthenticated() && isUser(userId);
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == userId && 
+                       request.resource.data.keys().hasAll(['email', 'name', 'role']) &&
+                       request.resource.data.role == 'organizer';
       allow read: if isAuthenticated() && 
                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
@@ -59,6 +63,14 @@ service cloud.firestore {
       allow read, write: if isAuthenticated() && 
                             exists(/databases/$(database)/documents/organizations/$(resource.data.organizationId)) &&
                             get(/databases/$(database)/documents/organizations/$(resource.data.organizationId)).data.ownerId == request.auth.uid;
+    }
+    
+    // Platform connections - users can manage their own connections
+    match /platformConnections/{connectionId} {
+      allow read, write: if isAuthenticated() && 
+                            request.auth.uid == resource.data.userId;
+      allow create: if isAuthenticated() && 
+                       request.auth.uid == request.resource.data.userId;
     }
   }
 }

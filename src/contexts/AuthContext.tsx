@@ -99,8 +99,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const profile = await getUserProfile(user.uid)
           setUserProfile(profile)
         } catch (err) {
-          console.error('Failed to load user profile:', err)
-          setError('Failed to load user profile')
+          console.warn('Failed to load user profile (this is normal for new users):', err)
+          // Don't set error for profile loading issues - user can still use the app
+          setUserProfile(null)
         }
       } else {
         setUserProfile(null)
@@ -212,7 +213,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const profile = await getUserProfile(currentUser.uid)
       setUserProfile(profile)
     } catch (err) {
-      console.error('Failed to refresh user profile:', err)
+      console.warn('Failed to refresh user profile:', err)
+      // Don't show error to user - just continue without profile
     }
   }
 

@@ -59,7 +59,7 @@ export default function OrganizationPage({
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-600" />
-          <p className="text-gray-600">Loading {organizationSlug}...</p>
+          <p className="text-gray-300">Loading {organizationSlug}...</p>
         </div>
       </div>
     )
@@ -79,13 +79,23 @@ export default function OrganizationPage({
   if (!organization) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600">Organization not found</p>
+        <p className="text-gray-300">Organization not found</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+      {/* Animated Background */}
+      <div 
+        className="absolute inset-0 opacity-5"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'pulse 8s ease-in-out infinite'
+        }}
+      />
+      
+      <div className="relative z-10">
       {/* Top Controls */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <ShareButton
@@ -94,14 +104,14 @@ export default function OrganizationPage({
           description={organization.description}
           variant="outline"
           size="sm"
-          className="bg-white/90 hover:bg-white/95 backdrop-blur-sm"
+          className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 text-white"
         />
         {showAdminControls && isFeatureEnabled('adminControls') && (
           <>
             <Link to="/profile">
               <Button
                 variant="outline"
-                className="bg-white/90 hover:bg-white/95 backdrop-blur-sm"
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 text-white"
                 size="sm"
               >
                 <User className="h-4 w-4 mr-2" />
@@ -148,13 +158,13 @@ export default function OrganizationPage({
       </section>
 
       {/* Quick Background Section */}
-      <section className="py-12">
+      <section className="py-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 my-8">
         <div className="container mx-auto px-4 max-w-4xl">
           <div className="text-center">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+            <h3 className="text-2xl font-semibold text-white mb-4">
               Welcome to {organization.name}
             </h3>
-            <p className="text-lg leading-relaxed text-gray-700">
+            <p className="text-lg leading-relaxed text-gray-200">
               {typeof organization.background === 'string' 
                 ? organization.background 
                 : organization.description || 'Welcome to our community!'
@@ -165,9 +175,9 @@ export default function OrganizationPage({
       </section>
 
       {/* Upcoming Events - List Style */}
-      <section id="events" className="py-16">
+      <section id="events" className="py-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 mb-8">
         <div className="container mx-auto px-4 max-w-4xl">
-          <h3 className="text-3xl font-bold text-center text-gray-900 mb-10">
+          <h3 className="text-3xl font-bold text-center text-white mb-10">
             Upcoming Events
           </h3>
           {(() => {
@@ -185,7 +195,7 @@ export default function OrganizationPage({
             return { publishedEvents, mainEvents, recurringEvents }
           })().publishedEvents.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-600">No upcoming events at the moment. Check back soon!</p>
+              <p className="text-gray-300">No upcoming events at the moment. Check back soon!</p>
             </div>
           ) : (
             <div className="space-y-12">
@@ -199,7 +209,7 @@ export default function OrganizationPage({
                 return mainEvents.length > 0 && (
                   <div className="space-y-6">
                       {mainEvents.map((event) => (
-              <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
+              <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300 bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-6">
                   <div className="flex flex-col">
                     {/* Main Event Info */}
@@ -222,7 +232,7 @@ export default function OrganizationPage({
                               Recurring
                             </Badge>
                           )}
-                          <h4 className="text-2xl font-bold text-gray-900">{event.title}</h4>
+                          <h4 className="text-2xl font-bold text-white">{event.title}</h4>
                         </div>
 
                         {event.series && (
@@ -231,8 +241,8 @@ export default function OrganizationPage({
                           </div>
                         )}
 
-                        <p className="text-gray-600 mb-3">{event.description}</p>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600 mb-3">
+                        <p className="text-gray-300 mb-3">{event.description}</p>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2" />
                             {event.date instanceof Date ? event.date.toLocaleDateString() : new Date(event.date).toLocaleDateString()} • {event.time}
@@ -242,7 +252,7 @@ export default function OrganizationPage({
                             {event.location}
                           </div>
                         </div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-white">
                           Price: {(() => {
                             if (event.price.type === 'free') {
                               return 'Free'
@@ -287,15 +297,15 @@ export default function OrganizationPage({
                       <div className="border-t pt-4 mt-4 space-y-4">
                         {event.series && (
                           <div>
-                            <h5 className="font-semibold text-gray-900 mb-2">About {event.series.name}</h5>
-                            <p className="text-gray-600 text-sm">{event.series.description}</p>
+                            <h5 className="font-semibold text-white mb-2">About {event.series.name}</h5>
+                            <p className="text-gray-300 text-sm">{event.series.description}</p>
                           </div>
                         )}
 
                         <div>
-                          <h5 className="font-semibold text-gray-900 mb-2">Event Details</h5>
-                          <p className="text-gray-600 text-sm mb-3">{event.fullDescription}</p>
-                          <div className="text-sm text-gray-600">
+                          <h5 className="font-semibold text-white mb-2">Event Details</h5>
+                          <p className="text-gray-300 text-sm mb-3">{event.fullDescription}</p>
+                          <div className="text-sm text-gray-300">
                             <p>
                               <strong>Address:</strong> {event.address}
                             </p>
@@ -304,14 +314,14 @@ export default function OrganizationPage({
 
                         {event.isRecurring && event.recurringDates && (
                           <div>
-                            <h5 className="font-semibold text-gray-900 mb-2">Upcoming Dates & Themes</h5>
+                            <h5 className="font-semibold text-white mb-2">Upcoming Dates & Themes</h5>
                             <div className="space-y-2">
                               {event.recurringDates.map((recurringDate, index) => (
                                 <div key={index} className="flex items-start gap-3 text-sm">
                                   <span className="font-medium text-purple-600 min-w-[2rem]">{recurringDate.date}</span>
                                   <div>
-                                    <span className="font-medium text-gray-900">{recurringDate.theme}:</span>
-                                    <span className="text-gray-600 ml-1">{recurringDate.description}</span>
+                                    <span className="font-medium text-white">{recurringDate.theme}:</span>
+                                    <span className="text-gray-300 ml-1">{recurringDate.description}</span>
                                   </div>
                                 </div>
                               ))}
@@ -337,13 +347,13 @@ export default function OrganizationPage({
                 const recurringEvents = publishedEvents.filter(event => event.isRecurring)
                 return recurringEvents.length > 0 && (
                   <div>
-                    <h4 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
+                    <h4 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
                       <Repeat className="h-6 w-6" />
                       Recurring Events
                     </h4>
                     <div className="space-y-6">
                       {recurringEvents.map((event) => (
-                        <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300">
+                        <Card key={event.id} className="hover:shadow-lg transition-shadow duration-300 bg-white/10 backdrop-blur-sm border-white/20">
                           <CardContent className="p-6">
                             <div className="flex flex-col">
                               {/* Main Event Info */}
@@ -364,7 +374,7 @@ export default function OrganizationPage({
                                       <Repeat className="h-3 w-3" />
                                       Recurring
                                     </Badge>
-                                    <h4 className="text-2xl font-bold text-gray-900">{event.title}</h4>
+                                    <h4 className="text-2xl font-bold text-white">{event.title}</h4>
                                   </div>
 
                                   {event.series && (
@@ -373,8 +383,8 @@ export default function OrganizationPage({
                                     </div>
                                   )}
 
-                                  <p className="text-gray-600 mb-3">{event.description}</p>
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-600 mb-3">
+                                  <p className="text-gray-300 mb-3">{event.description}</p>
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
                                     <div className="flex items-center">
                                       <Calendar className="h-4 w-4 mr-2" />
                                       {event.time}
@@ -384,7 +394,7 @@ export default function OrganizationPage({
                                       {event.location}
                                     </div>
                                   </div>
-                                  <div className="text-sm font-medium text-gray-900">
+                                  <div className="text-sm font-medium text-white">
                                     Price: {(() => {
                                       if (event.price.type === 'free') {
                                         return 'Free'
@@ -429,34 +439,34 @@ export default function OrganizationPage({
                               <div className="border-t pt-4 mt-4 space-y-4">
                                 {event.series && (
                                   <div>
-                                    <h5 className="font-semibold text-gray-900 mb-2">About {event.series.name}</h5>
-                                    <p className="text-gray-700">{event.series.description}</p>
+                                    <h5 className="font-semibold text-white mb-2">About {event.series.name}</h5>
+                                    <p className="text-gray-200">{event.series.description}</p>
                                   </div>
                                 )}
 
                                 {event.fullDescription && (
                                   <div>
-                                    <h5 className="font-semibold text-gray-900 mb-2">Description</h5>
-                                    <p className="text-gray-700 leading-relaxed">{event.fullDescription}</p>
+                                    <h5 className="font-semibold text-white mb-2">Description</h5>
+                                    <p className="text-gray-200 leading-relaxed">{event.fullDescription}</p>
                                   </div>
                                 )}
 
                                 <div>
-                                  <h5 className="font-semibold text-gray-900 mb-2">Location</h5>
-                                  <p className="text-gray-700">{event.address}</p>
+                                  <h5 className="font-semibold text-white mb-2">Location</h5>
+                                  <p className="text-gray-200">{event.address}</p>
                                 </div>
 
                                 {/* Recurring Schedule */}
                                 {event.isRecurring && event.recurringDates && (
                                   <div>
-                                    <h5 className="font-semibold text-gray-900 mb-3">Upcoming Schedule</h5>
+                                    <h5 className="font-semibold text-white mb-3">Upcoming Schedule</h5>
                                     <div className="space-y-2">
                                       {event.recurringDates.map((recurringDate, index) => (
-                                        <div key={index} className="flex items-center gap-3 p-2 bg-gray-50 rounded">
+                                        <div key={index} className="flex items-center gap-3 p-2 bg-white/10 rounded">
                                           <span className="font-medium text-purple-600 min-w-[2rem]">{recurringDate.date}</span>
                                           <div>
-                                            <span className="font-medium text-gray-900">{recurringDate.theme}:</span>
-                                            <span className="text-gray-600 ml-1">{recurringDate.description}</span>
+                                            <span className="font-medium text-white">{recurringDate.theme}:</span>
+                                            <span className="text-gray-300 ml-1">{recurringDate.description}</span>
                                           </div>
                                         </div>
                                       ))}
@@ -479,9 +489,9 @@ export default function OrganizationPage({
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20">
+      <section id="about" className="py-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 mb-8">
         <div className="container mx-auto px-4 max-w-6xl">
-          <h3 className="text-4xl font-bold text-center text-gray-900 mb-12">
+          <h3 className="text-4xl font-bold text-center text-white mb-12">
             About {organization.name}
           </h3>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -506,8 +516,8 @@ export default function OrganizationPage({
             <div className="h-96 flex flex-col">
               <div className="flex-1 overflow-y-auto pr-2 space-y-6">
                 <div>
-                  <h4 className="text-2xl font-semibold text-gray-900 mb-4">Our Story</h4>
-                  <div className="text-gray-700 leading-relaxed space-y-4">
+                  <h4 className="text-2xl font-semibold text-white mb-4">Our Story</h4>
+                  <div className="text-gray-200 leading-relaxed space-y-4">
                     {organization?.aboutStory ? (
                       <div>
                         {organization.aboutStory.split('\n').map((paragraph, index) => (
@@ -517,14 +527,14 @@ export default function OrganizationPage({
                         ))}
                       </div>
                     ) : (
-                      <p className="italic text-gray-600">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
+                      <p className="italic text-gray-400">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
                     )}
                   </div>
                 </div>
                 
                 <div>
-                  <h4 className="text-2xl font-semibold text-gray-900 mb-4">What We Offer</h4>
-                  <ul className="space-y-2 text-gray-700">
+                  <h4 className="text-2xl font-semibold text-white mb-4">What We Offer</h4>
+                  <ul className="space-y-2 text-gray-200">
                     {organization?.aboutOfferings && organization.aboutOfferings.length > 0 ? 
                       organization.aboutOfferings.map((offering, index) => (
                         <li key={index} className="flex items-center">
@@ -533,16 +543,16 @@ export default function OrganizationPage({
                         </li>
                       )) : (
                         <>
-                          <li className="flex items-center italic text-gray-600">
-                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          <li className="flex items-center italic text-gray-400">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-500"></div>
                             Community building
                           </li>
-                          <li className="flex items-center italic text-gray-600">
-                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          <li className="flex items-center italic text-gray-400">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-500"></div>
                             Regular meetups
                           </li>
-                          <li className="flex items-center italic text-gray-600">
-                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-400"></div>
+                          <li className="flex items-center italic text-gray-400">
+                            <div className="w-2 h-2 rounded-full mr-3 bg-gray-500"></div>
                             Fun activities
                           </li>
                         </>
@@ -553,12 +563,12 @@ export default function OrganizationPage({
               </div>
               
               <div className="pt-4 border-t">
-                <h4 className="text-2xl font-semibold text-gray-900 mb-4">Connect With Us</h4>
+                <h4 className="text-2xl font-semibold text-white mb-4">Connect With Us</h4>
                 <div className="flex items-center gap-4">
                   {organization.socialLinks?.instagram && (
                     <a 
                       href={`https://instagram.com/${organization.socialLinks.instagram.replace('@', '')}`} 
-                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      className="text-gray-300 hover:text-purple-400 transition-colors" 
                       aria-label="Instagram"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -569,7 +579,7 @@ export default function OrganizationPage({
                   {organization.socialLinks?.website && (
                     <a 
                       href={organization.socialLinks.website} 
-                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      className="text-gray-300 hover:text-purple-400 transition-colors" 
                       aria-label="Website"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -580,7 +590,7 @@ export default function OrganizationPage({
                   {organization.socialLinks?.eventbrite && (
                     <a 
                       href={organization.socialLinks.eventbrite} 
-                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      className="text-gray-300 hover:text-purple-400 transition-colors" 
                       aria-label="Eventbrite"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -591,7 +601,7 @@ export default function OrganizationPage({
                   {organization.socialLinks?.venmo && (
                     <a 
                       href={`https://venmo.com/${organization.socialLinks.venmo.replace('@', '')}`} 
-                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      className="text-gray-300 hover:text-purple-400 transition-colors" 
                       aria-label="Venmo"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -602,7 +612,7 @@ export default function OrganizationPage({
                   {organization.socialLinks?.other && (
                     <a 
                       href={organization.socialLinks.other} 
-                      className="text-gray-600 hover:text-purple-600 transition-colors" 
+                      className="text-gray-300 hover:text-purple-400 transition-colors" 
                       aria-label="Other Social Link"
                       target="_blank"
                       rel="noopener noreferrer"
@@ -612,7 +622,7 @@ export default function OrganizationPage({
                   )}
                   <a 
                     href={`mailto:${organization.contactEmail}`} 
-                    className="text-gray-600 hover:text-purple-600 transition-colors" 
+                    className="text-gray-300 hover:text-purple-600 transition-colors" 
                     aria-label="Email"
                   >
                     <Mail className="h-6 w-6" />
@@ -625,11 +635,12 @@ export default function OrganizationPage({
       </section>
 
       {/* Minimal Footer */}
-      <footer className="bg-gray-50 text-gray-400 py-3 border-t">
+      <footer className="bg-white/5 backdrop-blur-sm text-gray-300 py-3 border-t border-white/10">
         <div className="container mx-auto px-4 text-center">
           <p className="text-xs">Powered by <span className="text-purple-500 font-medium">voxxypresents</span></p>
         </div>
       </footer>
+      </div>
     </div>
   )
 }

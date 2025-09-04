@@ -64,15 +64,17 @@ export const createClub = async (data: CreateClubData, ownerId: string): Promise
     const id = await createOrganization(organizationData)
     
     // Update the user's organizationIds array to include the new club
+    // Skip this for now if there are permission issues - club creation is more important
     try {
       const userDocRef = doc(db, 'users', ownerId)
       await updateDoc(userDocRef, {
         organizationIds: arrayUnion(id),
         updatedAt: new Date()
       })
+      console.log('Successfully updated user organizationIds')
     } catch (userUpdateError) {
-      console.error('Failed to update user organizationIds:', userUpdateError)
-      // Don't throw here - club creation was successful, just log the error
+      console.warn('Failed to update user organizationIds - club created successfully but user profile not updated:', userUpdateError)
+      // Don't throw here - club creation was successful, just log the warning
     }
     
     return {

@@ -42,7 +42,7 @@ export default function CreateClubFlowEnhanced({
   initialData,
   isImportedFromEventbrite = false,
   eventbriteConnection 
-}: CreateClubFlowEnhancedProps = {}) {
+}: CreateClubFlowEnhancedProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<CreateClubData>(initialData || INITIAL_DATA)
   const [isCreating, setIsCreating] = useState(false)

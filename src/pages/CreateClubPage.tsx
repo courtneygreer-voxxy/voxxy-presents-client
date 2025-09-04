@@ -34,14 +34,11 @@ export default function CreateClubPage() {
       return
     }
 
+    // TODO: Implement actual platform connection checking once Eventbrite API is set up
+    // For now, just assume no connections exist
     try {
-      const userConnections = await getUserProfileConnections(currentUser.uid)
-      const eventbriteConn = userConnections.find(conn => 
-        conn.platform === 'eventbrite' && conn.status === 'connected'
-      )
-      
-      setConnections(userConnections)
-      setHasEventbriteConnection(!!eventbriteConn)
+      setConnections([])
+      setHasEventbriteConnection(false)
     } catch (error) {
       console.error('Failed to check Eventbrite connection:', error)
       setHasEventbriteConnection(false)
