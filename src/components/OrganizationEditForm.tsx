@@ -415,11 +415,13 @@ export function OrganizationEditForm({
         <AboutImagesManager
           organization={organization}
           onSave={async (updates) => {
-            // Update form data to keep it in sync
-            setFormData(prev => ({
-              ...prev,
-              ...updates
-            }))
+            // Update form data to keep it in sync - only update aboutImages field
+            if (updates.aboutImages) {
+              setFormData(prev => ({
+                ...prev,
+                aboutImageUrl: updates.aboutImages?.[0] || prev.aboutImageUrl
+              }))
+            }
             // Call parent save function
             await onSave(updates)
           }}
