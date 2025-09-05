@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
@@ -160,9 +161,9 @@ export default function OrganizationAdminEnhanced() {
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
         }}
       />
@@ -182,9 +183,9 @@ export default function OrganizationAdminEnhanced() {
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
         }}
       />
@@ -203,9 +204,9 @@ export default function OrganizationAdminEnhanced() {
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
         }}
       />
@@ -227,12 +228,12 @@ export default function OrganizationAdminEnhanced() {
   const connectionCount = platformConnections.filter(conn => conn.status === 'connected').length
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden admin-dark">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-5 pointer-events-none"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
         }}
       />
@@ -298,26 +299,24 @@ export default function OrganizationAdminEnhanced() {
       </div>
 
       {/* Main Content */}
-      <div className="grid grid-cols-4 gap-4 px-4 py-8">
-        <div></div>
-        <div className="col-span-2">
+      <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="organization" className="flex gap-8" orientation="vertical">
           <div className="w-64 flex-shrink-0">
-            <TabsList className="flex flex-col h-fit w-full">
-              <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start">
-                <Edit className="h-4 w-4" />
+            <TabsList className="flex flex-col h-fit w-full !bg-white/10 backdrop-blur-sm border border-white/20">
+              <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+                <Edit className="h-4 w-4 text-purple-400" />
                 Organization
               </TabsTrigger>
-              <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start">
-                <Calendar className="h-4 w-4" />
+              <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+                <Calendar className="h-4 w-4 text-purple-400" />
                 Events
               </TabsTrigger>
-              <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start">
-                <Users className="h-4 w-4" />
+              <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+                <Users className="h-4 w-4 text-purple-400" />
                 Subscribers
               </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start">
-                <Settings className="h-4 w-4" />
+              <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+                <Settings className="h-4 w-4 text-purple-400" />
                 Settings
               </TabsTrigger>
             </TabsList>
@@ -328,10 +327,10 @@ export default function OrganizationAdminEnhanced() {
             {/* Organization Settings Tab */}
             <TabsContent value="organization">
               <div className="space-y-6">
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20 mx-8">
+                <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle>Organization Settings</CardTitle>
-                    <CardDescription>
+                    <CardTitle className="text-white">Organization Settings</CardTitle>
+                    <CardDescription className="text-gray-300">
                       Update your organization's information, branding, and contact details.
                     </CardDescription>
                   </CardHeader>
@@ -346,11 +345,6 @@ export default function OrganizationAdminEnhanced() {
                   </CardContent>
                 </Card>
 
-                <AboutImagesManager
-                  organization={organization}
-                  onSave={handleSaveOrganization}
-                  isSaving={isSaving}
-                />
 
               </div>
             </TabsContent>
@@ -361,10 +355,10 @@ export default function OrganizationAdminEnhanced() {
                 <div className="flex items-center justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-white">Events</h2>
-                    <p className="text-gray-300">Create, import, and manage your organization's events</p>
+                    <p className="text-gray-300">Import events from platforms or create new ones to manage your club</p>
                   </div>
                   <Button 
-                    className="flex items-center gap-2"
+                    className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 relative z-20"
                     onClick={() => setIsCreateEventOpen(true)}
                   >
                     <Plus className="h-4 w-4" />
@@ -372,36 +366,39 @@ export default function OrganizationAdminEnhanced() {
                   </Button>
                 </div>
 
-                {/* Event Sync Section */}
-                <ClubEventSyncManager 
-                  organization={organization}
-                  onEventsImported={(events) => {
-                    setSaveMessage('✅ Events synced successfully!')
-                    setTimeout(() => setSaveMessage(null), 4000)
-                    refreshEvents()
-                  }}
-                />
-
-                {/* Ticket Management Section */}
-                <TicketManagementManager />
-
                 {events.length === 0 ? (
-                  <Card className="bg-white/10 backdrop-blur-sm border-white/20 mx-8">
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
                     <CardContent className="flex flex-col items-center justify-center py-12">
-                      <Calendar className="h-12 w-12 text-gray-400 mb-4" />
+                      <Calendar className="h-12 w-12 text-purple-400 mb-4" />
                       <h3 className="text-lg font-semibold text-white mb-2">No events yet</h3>
                       <p className="text-gray-300 text-center mb-6">
-                        Create your first event to start building your community.
+                        Import events from Eventbrite or create new ones to get started.
                       </p>
-                      <Button onClick={() => setIsCreateEventOpen(true)}>
-                        Create Your First Event
-                      </Button>
+                      <div className="flex flex-col sm:flex-row gap-3">
+                        <Button 
+                          className="bg-purple-600 hover:bg-purple-700"
+                          onClick={() => setIsCreateEventOpen(true)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Event
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          className="border-white/20 text-gray-300"
+                          onClick={() => {
+                            // Scroll to import section
+                            document.querySelector('[data-section="event-sync"]')?.scrollIntoView({ behavior: 'smooth' })
+                          }}
+                        >
+                          Import Events
+                        </Button>
+                      </div>
                     </CardContent>
                   </Card>
                 ) : (
                   <div className="space-y-4">
                     {events.map((event) => (
-                      <Card key={event.id}>
+                      <Card key={event.id} className="!bg-white/10 backdrop-blur-sm !border-white/20">
                         <CardContent className="p-6">
                           <div className="flex flex-col">
                             <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
@@ -429,14 +426,14 @@ export default function OrganizationAdminEnhanced() {
                                 <p className="text-gray-300 mb-3">{event.description}</p>
                                 <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
                                   <div className="flex items-center">
-                                    <Calendar className="h-4 w-4 mr-2" />
+                                    <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                                     {event.date instanceof Date 
                                       ? event.date.toLocaleDateString() 
                                       : new Date(event.date).toLocaleDateString()
                                     } • {event.time}
                                   </div>
                                   <div className="flex items-center">
-                                    <MapPin className="h-4 w-4 mr-2" />
+                                    <MapPin className="h-4 w-4 mr-2 text-purple-400" />
                                     {event.location}
                                   </div>
                                 </div>
@@ -447,6 +444,7 @@ export default function OrganizationAdminEnhanced() {
                                 <Button 
                                   variant="outline" 
                                   size="sm"
+                                  className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
                                   onClick={() => setEditingEvent(event)}
                                 >
                                   <Edit className="h-4 w-4 mr-2" />
@@ -455,10 +453,11 @@ export default function OrganizationAdminEnhanced() {
                                 <Button 
                                   variant="outline" 
                                   size="sm"
+                                  className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
                                   onClick={() => openRegistrationModal(event)}
                                 >
-                                  <Users className="h-4 w-4 mr-2" />
-                                  Manage
+                                  <BarChart3 className="h-4 w-4 mr-2" />
+                                  Analytics
                                 </Button>
                               </div>
                             </div>
@@ -468,13 +467,25 @@ export default function OrganizationAdminEnhanced() {
                     ))}
                   </div>
                 )}
+
+                {/* Event Sync Section - Moved to bottom with enhanced explanation */}
+                <div data-section="event-sync">
+                  <ClubEventSyncManager 
+                    organization={organization}
+                    onEventsImported={(events) => {
+                      setSaveMessage('✅ Events synced successfully!')
+                      setTimeout(() => setSaveMessage(null), 4000)
+                      refreshEvents()
+                    }}
+                  />
+                </div>
               </div>
             </TabsContent>
 
 
             {/* Subscribers Tab */}
             <TabsContent value="subscribers">
-              <Card>
+              <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
                 <CardHeader>
                   <CardTitle>Subscriber Management</CardTitle>
                   <CardDescription>
@@ -495,20 +506,40 @@ export default function OrganizationAdminEnhanced() {
             {/* Settings Tab */}
             <TabsContent value="settings">
               <div className="space-y-6">
-                {/* Platform Connections */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20 mx-8">
+                {/* Admin Management */}
+                <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle>Platform Connections</CardTitle>
-                    <CardDescription>
-                      Connect your event platforms to sync events, attendees, and data.
+                    <CardTitle className="text-white">Club Administrators</CardTitle>
+                    <CardDescription className="text-gray-300">
+                      Add other administrators to help manage your club.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <PlatformConnectionManager
-                      organizationId={organization.id}
-                      showAddConnection={true}
-                      compact={false}
-                    />
+                    <div className="space-y-4">
+                      <div className="flex gap-3">
+                        <Input
+                          placeholder="Enter admin email address"
+                          className="flex-1"
+                        />
+                        <Button className="bg-purple-600 hover:bg-purple-700">
+                          Add Admin
+                        </Button>
+                      </div>
+                      
+                      {/* Current Admins List */}
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-400">Current Administrators:</p>
+                        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <p className="text-white text-sm font-medium">You (Owner)</p>
+                              <p className="text-gray-400 text-xs">{organization.contactEmail}</p>
+                            </div>
+                            <span className="text-xs text-purple-400 bg-purple-400/20 px-2 py-1 rounded">Owner</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
 
@@ -522,8 +553,6 @@ export default function OrganizationAdminEnhanced() {
             </TabsContent>
           </div>
         </Tabs>
-        </div>
-        <div></div>
       </div>
 
       {/* Create Event Flow */}

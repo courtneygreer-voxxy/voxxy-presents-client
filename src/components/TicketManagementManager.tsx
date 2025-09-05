@@ -14,7 +14,8 @@ import {
 
 export function TicketManagementManager() {
   return (
-    <Card>
+    <div className="admin-dark">
+    <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Ticket className="h-5 w-5" />
@@ -131,5 +132,6 @@ export function TicketManagementManager() {
         </div>
       </CardContent>
     </Card>
+    </div>
   )
 }

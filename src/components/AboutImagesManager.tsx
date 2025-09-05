@@ -166,12 +166,13 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
   }
 
   return (
-    <Card>
+    <div className="admin-dark">
+    <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>About Section Images</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">About Section Images</CardTitle>
+            <CardDescription className="text-gray-300">
               Manage images that appear in the About section of your club page
             </CardDescription>
           </div>
@@ -188,8 +189,8 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
       <CardContent className="space-y-6">
         {/* Preview */}
         {showPreview && (
-          <div className="border rounded-lg p-4 bg-gray-50">
-            <Label className="text-sm font-medium text-gray-900 mb-2 block">Preview</Label>
+          <div className="border border-white/20 rounded-lg p-4 bg-white/5 backdrop-blur-sm">
+            <Label className="text-sm font-medium text-white mb-2 block">Preview</Label>
             <div className="w-full max-w-md">
               <ImageCarousel
                 images={imageUrls}
@@ -205,12 +206,12 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
           <Label className="text-base font-medium">Add New Image</Label>
           
           <Tabs value={uploadMethod} onValueChange={(value) => setUploadMethod(value as 'file' | 'url')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="file" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-2 !bg-white/10 border border-white/20">
+              <TabsTrigger value="file" className="flex items-center gap-2 text-gray-300 data-[state=active]:text-white">
                 <Upload className="h-4 w-4" />
                 Upload File
               </TabsTrigger>
-              <TabsTrigger value="url" className="flex items-center gap-2">
+              <TabsTrigger value="url" className="flex items-center gap-2 text-gray-300 data-[state=active]:text-white">
                 <Link className="h-4 w-4" />
                 Image URL
               </TabsTrigger>
@@ -223,15 +224,15 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
                 accept=".svg,.jpeg,.jpg,.png"
                 onChange={handleFileUpload}
                 disabled={isUploading || imageUrls.length >= 5}
-                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-500/20 file:text-purple-300 hover:file:bg-purple-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {isUploading && (
-                <p className="text-xs text-blue-600 flex items-center gap-1">
+                <p className="text-xs text-blue-400 flex items-center gap-1">
                   <span className="animate-spin">⭐</span>
                   Processing and compressing image...
                 </p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Upload JPEG, PNG, or SVG files (max 20MB source). Images will be heavily compressed to stay within database limits. Maximum 5 images.
               </p>
             </TabsContent>
@@ -250,7 +251,7 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
                   Add
                 </Button>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Paste a direct link to an image file hosted elsewhere
               </p>
             </TabsContent>
@@ -264,7 +265,7 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
               Current Images ({imageUrls.length}/5)
             </Label>
             {imageUrls.length > 0 && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 First image will be the main image
               </p>
             )}
@@ -360,5 +361,6 @@ export default function AboutImagesManager({ organization, onSave, isSaving = fa
         )}
       </CardContent>
     </Card>
+    </div>
   )
 }

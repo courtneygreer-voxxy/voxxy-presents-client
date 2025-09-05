@@ -22,6 +22,7 @@ import { useOrganization } from "@/hooks/useOrganization"
 import EventRegistration from "@/components/EventRegistration"
 import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
+import { WelcomeSection } from "@/components/WelcomeSection"
 import { isFeatureEnabled } from '@/config/environments'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
@@ -51,6 +52,41 @@ export default function OrganizationPage({
 
   const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
+  }
+
+  // Function to get background style based on organization's backgroundStyle
+  const getBackgroundStyle = (backgroundStyle: string = 'stars') => {
+    switch (backgroundStyle) {
+      case 'gradient-purple':
+        return {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          animation: 'none'
+        }
+      case 'gradient-sunset':
+        return {
+          background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%)',
+          animation: 'none'
+        }
+      case 'minimal-grid':
+        return {
+          background: '#111827',
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px)',
+          backgroundSize: '20px 20px',
+          animation: 'none'
+        }
+      case 'abstract-waves':
+        return {
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
+          backgroundSize: '400% 400%',
+          animation: 'gradient-shift 10s ease-in-out infinite'
+        }
+      case 'stars':
+      default:
+        return {
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          animation: 'pulse 8s ease-in-out infinite'
+        }
+    }
   }
 
 
@@ -86,13 +122,10 @@ export default function OrganizationPage({
 
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background */}
+      {/* Dynamic Background */}
       <div 
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
+        className="absolute inset-0 opacity-30 pointer-events-none"
+        style={getBackgroundStyle(organization.backgroundStyle)}
       />
       
       <div className="relative z-10">
@@ -132,51 +165,17 @@ export default function OrganizationPage({
       </div>
 
 
-      {/* Header Photo Section */}
-      <section id="home" className="relative h-80 overflow-hidden">
-        <img
-          src={bannerImage || organization.bannerUrl || "/placeholder.jpg"}
-          alt={`${organization.name} Header`}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="absolute bottom-6 left-6 text-white">
-          <div className="flex items-center space-x-4 mb-2">
-            <img
-              src={logoImage || organization.logoUrl || "/placeholder-logo.png"}
-              alt={`${organization.name} Logo`}
-              width={80}
-              height={80}
-              className="rounded-full border-4 border-white object-cover"
-            />
-            <div>
-              <h2 className="text-4xl font-bold">{organization.name}</h2>
-              <p className="text-lg text-gray-200">{organization.description}</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Background Section */}
-      <section className="py-12 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 my-8">
-        <div className="container mx-auto px-4 max-w-4xl">
-          <div className="text-center">
-            <h3 className="text-2xl font-semibold text-white mb-4">
-              Welcome to {organization.name}
-            </h3>
-            <p className="text-lg leading-relaxed text-gray-200">
-              {typeof organization.background === 'string' 
-                ? organization.background 
-                : organization.description || 'Welcome to our community!'
-              }
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Welcome Section - Replaces header photo and welcome */}
+      <WelcomeSection 
+        organization={organization}
+        logoImage={logoImage}
+        showAdminControls={showAdminControls}
+      />
 
       {/* Upcoming Events - List Style */}
-      <section id="events" className="py-16 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 mb-8">
-        <div className="container mx-auto px-4 max-w-4xl">
+      <section id="events" className="py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
           <h3 className="text-3xl font-bold text-center text-white mb-10">
             Upcoming Events
           </h3>
@@ -244,11 +243,11 @@ export default function OrganizationPage({
                         <p className="text-gray-300 mb-3">{event.description}</p>
                         <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
                           <div className="flex items-center">
-                            <Calendar className="h-4 w-4 mr-2" />
+                            <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                             {event.date instanceof Date ? event.date.toLocaleDateString() : new Date(event.date).toLocaleDateString()} • {event.time}
                           </div>
                           <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2" />
+                            <MapPin className="h-4 w-4 mr-2 text-purple-400" />
                             {event.location}
                           </div>
                         </div>
@@ -348,7 +347,7 @@ export default function OrganizationPage({
                 return recurringEvents.length > 0 && (
                   <div>
                     <h4 className="text-2xl font-semibold text-white mb-6 flex items-center gap-2">
-                      <Repeat className="h-6 w-6" />
+                      <Repeat className="h-6 w-6 text-purple-400" />
                       Recurring Events
                     </h4>
                     <div className="space-y-6">
@@ -386,11 +385,11 @@ export default function OrganizationPage({
                                   <p className="text-gray-300 mb-3">{event.description}</p>
                                   <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
                                     <div className="flex items-center">
-                                      <Calendar className="h-4 w-4 mr-2" />
+                                      <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                                       {event.time}
                                     </div>
                                     <div className="flex items-center">
-                                      <MapPin className="h-4 w-4 mr-2" />
+                                      <MapPin className="h-4 w-4 mr-2 text-purple-400" />
                                       {event.location}
                                     </div>
                                   </div>
@@ -485,12 +484,14 @@ export default function OrganizationPage({
               })()}
             </div>
           )}
+          </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-20 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg mx-16 mb-8">
+      <section id="about" className="py-16">
         <div className="container mx-auto px-4 max-w-6xl">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
           <h3 className="text-4xl font-bold text-center text-white mb-12">
             About {organization.name}
           </h3>
@@ -622,7 +623,7 @@ export default function OrganizationPage({
                   )}
                   <a 
                     href={`mailto:${organization.contactEmail}`} 
-                    className="text-gray-300 hover:text-purple-600 transition-colors" 
+                    className="text-gray-300 hover:text-purple-400 transition-colors" 
                     aria-label="Email"
                   >
                     <Mail className="h-6 w-6" />
@@ -630,6 +631,7 @@ export default function OrganizationPage({
                 </div>
               </div>
             </div>
+          </div>
           </div>
         </div>
       </section>

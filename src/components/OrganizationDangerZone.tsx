@@ -46,24 +46,24 @@ export function OrganizationDangerZone({
   }
 
   return (
-    <>
-      <Card className="border-red-200">
+    <div className="admin-dark">
+      <Card className="!bg-white/10 backdrop-blur-sm !border-red-400/50">
         <CardHeader>
           <div className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5 text-red-600" />
-            <CardTitle className="text-red-900">Danger Zone</CardTitle>
+            <AlertTriangle className="h-5 w-5 text-red-400" />
+            <CardTitle className="text-red-300">Danger Zone</CardTitle>
           </div>
-          <CardDescription>
+          <CardDescription className="text-gray-300">
             Irreversible and destructive actions for this organization.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <h4 className="font-semibold text-red-900 mb-2">Delete Organization</h4>
-            <p className="text-sm text-red-800 mb-4">
+          <div className="bg-red-500/10 border border-red-400/30 rounded-lg p-4">
+            <h4 className="font-semibold text-red-300 mb-2">Delete Organization</h4>
+            <p className="text-sm text-red-200 mb-4">
               Permanently delete this organization and all associated data. This action cannot be undone.
             </p>
-            <ul className="text-xs text-red-700 mb-4 list-disc list-inside space-y-1">
+            <ul className="text-xs text-red-200/80 mb-4 list-disc list-inside space-y-1">
               <li>All events will be permanently deleted</li>
               <li>All registration data will be lost</li>
               <li>All subscriber information will be removed</li>
@@ -129,6 +129,6 @@ export function OrganizationDangerZone({
           </div>
         </div>
       </ConfirmationModal>
-    </>
+    </div>
   )
 }

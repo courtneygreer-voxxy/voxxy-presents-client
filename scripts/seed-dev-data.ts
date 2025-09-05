@@ -82,6 +82,7 @@ async function seedDevData() {
         description: "NYC's premier creative community for underground artists and music lovers",
         bio: "Voxxy Presents NYC curates intimate experiences that blend underground music, visual art, and community connection. We create spaces where emerging and established artists can share their craft with passionate audiences in unique Brooklyn venues.",
         contactEmail: "hello@voxxypresents.com",
+        backgroundStyle: "abstract-waves", // New dynamic background option
         socialLinks: {
           instagram: "@voxxypresentsnyc",
           website: "https://www.voxxypresents.com",
@@ -102,6 +103,39 @@ async function seedDevData() {
       console.log(`✅ Voxxy Presents NYC created with ID: ${orgId}`)
     } else {
       console.log('✅ Voxxy Presents NYC already exists')
+    }
+
+    // Check if Brooklyn Hearts Club already exists
+    let brooklynOrg = await getOrganizationBySlug("brooklyn-hearts-club")
+    
+    if (!brooklynOrg) {
+      console.log('📄 Creating Brooklyn Hearts Club organization...')
+      const orgId = await createOrganization({
+        name: "Brooklyn Hearts Club",
+        slug: "brooklyn-hearts-club",
+        description: "Brooklyn's vibrant community for music lovers and creative souls",
+        bio: "Brooklyn Hearts Club brings together passionate music lovers in intimate settings throughout Brooklyn. We focus on creating meaningful connections between artists and audiences through carefully curated events that celebrate creativity and community.",
+        contactEmail: "hello@brooklynheartsclub.com",
+        backgroundStyle: "gradient-sunset", // Different background style for variety
+        socialLinks: {
+          instagram: "@brooklynheartsclub",
+          website: "https://www.brooklynheartsclub.com"
+        },
+        settings: {
+          defaultLocation: "Brooklyn Community Spaces",
+          defaultAddress: "Various locations throughout Brooklyn, NY",
+          theme: {
+            primaryColor: "#f472b6",
+            backgroundColor: "#1e1b4b"
+          }
+        },
+        ownerId: "dev-admin-user"
+      })
+      
+      brooklynOrg = await getOrganizationBySlug("brooklyn-hearts-club")
+      console.log(`✅ Brooklyn Hearts Club created with ID: ${orgId}`)
+    } else {
+      console.log('✅ Brooklyn Hearts Club already exists')
     }
 
     // Create sample events

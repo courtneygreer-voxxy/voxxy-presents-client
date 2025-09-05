@@ -152,7 +152,7 @@ export function ClubEventSyncManager({
 
   if (loading) {
     return (
-      <Card>
+      <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Calendar className="h-5 w-5" />
@@ -171,42 +171,59 @@ export function ClubEventSyncManager({
 
   if (!eventbriteConnection) {
     return (
-      <Card>
+      <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
         <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Calendar className="h-5 w-5" />
-            <span>Event Sync</span>
+          <CardTitle className="flex items-center space-x-2 text-white">
+            <Calendar className="h-5 w-5 text-purple-400" />
+            <span>Import Events from Eventbrite</span>
           </CardTitle>
-          <CardDescription>
-            Sync events from your connected platforms
+          <CardDescription className="text-gray-300">
+            Automatically import and sync your existing Eventbrite events
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Alert>
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              No Eventbrite account connected. Connect your Eventbrite account in Profile Settings → Platform Integrations to sync events to this club.
+        <CardContent className="space-y-4">
+          <div className="bg-purple-500/10 border border-purple-400/30 rounded-lg p-4">
+            <h4 className="font-semibold text-purple-300 mb-2">Why Connect Eventbrite?</h4>
+            <ul className="text-sm text-gray-300 space-y-1 list-disc list-inside">
+              <li>Import existing events with all details automatically</li>
+              <li>Keep event information synchronized across platforms</li>
+              <li>Save time on manual event creation</li>
+              <li>Maintain consistent event data everywhere</li>
+            </ul>
+          </div>
+
+          <Alert className="!bg-blue-500/10 !border-blue-400/30">
+            <AlertCircle className="h-4 w-4 text-blue-400" />
+            <AlertDescription className="text-blue-200">
+              <strong>No Eventbrite connection found.</strong> You'll need to connect your Eventbrite account through your Profile Settings first.
             </AlertDescription>
           </Alert>
-          <div className="mt-4">
+          
+          <div className="flex flex-col sm:flex-row gap-3">
             <Button
               onClick={() => window.open('/profile?tab=integrations', '_blank')}
-              variant="outline"
-              className="flex items-center space-x-2"
+              className="bg-purple-600 hover:bg-purple-700 text-white flex-1"
             >
-              <ExternalLink className="h-4 w-4" />
-              <span>Connect Eventbrite</span>
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Connect Eventbrite Account
+            </Button>
+            <Button variant="outline" className="text-gray-300 border-white/20">
+              Learn More
             </Button>
           </div>
+
+          <p className="text-xs text-gray-400 text-center">
+            Platform connections are managed at the profile level and shared across all your clubs.
+          </p>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <div className="space-y-6">
+    <div className="admin-dark space-y-6">
       {/* Connection Status */}
-      <Card>
+      <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
@@ -287,7 +304,7 @@ export function ClubEventSyncManager({
 
       {/* Events Preview */}
       {events.length > 0 && (
-        <Card>
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
               <Zap className="h-5 w-5" />

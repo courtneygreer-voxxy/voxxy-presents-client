@@ -8,7 +8,8 @@ import { Save, X } from "lucide-react"
 import type { Organization } from '@/types/database'
 import { getDefaultAboutStory, getDefaultOfferings } from '@/utils/defaultContent'
 import { compressImage, validateImageFile } from '@/utils/imageCompression'
-import { HeaderImageSelector } from '@/components/HeaderImageSelector'
+import AboutImagesManager from '@/components/AboutImagesManager'
+import { BackgroundSelector } from '@/components/BackgroundSelector'
 
 
 interface OrganizationEditFormProps {
@@ -33,6 +34,7 @@ export function OrganizationEditForm({
     contactEmail: organization.contactEmail,
     logoUrl: organization.logoUrl || '',
     bannerUrl: organization.bannerUrl || '',
+    backgroundStyle: organization.backgroundStyle || 'stars',
     aboutImageUrl: organization.aboutImageUrl || '',
     aboutStory: organization.aboutStory || '',
     aboutOfferings: organization.aboutOfferings && organization.aboutOfferings.length > 0 ? organization.aboutOfferings : getDefaultOfferings(),
@@ -52,7 +54,6 @@ export function OrganizationEditForm({
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [uploadingLogo, setUploadingLogo] = useState(false)
   const [uploadingHero, setUploadingHero] = useState(false)
-  const [uploadingAbout, setUploadingAbout] = useState(false)
   
   // Use external saving state if provided (for full page mode)
   const submitting = isSaving || isSubmitting
@@ -152,37 +153,6 @@ export function OrganizationEditForm({
     }
   }
 
-  const handleAboutImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    // Validate file (excluding SVG for about images)
-    if (!['image/jpeg', 'image/jpg', 'image/png'].includes(file.type)) {
-      alert('Please upload a valid image file (JPEG or PNG)')
-      return
-    }
-
-    if (file.size > 20 * 1024 * 1024) { // 20MB source limit
-      alert('Source file must be less than 20MB')
-      return
-    }
-
-    setUploadingAbout(true)
-    
-    try {
-      // Compress about images
-      const compressedDataUrl = await compressImage(file, 850) // 850KB target for about images
-      setFormData(prev => ({
-        ...prev,
-        aboutImageUrl: compressedDataUrl
-      }))
-      setUploadingAbout(false)
-    } catch (error) {
-      console.error('Error processing about image:', error)
-      alert('Error processing image. Please try a different file.')
-      setUploadingAbout(false)
-    }
-  }
 
   const addOffering = () => {
     setFormData(prev => ({
@@ -278,8 +248,8 @@ export function OrganizationEditForm({
       {!isFullPage && (
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">Edit Organization</h2>
-            <p className="text-gray-600">Update your organization's details and settings</p>
+            <h2 className="text-2xl font-bold text-white">Edit Organization</h2>
+            <p className="text-gray-300">Update your organization's details and settings</p>
           </div>
           <Button
             onClick={onCancel}
@@ -294,17 +264,17 @@ export function OrganizationEditForm({
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <Card>
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
           <CardHeader>
-            <CardTitle>Basic Information</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Basic Information</CardTitle>
+            <CardDescription className="text-gray-300">
               Core details about your organization
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name">Organization Name</Label>
+                <Label htmlFor="name" className="text-white">Organization Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
@@ -313,7 +283,7 @@ export function OrganizationEditForm({
                 />
               </div>
               <div>
-                <Label htmlFor="contactEmail">Contact Email</Label>
+                <Label htmlFor="contactEmail" className="text-white">Contact Email</Label>
                 <Input
                   id="contactEmail"
                   type="email"
@@ -325,7 +295,7 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="description">Tagline</Label>
+              <Label htmlFor="description" className="text-white">Tagline</Label>
               <Input
                 id="description"
                 value={formData.description}
@@ -335,7 +305,7 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="background">Short Description</Label>
+              <Label htmlFor="background" className="text-white">Short Description</Label>
               <Textarea
                 id="background"
                 value={formData.background}
@@ -348,16 +318,16 @@ export function OrganizationEditForm({
         </Card>
 
         {/* Default Location */}
-        <Card>
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
           <CardHeader>
-            <CardTitle>Default Location</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Default Location</CardTitle>
+            <CardDescription className="text-gray-300">
               Default venue information for events
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="defaultLocation">Venue Name</Label>
+              <Label htmlFor="defaultLocation" className="text-white">Venue Name</Label>
               <Input
                 id="defaultLocation"
                 value={formData.settings.defaultLocation}
@@ -367,7 +337,7 @@ export function OrganizationEditForm({
             </div>
             
             <div>
-              <Label htmlFor="defaultAddress">Address</Label>
+              <Label htmlFor="defaultAddress" className="text-white">Address</Label>
               <Input
                 id="defaultAddress"
                 value={formData.settings.defaultAddress}
@@ -378,102 +348,17 @@ export function OrganizationEditForm({
           </CardContent>
         </Card>
 
-        {/* Media & Branding */}
-        <Card>
+        {/* About Section */}
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
           <CardHeader>
-            <CardTitle>Media & Branding</CardTitle>
-            <CardDescription>
-              Images and visual identity for your organization
+            <CardTitle className="text-white">About Section</CardTitle>
+            <CardDescription className="text-gray-300">
+              Content for your organization's about section
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="logoFile">Logo Upload</Label>
-              <div className="space-y-2">
-                <input
-                  id="logoFile"
-                  type="file"
-                  accept=".svg,.jpeg,.jpg,.png"
-                  onChange={handleLogoUpload}
-                  disabled={uploadingLogo}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {uploadingLogo && (
-                  <p className="text-xs text-blue-600 flex items-center gap-1">
-                    <span className="animate-spin">⭐</span>
-                    Uploading logo...
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  Supported formats: SVG, JPEG, PNG. Max source file: 20MB (will be cropped to square and compressed automatically)
-                </p>
-                {formData.logoUrl && !uploadingLogo && (
-                  <div className="flex items-center gap-2 mt-2">
-                    <img 
-                      src={formData.logoUrl} 
-                      alt="Logo preview" 
-                      className="w-12 h-12 rounded-full object-cover border border-gray-200"
-                    />
-                    <span className="text-sm text-gray-600">Current logo</span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <HeaderImageSelector
-              currentImage={formData.bannerUrl}
-              onImageSelect={(imageUrl) => handleInputChange('bannerUrl', imageUrl)}
-              isSaving={isSubmitting}
-            />
-          </CardContent>
-        </Card>
-
-        {/* Club Background */}
-        <Card>
-          <CardHeader>
-            <CardTitle>About Section</CardTitle>
-            <CardDescription>
-              Content and images for your organization's about section
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="aboutImageFile">About Image Upload</Label>
-              <div className="space-y-2">
-                <input
-                  id="aboutImageFile"
-                  type="file"
-                  accept=".jpeg,.jpg,.png"
-                  onChange={handleAboutImageUpload}
-                  disabled={uploadingAbout}
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {uploadingAbout && (
-                  <p className="text-xs text-blue-600 flex items-center gap-1">
-                    <span className="animate-spin">⭐</span>
-                    Uploading about image...
-                  </p>
-                )}
-                <p className="text-xs text-gray-500">
-                  Supported formats: JPEG, PNG. Max source file: 20MB (will be compressed automatically). Recommended: 600x400px or larger
-                </p>
-                {formData.aboutImageUrl && !uploadingAbout && (
-                  <div className="mt-3">
-                    <Label className="text-sm text-gray-600">Preview:</Label>
-                    <div className="mt-1 relative h-32 rounded-lg overflow-hidden border border-gray-200">
-                      <img 
-                        src={formData.aboutImageUrl} 
-                        alt="About image preview" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="aboutStory">Our Story</Label>
+              <Label htmlFor="aboutStory" className="text-white">Our Story</Label>
               <Textarea
                 id="aboutStory"
                 value={formData.aboutStory}
@@ -487,7 +372,7 @@ export function OrganizationEditForm({
             </div>
 
             <div>
-              <Label>What We Offer</Label>
+              <Label className="text-white">What We Offer</Label>
               <div className="space-y-2">
                 {formData.aboutOfferings.map((offering, index) => (
                   <div key={index} className="flex gap-2 items-center">
@@ -526,18 +411,83 @@ export function OrganizationEditForm({
           </CardContent>
         </Card>
 
-        {/* Social Links */}
-        <Card>
+        {/* About Section Images */}
+        <AboutImagesManager
+          organization={organization}
+          onSave={async (updates) => {
+            // Update form data to keep it in sync
+            setFormData(prev => ({
+              ...prev,
+              ...updates
+            }))
+            // Call parent save function
+            await onSave(updates)
+          }}
+          isSaving={submitting}
+        />
+
+        {/* Media & Branding */}
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
           <CardHeader>
-            <CardTitle>Social Media & Links</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-white">Media & Branding</CardTitle>
+            <CardDescription className="text-gray-300">
+              Images and visual identity for your organization
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <Label htmlFor="logoFile" className="text-white">Logo Upload</Label>
+              <div className="space-y-2">
+                <input
+                  id="logoFile"
+                  type="file"
+                  accept=".svg,.jpeg,.jpg,.png"
+                  onChange={handleLogoUpload}
+                  disabled={uploadingLogo}
+                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                />
+                {uploadingLogo && (
+                  <p className="text-xs text-blue-600 flex items-center gap-1">
+                    <span className="animate-spin">⭐</span>
+                    Uploading logo...
+                  </p>
+                )}
+                <p className="text-xs text-gray-500">
+                  Supported formats: SVG, JPEG, PNG. Max source file: 20MB (will be cropped to square and compressed automatically)
+                </p>
+                {formData.logoUrl && !uploadingLogo && (
+                  <div className="flex items-center gap-2 mt-2">
+                    <img 
+                      src={formData.logoUrl} 
+                      alt="Logo preview" 
+                      className="w-12 h-12 rounded-full object-cover border border-gray-200"
+                    />
+                    <span className="text-sm text-gray-600">Current logo</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <BackgroundSelector
+              currentBackground={formData.backgroundStyle || 'stars'}
+              onBackgroundSelect={(backgroundId) => handleInputChange('backgroundStyle', backgroundId)}
+              isSaving={isSubmitting}
+            />
+          </CardContent>
+        </Card>
+
+        {/* Social Links */}
+        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+          <CardHeader>
+            <CardTitle className="text-white">Social Media & Links</CardTitle>
+            <CardDescription className="text-gray-300">
               Connect your social media accounts and external links
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="instagram">Instagram Handle</Label>
+                <Label htmlFor="instagram" className="text-white">Instagram Handle</Label>
                 <Input
                   id="instagram"
                   value={formData.socialLinks.instagram}
@@ -546,7 +496,7 @@ export function OrganizationEditForm({
                 />
               </div>
               <div>
-                <Label htmlFor="website">Website URL</Label>
+                <Label htmlFor="website" className="text-white">Website URL</Label>
                 <Input
                   id="website"
                   value={formData.socialLinks.website}
@@ -555,7 +505,7 @@ export function OrganizationEditForm({
                 />
               </div>
               <div>
-                <Label htmlFor="eventbrite">Eventbrite URL</Label>
+                <Label htmlFor="eventbrite" className="text-white">Eventbrite URL</Label>
                 <Input
                   id="eventbrite"
                   value={formData.socialLinks.eventbrite}
@@ -564,7 +514,7 @@ export function OrganizationEditForm({
                 />
               </div>
               <div>
-                <Label htmlFor="venmo">Venmo Handle</Label>
+                <Label htmlFor="venmo" className="text-white">Venmo Handle</Label>
                 <Input
                   id="venmo"
                   value={formData.socialLinks.venmo}
@@ -573,7 +523,7 @@ export function OrganizationEditForm({
                 />
               </div>
               <div>
-                <Label htmlFor="other">Other Social Link</Label>
+                <Label htmlFor="other" className="text-white">Other Social Link</Label>
                 <Input
                   id="other"
                   value={formData.socialLinks.other}

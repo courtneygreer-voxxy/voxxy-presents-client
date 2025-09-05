@@ -177,11 +177,14 @@ Streamlined event creation with dedicated workflows:
 
 ### Design Customization System
 Simple yet powerful branding controls for organization pages:
-- **Background Colors**: Full-page background color customization with preset options and custom hex input
+- **Dynamic Background Styles**: Choose from 5 curated background options (animated stars, purple gradient, sunset gradient, minimal grid, abstract waves) that work seamlessly with glass morphism design
+- **Glass Morphism UI**: Modern translucent components with backdrop blur effects for depth and visual appeal
 - **Text Color Control**: Customize color of key headings ("Welcome to [Club]", "Upcoming Events", "About [Club]", etc.)
 - **Button Color Theming**: Custom button colors for consistent branding across public pages
 - **Real-time Updates**: Changes save instantly and apply to public organization pages
 - **Minimal Interface**: Clean, focused design controls without overwhelming options
+
+**Recent Enhancement (v1.5.0)**: Replaced static header images with dynamic background selector and integrated welcome section combining profile picture, title, and organization message for improved visual hierarchy and responsive design.
 
 ### Image Carousel System
 Rich visual storytelling for organization about sections:
