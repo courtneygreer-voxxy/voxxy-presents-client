@@ -12,6 +12,7 @@ export interface Organization {
   aboutImages?: string[] // New multiple images field
   aboutStory?: string
   aboutOfferings?: string[]
+  backgroundStyle?: string // Dynamic background style (stars, gradient-purple, gradient-sunset, minimal-grid, abstract-waves)
   contactEmail: string
   socialLinks: {
     instagram?: string
