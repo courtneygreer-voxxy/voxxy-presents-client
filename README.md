@@ -333,5 +333,8 @@ For development questions or technical support, please refer to:
 - [Deployment Guide](DEPLOYMENT.md) - Staging → Production workflow
 - [Current Status](DEVELOPMENT-STATUS.md) - Project progress
 
+**📋 Release Notes:**
+- [v1.5.0 - Project Cool](docs/releases/v1.5.0.md) - Background customization system
+
 ---
 Built with ❤️ by the Voxxy team
