@@ -207,9 +207,6 @@ export function ClubEventSyncManager({
               <ExternalLink className="h-4 w-4 mr-2" />
               Connect Eventbrite Account
             </Button>
-            <Button variant="outline" className="text-gray-300 border-white/20">
-              Learn More
-            </Button>
           </div>
 
           <p className="text-xs text-gray-400 text-center">

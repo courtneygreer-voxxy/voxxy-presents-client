@@ -295,7 +295,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto glass-modal">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />
@@ -312,19 +312,19 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
           )}
           
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+            <div className="glass-card p-4">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="h-5 w-5 text-purple-400 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <h3 className="font-medium text-red-800 mb-1">Unable to Load Registration Data</h3>
-                  <p className="text-sm text-red-700 mb-3">{error}</p>
+                  <h3 className="font-medium text-white mb-1">Registration System Update</h3>
+                  <p className="text-sm text-gray-300 mb-3">Event analytics are temporarily unavailable as we've transitioned to a subscription-based model. Users now subscribe to club updates instead of registering for individual events.</p>
                   <div className="flex gap-3">
                     <Button 
                       size="sm" 
                       variant="outline" 
                       onClick={handleRetry}
                       disabled={loading}
-                      className="text-red-700 border-red-300 hover:bg-red-100"
+                      className="glass-button-outline"
                     >
                       {loading ? (
                         <>

@@ -274,12 +274,12 @@ export function OrganizationEditForm({
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="name" className="text-white">Organization Name</Label>
+                <Label htmlFor="name" className="text-white">Club Name</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => handleInputChange('name', e.target.value)}
-                  placeholder="Organization Name"
+                  placeholder="Club Name"
                 />
               </div>
               <div>

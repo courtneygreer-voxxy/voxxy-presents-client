@@ -302,14 +302,14 @@ export default function ContactPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="beta-organization">Organization/Club Name *</Label>
+                          <Label htmlFor="beta-organization">Club Name *</Label>
                           <Input
                             id="beta-organization"
                             type="text"
                             required
                             value={betaFormData.organizationName}
                             onChange={(e) => handleBetaInputChange('organizationName', e.target.value)}
-                            placeholder="Your community or organization name"
+                            placeholder="Your community or club name"
                             disabled={isSubmitting}
                           />
                         </div>

@@ -87,9 +87,9 @@ export function ShareButton({
           Share
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-3" align="end">
+      <PopoverContent className="w-64 p-3 glass-modal border-white/30" align="end">
         <div className="space-y-2">
-          <h4 className="font-medium text-sm">Share this page</h4>
+          <h4 className="font-medium text-sm text-white">Share this page</h4>
           
           {/* Copy Link */}
           <Button
@@ -106,8 +106,8 @@ export function ShareButton({
             {copied ? 'Copied!' : 'Copy link'}
           </Button>
 
-          <div className="border-t pt-2">
-            <p className="text-xs text-gray-500 mb-2">Share on social media</p>
+          <div className="border-t border-white/20 pt-2">
+            <p className="text-xs text-gray-300 mb-2">Share on social media</p>
             <div className="flex gap-1">
               <Button
                 variant="ghost"
@@ -138,7 +138,7 @@ export function ShareButton({
 
           {/* Native Share (if available) */}
           {canNativeShare && (
-            <div className="border-t pt-2">
+            <div className="border-t border-white/20 pt-2">
               <Button
                 variant="ghost"
                 size="sm"

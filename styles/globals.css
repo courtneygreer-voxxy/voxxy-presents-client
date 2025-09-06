@@ -87,6 +87,11 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Apply admin-dark theme to all pages by default */
+  html {
+    @apply admin-dark;
+  }
 }
 
 @keyframes gradient-shift {
@@ -104,4 +109,143 @@
 .gradient-shift {
   background-size: 400% 400%;
   animation: gradient-shift 10s ease-in-out infinite;
+}
+
+/* Glass Morphism Design System - Applied Globally */
+
+/* Core Glass Modal System */
+.glass-modal {
+  @apply bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50;
+}
+
+.glass-card {
+  @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg;
+}
+
+.glass-input {
+  @apply bg-white/10 border-white/20 text-white placeholder-gray-400;
+  @apply focus:border-purple-400 focus:ring-purple-400/20;
+}
+
+.glass-button-primary {
+  @apply bg-purple-600 hover:bg-purple-700 text-white !important;
+}
+
+.glass-button-secondary {
+  @apply bg-white/10 border-white/20 text-white hover:bg-white/20;
+}
+
+.glass-button-outline {
+  @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white;
+  @apply hover:bg-white/15 hover:border-white/30;
+}
+
+/* Global Component Overrides for Admin Dark Theme */
+.admin-dark {
+  /* Badge components - force purple/white theme */
+  .bg-purple-600 {
+    @apply !bg-purple-600 !text-white !important;
+  }
+  
+  /* All buttons default to glass styling */
+  button:not([class*="glass-"]):not([class*="bg-"]) {
+    @apply glass-button-secondary;
+  }
+  
+  /* Primary action buttons */
+  button[class*="bg-purple"] {
+    @apply glass-button-primary;
+  }
+  
+  /* Input fields */
+  input:not([class*="bg-"]), 
+  textarea:not([class*="bg-"]), 
+  select:not([class*="bg-"]) {
+    @apply glass-input;
+  }
+  
+  /* Card components */
+  [class*="Card"]:not([class*="bg-"]) {
+    @apply glass-card;
+  }
+  
+  /* Modal/Dialog components */
+  [data-radix-dialog-content] {
+    @apply glass-modal;
+  }
+  
+  /* Popover components */
+  [data-radix-popover-content] {
+    @apply glass-modal border-white/30;
+  }
+  
+  /* Dropdown components */
+  [data-radix-dropdown-menu-content] {
+    @apply glass-modal border-white/30;
+  }
+  
+  /* Badge component overrides */
+  [class*="Badge"] {
+    /* Status badges */
+    &[class*="bg-red"] {
+      @apply !bg-white !text-purple-600 !border-purple-600 !border !important;
+    }
+    
+    &[class*="bg-purple"] {
+      @apply !bg-purple-600 !text-white !important;
+    }
+    
+    /* Default badge styling */
+    &:not([class*="bg-"]) {
+      @apply bg-white/10 text-white border-white/20 border;
+    }
+  }
+  
+  /* Tab components */
+  [data-radix-tabs-trigger] {
+    @apply text-gray-400 hover:text-white !bg-transparent;
+    @apply data-[state=active]:!bg-white/20 data-[state=active]:!text-white;
+  }
+  
+  /* Table components */
+  table {
+    @apply text-white;
+  }
+  
+  th {
+    @apply text-white border-white/20;
+  }
+  
+  td {
+    @apply text-gray-300 border-white/10;
+  }
+  
+  /* Alert components */
+  [class*="alert"]:not([class*="bg-"]) {
+    @apply glass-card border-white/20;
+  }
+  
+  /* Select components */
+  [data-radix-select-trigger] {
+    @apply glass-input;
+  }
+  
+  [data-radix-select-content] {
+    @apply glass-modal border-white/30;
+  }
+}
+
+/* Force all Badge components to respect our theme globally */
+[class*="badge"] {
+  /* SOLD OUT badges */
+  &.bg-red-600, 
+  &[class*="bg-red"] {
+    @apply !bg-white !text-purple-600 !border-purple-600 !border !important;
+  }
+  
+  /* PRESALE badges */
+  &.bg-purple-600,
+  &[class*="bg-purple"] {
+    @apply !bg-purple-600 !text-white !important;
+  }
 }

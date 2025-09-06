@@ -19,10 +19,11 @@ import {
   User
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
-import EventRegistration from "@/components/EventRegistration"
+import { AddToCalendar } from "@/components/AddToCalendar"
 import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
 import { WelcomeSection } from "@/components/WelcomeSection"
+import { SubscriptionModal } from "@/components/SubscriptionModal"
 import { isFeatureEnabled } from '@/config/environments'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
@@ -115,13 +116,13 @@ export default function OrganizationPage({
   if (!organization) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-300">Organization not found</p>
+        <p className="text-gray-300">Club not found</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gray-900 relative overflow-hidden admin-dark">
       {/* Dynamic Background */}
       <div 
         className="absolute inset-0 opacity-30 pointer-events-none"
@@ -216,7 +217,7 @@ export default function OrganizationPage({
                       <div className="flex-1 mb-4 md:mb-0">
                         <div className="flex items-center gap-3 mb-2">
                           {event.status === 'sold_out' && (
-                            <Badge className="bg-red-600 text-white">
+                            <Badge className="bg-white text-purple-600 border border-purple-600">
                               SOLD OUT
                             </Badge>
                           )}
@@ -275,7 +276,7 @@ export default function OrganizationPage({
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        <EventRegistration event={event as any} organizationName={organization.name} />
+                        <AddToCalendar event={event} organizationName={organization.name} />
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}
@@ -310,6 +311,22 @@ export default function OrganizationPage({
                             </p>
                           </div>
                         </div>
+
+                        {/* Ticket Link Section */}
+                        {event.eventbriteUrl && (
+                          <div>
+                            <h5 className="font-semibold text-white mb-2">Get Tickets</h5>
+                            <a 
+                              href={event.eventbriteUrl} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              View tickets on Eventbrite
+                            </a>
+                          </div>
+                        )}
 
                         {event.isRecurring && event.recurringDates && (
                           <div>
@@ -360,7 +377,7 @@ export default function OrganizationPage({
                                 <div className="flex-1 mb-4 md:mb-0">
                                   <div className="flex items-center gap-3 mb-2">
                                     {event.status === 'sold_out' && (
-                                      <Badge className="bg-red-600 text-white">
+                                      <Badge className="bg-white text-purple-600 border border-purple-600">
                                         SOLD OUT
                                       </Badge>
                                     )}
@@ -417,7 +434,7 @@ export default function OrganizationPage({
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                  <EventRegistration event={event as any} organizationName={organization.name} />
+                                  <AddToCalendar event={event} organizationName={organization.name} />
                                   <Button
                                     variant="outline"
                                     onClick={() => toggleEventDetails(event.id)}
@@ -454,6 +471,22 @@ export default function OrganizationPage({
                                   <h5 className="font-semibold text-white mb-2">Location</h5>
                                   <p className="text-gray-200">{event.address}</p>
                                 </div>
+
+                                {/* Ticket Link Section */}
+                                {event.eventbriteUrl && (
+                                  <div>
+                                    <h5 className="font-semibold text-white mb-2">Get Tickets</h5>
+                                    <a 
+                                      href={event.eventbriteUrl} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm"
+                                    >
+                                      <ExternalLink className="h-4 w-4" />
+                                      View tickets on Eventbrite
+                                    </a>
+                                  </div>
+                                )}
 
                                 {/* Recurring Schedule */}
                                 {event.isRecurring && event.recurringDates && (
@@ -528,7 +561,7 @@ export default function OrganizationPage({
                         ))}
                       </div>
                     ) : (
-                      <p className="italic text-gray-400">Welcome to {organization?.name || 'our organization'}! We're building an amazing community...</p>
+                      <p className="italic text-gray-400">Welcome to {organization?.name || 'our club'}! We're building an amazing community...</p>
                     )}
                   </div>
                 </div>
@@ -632,6 +665,35 @@ export default function OrganizationPage({
               </div>
             </div>
           </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Subscription Section */}
+      <section className="py-16">
+        <div className="container mx-auto px-4 max-w-6xl">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 text-center">
+            <div className="max-w-2xl mx-auto">
+              <h3 className="text-3xl font-bold text-white mb-4">
+                Stay in the Loop with {organization.name}
+              </h3>
+              <p className="text-lg text-gray-300 mb-8">
+                Never miss out on events, updates, and community news. Join our community and be the first to know what's happening!
+              </p>
+              <SubscriptionModal 
+                organization={organization}
+                trigger={
+                  <button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 flex items-center gap-3 mx-auto group shadow-lg hover:shadow-xl transform hover:scale-105">
+                    <span className="text-xl">💌</span>
+                    Subscribe for Updates
+                    <span className="group-hover:translate-x-1 transition-transform text-xl">→</span>
+                  </button>
+                }
+              />
+              <p className="text-sm text-gray-400 mt-4">
+                Join our community • Unsubscribe anytime • Your privacy is protected
+              </p>
+            </div>
           </div>
         </div>
       </section>

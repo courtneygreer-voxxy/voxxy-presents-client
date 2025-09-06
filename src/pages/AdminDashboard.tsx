@@ -322,7 +322,7 @@ export default function AdminDashboard() {
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <Input
-                        placeholder="Search name, email, organization..."
+                        placeholder="Search name, email, club..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         className="pl-10"
@@ -377,7 +377,7 @@ export default function AdminDashboard() {
                             </p>
                             {submission.organizationName && (
                               <p className="text-sm text-gray-600 mb-1">
-                                <strong>Organization:</strong> {submission.organizationName}
+                                <strong>Club:</strong> {submission.organizationName}
                               </p>
                             )}
                             {submission.description && (

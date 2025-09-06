@@ -98,7 +98,7 @@ export default function OrganizationAdminEnhanced() {
 
     try {
       await updateOrganization(updates)
-      setSaveMessage('✅ Organization updated successfully! Changes are now live.')
+      setSaveMessage('✅ Club updated successfully! Changes are now live.')
       setTimeout(() => setSaveMessage(null), 4000)
     } catch (error) {
       console.error('Failed to save organization:', error)
@@ -305,7 +305,7 @@ export default function OrganizationAdminEnhanced() {
             <TabsList className="flex flex-col h-fit w-full !bg-white/10 backdrop-blur-sm border border-white/20">
               <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
                 <Edit className="h-4 w-4 text-purple-400" />
-                Organization
+                Club
               </TabsTrigger>
               <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
                 <Calendar className="h-4 w-4 text-purple-400" />
@@ -487,8 +487,8 @@ export default function OrganizationAdminEnhanced() {
             <TabsContent value="subscribers">
               <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
                 <CardHeader>
-                  <CardTitle>Subscriber Management</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-white">Subscriber Management</CardTitle>
+                  <CardDescription className="text-gray-300">
                     Manage club subscribers and event update requests.
                   </CardDescription>
                 </CardHeader>
