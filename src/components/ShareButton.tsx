@@ -87,7 +87,7 @@ export function ShareButton({
           Share
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-3 glass-modal border-white/30" align="end">
+      <PopoverContent className="w-64 p-3 bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50" align="end">
         <div className="space-y-2">
           <h4 className="font-medium text-sm text-white">Share this page</h4>
           

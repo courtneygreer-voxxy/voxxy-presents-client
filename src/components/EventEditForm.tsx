@@ -168,7 +168,7 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto glass-modal">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
         <DialogHeader>
           <DialogTitle>Edit Event</DialogTitle>
           <DialogDescription>

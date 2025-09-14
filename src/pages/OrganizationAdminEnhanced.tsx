@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, Link } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,7 +28,6 @@ import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
 import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
-import EventCreateFlow from "@/components/EventCreateFlow"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
@@ -58,7 +57,6 @@ export default function OrganizationAdminEnhanced() {
   const isBetaMode = isFeatureEnabled('platformIntegrationBeta')
   const previewMode = isBetaMode ? 'beta' : 'preview'
   const isComingSoonMode = !isPreviewMode && !isBetaMode
-  const [isCreateEventOpen, setIsCreateEventOpen] = useState(false)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
   
@@ -110,11 +108,6 @@ export default function OrganizationAdminEnhanced() {
     }
   }
 
-  const handleEventCreated = (event: any) => {
-    setSaveMessage('✅ Event created successfully!')
-    setTimeout(() => setSaveMessage(null), 4000)
-    refreshEvents()
-  }
 
   const handleEventUpdated = (event: any) => {
     setSaveMessage('✅ Event updated successfully!')
@@ -357,12 +350,14 @@ export default function OrganizationAdminEnhanced() {
                     <h2 className="text-2xl font-bold text-white">Events</h2>
                     <p className="text-gray-300">Import events from platforms or create new ones to manage your club</p>
                   </div>
-                  <Button 
+                  <Button
+                    asChild
                     className="bg-purple-600 hover:bg-purple-700 text-white flex items-center gap-2 relative z-20"
-                    onClick={() => setIsCreateEventOpen(true)}
                   >
-                    <Plus className="h-4 w-4" />
-                    Create Event
+                    <Link to={`/${orgSlug}/create-event`}>
+                      <Plus className="h-4 w-4" />
+                      Create Event
+                    </Link>
                   </Button>
                 </div>
 
@@ -375,12 +370,14 @@ export default function OrganizationAdminEnhanced() {
                         Import events from Eventbrite or create new ones to get started.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3">
-                        <Button 
+                        <Button
+                          asChild
                           className="bg-purple-600 hover:bg-purple-700"
-                          onClick={() => setIsCreateEventOpen(true)}
                         >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create Event
+                          <Link to={`/${orgSlug}/create-event`}>
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Event
+                          </Link>
                         </Button>
                         <Button 
                           variant="outline" 
@@ -555,15 +552,6 @@ export default function OrganizationAdminEnhanced() {
         </Tabs>
       </div>
 
-      {/* Create Event Flow */}
-      {isCreateEventOpen && organization && (
-        <EventCreateFlow
-          organization={organization}
-          isOpen={isCreateEventOpen}
-          onClose={() => setIsCreateEventOpen(false)}
-          onSuccess={handleEventCreated}
-        />
-      )}
 
       {/* Edit Event Modal */}
       {editingEvent && (

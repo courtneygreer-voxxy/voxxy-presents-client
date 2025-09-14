@@ -115,7 +115,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full max-w-md mx-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
         <CardDescription className="text-center">
@@ -224,9 +224,9 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
           </div>
 
           {/* Submit Button */}
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
             disabled={isSubmitting || loading}
             size="lg"
           >

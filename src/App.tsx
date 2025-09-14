@@ -19,6 +19,7 @@ import PlatformTestPage from './pages/PlatformTestPage'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
+import CreateEventPage from './pages/CreateEventPage'
 
 export default function App() {
   return (
@@ -72,6 +73,11 @@ export default function App() {
           <Route path="/:orgSlug/admin" element={
             <ProtectedRoute>
               <OrganizationAdminEnhanced />
+            </ProtectedRoute>
+          } />
+          <Route path="/:orgSlug/create-event" element={
+            <ProtectedRoute>
+              <CreateEventPage />
             </ProtectedRoute>
           } />
           {/* Admin routes */}

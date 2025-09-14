@@ -295,7 +295,7 @@ export default function EventRegistrationModal({ event, isOpen, onClose }: Event
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto glass-modal">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5" />

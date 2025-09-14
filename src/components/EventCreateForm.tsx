@@ -235,7 +235,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
           <DialogDescription>
@@ -380,7 +380,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
           </div>
 
           {/* Ticketing */}
-          <Card>
+          <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
             <CardHeader>
               <CardTitle className="text-lg">Ticketing</CardTitle>
             </CardHeader>
@@ -521,7 +521,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
 
 
           {/* Series Info */}
-          <Card>
+          <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
             <CardHeader>
               <CardTitle className="text-lg">Series (Optional)</CardTitle>
             </CardHeader>
@@ -550,7 +550,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
           </Card>
 
           {/* Recurring Events */}
-          <Card>
+          <Card className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
             <CardHeader>
               <CardTitle className="text-lg">Recurring Event</CardTitle>
             </CardHeader>
@@ -628,7 +628,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading} className="bg-purple-600 hover:bg-purple-700 text-white">
               {isLoading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
               Create Event
             </Button>
