@@ -41,7 +41,6 @@ interface SeriesData {
       normalPricePerPerson: number
     }
   }
-  eventbriteUrl: string
   capacity?: number
   startDate: Date | undefined
 }
@@ -61,7 +60,6 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       type: 'free',
       description: ''
     },
-    eventbriteUrl: '',
     startDate: undefined
   })
 
@@ -173,7 +171,6 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
           price: cleanObject(seriesData.price),
           capacity: seriesData.capacity,
           registrationRequired: false,
-          eventbriteUrl: seriesData.eventbriteUrl,
           series: {
             name: seriesData.name,
             description: seriesData.description
@@ -217,7 +214,6 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
           type: 'free',
           description: ''
         },
-        eventbriteUrl: '',
         startDate: undefined
       })
       setEvents([])
@@ -355,11 +351,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {seriesData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={seriesData.eventbriteUrl}
-                      onChange={(e) => handleSeriesChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={seriesData.status === 'published'}
                     />
@@ -406,11 +398,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {seriesData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={seriesData.eventbriteUrl}
-                      onChange={(e) => handleSeriesChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={seriesData.status === 'published'}
                     />

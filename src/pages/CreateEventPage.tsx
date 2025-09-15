@@ -96,9 +96,7 @@ export default function CreateEventPage() {
       type: 'free',
       description: ''
     },
-    eventbriteUrl: '',
     isRecurring: false,
-    imageUrl: '',
     status: 'draft'
   })
 

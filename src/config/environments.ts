@@ -21,8 +21,6 @@ interface EnvironmentConfig {
     debugMode: boolean
     experimentalFeatures: boolean
     dataSyncFromProduction: boolean
-    platformIntegrationPreview: boolean
-    platformIntegrationBeta: boolean
   }
 }
 
@@ -50,9 +48,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true,
       debugMode: true,
       experimentalFeatures: true,
-      dataSyncFromProduction: false,
-      platformIntegrationPreview: true, // Full preview mode in development
-      platformIntegrationBeta: true
+      dataSyncFromProduction: false
     }
   },
 
@@ -65,9 +61,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true,
       debugMode: true,
       experimentalFeatures: false,
-      dataSyncFromProduction: true, // Sync data from production for testing
-      platformIntegrationPreview: true, // Available in staging for demos
-      platformIntegrationBeta: false // Only in development for now
+      dataSyncFromProduction: true // Sync data from production for testing
     }
   },
 
@@ -80,9 +74,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
       adminControls: true, // Controlled admin access
       debugMode: false, // Debug mode disabled
       experimentalFeatures: false,
-      dataSyncFromProduction: false,
-      platformIntegrationPreview: false, // Disabled - show "coming soon" instead
-      platformIntegrationBeta: false // Disabled - show "coming soon" instead
+      dataSyncFromProduction: false
     }
   }
 }

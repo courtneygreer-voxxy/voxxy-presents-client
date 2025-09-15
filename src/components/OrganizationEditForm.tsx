@@ -41,7 +41,6 @@ export function OrganizationEditForm({
     socialLinks: {
       instagram: organization.socialLinks?.instagram || '',
       website: organization.socialLinks?.website || '',
-      eventbrite: organization.socialLinks?.eventbrite || '',
       venmo: organization.socialLinks?.venmo || '',
       other: organization.socialLinks?.other || ''
     },
@@ -504,15 +503,6 @@ export function OrganizationEditForm({
                   value={formData.socialLinks.website}
                   onChange={(e) => handleNestedInputChange('socialLinks', 'website', e.target.value)}
                   placeholder="https://yourwebsite.com"
-                />
-              </div>
-              <div>
-                <Label htmlFor="eventbrite" className="text-white">Eventbrite URL</Label>
-                <Input
-                  id="eventbrite"
-                  value={formData.socialLinks.eventbrite}
-                  onChange={(e) => handleNestedInputChange('socialLinks', 'eventbrite', e.target.value)}
-                  placeholder="https://eventbrite.com/your-profile"
                 />
               </div>
               <div>

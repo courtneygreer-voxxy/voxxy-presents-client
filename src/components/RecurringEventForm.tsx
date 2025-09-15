@@ -48,7 +48,6 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
       type: 'free',
       description: ''
     },
-    eventbriteUrl: '',
     series: {
       name: '',
       description: ''
@@ -217,7 +216,6 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
           type: 'free',
           description: ''
         },
-        eventbriteUrl: '',
         series: {
           name: '',
           description: ''
@@ -547,11 +545,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={formData.status === 'published'}
                     />
@@ -598,11 +592,7 @@ export default function RecurringEventForm({ organization, isOpen, onClose, onBa
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={formData.status === 'published'}
                     />

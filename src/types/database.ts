@@ -17,8 +17,6 @@ export interface Organization {
   socialLinks: {
     instagram?: string
     website?: string
-    eventbrite?: string
-    meetup?: string
     linktree?: string
     venmo?: string
     other?: string
@@ -81,7 +79,6 @@ export interface Event {
   // Capacity and registration
   capacity?: number
   registrationRequired: boolean
-  eventbriteUrl?: string
   presaleEnabled?: boolean // Deprecated: Use status 'presale' instead
   
   // Series information
@@ -174,8 +171,6 @@ export interface User {
   // Permissions
   organizationIds: string[] // Organizations they can manage
   
-  // Platform Integrations
-  platformConnections?: string[] // IDs of connected platform integrations
   
   // Settings
   emailNotifications: boolean

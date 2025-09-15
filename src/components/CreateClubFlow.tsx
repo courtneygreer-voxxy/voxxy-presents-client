@@ -19,7 +19,6 @@ import { createClub } from '@/services/clubCreation'
 
 const INITIAL_DATA: CreateClubData = {
   name: '',
-  tagline: '',
   description: '',
   contactEmail: '',
   defaultLocation: '',

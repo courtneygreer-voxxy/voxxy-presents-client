@@ -51,7 +51,6 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
         address: event.address,
         price: { ...event.price },
         capacity: event.capacity,
-        eventbriteUrl: event.eventbriteUrl,
         series: event.series ? { ...event.series } : undefined,
         isRecurring: event.isRecurring,
         imageUrl: event.imageUrl,
@@ -364,11 +363,7 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl || ''}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={formData.status === 'published'}
                     />
@@ -417,11 +412,7 @@ export default function EventEditForm({ event, isOpen, onClose, onSuccess, onDel
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl || ''}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={formData.status === 'published'}
                     />

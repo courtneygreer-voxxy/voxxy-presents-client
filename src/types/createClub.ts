@@ -1,22 +1,19 @@
 export interface CreateClubData {
   // Basic Info
   name: string
-  tagline: string
   description: string
   contactEmail: string
   defaultLocation: string
   defaultAddress: string
-  
+
   // Branding
   logoUrl?: string
   bannerUrl?: string
-  
+
   // Social & About
   socialLinks: {
     instagram?: string
     website?: string
-    eventbrite?: string
-    meetup?: string
     linktree?: string
     venmo?: string
     other?: string

@@ -27,16 +27,6 @@ export default function CreateClubSocial({ data, updateData }: CreateClubSocialP
       placeholder: 'Website: https://brooklynhearts.com'
     },
     {
-      key: 'eventbrite' as const,
-      emoji: '🎫',
-      placeholder: 'Eventbrite: https://eventbrite.com/o/...'
-    },
-    {
-      key: 'meetup' as const,
-      emoji: '👥',
-      placeholder: 'Meetup: https://meetup.com/...'
-    },
-    {
       key: 'linktree' as const,
       emoji: '🌳',
       placeholder: 'Linktree: https://linktr.ee/...'

@@ -23,8 +23,8 @@ export const transformClubData = (data: CreateClubData, ownerId: string): Omit<O
   const organizationData: any = {
     name: data.name,
     slug,
-    description: data.tagline, // Tagline maps to description (short tagline field)
-    background: data.description, // Club description maps to background field
+    description: data.description, // Club description maps to description field
+    background: data.description, // Club description also maps to background field for the welcome message
     aboutStory: getDisplayAboutStory(data.aboutStory, data.name),
     aboutOfferings: getDisplayOfferings(data.aboutOfferings),
     contactEmail: data.contactEmail,
@@ -48,8 +48,6 @@ export const transformClubData = (data: CreateClubData, ownerId: string): Omit<O
   // Only add social links that have values
   if (data.socialLinks.instagram) organizationData.socialLinks.instagram = data.socialLinks.instagram
   if (data.socialLinks.website) organizationData.socialLinks.website = data.socialLinks.website
-  if (data.socialLinks.eventbrite) organizationData.socialLinks.eventbrite = data.socialLinks.eventbrite
-  if (data.socialLinks.meetup) organizationData.socialLinks.meetup = data.socialLinks.meetup
   if (data.socialLinks.linktree) organizationData.socialLinks.linktree = data.socialLinks.linktree
   if (data.socialLinks.venmo) organizationData.socialLinks.venmo = data.socialLinks.venmo
   if (data.socialLinks.other) organizationData.socialLinks.other = data.socialLinks.other

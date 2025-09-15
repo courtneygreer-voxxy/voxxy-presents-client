@@ -20,7 +20,6 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
     switch (platform) {
       case 'instagram': return Instagram
       case 'website': return Globe
-      case 'eventbrite': return Calendar
       case 'venmo': return DollarSign
       case 'other': return Link
       default: return Link
@@ -34,7 +33,6 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
     { label: 'Location info', completed: !!data.defaultLocation, required: false },
     { label: 'About story', completed: !!data.aboutStory, required: false },
     { label: 'Logo uploaded', completed: !!data.logoUrl, required: false },
-    { label: 'Header photo', completed: !!data.bannerUrl, required: false },
     { label: 'Social links', completed: Object.values(data.socialLinks).some(link => link?.trim()), required: false },
   ]
 
@@ -52,7 +50,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
             Setup Complete ({completionPercentage}%)
           </h3>
           <p className="text-green-200 mb-4">
-            {requiredCompleted 
+            {requiredCompleted
               ? "Your club is ready to be created! Optional items can be added later."
               : "Please complete all required fields before creating your club."
             }
@@ -63,10 +61,10 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
             {completionChecks.map((check, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className={`w-4 h-4 rounded-full flex items-center justify-center ${
-                  check.completed 
-                    ? 'bg-green-600 text-white' 
-                    : check.required 
-                      ? 'bg-red-200 text-red-600' 
+                  check.completed
+                    ? 'bg-green-600 text-white'
+                    : check.required
+                      ? 'bg-red-200 text-red-600'
                       : 'bg-gray-200 text-gray-400'
                 }`}>
                   {check.completed && <CheckCircle className="h-3 w-3" />}
@@ -95,140 +93,142 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
           </p>
         </div>
         <div className="px-6 pb-6">
-          <div className="border border-white/20 rounded-lg overflow-hidden bg-white/5 backdrop-blur-sm">
-            {/* Header Banner */}
-            {data.bannerUrl ? (
-              <img 
-                src={data.bannerUrl} 
-                alt="Club banner" 
-                className="w-full h-48 object-cover"
-              />
-            ) : (
-              <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-48 flex items-center justify-center">
-                <div className="text-white text-center">
-                  <h3 className="text-lg font-semibold opacity-75">Your header photo will appear here</h3>
-                  <p className="text-sm opacity-60">Upload one in the branding step</p>
+          <div className="space-y-8">
+            {/* Component 1: Welcome Section - Matching WelcomeSection structure */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
+              <div className="flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
+                {/* Profile Picture */}
+                <div className="flex-shrink-0">
+                  {data.logoUrl ? (
+                    <img
+                      src={data.logoUrl}
+                      alt={`${data.name} Logo`}
+                      className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white/30 object-cover shadow-lg"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 md:w-32 md:h-32 bg-white/10 rounded-full border-4 border-white/30 shadow-lg flex items-center justify-center">
+                      <span className="text-gray-300 text-sm text-center">Logo<br/>Here</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Welcome Content */}
+                <div className="flex-1">
+                  <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                    {data.name}
+                  </h1>
+                  <p className="text-xl text-gray-300 mb-6">
+                    {data.description}
+                  </p>
+
+                  {/* Welcome Message */}
+                  <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+                    <h2 className="text-2xl font-semibold text-white mb-3">
+                      Welcome to {data.name}
+                    </h2>
+                    <p className="text-lg leading-relaxed text-gray-200">
+                      {getDisplayAboutStory(data.aboutStory, data.name)}
+                    </p>
+                  </div>
                 </div>
               </div>
-            )}
-            
-            {/* Main Content */}
-            <div className="p-6">
-              {/* Club Header Info */}
-              <div className="mb-6 -mt-12">
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-6 border border-white/20 mx-4">
-                  <div className="flex items-start gap-4">
-                    {data.logoUrl ? (
-                      <img 
-                        src={data.logoUrl} 
-                        alt="Club logo" 
-                        className="w-20 h-20 object-cover rounded-full border-2 border-white/20 shadow-md flex-shrink-0"
-                      />
-                    ) : (
-                      <div className="w-20 h-20 bg-white/10 rounded-full border-2 border-white/20 shadow-md flex items-center justify-center flex-shrink-0">
-                        <span className="text-gray-300 text-xs text-center">Logo<br/>Here</span>
+            </div>
+
+            {/* Component 2: Upcoming Events Section */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+              <h3 className="text-3xl font-bold text-center text-white mb-10">
+                Upcoming Events
+              </h3>
+              <div className="text-center py-12">
+                <div className="border-2 border-dashed border-white/20 rounded-lg p-6 bg-white/5">
+                  <h4 className="font-semibold mb-2 text-gray-200">Your Events Will Appear Here</h4>
+                  <div className="text-sm text-gray-300 space-y-1 mb-4">
+                    <p>Once you create your club, you can start adding events.</p>
+                    <p>Members will see event details and registration options right here!</p>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="bg-purple-600 hover:bg-purple-700"
+                    disabled
+                  >
+                    Sample Registration Button
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Component 3: About Section - Matching OrganizationPage About structure */}
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+              <h3 className="text-4xl font-bold text-center text-white mb-12">
+                About {data.name}
+              </h3>
+              <div className="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                  <div className="w-full h-96 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg flex items-center justify-center">
+                    <span className="text-gray-400 text-center">
+                      Your about images will appear here<br/>
+                      <span className="text-sm">Add them after creating your club</span>
+                    </span>
+                  </div>
+                </div>
+                <div className="h-96 flex flex-col">
+                  <div className="flex-1 overflow-y-auto pr-2 space-y-6">
+                    <div>
+                      <h4 className="text-2xl font-semibold text-white mb-4">Our Story</h4>
+                      <div className="text-gray-200 leading-relaxed space-y-4">
+                        <p className={isDefaultContent(data.aboutStory || '', data.name) ? 'italic text-gray-400' : ''}>
+                          {getDisplayAboutStory(data.aboutStory, data.name)}
+                        </p>
                       </div>
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
-                        {data.name}
-                      </h1>
-                      <p className="text-gray-200 text-sm md:text-base">{data.description}</p>
+                    </div>
+
+                    <div>
+                      <h4 className="text-2xl font-semibold text-white mb-4">What We Offer</h4>
+                      <ul className="space-y-2 text-gray-200">
+                        {getDisplayOfferings(data.aboutOfferings).map((offering, index) => (
+                          <li key={index} className="flex items-center">
+                            <div className={`w-2 h-2 rounded-full mr-3 ${
+                              (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
+                                ? 'bg-purple-600'
+                                : 'bg-gray-500'
+                            }`}></div>
+                            <span className={
+                              (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
+                                ? ''
+                                : 'italic text-gray-400'
+                            }>
+                              {offering}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <h4 className="text-2xl font-semibold text-white mb-4">Connect With Us</h4>
+                    <div className="flex items-center gap-4">
+                      {Object.values(data.socialLinks).some(link => link?.trim()) ? (
+                        Object.entries(data.socialLinks)
+                          .filter(([_, link]) => link?.trim())
+                          .map(([platform, link]) => {
+                            const Icon = getSocialIcon(platform)
+                            return (
+                              <div
+                                key={platform}
+                                className="text-gray-300 hover:text-purple-400 transition-colors"
+                                title={platform.charAt(0).toUpperCase() + platform.slice(1)}
+                              >
+                                <Icon className="h-6 w-6" />
+                              </div>
+                            )
+                          })
+                      ) : (
+                        <span className="text-gray-400 italic text-sm">Social links will appear here when added</span>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
-
-              {/* Contact Info */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center gap-2 text-gray-200">
-                  <Mail className="h-4 w-4" />
-                  <span className="text-sm">{data.contactEmail}</span>
-                </div>
-                {data.defaultLocation && (
-                  <div className="flex items-center gap-2 text-gray-200">
-                    <MapPin className="h-4 w-4" />
-                    <span className="text-sm">{data.defaultLocation}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Social Links */}
-              {Object.values(data.socialLinks).some(link => link?.trim()) && (
-                <div className="mb-6">
-                  <h3 className="font-semibold mb-3 text-white">Connect With Us</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {Object.entries(data.socialLinks)
-                      .filter(([_, link]) => link?.trim())
-                      .map(([platform, link]) => {
-                        const Icon = getSocialIcon(platform)
-                        return (
-                          <div 
-                            key={platform} 
-                            className="flex items-center gap-1 px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 text-purple-300 rounded-full text-sm"
-                          >
-                            <Icon className="h-3 w-3" />
-                            {platform.charAt(0).toUpperCase() + platform.slice(1)}
-                          </div>
-                        )
-                      })}
-                  </div>
-                </div>
-              )}
-
-              {/* About Story - Always show with default if empty */}
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-white">Our Story</h3>
-                <p className={`leading-relaxed ${
-                  isDefaultContent(data.aboutStory || '', data.name) 
-                    ? 'text-gray-400 italic' 
-                    : 'text-gray-200'
-                }`}>
-                  {getDisplayAboutStory(data.aboutStory, data.name)}
-                </p>
-              </div>
-
-              {/* Offerings - Always show with defaults if empty */}
-              <div className="mb-6">
-                <h3 className="font-semibold mb-3 text-lg text-white">What We Offer</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {getDisplayOfferings(data.aboutOfferings).map((offering, index) => (
-                    <div key={index} className={`flex items-center gap-3 rounded-lg p-3 ${
-                      (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                        ? 'bg-white/10 backdrop-blur-sm border border-white/20'
-                        : 'bg-white/5 backdrop-blur-sm border border-white/10'
-                    }`}>
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${
-                        (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                          ? 'bg-purple-400'
-                          : 'bg-gray-400'
-                      }`} />
-                      <span className={`text-sm font-medium ${
-                        (data.aboutOfferings && data.aboutOfferings.some(o => o.trim()))
-                          ? 'text-gray-200'
-                          : 'text-gray-400 italic'
-                      }`}>
-                        {offering}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Sample Event Preview */}
-              <div className="border-2 border-dashed border-white/20 rounded-lg p-6 bg-white/5 text-center">
-                <h3 className="font-semibold mb-2 text-gray-200">Your Events Will Appear Here</h3>
-                <div className="text-sm text-gray-300 space-y-1 mb-4">
-                  <p>Once you create your club, you can start adding events.</p>
-                  <p>Members will see event details and registration options right here!</p>
-                </div>
-                <Button 
-                  size="sm" 
-                  className="bg-purple-600 hover:bg-purple-700"
-                  disabled
-                >
-                  Sample Registration Button
-                </Button>
               </div>
             </div>
           </div>

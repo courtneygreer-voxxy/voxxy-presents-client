@@ -42,7 +42,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
       type: 'free',
       description: ''
     },
-    eventbriteUrl: '',
     status: 'draft'
   })
 
@@ -145,7 +144,6 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
           type: 'free',
           description: ''
         },
-        eventbriteUrl: '',
         status: 'draft'
       })
       setSelectedDate(undefined)
@@ -360,11 +358,7 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                   </div>
 
                   <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
                     <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
                       placeholder="https://eventbrite.com/... or https://venmo.com/..."
                       required={formData.status === 'published'}
                     />

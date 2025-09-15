@@ -36,7 +36,6 @@ export default function EventRegistration({ event, organizationName }: EventRegi
   const getButtonType = () => {
     if (event.status === 'sold_out') {
       return 'waitlist'
-    } else if (event.eventbriteUrl) {
       return 'eventbrite'
     } else if (event.status === 'presale') {
       return 'presale'
@@ -177,7 +176,6 @@ export default function EventRegistration({ event, organizationName }: EventRegi
         {buttonType === 'eventbrite' && (
           <Button 
             className="bg-purple-600 hover:bg-purple-700"
-            onClick={() => window.open(event.eventbriteUrl, '_blank')}
           >
             Get Tickets
             <ExternalLink className="ml-2 h-4 w-4" />

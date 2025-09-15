@@ -50,7 +50,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
       type: 'free',
       description: ''
     },
-    eventbriteUrl: '',
     isRecurring: false,
     imageUrl: '',
     status: 'draft'
@@ -217,8 +216,7 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
           type: 'free',
           description: ''
         },
-        eventbriteUrl: '',
-        isRecurring: false,
+            isRecurring: false,
         imageUrl: '',
         status: 'draft'
       })
@@ -430,16 +428,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
-                    <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
-                      placeholder="https://eventbrite.com/... or https://venmo.com/..."
-                      required={formData.status === 'published'}
-                    />
-                  </div>
                 </>
               )}
 
@@ -483,16 +471,6 @@ export default function EventCreateForm({ organization, isOpen, onClose, onSucce
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="eventbriteUrl">Ticket Purchase Link {formData.status === 'published' ? '*' : '(optional)'}</Label>
-                    <Input
-                      id="eventbriteUrl"
-                      value={formData.eventbriteUrl}
-                      onChange={(e) => handleInputChange('eventbriteUrl', e.target.value)}
-                      placeholder="https://eventbrite.com/... or https://venmo.com/..."
-                      required={formData.status === 'published'}
-                    />
-                  </div>
                 </>
               )}
 

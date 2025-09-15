@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import CreateClubName from './CreateClubName'
-import CreateClubDescription from './CreateClubDescription'
 import CreateClubContact from './CreateClubContact'
 import CreateClubLocation from './CreateClubLocation'
 import CreateClubAbout from './CreateClubAbout'
@@ -16,12 +15,10 @@ import { useAuth } from '@/hooks/useAuth'
 import { useToast } from '@/hooks/use-toast'
 import type { Organization } from '@/types/database'
 import type { CreateClubData } from '@/types/createClub'
-import type { PlatformConnection } from '@/types/platformIntegration'
 import { createClub } from '@/services/clubCreation'
 
 const INITIAL_DATA: CreateClubData = {
   name: '',
-  tagline: '',
   description: '',
   contactEmail: '',
   defaultLocation: '',
@@ -34,14 +31,10 @@ const INITIAL_DATA: CreateClubData = {
 
 interface CreateClubFlowEnhancedProps {
   initialData?: CreateClubData
-  isImportedFromEventbrite?: boolean
-  eventbriteConnection?: PlatformConnection | null
 }
 
-export default function CreateClubFlowEnhanced({ 
-  initialData,
-  isImportedFromEventbrite = false,
-  eventbriteConnection 
+export default function CreateClubFlowEnhanced({
+  initialData
 }: CreateClubFlowEnhancedProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [formData, setFormData] = useState<CreateClubData>(initialData || INITIAL_DATA)
@@ -52,14 +45,13 @@ export default function CreateClubFlowEnhanced({
   const { toast } = useToast()
 
   const steps = [
-    { id: 0, title: "What's your club called?", component: CreateClubName },
-    { id: 1, title: 'Describe your club', component: CreateClubDescription },
-    { id: 2, title: 'How can people reach you?', component: CreateClubContact },
-    { id: 3, title: 'Where do you usually meet?', component: CreateClubLocation },
-    { id: 4, title: 'Tell your story', component: CreateClubAbout },
-    { id: 5, title: 'Make it yours', component: CreateClubBranding },
-    { id: 6, title: 'Connect your socials', component: CreateClubSocial },
-    { id: 7, title: 'Preview & Create', component: CreateClubPreview }
+    { id: 0, title: 'Name & describe your club', component: CreateClubName },
+    { id: 1, title: 'How can people reach you?', component: CreateClubContact },
+    { id: 2, title: 'Where do you usually meet?', component: CreateClubLocation },
+    { id: 3, title: 'Tell your story', component: CreateClubAbout },
+    { id: 4, title: 'Make it yours', component: CreateClubBranding },
+    { id: 5, title: 'Connect your socials', component: CreateClubSocial },
+    { id: 6, title: 'Preview & Create', component: CreateClubPreview }
   ]
 
   const progress = ((currentStep + 1) / steps.length) * 100
@@ -180,20 +172,11 @@ export default function CreateClubFlowEnhanced({
         <div className="text-center mb-8">
           <div className="flex items-center justify-center space-x-3 mb-2">
             <h1 className="text-3xl font-bold text-white">
-              {isImportedFromEventbrite ? "Let's set up your Eventbrite club!" : "Let's create your club!"} 🎉
+              Let's create your club! 🎉
             </h1>
-            {isImportedFromEventbrite && (
-              <div className="flex items-center space-x-2 bg-orange-500/20 border border-orange-400/30 rounded-full px-3 py-1">
-                <div className="text-lg">🎫</div>
-                <span className="text-sm font-medium text-orange-200">Imported from Eventbrite</span>
-              </div>
-            )}
           </div>
           <p className="text-gray-200">
-            {isImportedFromEventbrite 
-              ? "We've pre-filled some details from your Eventbrite account - feel free to customize anything!"
-              : "We'll get you set up in just a few quick steps"
-            }
+            We'll get you set up in just a few quick steps
           </p>
         </div>
 

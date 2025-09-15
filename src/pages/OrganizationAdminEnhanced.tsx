@@ -31,16 +31,10 @@ import AboutImagesManager from "@/components/AboutImagesManager"
 import EventEditForm from "@/components/EventEditForm"
 import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
-import { PlatformConnectionManager } from "@/components/platform/PlatformConnectionManager"
-import { EventImportInterface } from "@/components/platform/EventImportInterface"
-import { TicketManagementCenter } from "@/components/platform/TicketManagementCenter"
-import { ClubEventSyncManager } from "@/components/ClubEventSyncManager"
 import { TicketManagementManager } from "@/components/TicketManagementManager"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
-import { getUserPlatformConnections } from '@/services/platformIntegrationService'
 import type { Organization, Event } from '@/types/database'
-import type { PlatformConnection, PlatformType } from '@/types/platformIntegration'
 
 export default function OrganizationAdminEnhanced() {
   const { orgSlug } = useParams<{ orgSlug: string }>()
@@ -52,43 +46,12 @@ export default function OrganizationAdminEnhanced() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   
-  // Feature flags for platform integration
-  const isPreviewMode = isFeatureEnabled('platformIntegrationPreview')
-  const isBetaMode = isFeatureEnabled('platformIntegrationBeta')
-  const previewMode = isBetaMode ? 'beta' : 'preview'
-  const isComingSoonMode = !isPreviewMode && !isBetaMode
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
   const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
   
-  // Platform integration state
-  const [platformConnections, setPlatformConnections] = useState<PlatformConnection[]>([])
-  const [connectionsLoading, setConnectionsLoading] = useState(true)
 
   const adminEnabled = isFeatureEnabled('adminControls')
 
-  // Load platform connections
-  React.useEffect(() => {
-    if (currentUser && organization) {
-      loadPlatformConnections()
-    }
-  }, [currentUser, organization])
-
-  const loadPlatformConnections = async () => {
-    if (!currentUser) return
-    
-    try {
-      const connections = await getUserPlatformConnections(currentUser.uid)
-      // Filter connections for this organization or user-level connections
-      const orgConnections = connections.filter(conn => 
-        !conn.organizationId || conn.organizationId === organization?.id
-      )
-      setPlatformConnections(orgConnections)
-    } catch (error) {
-      console.error('Failed to load platform connections:', error)
-    } finally {
-      setConnectionsLoading(false)
-    }
-  }
 
   const handleSaveOrganization = async (updates: Partial<Organization>) => {
     setIsSaving(true)
@@ -214,11 +177,6 @@ export default function OrganizationAdminEnhanced() {
     )
   }
 
-  const connectedPlatforms = platformConnections
-    .filter(conn => conn.status === 'connected')
-    .map(conn => conn.platform)
-    
-  const connectionCount = platformConnections.filter(conn => conn.status === 'connected').length
 
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden admin-dark">
@@ -240,11 +198,6 @@ export default function OrganizationAdminEnhanced() {
               <h1 className="text-3xl font-bold text-white">{organization.name} Admin</h1>
               <p className="text-gray-300 mt-1">
                 Manage your organization and events
-                {connectionCount > 0 && (
-                  <span className="text-blue-400">
-                    {' '}• {connectionCount} platform{connectionCount !== 1 ? 's' : ''} connected
-                  </span>
-                )}
               </p>
             </div>
             
@@ -367,7 +320,7 @@ export default function OrganizationAdminEnhanced() {
                       <Calendar className="h-12 w-12 text-purple-400 mb-4" />
                       <h3 className="text-lg font-semibold text-white mb-2">No events yet</h3>
                       <p className="text-gray-300 text-center mb-6">
-                        Import events from Eventbrite or create new ones to get started.
+                        Create events to get started.
                       </p>
                       <div className="flex flex-col sm:flex-row gap-3">
                         <Button
@@ -378,16 +331,6 @@ export default function OrganizationAdminEnhanced() {
                             <Plus className="h-4 w-4 mr-2" />
                             Create Event
                           </Link>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          className="border-white/20 text-gray-300"
-                          onClick={() => {
-                            // Scroll to import section
-                            document.querySelector('[data-section="event-sync"]')?.scrollIntoView({ behavior: 'smooth' })
-                          }}
-                        >
-                          Import Events
                         </Button>
                       </div>
                     </CardContent>
@@ -465,17 +408,6 @@ export default function OrganizationAdminEnhanced() {
                   </div>
                 )}
 
-                {/* Event Sync Section - Moved to bottom with enhanced explanation */}
-                <div data-section="event-sync">
-                  <ClubEventSyncManager 
-                    organization={organization}
-                    onEventsImported={(events) => {
-                      setSaveMessage('✅ Events synced successfully!')
-                      setTimeout(() => setSaveMessage(null), 4000)
-                      refreshEvents()
-                    }}
-                  />
-                </div>
               </div>
             </TabsContent>
 

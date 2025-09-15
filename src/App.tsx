@@ -15,7 +15,6 @@ import HelpPage from './pages/HelpPage'
 import ContactPage from './pages/ContactPage'
 import ProductsPage from './pages/ProductsPage'
 import AdminLogin from './pages/AdminLogin'
-import PlatformTestPage from './pages/PlatformTestPage'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
@@ -33,7 +32,6 @@ export default function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/products" element={<ProductsPage />} />
-          <Route path="/platform-test" element={<PlatformTestPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           

@@ -312,21 +312,6 @@ export default function OrganizationPage({
                           </div>
                         </div>
 
-                        {/* Ticket Link Section */}
-                        {event.eventbriteUrl && (
-                          <div>
-                            <h5 className="font-semibold text-white mb-2">Get Tickets</h5>
-                            <a 
-                              href={event.eventbriteUrl} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm"
-                            >
-                              <ExternalLink className="h-4 w-4" />
-                              View tickets on Eventbrite
-                            </a>
-                          </div>
-                        )}
 
                         {event.isRecurring && event.recurringDates && (
                           <div>
@@ -472,21 +457,6 @@ export default function OrganizationPage({
                                   <p className="text-gray-200">{event.address}</p>
                                 </div>
 
-                                {/* Ticket Link Section */}
-                                {event.eventbriteUrl && (
-                                  <div>
-                                    <h5 className="font-semibold text-white mb-2">Get Tickets</h5>
-                                    <a 
-                                      href={event.eventbriteUrl} 
-                                      target="_blank" 
-                                      rel="noopener noreferrer"
-                                      className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors text-sm"
-                                    >
-                                      <ExternalLink className="h-4 w-4" />
-                                      View tickets on Eventbrite
-                                    </a>
-                                  </div>
-                                )}
 
                                 {/* Recurring Schedule */}
                                 {event.isRecurring && event.recurringDates && (
@@ -619,17 +589,6 @@ export default function OrganizationPage({
                       rel="noopener noreferrer"
                     >
                       <ExternalLink className="h-6 w-6" />
-                    </a>
-                  )}
-                  {organization.socialLinks?.eventbrite && (
-                    <a 
-                      href={organization.socialLinks.eventbrite} 
-                      className="text-gray-300 hover:text-purple-400 transition-colors" 
-                      aria-label="Eventbrite"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Calendar className="h-6 w-6" />
                     </a>
                   )}
                   {organization.socialLinks?.venmo && (
