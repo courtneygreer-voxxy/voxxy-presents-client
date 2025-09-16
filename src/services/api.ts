@@ -140,6 +140,36 @@ export const eventsApi = {
   },
 }
 
+// Registrations API
+export const registrationsApi = {
+  async create(data: {
+    eventId: string
+    organizationId?: string
+    name: string
+    email?: string
+    registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'subscription'
+    phone?: string
+    notes?: string
+    subscribeToUpdates?: boolean
+    subscribeToNewsletter?: boolean
+    source?: 'website' | 'manual'
+  }) {
+    return fetchApi<any>('/registrations', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async getByEvent(eventId: string) {
+    return fetchApi<any>(`/registrations/event/${eventId}`)
+  },
+
+  async markEmailSent(registrationId: string) {
+    return fetchApi<any>(`/registrations/${registrationId}/email-sent`, {
+      method: 'PATCH',
+    })
+  },
+}
 
 // Email API endpoints
 export const emailApi = {
