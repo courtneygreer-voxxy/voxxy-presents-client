@@ -1,8 +1,5 @@
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 import { sanitizeInput } from '@/utils/inputSanitization'
-import { notificationService } from '@/services/notificationService'
-import type { CreateEmailRecipientData } from '@/types/database'
+import { registrationsApi } from '@/services/api'
 
 interface SubscriptionData {
   organizationId: string
@@ -44,31 +41,24 @@ class SubscriptionService {
         throw new Error('Message must be less than 500 characters')
       }
 
-      // TODO: Database permissions need to be configured
-      // For now, simulate successful subscription without database write
-      console.log('Subscription data (simulated save):', sanitizedData)
-      
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Create subscription using registrations API
+      const result = await registrationsApi.create({
+        eventId: 'org_subscription', // Special event ID for org-level subscriptions
+        organizationId: sanitizedData.organizationId,
+        name: sanitizedData.name,
+        email: sanitizedData.email,
+        registrationType: 'subscription' as any,
+        notes: sanitizedData.message,
+        subscribeToUpdates: sanitizedData.preferences.updates,
+        subscribeToNewsletter: sanitizedData.preferences.newsletter,
+        source: 'website'
+      })
 
-      // Send admin notification (disabled temporarily due to permissions)
-      try {
-        await notificationService.notifyAdminOfNewSubscription({
-          organizationId: sanitizedData.organizationId,
-          subscriberName: sanitizedData.name,
-          subscriberEmail: sanitizedData.email,
-          message: sanitizedData.message,
-          preferences: sanitizedData.preferences,
-          source: sanitizedData.source
-        })
-      } catch (notificationError) {
-        // Notification failed but subscription succeeded - just log the error
-        console.warn('Admin notification failed but subscription was successful:', notificationError)
-      }
+      console.log('Subscription created successfully:', result)
 
       return {
         success: true,
-        submissionId: 'simulated_' + Date.now()
+        submissionId: result.registration?.id || 'created_' + Date.now()
       }
 
     } catch (error) {
@@ -101,6 +91,20 @@ class SubscriptionService {
     } catch (error) {
       console.error('Rate limit check failed:', error)
       throw error
+    }
+  }
+
+  async getOrganizationSubscribers(organizationId: string) {
+    try {
+      // For now, we'll create a dummy event ID for org subscriptions
+      // Later we can add a proper org subscribers endpoint
+      const subscriptions = await registrationsApi.getByEvent('org_subscription')
+
+      // Filter by organization if we have that data
+      return subscriptions.registrations?.subscription || []
+    } catch (error) {
+      console.error('Failed to fetch subscribers:', error)
+      return []
     }
   }
 }

@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { 
-  Mail, 
-  Users, 
-  Clock, 
+import {
+  Mail,
+  Users,
+  Clock,
   Calendar,
   Download,
   Filter
 } from "lucide-react"
+import { subscriptionService } from '@/services/subscriptionService'
 import type { Event } from '@/types/database'
 
 interface SubscribersListProps {
@@ -23,10 +24,21 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // For now, show empty state as we're simplifying to focus only on club-level subscribers
-    // In the future, this will load organization-level newsletter subscribers
-    setLoading(false)
-    setNewsletterSubscribers([])
+    async function loadSubscribers() {
+      setLoading(true)
+      setError(null)
+      try {
+        const subscribers = await subscriptionService.getOrganizationSubscribers(organizationId)
+        setNewsletterSubscribers(subscribers)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load subscribers')
+        setNewsletterSubscribers([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    loadSubscribers()
   }, [organizationId])
 
   // Calculate stats
