@@ -13,7 +13,10 @@ import {
   Loader2,
   CheckCircle,
   HelpCircle,
-  AlertCircle
+  AlertCircle,
+  Share2,
+  Copy,
+  Eye
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { registrationsApi } from "@/services/api"
@@ -120,6 +123,33 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
     toast({
       title: "RSVPs Exported",
       description: "RSVP data has been downloaded as a CSV file."
+    })
+  }
+
+  const generateShareableLink = () => {
+    // Generate a shareable link for venue owners to view RSVPs
+    const baseUrl = window.location.origin
+    const shareUrl = `${baseUrl}/shared-rsvps/${event.id}?token=${btoa(event.id + '_' + Date.now())}`
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      toast({
+        title: "Link Copied!",
+        description: "Shareable RSVP link has been copied to your clipboard."
+      })
+    }).catch(() => {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea')
+      textArea.value = shareUrl
+      document.body.appendChild(textArea)
+      textArea.select()
+      document.execCommand('copy')
+      document.body.removeChild(textArea)
+
+      toast({
+        title: "Link Copied!",
+        description: "Shareable RSVP link has been copied to your clipboard."
+      })
     })
   }
 
@@ -258,15 +288,24 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
               </Card>
             </div>
 
-            {/* Export Button */}
-            <div className="flex justify-center">
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-3">
               <Button
                 onClick={exportRSVPs}
                 className="bg-purple-600 hover:bg-purple-700 text-white"
                 disabled={rsvpData.registrations.total === 0}
               >
                 <Download className="h-4 w-4 mr-2" />
-                Export RSVPs to CSV
+                Export to CSV
+              </Button>
+              <Button
+                onClick={generateShareableLink}
+                variant="outline"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                disabled={rsvpData.registrations.total === 0}
+              >
+                <Share2 className="h-4 w-4 mr-2" />
+                Share RSVPs
               </Button>
             </div>
 

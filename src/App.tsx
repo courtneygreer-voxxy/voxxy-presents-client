@@ -20,6 +20,7 @@ import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
+import SharedRSVPPage from './pages/SharedRSVPPage'
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
+          <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
