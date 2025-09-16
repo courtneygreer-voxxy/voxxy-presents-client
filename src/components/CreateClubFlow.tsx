@@ -175,7 +175,7 @@ export default function CreateClubFlow() {
             <Button
               onClick={handleCreate}
               disabled={!canProceed() || isCreating}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-700"
             >
               {isCreating ? 'Creating...' : 'Create Club'}
             </Button>

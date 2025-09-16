@@ -22,7 +22,7 @@ export const FORM_STYLES = {
   button: {
     primary: "px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium",
     secondary: "px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg font-medium",
-    success: "px-6 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+    success: "px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
   },
   
   // Form containers

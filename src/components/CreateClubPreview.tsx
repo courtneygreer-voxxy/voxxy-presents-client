@@ -262,7 +262,7 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
               size="lg"
               onClick={onCreate}
               disabled={!requiredCompleted || isCreating}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-3"
+              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
             >
               {isCreating ? (
                 <>

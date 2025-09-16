@@ -51,7 +51,7 @@ export default function EventTypeSelection({ organization, isOpen, onClose, onSe
                   <span>Perfect for workshops, parties, special events</span>
                 </div>
               </div>
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button className="w-full bg-purple-600 hover:bg-purple-700">
                 Create One-Time Event
               </Button>
             </CardContent>

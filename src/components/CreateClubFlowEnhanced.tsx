@@ -230,7 +230,7 @@ export default function CreateClubFlowEnhanced({
             <button
               onClick={handleCreate}
               disabled={!canProceed() || isCreating}
-              className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+              className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
             >
               {isCreating ? 'Creating...' : 'Create Club'}
             </button>

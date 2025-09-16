@@ -80,10 +80,8 @@ interface ClubSubscriber {
 
 #### Admin Interface Updates
 - **Subscribers Tab Enhancement**: 
-  - Real-time subscriber list
-  - Subscriber profile views
+  - Real-time subscriber list (already have)
   - Bulk actions (export, message)
-  - Subscription analytics
 
 ### 4. SendPulse Integration
 

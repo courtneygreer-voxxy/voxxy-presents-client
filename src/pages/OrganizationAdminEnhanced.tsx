@@ -9,8 +9,7 @@ import {
   ArrowLeft, 
   Settings, 
   Calendar, 
-  Users, 
-  BarChart3,
+  Users,
   Eye,
   Loader,
   Edit,
@@ -19,8 +18,7 @@ import {
   Mail,
   User,
   Link2,
-  Download,
-  Ticket
+  Download
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { useAuth } from "@/hooks/useAuth"
@@ -28,10 +26,7 @@ import { OrganizationEditForm } from "@/components/OrganizationEditForm"
 import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
 import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
-import EventEditForm from "@/components/EventEditForm"
-import EventRegistrationModal from "@/components/EventRegistrationModal"
 import SubscribersList from "@/components/SubscribersList"
-import { TicketManagementManager } from "@/components/TicketManagementManager"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
@@ -46,8 +41,6 @@ export default function OrganizationAdminEnhanced() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
   
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
-  const [registrationModalEvent, setRegistrationModalEvent] = useState<Event | null>(null)
   
 
   const adminEnabled = isFeatureEnabled('adminControls')
@@ -72,23 +65,7 @@ export default function OrganizationAdminEnhanced() {
   }
 
 
-  const handleEventUpdated = (event: any) => {
-    setSaveMessage('✅ Event updated successfully!')
-    setTimeout(() => setSaveMessage(null), 4000)
-    refreshEvents()
-    setEditingEvent(null)
-  }
 
-  const handleEventDeleted = (eventId: string) => {
-    setSaveMessage('✅ Event deleted successfully!')
-    setTimeout(() => setSaveMessage(null), 4000)
-    refreshEvents()
-    setEditingEvent(null)
-  }
-
-  const openRegistrationModal = (event: Event) => {
-    setRegistrationModalEvent(event)
-  }
 
   const handleDeleteOrganization = async () => {
     setIsDeleting(true)
@@ -381,23 +358,16 @@ export default function OrganizationAdminEnhanced() {
                               </div>
 
                               <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                <Button 
-                                  variant="outline" 
+                                <Button
+                                  variant="outline"
                                   size="sm"
                                   className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
-                                  onClick={() => setEditingEvent(event)}
+                                  asChild
                                 >
-                                  <Edit className="h-4 w-4 mr-2" />
-                                  Edit
-                                </Button>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
-                                  onClick={() => openRegistrationModal(event)}
-                                >
-                                  <BarChart3 className="h-4 w-4 mr-2" />
-                                  Analytics
+                                  <Link to={`/${orgSlug}/edit-event/${event.id}`}>
+                                    <Edit className="h-4 w-4 mr-2" />
+                                    Edit
+                                  </Link>
                                 </Button>
                               </div>
                             </div>
@@ -485,24 +455,7 @@ export default function OrganizationAdminEnhanced() {
       </div>
 
 
-      {/* Edit Event Modal */}
-      {editingEvent && (
-        <EventEditForm
-          event={editingEvent}
-          isOpen={!!editingEvent}
-          onClose={() => setEditingEvent(null)}
-          onSuccess={handleEventUpdated}
-          onDelete={handleEventDeleted}
-        />
-      )}
 
-      {registrationModalEvent && (
-        <EventRegistrationModal
-          event={registrationModalEvent}
-          isOpen={!!registrationModalEvent}
-          onClose={() => setRegistrationModalEvent(null)}
-        />
-      )}
     </div>
   )
 }
