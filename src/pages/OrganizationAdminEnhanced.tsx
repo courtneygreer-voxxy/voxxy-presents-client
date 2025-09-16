@@ -27,6 +27,7 @@ import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
 import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
 import SubscribersList from "@/components/SubscribersList"
+import { RSVPListModal } from "@/components/RSVPListModal"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
 import type { Organization, Event } from '@/types/database'
@@ -358,6 +359,7 @@ export default function OrganizationAdminEnhanced() {
                               </div>
 
                               <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
+                                <RSVPListModal event={event} />
                                 <Button
                                   variant="outline"
                                   size="sm"
