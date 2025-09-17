@@ -68,7 +68,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   production: {
     name: 'production',
-    dataSource: 'api', // Production API
+    dataSource: 'firebase', // Use Firebase for data, API for RSVP functionality
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
