@@ -147,7 +147,7 @@ export const registrationsApi = {
     organizationId?: string
     name: string
     email?: string
-    registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request' | 'subscription'
+    registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'subscription'
     phone?: string
     notes?: string
     subscribeToUpdates?: boolean

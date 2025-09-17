@@ -32,7 +32,7 @@ interface RegistrationData {
   name: string
   email?: string
   phone?: string
-  registrationType: 'rsvp_yes' | 'rsvp_maybe' | 'presale_request'
+  registrationType: 'rsvp_yes' | 'rsvp_maybe'
   registeredAt: Date
   notes?: string
   subscribeToUpdates?: boolean
@@ -48,7 +48,6 @@ interface RSVPData {
   registrations: {
     rsvp_yes: RegistrationData[]
     rsvp_maybe: RegistrationData[]
-    presale_requests: RegistrationData[]
     total: number
   }
 }
@@ -91,8 +90,7 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
 
     const allRSVPs = [
       ...rsvpData.registrations.rsvp_yes.map(r => ({...r, type: 'Yes'})),
-      ...rsvpData.registrations.rsvp_maybe.map(r => ({...r, type: 'Maybe'})),
-      ...rsvpData.registrations.presale_requests.map(r => ({...r, type: 'Presale'}))
+      ...rsvpData.registrations.rsvp_maybe.map(r => ({...r, type: 'Maybe'}))
     ]
 
     // Create CSV content
@@ -253,7 +251,7 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
         ) : rsvpData ? (
           <div className="space-y-6">
             {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <Card className="bg-green-500/20 border-green-400/30">
                 <CardContent className="p-4 text-center">
                   <div className="text-2xl font-bold text-green-300">
@@ -268,14 +266,6 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
                     {rsvpData.registrations.rsvp_maybe.length}
                   </div>
                   <div className="text-sm text-yellow-400">Maybe</div>
-                </CardContent>
-              </Card>
-              <Card className="bg-blue-500/20 border-blue-400/30">
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-300">
-                    {rsvpData.registrations.presale_requests.length}
-                  </div>
-                  <div className="text-sm text-blue-400">Presale</div>
                 </CardContent>
               </Card>
               <Card className="bg-purple-500/20 border-purple-400/30">
@@ -311,15 +301,12 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
 
             {/* RSVP Lists */}
             <Tabs defaultValue="going" className="w-full">
-              <TabsList className="grid w-full grid-cols-3 bg-white/10">
+              <TabsList className="grid w-full grid-cols-2 bg-white/10">
                 <TabsTrigger value="going" className="data-[state=active]:bg-green-500/30">
                   Going ({rsvpData.registrations.rsvp_yes.length})
                 </TabsTrigger>
                 <TabsTrigger value="maybe" className="data-[state=active]:bg-yellow-500/30">
                   Maybe ({rsvpData.registrations.rsvp_maybe.length})
-                </TabsTrigger>
-                <TabsTrigger value="presale" className="data-[state=active]:bg-blue-500/30">
-                  Presale ({rsvpData.registrations.presale_requests.length})
                 </TabsTrigger>
               </TabsList>
 
@@ -336,14 +323,6 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
                   rsvpData.registrations.rsvp_maybe,
                   "Maybe Attendees",
                   <HelpCircle className="h-5 w-5 text-yellow-400" />
-                )}
-              </TabsContent>
-
-              <TabsContent value="presale" className="mt-6">
-                {renderRSVPList(
-                  rsvpData.registrations.presale_requests,
-                  "Presale Requests",
-                  <Mail className="h-5 w-5 text-blue-400" />
                 )}
               </TabsContent>
             </Tabs>
