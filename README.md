@@ -19,7 +19,7 @@ Voxxy Presents is a comprehensive event management solution designed for creativ
 - **Admin Dashboard**: Full-featured management interface for organization owners
 - **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series with improved page-based workflows
 - **Dynamic Event Management**: Support for free events, paid tickets, and presale systems
-- **Registration Workflows**: RSVP tracking, presale requests, and external ticketing integration
+- **Registration Workflows**: RSVP tracking with calendar integration, subscription management, and external ticketing integration
 - **Series & Recurring Events**: Advanced management with individual event customization
 - **Image Management**: File upload system with automatic compression and carousel display
 - **Club Creation Wizard**: Streamlined guided setup for new organizations
@@ -94,6 +94,28 @@ Voxxy Presents is a comprehensive event management solution designed for creativ
 
    The application will be available at `http://localhost:5173`
 
+## ✨ RSVP System Features
+
+The platform includes a comprehensive RSVP management system:
+
+### Public RSVP Flow
+- **RSVP Modal**: Public users can RSVP "Going" or "Maybe" for published events
+- **Calendar Integration**: Auto-generates .ics files and Google/Outlook calendar links
+- **Simple Captcha**: Math-based verification to prevent spam
+- **Subscription Option**: Users can subscribe to organization updates
+
+### Admin Management Interface
+- **RSVP Dashboard**: View all registrations with Going/Maybe/Total counts
+- **CSV Export**: Download registration data for external processing
+- **Real-time Updates**: Live registration counts and attendee information
+- **Shareable Links**: Generate public links for venue owners to view RSVPs
+
+### Technical Implementation
+- **Frontend**: React modals with TypeScript, glass morphism UI design
+- **Backend**: Firebase integration with real-time data sync
+- **API**: RESTful endpoints for registration management
+- **Validation**: Server-side validation with duplicate detection
+
 ## 📁 Project Structure
 
 ```
@@ -102,6 +124,8 @@ src/
 │   ├── ui/             # Base UI components (shadcn/ui)
 │   ├── OrganizationPage.tsx     # Reusable organization template
 │   ├── OrganizationEditForm.tsx # Admin form component
+│   ├── RSVPModal.tsx            # Public RSVP interface with calendar integration
+│   ├── RSVPListModal.tsx        # Admin RSVP management dashboard
 │   └── EventRegistration.tsx
 ├── config/             # Environment configuration
 │   └── environments.ts # Multi-environment setup
@@ -113,6 +137,7 @@ src/
 │   ├── BrooklynHeartsClub.tsx
 │   ├── VoxxyPresentsNYC.tsx
 │   ├── OrganizationAdmin.tsx    # Admin dashboard
+│   ├── SharedRSVPPage.tsx       # Public RSVP view for venue owners
 │   └── AdminDashboard.tsx
 ├── services/           # API service layer
 │   └── api.ts
