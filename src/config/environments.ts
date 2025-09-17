@@ -43,6 +43,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
     dataSource: 'firebase', // Direct Firebase for fast iteration
+    apiBaseUrl: 'http://localhost:3002/api', // Local API for RSVP system
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
