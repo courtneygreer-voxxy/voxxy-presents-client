@@ -363,7 +363,7 @@ export default function OrganizationAdminEnhanced() {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
+                                  className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
                                   asChild
                                 >
                                   <Link to={`/${orgSlug}/edit-event/${event.id}`}>

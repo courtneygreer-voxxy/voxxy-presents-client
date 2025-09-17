@@ -155,7 +155,7 @@ export function RSVPListModal({ event, trigger }: RSVPListModalProps) {
     <Button
       variant="outline"
       size="sm"
-      className="border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
+      className="bg-purple-600 hover:bg-purple-700 text-white border-purple-600"
     >
       <Users className="h-4 w-4 mr-2" />
       Check RSVPs
