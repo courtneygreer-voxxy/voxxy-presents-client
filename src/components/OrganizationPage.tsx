@@ -282,7 +282,7 @@ export default function OrganizationPage({
                         <Button
                           variant="outline"
                           onClick={() => toggleEventDetails(event.id)}
-                          className="flex items-center gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          className="flex items-center gap-2 border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
                         >
                           Details
                           {expandedEvents.includes(event.id) ? (
@@ -426,7 +426,7 @@ export default function OrganizationPage({
                                   <Button
                                     variant="outline"
                                     onClick={() => toggleEventDetails(event.id)}
-                                    className="flex items-center gap-2 bg-white/10 border-white/20 text-white hover:bg-white/20"
+                                    className="flex items-center gap-2 border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
                                   >
                                     Details & Schedule
                                     {expandedEvents.includes(event.id) ? (
