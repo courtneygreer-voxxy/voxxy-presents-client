@@ -16,7 +16,7 @@ const htmlEntities: Record<string, string> = {
  * Escape HTML entities in a string
  */
 export function escapeHtml(text: string): string {
-  return text.replace(/[&<>"'\/]/g, (match) => htmlEntities[match] || match)
+  return text.replace(/[&<>"'/]/g, (match) => htmlEntities[match] || match)
 }
 
 /**

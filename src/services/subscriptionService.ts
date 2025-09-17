@@ -94,7 +94,7 @@ class SubscriptionService {
     }
   }
 
-  async getOrganizationSubscribers(organizationId: string) {
+  async getOrganizationSubscribers(_organizationId: string) {
     try {
       // For now, we'll create a dummy event ID for org subscriptions
       // Later we can add a proper org subscribers endpoint
