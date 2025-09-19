@@ -152,8 +152,8 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
               </SelectTrigger>
               <SelectContent className="bg-gray-900 border-gray-700">
                 <SelectItem value="both" className="text-white hover:bg-gray-800">All Venues</SelectItem>
-                <SelectItem value="free" className="text-white hover:bg-gray-800">Free Events Only</SelectItem>
-                <SelectItem value="paid" className="text-white hover:bg-gray-800">Paid Events Only</SelectItem>
+                <SelectItem value="free" className="text-white hover:bg-gray-800">Free Venue Space</SelectItem>
+                <SelectItem value="paid" className="text-white hover:bg-gray-800">Paid Venue Space</SelectItem>
               </SelectContent>
             </Select>
           </div>

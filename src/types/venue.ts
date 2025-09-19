@@ -25,6 +25,15 @@ export type VenueType = 'bar' | 'restaurant' | 'community_center' | 'outdoor' | 
 
 export type VenueClaimStatus = 'unclaimed' | 'pending' | 'claimed'
 
+export interface VenueAccessibility {
+  wheelchairAccessible: boolean
+  lgbtqFriendly: boolean
+  '420Friendly': boolean
+  genderNeutralBathrooms?: boolean
+  hearingAccessible?: boolean
+  visuallyAccessible?: boolean
+}
+
 export interface Venue {
   id: string
   slug: string
@@ -38,6 +47,7 @@ export interface Venue {
   amenities: string[]
   photos: string[]
   contactInfo: VenueContactInfo
+  accessibility: VenueAccessibility
   claimStatus: VenueClaimStatus
   ownerId?: string
   pricingType: 'paid' | 'free' | 'both'

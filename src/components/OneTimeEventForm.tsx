@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -8,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { CalendarIcon, ArrowLeft, Loader } from "lucide-react"
+import { CalendarIcon, ArrowLeft, Loader, Search } from "lucide-react"
 import { format } from "date-fns"
 import { eventsApi } from "@/services/api"
 import { createEvent } from "@/lib/database"
@@ -24,6 +25,7 @@ interface OneTimeEventFormProps {
 }
 
 export default function OneTimeEventForm({ organization, isOpen, onClose, onBack, onSuccess }: OneTimeEventFormProps) {
+  const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date>()
@@ -317,6 +319,18 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                     required={formData.status !== 'draft'}
                   />
                 </div>
+              </div>
+
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/voxxy-shop/venues')}
+                  className="w-full sm:w-auto"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Search Venues
+                </Button>
               </div>
             </CardContent>
           </Card>

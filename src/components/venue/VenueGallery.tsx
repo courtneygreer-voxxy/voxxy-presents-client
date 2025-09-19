@@ -41,39 +41,36 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
 
   return (
     <>
-      {/* Main Gallery Grid - 2x2 Equal Sizing */}
-      <div className="grid grid-cols-2 gap-3">
-        {photos.slice(0, 4).map((photo, index) => (
-          <button
-            key={index}
-            onClick={() => openLightbox(index)}
-            className="relative aspect-square overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
-          >
-            <img
-              src={photo}
-              alt={`${venueName} - Photo ${index + 1}`}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
-            
-            {/* Show "View All" overlay on last photo if there are more than 4 */}
-            {index === 3 && photos.length > 4 && (
-              <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">+{photos.length - 4} more</span>
-              </div>
-            )}
-          </button>
-        ))}
-        
-        {/* Fill remaining spots if less than 4 photos */}
-        {photos.length < 4 && Array.from({ length: 4 - photos.length }).map((_, index) => (
-          <div
-            key={`placeholder-${index}`}
-            className="aspect-square bg-white/5 border border-white/10 rounded-lg flex items-center justify-center"
-          >
-            <span className="text-gray-400 text-sm">No photo</span>
-          </div>
-        ))}
+      {/* Main Gallery Carousel - Single Row */}
+      <div className="relative">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+          {photos.map((photo, index) => (
+            <button
+              key={index}
+              onClick={() => openLightbox(index)}
+              className="relative w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
+            >
+              <img
+                src={photo}
+                alt={`${venueName} - Photo ${index + 1}`}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-all duration-300" />
+            </button>
+          ))}
+
+          {/* Show placeholder if no photos */}
+          {photos.length === 0 && (
+            <div className="w-32 h-24 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-gray-400 text-xs">No photos</span>
+            </div>
+          )}
+        </div>
+
+        {/* Scroll indicator for many photos */}
+        {photos.length > 4 && (
+          <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/20 to-transparent pointer-events-none rounded-r-lg" />
+        )}
       </div>
 
       {/* Show all photos button if more than 4 */}

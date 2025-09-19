@@ -89,28 +89,16 @@ export function VenueCard({ venue, compact = false }: VenueCardProps) {
             )}
             
             <div className="flex-1 min-w-0">
-              <div className="flex items-start justify-between mb-1">
-                <h3 className="font-semibold text-white truncate">{venue.name}</h3>
-                <div className="text-xs ml-2 flex-shrink-0 px-2 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 rounded-full">
-                  {VENUE_TYPE_LABELS[venue.venueType]}
-                </div>
-              </div>
-              
+              <h3 className="font-semibold text-white truncate mb-1">{venue.name}</h3>
+
               <div className="flex items-center gap-2 text-sm text-gray-300 mb-2">
                 <MapPin className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate">{venue.address}</span>
               </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-sm text-gray-300">
-                  <Users className="h-3 w-3" />
-                  <span>Up to {venue.capacity}</span>
-                </div>
-                {isOpenNow() && (
-                  <div className="text-xs px-2 py-1 bg-green-500/20 border border-green-400/30 text-green-300 rounded-full">
-                    Open Now
-                  </div>
-                )}
+
+              <div className="flex items-center gap-2 text-sm text-gray-300">
+                <Users className="h-3 w-3" />
+                <span>Up to {venue.capacity}</span>
               </div>
             </div>
           </div>
@@ -136,21 +124,7 @@ export function VenueCard({ venue, compact = false }: VenueCardProps) {
             </div>
           )}
           
-          {/* Overlays */}
-          <div className="absolute top-3 left-3">
-            <div className={`px-3 py-1 rounded-full text-xs font-medium ${VENUE_TYPE_COLORS[venue.venueType].replace('bg-', 'bg-').replace('text-', 'text-')}`}>
-              {VENUE_TYPE_LABELS[venue.venueType]}
-            </div>
-          </div>
-          
-          {isOpenNow() && (
-            <div className="absolute top-3 right-3">
-              <div className="bg-green-500/20 border border-green-400/30 text-green-300 px-3 py-1 rounded-full text-xs flex items-center">
-                <Clock className="h-3 w-3 mr-1" />
-                Open Now
-              </div>
-            </div>
-          )}
+          {/* Removed overlays */}
         </div>
         
         <div className="p-6">
@@ -178,9 +152,9 @@ export function VenueCard({ venue, compact = false }: VenueCardProps) {
             </span>
           </div>
           
-          {/* Featured Amenities */}
-          {getFeaturedAmenities().length > 0 && (
-            <div className="mb-4">
+          {/* Featured Amenities - Always show container for alignment */}
+          <div className="mb-4 min-h-[32px] flex items-center">
+            {getFeaturedAmenities().length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {getFeaturedAmenities().map((amenity, index) => (
                   <div key={index} className="flex items-center gap-1 text-xs text-gray-300 bg-white/10 px-2 py-1 rounded-full">
@@ -196,8 +170,10 @@ export function VenueCard({ venue, compact = false }: VenueCardProps) {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="text-xs text-gray-500">No amenities listed</div>
+            )}
+          </div>
           
           {/* Action */}
           <button className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 group-hover:bg-purple-500 text-white transition-colors duration-200 rounded-lg">

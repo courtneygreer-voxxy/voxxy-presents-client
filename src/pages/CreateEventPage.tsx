@@ -10,7 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Badge } from "@/components/ui/badge"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, X, Plus, Loader, ArrowLeft, Sparkles } from "lucide-react"
+import { CalendarIcon, X, Plus, Loader, ArrowLeft, Sparkles, Search } from "lucide-react"
 import { format } from "date-fns"
 import { Link } from "react-router-dom"
 import { eventsApi } from "@/services/api"
@@ -501,6 +501,18 @@ export default function CreateEventPage() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="mt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/voxxy-shop/venues')}
+                  className="w-full sm:w-auto bg-white/10 border-white/20 text-white hover:bg-white/15"
+                >
+                  <Search className="mr-2 h-4 w-4" />
+                  Help us find the venue
+                </Button>
               </div>
             </CardContent>
           </Card>

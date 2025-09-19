@@ -67,6 +67,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       instagram: 'crystallakebrooklyn',
       tiktok: 'crystallakebar'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -91,6 +97,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       phone: '(718) 555-0456',
       website: 'https://foundrybklyn.com'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -114,6 +126,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       email: 'events@prospectcc.org',
       phone: '(718) 555-0789',
       website: 'https://prospectcommunitycenter.org'
+    },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
     },
     claimStatus: 'unclaimed',
     ownerId: undefined,
@@ -140,6 +158,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://rooftopgarden.cafe',
       instagram: 'rooftopgardencafe'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -162,6 +186,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
     contactInfo: {
       email: 'bookings@warehouse23.nyc',
       phone: '(718) 555-2300'
+    },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
     },
     claimStatus: 'unclaimed',
     ownerId: undefined,
@@ -189,6 +219,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       instagram: 'bklynbeergarden',
       tiktok: 'brooklynbeergarden'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -212,6 +248,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       email: 'booking@studyhall.space',
       phone: '(718) 555-8900',
       website: 'https://studyhall.space'
+    },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
     },
     claimStatus: 'unclaimed',
     ownerId: undefined,
@@ -237,6 +279,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       phone: '(718) 555-2340',
       website: 'https://parksiderestaurant.com'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -261,6 +309,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       phone: '(718) 555-4560',
       website: 'https://innovationhub.nyc'
     },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': false,
+      genderNeutralBathrooms: true
+    },
     claimStatus: 'unclaimed',
     ownerId: undefined,
     pricingType: 'both'
@@ -284,6 +338,12 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       email: 'events@sunsetter.nyc',
       phone: '(718) 555-7890',
       website: 'https://sunsetter.nyc'
+    },
+    accessibility: {
+      wheelchairAccessible: true,
+      lgbtqFriendly: true,
+      '420Friendly': true,
+      genderNeutralBathrooms: true
     },
     claimStatus: 'unclaimed',
     ownerId: undefined,
