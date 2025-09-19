@@ -55,8 +55,8 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   staging: {
     name: 'staging',
-    dataSource: 'firebase', // Firebase with synced production data
-    apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api', // TODO: Update to actual staging API URL
+    dataSource: 'api', // Use API for RSVP system testing
+    apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -68,7 +68,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   production: {
     name: 'production',
-    dataSource: 'api', // Production API
+    dataSource: 'firebase', // Use Firebase for data, API for RSVP functionality
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
