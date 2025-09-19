@@ -16,7 +16,7 @@ import {
   Users
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { registrationsApi } from "@/services/api"
+import { registrationsApi, ApiError } from "@/services/api"
 import type { Event } from '@/types/database'
 
 interface RSVPModalProps {
@@ -134,11 +134,21 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
 
     } catch (error) {
       console.error('RSVP failed:', error)
-      toast({
-        variant: "destructive",
-        title: "RSVP Failed",
-        description: "Something went wrong. Please try again."
-      })
+
+      // Handle specific error cases
+      if (error instanceof ApiError && error.status === 409) {
+        toast({
+          variant: "destructive",
+          title: "Already Registered",
+          description: "You're already registered for this event! Check your email for confirmation details."
+        })
+      } else {
+        toast({
+          variant: "destructive",
+          title: "RSVP Failed",
+          description: "Something went wrong. Please try again."
+        })
+      }
     } finally {
       setIsSubmitting(false)
     }
