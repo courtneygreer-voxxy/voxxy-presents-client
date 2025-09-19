@@ -68,7 +68,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       tiktok: 'crystallakebar'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'the-foundry-brooklyn',
@@ -91,7 +92,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://foundrybklyn.com'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'prospect-community-center',
@@ -114,7 +116,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://prospectcommunitycenter.org'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'rooftop-garden-cafe',
@@ -138,7 +141,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       instagram: 'rooftopgardencafe'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'warehouse-23',
@@ -160,7 +164,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       phone: '(718) 555-2300'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'brooklyn-beer-garden',
@@ -185,7 +190,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       tiktok: 'brooklynbeergarden'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'the-study-hall',
@@ -208,7 +214,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://studyhall.space'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'parkside-restaurant',
@@ -231,7 +238,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://parksiderestaurant.com'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'innovation-hub',
@@ -254,7 +262,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://innovationhub.nyc'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'both'
   },
   {
     slug: 'sunset-terrace',
@@ -277,7 +286,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       website: 'https://sunsetter.nyc'
     },
     claimStatus: 'unclaimed',
-    ownerId: undefined
+    ownerId: undefined,
+    pricingType: 'free'
   }
 ]
 

@@ -48,7 +48,6 @@ export default function VenueSearchPortal() {
   
   // Filters state
   const [filters, setFilters] = useState<VenueSearchFilters>({
-    query: searchParams.get('q') || '',
     location: searchParams.get('location') || '',
   })
 
@@ -79,8 +78,8 @@ export default function VenueSearchPortal() {
     
     // Update URL with search params
     const params = new URLSearchParams()
-    if (filters.query) params.set('q', filters.query)
     if (filters.location) params.set('location', filters.location)
+    if (filters.pricingType && filters.pricingType !== 'both') params.set('pricing', filters.pricingType)
     setSearchParams(params)
     
     try {
@@ -88,28 +87,12 @@ export default function VenueSearchPortal() {
       const devVenues = getDevVenues()
       let filteredVenues = devVenues
 
-      // Apply query filter
-      if (filters.query) {
-        const query = filters.query.toLowerCase()
-        filteredVenues = filteredVenues.filter(venue =>
-          venue.name.toLowerCase().includes(query) ||
-          venue.description.toLowerCase().includes(query) ||
-          venue.amenities.some(amenity => amenity.toLowerCase().includes(query))
-        )
-      }
-
       // Apply location filter
       if (filters.location) {
         const location = filters.location.toLowerCase()
         filteredVenues = filteredVenues.filter(venue =>
-          venue.address.toLowerCase().includes(location)
-        )
-      }
-
-      // Apply venue type filter
-      if (filters.venueType && filters.venueType.length > 0) {
-        filteredVenues = filteredVenues.filter(venue =>
-          filters.venueType!.includes(venue.venueType)
+          venue.address.toLowerCase().includes(location) ||
+          venue.name.toLowerCase().includes(location)
         )
       }
 
@@ -123,12 +106,10 @@ export default function VenueSearchPortal() {
         })
       }
 
-      // Apply amenities filter
-      if (filters.amenities && filters.amenities.length > 0) {
+      // Apply pricing type filter
+      if (filters.pricingType && filters.pricingType !== 'both') {
         filteredVenues = filteredVenues.filter(venue =>
-          filters.amenities!.some(amenity =>
-            venue.amenities.includes(amenity)
-          )
+          venue.pricingType === filters.pricingType || venue.pricingType === 'both'
         )
       }
 
@@ -222,11 +203,9 @@ export default function VenueSearchPortal() {
                     <p className="text-white font-semibold">
                       {venues.length} {venues.length === 1 ? 'venue' : 'venues'} found
                     </p>
-                    {(filters.query || filters.location) && (
+                    {filters.location && (
                       <p className="text-sm text-gray-300">
-                        {filters.query && `"${filters.query}"`}
-                        {filters.query && filters.location && ' in '}
-                        {filters.location && `${filters.location}`}
+                        in {filters.location}
                       </p>
                     )}
                   </div>
@@ -296,7 +275,7 @@ export default function VenueSearchPortal() {
                 </p>
                 <button
                   onClick={() => {
-                    setFilters({ query: '' })
+                    setFilters({})
                     handleSearch()
                   }}
                   className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg"

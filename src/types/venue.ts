@@ -40,19 +40,19 @@ export interface Venue {
   contactInfo: VenueContactInfo
   claimStatus: VenueClaimStatus
   ownerId?: string
+  pricingType: 'paid' | 'free' | 'both'
   createdAt: Date
   updatedAt: Date
 }
 
 export interface VenueSearchFilters {
-  query?: string
   location?: string
-  venueType?: VenueType[]
   capacity?: {
     min?: number
     max?: number
   }
-  amenities?: string[]
+  pricingType?: 'paid' | 'free' | 'both'
+  availability?: string // Coming soon feature - will be grayed out
 }
 
 export interface VenueSearchResult {

@@ -1,39 +1,19 @@
 import React from 'react'
-import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { 
-  MapPin, 
-  Users, 
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  MapPin,
+  Users,
   Filter,
   X,
+  DollarSign,
+  Clock,
   Search
 } from 'lucide-react'
-import { VenueSearchFilters, VenueType } from '@/types/venue'
-
-const VENUE_TYPES: { value: VenueType; label: string }[] = [
-  { value: 'bar', label: 'Bar' },
-  { value: 'restaurant', label: 'Restaurant' },
-  { value: 'community_center', label: 'Community Center' },
-  { value: 'outdoor', label: 'Outdoor Space' },
-  { value: 'event_space', label: 'Event Space' },
-  { value: 'other', label: 'Other' }
-]
-
-const COMMON_AMENITIES = [
-  'WiFi',
-  'Parking',
-  'Full Bar',
-  'Kitchen',
-  'Sound System',
-  'Projector',
-  'ADA Accessible',
-  'Outdoor Seating',
-  'Private Event Space'
-]
+import { VenueSearchFilters } from '@/types/venue'
 
 interface VenueFiltersProps {
   filters: VenueSearchFilters
@@ -58,46 +38,26 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
     })
   }
 
-  const toggleVenueType = (venueType: VenueType) => {
-    const currentTypes = filters.venueType || []
-    const newTypes = currentTypes.includes(venueType)
-      ? currentTypes.filter(type => type !== venueType)
-      : [...currentTypes, venueType]
-    
-    updateFilter('venueType', newTypes.length > 0 ? newTypes : undefined)
-  }
-
-  const toggleAmenity = (amenity: string) => {
-    const currentAmenities = filters.amenities || []
-    const newAmenities = currentAmenities.includes(amenity)
-      ? currentAmenities.filter(a => a !== amenity)
-      : [...currentAmenities, amenity]
-    
-    updateFilter('amenities', newAmenities.length > 0 ? newAmenities : undefined)
-  }
-
   const clearAllFilters = () => {
-    onFiltersChange({
-      query: filters.query // Keep search query but clear other filters
-    })
+    onFiltersChange({})
   }
 
   const hasActiveFilters = () => {
     return !!(
       filters.location ||
-      (filters.venueType && filters.venueType.length > 0) ||
       filters.capacity?.min ||
       filters.capacity?.max ||
-      (filters.amenities && filters.amenities.length > 0)
+      filters.pricingType ||
+      filters.availability
     )
   }
 
   const getActiveFilterCount = () => {
     let count = 0
     if (filters.location) count++
-    if (filters.venueType?.length) count += filters.venueType.length
     if (filters.capacity?.min || filters.capacity?.max) count++
-    if (filters.amenities?.length) count += filters.amenities.length
+    if (filters.pricingType && filters.pricingType !== 'both') count++
+    if (filters.availability) count++
     return count
   }
 
@@ -108,14 +68,14 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Filter className="h-5 w-5 text-gray-300" />
-            <h3 className="font-semibold text-white">Filters</h3>
+            <h3 className="font-semibold text-white">Search Filters</h3>
             {hasActiveFilters() && (
               <div className="px-2 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs rounded-full">
                 {getActiveFilterCount()}
               </div>
             )}
           </div>
-          
+
           {hasActiveFilters() && (
             <button
               onClick={clearAllFilters}
@@ -128,91 +88,48 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
         </div>
 
         <div className="space-y-6">
-          {/* Search Query */}
-          <div>
-            <label className="text-sm font-medium mb-2 block text-gray-200">Search Venues</label>
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                placeholder="Venue name or keywords..."
-                value={filters.query || ''}
-                onChange={(e) => updateFilter('query', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    onSearch()
-                  }
-                }}
-              />
-            </div>
-          </div>
-
           {/* Location */}
           <div>
-            <label className="text-sm font-medium mb-2 block text-gray-200">Location</label>
+            <Label className="text-sm font-medium mb-2 block text-gray-200">Location</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <input
-                placeholder="Brooklyn, Manhattan, etc."
+              <Input
+                placeholder="Brooklyn, Manhattan, Queens..."
                 value={filters.location || ''}
                 onChange={(e) => updateFilter('location', e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+                className="pl-10 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
               />
-            </div>
-          </div>
-
-          {/* Venue Type */}
-          <div>
-            <label className="text-sm font-medium mb-3 block text-gray-200">Venue Type</label>
-            <div className="grid grid-cols-1 gap-3">
-              {VENUE_TYPES.map((venueType) => (
-                <div key={venueType.value} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={`venue-type-${venueType.value}`}
-                    checked={(filters.venueType || []).includes(venueType.value)}
-                    onChange={() => toggleVenueType(venueType.value)}
-                    className="w-4 h-4 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
-                  />
-                  <label 
-                    htmlFor={`venue-type-${venueType.value}`}
-                    className="text-sm font-normal cursor-pointer text-gray-200"
-                  >
-                    {venueType.label}
-                  </label>
-                </div>
-              ))}
             </div>
           </div>
 
           {/* Capacity */}
           <div>
-            <label className="text-sm font-medium mb-3 block text-gray-200">Capacity</label>
+            <Label className="text-sm font-medium mb-3 block text-gray-200">Capacity</Label>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="text-xs text-gray-300 mb-1 block">Min</label>
+                <Label className="text-xs text-gray-300 mb-1 block">Min</Label>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
+                  <Input
                     type="number"
                     placeholder="0"
                     value={filters.capacity?.min || ''}
                     onChange={(e) => updateCapacity('min', e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+                    className="pl-10 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                     min="0"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-xs text-gray-300 mb-1 block">Max</label>
+                <Label className="text-xs text-gray-300 mb-1 block">Max</Label>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <input
+                  <Input
                     type="number"
                     placeholder="500"
                     value={filters.capacity?.max || ''}
                     onChange={(e) => updateCapacity('max', e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white placeholder-gray-400 rounded-lg focus:bg-white/15 focus:border-white/30 focus:outline-none transition-all duration-200"
+                    className="pl-10 bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                     min="0"
                   />
                 </div>
@@ -220,38 +137,55 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
             </div>
           </div>
 
-          {/* Amenities */}
+          {/* Pricing Type */}
           <div>
-            <label className="text-sm font-medium mb-3 block text-gray-200">Amenities</label>
-            <div className="grid grid-cols-1 gap-2">
-              {COMMON_AMENITIES.map((amenity) => (
-                <div key={amenity} className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id={`amenity-${amenity}`}
-                    checked={(filters.amenities || []).includes(amenity)}
-                    onChange={() => toggleAmenity(amenity)}
-                    className="w-4 h-4 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
-                  />
-                  <label 
-                    htmlFor={`amenity-${amenity}`}
-                    className="text-sm font-normal cursor-pointer text-gray-200"
-                  >
-                    {amenity}
-                  </label>
+            <Label className="text-sm font-medium mb-3 block text-gray-200">Pricing</Label>
+            <Select
+              value={filters.pricingType || 'both'}
+              onValueChange={(value) => updateFilter('pricingType', value)}
+            >
+              <SelectTrigger className="bg-white/10 backdrop-blur-sm border-white/20 text-white focus:bg-white/15 focus:border-white/30">
+                <div className="flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-gray-400" />
+                  <SelectValue placeholder="Select pricing type" />
                 </div>
-              ))}
-            </div>
+              </SelectTrigger>
+              <SelectContent className="bg-gray-900 border-gray-700">
+                <SelectItem value="both" className="text-white hover:bg-gray-800">All Venues</SelectItem>
+                <SelectItem value="free" className="text-white hover:bg-gray-800">Free Events Only</SelectItem>
+                <SelectItem value="paid" className="text-white hover:bg-gray-800">Paid Events Only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Availability - Coming Soon */}
+          <div>
+            <Label className="text-sm font-medium mb-3 block text-gray-200 flex items-center gap-2">
+              Availability
+              <Badge variant="secondary" className="bg-gray-600/50 text-gray-300 text-xs">
+                Coming Soon
+              </Badge>
+            </Label>
+            <Select disabled>
+              <SelectTrigger className="bg-white/5 backdrop-blur-sm border-white/10 text-gray-500 cursor-not-allowed">
+                <div className="flex items-center gap-2">
+                  <Clock className="h-4 w-4 text-gray-500" />
+                  <SelectValue placeholder="Check venue availability" />
+                </div>
+              </SelectTrigger>
+            </Select>
+            <p className="text-xs text-gray-400 mt-1">Real-time availability checking coming soon</p>
           </div>
 
           {/* Search Button */}
-          <button 
-            onClick={onSearch} 
+          <Button
+            onClick={onSearch}
             disabled={isLoading}
-            className="w-full px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg"
+            className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white"
           >
+            <Search className="h-4 w-4 mr-2" />
             {isLoading ? 'Searching...' : 'Search Venues'}
-          </button>
+          </Button>
         </div>
       </div>
     </div>

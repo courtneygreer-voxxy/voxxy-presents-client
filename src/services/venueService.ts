@@ -16,20 +16,16 @@ class VenueService {
    */
   async searchVenues(filters: VenueSearchFilters = {}): Promise<VenueSearchResult> {
     const params = new URLSearchParams()
-    
-    if (filters.query) params.append('q', filters.query)
+
     if (filters.location) params.append('location', filters.location)
-    if (filters.venueType?.length) {
-      filters.venueType.forEach(type => params.append('type', type))
-    }
     if (filters.capacity?.min !== undefined) {
       params.append('capacity_min', filters.capacity.min.toString())
     }
     if (filters.capacity?.max !== undefined) {
       params.append('capacity_max', filters.capacity.max.toString())
     }
-    if (filters.amenities?.length) {
-      filters.amenities.forEach(amenity => params.append('amenities', amenity))
+    if (filters.pricingType && filters.pricingType !== 'both') {
+      params.append('pricing_type', filters.pricingType)
     }
 
     try {
@@ -107,7 +103,7 @@ class VenueService {
     if (!query.trim()) return []
 
     const params = new URLSearchParams({
-      q: query,
+      location: query,
       limit: '10',
       fields: 'id,slug,name,address,venueType'
     })
