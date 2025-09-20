@@ -403,7 +403,8 @@ For development questions or technical support, please refer to:
 - [Firebase Security](docs/development/FIREBASE_SECURITY.md) - Database security
 
 **📋 Release Notes:**
-- [v1.8.0 - Venue Marketplace](docs/PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) - Complete venue platform
+- [v1.8.0 - Venue Marketplace](docs/releases/RELEASE_NOTES_v1.8.0.md) - Complete venue discovery platform
+- [v1.8.0 - Project Plan](docs/PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) - Venue marketplace development plan
 - [v1.6.0 - MVP Release](docs/releases/RELEASE_NOTES_v1.6.0.md) - Glass morphism UI and streamlined workflows
 - [v1.5.0 - Project Cool](docs/releases/v1.5.0.md) - Background customization system
 
