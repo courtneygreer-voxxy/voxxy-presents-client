@@ -15,6 +15,7 @@ A modern event management platform that simplifies recurring community events wi
 Voxxy Presents is a comprehensive event management solution designed for creative communities, clubs, and recurring event organizers. The platform provides:
 
 - **Custom Organization Pages**: Branded landing pages with image carousels and rich content
+- **Venue Marketplace**: Complete venue discovery and booking platform with glass morphism UI
 - **Design Customization**: Background color, text color, and button color personalization
 - **Admin Dashboard**: Full-featured management interface for organization owners
 - **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series with improved page-based workflows
@@ -26,6 +27,8 @@ Voxxy Presents is a comprehensive event management solution designed for creativ
 - **Real-time Data**: Live event updates and registration management
 - **Multi-Environment Support**: Development, staging, production, and sandbox environments
 - **Glass Morphism Design**: Modern UI with translucent components and backdrop blur effects
+- **Venue Discovery**: Advanced search and filtering system for event venues
+- **Peerspace-Inspired Layout**: Optimized venue profiles with image-first approach
 
 ## 🛠 Technology Stack
 
@@ -376,20 +379,38 @@ For development questions or technical support, please refer to:
 
 ---
 
-## 📚 Documentation
+## 🎯 Latest Release: v1.8.0 Venue Marketplace
 
-**📖 [Complete Documentation Index](docs/README.md)** - Navigate all project docs
+**🚀 Now Live**: Complete venue discovery platform with modern glass morphism UI design
+
+### What's New in v1.8.0:
+- ✨ **Venue Marketplace**: Full-featured venue search and discovery platform
+- 🎨 **Glass Morphism Design**: Modern translucent UI with backdrop blur effects
+- 🏢 **Peerspace-Inspired Layout**: Image-first venue profiles for better visualization
+- 🔍 **Advanced Search**: Location, capacity, and amenity-based filtering
+- 📱 **Responsive Design**: Optimized for all device sizes
+- 🌟 **Contact Integration**: Streamlined venue inquiry system
+
+---
+
+## 📚 Documentation
 
 **🚀 Quick Links:**
 - [Contributing Guidelines](CONTRIBUTING.md) - Development workflow
-- [Operations Runbook](RUNBOOK.md) - Emergency procedures  
-- [Customer Guide](CUSTOMER-ONBOARDING.md) - Email system usage
-- [Deployment Guide](DEPLOYMENT.md) - Staging → Production workflow
-- [Current Status](DEVELOPMENT-STATUS.md) - Project progress
+- [Operations Runbook](docs/development/RUNBOOK.md) - Emergency procedures
+- [Deployment Guide](docs/deployment/DEPLOYMENT.md) - Staging → Production workflow
+- [Branching Strategy](docs/development/BRANCHING_STRATEGY.md) - Git workflow
+- [Firebase Security](docs/development/FIREBASE_SECURITY.md) - Database security
 
 **📋 Release Notes:**
-- [v1.6.0 - MVP Release](RELEASE_NOTES_v1.6.0.md) - Glass morphism UI, streamlined workflows, and platform integration removal
+- [v1.8.0 - Venue Marketplace](docs/PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) - Complete venue platform
+- [v1.6.0 - MVP Release](docs/releases/RELEASE_NOTES_v1.6.0.md) - Glass morphism UI and streamlined workflows
 - [v1.5.0 - Project Cool](docs/releases/v1.5.0.md) - Background customization system
 
+**🎨 Design System:**
+- [Glass Morphism Components](docs/design/GLASS_MODAL_DESIGN_SYSTEM.md) - UI component guidelines
+- [Styling Guidelines](docs/design/STYLING_UPDATE_SESSION.md) - Design system documentation
+
 ---
-Built with ❤️ by the Voxxy team# Trigger deployment Sat Sep 20 10:22:24 EDT 2025
+
+Built with ❤️ by the Voxxy team
