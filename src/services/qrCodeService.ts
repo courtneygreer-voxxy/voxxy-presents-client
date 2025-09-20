@@ -301,5 +301,5 @@ export class QRCodeService {
 // Export singleton instance
 export const qrCodeService = new QRCodeService();
 
-// Export for testing
-export { QRCodeService };
+// Export class for testing
+export { QRCodeService as QRCodeServiceClass };

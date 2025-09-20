@@ -164,6 +164,30 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
 
       // Handle specific error cases
       if (error instanceof ApiError && error.status === 409) {
+        // In development, generate ticket anyway for testing
+        if (import.meta.env.DEV) {
+          console.log('Development mode: Generating QR ticket despite duplicate registration');
+
+          const ticketResponse = await qrCodeService.generateTicket({
+            eventId: event.id,
+            attendeeEmail: formData.email || `guest_${Date.now()}@voxxypresents.com`,
+            attendeeName: formData.name,
+            rsvpStatus: formData.registrationType === 'rsvp_yes' ? 'going' : 'maybe',
+            organizationId: event.organizationId || 'voxxy-presents'
+          })
+
+          if (ticketResponse.success && ticketResponse.ticket) {
+            setDigitalTicket(ticketResponse.ticket)
+            setIsSuccess(true)
+
+            toast({
+              title: "🎫 Development Mode: Ticket Generated!",
+              description: "Generated QR ticket for testing (already registered)."
+            })
+            return
+          }
+        }
+
         toast({
           variant: "destructive",
           title: "Already Registered",

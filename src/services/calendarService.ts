@@ -248,5 +248,5 @@ export class CalendarService {
 // Export singleton instance
 export const calendarService = new CalendarService();
 
-// Export for testing
-export { CalendarService };
+// Export class for testing
+export { CalendarService as CalendarServiceClass };
