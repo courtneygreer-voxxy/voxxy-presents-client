@@ -155,22 +155,25 @@ export default function VenueSearchPortal() {
       {/* Header */}
       <div className="bg-gray-800 border-b border-white/10 relative z-10">
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="flex items-center justify-between">
             <button
               onClick={() => navigate('/voxxy-shop')}
-              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
+              className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg flex-shrink-0"
             >
               <ArrowLeft className="h-4 w-4" />
               Back to Shop
             </button>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            <Store className="h-8 w-8 text-purple-400" />
-            <div>
-              <h1 className="text-3xl font-bold text-white">Venue Marketplace</h1>
-              <p className="text-gray-200">Find the perfect space for your next event</p>
+
+            <div className="flex items-center gap-3 flex-1 justify-center">
+              <Store className="h-8 w-8 text-purple-400" />
+              <div className="text-center">
+                <h1 className="text-3xl font-bold text-white">Venue Marketplace</h1>
+                <p className="text-gray-200">Find the perfect space for your next event</p>
+              </div>
             </div>
+
+            {/* Spacer to balance the layout */}
+            <div className="flex-shrink-0 w-[140px]"></div>
           </div>
         </div>
       </div>

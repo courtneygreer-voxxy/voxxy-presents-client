@@ -321,16 +321,15 @@ export default function OneTimeEventForm({ organization, isOpen, onClose, onBack
                 </div>
               </div>
 
-              <div className="mt-4">
-                <Button
+              <div className="mt-4 text-center">
+                <p className="text-gray-400 text-sm mb-2">Need help finding a venue?</p>
+                <button
                   type="button"
-                  variant="outline"
                   onClick={() => navigate('/voxxy-shop/venues')}
-                  className="w-full sm:w-auto"
+                  className="text-purple-300 hover:text-purple-200 transition-colors underline"
                 >
-                  <Search className="mr-2 h-4 w-4" />
                   Search Venues
-                </Button>
+                </button>
               </div>
             </CardContent>
           </Card>

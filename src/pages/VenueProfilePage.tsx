@@ -243,6 +243,15 @@ export default function VenueProfilePage() {
                 </Button>
               }
             />
+
+            <Button
+              onClick={() => setIsContactModalOpen(true)}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+              size="sm"
+            >
+              <Mail className="h-4 w-4 mr-2" />
+              Contact
+            </Button>
           </div>
         </div>
 
@@ -277,15 +286,35 @@ export default function VenueProfilePage() {
                   <span>Capacity: {venue.capacity}</span>
                 </div>
 
-                {/* Pricing Type */}
-                <div className="flex items-center gap-2 text-gray-300">
-                  <DollarSign className="h-4 w-4 text-purple-400" />
-                  <span>
-                    {venue.pricingType === 'free' ? 'Free Venue Space' :
-                     venue.pricingType === 'paid' ? 'Paid Venue Space' :
-                     'Free & Paid Venue Space'}
-                  </span>
-                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Images Section - Moved up after hero */}
+        <section className="py-8">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+              <h3 className="text-xl font-bold text-white mb-6">Venue Photos</h3>
+              <VenueGallery photos={venue.photos} venueName={venue.name} />
+            </div>
+          </div>
+        </section>
+
+        {/* Amenities Section */}
+        <section className="py-8">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
+              <h3 className="text-xl font-bold text-white mb-6">What This Venue Offers</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {venue.amenities.map((amenity, index) => (
+                  <div key={index} className="flex items-center gap-3">
+                    <div className="text-purple-400">
+                      {AMENITY_ICONS[amenity] || <Star className="h-4 w-4" />}
+                    </div>
+                    <span className="text-gray-200">{amenity}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -311,54 +340,31 @@ export default function VenueProfilePage() {
           </div>
         </section>
 
-
-        {/* Amenities Section */}
-        <section className="py-8">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-white mb-6">What This Venue Offers</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {venue.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center gap-3">
-                    <div className="text-purple-400">
-                      {AMENITY_ICONS[amenity] || <Star className="h-4 w-4" />}
-                    </div>
-                    <span className="text-gray-200">{amenity}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Images Section */}
-        <section className="py-8">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-white mb-6">Venue Photos</h3>
-              <VenueGallery photos={venue.photos} venueName={venue.name} />
-            </div>
-          </div>
-        </section>
-
         {/* Contact Information Section */}
         <section className="py-8">
           <div className="container mx-auto px-4 max-w-6xl">
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
               <h3 className="text-xl font-bold text-white mb-6">Contact Information</h3>
-              <div className="space-y-4 mb-6">
-                <div className="flex items-center gap-3">
+
+              {/* Contact Grid Layout */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                {/* Email */}
+                <div className="flex items-center gap-3 justify-center md:justify-start">
                   <Mail className="h-5 w-5 text-purple-400" />
                   <span className="text-gray-200">{venue.contactInfo.email}</span>
                 </div>
+
+                {/* Phone */}
                 {venue.contactInfo.phone && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-center md:justify-start">
                     <Phone className="h-5 w-5 text-purple-400" />
                     <span className="text-gray-200">{venue.contactInfo.phone}</span>
                   </div>
                 )}
+
+                {/* Website */}
                 {venue.contactInfo.website && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-center md:justify-start">
                     <ExternalLink className="h-5 w-5 text-purple-400" />
                     <a
                       href={venue.contactInfo.website}
@@ -370,8 +376,10 @@ export default function VenueProfilePage() {
                     </a>
                   </div>
                 )}
+
+                {/* Social Media Links */}
                 {venue.contactInfo.instagram && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-center md:justify-start">
                     <Instagram className="h-5 w-5 text-purple-400" />
                     <a
                       href={`https://instagram.com/${venue.contactInfo.instagram.replace('@', '')}`}
@@ -383,8 +391,9 @@ export default function VenueProfilePage() {
                     </a>
                   </div>
                 )}
+
                 {venue.contactInfo.tiktok && (
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3 justify-center md:justify-start">
                     <Video className="h-5 w-5 text-purple-400" />
                     <a
                       href={`https://tiktok.com/@${venue.contactInfo.tiktok.replace('@', '')}`}
@@ -397,13 +406,15 @@ export default function VenueProfilePage() {
                   </div>
                 )}
               </div>
-              <Button
-                onClick={() => setIsContactModalOpen(true)}
-                className="bg-purple-600 hover:bg-purple-700 text-white"
-              >
-                <Mail className="h-4 w-4 mr-2" />
-                Connect with venue
-              </Button>
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => setIsContactModalOpen(true)}
+                  className="bg-purple-600 hover:bg-purple-700 text-white"
+                >
+                  <Mail className="h-4 w-4 mr-2" />
+                  Connect with venue
+                </Button>
+              </div>
             </div>
           </div>
         </section>

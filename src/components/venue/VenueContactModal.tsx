@@ -106,10 +106,10 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md bg-white/10 backdrop-blur-sm border border-white/20 text-white">
         <DialogHeader>
-          <DialogTitle>Contact {venue.name}</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-white">Contact {venue.name}</DialogTitle>
+          <DialogDescription className="text-gray-300">
             Send a message about your event or booking inquiry
           </DialogDescription>
         </DialogHeader>
@@ -117,14 +117,14 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
         {isSuccess ? (
           // Success State
           <div className="text-center py-6">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Mail className="h-8 w-8 text-green-600" />
+            <div className="w-16 h-16 bg-green-500/20 border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Mail className="h-8 w-8 text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Message Sent!</h3>
-            <p className="text-gray-600 mb-6">
+            <h3 className="text-lg font-semibold text-white mb-2">Message Sent!</h3>
+            <p className="text-gray-300 mb-6">
               We've sent your message to {venue.name}. They'll get back to you soon.
             </p>
-            <Button onClick={handleClose} className="w-full">
+            <Button onClick={handleClose} className="w-full bg-purple-600 hover:bg-purple-700 text-white">
               Done
             </Button>
           </div>
@@ -132,31 +132,31 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
           // Contact Form
           <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{error}</p>
+              <div className="p-3 bg-red-500/20 border border-red-400/30 rounded-md">
+                <p className="text-sm text-red-300">{error}</p>
               </div>
             )}
 
             {/* Contact Info Display */}
-            <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-lg space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <Mail className="h-4 w-4 text-gray-500" />
-                <span>{venue.contactInfo.email}</span>
+                <Mail className="h-4 w-4 text-purple-400" />
+                <span className="text-gray-200">{venue.contactInfo.email}</span>
               </div>
               {venue.contactInfo.phone && (
                 <div className="flex items-center gap-2 text-sm">
-                  <Phone className="h-4 w-4 text-gray-500" />
-                  <span>{venue.contactInfo.phone}</span>
+                  <Phone className="h-4 w-4 text-purple-400" />
+                  <span className="text-gray-200">{venue.contactInfo.phone}</span>
                 </div>
               )}
               {venue.contactInfo.website && (
                 <div className="flex items-center gap-2 text-sm">
-                  <ExternalLink className="h-4 w-4 text-gray-500" />
-                  <a 
-                    href={venue.contactInfo.website} 
-                    target="_blank" 
+                  <ExternalLink className="h-4 w-4 text-purple-400" />
+                  <a
+                    href={venue.contactInfo.website}
+                    target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-600 hover:underline"
+                    className="text-purple-300 hover:text-purple-200 transition-colors"
                   >
                     Visit Website
                   </a>
@@ -167,23 +167,25 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
             {/* Form Fields */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="fromName">Your Name *</Label>
+                <Label htmlFor="fromName" className="text-gray-200">Your Name *</Label>
                 <Input
                   id="fromName"
                   value={formData.fromName}
                   onChange={(e) => handleInputChange('fromName', e.target.value)}
                   placeholder="John Doe"
+                  className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                   required
                 />
               </div>
               <div>
-                <Label htmlFor="fromEmail">Your Email *</Label>
+                <Label htmlFor="fromEmail" className="text-gray-200">Your Email *</Label>
                 <Input
                   id="fromEmail"
                   type="email"
                   value={formData.fromEmail}
                   onChange={(e) => handleInputChange('fromEmail', e.target.value)}
                   placeholder="john@example.com"
+                  className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                   required
                 />
               </div>
@@ -191,14 +193,14 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>Event Date (Optional)</Label>
+                <Label className="text-gray-200">Event Date (Optional)</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
                       variant="outline"
                       className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !formData.eventDate && 'text-muted-foreground'
+                        'w-full justify-start text-left font-normal bg-white/10 backdrop-blur-sm border-white/20 text-white hover:bg-white/15 hover:border-white/30',
+                        !formData.eventDate && 'text-gray-400'
                       )}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
@@ -216,35 +218,38 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
                 </Popover>
               </div>
               <div>
-                <Label htmlFor="attendeeCount">Expected Attendees</Label>
+                <Label htmlFor="attendeeCount" className="text-gray-200">Expected Attendees</Label>
                 <Input
                   id="attendeeCount"
                   type="number"
                   value={formData.attendeeCount}
                   onChange={(e) => handleInputChange('attendeeCount', e.target.value)}
                   placeholder="50"
+                  className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                   min="1"
                 />
               </div>
             </div>
 
             <div>
-              <Label htmlFor="eventType">Event Type</Label>
+              <Label htmlFor="eventType" className="text-gray-200">Event Type</Label>
               <Input
                 id="eventType"
                 value={formData.eventType}
                 onChange={(e) => handleInputChange('eventType', e.target.value)}
                 placeholder="Birthday party, corporate event, workshop, etc."
+                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
               />
             </div>
 
             <div>
-              <Label htmlFor="message">Message *</Label>
+              <Label htmlFor="message" className="text-gray-200">Message *</Label>
               <Textarea
                 id="message"
                 value={formData.message}
                 onChange={(e) => handleInputChange('message', e.target.value)}
                 placeholder="Tell us about your event, preferred dates, and any special requirements..."
+                className="bg-white/10 backdrop-blur-sm border-white/20 text-white placeholder-gray-400 focus:bg-white/15 focus:border-white/30"
                 rows={4}
                 required
               />
@@ -256,15 +261,15 @@ export function VenueContactModal({ venue, isOpen, onClose }: VenueContactModalP
                 type="button"
                 variant="outline"
                 onClick={openEmailClient}
-                className="flex-1"
+                className="flex-1 bg-white/10 border-white/20 text-white hover:bg-white/15 hover:border-white/30"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Open Email
               </Button>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 disabled={isLoading}
-                className="flex-1"
+                className="flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50"
               >
                 {isLoading ? 'Sending...' : 'Send Message'}
               </Button>

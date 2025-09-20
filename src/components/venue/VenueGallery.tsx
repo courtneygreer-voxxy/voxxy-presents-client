@@ -41,14 +41,14 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
 
   return (
     <>
-      {/* Main Gallery Carousel - Single Row */}
+      {/* Main Gallery Carousel - Larger Images Full Width */}
       <div className="relative">
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+        <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
           {photos.map((photo, index) => (
             <button
               key={index}
               onClick={() => openLightbox(index)}
-              className="relative w-32 h-24 flex-shrink-0 overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
+              className="relative w-64 h-48 flex-shrink-0 overflow-hidden rounded-lg group hover:opacity-95 transition-opacity"
             >
               <img
                 src={photo}
@@ -61,14 +61,14 @@ export function VenueGallery({ photos, venueName }: VenueGalleryProps) {
 
           {/* Show placeholder if no photos */}
           {photos.length === 0 && (
-            <div className="w-32 h-24 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
-              <span className="text-gray-400 text-xs">No photos</span>
+            <div className="w-64 h-48 bg-white/5 border border-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
+              <span className="text-gray-400 text-sm">No photos available</span>
             </div>
           )}
         </div>
 
         {/* Scroll indicator for many photos */}
-        {photos.length > 4 && (
+        {photos.length > 2 && (
           <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/20 to-transparent pointer-events-none rounded-r-lg" />
         )}
       </div>

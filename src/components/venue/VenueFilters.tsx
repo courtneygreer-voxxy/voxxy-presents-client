@@ -137,26 +137,6 @@ export function VenueFilters({ filters, onFiltersChange, onSearch, isLoading }: 
             </div>
           </div>
 
-          {/* Pricing Type */}
-          <div>
-            <Label className="text-sm font-medium mb-3 block text-gray-200">Pricing</Label>
-            <Select
-              value={filters.pricingType || 'both'}
-              onValueChange={(value) => updateFilter('pricingType', value)}
-            >
-              <SelectTrigger className="bg-white/10 backdrop-blur-sm border-white/20 text-white focus:bg-white/15 focus:border-white/30">
-                <div className="flex items-center gap-2">
-                  <DollarSign className="h-4 w-4 text-gray-400" />
-                  <SelectValue placeholder="Select pricing type" />
-                </div>
-              </SelectTrigger>
-              <SelectContent className="bg-gray-900 border-gray-700">
-                <SelectItem value="both" className="text-white hover:bg-gray-800">All Venues</SelectItem>
-                <SelectItem value="free" className="text-white hover:bg-gray-800">Free Venue Space</SelectItem>
-                <SelectItem value="paid" className="text-white hover:bg-gray-800">Paid Venue Space</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
 
           {/* Availability - Coming Soon */}
           <div>
