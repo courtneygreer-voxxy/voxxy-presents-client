@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw, Search, Filter, X } from "lucide-react"
+import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw, Search, Filter, X, QrCode, CheckCircle, XCircle, Ticket } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { organizationsRef } from '@/lib/database'
 import { getDocs, query, where } from 'firebase/firestore'
@@ -50,6 +50,18 @@ export default function AdminDashboard() {
   // Filter and search state
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState('all')
+
+  // Ticket validation state
+  const [ticketCode, setTicketCode] = useState('')
+  const [validationResult, setValidationResult] = useState<any>(null)
+  const [validationLoading, setValidationLoading] = useState(false)
+  const [validationHistory, setValidationHistory] = useState<any[]>([])
+  const [manualCode, setManualCode] = useState('')
+
+  // Ticket management state
+  const [ticketDashboard, setTicketDashboard] = useState<any>(null)
+  const [ticketDashboardLoading, setTicketDashboardLoading] = useState(true)
+  const [selectedEventId, setSelectedEventId] = useState<string>('all')
 
   // Filter submissions based on search and filters
   const filteredSubmissions = emailData?.submissions ? emailData.submissions.filter(submission => {
@@ -175,6 +187,84 @@ export default function AdminDashboard() {
     }
   }
 
+  // Ticket validation functions
+  const validateTicket = async (code: string) => {
+    if (!code.trim()) return
+
+    setValidationLoading(true)
+    setValidationResult(null)
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      const response = await fetch(`${apiUrl}/tickets/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ qrCode: code.trim() })
+      })
+
+      const result = await response.json()
+      setValidationResult(result)
+
+      // Add to validation history
+      const historyItem = {
+        id: Date.now(),
+        code: code.trim(),
+        result,
+        timestamp: new Date(),
+        success: response.ok
+      }
+      setValidationHistory(prev => [historyItem, ...prev.slice(0, 9)]) // Keep last 10 validations
+
+      // Clear input after validation
+      setTicketCode('')
+      setManualCode('')
+    } catch (error) {
+      console.error('Ticket validation error:', error)
+      setValidationResult({
+        valid: false,
+        message: 'Network error - please check your connection'
+      })
+    } finally {
+      setValidationLoading(false)
+    }
+  }
+
+  const handleQRScan = (code: string) => {
+    setTicketCode(code)
+    validateTicket(code)
+  }
+
+  const handleManualValidation = () => {
+    if (manualCode.trim()) {
+      validateTicket(manualCode.trim())
+    }
+  }
+
+  // Load ticket dashboard data
+  useEffect(() => {
+    if (!isAdmin) return
+
+    const loadTicketDashboard = async () => {
+      setTicketDashboardLoading(true)
+      try {
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+        const response = await fetch(`${apiUrl}/tickets/dashboard`)
+        if (response.ok) {
+          const data = await response.json()
+          setTicketDashboard(data)
+        }
+      } catch (error) {
+        console.error('Failed to load ticket dashboard:', error)
+      } finally {
+        setTicketDashboardLoading(false)
+      }
+    }
+
+    loadTicketDashboard()
+  }, [isAdmin])
+
   if (!isAdmin) {
     return null // Will redirect to login
   }
@@ -218,8 +308,10 @@ export default function AdminDashboard() {
 
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="email" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="email">Email Analytics</TabsTrigger>
+            <TabsTrigger value="tickets">Ticket Validation</TabsTrigger>
+            <TabsTrigger value="ticket-management">Ticket Management</TabsTrigger>
             <TabsTrigger value="clubs">Club Management</TabsTrigger>
           </TabsList>
 
@@ -421,6 +513,399 @@ export default function AdminDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Ticket Validation Tab */}
+          <TabsContent value="tickets" className="space-y-6">
+            <div className="max-w-4xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">Ticket Validation</h2>
+                <p className="text-gray-600">Scan QR codes or enter backup codes to validate event tickets</p>
+              </div>
+
+              {/* Validation Interface */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* QR Code Scanner Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <QrCode className="h-5 w-5" />
+                      QR Code Scanner
+                    </CardTitle>
+                    <CardDescription>
+                      Point camera at QR code on ticket
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center">
+                      <div className="text-center">
+                        <QrCode className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600 mb-4">Camera scanner would appear here</p>
+                        <p className="text-sm text-gray-500">Use manual entry below for testing</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Manual Entry Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Ticket className="h-5 w-5" />
+                      Manual Entry
+                    </CardTitle>
+                    <CardDescription>
+                      Enter QR code or backup code manually
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-4">
+                      <div>
+                        <label className="text-sm font-medium text-gray-700 mb-2 block">
+                          QR Code or Backup Code
+                        </label>
+                        <Input
+                          placeholder="Enter code here..."
+                          value={manualCode}
+                          onChange={(e) => setManualCode(e.target.value)}
+                          onKeyPress={(e) => e.key === 'Enter' && handleManualValidation()}
+                        />
+                      </div>
+
+                      <Button
+                        onClick={handleManualValidation}
+                        className="w-full"
+                        disabled={validationLoading || !manualCode.trim()}
+                      >
+                        {validationLoading ? (
+                          <>
+                            <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                            Validating...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Validate Ticket
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Validation Result */}
+              {validationResult && (
+                <Card className={`border-2 ${validationResult.valid ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}`}>
+                  <CardContent className="p-6">
+                    <div className="flex items-start gap-4">
+                      {validationResult.valid ? (
+                        <CheckCircle className="h-8 w-8 text-green-600 flex-shrink-0 mt-1" />
+                      ) : (
+                        <XCircle className="h-8 w-8 text-red-600 flex-shrink-0 mt-1" />
+                      )}
+
+                      <div className="flex-1">
+                        <h3 className={`text-lg font-semibold mb-2 ${validationResult.valid ? 'text-green-900' : 'text-red-900'}`}>
+                          {validationResult.valid ? '✅ Valid Ticket' : '❌ Invalid Ticket'}
+                        </h3>
+
+                        <p className={`mb-3 ${validationResult.valid ? 'text-green-800' : 'text-red-800'}`}>
+                          {validationResult.message}
+                        </p>
+
+                        {validationResult.valid && validationResult.ticket && (
+                          <div className="bg-white/60 rounded-lg p-4 space-y-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700">Attendee:</span>
+                                <p className="text-gray-900">{validationResult.ticket.attendeeName}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Event:</span>
+                                <p className="text-gray-900">{validationResult.ticket.eventTitle}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Ticket #:</span>
+                                <p className="text-gray-900 font-mono">{validationResult.ticket.ticketNumber}</p>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Status:</span>
+                                <Badge className={validationResult.ticket.status === 'valid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                                  {validationResult.ticket.status}
+                                </Badge>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Validation History */}
+              {validationHistory.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Validations</CardTitle>
+                    <CardDescription>Last {validationHistory.length} ticket validations</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {validationHistory.map((item) => (
+                        <div
+                          key={item.id}
+                          className={`flex items-center justify-between p-3 rounded-lg border ${
+                            item.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            {item.success ? (
+                              <CheckCircle className="h-5 w-5 text-green-600" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-red-600" />
+                            )}
+                            <div>
+                              <p className="font-medium text-sm">
+                                {item.result.valid ? 'Valid' : 'Invalid'} - {item.result.message}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {item.timestamp.toLocaleTimeString()}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs font-mono text-gray-600">
+                              {item.code.substring(0, 12)}...
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {/* Help Section */}
+              <Card className="bg-blue-50 border-blue-200">
+                <CardHeader>
+                  <CardTitle className="text-blue-900">How to Use Ticket Validation</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3 text-blue-800">
+                  <div className="flex items-start gap-3">
+                    <QrCode className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">QR Code Scanning</p>
+                      <p className="text-sm">Point your device's camera at the QR code on the attendee's ticket. The code will be automatically detected and validated.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <Ticket className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Manual Entry</p>
+                      <p className="text-sm">If QR scanning isn't working, attendees can provide their 6-digit backup code for manual entry.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-medium">Validation Results</p>
+                      <p className="text-sm">Valid tickets show green with attendee details. Invalid tickets show red with error reasons.</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Ticket Management Tab */}
+          <TabsContent value="ticket-management" className="space-y-6">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Ticket Management</h2>
+                <p className="text-gray-600">View analytics and manage digital tickets</p>
+              </div>
+            </div>
+
+            {ticketDashboardLoading ? (
+              <div className="text-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading ticket data...</p>
+              </div>
+            ) : ticketDashboard ? (
+              <>
+                {/* Ticket Analytics Overview */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Total Tickets</CardTitle>
+                      <Ticket className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">{ticketDashboard.analytics?.totalTickets || 0}</div>
+                      <p className="text-xs text-muted-foreground">All generated tickets</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Valid Tickets</CardTitle>
+                      <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-600">{ticketDashboard.analytics?.validTickets || 0}</div>
+                      <p className="text-xs text-muted-foreground">Ready for use</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Used Tickets</CardTitle>
+                      <CheckCircle className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-blue-600">{ticketDashboard.analytics?.usedTickets || 0}</div>
+                      <p className="text-xs text-muted-foreground">Already validated</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">Expired Tickets</CardTitle>
+                      <XCircle className="h-4 w-4 text-muted-foreground" />
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-600">{ticketDashboard.analytics?.expiredTickets || 0}</div>
+                      <p className="text-xs text-muted-foreground">No longer valid</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Event Filter */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Filter by Event</CardTitle>
+                    <CardDescription>View tickets for specific events</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Select value={selectedEventId} onValueChange={setSelectedEventId}>
+                      <SelectTrigger className="w-full md:w-80">
+                        <SelectValue placeholder="Select an event" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Events</SelectItem>
+                        {ticketDashboard.events?.map((event: any) => (
+                          <SelectItem key={event.eventId} value={event.eventId}>
+                            {event.eventTitle} ({event.ticketCount} tickets)
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </CardContent>
+                </Card>
+
+                {/* Tickets List */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Recent Tickets</CardTitle>
+                    <CardDescription>
+                      {selectedEventId === 'all'
+                        ? 'All tickets across events'
+                        : `Tickets for ${ticketDashboard.events?.find((e: any) => e.eventId === selectedEventId)?.eventTitle || 'selected event'}`
+                      }
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {ticketDashboard.tickets && ticketDashboard.tickets.length > 0 ? (
+                      <div className="space-y-4">
+                        {ticketDashboard.tickets
+                          .filter((ticket: any) => selectedEventId === 'all' || ticket.eventId === selectedEventId)
+                          .slice(0, 10)
+                          .map((ticket: any) => (
+                          <div key={ticket.id} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-semibold text-gray-900">{ticket.attendeeName}</h3>
+                                <Badge className={
+                                  ticket.status === 'valid' ? 'bg-green-100 text-green-800' :
+                                  ticket.status === 'used' ? 'bg-blue-100 text-blue-800' :
+                                  'bg-red-100 text-red-800'
+                                }>
+                                  {ticket.status}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-gray-600 mb-1">
+                                <strong>Event:</strong> {ticket.eventTitle}
+                              </p>
+                              <p className="text-sm text-gray-600 mb-1">
+                                <strong>Ticket #:</strong> <span className="font-mono">{ticket.ticketNumber}</span>
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                <strong>Backup Code:</strong> <span className="font-mono">{ticket.backupCode}</span>
+                              </p>
+                            </div>
+                            <div className="text-right text-sm text-gray-500">
+                              <p>Generated: {new Date(ticket.createdAt).toLocaleDateString()}</p>
+                              {ticket.usedAt && (
+                                <p>Used: {new Date(ticket.usedAt).toLocaleDateString()}</p>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+
+                        {ticketDashboard.tickets.filter((ticket: any) => selectedEventId === 'all' || ticket.eventId === selectedEventId).length > 10 && (
+                          <div className="text-center py-4">
+                            <p className="text-sm text-gray-500">
+                              Showing 10 of {ticketDashboard.tickets.filter((ticket: any) => selectedEventId === 'all' || ticket.eventId === selectedEventId).length} tickets
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="text-center py-12">
+                        <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <p className="text-gray-600">No tickets found</p>
+                        <p className="text-sm text-gray-500 mt-2">
+                          Tickets will appear here when users RSVP to events
+                        </p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Events Breakdown */}
+                {ticketDashboard.events && ticketDashboard.events.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Events Overview</CardTitle>
+                      <CardDescription>Ticket statistics by event</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {ticketDashboard.events.map((event: any) => (
+                          <div key={event.eventId} className="flex items-center justify-between p-4 border rounded-lg">
+                            <div>
+                              <h3 className="font-semibold text-gray-900">{event.eventTitle}</h3>
+                              <p className="text-sm text-gray-600">{event.eventId}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-semibold text-gray-900">{event.ticketCount}</p>
+                              <p className="text-sm text-gray-500">tickets</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <Ticket className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No ticket data available</p>
+              </div>
+            )}
           </TabsContent>
 
           {/* Club Management Tab */}

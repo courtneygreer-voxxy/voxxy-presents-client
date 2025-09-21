@@ -6,9 +6,9 @@ import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
-  ArrowLeft, 
-  Settings, 
-  Calendar, 
+  ArrowLeft,
+  Settings,
+  Calendar,
   Users,
   Eye,
   Loader,
@@ -18,7 +18,12 @@ import {
   Mail,
   User,
   Link2,
-  Download
+  Download,
+  QrCode,
+  CheckCircle,
+  XCircle,
+  Ticket,
+  RefreshCw
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { useAuth } from "@/hooks/useAuth"
@@ -41,6 +46,15 @@ export default function OrganizationAdminEnhanced() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
+
+  // Ticket validation state
+  const [ticketCode, setTicketCode] = useState('')
+  const [validationResult, setValidationResult] = useState<any>(null)
+  const [validationLoading, setValidationLoading] = useState(false)
+  const [validationHistory, setValidationHistory] = useState<any[]>([])
+  const [manualCode, setManualCode] = useState('')
+  const [ticketDashboard, setTicketDashboard] = useState<any>(null)
+  const [ticketDashboardLoading, setTicketDashboardLoading] = useState(true)
   
   
 
@@ -87,6 +101,56 @@ export default function OrganizationAdminEnhanced() {
       setTimeout(() => setSaveMessage(null), 7000)
     } finally {
       setIsDeleting(false)
+    }
+  }
+
+  // Ticket validation functions
+  const validateTicket = async (code: string) => {
+    if (!code.trim()) return
+
+    setValidationLoading(true)
+    setValidationResult(null)
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      const response = await fetch(`${apiUrl}/tickets/validate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ qrCode: code.trim() })
+      })
+
+      const result = await response.json()
+      setValidationResult(result)
+
+      // Add to validation history
+      const historyItem = {
+        id: Date.now(),
+        code: code.trim(),
+        result,
+        timestamp: new Date(),
+        success: response.ok
+      }
+      setValidationHistory(prev => [historyItem, ...prev.slice(0, 9)]) // Keep last 10 validations
+
+      // Clear input after validation
+      setTicketCode('')
+      setManualCode('')
+    } catch (error) {
+      console.error('Ticket validation error:', error)
+      setValidationResult({
+        valid: false,
+        message: 'Network error - please check your connection'
+      })
+    } finally {
+      setValidationLoading(false)
+    }
+  }
+
+  const handleManualValidation = () => {
+    if (manualCode.trim()) {
+      validateTicket(manualCode.trim())
     }
   }
 
@@ -238,6 +302,10 @@ export default function OrganizationAdminEnhanced() {
               <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
                 <Users className="h-4 w-4 text-purple-400" />
                 Subscribers
+              </TabsTrigger>
+              <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+                <QrCode className="h-4 w-4 text-purple-400" />
+                Tickets
               </TabsTrigger>
               <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
                 <Settings className="h-4 w-4 text-purple-400" />
@@ -402,6 +470,213 @@ export default function OrganizationAdminEnhanced() {
                   )}
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            {/* Tickets Tab */}
+            <TabsContent value="tickets">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Ticket Management</h2>
+                    <p className="text-gray-300">Validate tickets and manage digital entry for your events</p>
+                  </div>
+                </div>
+
+                {/* Ticket Validation Interface */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* QR Code Scanner Section */}
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <QrCode className="h-5 w-5 text-purple-400" />
+                        QR Code Scanner
+                      </CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Point camera at QR code on ticket
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="aspect-square bg-white/5 rounded-lg flex items-center justify-center border border-white/10">
+                        <div className="text-center">
+                          <QrCode className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                          <p className="text-gray-300 mb-4">Camera scanner would appear here</p>
+                          <p className="text-sm text-gray-400">Use manual entry below for testing</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Manual Entry Section */}
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-white flex items-center gap-2">
+                        <Ticket className="h-5 w-5 text-purple-400" />
+                        Manual Entry
+                      </CardTitle>
+                      <CardDescription className="text-gray-300">
+                        Enter QR code or backup code manually
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-4">
+                        <div>
+                          <label className="text-sm font-medium text-gray-300 mb-2 block">
+                            QR Code or Backup Code
+                          </label>
+                          <Input
+                            placeholder="Enter code here..."
+                            value={manualCode}
+                            onChange={(e) => setManualCode(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleManualValidation()}
+                            className="bg-white/5 border-white/20 text-white placeholder-gray-400"
+                          />
+                        </div>
+
+                        <Button
+                          onClick={handleManualValidation}
+                          className="w-full bg-purple-600 hover:bg-purple-700"
+                          disabled={validationLoading || !manualCode.trim()}
+                        >
+                          {validationLoading ? (
+                            <>
+                              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                              Validating...
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2" />
+                              Validate Ticket
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Validation Result */}
+                {validationResult && (
+                  <Card className={`!border-2 ${validationResult.valid ? '!border-green-400/50 !bg-green-500/10' : '!border-red-400/50 !bg-red-500/10'} backdrop-blur-sm`}>
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        {validationResult.valid ? (
+                          <CheckCircle className="h-8 w-8 text-green-400 flex-shrink-0 mt-1" />
+                        ) : (
+                          <XCircle className="h-8 w-8 text-red-400 flex-shrink-0 mt-1" />
+                        )}
+
+                        <div className="flex-1">
+                          <h3 className={`text-lg font-semibold mb-2 ${validationResult.valid ? 'text-green-300' : 'text-red-300'}`}>
+                            {validationResult.valid ? '✅ Valid Ticket' : '❌ Invalid Ticket'}
+                          </h3>
+
+                          <p className={`mb-3 ${validationResult.valid ? 'text-green-200' : 'text-red-200'}`}>
+                            {validationResult.message}
+                          </p>
+
+                          {validationResult.valid && validationResult.ticket && (
+                            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 space-y-2 border border-white/20">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="font-medium text-gray-300">Attendee:</span>
+                                  <p className="text-white">{validationResult.ticket.attendeeName}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-300">Event:</span>
+                                  <p className="text-white">{validationResult.ticket.eventTitle}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-300">Ticket #:</span>
+                                  <p className="text-white font-mono">{validationResult.ticket.ticketNumber}</p>
+                                </div>
+                                <div>
+                                  <span className="font-medium text-gray-300">Status:</span>
+                                  <Badge className={validationResult.ticket.status === 'valid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}>
+                                    {validationResult.ticket.status}
+                                  </Badge>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Validation History */}
+                {validationHistory.length > 0 && (
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardHeader>
+                      <CardTitle className="text-white">Recent Validations</CardTitle>
+                      <CardDescription className="text-gray-300">Last {validationHistory.length} ticket validations</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {validationHistory.map((item) => (
+                          <div
+                            key={item.id}
+                            className={`flex items-center justify-between p-3 rounded-lg border ${
+                              item.success ? 'bg-green-500/10 border-green-400/30' : 'bg-red-500/10 border-red-400/30'
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              {item.success ? (
+                                <CheckCircle className="h-5 w-5 text-green-400" />
+                              ) : (
+                                <XCircle className="h-5 w-5 text-red-400" />
+                              )}
+                              <div>
+                                <p className="font-medium text-sm text-white">
+                                  {item.result.valid ? 'Valid' : 'Invalid'} - {item.result.message}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  {item.timestamp.toLocaleTimeString()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs font-mono text-gray-400">
+                                {item.code.substring(0, 12)}...
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Help Section */}
+                <Card className="!bg-purple-500/10 !border-purple-400/30 backdrop-blur-sm">
+                  <CardHeader>
+                    <CardTitle className="text-purple-300">How to Use Ticket Validation</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3 text-purple-200">
+                    <div className="flex items-start gap-3">
+                      <QrCode className="h-5 w-5 flex-shrink-0 mt-0.5 text-purple-400" />
+                      <div>
+                        <p className="font-medium">QR Code Scanning</p>
+                        <p className="text-sm text-purple-300">Point your device's camera at the QR code on the attendee's ticket. The code will be automatically detected and validated.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <Ticket className="h-5 w-5 flex-shrink-0 mt-0.5 text-purple-400" />
+                      <div>
+                        <p className="font-medium">Manual Entry</p>
+                        <p className="text-sm text-purple-300">If QR scanning isn't working, attendees can provide their 6-digit backup code for manual entry.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5 text-purple-400" />
+                      <div>
+                        <p className="font-medium">Validation Results</p>
+                        <p className="text-sm text-purple-300">Valid tickets show green with attendee details. Invalid tickets show red with error reasons.</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
             {/* Settings Tab */}
