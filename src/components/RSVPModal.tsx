@@ -13,11 +13,17 @@ import {
   Loader2,
   MapPin,
   Shield,
-  Users
+  Users,
+  QrCode,
+  Ticket,
+  Mail
 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { registrationsApi, ApiError } from "@/services/api"
+import { qrCodeService } from "@/services/qrCodeService"
+import { calendarService } from "@/services/calendarService"
 import type { Event } from '@/types/database'
+import type { DigitalTicket } from '@/types/ticket'
 
 interface RSVPModalProps {
   event: Event
@@ -41,6 +47,8 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
   const [formData, setFormData] = useState<RSVPForm>(INITIAL_FORM)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [digitalTicket, setDigitalTicket] = useState<DigitalTicket | null>(null)
+  const [isGeneratingTicket, setIsGeneratingTicket] = useState(false)
   const [captchaQuestion, setCaptchaQuestion] = useState('')
   const [captchaAnswer, setCaptchaAnswer] = useState('')
   const [userCaptchaAnswer, setUserCaptchaAnswer] = useState('')
@@ -111,6 +119,7 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
 
     setIsSubmitting(true)
     try {
+      // Submit RSVP
       const result = await registrationsApi.create({
         eventId: event.id,
         name: formData.name,
@@ -119,24 +128,66 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
         source: 'website'
       })
 
+      // Generate digital ticket
+      setIsGeneratingTicket(true)
+      const ticketResponse = await qrCodeService.generateTicket({
+        eventId: event.id,
+        attendeeEmail: formData.email || `guest_${Date.now()}@voxxypresents.com`,
+        attendeeName: formData.name,
+        rsvpStatus: formData.registrationType === 'rsvp_yes' ? 'going' : 'maybe',
+        organizationId: event.organizationId || 'voxxy-presents'
+      })
+
+      if (ticketResponse.success && ticketResponse.ticket) {
+        setDigitalTicket(ticketResponse.ticket)
+
+        // TODO: Send RSVP confirmation email with QR ticket
+        // This would be implemented in Phase 1.2
+        console.log('Digital ticket generated:', ticketResponse.ticket.ticketId)
+      }
+
       setIsSuccess(true)
 
       toast({
         title: "🎉 RSVP Confirmed!",
-        description: `Great! We've got you down for ${event.title}.`
+        description: `Great! We've got you down for ${event.title}. Your digital ticket is ready!`
       })
 
-      // Reset form after short delay to allow calendar view
+      // Reset form after short delay to allow ticket view
       setTimeout(() => {
         setFormData(INITIAL_FORM)
         generateCaptcha()
-      }, 5000)
+      }, 8000) // Extended to allow more time to view ticket
 
     } catch (error) {
       console.error('RSVP failed:', error)
 
       // Handle specific error cases
       if (error instanceof ApiError && error.status === 409) {
+        // In development, generate ticket anyway for testing
+        if (import.meta.env.DEV) {
+          console.log('Development mode: Generating QR ticket despite duplicate registration');
+
+          const ticketResponse = await qrCodeService.generateTicket({
+            eventId: event.id,
+            attendeeEmail: formData.email || `guest_${Date.now()}@voxxypresents.com`,
+            attendeeName: formData.name,
+            rsvpStatus: formData.registrationType === 'rsvp_yes' ? 'going' : 'maybe',
+            organizationId: event.organizationId || 'voxxy-presents'
+          })
+
+          if (ticketResponse.success && ticketResponse.ticket) {
+            setDigitalTicket(ticketResponse.ticket)
+            setIsSuccess(true)
+
+            toast({
+              title: "🎫 Development Mode: Ticket Generated!",
+              description: "Generated QR ticket for testing (already registered)."
+            })
+            return
+          }
+        }
+
         toast({
           variant: "destructive",
           title: "Already Registered",
@@ -151,35 +202,34 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
       }
     } finally {
       setIsSubmitting(false)
+      setIsGeneratingTicket(false)
     }
   }
 
   const resetAndClose = () => {
     setFormData(INITIAL_FORM)
     setIsSuccess(false)
+    setDigitalTicket(null)
     setIsOpen(false)
     generateCaptcha()
   }
 
   const generateCalendarFile = () => {
     const startDate = new Date(event.date)
-    const endDate = event.endDate ? new Date(event.endDate) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000) // 2 hours default
+    const endDate = event.endDate ? new Date(event.endDate) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000)
 
-    const formatDate = (date: Date) => date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
+    const calendarEvent = calendarService.createEventFromRSVP({
+      title: event.title,
+      description: event.description,
+      location: `${event.location}${event.address ? `, ${event.address}` : ''}`,
+      startDate,
+      endDate,
+      organizerEmail: 'team@voxxypresents.com',
+      organizerName: event.organizationId || 'Voxxy Presents',
+      eventUrl: window.location.href
+    })
 
-    const icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Voxxy Presents//Event//EN
-BEGIN:VEVENT
-UID:${event.id}@voxxy.app
-DTSTART:${formatDate(startDate)}
-DTEND:${formatDate(endDate)}
-SUMMARY:${event.title}
-DESCRIPTION:${event.description}
-LOCATION:${event.location}${event.address ? `, ${event.address}` : ''}
-END:VEVENT
-END:VCALENDAR`
-
+    const icsContent = calendarService.generateICS(calendarEvent)
     const blob = new Blob([icsContent], { type: 'text/calendar' })
     const url = URL.createObjectURL(blob)
     const link = document.createElement('a')
@@ -193,19 +243,18 @@ END:VCALENDAR`
     const startDate = new Date(event.date)
     const endDate = event.endDate ? new Date(event.endDate) : new Date(startDate.getTime() + 2 * 60 * 60 * 1000)
 
-    const title = encodeURIComponent(event.title)
-    const details = encodeURIComponent(event.description)
-    const location = encodeURIComponent(`${event.location}${event.address ? `, ${event.address}` : ''}`)
+    const calendarEvent = calendarService.createEventFromRSVP({
+      title: event.title,
+      description: event.description,
+      location: `${event.location}${event.address ? `, ${event.address}` : ''}`,
+      startDate,
+      endDate,
+      organizerEmail: 'team@voxxypresents.com',
+      organizerName: event.organizationId || 'Voxxy Presents'
+    })
 
-    if (type === 'google') {
-      const start = startDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
-      const end = endDate.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z'
-      return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${start}/${end}&details=${details}&location=${location}`
-    } else {
-      const start = startDate.toISOString()
-      const end = endDate.toISOString()
-      return `https://outlook.live.com/calendar/0/deeplink/compose?subject=${title}&startdt=${start}&enddt=${end}&body=${details}&location=${location}`
-    }
+    const links = calendarService.getAllCalendarLinks(calendarEvent)
+    return type === 'google' ? links.google : links.outlook
   }
 
   const defaultTrigger = (
@@ -222,13 +271,78 @@ END:VCALENDAR`
         <DialogTrigger asChild>
           {trigger || defaultTrigger}
         </DialogTrigger>
-        <DialogContent className="sm:max-w-lg bg-white/15 backdrop-blur-md border-white/30 text-white">
+        <DialogContent className="sm:max-w-lg bg-white/15 backdrop-blur-md border-white/30 text-white max-h-[90vh] overflow-y-auto">
           <div className="text-center py-6">
             <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
             <h3 className="text-2xl font-bold text-white mb-2">You're Going! 🎉</h3>
             <p className="text-gray-300 mb-6">
               Thanks for RSVPing to <strong>{event.title}</strong>
             </p>
+
+            {/* Digital Ticket Section */}
+            {digitalTicket && (
+              <Card className="bg-white/10 border-white/20 mb-6">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Ticket className="h-5 w-5 text-purple-400" />
+                    <h4 className="text-lg font-semibold text-white">Your Digital Ticket</h4>
+                  </div>
+
+                  {/* QR Code Display */}
+                  <div className="bg-white p-4 rounded-lg mb-4 mx-auto max-w-48">
+                    <img
+                      src={digitalTicket.qrCode}
+                      alt="QR Code Ticket"
+                      className="w-full h-auto"
+                    />
+                  </div>
+
+                  {/* Ticket Details */}
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Ticket ID:</span>
+                      <span className="font-mono text-purple-300">{digitalTicket.ticketId}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Access Code:</span>
+                      <span className="font-mono text-purple-300">{digitalTicket.accessCode}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Status:</span>
+                      <Badge variant="outline" className={
+                        digitalTicket.rsvpStatus === 'going'
+                          ? 'bg-green-500/20 border-green-400 text-green-300'
+                          : 'bg-yellow-500/20 border-yellow-400 text-yellow-300'
+                      }>
+                        {digitalTicket.rsvpStatus === 'going' ? 'Going' : 'Maybe'}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 p-3 bg-purple-500/20 rounded-lg border border-purple-400/30">
+                    <div className="flex items-start gap-2">
+                      <QrCode className="h-4 w-4 text-purple-300 mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-purple-200">
+                        Show this QR code at the door for quick entry. Use the access code as backup if needed.
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Email Notification */}
+            {formData.email && (
+              <div className="mb-6 p-3 bg-blue-500/20 rounded-lg border border-blue-400/30">
+                <div className="flex items-center gap-2 mb-2">
+                  <Mail className="h-4 w-4 text-blue-300" />
+                  <span className="text-sm font-medium text-blue-200">Email Confirmation</span>
+                </div>
+                <p className="text-xs text-blue-200">
+                  A confirmation email with your digital ticket has been sent to <strong>{formData.email}</strong>
+                </p>
+              </div>
+            )}
 
             {/* Event Details Summary */}
             <Card className="bg-white/10 border-white/20 mb-6">

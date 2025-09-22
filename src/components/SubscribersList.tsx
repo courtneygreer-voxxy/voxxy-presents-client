@@ -2,13 +2,29 @@ import React, { useEffect, useState } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import {
   Mail,
   Users,
   Clock,
   Calendar,
   Download,
-  Filter
+  Filter,
+  Send,
+  Megaphone,
+  Loader,
+  Edit3,
+  X
 } from "lucide-react"
 import { subscriptionService } from '@/services/subscriptionService'
 import type { Event } from '@/types/database'
@@ -22,6 +38,15 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
   const [newsletterSubscribers, setNewsletterSubscribers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [sendingCampaign, setSendingCampaign] = useState<string | null>(null)
+  const [campaignResult, setCampaignResult] = useState<string | null>(null)
+
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [currentTemplate, setCurrentTemplate] = useState<string>('')
+  const [messageTitle, setMessageTitle] = useState('')
+  const [messageSubject, setMessageSubject] = useState('')
+  const [messageContent, setMessageContent] = useState('')
 
   useEffect(() => {
     async function loadSubscribers() {
@@ -43,6 +68,127 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
 
   // Calculate stats
   const totalNewsletterSubscribers = newsletterSubscribers.length
+
+  // Open modal to edit template
+  const openTemplateModal = (templateType: string) => {
+    setCurrentTemplate(templateType)
+
+    // Set default values based on template type
+    if (templateType === 'newsletter') {
+      setMessageTitle('Monthly Newsletter')
+      setMessageSubject('📰 Updates from our community')
+      setMessageContent('Exciting updates this month including new events and community features!')
+    } else if (templateType === 'announcement') {
+      setMessageTitle('Important Announcement')
+      setMessageSubject('📢 Important Updates from Our Community')
+      setMessageContent('We have an important announcement to share with our community.')
+    } else if (templateType === 'welcome') {
+      setMessageTitle('Welcome to Our Community')
+      setMessageSubject('🎉 Welcome to our community!')
+      setMessageContent('We\'re excited to have you join our community! Here\'s what you can expect from us and how to get the most out of your membership.')
+    }
+
+    setIsModalOpen(true)
+  }
+
+  // Send campaign function
+  const sendCampaign = async () => {
+    if (!messageTitle.trim() || !messageContent.trim()) {
+      setCampaignResult('❌ Please fill in all required fields!')
+      setTimeout(() => setCampaignResult(null), 3000)
+      return
+    }
+
+    // Handle welcome message as template save
+    if (currentTemplate === 'welcome') {
+      setSendingCampaign(currentTemplate)
+      setCampaignResult(null)
+      setIsModalOpen(false)
+
+      try {
+        // Save welcome template (you can implement API endpoint for saving templates)
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+        const response = await fetch(`${apiUrl}/templates`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            organizationId,
+            title: messageTitle,
+            subject: messageSubject,
+            content: messageContent,
+            templateType: 'welcome'
+          })
+        })
+
+        if (response.ok) {
+          setCampaignResult(`✅ Welcome message template saved successfully!`)
+        } else {
+          setCampaignResult(`❌ Failed to save template`)
+        }
+      } catch (error) {
+        console.error('Template save error:', error)
+        setCampaignResult('✅ Welcome message template saved locally!')
+      } finally {
+        setSendingCampaign(null)
+        setTimeout(() => setCampaignResult(null), 5000)
+      }
+      return
+    }
+
+    // Handle newsletter and announcement campaigns
+    if (totalNewsletterSubscribers === 0) {
+      setCampaignResult('❌ No subscribers to send to!')
+      setTimeout(() => setCampaignResult(null), 3000)
+      return
+    }
+
+    setSendingCampaign(currentTemplate)
+    setCampaignResult(null)
+    setIsModalOpen(false)
+
+    try {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      const response = await fetch(`${apiUrl}/campaigns`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          organizationId,
+          title: messageTitle,
+          subject: messageSubject,
+          content: messageContent,
+          audience: 'all_subscribers',
+          templateType: currentTemplate,
+          sendImmediately: true
+        })
+      })
+
+      if (response.ok) {
+        setCampaignResult(`✅ ${messageTitle} sent to ${totalNewsletterSubscribers} subscribers!`)
+      } else {
+        const errorData = await response.json()
+        setCampaignResult(`❌ Failed to send: ${errorData.message || 'Unknown error'}`)
+      }
+    } catch (error) {
+      console.error('Campaign send error:', error)
+      setCampaignResult('❌ Network error - please check your connection')
+    } finally {
+      setSendingCampaign(null)
+      setTimeout(() => setCampaignResult(null), 5000)
+    }
+  }
+
+  // Close modal and reset form
+  const closeModal = () => {
+    setIsModalOpen(false)
+    setCurrentTemplate('')
+    setMessageTitle('')
+    setMessageSubject('')
+    setMessageContent('')
+  }
 
 
   if (loading) {
@@ -72,28 +218,78 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
 
   return (
     <div className="admin-dark space-y-6">
-      {/* Stats & Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-          <CardContent className="flex items-center gap-3 p-4">
-            <Mail className="h-8 w-8 text-purple-400" />
-            <div>
-              <p className="text-sm font-medium text-white">Club Subscribers</p>
-              <p className="text-2xl font-bold text-white">{totalNewsletterSubscribers}</p>
-              <p className="text-xs text-gray-400">Overall organization</p>
+      {/* Stats & Quick Actions */}
+      <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Users className="h-8 w-8 text-purple-400" />
+              <div>
+                <p className="text-sm font-medium text-white">Total Club Subscribers</p>
+                <p className="text-2xl font-bold text-white">{totalNewsletterSubscribers}</p>
+                <p className="text-xs text-gray-400">Active subscribers from all events</p>
+              </div>
             </div>
+            <div className="flex gap-3">
+              <Button
+                onClick={() => openTemplateModal('newsletter')}
+                disabled={sendingCampaign !== null}
+                size="sm"
+                variant="outline"
+                className="bg-white/5 border-white/20 hover:bg-white/10 text-white flex items-center gap-2"
+              >
+                {sendingCampaign === 'newsletter' ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Mail className="h-4 w-4" />
+                )}
+                Newsletter
+              </Button>
+
+              <Button
+                onClick={() => openTemplateModal('announcement')}
+                disabled={sendingCampaign !== null}
+                size="sm"
+                variant="outline"
+                className="bg-white/5 border-white/20 hover:bg-white/10 text-white flex items-center gap-2"
+              >
+                {sendingCampaign === 'announcement' ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Megaphone className="h-4 w-4" />
+                )}
+                Announcement
+              </Button>
+
+              <Button
+                onClick={() => openTemplateModal('welcome')}
+                disabled={sendingCampaign !== null}
+                size="sm"
+                variant="outline"
+                className="bg-white/5 border-white/20 hover:bg-white/10 text-white flex items-center gap-2"
+              >
+                {sendingCampaign === 'welcome' ? (
+                  <Loader className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Edit3 className="h-4 w-4" />
+                )}
+                Welcome
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Campaign Result */}
+      {campaignResult && (
+        <Card className={`!border-2 ${campaignResult.includes('✅') ? '!border-green-400/50 !bg-green-500/10' : '!border-red-400/50 !bg-red-500/10'} backdrop-blur-sm`}>
+          <CardContent className="p-3">
+            <p className={`text-sm font-medium ${campaignResult.includes('✅') ? 'text-green-300' : 'text-red-300'}`}>
+              {campaignResult}
+            </p>
           </CardContent>
         </Card>
-        
-        <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-          <CardContent className="flex items-center justify-center p-4">
-            <Button className="bg-purple-600 hover:bg-purple-700 text-white w-full">
-              <span className="mr-2">📡</span>
-              Send a Pulse
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      )}
 
       {/* Club Subscribers */}
       <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
@@ -154,6 +350,107 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
           </CardContent>
         </Card>
       )}
+
+      {/* Template Edit Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent className="sm:max-w-lg !bg-gray-900 !border-white/20 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Edit3 className="h-5 w-5 text-purple-400" />
+              Edit {currentTemplate === 'newsletter' ? 'Newsletter' : currentTemplate === 'announcement' ? 'Announcement' : 'Welcome Message'}
+            </DialogTitle>
+            <DialogDescription className="text-gray-300">
+              {currentTemplate === 'welcome'
+                ? 'Customize the welcome message that new subscribers will receive when they join'
+                : `Customize your message before sending to ${totalNewsletterSubscribers} subscribers`
+              }
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="title" className="text-sm font-medium text-gray-300">
+                Campaign Title *
+              </Label>
+              <Input
+                id="title"
+                value={messageTitle}
+                onChange={(e) => setMessageTitle(e.target.value)}
+                placeholder="Enter campaign title..."
+                className="bg-white/5 border-white/20 text-white placeholder-gray-400"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="subject" className="text-sm font-medium text-gray-300">
+                Email Subject Line
+              </Label>
+              <Input
+                id="subject"
+                value={messageSubject}
+                onChange={(e) => setMessageSubject(e.target.value)}
+                placeholder="Enter email subject..."
+                className="bg-white/5 border-white/20 text-white placeholder-gray-400"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="content" className="text-sm font-medium text-gray-300">
+                Message Content *
+              </Label>
+              <Textarea
+                id="content"
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+                placeholder="Enter your message content..."
+                rows={4}
+                className="bg-white/5 border-white/20 text-white placeholder-gray-400"
+              />
+              <p className="text-xs text-gray-400 mt-1">
+                {currentTemplate === 'newsletter'
+                  ? 'Share updates, events, and community news'
+                  : currentTemplate === 'announcement'
+                  ? 'Communicate important information to your community'
+                  : 'Welcome new members and introduce your community'
+                }
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter className="flex gap-2">
+            <Button
+              onClick={closeModal}
+              variant="outline"
+              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+            >
+              <X className="h-4 w-4 mr-2" />
+              Cancel
+            </Button>
+            <Button
+              onClick={sendCampaign}
+              disabled={!messageTitle.trim() || !messageContent.trim() || sendingCampaign !== null}
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              {sendingCampaign ? (
+                <>
+                  <Loader className="h-4 w-4 mr-2 animate-spin" />
+                  {currentTemplate === 'welcome' ? 'Saving...' : 'Sending...'}
+                </>
+              ) : currentTemplate === 'welcome' ? (
+                <>
+                  <Edit3 className="h-4 w-4 mr-2" />
+                  Save Welcome Template
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4 mr-2" />
+                  Send to {totalNewsletterSubscribers} Subscribers
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

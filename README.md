@@ -379,17 +379,17 @@ For development questions or technical support, please refer to:
 
 ---
 
-## 🎯 Latest Release: v1.8.0 Venue Marketplace
+## 🎯 Latest Release: v1.9.0 Email Notifications System
 
-**🚀 Now Live**: Complete venue discovery platform with modern glass morphism UI design
+**🚀 Now Live**: Complete email notification system with DMARC compliance and brand messaging updates
 
-### What's New in v1.8.0:
-- ✨ **Venue Marketplace**: Full-featured venue search and discovery platform
-- 🎨 **Glass Morphism Design**: Modern translucent UI with backdrop blur effects
-- 🏢 **Peerspace-Inspired Layout**: Image-first venue profiles for better visualization
-- 🔍 **Advanced Search**: Location, capacity, and amenity-based filtering
-- 📱 **Responsive Design**: Optimized for all device sizes
-- 🌟 **Contact Integration**: Streamlined venue inquiry system
+### What's New in v1.9.0:
+- 📧 **Email Notifications**: Full email delivery system for subscriptions and RSVPs
+- 🔐 **DMARC Compliance**: Proper SPF and DKIM configuration for reliable email delivery
+- 🏷️ **Brand Messaging**: Updated all "Voxxy AI" references to "Voxxy"
+- 🛠️ **Debug Logging**: Comprehensive logging system for troubleshooting email flow
+- ✅ **Production Ready**: Staging issues resolved, deployed to production
+- 🔄 **Subscriber Management**: Enhanced subscription and email delivery tracking
 
 ---
 
@@ -403,7 +403,8 @@ For development questions or technical support, please refer to:
 - [Firebase Security](docs/development/FIREBASE_SECURITY.md) - Database security
 
 **📋 Release Notes:**
-- [v1.8.0 - Venue Marketplace](docs/PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) - Complete venue platform
+- [v1.8.0 - Venue Marketplace](docs/releases/RELEASE_NOTES_v1.8.0.md) - Complete venue discovery platform
+- [v1.8.0 - Project Plan](docs/PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) - Venue marketplace development plan
 - [v1.6.0 - MVP Release](docs/releases/RELEASE_NOTES_v1.6.0.md) - Glass morphism UI and streamlined workflows
 - [v1.5.0 - Project Cool](docs/releases/v1.5.0.md) - Background customization system
 

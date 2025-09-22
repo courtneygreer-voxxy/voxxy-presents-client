@@ -2,6 +2,10 @@
 
 *Complete guide to building, deploying, and managing the Voxxy Presents platform*
 
+## 🎯 Latest: v1.8.0 Venue Marketplace
+
+**🚀 Now Live**: Complete venue discovery platform with glass morphism UI
+
 ---
 
 ## 🗂️ Documentation Navigation
@@ -10,40 +14,44 @@
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | [README.md](../README.md) | Project overview and quick setup | Developers |
-| [CUSTOMER-ONBOARDING.md](../CUSTOMER-ONBOARDING.md) | Email system user guide | End users |
-| [DEVELOPMENT-STATUS.md](../DEVELOPMENT-STATUS.md) | Current project status and next steps | Team |
+| [CONTRIBUTING.md](../CONTRIBUTING.md) | Coding standards and PR process | Developers |
+| [legacy/CUSTOMER-ONBOARDING.md](legacy/CUSTOMER-ONBOARDING.md) | Email system user guide | End users |
 
 ### 🛠️ **Development**
 | Document | Purpose | Audience |
 |----------|---------|----------|
-| [CONTRIBUTING.md](../CONTRIBUTING.md) | Coding standards and PR process | Developers |
-| [DEPLOYMENT.md](../DEPLOYMENT.md) | Environment strategy and deployment workflows | DevOps |
-| [BRANCHING_STRATEGY.md](../BRANCHING_STRATEGY.md) | Git workflow and branch management | Developers |
-
-### 🚨 **Operations**
-| Document | Purpose | Audience |
-|----------|---------|----------|
-| [RUNBOOK.md](../RUNBOOK.md) | Emergency procedures and troubleshooting | Operations |
-| [DEBUGGING-STATUS.md](../DEBUGGING-STATUS.md) | Common debugging scenarios | Support |
-
-### 🏗️ **Architecture**
-| Document | Purpose | Audience |
-|----------|---------|----------|
-| [BACKEND_EMAIL_SETUP.md](../BACKEND_EMAIL_SETUP.md) | Email system technical implementation | Developers |
-| [FIREBASE_SECURITY.md](../FIREBASE_SECURITY.md) | Database security configuration | DevOps |
-| [AUTH_IMPLEMENTATION.md](../AUTH_IMPLEMENTATION.md) | Authentication system details | Developers |
-
-### 📋 **Project Management**
-| Document | Purpose | Audience |
-|----------|---------|----------|
-| [CREATE_CLUB_TASKS.md](../CREATE_CLUB_TASKS.md) | Club creation feature requirements | Product |
-| [DEVELOPMENT_CONTEXT.md](../DEVELOPMENT_CONTEXT.md) | Project context and decisions | Team |
-| [BRANCH_PROTECTION_SETUP.md](../BRANCH_PROTECTION_SETUP.md) | Repository protection configuration | DevOps |
+| [development/RUNBOOK.md](development/RUNBOOK.md) | Emergency procedures and troubleshooting | Operations |
+| [development/BRANCHING_STRATEGY.md](development/BRANCHING_STRATEGY.md) | Git workflow and branch management | Developers |
+| [development/AUTH_IMPLEMENTATION.md](development/AUTH_IMPLEMENTATION.md) | Authentication system details | Developers |
+| [development/FIREBASE_SECURITY.md](development/FIREBASE_SECURITY.md) | Database security configuration | DevOps |
+| [development/BACKEND_EMAIL_SETUP.md](development/BACKEND_EMAIL_SETUP.md) | Email system implementation | Developers |
 
 ### 🚀 **Deployment**
 | Document | Purpose | Audience |
 |----------|---------|----------|
-| [RENDER_DEPLOYMENT.md](../RENDER_DEPLOYMENT.md) | Frontend deployment configuration | DevOps |
+| [deployment/DEPLOYMENT.md](deployment/DEPLOYMENT.md) | Environment strategy and deployment workflows | DevOps |
+| [deployment/RENDER_DEPLOYMENT.md](deployment/RENDER_DEPLOYMENT.md) | Frontend deployment configuration | DevOps |
+| [deployment/PLATFORM_INTEGRATION_DEPLOYMENT.md](deployment/PLATFORM_INTEGRATION_DEPLOYMENT.md) | Third-party integrations | DevOps |
+
+### 🎨 **Design System**
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [design/GLASS_MODAL_DESIGN_SYSTEM.md](design/GLASS_MODAL_DESIGN_SYSTEM.md) | UI component guidelines | Developers |
+| [design/STYLING_UPDATE_SESSION.md](design/STYLING_UPDATE_SESSION.md) | Design system documentation | Developers |
+
+### 📦 **Releases**
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [releases/RELEASE_NOTES_v1.8.0.md](releases/RELEASE_NOTES_v1.8.0.md) | Complete venue marketplace platform | Team |
+| [PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md](PROJECT_PLAN_VENUE_MARKETPLACE_v1.8.0.md) | Latest venue marketplace project plan | Team |
+| [releases/RELEASE_NOTES_v1.6.0.md](releases/RELEASE_NOTES_v1.6.0.md) | MVP release with glass morphism | Team |
+| [releases/v1.5.0.md](releases/v1.5.0.md) | Background customization system | Team |
+
+### 📋 **Archive & Legacy**
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [archive/](archive/) | Historical development documents | Team |
+| [legacy/](legacy/) | Deprecated features and implementations | Team |
 
 ---
 
@@ -122,5 +130,11 @@ Root Level:
 
 **💡 Tip**: Use Cmd+F (or Ctrl+F) to search within documents for specific topics.
 
-**Last Updated**: August 29, 2025  
+---
+
+## 🚀 Next Release: Email & Notifications
+
+**In Development**: Advanced email messaging integration and real-time notification system
+
+**Last Updated**: September 20, 2025
 **Maintainer**: Voxxy Presents Team
