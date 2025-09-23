@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
 import { 
@@ -23,6 +24,9 @@ interface BetaFormData {
   name: string
   email: string
   organizationName: string
+  eventFrequency: string
+  typicalAttendance: string
+  biggestChallenge: string
   description: string
 }
 
@@ -36,6 +40,9 @@ export default function ContactPage() {
     name: '',
     email: '',
     organizationName: '',
+    eventFrequency: '',
+    typicalAttendance: '',
+    biggestChallenge: '',
     description: ''
   })
   
@@ -101,7 +108,7 @@ export default function ContactPage() {
         name: betaFormData.name,
         email: betaFormData.email,
         organizationName: betaFormData.organizationName,
-        description: betaFormData.description,
+        description: `Event Frequency: ${betaFormData.eventFrequency}\nTypical Attendance: ${betaFormData.typicalAttendance}\nBiggest Challenge: ${betaFormData.biggestChallenge}\n\nDescription: ${betaFormData.description}`,
         source: 'contact_page'
       }
 
@@ -173,11 +180,11 @@ export default function ContactPage() {
           <CardContent>
             <div className="space-y-4">
               <p className="text-sm text-gray-300">
-                {submissionType === 'beta' 
-                  ? "We're excited to learn more about your community and will prioritize your beta application."
+                {submissionType === 'beta'
+                  ? "We're excited to learn more about your recurring events and will prioritize your beta application based on your organizing needs."
                   : submissionType === 'updates'
-                  ? "You'll receive updates about Voxxy Presents and new features as they become available."
-                  : "Our team is reviewing your message and will respond soon."}
+                  ? "You'll receive updates about Voxxy Presents features and best practices for club organizers as they become available."
+                  : "Our team is reviewing your message and will respond soon with personalized support."}
               </p>
               <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
                 <Link to="/">
@@ -234,12 +241,12 @@ export default function ContactPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
             Ready to{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Transform Your Community?
+              Transform Your Recurring Events?
             </span>
           </h1>
           
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Join community organizers everywhere who are building with Voxxy. 
+            Join club organizers everywhere who are building sustainable communities with professional event infrastructure.
             Let's create something amazing together.
           </p>
         </div>
@@ -261,10 +268,10 @@ export default function ContactPage() {
               
               <CardContent>
                 <Tabs defaultValue="beta" className="space-y-6" onValueChange={handleTabChange}>
-                  <TabsList className="grid w-full grid-cols-3">
-                    <TabsTrigger value="beta">Beta Access</TabsTrigger>
-                    <TabsTrigger value="updates">Updates</TabsTrigger>
-                    <TabsTrigger value="contact">Contact Team</TabsTrigger>
+                  <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20">
+                    <TabsTrigger value="beta" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-white/20">Beta Access</TabsTrigger>
+                    <TabsTrigger value="updates" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-white/20">Updates</TabsTrigger>
+                    <TabsTrigger value="contact" className="text-gray-300 data-[state=active]:text-white data-[state=active]:bg-white/20">Contact Team</TabsTrigger>
                   </TabsList>
                   
                   <TabsContent value="beta">
@@ -302,7 +309,7 @@ export default function ContactPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="beta-organization">Club Name *</Label>
+                          <Label htmlFor="beta-organization">Club/Event Series Name *</Label>
                           <Input
                             id="beta-organization"
                             type="text"
@@ -313,15 +320,67 @@ export default function ContactPage() {
                             disabled={isSubmitting}
                           />
                         </div>
-                        
+
                         <div>
-                          <Label htmlFor="beta-description">Brief Description *</Label>
+                          <Label htmlFor="beta-frequency">Event Frequency *</Label>
+                          <Select
+                            value={betaFormData.eventFrequency}
+                            onValueChange={(value) => handleBetaInputChange('eventFrequency', value)}
+                            disabled={isSubmitting}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="How often do you host events?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                              <SelectItem value="seasonal">Seasonal</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="beta-attendance">Typical Attendance Size *</Label>
+                          <Input
+                            id="beta-attendance"
+                            type="text"
+                            required
+                            value={betaFormData.typicalAttendance}
+                            onChange={(e) => handleBetaInputChange('typicalAttendance', e.target.value)}
+                            placeholder="e.g., 15-30 people, 50+ people"
+                            disabled={isSubmitting}
+                          />
+                        </div>
+
+                        <div>
+                          <Label htmlFor="beta-challenge">Current Biggest Challenge *</Label>
+                          <Select
+                            value={betaFormData.biggestChallenge}
+                            onValueChange={(value) => handleBetaInputChange('biggestChallenge', value)}
+                            disabled={isSubmitting}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="What's your biggest challenge?" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="rsvp-management">RSVP Management</SelectItem>
+                              <SelectItem value="venue-coordination">Venue Coordination</SelectItem>
+                              <SelectItem value="promotion">Promotion</SelectItem>
+                              <SelectItem value="finding-venues">Finding Venues</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+
+                        <div>
+                          <Label htmlFor="beta-description">Brief Description of Your Events *</Label>
                           <Textarea
                             id="beta-description"
                             required
                             value={betaFormData.description}
                             onChange={(e) => handleBetaInputChange('description', e.target.value)}
-                            placeholder="Tell us about your community and what you're looking to achieve"
+                            placeholder="Tell us about your events and what you're looking to achieve"
                             rows={3}
                             disabled={isSubmitting}
                           />
@@ -374,8 +433,8 @@ export default function ContactPage() {
                         </div>
                       </div>
                       
-                      <p className="text-sm text-gray-600">
-                        Stay updated on Voxxy Presents features, community building tips, and product announcements.
+                      <p className="text-sm text-gray-300">
+                        Stay updated on Voxxy Presents features, recurring event best practices, and product announcements for club organizers.
                       </p>
                       
                       <Button 
@@ -395,7 +454,7 @@ export default function ContactPage() {
                         <Mail className="h-12 w-12 text-purple-400 mx-auto mb-4" />
                         <h3 className="text-lg font-semibold mb-2 text-white">Contact Our Team Directly</h3>
                         <p className="text-gray-200 mb-6">
-                          Have questions or need personalized support? Reach out to our team directly.
+                          Have questions about recurring events or need personalized support? Our team understands club organizing and community building.
                         </p>
                         <Button 
                           className="bg-purple-600 hover:bg-purple-700"
@@ -431,9 +490,9 @@ export default function ContactPage() {
                     <Rocket className="h-4 w-4 mr-2" />
                     Paid Beta Program
                   </Badge>
-                  <CardTitle className="text-white">What's Included</CardTitle>
+                  <CardTitle className="text-white">What's Included for Club Organizers</CardTitle>
                   <CardDescription className="text-gray-200">
-                    Early access with special benefits for founding communities
+                    Professional event infrastructure with special benefits for founding communities
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -441,22 +500,22 @@ export default function ContactPage() {
                     <li className="flex items-start">
                       <Sparkles className="h-5 w-5 text-purple-400 mr-3 mt-0.5 flex-shrink-0" />
                       <div>
-                        <p className="font-medium text-white">Full Platform Access</p>
-                        <p className="text-sm text-gray-300">All features at beta pricing</p>
+                        <p className="font-medium text-white">Complete Platform Access</p>
+                        <p className="text-sm text-gray-300">All RSVP and venue coordination features at validated $15/month pricing</p>
                       </div>
                     </li>
                     <li className="flex items-start">
                       <Users className="h-5 w-5 text-purple-400 mr-3 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium text-white">1-on-1 Onboarding</p>
-                        <p className="text-sm text-gray-300">Personal setup and training</p>
+                        <p className="text-sm text-gray-300">Personal setup optimized for your specific recurring events</p>
                       </div>
                     </li>
                     <li className="flex items-start">
                       <MessageCircle className="h-5 w-5 text-purple-400 mr-3 mt-0.5 flex-shrink-0" />
                       <div>
                         <p className="font-medium text-white">Direct Product Input</p>
-                        <p className="text-sm text-gray-300">Help shape the platform's future</p>
+                        <p className="text-sm text-gray-300">Help shape features specifically for club organizers</p>
                       </div>
                     </li>
                   </ul>
@@ -472,19 +531,19 @@ export default function ContactPage() {
                   <div>
                     <p className="font-medium mb-1 text-white">How quickly will you respond?</p>
                     <p className="text-sm text-gray-300">
-                      We respond to all inquiries within 24 hours, usually much faster.
+                      We respond to all inquiries within 24 hours, usually much faster during business hours.
                     </p>
                   </div>
                   <div>
-                    <p className="font-medium mb-1 text-white">Is there a cost for the beta?</p>
+                    <p className="font-medium mb-1 text-white">What does beta access cost?</p>
                     <p className="text-sm text-gray-300">
-                      Beta pricing starts at $15/month with special early-adopter benefits.
+                      Beta pricing is $15/month + standard processing fees for paid events. Free events only pay the monthly fee.
                     </p>
                   </div>
                   <div>
-                    <p className="font-medium mb-1 text-white">What if I need help getting started?</p>
+                    <p className="font-medium mb-1 text-white">Do you understand recurring events?</p>
                     <p className="text-sm text-gray-300">
-                      Every beta member gets 1-on-1 onboarding and ongoing support.
+                      Yes! Our team specifically focuses on club organizers and recurring event challenges, not one-off corporate events.
                     </p>
                   </div>
                 </CardContent>
@@ -524,7 +583,7 @@ export default function ContactPage() {
             Other Ways to Connect
           </h2>
           <p className="text-gray-200 mb-8">
-            Choose the method that works best for you
+            Choose the method that works best for your organizing style
           </p>
           
           <div className="grid md:grid-cols-2 gap-6">
@@ -538,7 +597,7 @@ export default function ContactPage() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-white">Help Center</p>
-                    <p className="text-sm text-gray-300">Browse FAQs and guides</p>
+                    <p className="text-sm text-gray-300">Browse FAQs and guides specific to recurring events</p>
                   </div>
                 </div>
               </Link>

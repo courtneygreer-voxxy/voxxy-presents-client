@@ -53,13 +53,13 @@ export default function ProductsPage() {
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tight">
             Complete Solutions for{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-            Communities
+            Event Organizers
             </span>
           </h1>
           
           <p className="text-xl text-gray-200 mb-12 max-w-3xl mx-auto">
-            From social outings to community planning tools - discover the full suite 
-            of products designed to help communities thrive.
+            From individual dining decisions to professional event infrastructure - discover the full suite
+            of products designed to help people spend more time together.
           </p>
         </div>
       </section>
@@ -77,38 +77,38 @@ export default function ProductsPage() {
                   Voxxy Presents
                 </h2>
                 <p className="text-lg text-gray-200 mb-6">
-                  The complete community management platform for creative organizers everywhere. 
-                  Professional tools handle white-labeled event pages, automated billing, and partnerships - 
-                  everything you need to scale your community.
+                  Complete event infrastructure for club organizers running recurring events.
+                  Professional RSVP management, venue coordination, and promotion tools handle the logistics
+                  so you can focus on creating experiences.
                 </p>
                 
                 <div className="grid md:grid-cols-2 gap-4 mb-8">
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-white">Custom Event Pages</p>
-                      <p className="text-sm text-gray-300">White-labeled community presence</p>
+                      <p className="font-medium text-white">Smart RSVP Management</p>
+                      <p className="text-sm text-gray-300">Convert "maybe" responses to confirmed attendance</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-white">Revenue Tools</p>
-                      <p className="text-sm text-gray-300">Subscriptions & payments</p>
+                      <p className="font-medium text-white">Venue Coordination Hub</p>
+                      <p className="text-sm text-gray-300">Automated guest list sharing and capacity management</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-white">Venue Network</p>
-                      <p className="text-sm text-gray-300">Partnership network access</p>
+                      <p className="font-medium text-white">Promotion Automation</p>
+                      <p className="text-sm text-gray-300">Newsletter and social media tools that connect</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-3">
                     <CheckCircle className="h-5 w-5 text-green-300 mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="font-medium text-white">Analytics</p>
-                      <p className="text-sm text-gray-300">Growth insights & reporting</p>
+                      <p className="font-medium text-white">Recurring Event Series</p>
+                      <p className="text-sm text-gray-300">Monthly pop-ups and weekly events made simple</p>
                     </div>
                   </div>
                 </div>
@@ -132,8 +132,8 @@ export default function ProductsPage() {
                     <Users className="h-16 w-16 text-purple-400 mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2 text-white">Community First</h3>
                     <p className="text-gray-200 text-sm">
-                      Built specifically for creative community organizers who want professional tools to handle 
-                      coordination without losing the personal touch that makes their communities special.
+                      Built specifically for club organizers running recurring events who want professional infrastructure
+                      without enterprise complexity or pricing.
                     </p>
                   </div>
                 </CardContent>
@@ -148,8 +148,8 @@ export default function ProductsPage() {
                     <Smartphone className="h-16 w-16 text-blue-300 mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2 text-white">Mobile Experience</h3>
                     <p className="text-gray-200 text-sm">
-                      Native mobile apps for iOS and Android that bring your community 
-                      experience directly to your members' pockets.
+                      The starting point for social planning - where individuals discover experiences
+                      they can share with their communities.
                     </p>
                   </div>
                 </CardContent>
@@ -157,43 +157,42 @@ export default function ProductsPage() {
 
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <Badge className="bg-blue-500/20 border border-blue-400/30 text-blue-300">Coming Soon</Badge>
+                  <Badge className="bg-blue-500/20 border border-blue-400/30 text-blue-300">Available Now</Badge>
                   <Badge className="bg-white/10 backdrop-blur-sm border border-white/20 text-gray-200 text-xs">
-                    <Clock className="h-3 w-3 mr-1" />
-                    2025 Q2
+                    iPhone
                   </Badge>
                 </div>
                 <h2 className="text-3xl font-bold text-white mb-4">
                   Voxxy Mobile
                 </h2>
                 <p className="text-lg text-gray-200 mb-6">
-                  Dedicated mobile apps that give your community members a seamless, 
-                  native experience for event registration, community messaging, 
-                  and staying connected on the go.
+                  AI-powered restaurant discovery for friend groups who struggle with dining decisions.
+                  Helps individuals find great spots to share with their groups, supporting the entire ecosystem of social planning.
                 </p>
                 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                    <span className="text-gray-200">Push notifications for events and updates</span>
+                    <span className="text-gray-200">AI-powered restaurant recommendations</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                    <span className="text-gray-200">Offline event information and schedules</span>
+                    <span className="text-gray-200">Friend group dining coordination</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                    <span className="text-gray-200">In-app community messaging and forums</span>
+                    <span className="text-gray-200">Social sharing and planning tools</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-blue-300 rounded-full"></div>
-                    <span className="text-gray-200">Quick event check-ins and QR codes</span>
+                    <span className="text-gray-200">Saves time on "where should we eat?" decisions</span>
                   </div>
                 </div>
 
-                <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white cursor-not-allowed opacity-50" disabled>
-                  <Clock className="mr-2 h-4 w-4" />
-                  Coming Q2 2025
+                <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
+                  <a href="https://apps.apple.com/us/app/voxxy/id6499627309" target="_blank" rel="noopener noreferrer">
+                    Download for iPhone
+                  </a>
                 </Button>
               </div>
             </div>
@@ -212,27 +211,26 @@ export default function ProductsPage() {
                   Voxxy Planner
                 </h2>
                 <p className="text-lg text-gray-200 mb-6">
-                  Advanced event planning and resource management tools for larger 
-                  creative organizations. Budget tracking, vendor management, 
-                  and collaborative planning workflows.
+                  Advanced trip and experience planning tools for groups who want to coordinate
+                  complex social experiences. The natural evolution from individual discovery to group execution.
                 </p>
                 
                 <div className="space-y-3 mb-8">
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-                    <span className="text-gray-200">Budget planning and expense tracking</span>
+                    <span className="text-gray-200">Group trip planning and coordination</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-                    <span className="text-gray-200">Vendor and supplier relationship management</span>
+                    <span className="text-gray-200">Complex event planning workflows</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-                    <span className="text-gray-200">Team collaboration and task assignment</span>
+                    <span className="text-gray-200">Budget tracking and expense management</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <div className="w-2 h-2 bg-orange-300 rounded-full"></div>
-                    <span className="text-gray-200">Advanced analytics and ROI reporting</span>
+                    <span className="text-gray-200">Collaborative planning tools</span>
                   </div>
                 </div>
 
@@ -248,8 +246,8 @@ export default function ProductsPage() {
                     <Calendar className="h-16 w-16 text-orange-300 mx-auto mb-4" />
                     <h3 className="font-bold text-lg mb-2 text-white">Enterprise Planning</h3>
                     <p className="text-gray-200 text-sm">
-                      For established creative organizations that need advanced planning tools 
-                      and want to scale their operations professionally.
+                      For groups and organizations ready to coordinate complex experiences and trips
+                      with professional planning tools.
                     </p>
                   </div>
                 </CardContent>
@@ -267,8 +265,8 @@ export default function ProductsPage() {
               Better Together
             </h2>
             <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-              Each Voxxy product works seamlessly with the others, creating a complete 
-              ecosystem for your creative community.
+              Each Voxxy product works seamlessly with the others, creating a complete
+              ecosystem for social planning and community building.
             </p>
           </div>
 
@@ -279,27 +277,27 @@ export default function ProductsPage() {
                   <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Users className="h-8 w-8 text-purple-300" />
                   </div>
-                  <h3 className="font-bold mb-2 text-white">Start with Presents</h3>
+                  <h3 className="font-bold mb-2 text-white">Start with Mobile</h3>
                   <p className="text-gray-200 text-sm">
-                    Build your community foundation with event management and member engagement
+                    Individuals discover experiences and build social planning habits
                   </p>
                 </div>
                 <div>
                   <div className="w-16 h-16 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Smartphone className="h-8 w-8 text-blue-300" />
                   </div>
-                  <h3 className="font-bold mb-2 text-white">Add Mobile</h3>
+                  <h3 className="font-bold mb-2 text-white">Scale with Presents</h3>
                   <p className="text-gray-200 text-sm">
-                    Enhance engagement with native mobile apps for your community members
+                    Organizers get professional infrastructure for recurring community events
                   </p>
                 </div>
                 <div>
                   <div className="w-16 h-16 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Calendar className="h-8 w-8 text-orange-300" />
                   </div>
-                  <h3 className="font-bold mb-2 text-white">Scale with Planner</h3>
+                  <h3 className="font-bold mb-2 text-white">Expand with Planner</h3>
                   <p className="text-gray-200 text-sm">
-                    Grow into advanced planning tools as your organization expands
+                    Advanced coordination tools for complex group experiences
                   </p>
                 </div>
               </div>
@@ -318,7 +316,7 @@ export default function ProductsPage() {
             Ready to start your journey?
           </h2>
           <p className="text-lg text-gray-200 mb-8 max-w-2xl mx-auto">
-            Begin with Voxxy Presents and build the creative community of your dreams with your planner friend
+            Begin with Voxxy Presents and build sustainable recurring events with professional infrastructure
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>

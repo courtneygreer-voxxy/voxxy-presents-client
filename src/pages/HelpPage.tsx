@@ -30,49 +30,49 @@ export default function HelpPage() {
 
   const faqItems: FAQItem[] = [
     {
-      question: "What is included in the beta program?",
-      answer: "The beta program includes full access to all Voxxy Presents features, priority customer support, direct input on product development, and special beta pricing. You'll work closely with our team to ensure the platform meets your community's specific needs.",
+      question: "What is included in the beta program for club organizers?",
+      answer: "The beta program includes full access to all Voxxy Presents features including RSVP management, venue coordination tools, promotion automation, priority customer support, direct input on product development, and validated beta pricing at $15/month.",
       category: "Getting Started"
     },
     {
-      question: "How quickly can I set up my community?",
-      answer: "Most organizers have their basic community setup within 24 hours. Our onboarding process includes a 1-on-1 setup call, template selection, and migration assistance if you're moving from another platform. Complex customizations may take 2-3 business days.",
+      question: "How quickly can I set up my recurring events?",
+      answer: "Most club organizers have their recurring event series set up within 24 hours. Our onboarding process includes a 1-on-1 setup call, event template selection, and migration assistance if you're moving from Eventbrite or other platforms.",
       category: "Getting Started"
     },
     {
-      question: "Can I customize the branding to match my community?",
-      answer: "Absolutely! Voxxy Presents is white-labeled, meaning your community pages will showcase your brand, not ours. You can customize colors, logos, fonts, and even use a custom domain. We want your community to feel authentically yours.",
-      category: "Customization"
+      question: "How does the \"maybe\" conversion system work?",
+      answer: "Our smart follow-up sequences automatically reach out to \"maybe\" respondents with personalized messages based on their engagement history. Most organizers see 40-60% conversion from \"maybe\" to \"yes\" with our automated system.",
+      category: "RSVP Management"
     },
     {
-      question: "How does the venue partnership network work?",
-      answer: "We're building partnerships with creative spaces and venues. Through your dashboard, you can browse available venues, check availability, and book directly. Our network includes art studios, event spaces, galleries, and community centers.",
-      category: "Features"
+      question: "Can this work for free events?",
+      answer: "Absolutely! The $15/month covers all RSVP management for free events. You only pay processing fees if you're collecting money. Most community events are free and that's perfectly fine.",
+      category: "RSVP Management"
     },
     {
-      question: "What payment methods do you support?",
-      answer: "We integrate with Stripe to support all major credit cards, ACH transfers, and digital wallets like Apple Pay and Google Pay. You can also set up sliding scale pricing to make your events accessible to all community members.",
-      category: "Billing"
+      question: "How does automated guest list sharing work?",
+      answer: "Once you connect a venue partnership, we automatically share confirmed guest lists, track capacity in real-time, and handle communication about changes. Venues love it because they get clean data without constant email back-and-forth.",
+      category: "Venue Coordination"
     },
     {
-      question: "How do recurring events work?",
-      answer: "Set up your recurring events once (weekly art classes, monthly meetups, etc.) and we handle all the scheduling, registration, and reminders automatically. You can customize individual events in the series or pause/resume as needed.",
-      category: "Features"
+      question: "What's included in the venue discovery network?",
+      answer: "We're building partnerships with creative spaces, community centers, galleries, and event venues that specifically want recurring community events. You can browse availability, read organizer reviews, and book directly through the platform.",
+      category: "Venue Coordination"
     },
     {
-      question: "Can I migrate my existing member list?",
-      answer: "Yes! We provide migration assistance to help you import your existing member data from spreadsheets, Eventbrite, Meetup, or other platforms. We'll work with you during onboarding to ensure a smooth transition.",
-      category: "Getting Started"
+      question: "Why $15/month instead of per-event pricing?",
+      answer: "Recurring event organizers told us per-event pricing makes it impossible to budget and plan ahead. $15/month covers all your events - whether you host weekly, monthly, or seasonally. It's validated pricing that works for community builders.",
+      category: "Pricing"
     },
     {
-      question: "What kind of support do you provide?",
-      answer: "Beta members get priority support via email and scheduled calls. We also provide comprehensive documentation, video tutorials, and a getting-started guide. Most questions are answered within 4 hours during business days.",
+      question: "Are there any hidden fees beyond the $15/month?",
+      answer: "No hidden fees. If you collect money for events, standard payment processing fees apply (same rates as Stripe). For free events, it's just the monthly fee. No per-attendee charges, no setup fees, no surprises.",
+      category: "Pricing"
+    },
+    {
+      question: "Do you understand recurring events?",
+      answer: "Yes! Our team specifically focuses on club organizers and recurring event challenges, not one-off corporate events.",
       category: "Support"
-    },
-    {
-      question: "Is there a minimum commitment?",
-      answer: "No long-term contracts required during the beta program. You can cancel at any time. We believe in earning your business through great service and results, not binding contracts.",
-      category: "Billing"
     },
     {
       question: "How do you handle member data and privacy?",
@@ -136,7 +136,7 @@ export default function HelpPage() {
           </h1>
           
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Find answers to common questions, access our getting started guide, 
+            Find answers to common questions, access our getting started guide for recurring events,
             or get in touch with our support team.
           </p>
 
@@ -165,7 +165,7 @@ export default function HelpPage() {
                 </div>
                 <CardTitle className="text-white">Getting Started Guide</CardTitle>
                 <CardDescription className="text-gray-200">
-                  Complete walkthrough for setting up your first community
+                  Complete walkthrough for setting up your first recurring event series
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -183,7 +183,7 @@ export default function HelpPage() {
                 </div>
                 <CardTitle className="text-white">Schedule a Call</CardTitle>
                 <CardDescription className="text-gray-200">
-                  Book a 1-on-1 session with our customer success team
+                  Book a 1-on-1 session with our customer success team who understand club organizing
                 </CardDescription>
               </CardHeader>
               <CardContent className="text-center">
@@ -227,7 +227,7 @@ export default function HelpPage() {
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-gray-200">
-              Quick answers to common questions from community organizers
+              Quick answers to common questions from club organizers and recurring event hosts
             </p>
           </div>
 
@@ -289,10 +289,10 @@ export default function HelpPage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Additional Resources
+              Resources for Club Organizers
             </h2>
             <p className="text-lg text-gray-200">
-              Dive deeper into specific topics
+              Best practices and guides for successful recurring events
             </p>
           </div>
 
@@ -300,16 +300,16 @@ export default function HelpPage() {
             <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-lg">
               <CardHeader>
                 <Users className="h-8 w-8 text-purple-400 mb-3" />
-                <CardTitle className="text-white">Community Management</CardTitle>
+                <CardTitle className="text-white">RSVP Management</CardTitle>
                 <CardDescription className="text-gray-200">
-                  Best practices for growing and engaging your creative community
+                  Proven strategies for improving attendance at recurring events
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="text-sm space-y-2 text-gray-300">
-                  <li>• Member onboarding strategies</li>
-                  <li>• Engagement tactics that work</li>
-                  <li>• Building community guidelines</li>
+                  <li>• Converting "maybe" responses effectively</li>
+                  <li>• Reducing no-shows for community events</li>
+                  <li>• Building reliable attendance patterns</li>
                 </ul>
               </CardContent>
             </Card>
@@ -317,16 +317,16 @@ export default function HelpPage() {
             <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-lg">
               <CardHeader>
                 <CreditCard className="h-8 w-8 text-green-400 mb-3" />
-                <CardTitle className="text-white">Revenue & Pricing</CardTitle>
+                <CardTitle className="text-white">Venue Relationships</CardTitle>
                 <CardDescription className="text-gray-200">
-                  Strategies for sustainable community monetization
+                  Building sustainable partnerships with event spaces
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="text-sm space-y-2 text-gray-300">
-                  <li>• Pricing models that work</li>
-                  <li>• Sliding scale implementation</li>
-                  <li>• Subscription management</li>
+                  <li>• Negotiating recurring event partnerships</li>
+                  <li>• Managing venue communication professionally</li>
+                  <li>• Finding community-friendly spaces</li>
                 </ul>
               </CardContent>
             </Card>
@@ -334,16 +334,16 @@ export default function HelpPage() {
             <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 hover:border-white/30 transition-all duration-300 shadow-lg">
               <CardHeader>
                 <BookOpen className="h-8 w-8 text-blue-400 mb-3" />
-                <CardTitle className="text-white">Event Planning</CardTitle>
+                <CardTitle className="text-white">Event Series Planning</CardTitle>
                 <CardDescription className="text-gray-200">
-                  Tools and tips for successful creative events
+                  Scaling from single events to recurring series
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="text-sm space-y-2 text-gray-300">
-                  <li>• Venue selection guide</li>
-                  <li>• Event promotion strategies</li>
-                  <li>• Managing registrations</li>
+                  <li>• Monthly pop-up event strategies</li>
+                  <li>• Weekly programming that builds community</li>
+                  <li>• Seasonal event planning</li>
                 </ul>
               </CardContent>
             </Card>
@@ -358,7 +358,7 @@ export default function HelpPage() {
             Still need help?
           </h2>
           <p className="text-lg text-gray-200 mb-8">
-            Our team is here to help you succeed. Get in touch for personalized support.
+            Our team understands recurring events and community building. Get in touch for personalized support.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" asChild>

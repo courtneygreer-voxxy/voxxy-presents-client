@@ -174,14 +174,14 @@ export default function HomePage() {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
-            Community{" "}
+            Complete{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Management for Organizers
+              Event Infrastructure for Club Organizers
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
-            Handle event coordination, member engagement, and ticketing from one platform so you can focus on creating meaningful experiences
+            RSVP management, venue coordination, and promotion tools in one platform - so you can focus on creating experiences, not juggling logistics
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -208,53 +208,53 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Community Building is Broken
+              Event Coordination is Broken
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Organizers everywhere face the same challenges
+              Club organizers everywhere face the same recurring challenges
             </p>
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Breaking Through the Noise</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">"Maybe" RSVPs Kill Planning</h3>
               <p className="text-gray-300">
-                Crowded social platforms and event sites make it impossible to reach your community effectively
+                Soft commits make venue coordination and capacity planning impossible to manage
               </p>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Complex Event Management</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">Venue Coordination Nightmare</h3>
               <p className="text-gray-300">
-                Managing event series without Eventbrite's overwhelming complexity and fees
+                Manually sharing guest lists, tracking capacity changes, constant email back-and-forth with venue staff
               </p>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Lightweight Ticketing</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">Promotion Scattered Everywhere</h3>
               <p className="text-gray-300">
-                Need simple ticket management for individuals and groups without enterprise overhead
+                Instagram posts, newsletter emails, word-of-mouth - nothing connects or tracks effectively
               </p>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Platform Juggling</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">Free Event Tools Don't Scale</h3>
               <p className="text-gray-300">
-                Managing events across multiple platforms creates confusion and missed opportunities
+                Eventbrite works for one-offs but breaks down for recurring club events and series management
               </p>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Member Engagement</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">Manual Contact Management</h3>
               <p className="text-gray-300">
-                Keeping recurring members engaged between events without constant manual outreach
+                Pulling emails from multiple sources, no automated follow-up or member engagement
               </p>
             </div>
             
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Last-Minute Dropoffs</h3>
+              <h3 className="text-lg font-semibold text-purple-400 mb-3">No Venue Network</h3>
               <p className="text-gray-300">
-                Unpredictable attendance affecting revenue and venue planning
+                Starting from scratch to find spaces for every event, no relationship management
               </p>
             </div>
           </div>
@@ -266,10 +266,10 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Meet Your Community Assistant
+              Built for Recurring Event Organizers
             </h2>
             <p className="text-xl text-gray-200 max-w-2xl mx-auto">
-              Designed for community organizers everywhere. Voxxy does the work, not just provides tools.
+              Designed specifically for club organizers. Voxxy handles the logistics, you focus on the experience.
             </p>
           </div>
           
@@ -278,9 +278,9 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Sparkles className="h-6 w-6 text-purple-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Branded Community Pages</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Smart RSVP Management</h3>
               <p className="text-gray-300">
-                Showcase your unique identity with custom pages that reflect your community's personality
+                Convert "maybes" to "yes" with automated follow-up sequences and attendance prediction
               </p>
             </div>
             
@@ -288,9 +288,9 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Calendar className="h-6 w-6 text-blue-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Cross-Platform Management</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Venue Integration Hub</h3>
               <p className="text-gray-300">
-                Manage all your events from one place, no more juggling multiple platforms
+                Automated guest list sharing, capacity tracking, and streamlined venue communication
               </p>
             </div>
             
@@ -298,9 +298,9 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-green-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Smart Ticket Management</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Integrated Promotion Tools</h3>
               <p className="text-gray-300">
-                Easy purchasing for individuals and groups with intelligent pricing and automation
+                Newsletter automation, social media scheduling, and word-of-mouth referral tracking
               </p>
             </div>
             
@@ -308,9 +308,9 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-pink-500/20 backdrop-blur-sm border border-pink-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-pink-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Member Engagement Tools</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Recurring Event Series</h3>
               <p className="text-gray-300">
-                Keep your community connected between events with automated engagement features
+                Set up your monthly pop-ups or weekly events once, manage them forever
               </p>
             </div>
             
@@ -318,9 +318,19 @@ export default function HomePage() {
               <div className="w-12 h-12 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-lg flex items-center justify-center mb-4">
                 <ArrowRight className="h-6 w-6 text-indigo-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Revenue Optimization</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Member Database & Engagement</h3>
               <p className="text-gray-300">
-                Turn your passion into sustainable income with AI-powered revenue insights
+                Contact management across all events with automated member engagement between events
+              </p>
+            </div>
+
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="w-12 h-12 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-lg flex items-center justify-center mb-4">
+                <MapPin className="h-6 w-6 text-orange-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Venue Discovery Network</h3>
+              <p className="text-gray-300">
+                Access curated spaces that actively want recurring community events
               </p>
             </div>
           </div>
@@ -332,33 +342,33 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Community Organizers Choose Voxxy
+              Club Organizers Choose Voxxy
             </h2>
             <p className="text-xl text-gray-200">
-              Join the community organizers everywhere already building with Voxxy Presents
+              Join the recurring event organizers already building sustainable communities with Voxxy Presents
             </p>
           </div>
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="text-4xl mb-4">🎨</div>
-              <h3 className="font-semibold mb-2 text-white">Art Collectives</h3>
-              <p className="text-gray-300 text-sm">
-                "Finally, tools that understand our creative process and help us focus on what matters - the art."
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="text-4xl mb-4">🎭</div>
-              <h3 className="font-semibold mb-2 text-white">Cultural Events</h3>
-              <p className="text-gray-300 text-sm">
-                "Voxxy helped us turn our passion project into a sustainable community business."
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
               <div className="text-4xl mb-4">🎵</div>
-              <h3 className="font-semibold mb-2 text-white">Music Venues</h3>
+              <h3 className="font-semibold mb-2 text-white">Vinyl Listening Clubs</h3>
               <p className="text-gray-300 text-sm">
-                "The white-label approach means our brand stays front and center while Voxxy handles the tech."
+                "Voxxy turned our maybe RSVPs into actual attendees. Our Dumbo House events now consistently hit capacity."
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="text-4xl mb-4">🎉</div>
+              <h3 className="font-semibold mb-2 text-white">Pop-up Event Series</h3>
+              <p className="text-gray-300 text-sm">
+                "No more venue coordination headaches - Voxxy handles all the guest list sharing automatically so we can focus on programming."
+              </p>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="text-4xl mb-4">🤝</div>
+              <h3 className="font-semibold mb-2 text-white">Community Event Organizers</h3>
+              <p className="text-gray-300 text-sm">
+                "We went from 20% no-shows to 95% attendance with their RSVP management tools. Game changer for free events."
               </p>
             </div>
           </div>
@@ -369,10 +379,10 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to let AI handle your event coordination?
+            Ready to let AI handle your event logistics?
           </h2>
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Join community organizers everywhere who are building sustainable businesses with Voxxy
+            Join club organizers everywhere who are building sustainable recurring events with Voxxy
           </p>
           <Link
             to="/contact"
@@ -391,8 +401,8 @@ export default function HomePage() {
             <div className="md:col-span-1">
               <h3 className="text-2xl font-bold text-purple-400 mb-4">Voxxy Presents</h3>
               <p className="text-gray-300 mb-4 max-w-md">
-                Community management tools for organizers everywhere. 
-                Focus on building community, we'll handle the coordination.
+                Event infrastructure for recurring club organizers.
+                Focus on building community experiences, we'll handle the coordination logistics.
               </p>
             </div>
             <div>
