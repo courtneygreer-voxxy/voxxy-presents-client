@@ -13,7 +13,7 @@ if (MIXPANEL_TOKEN && isProductionEnvironment) {
     debug: false, // Always false in production
     track_pageview: false, // We'll handle this manually
     persistence: 'localStorage',
-    api_host: 'https://api-eu.mixpanel.com', // EU endpoint for privacy compliance
+    api_host: 'https://api.mixpanel.com', // US endpoint for US-based project
   });
   console.log('Mixpanel analytics initialized for production environment');
 } else {
