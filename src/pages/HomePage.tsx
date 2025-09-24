@@ -470,7 +470,7 @@ export default function HomePage() {
       <section className="py-20 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl font-bold text-white mb-4">
-            Ready to let AI handle your event logistics?
+            Ready to let Voxxy handle your event logistics?
           </h2>
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
             Join club organizers everywhere who are building sustainable recurring events with Voxxy

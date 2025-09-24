@@ -163,18 +163,23 @@ export interface User {
   email: string
   name?: string
   role: 'admin' | 'organizer' | 'user'
-  
+
+  // Beta Access Control
+  betaStatus: 'pending' | 'approved' | 'denied'
+  betaRequestedAt?: Date
+  betaApprovedAt?: Date
+  betaApprovedBy?: string // Admin user ID who approved
+
   // Profile
   profilePicture?: string
   background?: string
-  
+
   // Permissions
   organizationIds: string[] // Organizations they can manage
-  
-  
+
   // Settings
   emailNotifications: boolean
-  
+
   createdAt: Date
   updatedAt: Date
 }

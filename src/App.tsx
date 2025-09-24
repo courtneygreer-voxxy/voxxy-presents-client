@@ -3,7 +3,9 @@ import { useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
+import { BetaAccessGuard } from './components/auth/BetaAccessGuard'
 import HomePage from './pages/HomePage'
+import BetaPendingPage from './pages/BetaPendingPage'
 import OrganizationPublic from './pages/OrganizationPublic'
 import OrganizationAdminEnhanced from './pages/OrganizationAdminEnhanced'
 import AdminDashboard from './pages/AdminDashboard'
@@ -58,41 +60,58 @@ export default function App() {
               <LoginPage />
             </RedirectIfAuthenticated>
           } />
-          
-          {/* Protected routes - require authentication */}
+
+          {/* Beta pending page */}
+          <Route path="/beta-pending" element={<BetaPendingPage />} />
+
+          {/* Protected routes - require authentication and beta access */}
           <Route path="/profile" element={
             <ProtectedRoute>
-              <ProfilePage />
+              <BetaAccessGuard>
+                <ProfilePage />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/voxxy-shop" element={
             <ProtectedRoute>
-              <VoxxyShop />
+              <BetaAccessGuard>
+                <VoxxyShop />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/voxxy-shop/venues" element={
             <ProtectedRoute>
-              <VenueSearchPortal />
+              <BetaAccessGuard>
+                <VenueSearchPortal />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/create-club" element={
             <ProtectedRoute requireEmailVerification={true}>
-              <CreateClubPage />
+              <BetaAccessGuard>
+                <CreateClubPage />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/:orgSlug/admin" element={
             <ProtectedRoute>
-              <OrganizationAdminEnhanced />
+              <BetaAccessGuard>
+                <OrganizationAdminEnhanced />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/:orgSlug/create-event" element={
             <ProtectedRoute>
-              <CreateEventPage />
+              <BetaAccessGuard>
+                <CreateEventPage />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           <Route path="/:orgSlug/edit-event/:eventId" element={
             <ProtectedRoute>
-              <EditEventPage />
+              <BetaAccessGuard>
+                <EditEventPage />
+              </BetaAccessGuard>
             </ProtectedRoute>
           } />
           {/* Admin routes */}

@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { organizationsRef } from '@/lib/database'
 import { getDocs, query, where } from 'firebase/firestore'
 import type { Organization } from '@/types/database'
+import BetaUsersManagement from '@/components/admin/BetaUsersManagement'
 
 interface ContactSubmission {
   id: string
@@ -307,13 +308,19 @@ export default function AdminDashboard() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="email" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+        <Tabs defaultValue="beta" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="beta">Beta Users</TabsTrigger>
             <TabsTrigger value="email">Email Analytics</TabsTrigger>
             <TabsTrigger value="tickets">Ticket Validation</TabsTrigger>
             <TabsTrigger value="ticket-management">Ticket Management</TabsTrigger>
             <TabsTrigger value="clubs">Club Management</TabsTrigger>
           </TabsList>
+
+          {/* Beta Users Tab */}
+          <TabsContent value="beta" className="space-y-6">
+            <BetaUsersManagement />
+          </TabsContent>
 
           {/* Email Analytics Tab */}
           <TabsContent value="email" className="space-y-6">
