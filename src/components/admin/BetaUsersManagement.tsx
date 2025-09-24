@@ -19,8 +19,6 @@ import {
   UserX
 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { collection, query, where, getDocs, doc, updateDoc, Timestamp } from 'firebase/firestore'
-import { db } from '@/lib/firebase'
 import type { User } from '@/types/database'
 
 interface BetaUser extends User {
@@ -35,58 +33,64 @@ export default function BetaUsersManagement() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'denied'>('all')
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
 
-  // Load beta users
+  // Load beta users from API
   const loadBetaUsers = async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const usersRef = collection(db, 'users')
-      const q = query(usersRef) // Get all users, we'll filter on the frontend for now
-      const querySnapshot = await getDocs(q)
-
-      const users: BetaUser[] = []
-      querySnapshot.forEach((doc) => {
-        const userData = doc.data()
-        users.push({
-          id: doc.id,
-          ...userData,
-          createdAt: userData.createdAt?.toDate() || new Date(),
-          updatedAt: userData.updatedAt?.toDate() || new Date(),
-          betaRequestedAt: userData.betaRequestedAt?.toDate() || undefined,
-          betaApprovedAt: userData.betaApprovedAt?.toDate() || undefined,
-        } as BetaUser)
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/admin/users`, {
+        headers: {
+          'x-admin-key': 'voxxy-admin-2024', // Should match API expected key
+          'Content-Type': 'application/json'
+        }
       })
 
-      // Sort by creation date, newest first
-      users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
 
-      setBetaUsers(users)
+      const data = await response.json()
+
+      if (!data.success) {
+        throw new Error(data.error || 'Failed to load users')
+      }
+
+      setBetaUsers(data.users || [])
     } catch (err) {
       console.error('Error loading beta users:', err)
-      setError('Failed to load beta users')
+      setError(err instanceof Error ? err.message : 'Failed to load beta users')
     } finally {
       setLoading(false)
     }
   }
 
-  // Update user beta status
+  // Update user beta status via API
   const updateBetaStatus = async (userId: string, status: 'approved' | 'denied') => {
     setUpdatingUserId(userId)
 
     try {
-      const userRef = doc(db, 'users', userId)
-      const updateData: any = {
-        betaStatus: status,
-        updatedAt: Timestamp.now()
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/beta-status`, {
+        method: 'PUT',
+        headers: {
+          'x-admin-key': 'voxxy-admin-2024',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP ${response.status}`)
       }
 
-      if (status === 'approved') {
-        updateData.betaApprovedAt = Timestamp.now()
-        updateData.betaApprovedBy = 'admin' // Could be the current admin user ID
-      }
+      const result = await response.json()
 
-      await updateDoc(userRef, updateData)
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to update status')
+      }
 
       // Update local state
       setBetaUsers(prevUsers =>
@@ -102,12 +106,11 @@ export default function BetaUsersManagement() {
         )
       )
 
-      // TODO: Send approval/denial email notification
       console.log(`Beta ${status} for user ${userId}`)
 
     } catch (err) {
       console.error(`Error updating beta status:`, err)
-      setError(`Failed to ${status} user`)
+      setError(err instanceof Error ? err.message : `Failed to ${status} user`)
     } finally {
       setUpdatingUserId(null)
     }
