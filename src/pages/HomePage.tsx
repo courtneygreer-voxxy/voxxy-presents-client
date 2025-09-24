@@ -20,7 +20,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-2"
+        className="absolute inset-0 opacity-1"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
@@ -243,14 +243,14 @@ export default function HomePage() {
           </div>
           
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight">
-            Complete{" "}
+            Recurring {" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Event Infrastructure for Club Organizers
+            Event Platform Building Real Communities
             </span>
           </h1>
           
           <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
-            RSVP management, venue coordination, and promotion tools in one platform - so you can focus on creating experiences, not juggling logistics
+            Recurring event management tools that help club organizers build sustainable communities with consistent attendance and engaged members.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
