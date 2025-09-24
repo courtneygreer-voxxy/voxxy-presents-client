@@ -10,22 +10,11 @@ const isProductionEnvironment = ENVIRONMENT === 'production';
 
 if (MIXPANEL_TOKEN && isProductionEnvironment) {
   mixpanel.init(MIXPANEL_TOKEN, {
-    debug: true, // Enable debug mode to see events in console
-    track_pageview: false, // We'll handle this manually
+    debug: false,
+    track_pageview: false,
     persistence: 'localStorage',
-    api_host: 'https://api.mixpanel.com', // US endpoint for US-based project
+    api_host: 'https://api.mixpanel.com',
   });
-  console.log('🎯 Mixpanel analytics initialized for production environment');
-  console.log('🔑 Token:', MIXPANEL_TOKEN);
-  console.log('🌐 API Host:', 'https://api.mixpanel.com');
-} else {
-  if (isDevelopment) {
-    console.log('Analytics disabled - development environment');
-  } else if (!isProductionEnvironment) {
-    console.log(`Analytics disabled - ${ENVIRONMENT || 'unknown'} environment`);
-  } else {
-    console.warn('Mixpanel token not found. Analytics tracking disabled.');
-  }
 }
 
 // Types for event properties
@@ -115,10 +104,7 @@ class Analytics {
 
   // Core tracking methods
   track(eventName: string, properties?: Record<string, any>) {
-    if (!this.isEnabled) {
-      console.log('🚫 Analytics disabled, skipping event:', eventName);
-      return;
-    }
+    if (!this.isEnabled) return;
 
     try {
       const eventData = {
@@ -127,11 +113,9 @@ class Analytics {
         session_id: this.getSessionId(),
       };
 
-      console.log('📊 Sending event:', eventName, eventData);
       mixpanel.track(eventName, eventData);
-      console.log('✅ Event sent successfully');
     } catch (error) {
-      console.error('❌ Analytics tracking error:', error);
+      console.error('Analytics tracking error:', error);
     }
   }
 
