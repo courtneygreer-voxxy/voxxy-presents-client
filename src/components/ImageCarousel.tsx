@@ -65,7 +65,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
       <Button
         variant="ghost"
         size="sm"
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
         onClick={goToPrevious}
         aria-label="Previous image"
       >
@@ -75,7 +75,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
       <Button
         variant="ghost"
         size="sm"
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
         onClick={goToNext}
         aria-label="Next image"
       >

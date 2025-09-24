@@ -56,7 +56,7 @@ export default function VoxxyShop() {
   return (
     <div className="min-h-screen bg-gray-900 relative">
       {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-1">
+      <div className="absolute inset-0 opacity-[0.5]">
         <div 
           className="absolute inset-0 bg-repeat animate-pulse"
           style={{
