@@ -20,7 +20,7 @@ export default function HomePage() {
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-2"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
@@ -359,6 +359,51 @@ export default function HomePage() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* 1. Recurring Event Series - First */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="w-12 h-12 bg-pink-500/20 backdrop-blur-sm border border-pink-400/30 rounded-lg flex items-center justify-center mb-4">
+                <Calendar className="h-6 w-6 text-pink-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Recurring Event Series</h3>
+              <p className="text-gray-300">
+                Set up your monthly pop-ups or weekly events once, manage them forever
+              </p>
+            </div>
+
+            {/* 2. Member Database & Engagement - Second */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="w-12 h-12 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-lg flex items-center justify-center mb-4">
+                <Users className="h-6 w-6 text-indigo-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Member Database & Engagement</h3>
+              <p className="text-gray-300">
+                Contact management across all events with automated member engagement between events
+              </p>
+            </div>
+
+            {/* 3. Venue Integration Hub - Third */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="w-12 h-12 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center mb-4">
+                <ArrowRight className="h-6 w-6 text-blue-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Venue Integration Hub</h3>
+              <p className="text-gray-300">
+                Automated guest list sharing, capacity tracking, and streamlined venue communication
+              </p>
+            </div>
+
+            {/* 4. Venue Discovery Network - Fourth */}
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+              <div className="w-12 h-12 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-lg flex items-center justify-center mb-4">
+                <MapPin className="h-6 w-6 text-orange-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-3">Venue Discovery Network</h3>
+              <p className="text-gray-300">
+                Access curated spaces that actively want recurring community events
+              </p>
+            </div>
+
+            {/* 5. Smart RSVP Management - Fifth */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
               <div className="w-12 h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Sparkles className="h-6 w-6 text-purple-300" />
@@ -368,54 +413,15 @@ export default function HomePage() {
                 Convert "maybes" to "yes" with automated follow-up sequences and attendance prediction
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center mb-4">
-                <Calendar className="h-6 w-6 text-blue-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Venue Integration Hub</h3>
-              <p className="text-gray-300">
-                Automated guest list sharing, capacity tracking, and streamlined venue communication
-              </p>
-            </div>
-            
+
+            {/* 6. Budget Tools - Sixth (replacing Integrated Promotion Tools) */}
             <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
               <div className="w-12 h-12 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-green-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Integrated Promotion Tools</h3>
+              <h3 className="text-xl font-semibold text-white mb-3">Budget Management Tools</h3>
               <p className="text-gray-300">
-                Newsletter automation, social media scheduling, and word-of-mouth referral tracking
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-pink-500/20 backdrop-blur-sm border border-pink-400/30 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-pink-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Recurring Event Series</h3>
-              <p className="text-gray-300">
-                Set up your monthly pop-ups or weekly events once, manage them forever
-              </p>
-            </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-lg flex items-center justify-center mb-4">
-                <ArrowRight className="h-6 w-6 text-indigo-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Member Database & Engagement</h3>
-              <p className="text-gray-300">
-                Contact management across all events with automated member engagement between events
-              </p>
-            </div>
-
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="w-12 h-12 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-lg flex items-center justify-center mb-4">
-                <MapPin className="h-6 w-6 text-orange-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Venue Discovery Network</h3>
-              <p className="text-gray-300">
-                Access curated spaces that actively want recurring community events
+                Track event costs, venue fees, and revenue with automated expense reporting and budget planning
               </p>
             </div>
           </div>
