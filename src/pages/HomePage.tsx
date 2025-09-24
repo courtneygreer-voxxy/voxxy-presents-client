@@ -5,10 +5,16 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus, Menu, X } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
+import { usePageTracking } from "@/hooks/usePageTracking"
+import { TrackedLink } from "@/components/analytics/TrackedLink"
+import { TrackedButton } from "@/components/analytics/TrackedButton"
 
 export default function HomePage() {
   const { isAuthenticated, currentUser } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Track page views and engagement
+  usePageTracking('Home')
   
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
@@ -28,11 +34,66 @@ export default function HomePage() {
             Voxxy Presents
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <Link to="/features" className="text-gray-300 hover:text-purple-400 transition-colors">Features</Link>
-            <Link to="/pricing" className="text-gray-300 hover:text-purple-400 transition-colors">Pricing</Link>
-            <Link to="/products" className="text-gray-300 hover:text-purple-400 transition-colors">Products</Link>
-            <Link to="/help" className="text-gray-300 hover:text-purple-400 transition-colors">Help Center</Link>
-            <Link to="/contact" className="text-gray-300 hover:text-purple-400 transition-colors">Contact</Link>
+            <TrackedLink
+              to="/features"
+              className="text-gray-300 hover:text-purple-400 transition-colors"
+              trackingData={{
+                link_text: 'Features',
+                destination_page: 'Features',
+                current_page: 'Home',
+                link_position: 'header'
+              }}
+            >
+              Features
+            </TrackedLink>
+            <TrackedLink
+              to="/pricing"
+              className="text-gray-300 hover:text-purple-400 transition-colors"
+              trackingData={{
+                link_text: 'Pricing',
+                destination_page: 'Pricing',
+                current_page: 'Home',
+                link_position: 'header'
+              }}
+            >
+              Pricing
+            </TrackedLink>
+            <TrackedLink
+              to="/products"
+              className="text-gray-300 hover:text-purple-400 transition-colors"
+              trackingData={{
+                link_text: 'Products',
+                destination_page: 'Products',
+                current_page: 'Home',
+                link_position: 'header'
+              }}
+            >
+              Products
+            </TrackedLink>
+            <TrackedLink
+              to="/help"
+              className="text-gray-300 hover:text-purple-400 transition-colors"
+              trackingData={{
+                link_text: 'Help Center',
+                destination_page: 'Help',
+                current_page: 'Home',
+                link_position: 'header'
+              }}
+            >
+              Help Center
+            </TrackedLink>
+            <TrackedLink
+              to="/contact"
+              className="text-gray-300 hover:text-purple-400 transition-colors"
+              trackingData={{
+                link_text: 'Contact',
+                destination_page: 'Contact',
+                current_page: 'Home',
+                link_position: 'header'
+              }}
+            >
+              Contact
+            </TrackedLink>
           </div>
           <div className="flex items-center gap-4">
             {/* Desktop Navigation */}
@@ -61,13 +122,21 @@ export default function HomePage() {
                     <LogIn className="mr-2 h-4 w-4" />
                     Sign In
                   </Link>
-                  <Link
-                    to="/contact"
+                  <TrackedButton
                     className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg flex items-center"
+                    trackingData={{
+                      button_text: 'Request Beta Access',
+                      button_location: 'header',
+                      page_name: 'Home',
+                      is_primary_cta: true
+                    }}
+                    asChild
                   >
-                    <UserPlus className="mr-2 h-4 w-4" />
-                    Request Beta Access
-                  </Link>
+                    <Link to="/contact">
+                      <UserPlus className="mr-2 h-4 w-4" />
+                      Request Beta Access
+                    </Link>
+                  </TrackedButton>
                 </>
               )}
             </div>
@@ -185,20 +254,36 @@ export default function HomePage() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link
-              to="/contact"
+            <TrackedButton
               className="inline-flex items-center px-8 py-6 bg-purple-600 hover:bg-purple-700 text-white text-lg font-medium rounded-lg transition-colors duration-200"
+              trackingData={{
+                button_text: 'Request Paid Beta Access',
+                button_location: 'hero',
+                page_name: 'Home',
+                is_primary_cta: true
+              }}
+              asChild
             >
-              Request Paid Beta Access
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-            <Link
-              to="/contact"
+              <Link to="/contact">
+                Request Paid Beta Access
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </TrackedButton>
+            <TrackedButton
               className="inline-flex items-center px-8 py-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 text-lg font-medium rounded-lg"
+              trackingData={{
+                button_text: 'Get Product Updates',
+                button_location: 'hero',
+                page_name: 'Home',
+                is_primary_cta: false
+              }}
+              asChild
             >
-              Get Product Updates
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
+              <Link to="/contact">
+                Get Product Updates
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </TrackedButton>
           </div>
         </div>
       </section>

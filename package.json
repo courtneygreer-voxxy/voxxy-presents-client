@@ -66,6 +66,7 @@
     "geist": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
+    "mixpanel-browser": "^2.70.0",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",
     "react-day-picker": "latest",

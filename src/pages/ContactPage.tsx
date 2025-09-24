@@ -7,9 +7,9 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Mail, 
-  ArrowRight, 
+import {
+  Mail,
+  ArrowRight,
   CheckCircle,
   Users,
   Rocket,
@@ -19,6 +19,10 @@ import {
 import { Link } from "react-router-dom"
 import { contactFormApi, EmailServiceError } from "@/services/emailService"
 import { CreateContactSubmissionData } from "@/types/database"
+import { usePageTracking } from "@/hooks/usePageTracking"
+import { useFormTracking } from "@/hooks/useFormTracking"
+import { TrackedLink } from "@/components/analytics/TrackedLink"
+import { TrackedEmailLink } from "@/components/analytics/TrackedLink"
 
 interface BetaFormData {
   name: string
@@ -36,6 +40,11 @@ interface UpdatesFormData {
 }
 
 export default function ContactPage() {
+  // Analytics tracking
+  usePageTracking('Contact')
+  const betaFormTracking = useFormTracking('beta_access', 'Contact')
+  const updatesFormTracking = useFormTracking('contact', 'Contact')
+
   const [betaFormData, setBetaFormData] = useState<BetaFormData>({
     name: '',
     email: '',

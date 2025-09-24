@@ -1,5 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
 import { AuthProvider } from './contexts/AuthContext'
+import { analytics } from './lib/analytics'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import HomePage from './pages/HomePage'
 import OrganizationPublic from './pages/OrganizationPublic'
@@ -21,8 +23,14 @@ import VenueSearchPortal from './pages/VenueSearchPortal'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
+import AnalyticsTestPage from './pages/AnalyticsTestPage'
 
 export default function App() {
+  // Initialize analytics on app start
+  useEffect(() => {
+    analytics.initializeUser();
+  }, []);
+
   return (
     <AuthProvider>
       <Router>
@@ -34,6 +42,7 @@ export default function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/analytics-test" element={<AnalyticsTestPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
           <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
