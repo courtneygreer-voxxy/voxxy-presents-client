@@ -80,9 +80,9 @@ export default function PricingPage() {
                     Most Popular
                   </Badge>
                 </div>
-                <CardTitle className="text-2xl font-bold text-white">Event Infrastructure Beta</CardTitle>
+                <CardTitle className="text-2xl font-bold text-white">Community Platform Beta</CardTitle>
                 <CardDescription className="text-gray-200 mt-2">
-                  Complete platform access with founding member benefits - perfect for recurring event organizers
+                  Complete platform access with founding member benefits - perfect for community organizers and social clubs
                 </CardDescription>
               </CardHeader>
               
@@ -127,15 +127,7 @@ export default function PricingPage() {
                   </li>
                   <li className="flex items-center">
                     <Check className="h-5 w-5 text-green-300 mr-3 flex-shrink-0" />
-                    <span className="font-medium text-purple-400">1-on-1 onboarding session</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-green-300 mr-3 flex-shrink-0" />
                     <span className="font-medium text-purple-400">Direct product input & feedback</span>
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-5 w-5 text-green-300 mr-3 flex-shrink-0" />
-                    <span className="font-medium text-purple-400">Priority support from real humans</span>
                   </li>
                 </ul>
 
@@ -198,10 +190,10 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-4xl px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">
-              Priced for Event Organizers, Not Enterprises
+              Priced for Community Organizers, Not Enterprises
             </h2>
             <p className="text-lg text-gray-200 max-w-2xl mx-auto">
-              We believe great event infrastructure shouldn't break your budget - whether you're running free community events or paid experiences
+              We believe great community tools shouldn't break your budget - whether you're running free community events or paid experiences
             </p>
           </div>
 
@@ -215,7 +207,7 @@ export default function PricingPage() {
                   <li className="flex items-start">
                     <Check className="h-5 w-5 text-green-300 mr-3 mt-0.5 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-white">Base Platform:</span> $15/month covers all infrastructure and tools
+                      <span className="font-medium text-white">Base Platform:</span> $15/month covers all platform features and tools
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -270,7 +262,7 @@ export default function PricingPage() {
             Ready to start building?
           </h2>
           <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-            Lock in validated beta pricing and get professional event infrastructure for your recurring events
+            Lock in validated beta pricing and get professional community tools for your recurring events
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>

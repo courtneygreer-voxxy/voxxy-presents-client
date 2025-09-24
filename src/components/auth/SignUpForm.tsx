@@ -295,11 +295,11 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
               />
               <Label htmlFor="acceptTerms" className="text-sm leading-5">
                 I agree to the{' '}
-                <a href="/terms" className="text-primary underline hover:no-underline" target="_blank">
+                <a href="https://www.heyvoxxy.com/#/terms" className="text-primary underline hover:no-underline" target="_blank">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/privacy" className="text-primary underline hover:no-underline" target="_blank">
+                <a href="https://www.heyvoxxy.com/#/privacy" className="text-primary underline hover:no-underline" target="_blank">
                   Privacy Policy
                 </a>
               </Label>

@@ -190,7 +190,7 @@ export default function ProductsPage() {
                 </div>
 
                 <Button className="bg-blue-600 hover:bg-blue-700 text-white" asChild>
-                  <a href="https://apps.apple.com/us/app/voxxy/id6499627309" target="_blank" rel="noopener noreferrer">
+                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer">
                     Download for iPhone
                   </a>
                 </Button>
