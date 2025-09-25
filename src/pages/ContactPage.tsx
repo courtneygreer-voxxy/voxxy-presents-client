@@ -170,7 +170,7 @@ export default function ContactPage() {
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center px-4">
         {/* Animated Background */}
         <div 
-          className="absolute inset-0 opacity-5"
+          className="absolute inset-0 opacity-[0.5]"
           style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
             animation: 'pulse 8s ease-in-out infinite'
@@ -212,7 +212,7 @@ export default function ContactPage() {
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
       {/* Animated Background */}
       <div 
-        className="absolute inset-0 opacity-5"
+        className="absolute inset-0 opacity-[0.5]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           animation: 'pulse 8s ease-in-out infinite'
@@ -292,7 +292,7 @@ export default function ContactPage() {
                     <form onSubmit={handleBetaSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="beta-name">Name *</Label>
+                          <Label htmlFor="beta-name" className="text-white">Name *</Label>
                           <Input
                             id="beta-name"
                             type="text"
@@ -305,7 +305,7 @@ export default function ContactPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="beta-email">Email *</Label>
+                          <Label htmlFor="beta-email" className="text-white">Email *</Label>
                           <Input
                             id="beta-email"
                             type="email"
@@ -318,7 +318,7 @@ export default function ContactPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="beta-organization">Club/Event Series Name *</Label>
+                          <Label htmlFor="beta-organization" className="text-white">Club/Event Series Name</Label>
                           <Input
                             id="beta-organization"
                             type="text"
@@ -331,16 +331,16 @@ export default function ContactPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="beta-frequency">Event Frequency *</Label>
+                          <Label htmlFor="beta-frequency" className="text-white">Event Frequency</Label>
                           <Select
                             value={betaFormData.eventFrequency}
                             onValueChange={(value) => handleBetaInputChange('eventFrequency', value)}
                             disabled={isSubmitting}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                               <SelectValue placeholder="How often do you host events?" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-gray-800 border-gray-600 text-white">
                               <SelectItem value="weekly">Weekly</SelectItem>
                               <SelectItem value="monthly">Monthly</SelectItem>
                               <SelectItem value="seasonal">Seasonal</SelectItem>
@@ -350,7 +350,7 @@ export default function ContactPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="beta-attendance">Typical Attendance Size *</Label>
+                          <Label htmlFor="beta-attendance" className="text-white">Typical Attendance Size</Label>
                           <Input
                             id="beta-attendance"
                             type="text"
@@ -363,16 +363,16 @@ export default function ContactPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="beta-challenge">Current Biggest Challenge *</Label>
+                          <Label htmlFor="beta-challenge" className="text-white">Current Biggest Challenge</Label>
                           <Select
                             value={betaFormData.biggestChallenge}
                             onValueChange={(value) => handleBetaInputChange('biggestChallenge', value)}
                             disabled={isSubmitting}
                           >
-                            <SelectTrigger>
+                            <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                               <SelectValue placeholder="What's your biggest challenge?" />
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className="bg-gray-800 border-gray-600 text-white">
                               <SelectItem value="rsvp-management">RSVP Management</SelectItem>
                               <SelectItem value="venue-coordination">Venue Coordination</SelectItem>
                               <SelectItem value="promotion">Promotion</SelectItem>
@@ -383,7 +383,7 @@ export default function ContactPage() {
                         </div>
 
                         <div>
-                          <Label htmlFor="beta-description">Brief Description of Your Events *</Label>
+                          <Label htmlFor="beta-description" className="text-white">Brief Description of Your Events</Label>
                           <Textarea
                             id="beta-description"
                             required
@@ -416,7 +416,7 @@ export default function ContactPage() {
                     <form onSubmit={handleUpdatesSubmit} className="space-y-4">
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="updates-name">Name *</Label>
+                          <Label htmlFor="updates-name" className="text-white">Name *</Label>
                           <Input
                             id="updates-name"
                             type="text"
@@ -429,7 +429,7 @@ export default function ContactPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="updates-email">Email *</Label>
+                          <Label htmlFor="updates-email" className="text-white">Email *</Label>
                           <Input
                             id="updates-email"
                             type="email"

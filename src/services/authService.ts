@@ -126,7 +126,9 @@ export const signUp = async ({ email, password, displayName }: SignUpData): Prom
       name: displayName,
       role: 'organizer', // All new users are club organizers
       organizationIds: [], // Will be populated when they create clubs
-      emailNotifications: true
+      emailNotifications: true,
+      betaStatus: 'pending', // New users start with pending beta access
+      betaRequestedAt: new Date()
     })
     
     // Send email verification with rate limiting protection

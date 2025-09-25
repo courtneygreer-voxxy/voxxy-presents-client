@@ -29,7 +29,7 @@ class VenueService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venues?${params}`, {
+      const response = await fetch(`${API_BASE_URL}/venues?${params}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -51,7 +51,7 @@ class VenueService {
    */
   async getVenueBySlug(slug: string): Promise<Venue> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venues/${slug}`, {
+      const response = await fetch(`${API_BASE_URL}/venues/${slug}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -76,7 +76,7 @@ class VenueService {
    */
   async getVenueById(id: string): Promise<Venue> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venues/by-id/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/venues/by-id/${id}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -109,7 +109,7 @@ class VenueService {
     })
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venues/search?${params}`, {
+      const response = await fetch(`${API_BASE_URL}/venues/search?${params}`, {
         headers: {
           'Content-Type': 'application/json',
         },
@@ -132,7 +132,7 @@ class VenueService {
    */
   async submitVenueOwnerSignup(signup: VenueOwnerSignup): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venue-owner-signup`, {
+      const response = await fetch(`${API_BASE_URL}/venue-owner-signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -158,7 +158,7 @@ class VenueService {
    */
   async sendVenueContactRequest(request: VenueContactRequest): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/venues/${request.venueId}/contact`, {
+      const response = await fetch(`${API_BASE_URL}/venues/${request.venueId}/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
