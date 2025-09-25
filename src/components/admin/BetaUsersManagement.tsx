@@ -39,8 +39,8 @@ export default function BetaUsersManagement() {
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-      const response = await fetch(`${apiUrl}/api/admin/users`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      const response = await fetch(`${apiUrl}/admin/users`, {
         headers: {
           'x-admin-key': 'voxxy-admin-2024', // Should match API expected key
           'Content-Type': 'application/json'
@@ -71,8 +71,8 @@ export default function BetaUsersManagement() {
     setUpdatingUserId(userId)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-      const response = await fetch(`${apiUrl}/api/admin/users/${userId}/beta-status`, {
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
+      const response = await fetch(`${apiUrl}/admin/users/${userId}/beta-status`, {
         method: 'PUT',
         headers: {
           'x-admin-key': 'voxxy-admin-2024',
