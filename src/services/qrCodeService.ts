@@ -16,10 +16,16 @@ import {
  * Handles ticket creation, QR code generation, and validation
  */
 export class QRCodeService {
-  private readonly JWT_SECRET = import.meta.env.VITE_JWT_SECRET || (() => {
-    throw new Error('VITE_JWT_SECRET environment variable is required for ticket generation');
-  })();
   private readonly DEFAULT_EXPIRY_HOURS = 24; // Tickets expire 24 hours after event end
+
+  // Get JWT secret with validation (only when actually needed)
+  private getJWTSecret(): string {
+    const jwtSecret = import.meta.env.VITE_JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('VITE_JWT_SECRET environment variable is required for ticket generation');
+    }
+    return jwtSecret;
+  }
 
   /**
    * Generate a complete digital ticket with QR code
@@ -229,7 +235,7 @@ export class QRCodeService {
     const payload = btoa(JSON.stringify(data));
 
     // Simplified signature (in production, use proper HMAC)
-    const signature = btoa(`${header}.${payload}.${this.JWT_SECRET}`).substring(0, 16);
+    const signature = btoa(`${header}.${payload}.${this.getJWTSecret()}`).substring(0, 16);
 
     return `${header}.${payload}.${signature}`;
   }
@@ -245,7 +251,7 @@ export class QRCodeService {
       const [header, payload, signature] = parts;
 
       // Verify signature (simplified)
-      const expectedSignature = btoa(`${header}.${payload}.${this.JWT_SECRET}`).substring(0, 16);
+      const expectedSignature = btoa(`${header}.${payload}.${this.getJWTSecret()}`).substring(0, 16);
       if (signature !== expectedSignature) return null;
 
       // Decode payload
