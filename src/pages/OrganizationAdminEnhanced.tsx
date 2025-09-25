@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
+import {
   ArrowLeft,
   Settings,
   Calendar,
@@ -23,7 +23,8 @@ import {
   CheckCircle,
   XCircle,
   Ticket,
-  RefreshCw
+  RefreshCw,
+  DollarSign
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
 import { useAuth } from "@/hooks/useAuth"
@@ -290,24 +291,31 @@ export default function OrganizationAdminEnhanced() {
       <div className="container mx-auto px-4 py-8">
         <Tabs defaultValue="organization" className="flex gap-8" orientation="vertical">
           <div className="w-64 flex-shrink-0">
-            <TabsList className="flex flex-col h-fit w-full !bg-white/10 backdrop-blur-sm border border-white/20">
-              <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+            <TabsList className="flex flex-col h-fit w-full !bg-transparent backdrop-blur-sm border border-white/20">
+              <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Edit className="h-4 w-4 text-purple-400" />
                 Club
               </TabsTrigger>
-              <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+              <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Calendar className="h-4 w-4 text-purple-400" />
                 Events
               </TabsTrigger>
-              <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+              {/* Events Subcategories */}
+              <div className="ml-2 flex flex-col">
+                <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-4 py-3">
+                  <QrCode className="h-4 w-4 text-purple-400" />
+                  Tickets
+                </TabsTrigger>
+                <TabsTrigger value="budget" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-4 py-3">
+                  <DollarSign className="h-4 w-4 text-purple-400" />
+                  Budget
+                </TabsTrigger>
+              </div>
+              <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Users className="h-4 w-4 text-purple-400" />
                 Subscribers
               </TabsTrigger>
-              <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
-                <QrCode className="h-4 w-4 text-purple-400" />
-                Tickets
-              </TabsTrigger>
-              <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white data-[state=active]:!bg-white/20 data-[state=active]:!text-white">
+              <TabsTrigger value="settings" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Settings className="h-4 w-4 text-purple-400" />
                 Settings
               </TabsTrigger>
@@ -673,6 +681,80 @@ export default function OrganizationAdminEnhanced() {
                         <p className="font-medium">Validation Results</p>
                         <p className="text-sm text-purple-300">Valid tickets show green with attendee details. Invalid tickets show red with error reasons.</p>
                       </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Budget Tab */}
+            <TabsContent value="budget">
+              <div className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Event Budget Management</h2>
+                    <p className="text-gray-300">Track expenses, revenue, and financial performance for your events</p>
+                  </div>
+                </div>
+
+                {/* Budget Overview Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-300">Total Revenue</p>
+                          <p className="text-2xl font-bold text-green-400">$0.00</p>
+                        </div>
+                        <div className="p-3 bg-green-500/20 rounded-full">
+                          <DollarSign className="h-6 w-6 text-green-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-300">Total Expenses</p>
+                          <p className="text-2xl font-bold text-red-400">$0.00</p>
+                        </div>
+                        <div className="p-3 bg-red-500/20 rounded-full">
+                          <DollarSign className="h-6 w-6 text-red-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-gray-300">Net Profit</p>
+                          <p className="text-2xl font-bold text-white">$0.00</p>
+                        </div>
+                        <div className="p-3 bg-purple-500/20 rounded-full">
+                          <DollarSign className="h-6 w-6 text-purple-400" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Coming Soon Notice */}
+                <Card className="!bg-purple-500/10 !border-purple-400/30 backdrop-blur-sm">
+                  <CardContent className="p-8 text-center">
+                    <div className="text-4xl mb-4">📊</div>
+                    <h3 className="text-xl font-bold text-purple-300 mb-3">Budget Management Coming Soon</h3>
+                    <p className="text-purple-200 mb-6 max-w-md mx-auto">
+                      Track event expenses, ticket revenue, vendor costs, and generate financial reports for your events.
+                    </p>
+                    <div className="space-y-2 text-sm text-purple-300">
+                      <p>• 📈 Revenue tracking from ticket sales</p>
+                      <p>• 💰 Expense categorization and tracking</p>
+                      <p>• 📋 Financial reports and analytics</p>
+                      <p>• 🎯 Budget planning for future events</p>
                     </div>
                   </CardContent>
                 </Card>
