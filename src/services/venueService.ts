@@ -1,11 +1,12 @@
-import { 
-  Venue, 
-  VenueSearchFilters, 
-  VenueSearchResult, 
-  VenueOwnerSignup, 
-  VenueContactRequest 
+import {
+  Venue,
+  VenueSearchFilters,
+  VenueSearchResult,
+  VenueOwnerSignup,
+  VenueContactRequest
 } from '@/types/venue'
 import { getApiUrl } from '@/config/environments'
+import { rateLimitedFetch, rateLimitedPost } from '@/utils/rateLimitedFetch'
 
 const API_BASE_URL = getApiUrl()
 
@@ -29,10 +30,11 @@ class VenueService {
     }
 
     try {
-      const response = await fetch(`${API_BASE_URL}/venues?${params}`, {
+      const response = await rateLimitedFetch(`${API_BASE_URL}/venues?${params}`, {
         headers: {
           'Content-Type': 'application/json',
         },
+        rateLimitKey: 'venue-search'
       })
 
       if (!response.ok) {
@@ -158,21 +160,9 @@ class VenueService {
    */
   async sendVenueContactRequest(request: VenueContactRequest): Promise<{ success: boolean; message: string }> {
     try {
-      const response = await fetch(`${API_BASE_URL}/venues/${request.venueId}/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
+      return await rateLimitedPost(`${API_BASE_URL}/venues/${request.venueId}/contact`, request, {
+        rateLimitKey: `venue-contact:${request.venueId}`
       })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || 'Failed to send contact request')
-      }
-
-      return result
     } catch (error) {
       console.error('Error sending venue contact request:', error)
       throw error
