@@ -16,7 +16,9 @@ import {
  * Handles ticket creation, QR code generation, and validation
  */
 export class QRCodeService {
-  private readonly JWT_SECRET = 'voxxy-presents-ticket-secret'; // TODO: Move to env var
+  private readonly JWT_SECRET = import.meta.env.VITE_JWT_SECRET || (() => {
+    throw new Error('VITE_JWT_SECRET environment variable is required for ticket generation');
+  })();
   private readonly DEFAULT_EXPIRY_HOURS = 24; // Tickets expire 24 hours after event end
 
   /**

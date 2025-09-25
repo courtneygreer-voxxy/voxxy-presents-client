@@ -24,8 +24,36 @@ interface EnvironmentConfig {
   }
 }
 
+// Validate critical environment variables
+function validateEnvironmentVariables(): void {
+  const required = [
+    'VITE_FIREBASE_API_KEY',
+    'VITE_FIREBASE_PROJECT_ID',
+    'VITE_JWT_SECRET'
+  ];
+
+  const missing = required.filter(key => !import.meta.env[key]);
+
+  if (missing.length > 0) {
+    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
+  }
+
+  // Additional validation for JWT secret
+  const jwtSecret = import.meta.env.VITE_JWT_SECRET;
+  if (jwtSecret && jwtSecret.length < 32) {
+    console.warn('⚠️ JWT secret should be at least 32 characters for security');
+  }
+
+  if (jwtSecret && (jwtSecret.includes('dev-') || jwtSecret.includes('staging-')) && import.meta.env.VITE_ENVIRONMENT === 'production') {
+    throw new Error('🚨 Development/staging JWT secret detected in production environment!');
+  }
+}
+
 // Get Firebase config from environment variables
 function getFirebaseConfigFromEnv() {
+  // Validate environment variables first
+  validateEnvironmentVariables();
+
   return {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
     authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
