@@ -525,12 +525,12 @@ export default function AdminDashboard() {
                               <Badge
                                 variant="outline"
                                 className={`text-xs ${
-                                  venue.claimStatus === 'claimed' ? 'bg-green-100 text-green-800' :
-                                  venue.claimStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-gray-100 text-gray-800'
+                                  venue.approvalStatus === 'approved' ? 'bg-green-100 text-green-800' :
+                                  venue.approvalStatus === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-red-100 text-red-800'
                                 }`}
                               >
-                                {venue.claimStatus}
+                                {venue.approvalStatus}
                               </Badge>
                             </div>
                             <div className="text-sm text-gray-500">
@@ -582,9 +582,9 @@ export default function AdminDashboard() {
                       <div className="flex items-center">
                         <CheckCircle className="h-8 w-8 text-green-600" />
                         <div className="ml-4">
-                          <p className="text-sm font-medium text-gray-600">Claimed</p>
+                          <p className="text-sm font-medium text-gray-600">Approved</p>
                           <p className="text-2xl font-bold text-gray-900">
-                            {venues.filter(v => v.claimStatus === 'claimed').length}
+                            {venues.filter(v => v.approvalStatus === 'approved').length}
                           </p>
                         </div>
                       </div>
@@ -596,9 +596,9 @@ export default function AdminDashboard() {
                       <div className="flex items-center">
                         <XCircle className="h-8 w-8 text-gray-600" />
                         <div className="ml-4">
-                          <p className="text-sm font-medium text-gray-600">Unclaimed</p>
+                          <p className="text-sm font-medium text-gray-600">Pending</p>
                           <p className="text-2xl font-bold text-gray-900">
-                            {venues.filter(v => v.claimStatus === 'unclaimed').length}
+                            {venues.filter(v => v.approvalStatus === 'pending').length}
                           </p>
                         </div>
                       </div>
