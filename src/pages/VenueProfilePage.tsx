@@ -207,43 +207,6 @@ export default function VenueProfilePage() {
               className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 text-white"
             />
 
-            <SubscriptionModal
-              organization={{
-                id: venue.id,
-                slug: venue.slug,
-                name: venue.name,
-                description: venue.description,
-                background: venue.description,
-                logoUrl: venue.photos[0] || '',
-                backgroundStyle: 'stars',
-                contactEmail: venue.contactInfo.email,
-                socialLinks: {
-                  instagram: venue.contactInfo.instagram || '',
-                  website: venue.contactInfo.website || ''
-                },
-                settings: {
-                  defaultLocation: venue.address,
-                  defaultAddress: venue.address,
-                  theme: {
-                    primaryColor: '#9333ea',
-                    backgroundColor: '#111827'
-                  }
-                },
-                ownerId: venue.ownerId || 'venue-owner',
-                createdAt: venue.createdAt,
-                updatedAt: venue.updatedAt
-              }}
-              trigger={
-                <Button
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                  size="sm"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Subscribe
-                </Button>
-              }
-            />
-
             <Button
               onClick={() => setIsContactModalOpen(true)}
               className="bg-purple-600 hover:bg-purple-700 text-white"
@@ -406,15 +369,47 @@ export default function VenueProfilePage() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => setIsContactModalOpen(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Connect with venue
-                </Button>
-              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Subscription Footer */}
+        <section className="bg-white/5 backdrop-blur-sm border-t border-white/10 py-12">
+          <div className="container mx-auto px-4 text-center">
+            <div className="max-w-md mx-auto">
+              <h3 className="text-2xl font-bold text-white mb-4">Stay Updated</h3>
+              <p className="text-gray-300 mb-6">
+                Get notified about upcoming events and special offers at {venue.name}
+              </p>
+              <Button
+                onClick={() => setIsContactModalOpen(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white mr-4"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Contact Venue
+              </Button>
+              <SubscriptionModal
+                trigger={
+                  <Button
+                    variant="outline"
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                  >
+                    <Bell className="h-4 w-4 mr-2" />
+                    Subscribe for Updates
+                  </Button>
+                }
+                organization={{
+                  id: venue.id,
+                  slug: venue.slug,
+                  name: venue.name,
+                  description: venue.description,
+                  contactEmail: venue.contactInfo.email,
+                  logoUrl: venue.photos[0] || '',
+                  ownerId: venue.ownerId,
+                  createdAt: venue.createdAt,
+                  updatedAt: venue.updatedAt
+                }}
+              />
             </div>
           </div>
         </section>

@@ -33,64 +33,75 @@ export default function BetaUsersManagement() {
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'denied'>('all')
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
 
-  // Load beta users from API
+  // Load beta users from API (using mock data for development)
   const loadBetaUsers = async () => {
     setLoading(true)
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
-      const response = await fetch(`${apiUrl}/admin/users`, {
-        headers: {
-          'x-admin-key': 'voxxy-admin-2024', // Should match API expected key
-          'Content-Type': 'application/json'
+      // Mock data for development - replace with actual API call when backend is ready
+      const mockBetaUsers: BetaUser[] = [
+        {
+          id: 'user1',
+          email: 'john@example.com',
+          name: 'John Doe',
+          role: 'organizer',
+          betaStatus: 'approved',
+          betaRequestedAt: new Date('2024-01-15'),
+          betaApprovedAt: new Date('2024-01-20'),
+          betaApprovedBy: 'admin',
+          organizationIds: ['org1'],
+          emailNotifications: true,
+          createdAt: new Date('2024-01-15'),
+          updatedAt: new Date('2024-01-20')
+        },
+        {
+          id: 'user2',
+          email: 'sarah@creativecollective.com',
+          name: 'Sarah Chen',
+          role: 'organizer',
+          betaStatus: 'pending',
+          betaRequestedAt: new Date('2024-02-20'),
+          organizationIds: [],
+          emailNotifications: true,
+          createdAt: new Date('2024-02-20'),
+          updatedAt: new Date('2024-02-20')
+        },
+        {
+          id: 'user3',
+          email: 'mike@brooklynlounge.com',
+          name: 'Mike Rodriguez',
+          role: 'venue_owner',
+          betaStatus: 'approved',
+          betaRequestedAt: new Date('2024-03-10'),
+          betaApprovedAt: new Date('2024-03-15'),
+          betaApprovedBy: 'admin',
+          organizationIds: [],
+          emailNotifications: true,
+          createdAt: new Date('2024-03-10'),
+          updatedAt: new Date('2024-03-15')
         }
-      })
+      ]
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      const data = await response.json()
-
-      if (!data.success) {
-        throw new Error(data.error || 'Failed to load users')
-      }
-
-      setBetaUsers(data.users || [])
+      setBetaUsers(mockBetaUsers)
+      setLoading(false)
     } catch (err) {
       console.error('Error loading beta users:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load beta users')
-    } finally {
+      setError('Failed to load beta users')
       setLoading(false)
     }
   }
 
-  // Update user beta status via API
+  // Update user beta status (mock implementation)
   const updateBetaStatus = async (userId: string, status: 'approved' | 'denied') => {
     setUpdatingUserId(userId)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
-      const response = await fetch(`${apiUrl}/admin/users/${userId}/beta-status`, {
-        method: 'PUT',
-        headers: {
-          'x-admin-key': 'voxxy-admin-2024',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status })
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `HTTP ${response.status}`)
-      }
-
-      const result = await response.json()
-
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to update status')
-      }
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000))
 
       // Update local state
       setBetaUsers(prevUsers =>

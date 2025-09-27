@@ -22,6 +22,8 @@ import AdminLogin from './pages/AdminLogin'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
+import VenueCreatePage from './pages/VenueCreatePage'
+import VenueOwnerDashboardNew from './pages/VenueOwnerDashboardNew'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
@@ -83,6 +85,20 @@ export default function App() {
             <ProtectedRoute>
               <BetaAccessGuard>
                 <VenueSearchPortal />
+              </BetaAccessGuard>
+            </ProtectedRoute>
+          } />
+          <Route path="/venues/create" element={
+            <ProtectedRoute requireEmailVerification={true}>
+              <BetaAccessGuard>
+                <VenueCreatePage />
+              </BetaAccessGuard>
+            </ProtectedRoute>
+          } />
+          <Route path="/venues/dashboard" element={
+            <ProtectedRoute requireEmailVerification={true}>
+              <BetaAccessGuard>
+                <VenueOwnerDashboardNew />
               </BetaAccessGuard>
             </ProtectedRoute>
           } />

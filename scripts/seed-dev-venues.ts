@@ -73,8 +73,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -103,8 +103,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -133,8 +133,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -164,8 +164,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -193,8 +193,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -225,8 +225,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -255,8 +255,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -285,8 +285,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -315,8 +315,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
   {
@@ -345,8 +345,8 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': true,
       genderNeutralBathrooms: true
     },
-    claimStatus: 'unclaimed',
-    ownerId: undefined,
+    approvalStatus: 'pending',
+    ownerId: 'dev-owner-1',
     pricingType: 'free'
   }
 ]

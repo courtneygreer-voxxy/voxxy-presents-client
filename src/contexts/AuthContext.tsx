@@ -36,6 +36,12 @@ interface AuthContextType {
   isAuthenticated: boolean
   isEmailVerified: boolean
   needsEmailVerification: boolean
+
+  // Role-specific helpers (v2.0.0)
+  isAdmin: boolean
+  isOrganizer: boolean
+  isVenueOwner: boolean
+  hasRole: (role: User['role']) => boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -218,6 +224,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
+  // Role-specific helper functions (v2.0.0)
+  const isAdmin = userProfile?.role === 'admin'
+  const isOrganizer = userProfile?.role === 'organizer'
+  const isVenueOwner = userProfile?.role === 'venue_owner'
+  const hasRole = (role: User['role']) => userProfile?.role === role
+
   const value: AuthContextType = {
     currentUser,
     userProfile,
@@ -232,7 +244,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     refreshUserProfile: handleRefreshUserProfile,
     isAuthenticated,
     isEmailVerified,
-    needsEmailVerification
+    needsEmailVerification,
+    isAdmin,
+    isOrganizer,
+    isVenueOwner,
+    hasRole
   }
 
   return (
