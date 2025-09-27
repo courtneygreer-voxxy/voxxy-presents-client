@@ -141,7 +141,11 @@ export function VenuesManagement({ venues, onVenueUpdate }: VenuesManagementProp
 
   const counts = getStatusCounts()
 
-  if (!userProfile || userProfile.role !== 'admin') {
+  // Check admin permissions (Firebase auth or localStorage session)
+  const isAdmin = (userProfile?.role === 'admin') ||
+                  (localStorage.getItem('voxxy_admin_session') === 'true')
+
+  if (!isAdmin) {
     return (
       <Alert>
         <AlertDescription>

@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -57,105 +56,115 @@ export function VenueOwnerInfoForm({ initialData, userEmail, userName, onComplet
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
-          <CardDescription>
+      <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-white mb-2">Contact Information</h3>
+          <p className="text-gray-300">
             How should event organizers and our team reach you?
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="ownerName">Full Name *</Label>
+            <Label htmlFor="ownerName" className="text-white">Full Name *</Label>
             <Input
               id="ownerName"
               value={formData.ownerName}
               onChange={(e) => handleInputChange('ownerName', e.target.value)}
-              className={errors.ownerName ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.ownerName ? 'border-red-400' : ''}`}
             />
-            {errors.ownerName && <p className="text-red-500 text-sm mt-1">{errors.ownerName}</p>}
+            {errors.ownerName && <p className="text-red-400 text-sm mt-1">{errors.ownerName}</p>}
           </div>
 
           <div>
-            <Label htmlFor="ownerEmail">Email Address *</Label>
+            <Label htmlFor="ownerEmail" className="text-white">Email Address *</Label>
             <Input
               id="ownerEmail"
               type="email"
               value={formData.ownerEmail}
               onChange={(e) => handleInputChange('ownerEmail', e.target.value)}
-              className={errors.ownerEmail ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.ownerEmail ? 'border-red-400' : ''}`}
             />
-            {errors.ownerEmail && <p className="text-red-500 text-sm mt-1">{errors.ownerEmail}</p>}
+            {errors.ownerEmail && <p className="text-red-400 text-sm mt-1">{errors.ownerEmail}</p>}
           </div>
 
           <div>
-            <Label htmlFor="ownerPhone">Phone Number</Label>
+            <Label htmlFor="ownerPhone" className="text-white">Phone Number</Label>
             <Input
               id="ownerPhone"
               type="tel"
               value={formData.ownerPhone}
               onChange={(e) => handleInputChange('ownerPhone', e.target.value)}
               placeholder="(555) 123-4567"
-              className={errors.ownerPhone ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.ownerPhone ? 'border-red-400' : ''}`}
             />
-            {errors.ownerPhone && <p className="text-red-500 text-sm mt-1">{errors.ownerPhone}</p>}
+            {errors.ownerPhone && <p className="text-red-400 text-sm mt-1">{errors.ownerPhone}</p>}
           </div>
 
           <div>
-            <Label htmlFor="preferredContactMethod">Preferred Contact Method</Label>
+            <Label htmlFor="preferredContactMethod" className="text-white">Preferred Contact Method</Label>
             <Select
               value={formData.preferredContactMethod}
               onValueChange={(value) => handleInputChange('preferredContactMethod', value as 'email' | 'phone')}
             >
-              <SelectTrigger>
+              <SelectTrigger className="bg-white/10 border-white/20 text-white">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="email">Email</SelectItem>
-                <SelectItem value="phone">Phone</SelectItem>
+              <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectItem value="email" className="text-white hover:bg-gray-700">Email</SelectItem>
+                <SelectItem value="phone" className="text-white hover:bg-gray-700">Phone</SelectItem>
               </SelectContent>
             </Select>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Business Information</CardTitle>
-          <CardDescription>
+      <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-white mb-2">Business Information</h3>
+          <p className="text-gray-300">
             Tell us more about your business (optional)
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="businessInfo">Business Details</Label>
+            <Label htmlFor="businessInfo" className="text-white">Business Details</Label>
             <Textarea
               id="businessInfo"
               value={formData.businessInfo}
               onChange={(e) => handleInputChange('businessInfo', e.target.value)}
               placeholder="Tell us about your business, years in operation, special certifications, etc."
               rows={3}
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
             />
           </div>
 
           <div>
-            <Label htmlFor="message">Additional Message</Label>
+            <Label htmlFor="message" className="text-white">Additional Message</Label>
             <Textarea
               id="message"
               value={formData.message}
               onChange={(e) => handleInputChange('message', e.target.value)}
               placeholder="Anything else you'd like our team to know?"
               rows={3}
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
             />
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+        >
           Back
         </Button>
-        <Button type="submit">
+        <Button
+          type="submit"
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+        >
           Continue to Review
         </Button>
       </div>

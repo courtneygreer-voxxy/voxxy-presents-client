@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -128,61 +127,61 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Basic Information</CardTitle>
-          <CardDescription>
+      <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-white mb-2">Basic Information</h3>
+          <p className="text-gray-300">
             Tell us about your venue's key details
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="space-y-4">
           <div>
-            <Label htmlFor="name">Venue Name *</Label>
+            <Label htmlFor="name" className="text-white">Venue Name *</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
               placeholder="e.g., The Brooklyn Lounge"
-              className={errors.name ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.name ? 'border-red-400' : ''}`}
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-red-400 text-sm mt-1">{errors.name}</p>}
           </div>
 
           <div>
-            <Label htmlFor="description">Description *</Label>
+            <Label htmlFor="description" className="text-white">Description *</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => handleInputChange('description', e.target.value)}
               placeholder="Describe your venue's atmosphere, style, and what makes it special..."
               rows={4}
-              className={errors.description ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.description ? 'border-red-400' : ''}`}
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && <p className="text-red-400 text-sm mt-1">{errors.description}</p>}
           </div>
 
           <div>
-            <Label htmlFor="address">Address *</Label>
+            <Label htmlFor="address" className="text-white">Address *</Label>
             <Input
               id="address"
               value={formData.address}
               onChange={(e) => handleInputChange('address', e.target.value)}
               placeholder="123 Main St, Brooklyn, NY 11201"
-              className={errors.address ? 'border-red-500' : ''}
+              className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.address ? 'border-red-400' : ''}`}
             />
-            {errors.address && <p className="text-red-500 text-sm mt-1">{errors.address}</p>}
+            {errors.address && <p className="text-red-400 text-sm mt-1">{errors.address}</p>}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="venueType">Venue Type</Label>
+              <Label htmlFor="venueType" className="text-white">Venue Type</Label>
               <Select value={formData.venueType} onValueChange={(value) => handleInputChange('venueType', value as VenueType)}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-white/10 border-white/20 text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-gray-800 border-gray-700">
                   {VENUE_TYPES.map(type => (
-                    <SelectItem key={type.value} value={type.value}>
+                    <SelectItem key={type.value} value={type.value} className="text-white hover:bg-gray-700">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -191,29 +190,29 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
             </div>
 
             <div>
-              <Label htmlFor="capacity">Capacity *</Label>
+              <Label htmlFor="capacity" className="text-white">Capacity *</Label>
               <Input
                 id="capacity"
                 type="number"
                 min="1"
                 value={formData.capacity}
                 onChange={(e) => handleInputChange('capacity', parseInt(e.target.value) || 0)}
-                className={errors.capacity ? 'border-red-500' : ''}
+                className={`bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 ${errors.capacity ? 'border-red-400' : ''}`}
               />
-              {errors.capacity && <p className="text-red-500 text-sm mt-1">{errors.capacity}</p>}
+              {errors.capacity && <p className="text-red-400 text-sm mt-1">{errors.capacity}</p>}
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Amenities</CardTitle>
-          <CardDescription>
+      <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-white mb-2">Amenities</h3>
+          <p className="text-gray-300">
             What features and amenities does your venue offer?
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+          </p>
+        </div>
+        <div className="space-y-4">
           {/* Common Amenities */}
           <div className="flex flex-wrap gap-2">
             {COMMON_AMENITIES.map(amenity => (
@@ -223,6 +222,9 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
                 variant={formData.amenities.includes(amenity) ? "default" : "outline"}
                 size="sm"
                 onClick={() => formData.amenities.includes(amenity) ? removeAmenity(amenity) : addAmenity(amenity)}
+                className={formData.amenities.includes(amenity) ?
+                  "bg-purple-600 hover:bg-purple-700 text-white" :
+                  "bg-white/10 border-white/20 text-white hover:bg-white/20"}
               >
                 {amenity}
               </Button>
@@ -232,13 +234,13 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
           {/* Selected Amenities */}
           {formData.amenities.length > 0 && (
             <div>
-              <Label>Selected Amenities</Label>
+              <Label className="text-white">Selected Amenities</Label>
               <div className="flex flex-wrap gap-2 mt-2">
                 {formData.amenities.map(amenity => (
-                  <Badge key={amenity} variant="secondary" className="flex items-center gap-1">
+                  <Badge key={amenity} className="bg-purple-600/80 text-white flex items-center gap-1">
                     {amenity}
                     <X
-                      className="h-3 w-3 cursor-pointer hover:text-red-500"
+                      className="h-3 w-3 cursor-pointer hover:text-red-400"
                       onClick={() => removeAmenity(amenity)}
                     />
                   </Badge>
@@ -254,25 +256,31 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
               onChange={(e) => setCustomAmenity(e.target.value)}
               placeholder="Add custom amenity..."
               onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addCustomAmenity())}
+              className="bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
             />
-            <Button type="button" onClick={addCustomAmenity} size="sm">
+            <Button
+              type="button"
+              onClick={addCustomAmenity}
+              size="sm"
+              className="bg-purple-600 hover:bg-purple-700 text-white"
+            >
               <Plus className="h-4 w-4" />
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Accessibility</CardTitle>
-          <CardDescription>
+      <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-bold text-white mb-2">Accessibility</h3>
+          <p className="text-gray-300">
             Help event organizers understand your venue's accessibility features
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
+          </p>
+        </div>
+        <div className="space-y-4">
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <Label htmlFor="wheelchairAccessible">Wheelchair Accessible</Label>
+              <Label htmlFor="wheelchairAccessible" className="text-white">Wheelchair Accessible</Label>
               <Switch
                 id="wheelchairAccessible"
                 checked={formData.accessibility.wheelchairAccessible}
@@ -284,7 +292,7 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="lgbtqFriendly">LGBTQ+ Friendly</Label>
+              <Label htmlFor="lgbtqFriendly" className="text-white">LGBTQ+ Friendly</Label>
               <Switch
                 id="lgbtqFriendly"
                 checked={formData.accessibility.lgbtqFriendly}
@@ -296,7 +304,7 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
             </div>
 
             <div className="flex items-center justify-between">
-              <Label htmlFor="genderNeutralBathrooms">Gender Neutral Bathrooms</Label>
+              <Label htmlFor="genderNeutralBathrooms" className="text-white">Gender Neutral Bathrooms</Label>
               <Switch
                 id="genderNeutralBathrooms"
                 checked={formData.accessibility.genderNeutralBathrooms || false}
@@ -307,15 +315,23 @@ export function VenueDetailsForm({ initialData, onComplete, onBack }: VenueDetai
               />
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* Form Actions */}
       <div className="flex justify-between">
-        <Button type="button" variant="outline" onClick={onBack}>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onBack}
+          className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:border-white/30"
+        >
           Cancel
         </Button>
-        <Button type="submit">
+        <Button
+          type="submit"
+          className="bg-purple-600 hover:bg-purple-700 text-white"
+        >
           Continue to Owner Info
         </Button>
       </div>
