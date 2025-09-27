@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { SignUpForm } from '@/components/auth/SignUpForm'
+import { UnifiedSignUpForm } from '@/components/auth/UnifiedSignUpForm'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function SignUpPage() {
@@ -40,7 +40,7 @@ export default function SignUpPage() {
       
       <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
-          <SignUpForm
+          <UnifiedSignUpForm
             onSuccess={handleSuccess}
             onSwitchToLogin={handleSwitchToLogin}
           />

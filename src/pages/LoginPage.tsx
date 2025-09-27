@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LoginForm } from '@/components/auth/LoginForm'
+import { UnifiedLoginForm } from '@/components/auth/UnifiedLoginForm'
 import { PasswordResetForm } from '@/components/auth/PasswordResetForm'
 import { useAuth } from '@/hooks/useAuth'
 
@@ -57,7 +57,7 @@ export default function LoginPage() {
               onBackToLogin={handleBackToLogin}
             />
           ) : (
-            <LoginForm
+            <UnifiedLoginForm
               onSuccess={handleSuccess}
               onSwitchToSignUp={handleSwitchToSignUp}
               onForgotPassword={handleForgotPassword}
