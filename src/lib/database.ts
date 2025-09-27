@@ -271,7 +271,7 @@ export const createUser = async (uid: string, data: Omit<User, 'id' | 'createdAt
 export const getUser = async (uid: string): Promise<User | null> => {
   const docRef = doc(db, 'users', uid)
   const docSnap = await getDoc(docRef)
-  
+
   if (docSnap.exists()) {
     const data = docSnap.data()
     return {
@@ -282,4 +282,12 @@ export const getUser = async (uid: string): Promise<User | null> => {
     } as User
   }
   return null
+}
+
+export const updateUser = async (uid: string, data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>) => {
+  const docRef = doc(db, 'users', uid)
+  await updateDoc(docRef, {
+    ...data,
+    updatedAt: Timestamp.now()
+  })
 }

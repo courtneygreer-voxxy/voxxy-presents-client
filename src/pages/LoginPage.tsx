@@ -21,7 +21,14 @@ export default function LoginPage() {
 
       // Role-based redirect
       if (isVenueOwner) {
-        navigate('/venues/dashboard')
+        // Check if venue owner has completed onboarding (created a venue)
+        const hasCompletedOnboarding = userProfile.venueOwnerProfile?.onboardingCompleted
+        if (hasCompletedOnboarding) {
+          navigate('/venues/dashboard')
+        } else {
+          // First time venue owner - redirect to venue creation
+          navigate('/venues/create')
+        }
       } else if (isOrganizer) {
         navigate('/profile')
       } else {

@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
+import { updateUser } from '@/lib/database'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import { VenueDetailsForm } from './VenueDetailsForm'
@@ -38,6 +39,20 @@ export function VenueCreateFlow() {
 
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 2000))
+
+      // Mark venue owner onboarding as completed
+      if (currentUser) {
+        await updateUser(currentUser.uid, {
+          venueOwnerProfile: {
+            venueIds: userProfile?.venueOwnerProfile?.venueIds || [],
+            businessInfo: userProfile?.venueOwnerProfile?.businessInfo || '',
+            phone: userProfile?.venueOwnerProfile?.phone || '',
+            preferredContactMethod: userProfile?.venueOwnerProfile?.preferredContactMethod || 'email',
+            onboardingCompleted: true,
+            ...userProfile?.venueOwnerProfile
+          }
+        })
+      }
 
       setCurrentStep('submitted')
 

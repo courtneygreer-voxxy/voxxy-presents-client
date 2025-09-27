@@ -133,11 +133,18 @@ export function RedirectIfAuthenticated({
   // If authenticated, redirect away from auth pages based on role
   if (isAuthenticated && userProfile) {
     // Use custom redirectTo if provided, otherwise use role-based redirect
-    const targetPath = redirectTo || (
-      isVenueOwner ? '/venues/dashboard' :
-      isOrganizer ? '/profile' :
-      '/'
-    )
+    let targetPath = redirectTo
+    if (!targetPath) {
+      if (isVenueOwner) {
+        // Check if venue owner has completed onboarding (created a venue)
+        const hasCompletedOnboarding = userProfile.venueOwnerProfile?.onboardingCompleted
+        targetPath = hasCompletedOnboarding ? '/venues/dashboard' : '/venues/create'
+      } else if (isOrganizer) {
+        targetPath = '/profile'
+      } else {
+        targetPath = '/'
+      }
+    }
     return <Navigate to={targetPath} replace />
   }
 

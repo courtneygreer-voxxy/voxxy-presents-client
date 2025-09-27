@@ -124,6 +124,10 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     // Determine role based on userType
     const role = userType === 'venue-owner' ? 'venue_owner' : 'organizer'
 
+    // Venue owners get immediate beta access, club owners need approval
+    const betaStatus = userType === 'venue-owner' ? 'approved' : 'pending'
+    const betaApprovedAt = userType === 'venue-owner' ? new Date() : undefined
+
     // Create user profile in Firestore
     await createUser(user.uid, {
       email: user.email!,
@@ -131,8 +135,9 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
       role: role,
       organizationIds: [], // Will be populated when they create clubs/venues
       emailNotifications: true,
-      betaStatus: 'pending', // New users start with pending beta access
+      betaStatus: betaStatus,
       betaRequestedAt: new Date(),
+      ...(betaApprovedAt && { betaApprovedAt }),
       // Add venue owner specific fields if needed
       ...(userType === 'venue-owner' && {
         venueOwnerProfile: {
