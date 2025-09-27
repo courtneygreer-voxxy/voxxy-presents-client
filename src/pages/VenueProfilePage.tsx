@@ -403,8 +403,21 @@ export default function VenueProfilePage() {
                   slug: venue.slug,
                   name: venue.name,
                   description: venue.description,
+                  background: venue.description,
                   contactEmail: venue.contactInfo.email,
                   logoUrl: venue.photos[0] || '',
+                  socialLinks: {
+                    instagram: venue.contactInfo.instagram || '',
+                    website: venue.contactInfo.website || ''
+                  },
+                  settings: {
+                    defaultLocation: venue.address,
+                    defaultAddress: venue.address,
+                    theme: {
+                      primaryColor: '#9333ea',
+                      backgroundColor: '#111827'
+                    }
+                  },
                   ownerId: venue.ownerId,
                   createdAt: venue.createdAt,
                   updatedAt: venue.updatedAt
