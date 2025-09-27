@@ -5,18 +5,27 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function SignUpPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, userProfile, isOrganizer, isVenueOwner } = useAuth()
 
-  // If already authenticated, redirect to home or create club
+  // If already authenticated, redirect based on role
   React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/')
+    if (isAuthenticated && userProfile) {
+      // Role-based redirect
+      if (isVenueOwner) {
+        navigate('/venues/dashboard')
+      } else if (isOrganizer) {
+        navigate('/profile')
+      } else {
+        // Fallback for other roles
+        navigate('/')
+      }
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, userProfile, isVenueOwner, isOrganizer, navigate])
 
   const handleSuccess = () => {
-    // After successful signup, redirect to profile page
-    navigate('/profile')
+    // After successful signup, role-based redirect will be handled by useEffect above
+    // when userProfile is loaded
+    console.log('Signup successful, waiting for user profile to load...')
   }
 
   const handleSwitchToLogin = () => {

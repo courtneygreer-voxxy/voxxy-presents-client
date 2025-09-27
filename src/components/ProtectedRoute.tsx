@@ -112,11 +112,11 @@ interface RedirectIfAuthenticatedProps {
   redirectTo?: string
 }
 
-export function RedirectIfAuthenticated({ 
-  children, 
-  redirectTo = '/' 
+export function RedirectIfAuthenticated({
+  children,
+  redirectTo
 }: RedirectIfAuthenticatedProps) {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, userProfile, isOrganizer, isVenueOwner } = useAuth()
 
   // Show loading spinner while auth state is being determined
   if (loading) {
@@ -130,9 +130,15 @@ export function RedirectIfAuthenticated({
     )
   }
 
-  // If authenticated, redirect away from auth pages
-  if (isAuthenticated) {
-    return <Navigate to={redirectTo} replace />
+  // If authenticated, redirect away from auth pages based on role
+  if (isAuthenticated && userProfile) {
+    // Use custom redirectTo if provided, otherwise use role-based redirect
+    const targetPath = redirectTo || (
+      isVenueOwner ? '/venues/dashboard' :
+      isOrganizer ? '/profile' :
+      '/'
+    )
+    return <Navigate to={targetPath} replace />
   }
 
   // Not authenticated, show the auth page
