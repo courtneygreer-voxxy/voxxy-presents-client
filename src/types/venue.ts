@@ -23,7 +23,7 @@ export interface VenueContactInfo {
 
 export type VenueType = 'bar' | 'restaurant' | 'community_center' | 'outdoor' | 'event_space' | 'other'
 
-export type VenueApprovalStatus = 'pending' | 'approved' | 'rejected'
+export type VenueClaimStatus = 'pending' | 'approved' | 'rejected'
 
 export interface VenueAccessibility {
   wheelchairAccessible: boolean
@@ -50,7 +50,7 @@ export interface Venue {
   accessibility: VenueAccessibility
 
   // Updated approval system (no claiming)
-  approvalStatus: VenueApprovalStatus
+  claimStatus: VenueClaimStatus
   ownerId: string // REQUIRED - no unclaimed venues
   approvedBy?: string // Admin user ID who approved
   approvedAt?: Date
@@ -159,7 +159,7 @@ export interface AdminVenueListItem {
   name: string
   address: string
   venueType: VenueType
-  approvalStatus: VenueApprovalStatus
+  claimStatus: VenueClaimStatus
   ownerName: string
   ownerEmail: string
   createdAt: Date

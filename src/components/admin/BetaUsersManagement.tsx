@@ -41,7 +41,8 @@ export default function BetaUsersManagement() {
     setError(null)
 
     try {
-      const users = await adminApi.getAllUsers()
+      const response = await adminApi.getAllUsers()
+      const users = Array.isArray(response) ? response : (response.users || [])
       setBetaUsers(users.map(user => ({
         ...user,
         createdAt: new Date(user.createdAt),

@@ -27,85 +27,70 @@ import {
 import { useAuth } from '@/contexts/AuthContext'
 import { VenueProfileEditor } from '@/components/venue/VenueProfileEditor'
 import { EventPipelineCRM } from '@/components/venue/EventPipelineCRM'
+import { venuesApi } from '@/services/api'
 import type { Venue } from '@/types/venue'
 
 export default function VenueOwnerDashboardNew() {
   const navigate = useNavigate()
   const { currentUser, userProfile, isVenueOwner, isOrganizer } = useAuth()
-  const [venue, setVenue] = useState<Venue | null>(null)
+  const [venues, setVenues] = useState<Venue[]>([])
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     // Check authentication and role
     if (!currentUser) {
-      navigate('/login')
+      navigate('/login/venue-owner')
       return
     }
 
-    // Allow both venue owners and organizers to access venue dashboard
-    if (!isVenueOwner && !isOrganizer) {
+    // Only allow venue owners to access venue dashboard
+    if (!isVenueOwner) {
       navigate('/')
+      return
+    }
+
+    // Check if venue owner has completed onboarding
+    if (!userProfile?.venueOwnerProfile?.onboardingCompleted) {
+      navigate('/venues/create')
       return
     }
 
     // Load venue data for this owner
     const loadVenueData = async () => {
       try {
-        // TODO: Replace with actual API call to get venue by ownerId
-        console.log('Loading venue for owner:', currentUser.uid)
+        console.log('Loading venues for owner:', currentUser.uid)
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        // Call real API to get venues by owner
+        const response = await venuesApi.getByOwner(currentUser.uid)
 
-        // Mock venue data - in production this would come from the API
-        const mockVenue: Venue = {
-          id: 'venue-123',
-          name: 'The Foundry Brooklyn',
-          description: 'Industrial-chic event space with soaring ceilings, exposed steel beams, and floor-to-ceiling windows.',
-          address: '456 Atlantic Ave, Brooklyn, NY 11217',
-          coordinates: {
-            lat: 40.6838,
-            lng: -73.9857
-          },
-          hours: {
-            monday: { open: '17:00', close: '02:00' },
-            tuesday: { open: '17:00', close: '02:00' },
-            wednesday: { open: '17:00', close: '02:00' },
-            thursday: { open: '17:00', close: '02:00' },
-            friday: { open: '17:00', close: '03:00' },
-            saturday: { open: '17:00', close: '03:00' },
-            sunday: { open: '17:00', close: '01:00' }
-          },
-          contactInfo: {
-            email: 'info@brooklynlounge.com',
-            phone: '(718) 555-0123',
-            website: 'https://brooklynlounge.com',
-            instagram: '@brooklynlounge'
-          },
-          ownerId: currentUser.uid,
-          venueType: 'bar',
-          capacity: 75,
-          amenities: ['WiFi', 'Sound System', 'Full Bar', 'ADA Accessible'],
-          accessibility: {
-            wheelchairAccessible: true,
-            lgbtqFriendly: true,
-            '420Friendly': false,
-            genderNeutralBathrooms: true
-          },
-          pricingType: 'both',
-          photos: [],
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          approvalStatus: 'approved',
-          approvedAt: new Date(),
-          approvedBy: 'admin-123',
-          slug: 'the-foundry-brooklyn'
+        if (response.success && response.venues) {
+          setVenues(response.venues)
+
+          // Check if any venues need approval
+          const pendingVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'pending')
+          const approvedVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'approved')
+
+          if (pendingVenues.length > 0 && approvedVenues.length === 0) {
+            // All venues are pending, redirect to pending page
+            navigate('/venues/pending')
+            return
+          }
+
+          // Select the first approved venue, or first venue if all approved
+          if (approvedVenues.length > 0) {
+            setSelectedVenue(approvedVenues[0])
+          } else if (response.venues.length > 0) {
+            setSelectedVenue(response.venues[0])
+          }
+        } else {
+          // No venues found
+          setVenues([])
+          setSelectedVenue(null)
         }
-
-        setVenue(mockVenue)
       } catch (err) {
-        console.error('Error loading venue:', err)
+        console.error('Error loading venues:', err)
         setError('Failed to load venue data. Please try again.')
       } finally {
         setLoading(false)
@@ -121,8 +106,8 @@ export default function VenueOwnerDashboardNew() {
   }
 
   const handlePreviewVenue = () => {
-    if (venue) {
-      navigate(`/venue/${venue.slug}`)
+    if (selectedVenue) {
+      navigate(`/venue/${selectedVenue.slug}`)
     }
   }
 
@@ -179,7 +164,7 @@ export default function VenueOwnerDashboardNew() {
     )
   }
 
-  if (!venue) {
+  if (!selectedVenue) {
     return (
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center p-4">
         {/* Animated background dots */}
@@ -207,7 +192,8 @@ export default function VenueOwnerDashboardNew() {
   }
 
   const getStatusIcon = () => {
-    switch (venue.approvalStatus) {
+    if (!selectedVenue) return <Clock className="h-5 w-5 text-yellow-400" />
+    switch (selectedVenue.claimStatus) {
       case 'approved':
         return <CheckCircle className="h-5 w-5 text-green-400" />
       case 'rejected':
@@ -218,7 +204,8 @@ export default function VenueOwnerDashboardNew() {
   }
 
   const getStatusBadge = () => {
-    switch (venue.approvalStatus) {
+    if (!selectedVenue) return <Badge className="bg-yellow-400/20 text-yellow-400 border-yellow-400/30">Pending Review</Badge>
+    switch (selectedVenue.claimStatus) {
       case 'approved':
         return <Badge className="bg-green-400/20 text-green-400 border-green-400/30">Approved</Badge>
       case 'rejected':
@@ -254,12 +241,30 @@ export default function VenueOwnerDashboardNew() {
                 Back
               </Button>
               <div>
-                <h1 className="text-2xl font-bold text-white">{venue.name} Admin</h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-2xl font-bold text-white">{selectedVenue?.name} Admin</h1>
+                  {venues.length > 1 && (
+                    <select
+                      value={selectedVenue?.id || ''}
+                      onChange={(e) => {
+                        const venue = venues.find(v => v.id === e.target.value)
+                        if (venue) setSelectedVenue(venue)
+                      }}
+                      className="bg-white/10 border border-white/20 text-white rounded px-3 py-1 text-sm"
+                    >
+                      {venues.map(venue => (
+                        <option key={venue.id} value={venue.id} className="bg-gray-800 text-white">
+                          {venue.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
                 <p className="text-gray-300 text-sm">Manage your venue and events</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              {venue.approvalStatus === 'approved' && (
+              {selectedVenue?.claimStatus === 'approved' && (
                 <Button
                   onClick={handlePreviewVenue}
                   variant="outline"
@@ -387,7 +392,7 @@ export default function VenueOwnerDashboardNew() {
                     </CardDescription>
                   </CardHeader>
                 </Card>
-                <VenueProfileEditor venue={venue} onUpdate={setVenue} />
+                <VenueProfileEditor venue={selectedVenue} onUpdate={setSelectedVenue} />
               </div>
             </TabsContent>
 
@@ -402,7 +407,7 @@ export default function VenueOwnerDashboardNew() {
                     </CardDescription>
                   </CardHeader>
                 </Card>
-                <EventPipelineCRM venueId={venue.id} />
+                <EventPipelineCRM venueId={selectedVenue?.id || ''} />
               </div>
             </TabsContent>
 

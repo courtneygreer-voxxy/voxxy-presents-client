@@ -12,6 +12,11 @@ import AdminDashboard from './pages/AdminDashboard'
 import CreateClubPage from './pages/CreateClubPage'
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
+import AuthTypePage from './pages/AuthTypePage'
+import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
+import VenueOwnerSignUpPage from './pages/VenueOwnerSignUpPage'
+import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
+import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
 import ProfilePage from './pages/ProfilePage'
 import PricingPage from './pages/PricingPage'
 import FeaturesPage from './pages/FeaturesPage'
@@ -23,6 +28,7 @@ import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
 import VenueCreatePage from './pages/VenueCreatePage'
+import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
 import VenueOwnerDashboardNew from './pages/VenueOwnerDashboardNew'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
@@ -52,14 +58,43 @@ export default function App() {
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
-          <Route path="/sign-up" element={
+          <Route path="/auth" element={
             <RedirectIfAuthenticated>
-              <SignUpPage />
+              <AuthTypePage />
+            </RedirectIfAuthenticated>
+          } />
+
+          {/* Legacy routes - redirect to auth selection */}
+          <Route path="/sign-up" element={
+            <RedirectIfAuthenticated redirectTo="/auth">
+              <AuthTypePage />
             </RedirectIfAuthenticated>
           } />
           <Route path="/login" element={
+            <RedirectIfAuthenticated redirectTo="/auth">
+              <AuthTypePage />
+            </RedirectIfAuthenticated>
+          } />
+
+          {/* Specific user type authentication routes */}
+          <Route path="/signup/club-owner" element={
             <RedirectIfAuthenticated>
-              <LoginPage />
+              <ClubOwnerSignUpPage />
+            </RedirectIfAuthenticated>
+          } />
+          <Route path="/signup/venue-owner" element={
+            <RedirectIfAuthenticated>
+              <VenueOwnerSignUpPage />
+            </RedirectIfAuthenticated>
+          } />
+          <Route path="/login/club-owner" element={
+            <RedirectIfAuthenticated>
+              <ClubOwnerLoginPage />
+            </RedirectIfAuthenticated>
+          } />
+          <Route path="/login/venue-owner" element={
+            <RedirectIfAuthenticated>
+              <VenueOwnerLoginPage />
             </RedirectIfAuthenticated>
           } />
 
@@ -69,7 +104,7 @@ export default function App() {
           {/* Protected routes - require authentication and beta access */}
           <Route path="/profile" element={
             <ProtectedRoute>
-              <BetaAccessGuard>
+              <BetaAccessGuard requireNonVenueOwner={true}>
                 <ProfilePage />
               </BetaAccessGuard>
             </ProtectedRoute>
@@ -90,16 +125,17 @@ export default function App() {
           } />
           <Route path="/venues/create" element={
             <ProtectedRoute requireEmailVerification={true}>
-              <BetaAccessGuard>
-                <VenueCreatePage />
-              </BetaAccessGuard>
+              <VenueCreatePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/venues/pending" element={
+            <ProtectedRoute requireEmailVerification={true}>
+              <VenuePendingApprovalPage />
             </ProtectedRoute>
           } />
           <Route path="/venues/dashboard" element={
             <ProtectedRoute requireEmailVerification={true}>
-              <BetaAccessGuard>
-                <VenueOwnerDashboardNew />
-              </BetaAccessGuard>
+              <VenueOwnerDashboardNew />
             </ProtectedRoute>
           } />
           <Route path="/create-club" element={

@@ -84,11 +84,12 @@ export default function AdminDashboard() {
       }
     }
 
-    // Load venues
+    // Load venues (temporarily disabled - venues endpoint not available in local API)
     const loadVenues = async () => {
       try {
-        const result = await venueService.searchVenues({})
-        setVenues(result.venues || [])
+        // const result = await venueService.searchVenues({})
+        // setVenues(result.venues || [])
+        setVenues([]) // Empty for now
       } catch (error) {
         console.error('Error loading venues:', error)
       } finally {
@@ -96,16 +97,18 @@ export default function AdminDashboard() {
       }
     }
 
-    // Load email data
+    // Load email data (temporarily disabled - email endpoint not available in local API)
     const loadEmailData = async () => {
       setEmailLoading(true)
       try {
-        const response = await fetch('/api/admin/email-dashboard')
-        if (response.ok) {
-          const data = await response.json()
-          setEmailData(data)
-          setLastRefresh(new Date())
-        }
+        // const response = await fetch('/api/admin/email-dashboard')
+        // if (response.ok) {
+        //   const data = await response.json()
+        //   setEmailData(data)
+        //   setLastRefresh(new Date())
+        // }
+        setEmailData([]) // Empty for now
+        setLastRefresh(new Date())
       } catch (error) {
         console.error('Error loading email data:', error)
       } finally {
@@ -142,7 +145,7 @@ export default function AdminDashboard() {
   }
 
   // Filter submissions
-  const filteredSubmissions = emailData?.submissions.filter(submission => {
+  const filteredSubmissions = (emailData?.submissions || []).filter(submission => {
     const matchesSearch = searchQuery === '' ||
       submission.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       submission.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -265,7 +268,7 @@ export default function AdminDashboard() {
                   <Users className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-purple-600">{emailData?.stats.beta_requests || 0}</div>
+                  <div className="text-2xl font-bold text-purple-600">{emailData?.stats?.beta_requests || 0}</div>
                   <p className="text-xs text-muted-foreground">Paid beta interest</p>
                 </CardContent>
               </Card>
@@ -276,7 +279,7 @@ export default function AdminDashboard() {
                   <TrendingUp className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-blue-600">{emailData?.stats.newsletter_signups || 0}</div>
+                  <div className="text-2xl font-bold text-blue-600">{emailData?.stats?.newsletter_signups || 0}</div>
                   <p className="text-xs text-muted-foreground">Newsletter signups</p>
                 </CardContent>
               </Card>
@@ -287,7 +290,7 @@ export default function AdminDashboard() {
                   <BarChart3 className="h-4 w-4 text-muted-foreground" />
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-gray-600">{emailData?.stats.general_contacts || 0}</div>
+                  <div className="text-2xl font-bold text-gray-600">{emailData?.stats?.general_contacts || 0}</div>
                   <p className="text-xs text-muted-foreground">Direct contact clicks</p>
                 </CardContent>
               </Card>

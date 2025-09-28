@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { updateUser } from '@/lib/database'
+import { venuesApi } from '@/services/api'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, AlertCircle } from 'lucide-react'
 import { VenueDetailsForm } from './VenueDetailsForm'
@@ -34,20 +35,43 @@ export function VenueCreateFlow() {
     setSubmitError(null)
 
     try {
-      // TODO: Implement venue creation API call
       console.log('Submitting venue:', finalData)
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
+      // Create venue via API
+      const venueResponse = await venuesApi.create({
+        name: finalData.name,
+        slug: finalData.slug,
+        description: finalData.description,
+        address: finalData.address,
+        coordinates: finalData.coordinates,
+        hours: finalData.hours,
+        capacity: finalData.capacity,
+        venueType: finalData.venueType,
+        amenities: finalData.amenities || [],
+        photos: finalData.photos || [],
+        contactInfo: {
+          name: finalData.ownerName,
+          email: finalData.ownerEmail,
+          phone: finalData.ownerPhone,
+          preferredContactMethod: finalData.preferredContactMethod || 'email'
+        },
+        accessibility: finalData.accessibility,
+        claimStatus: 'pending', // Set as pending for approval
+        ownerId: currentUser?.uid,
+        pricingType: finalData.pricingType || 'both'
+      })
 
-      // Mark venue owner onboarding as completed
-      if (currentUser) {
+      console.log('Venue created successfully:', venueResponse)
+
+      // Update user profile with venue ID and mark onboarding as completed
+      if (currentUser && venueResponse.venue) {
+        const existingVenueIds = userProfile?.venueOwnerProfile?.venueIds || []
         await updateUser(currentUser.uid, {
           venueOwnerProfile: {
-            venueIds: userProfile?.venueOwnerProfile?.venueIds || [],
-            businessInfo: userProfile?.venueOwnerProfile?.businessInfo || '',
-            phone: userProfile?.venueOwnerProfile?.phone || '',
-            preferredContactMethod: userProfile?.venueOwnerProfile?.preferredContactMethod || 'email',
+            venueIds: [...existingVenueIds, venueResponse.venue.id],
+            businessInfo: finalData.businessInfo || '',
+            phone: finalData.ownerPhone,
+            preferredContactMethod: finalData.preferredContactMethod || 'email',
             onboardingCompleted: true,
             ...userProfile?.venueOwnerProfile
           }
@@ -56,13 +80,13 @@ export function VenueCreateFlow() {
 
       setCurrentStep('submitted')
 
-      // Redirect to venue dashboard after a short delay
+      // Redirect to pending approval screen
       setTimeout(() => {
-        navigate('/venues/dashboard')
-      }, 2000)
+        navigate('/venues/pending')
+      }, 3000)
     } catch (error) {
       console.error('Error submitting venue:', error)
-      setSubmitError('Failed to submit venue. Please try again.')
+      setSubmitError(error instanceof Error ? error.message : 'Failed to submit venue. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
