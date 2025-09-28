@@ -405,6 +405,19 @@ venue_approvals/          # New: Admin approval workflow tracking
 
 **🎉 COMPLETED**: Full beta user management system with real backend data, deployed to production, ready for admin use.
 
+### Phase 1.7: Venue API Infrastructure ✅ COMPLETED
+**Goal**: Fix venue creation backend and ensure API functionality
+
+#### Sprint 1.7.1: Backend API Fixes ✅ COMPLETED
+- [x] Convert venues.ts from Firebase Client SDK to Admin SDK
+- [x] Fix TypeScript compilation errors in venue routes
+- [x] Enable venue creation endpoint with pending status by default
+- [x] Test venue creation and retrieval endpoints
+- [x] Clear development database to eliminate cross-wires
+- [x] Clear Firebase Authentication users for clean testing
+
+**🎉 COMPLETED**: Venue creation API is fully functional, development database cleared, ready for testing venue owner flows.
+
 ### Phase 2: Event Integration (Weeks 3-4)
 **Goal**: Connect events with venues and implement approval workflow
 
@@ -533,6 +546,33 @@ main ──┬── develop ──┬── feature/venue-owner-auth
 
 **Risk**: Low venue creation without existing venue claiming
 **Mitigation**: Targeted outreach, simplified creation flow, manual admin venue creation
+
+---
+
+## 🚨 Known Issues & Next Steps
+
+### Current Known Issues
+#### Issue #1: Venue Owner Routing Problem 🔴 CRITICAL
+**Status**: Identified - Needs Resolution
+**Problem**: After venue owner signup, users are redirected to `/profile` instead of `/venues/create`
+**Expected Flow**: Venue owners should go directly to venue creation after signup
+**Impact**: Venue owners cannot complete the intended onboarding flow
+**Location**: Likely in `ProtectedRoute.tsx` and/or `AuthContext.tsx` routing logic
+**Priority**: Critical - blocks venue owner onboarding
+
+**Investigation Required**:
+- Check `RedirectIfAuthenticated` component routing logic for venue owners
+- Verify `ProtectedRoute` component distinguishes venue owners from club owners
+- Confirm venue owner role detection and routing in auth context
+- Test that `isVenueOwner` flags are working correctly
+
+**Next Sprint**: Fix venue owner routing to enable proper onboarding flow completion
+
+### Recently Resolved Issues ✅
+- ✅ Firebase Admin SDK conversion - venues API now functional
+- ✅ Development database cleanup - all cross-wires removed
+- ✅ Authentication user cleanup - clean testing environment
+- ✅ Venue creation endpoint - API accepting requests properly
 
 ---
 
