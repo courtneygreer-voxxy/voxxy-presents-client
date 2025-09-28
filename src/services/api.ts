@@ -210,4 +210,24 @@ export const emailApi = {
   }
 }
 
+// Admin API
+export const adminApi = {
+  async getAllUsers() {
+    return fetchApi<any[]>('/admin/users')
+  },
+
+  async updateUserBetaStatus(userId: string, status: 'approved' | 'denied', notes?: string) {
+    return fetchApi<any>(`/admin/users/${userId}/beta-status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes }),
+    })
+  },
+
+  async approveAllBetaUsers() {
+    return fetchApi<any>('/admin/approve-all-beta-users', {
+      method: 'POST',
+    })
+  }
+}
+
 export { ApiError }

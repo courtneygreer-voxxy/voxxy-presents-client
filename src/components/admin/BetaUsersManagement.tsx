@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import type { User } from '@/types/database'
+import { adminApi, ApiError } from '@/services/api'
 
 interface BetaUser extends User {
   // Add any additional fields we might need
@@ -32,76 +33,36 @@ export default function BetaUsersManagement() {
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved' | 'denied'>('all')
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null)
+  const [approvingAll, setApprovingAll] = useState(false)
 
-  // Load beta users from API (using mock data for development)
+  // Load beta users from API
   const loadBetaUsers = async () => {
     setLoading(true)
     setError(null)
 
     try {
-      // Mock data for development - replace with actual API call when backend is ready
-      const mockBetaUsers: BetaUser[] = [
-        {
-          id: 'user1',
-          email: 'john@example.com',
-          name: 'John Doe',
-          role: 'organizer',
-          betaStatus: 'approved',
-          betaRequestedAt: new Date('2024-01-15'),
-          betaApprovedAt: new Date('2024-01-20'),
-          betaApprovedBy: 'admin',
-          organizationIds: ['org1'],
-          emailNotifications: true,
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-20')
-        },
-        {
-          id: 'user2',
-          email: 'sarah@creativecollective.com',
-          name: 'Sarah Chen',
-          role: 'organizer',
-          betaStatus: 'pending',
-          betaRequestedAt: new Date('2024-02-20'),
-          organizationIds: [],
-          emailNotifications: true,
-          createdAt: new Date('2024-02-20'),
-          updatedAt: new Date('2024-02-20')
-        },
-        {
-          id: 'user3',
-          email: 'mike@brooklynlounge.com',
-          name: 'Mike Rodriguez',
-          role: 'venue_owner',
-          betaStatus: 'approved',
-          betaRequestedAt: new Date('2024-03-10'),
-          betaApprovedAt: new Date('2024-03-15'),
-          betaApprovedBy: 'admin',
-          organizationIds: [],
-          emailNotifications: true,
-          createdAt: new Date('2024-03-10'),
-          updatedAt: new Date('2024-03-15')
-        }
-      ]
-
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 500))
-
-      setBetaUsers(mockBetaUsers)
+      const users = await adminApi.getAllUsers()
+      setBetaUsers(users.map(user => ({
+        ...user,
+        createdAt: new Date(user.createdAt),
+        updatedAt: new Date(user.updatedAt),
+        betaRequestedAt: user.betaRequestedAt ? new Date(user.betaRequestedAt) : user.createdAt ? new Date(user.createdAt) : new Date(),
+        betaApprovedAt: user.betaApprovedAt ? new Date(user.betaApprovedAt) : undefined
+      })))
       setLoading(false)
     } catch (err) {
       console.error('Error loading beta users:', err)
-      setError('Failed to load beta users')
+      setError(err instanceof ApiError ? err.message : 'Failed to load beta users')
       setLoading(false)
     }
   }
 
-  // Update user beta status (mock implementation)
+  // Update user beta status
   const updateBetaStatus = async (userId: string, status: 'approved' | 'denied') => {
     setUpdatingUserId(userId)
 
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await adminApi.updateUserBetaStatus(userId, status)
 
       // Update local state
       setBetaUsers(prevUsers =>
@@ -121,9 +82,29 @@ export default function BetaUsersManagement() {
 
     } catch (err) {
       console.error(`Error updating beta status:`, err)
-      setError(err instanceof Error ? err.message : `Failed to ${status} user`)
+      setError(err instanceof ApiError ? err.message : `Failed to ${status} user`)
     } finally {
       setUpdatingUserId(null)
+    }
+  }
+
+  // Approve all pending beta users
+  const approveAllBetaUsers = async () => {
+    setApprovingAll(true)
+    setError(null)
+
+    try {
+      await adminApi.approveAllBetaUsers()
+
+      // Reload users to get updated data
+      await loadBetaUsers()
+
+      console.log('All beta users approved successfully')
+    } catch (err) {
+      console.error('Error approving all beta users:', err)
+      setError(err instanceof ApiError ? err.message : 'Failed to approve all beta users')
+    } finally {
+      setApprovingAll(false)
     }
   }
 
@@ -240,10 +221,23 @@ export default function BetaUsersManagement() {
                 Manage beta access requests and user approvals
               </CardDescription>
             </div>
-            <Button onClick={loadBetaUsers} variant="outline" size="sm">
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex gap-2">
+              {stats.pending > 0 && (
+                <Button
+                  onClick={approveAllBetaUsers}
+                  disabled={approvingAll}
+                  className="bg-green-600 hover:bg-green-700"
+                  size="sm"
+                >
+                  <UserCheck className="h-4 w-4 mr-2" />
+                  {approvingAll ? 'Approving...' : `Approve All (${stats.pending})`}
+                </Button>
+              )}
+              <Button onClick={loadBetaUsers} variant="outline" size="sm">
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
