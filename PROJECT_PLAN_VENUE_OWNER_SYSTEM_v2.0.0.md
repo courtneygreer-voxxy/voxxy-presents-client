@@ -380,15 +380,30 @@ venue_approvals/          # New: Admin approval workflow tracking
 - Improved venue public page with subscription footer
 - Better admin permission handling
 
-### Phase 1.5: Unified Authentication (Current Phase) 🔄 IN PROGRESS
+### Phase 1.5: Unified Authentication ✅ COMPLETED
 **Goal**: Create unified signup/login experience for both club owners and venue owners
 
-#### Sprint 1.5.1: Unified Auth Flow
-- [ ] Create unified login/signup pages with tabs for different user types
-- [ ] Update authentication to handle venue owner vs club owner registration
-- [ ] Implement proper role assignment during signup
-- [ ] Add email verification requirements for venue owners
-- [ ] Test authentication flows across all user types
+#### Sprint 1.5.1: Unified Auth Flow ✅ COMPLETED
+- [x] Create unified login/signup pages with tabs for different user types
+- [x] Update authentication to handle venue owner vs club owner registration
+- [x] Implement proper role assignment during signup
+- [x] Add email verification requirements for venue owners
+- [x] Test authentication flows across all user types
+
+**🎉 COMPLETED**: Unified authentication system with tabbed interface for different user roles, proper venue owner onboarding flow that bypasses beta requirements, and role-based redirects after login.
+
+### Phase 1.6: Beta User Management (Current Phase) ✅ COMPLETED
+**Goal**: Connect real beta user data to admin dashboard for production management
+
+#### Sprint 1.6.1: Admin Beta Management ✅ COMPLETED
+- [x] Replace mock data with real API calls in BetaUsersManagement component
+- [x] Add admin API functions for user management (getAllUsers, updateUserBetaStatus, approveAllBetaUsers)
+- [x] Deploy API endpoints to Google Cloud Run production environment
+- [x] Add "Approve All" button for batch approval of pending beta users
+- [x] Synchronize all API repository branches with latest changes
+- [x] Test real-time beta user management through admin interface
+
+**🎉 COMPLETED**: Full beta user management system with real backend data, deployed to production, ready for admin use.
 
 ### Phase 2: Event Integration (Weeks 3-4)
 **Goal**: Connect events with venues and implement approval workflow
