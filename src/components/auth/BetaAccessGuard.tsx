@@ -23,8 +23,8 @@ export function BetaAccessGuard({ children, requireNonVenueOwner = false }: Beta
 
   // Check if this route requires non-venue-owner access
   if (requireNonVenueOwner && isVenueOwner) {
-    // Redirect venue owners to their dashboard instead of /profile
-    return <Navigate to="/venues/dashboard" replace />
+    // Redirect venue owners to their V2 dashboard instead of /profile
+    return <Navigate to="/venue-owner/dashboard" replace />
   }
 
   // Check beta status for authenticated users (venue owners skip beta)

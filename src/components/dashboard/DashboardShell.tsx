@@ -1,9 +1,21 @@
 import React from 'react'
 import { useAuth } from '@/contexts/AuthContext'
-import { User } from '@/types/database-v2'
+import { User as UserV2 } from '@/types/database-v2'
+import { User as UserV1 } from '@/types/database'
 import UniversalHeader from './UniversalHeader'
 import RoleBasedNavigation from './RoleBasedNavigation'
 import DynamicContent from './DynamicContent'
+
+// Helper function to convert V1 user to V2 compatible structure
+const normalizeUserForV2 = (user: UserV1): UserV2 => {
+  return {
+    ...user,
+    role: user.role === 'user' ? 'guest' : user.role as UserV2['role'],
+    approvalStatus: user.betaStatus || 'pending',
+    requestedAt: user.betaRequestedAt || user.createdAt,
+    deniedReason: undefined,
+  } as UserV2
+}
 
 interface DashboardShellProps {
   children?: React.ReactNode
@@ -29,17 +41,20 @@ export default function DashboardShell({ children }: DashboardShellProps) {
     return null
   }
 
+  // Normalize user profile for V2 compatibility
+  const normalizedUser = normalizeUserForV2(userProfile)
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Universal Header - same across all roles */}
-      <UniversalHeader user={userProfile} />
+      <UniversalHeader user={normalizedUser} />
 
       {/* Role-based Navigation */}
-      <RoleBasedNavigation role={userProfile.role} />
+      <RoleBasedNavigation role={normalizedUser.role} />
 
       {/* Dynamic Content Area */}
       <main className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <DynamicContent role={userProfile.role}>
+        <DynamicContent role={normalizedUser.role}>
           {children}
         </DynamicContent>
       </main>
@@ -51,7 +66,7 @@ export default function DashboardShell({ children }: DashboardShellProps) {
 export { DashboardShell }
 
 // Role-specific dashboard wrappers for clean component usage
-export function OrganizerDashboard({ children }: { children: React.ReactNode }) {
+export function OrganizerDashboard({ children }: { children?: React.ReactNode }) {
   return (
     <DashboardShell>
       {children}
@@ -59,7 +74,7 @@ export function OrganizerDashboard({ children }: { children: React.ReactNode }) 
   )
 }
 
-export function VenueOwnerDashboard({ children }: { children: React.ReactNode }) {
+export function VenueOwnerDashboard({ children }: { children?: React.ReactNode }) {
   return (
     <DashboardShell>
       {children}
@@ -67,7 +82,7 @@ export function VenueOwnerDashboard({ children }: { children: React.ReactNode })
   )
 }
 
-export function AdminDashboard({ children }: { children: React.ReactNode }) {
+export function AdminDashboard({ children }: { children?: React.ReactNode }) {
   return (
     <DashboardShell>
       {children}
@@ -75,7 +90,7 @@ export function AdminDashboard({ children }: { children: React.ReactNode }) {
   )
 }
 
-export function GuestDashboard({ children }: { children: React.ReactNode }) {
+export function GuestDashboard({ children }: { children?: React.ReactNode }) {
   return (
     <DashboardShell>
       {children}

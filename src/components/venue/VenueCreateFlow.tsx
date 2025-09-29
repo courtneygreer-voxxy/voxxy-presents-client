@@ -30,6 +30,16 @@ export function VenueCreateFlow() {
     setCurrentStep('review')
   }
 
+  // Helper function to generate URL-friendly slug
+  const generateSlug = (name: string): string => {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '') // Remove special characters
+      .replace(/[\s_-]+/g, '-') // Replace spaces and underscores with hyphens
+      .replace(/^-+|-+$/g, '') // Remove leading/trailing hyphens
+  }
+
   const handleSubmitVenue = async (finalData: VenueCreationRequest) => {
     setIsSubmitting(true)
     setSubmitError(null)
@@ -37,10 +47,14 @@ export function VenueCreateFlow() {
     try {
       console.log('Submitting venue:', finalData)
 
+      // Generate slug from venue name if not provided
+      const slug = finalData.slug || generateSlug(finalData.name)
+      console.log('Generated slug:', slug)
+
       // Create venue via API
       const venueResponse = await venuesApi.create({
         name: finalData.name,
-        slug: finalData.slug,
+        slug: slug,
         description: finalData.description,
         address: finalData.address,
         coordinates: finalData.coordinates,

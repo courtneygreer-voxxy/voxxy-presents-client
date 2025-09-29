@@ -1,7 +1,7 @@
 // API service for connecting to voxxy-presents-api backend
 import { getApiUrl } from '@/config/environments'
 
-const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002/api'
+const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 
 class ApiError extends Error {
@@ -25,6 +25,12 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   // Add admin key for admin endpoints
   if (endpoint.startsWith('/admin/')) {
     headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024'
+  }
+
+  // Debug logging
+  console.log(`🌐 API DEBUG: ${options?.method || 'GET'} ${url}`)
+  if (options?.body) {
+    console.log(`📦 API DEBUG: Request body:`, JSON.parse(options.body as string))
   }
 
   try {
@@ -52,6 +58,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     }
 
     const data = await response.json()
+    console.log(`✅ API DEBUG: ${options?.method || 'GET'} ${url} - Success:`, data)
     return data
     
   } catch (error) {
@@ -303,6 +310,21 @@ export const adminApi = {
   async approveAllBetaUsers() {
     return fetchApi<any>('/admin/approve-all-beta-users', {
       method: 'POST',
+    })
+  },
+
+  // Venue approval endpoints
+  async approveVenue(venueId: string, adminNotes?: string) {
+    return fetchApi<any>(`/admin/venues/${venueId}/approve`, {
+      method: 'PUT',
+      body: JSON.stringify({ adminNotes }),
+    })
+  },
+
+  async rejectVenue(venueId: string, reason: string, adminNotes?: string) {
+    return fetchApi<any>(`/admin/venues/${venueId}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason, adminNotes }),
     })
   }
 }

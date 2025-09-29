@@ -3,11 +3,20 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import { VenueCreateFlow } from '@/components/venue/VenueCreateFlow'
 import { Button } from '@/components/ui/button'
-import { ArrowLeft, Building2 } from 'lucide-react'
+import { ArrowLeft, Building2, LogOut, Home } from 'lucide-react'
 
 export default function VenueCreatePage() {
   const navigate = useNavigate()
-  const { currentUser, isAuthenticated } = useAuth()
+  const { currentUser, isAuthenticated, signOut } = useAuth()
+
+  const handleSignOut = async () => {
+    try {
+      await signOut()
+      navigate('/')
+    } catch (error) {
+      console.error('Failed to sign out:', error)
+    }
+  }
 
   // Redirect if not authenticated
   React.useEffect(() => {
@@ -57,22 +66,53 @@ export default function VenueCreatePage() {
       {/* Header */}
       <div className="relative z-10 bg-white/5 backdrop-blur-sm border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => navigate('/voxxy-shop')}
-              className="text-white hover:bg-white/10 flex items-center gap-2"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              Back to Voxxy Shop
-            </Button>
+          <div className="flex items-center justify-between">
+            {/* Left side navigation */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="text-white hover:bg-white/10 flex items-center gap-2"
+              >
+                <Home className="h-4 w-4" />
+                Home
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/venue-owner/dashboard')}
+                className="text-white hover:bg-white/10 flex items-center gap-2"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Dashboard
+              </Button>
+            </div>
+
+            {/* Right side - User actions */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleSignOut}
+                className="border-white/30 text-white hover:bg-white/10 flex items-center gap-2"
+              >
+                <LogOut className="h-4 w-4" />
+                Sign Out
+              </Button>
+            </div>
           </div>
+
           <div className="mt-4">
             <h1 className="text-3xl font-bold text-white">Create Your Venue</h1>
             <p className="text-gray-300 mt-2">
               Join Voxxy's network of event venues. Build your profile and start attracting events.
             </p>
+            <div className="mt-3 p-3 bg-blue-900/30 border border-blue-500/30 rounded-lg">
+              <p className="text-blue-200 text-sm">
+                💡 <strong>Having trouble?</strong> You can return to your dashboard or sign out anytime using the buttons above.
+              </p>
+            </div>
           </div>
         </div>
       </div>

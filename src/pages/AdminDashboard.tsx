@@ -84,14 +84,16 @@ export default function AdminDashboard() {
       }
     }
 
-    // Load venues (temporarily disabled - venues endpoint not available in local API)
+    // Load venues for approval management
     const loadVenues = async () => {
       try {
-        // const result = await venueService.searchVenues({})
-        // setVenues(result.venues || [])
-        setVenues([]) // Empty for now
+        const result = await venueService.searchVenues({})
+        console.log('Loaded venues for admin:', result)
+        setVenues(result.venues || [])
       } catch (error) {
         console.error('Error loading venues:', error)
+        // Set empty array if API fails, but still show the venue management interface
+        setVenues([])
       } finally {
         setVenueLoading(false)
       }
