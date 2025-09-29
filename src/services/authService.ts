@@ -122,7 +122,7 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     })
 
     // Determine role based on userType
-    const role = userType === 'venue-owner' ? 'venue_owner' : 'organizer'
+    const role = userType === 'venue-owner' ? 'venue_owner' : 'organizer' as const
 
     // Create user profile with different fields based on user type
     const baseUserData = {

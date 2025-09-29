@@ -48,7 +48,7 @@ export function VenueCreateFlow() {
       console.log('Submitting venue:', finalData)
 
       // Generate slug from venue name if not provided
-      const slug = finalData.slug || generateSlug(finalData.name)
+      const slug = (finalData as any).slug || generateSlug(finalData.name)
       console.log('Generated slug:', slug)
 
       // Create venue via API

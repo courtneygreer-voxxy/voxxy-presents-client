@@ -109,7 +109,7 @@ export default function AdminDashboard() {
         //   setEmailData(data)
         //   setLastRefresh(new Date())
         // }
-        setEmailData([]) // Empty for now
+        setEmailData(null) // Empty for now
         setLastRefresh(new Date())
       } catch (error) {
         console.error('Error loading email data:', error)
