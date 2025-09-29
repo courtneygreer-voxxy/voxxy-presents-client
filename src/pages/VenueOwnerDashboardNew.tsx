@@ -75,8 +75,8 @@ export default function VenueOwnerDashboardNew() {
           const pendingVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'pending')
           const approvedVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'approved')
 
-          console.log('🏢 VENUE DEBUG: Pending venues:', pendingVenues.length, pendingVenues.map(v => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
-          console.log('🏢 VENUE DEBUG: Approved venues:', approvedVenues.length, approvedVenues.map(v => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
+          console.log('🏢 VENUE DEBUG: Pending venues:', pendingVenues.length, pendingVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
+          console.log('🏢 VENUE DEBUG: Approved venues:', approvedVenues.length, approvedVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
 
           if (pendingVenues.length > 0 && approvedVenues.length === 0) {
             // All venues are pending, redirect to pending page

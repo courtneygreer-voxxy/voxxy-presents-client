@@ -19,7 +19,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
   // Add admin key for admin endpoints
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options?.headers,
+    ...(options?.headers as Record<string, string> || {}),
   }
 
   // Add admin key for admin endpoints

@@ -177,11 +177,11 @@ export function DebugPanel() {
           )}
 
           {/* Organizer Profile */}
-          {userProfile?.organizerProfile && isExpanded && (
+          {(userProfile as any)?.organizerProfile && isExpanded && (
             <div className="space-y-2">
               <div className="font-semibold text-gray-700">🎯 Organizer Profile</div>
               <div className="bg-green-50 p-2 rounded text-xs">
-                <div><strong>Org IDs:</strong> {userProfile.organizerProfile.organizationIds?.length || 0}</div>
+                <div><strong>Org IDs:</strong> {(userProfile as any).organizerProfile.organizationIds?.length || 0}</div>
               </div>
             </div>
           )}

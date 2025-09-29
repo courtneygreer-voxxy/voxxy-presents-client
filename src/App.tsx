@@ -65,10 +65,10 @@ function RoleBasedDashboardRedirect() {
       console.log('Admin detected, redirecting to admin dashboard')
       return <Navigate to="/admin/dashboard" replace />
 
-    case 'guest':
+    case 'user':
     default:
-      console.log('Guest or unknown role, redirecting to guest dashboard')
-      return <Navigate to="/guest/dashboard" replace />
+      console.log('User or unknown role, redirecting to home')
+      return <Navigate to="/" replace />
   }
 }
 
