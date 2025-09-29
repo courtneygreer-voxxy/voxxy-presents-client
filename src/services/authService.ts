@@ -122,7 +122,7 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     })
 
     // Determine role based on userType
-    const role = userType === 'venue-owner' ? 'venue_owner' : 'organizer' as const
+    const role: 'venue_owner' | 'organizer' = userType === 'venue-owner' ? 'venue_owner' : 'organizer'
 
     // Create user profile with different fields based on user type
     const baseUserData = {
@@ -151,11 +151,13 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     } : {}
 
     // Create user profile in Firestore
-    await createUser(user.uid, {
+    const userData = {
       ...baseUserData,
       ...clubOwnerData,
       ...venueOwnerData
-    })
+    } as any
+
+    await createUser(user.uid, userData)
     
     // Send email verification with rate limiting protection
     await sendEmailVerificationSafe(user)
