@@ -24,7 +24,9 @@ import {
   Bell,
   UserPlus,
   Star,
-  Phone
+  Phone,
+  Share,
+  Copy
 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { VenueProfileEditor } from '@/components/venue/VenueProfileEditor'
@@ -115,7 +117,25 @@ export default function VenueOwnerDashboardNew() {
 
   const handlePreviewVenue = () => {
     if (selectedVenue) {
+      console.log('🔗 VENUE DEBUG: Navigating to public venue page:', `/venue/${selectedVenue.slug}`)
       navigate(`/venue/${selectedVenue.slug}`)
+    }
+  }
+
+  const handleShareVenue = async () => {
+    if (selectedVenue) {
+      const publicUrl = `${window.location.origin}/venue/${selectedVenue.slug}`
+      console.log('🔗 VENUE DEBUG: Sharing venue URL:', publicUrl)
+
+      try {
+        await navigator.clipboard.writeText(publicUrl)
+        // TODO: Add toast notification for successful copy
+        console.log('✅ VENUE DEBUG: URL copied to clipboard')
+      } catch (err) {
+        console.error('❌ VENUE DEBUG: Failed to copy URL:', err)
+        // Fallback: show the URL in an alert
+        alert(`Venue URL: ${publicUrl}`)
+      }
     }
   }
 
@@ -252,50 +272,26 @@ export default function VenueOwnerDashboardNew() {
       <div className="relative z-10 bg-white/10 backdrop-blur-sm border-b border-white/20">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <Button
-                onClick={() => navigate('/voxxy-shop')}
-                variant="outline"
-                size="sm"
-                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-2xl font-bold text-white">{selectedVenue?.name}</h1>
-                  {venues.length > 1 && (
-                    <select
-                      value={selectedVenue?.id || ''}
-                      onChange={(e) => {
-                        const venue = venues.find(v => v.id === e.target.value)
-                        if (venue) setSelectedVenue(venue)
-                      }}
-                      className="bg-white/10 border border-white/20 text-white rounded px-3 py-1 text-sm"
-                    >
-                      {venues.map(venue => (
-                        <option key={venue.id} value={venue.id} className="bg-gray-800 text-white">
-                          {venue.name}
-                        </option>
-                      ))}
-                    </select>
-                  )}
-                </div>
-                <p className="text-gray-300 text-sm">Manage your venue profile and bookings</p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-white">My Venue</h1>
+              <p className="text-gray-300 text-sm">Manage your venue profile and bookings</p>
             </div>
             <div className="flex items-center gap-3">
-              {selectedVenue?.claimStatus === 'approved' && (
-                <Button
-                  onClick={handlePreviewVenue}
-                  variant="outline"
-                  size="sm"
-                  className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              {venues.length > 1 && (
+                <select
+                  value={selectedVenue?.id || ''}
+                  onChange={(e) => {
+                    const venue = venues.find(v => v.id === e.target.value)
+                    if (venue) setSelectedVenue(venue)
+                  }}
+                  className="bg-white/10 border border-white/20 text-white rounded px-3 py-1 text-sm"
                 >
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
-                </Button>
+                  {venues.map(venue => (
+                    <option key={venue.id} value={venue.id} className="bg-gray-800 text-white">
+                      {venue.name}
+                    </option>
+                  ))}
+                </select>
               )}
               <Button
                 onClick={handleLogout}
@@ -313,13 +309,9 @@ export default function VenueOwnerDashboardNew() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8 relative z-10">
-        <Tabs defaultValue="overview" className="flex gap-8" orientation="vertical">
+        <Tabs defaultValue="venue" className="flex gap-8" orientation="vertical">
           <div className="w-64 flex-shrink-0">
             <TabsList className="flex flex-col h-fit w-full !bg-transparent backdrop-blur-sm border border-white/20">
-              <TabsTrigger value="overview" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
-                <Building2 className="h-4 w-4 text-purple-400" />
-                Overview
-              </TabsTrigger>
               <TabsTrigger value="venue" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Building2 className="h-4 w-4 text-purple-400" />
                 My Venue
@@ -336,10 +328,9 @@ export default function VenueOwnerDashboardNew() {
           </div>
 
           <div className="flex-1 min-w-0">
-            {/* Overview Tab */}
-            <TabsContent value="overview">
+            {/* My Venue Tab */}
+            <TabsContent value="venue">
               <div className="space-y-6">
-                {/* Venue Info Card - Real Data */}
                 <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
                   <CardHeader>
                     <div className="flex items-center justify-between">
@@ -349,85 +340,30 @@ export default function VenueOwnerDashboardNew() {
                           {getStatusBadge()}
                         </CardTitle>
                         <CardDescription className="text-gray-300">
-                          {selectedVenue?.description}
+                          Manage your venue profile and information that appears on the public listing.
                         </CardDescription>
                       </div>
-                      <Button
-                        onClick={handlePreviewVenue}
-                        variant="outline"
-                        size="sm"
-                        className="bg-white/10 border-white/20 text-white hover:bg-white/20"
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        Preview Public Page
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    {/* Venue Details */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <MapPin className="h-5 w-5 text-purple-400" />
-                          <span className="text-gray-200">{selectedVenue?.address}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Users className="h-5 w-5 text-purple-400" />
-                          <span className="text-gray-200">Capacity: {selectedVenue?.capacity}</span>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <Building2 className="h-5 w-5 text-purple-400" />
-                          <span className="text-gray-200">Type: {selectedVenue?.venueType?.replace('_', ' ')}</span>
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <Mail className="h-5 w-5 text-purple-400" />
-                          <span className="text-gray-200">{selectedVenue?.contactInfo?.email}</span>
-                        </div>
-                        {selectedVenue?.contactInfo?.phone && (
-                          <div className="flex items-center gap-3">
-                            <Phone className="h-5 w-5 text-purple-400" />
-                            <span className="text-gray-200">{selectedVenue.contactInfo.phone}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <Calendar className="h-5 w-5 text-purple-400" />
-                          <span className="text-gray-200">
-                            Created: {selectedVenue?.createdAt ? new Date(selectedVenue.createdAt).toLocaleDateString() : 'Unknown'}
-                          </span>
-                        </div>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={handlePreviewVenue}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          Preview Public Page
+                        </Button>
+                        <Button
+                          onClick={handleShareVenue}
+                          variant="outline"
+                          size="sm"
+                          className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                        >
+                          <Share className="h-4 w-4 mr-2" />
+                          Share
+                        </Button>
                       </div>
                     </div>
-
-                    {/* Amenities */}
-                    {selectedVenue?.amenities && selectedVenue.amenities.length > 0 && (
-                      <div className="mt-6">
-                        <h3 className="text-lg font-semibold text-white mb-4">Amenities</h3>
-                        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                          {selectedVenue.amenities.map((amenity, index) => (
-                            <div key={index} className="flex items-center gap-2 bg-white/5 rounded-lg p-2">
-                              <Star className="h-4 w-4 text-purple-400" />
-                              <span className="text-gray-200 text-sm">{amenity}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </TabsContent>
-
-            {/* My Venue Tab */}
-            <TabsContent value="venue">
-              <div className="space-y-6">
-                <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
-                  <CardHeader>
-                    <CardTitle className="text-white">My Venue</CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Manage your venue profile and information that appears on the public listing.
-                    </CardDescription>
                   </CardHeader>
                 </Card>
                 <VenueProfileEditor venue={selectedVenue} onUpdate={setSelectedVenue} />
