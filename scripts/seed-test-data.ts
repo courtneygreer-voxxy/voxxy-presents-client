@@ -263,14 +263,22 @@ async function createTestEvent(organizationId: string, venueId: string): Promise
     const eventData = {
       title: 'Community Wine Tasting',
       description: 'Join us for an intimate wine tasting experience featuring local Brooklyn wines. Learn about different varietals while meeting fellow wine enthusiasts in our cozy loft space.',
+      fullDescription: 'Join us for an intimate wine tasting experience featuring carefully selected local Brooklyn wines. This educational and social evening will guide you through different varietals while you meet fellow wine enthusiasts in our cozy loft space. Our sommelier will share insights about each wine\'s origin, tasting notes, and perfect food pairings.',
       date: admin.firestore.Timestamp.fromDate(eventDate),
       endDate: admin.firestore.Timestamp.fromDate(endDate),
+      time: '7:00 PM - 9:30 PM',
       location: 'Brooklyn Loft',
       address: '123 Industrial Ave, Brooklyn, NY 11201',
       capacity: 30,
       attendeeCount: 0,
       organizationId: organizationId,
       venueId: venueId,
+      price: {
+        type: 'paid',
+        amount: 45,
+        currency: 'USD',
+        description: 'Includes wine tasting and light appetizers'
+      },
       ticketInfo: {
         price: 45,
         currency: 'USD',
