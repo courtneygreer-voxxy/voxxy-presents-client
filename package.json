@@ -24,7 +24,10 @@
     "build:production": "NODE_ENV=production VITE_ENVIRONMENT=production npm run build",
     "build:sandbox": "NODE_ENV=development VITE_ENVIRONMENT=sandbox npm run build",
     "mock-email-server": "node scripts/mock-email-server.mjs",
-    "security-check": "node scripts/check-security.js"
+    "security-check": "node scripts/check-security.js",
+    "cleanup-data": "tsx scripts/cleanup-firebase-data.ts",
+    "seed-data": "tsx scripts/seed-test-data.ts",
+    "refresh-env": "tsx scripts/refresh-environment.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
