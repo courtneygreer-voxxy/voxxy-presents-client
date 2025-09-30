@@ -21,8 +21,9 @@ import {
 import { VenueCard } from '@/components/venue/VenueCard'
 import { VenueFilters } from '@/components/venue/VenueFilters'
 import { Venue, VenueSearchFilters } from '@/types/venue'
+import { venuesApi } from '@/services/api'
 
-// Mock data for development - replace with API call
+// Mock data for development - fallback only
 import { getDevVenues } from '../../scripts/seed-dev-venues'
 
 type ViewMode = 'grid' | 'list'
@@ -59,14 +60,39 @@ export default function VenueSearchPortal() {
   const loadVenues = async () => {
     setLoading(true)
     setError(null)
-    
+
     try {
-      // For development, use mock data
-      const devVenues = getDevVenues()
-      setVenues(devVenues)
+      console.log('🏢 VENUE MARKETPLACE DEBUG: Loading venues from API')
+
+      // Call real API to get all venues
+      const apiResponse = await venuesApi.getAll({})
+
+      console.log('🏢 VENUE MARKETPLACE DEBUG: API response:', apiResponse)
+
+      if (apiResponse.success && apiResponse.venues) {
+        console.log(`✅ VENUE MARKETPLACE DEBUG: Found ${apiResponse.venues.length} venues in API`)
+        // Only show approved venues in the marketplace
+        const approvedVenues = apiResponse.venues.filter((venue: Venue) => venue.claimStatus === 'approved')
+        console.log(`✅ VENUE MARKETPLACE DEBUG: ${approvedVenues.length} approved venues`)
+        setVenues(approvedVenues)
+      } else {
+        console.log('⚠️ VENUE MARKETPLACE DEBUG: API call failed or no venues found, using mock data')
+        // Fallback to mock data for development
+        const devVenues = getDevVenues()
+        setVenues(devVenues)
+      }
     } catch (err) {
-      console.error('Error loading venues:', err)
-      setError('Failed to load venues. Please try again.')
+      console.error('🚨 VENUE MARKETPLACE DEBUG: Error loading venues:', err)
+
+      // Fallback to mock data if API fails
+      try {
+        console.log('⚠️ VENUE MARKETPLACE DEBUG: API failed, using mock data fallback')
+        const devVenues = getDevVenues()
+        setVenues(devVenues)
+      } catch (fallbackErr) {
+        console.error('🚨 VENUE MARKETPLACE DEBUG: Even fallback failed:', fallbackErr)
+        setError('Failed to load venues. Please try again.')
+      }
     } finally {
       setLoading(false)
     }
@@ -75,47 +101,85 @@ export default function VenueSearchPortal() {
   const handleSearch = async () => {
     setLoading(true)
     setError(null)
-    
+
     // Update URL with search params
     const params = new URLSearchParams()
     if (filters.location) params.set('location', filters.location)
     if (filters.pricingType && filters.pricingType !== 'both') params.set('pricing', filters.pricingType)
     setSearchParams(params)
-    
+
     try {
-      // For development, filter mock data
-      const devVenues = getDevVenues()
-      let filteredVenues = devVenues
+      console.log('🔍 VENUE MARKETPLACE DEBUG: Searching venues with filters:', filters)
 
-      // Apply location filter
+      // Build API search parameters
+      const searchParams: any = {}
+
       if (filters.location) {
-        const location = filters.location.toLowerCase()
-        filteredVenues = filteredVenues.filter(venue =>
-          venue.address.toLowerCase().includes(location) ||
-          venue.name.toLowerCase().includes(location)
-        )
+        searchParams.location = filters.location
       }
 
-      // Apply capacity filter
-      if (filters.capacity?.min || filters.capacity?.max) {
-        filteredVenues = filteredVenues.filter(venue => {
-          const capacity = venue.capacity
-          const minMatch = !filters.capacity?.min || capacity >= filters.capacity.min
-          const maxMatch = !filters.capacity?.max || capacity <= filters.capacity.max
-          return minMatch && maxMatch
-        })
+      if (filters.capacity?.min) {
+        searchParams.capacity_min = filters.capacity.min
       }
 
-      // Apply pricing type filter
+      if (filters.capacity?.max) {
+        searchParams.capacity_max = filters.capacity.max
+      }
+
       if (filters.pricingType && filters.pricingType !== 'both') {
-        filteredVenues = filteredVenues.filter(venue =>
-          venue.pricingType === filters.pricingType || venue.pricingType === 'both'
-        )
+        searchParams.pricing_type = filters.pricingType
       }
 
-      setVenues(filteredVenues)
+      // Only show approved venues
+      searchParams.claim_status = 'approved'
+
+      console.log('🔍 VENUE MARKETPLACE DEBUG: API search params:', searchParams)
+
+      // Call real API with search filters
+      const apiResponse = await venuesApi.getAll(searchParams)
+
+      console.log('🔍 VENUE MARKETPLACE DEBUG: Search API response:', apiResponse)
+
+      if (apiResponse.success && apiResponse.venues) {
+        console.log(`✅ VENUE MARKETPLACE DEBUG: Found ${apiResponse.venues.length} matching venues`)
+        setVenues(apiResponse.venues)
+      } else {
+        console.log('⚠️ VENUE MARKETPLACE DEBUG: Search API failed, using mock data with client-side filtering')
+
+        // Fallback to mock data with client-side filtering
+        const devVenues = getDevVenues()
+        let filteredVenues = devVenues
+
+        // Apply location filter
+        if (filters.location) {
+          const location = filters.location.toLowerCase()
+          filteredVenues = filteredVenues.filter(venue =>
+            venue.address.toLowerCase().includes(location) ||
+            venue.name.toLowerCase().includes(location)
+          )
+        }
+
+        // Apply capacity filter
+        if (filters.capacity?.min || filters.capacity?.max) {
+          filteredVenues = filteredVenues.filter(venue => {
+            const capacity = venue.capacity
+            const minMatch = !filters.capacity?.min || capacity >= filters.capacity.min
+            const maxMatch = !filters.capacity?.max || capacity <= filters.capacity.max
+            return minMatch && maxMatch
+          })
+        }
+
+        // Apply pricing type filter
+        if (filters.pricingType && filters.pricingType !== 'both') {
+          filteredVenues = filteredVenues.filter(venue =>
+            venue.pricingType === filters.pricingType || venue.pricingType === 'both'
+          )
+        }
+
+        setVenues(filteredVenues)
+      }
     } catch (err) {
-      console.error('Error searching venues:', err)
+      console.error('🚨 VENUE MARKETPLACE DEBUG: Search error:', err)
       setError('Search failed. Please try again.')
     } finally {
       setLoading(false)
@@ -304,16 +368,12 @@ export default function VenueSearchPortal() {
               </div>
             )}
 
-            {/* Coming Soon Features */}
+            {/* Footer */}
             {!loading && venues.length > 0 && (
-              <div className="mt-8 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg p-6 text-center">
-                <h3 className="font-semibold text-blue-200 mb-2">Coming Soon</h3>
-                <p className="text-blue-300 text-sm mb-4">
-                  Interactive map view, availability calendar, and direct booking
+              <div className="mt-8 text-center py-6">
+                <p className="text-gray-400 text-sm">
+                  Voxxy Presents™
                 </p>
-                <div className="inline-flex px-3 py-1 bg-blue-600/30 border border-blue-400/40 text-blue-200 text-xs rounded-full">
-                  v1.5.0 Features
-                </div>
               </div>
             )}
           </div>

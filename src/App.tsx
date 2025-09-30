@@ -1,9 +1,15 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
+import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import { BetaAccessGuard } from './components/auth/BetaAccessGuard'
+// V2 Architecture imports
+import ProtectedRouteV2, { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
+import { OrganizerDashboard, VenueOwnerDashboard, AdminDashboard as AdminDashboardV2, GuestDashboard } from './components/dashboard/DashboardShell'
+import VenueOwnerDashboardNew from './pages/VenueOwnerDashboardNew'
+import ProfilePage from './pages/ProfilePage'
 import HomePage from './pages/HomePage'
 import BetaPendingPage from './pages/BetaPendingPage'
 import OrganizationPublic from './pages/OrganizationPublic'
@@ -12,7 +18,11 @@ import AdminDashboard from './pages/AdminDashboard'
 import CreateClubPage from './pages/CreateClubPage'
 import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
-import ProfilePage from './pages/ProfilePage'
+import AuthTypePage from './pages/AuthTypePage'
+import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
+import VenueOwnerSignUpPage from './pages/VenueOwnerSignUpPage'
+import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
+import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
 import PricingPage from './pages/PricingPage'
 import FeaturesPage from './pages/FeaturesPage'
 import HelpPage from './pages/HelpPage'
@@ -23,11 +33,44 @@ import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
 import VenueCreatePage from './pages/VenueCreatePage'
-import VenueOwnerDashboardNew from './pages/VenueOwnerDashboardNew'
+import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
 import AnalyticsTestPage from './pages/AnalyticsTestPage'
+import { DebugPanel } from './components/debug/DebugPanel'
+
+// Role-based dashboard redirect component
+function RoleBasedDashboardRedirect() {
+  const { userProfile } = useAuth()
+
+  console.log('RoleBasedDashboardRedirect - User profile:', userProfile)
+
+  if (!userProfile) {
+    console.log('No user profile, redirecting to home')
+    return <Navigate to="/" replace />
+  }
+
+  // Route based on user role
+  switch (userProfile.role) {
+    case 'venue_owner':
+      console.log('Venue owner detected, redirecting to venue dashboard')
+      return <Navigate to="/venue-owner/dashboard" replace />
+
+    case 'organizer':
+      console.log('Organizer (club owner) detected, redirecting to organizer dashboard')
+      return <Navigate to="/organizer/dashboard" replace />
+
+    case 'admin':
+      console.log('Admin detected, redirecting to admin dashboard')
+      return <Navigate to="/admin/dashboard" replace />
+
+    case 'user':
+    default:
+      console.log('User or unknown role, redirecting to home')
+      return <Navigate to="/" replace />
+  }
+}
 
 export default function App() {
   // Initialize analytics on app start
@@ -38,6 +81,8 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Debug Panel - Shows on all pages in development */}
+        <DebugPanel />
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<HomePage />} />
@@ -52,28 +97,50 @@ export default function App() {
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
+          <Route path="/auth" element={
+            <RedirectIfAuthenticatedV2>
+              <AuthTypePage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
+          {/* Legacy routes - redirect to auth selection */}
           <Route path="/sign-up" element={
-            <RedirectIfAuthenticated>
-              <SignUpPage />
-            </RedirectIfAuthenticated>
+            <RedirectIfAuthenticatedV2 redirectTo="/auth">
+              <AuthTypePage />
+            </RedirectIfAuthenticatedV2>
           } />
           <Route path="/login" element={
-            <RedirectIfAuthenticated>
-              <LoginPage />
-            </RedirectIfAuthenticated>
+            <RedirectIfAuthenticatedV2 redirectTo="/auth">
+              <AuthTypePage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
+          {/* Specific user type authentication routes */}
+          <Route path="/signup/club-owner" element={
+            <RedirectIfAuthenticatedV2>
+              <ClubOwnerSignUpPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+          <Route path="/signup/venue-owner" element={
+            <RedirectIfAuthenticatedV2>
+              <VenueOwnerSignUpPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+          <Route path="/login/club-owner" element={
+            <RedirectIfAuthenticatedV2>
+              <ClubOwnerLoginPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+          <Route path="/login/venue-owner" element={
+            <RedirectIfAuthenticatedV2>
+              <VenueOwnerLoginPage />
+            </RedirectIfAuthenticatedV2>
           } />
 
           {/* Beta pending page */}
           <Route path="/beta-pending" element={<BetaPendingPage />} />
 
           {/* Protected routes - require authentication and beta access */}
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <BetaAccessGuard>
-                <ProfilePage />
-              </BetaAccessGuard>
-            </ProtectedRoute>
-          } />
           <Route path="/voxxy-shop" element={
             <ProtectedRoute>
               <BetaAccessGuard>
@@ -88,19 +155,19 @@ export default function App() {
               </BetaAccessGuard>
             </ProtectedRoute>
           } />
+          {/* Legacy venue routes - redirect to V2 paths */}
           <Route path="/venues/create" element={
-            <ProtectedRoute requireEmailVerification={true}>
-              <BetaAccessGuard>
-                <VenueCreatePage />
-              </BetaAccessGuard>
-            </ProtectedRoute>
+            <ProtectedRouteV2 requireEmailVerification={true} allowedRoles={['venue_owner', 'admin']}>
+              <VenueCreatePage />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/venues/pending" element={
+            <ProtectedRouteV2 requireEmailVerification={true} allowedRoles={['venue_owner', 'admin']}>
+              <VenuePendingApprovalPage />
+            </ProtectedRouteV2>
           } />
           <Route path="/venues/dashboard" element={
-            <ProtectedRoute requireEmailVerification={true}>
-              <BetaAccessGuard>
-                <VenueOwnerDashboardNew />
-              </BetaAccessGuard>
-            </ProtectedRoute>
+            <Navigate to="/venue-owner/dashboard" replace />
           } />
           <Route path="/create-club" element={
             <ProtectedRoute requireEmailVerification={true}>
@@ -134,6 +201,109 @@ export default function App() {
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
+
+          {/* V2 Architecture Dashboard Routes */}
+          {/* Organizer Dashboard - Restored Original Beautiful Styling */}
+          <Route path="/organizer/dashboard" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+              <ProfilePage />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/organizer/organizations" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+              <ProfilePage />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/organizer/events" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+              <ProfilePage />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/organizer/audience" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+              <ProfilePage />
+            </ProtectedRouteV2>
+          } />
+
+          {/* Venue Owner Dashboard */}
+          <Route path="/venue-owner/dashboard" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/venue-owner/venues" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/venue-owner/bookings" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/venue-owner/profile" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+
+          {/* Admin V2 Dashboard */}
+          <Route path="/admin/v2" element={
+            <ProtectedRouteV2 allowedRoles={['admin']}>
+              <AdminDashboardV2 />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/admin/approvals" element={
+            <ProtectedRouteV2 allowedRoles={['admin']}>
+              <AdminDashboardV2 />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/admin/users" element={
+            <ProtectedRouteV2 allowedRoles={['admin']}>
+              <AdminDashboardV2 />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/admin/content" element={
+            <ProtectedRouteV2 allowedRoles={['admin']}>
+              <AdminDashboardV2 />
+            </ProtectedRouteV2>
+          } />
+
+          {/* Guest Dashboard (Future) */}
+          <Route path="/guest/dashboard" element={
+            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
+              <GuestDashboard />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/guest/registrations" element={
+            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
+              <GuestDashboard />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/guest/favorites" element={
+            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
+              <GuestDashboard />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/guest/social" element={
+            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
+              <GuestDashboard />
+            </ProtectedRouteV2>
+          } />
+
+          {/* Universal Settings Route */}
+          <Route path="/settings" element={
+            <ProtectedRouteV2>
+              <div>Settings page coming soon...</div>
+            </ProtectedRouteV2>
+          } />
+
+          {/* Legacy Route Redirects for V2 - Role-based dashboard routing */}
+          <Route path="/profile" element={
+            <ProtectedRouteV2>
+              <RoleBasedDashboardRedirect />
+            </ProtectedRouteV2>
+          } />
         </Routes>
       </Router>
     </AuthProvider>

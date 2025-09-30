@@ -1,7 +1,7 @@
 // API service for connecting to voxxy-presents-api backend
 import { getApiUrl } from '@/config/environments'
 
-const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3002/api'
+const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 
 class ApiError extends Error {
@@ -15,13 +15,27 @@ class ApiError extends Error {
 
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
-  
+
+  // Add admin key for admin endpoints
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options?.headers as Record<string, string> || {}),
+  }
+
+  // Add admin key for admin endpoints
+  if (endpoint.startsWith('/admin/')) {
+    headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024'
+  }
+
+  // Debug logging
+  console.log(`🌐 API DEBUG: ${options?.method || 'GET'} ${url}`)
+  if (options?.body) {
+    console.log(`📦 API DEBUG: Request body:`, JSON.parse(options.body as string))
+  }
+
   try {
     const response = await fetch(url, {
-      headers: {
-        'Content-Type': 'application/json',
-        ...options?.headers,
-      },
+      headers,
       ...options,
     })
 
@@ -44,6 +58,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     }
 
     const data = await response.json()
+    console.log(`✅ API DEBUG: ${options?.method || 'GET'} ${url} - Success:`, data)
     return data
     
   } catch (error) {
@@ -207,6 +222,110 @@ export const emailApi = {
   async getEmailThreads(organizationId?: string) {
     const endpoint = organizationId ? `/email/threads?organization=${organizationId}` : '/email/threads'
     return fetchApi<any[]>(endpoint)
+  }
+}
+
+// Venues API
+export const venuesApi = {
+  async create(data: any) {
+    return fetchApi<any>('/venues', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async getAll(params?: {
+    location?: string
+    capacity_min?: number
+    capacity_max?: number
+    pricing_type?: string
+    venue_type?: string
+    claim_status?: string
+    limit?: number
+    offset?: number
+  }) {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    return fetchApi<any>(`/venues?${queryParams}`)
+  },
+
+  async getBySlug(slug: string) {
+    return fetchApi<any>(`/venues/${slug}`)
+  },
+
+  async getById(id: string) {
+    return fetchApi<any>(`/venues/by-id/${id}`)
+  },
+  async getByOwner(ownerId: string) {
+    return fetchApi<any>(`/venues/by-owner/${ownerId}`)
+  },
+
+  async update(id: string, data: any) {
+    return fetchApi<any>(`/venues/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  async delete(id: string) {
+    return fetchApi<any>(`/venues/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  async contact(id: string, data: {
+    fromName: string
+    fromEmail: string
+    eventDate?: string
+    attendeeCount?: number
+    eventType?: string
+    message: string
+  }) {
+    return fetchApi<any>(`/venues/${id}/contact`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  }
+}
+
+// Admin API
+export const adminApi = {
+  async getAllUsers() {
+    return fetchApi<any[]>('/admin/users')
+  },
+
+  async updateUserBetaStatus(userId: string, status: 'approved' | 'denied', notes?: string) {
+    return fetchApi<any>(`/admin/users/${userId}/beta-status`, {
+      method: 'PUT',
+      body: JSON.stringify({ status, notes }),
+    })
+  },
+
+  async approveAllBetaUsers() {
+    return fetchApi<any>('/admin/approve-all-beta-users', {
+      method: 'POST',
+    })
+  },
+
+  // Venue approval endpoints
+  async approveVenue(venueId: string, adminNotes?: string) {
+    return fetchApi<any>(`/admin/venues/${venueId}/approve`, {
+      method: 'PUT',
+      body: JSON.stringify({ adminNotes }),
+    })
+  },
+
+  async rejectVenue(venueId: string, reason: string, adminNotes?: string) {
+    return fetchApi<any>(`/admin/venues/${venueId}/reject`, {
+      method: 'PUT',
+      body: JSON.stringify({ reason, adminNotes }),
+    })
   }
 }
 

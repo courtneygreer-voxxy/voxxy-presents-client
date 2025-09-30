@@ -45,9 +45,9 @@ export function VenuesManagement({ venues, onVenueUpdate }: VenuesManagementProp
       )
     }
 
-    // Filter by status
+    // Filter by status (use claimStatus for venues)
     if (statusFilter !== 'all') {
-      filtered = filtered.filter(venue => venue.approvalStatus === statusFilter)
+      filtered = filtered.filter(venue => venue.claimStatus === statusFilter)
     }
 
     setFilteredVenues(filtered)
@@ -68,7 +68,7 @@ export function VenuesManagement({ venues, onVenueUpdate }: VenuesManagementProp
       if (updatedVenue && onVenueUpdate) {
         const updated: Venue = {
           ...updatedVenue,
-          approvalStatus: 'approved',
+          claimStatus: 'approved',
           approvedBy: request.adminId,
           approvedAt: new Date()
         }
@@ -106,7 +106,7 @@ export function VenuesManagement({ venues, onVenueUpdate }: VenuesManagementProp
       if (updatedVenue && onVenueUpdate) {
         const updated: Venue = {
           ...updatedVenue,
-          approvalStatus: 'rejected',
+          claimStatus: 'rejected',
           rejectedReason: request.reason,
           approvedBy: request.adminId,
           approvedAt: new Date()
@@ -133,9 +133,9 @@ export function VenuesManagement({ venues, onVenueUpdate }: VenuesManagementProp
   const getStatusCounts = () => {
     return {
       total: venues.length,
-      pending: venues.filter(v => v.approvalStatus === 'pending').length,
-      approved: venues.filter(v => v.approvalStatus === 'approved').length,
-      rejected: venues.filter(v => v.approvalStatus === 'rejected').length
+      pending: venues.filter(v => v.claimStatus === 'pending').length,
+      approved: venues.filter(v => v.claimStatus === 'approved').length,
+      rejected: venues.filter(v => v.claimStatus === 'rejected').length
     }
   }
 

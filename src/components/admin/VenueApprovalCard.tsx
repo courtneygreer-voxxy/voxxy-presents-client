@@ -18,6 +18,7 @@ import {
 } from 'lucide-react'
 import { Venue, VenueApprovalRequest } from '@/types/venue'
 import { useAuth } from '@/contexts/AuthContext'
+import { adminApi, venuesApi } from '@/services/api'
 
 interface VenueApprovalCardProps {
   venue: Venue
@@ -34,7 +35,7 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
   const [error, setError] = useState<string | null>(null)
 
   const getStatusIcon = () => {
-    switch (venue.approvalStatus) {
+    switch (venue.claimStatus) {
       case 'approved':
         return <CheckCircle className="h-5 w-5 text-green-600" />
       case 'rejected':
@@ -46,7 +47,7 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
   }
 
   const getStatusBadge = () => {
-    switch (venue.approvalStatus) {
+    switch (venue.claimStatus) {
       case 'approved':
         return <Badge className="bg-green-100 text-green-800">Approved</Badge>
       case 'rejected':
@@ -58,18 +59,37 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
   }
 
   const handleApprove = async () => {
-    if (!userProfile?.id || !onApprove) return
+    if (!userProfile?.id) return
 
     setIsProcessing(true)
     setError(null)
 
     try {
-      await onApprove({
-        venueId: venue.id,
-        action: 'approve',
-        adminId: userProfile.id,
+      console.log('Approving venue:', venue.id)
+
+      // Use real API endpoint to approve venue
+      const response = await venuesApi.update(venue.id, {
+        claimStatus: 'approved',
+        approvedBy: userProfile.id,
         adminNotes: adminNotes || undefined
       })
+
+      console.log('Venue approved successfully:', response)
+
+      // Call the parent component's onApprove for UI updates
+      if (onApprove) {
+        await onApprove({
+          venueId: venue.id,
+          action: 'approve',
+          adminId: userProfile.id,
+          adminNotes: adminNotes || undefined
+        })
+      }
+
+      // Clear form and refresh page to show updated status
+      setAdminNotes('')
+      window.location.reload()
+
     } catch (err) {
       console.error('Error approving venue:', err)
       setError('Failed to approve venue. Please try again.')
@@ -79,7 +99,7 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
   }
 
   const handleReject = async () => {
-    if (!userProfile?.id || !onReject) return
+    if (!userProfile?.id) return
     if (!rejectReason.trim()) {
       setError('Rejection reason is required')
       return
@@ -89,16 +109,36 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
     setError(null)
 
     try {
-      await onReject({
-        venueId: venue.id,
-        action: 'reject',
-        adminId: userProfile.id,
-        reason: rejectReason,
+      console.log('Rejecting venue:', venue.id, 'Reason:', rejectReason)
+
+      // Use real API endpoint to reject venue
+      const response = await venuesApi.update(venue.id, {
+        claimStatus: 'rejected',
+        rejectedReason: rejectReason,
+        approvedBy: userProfile.id,
         adminNotes: adminNotes || undefined
       })
+
+      console.log('Venue rejected successfully:', response)
+
+      // Call the parent component's onReject for UI updates
+      if (onReject) {
+        await onReject({
+          venueId: venue.id,
+          action: 'reject',
+          adminId: userProfile.id,
+          reason: rejectReason,
+          adminNotes: adminNotes || undefined
+        })
+      }
+
       setShowRejectForm(false)
       setRejectReason('')
       setAdminNotes('')
+
+      // Refresh page to show updated status
+      window.location.reload()
+
     } catch (err) {
       console.error('Error rejecting venue:', err)
       setError('Failed to reject venue. Please try again.')
@@ -107,14 +147,26 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
     }
   }
 
-  const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(date)
+  const formatDate = (date: Date | string | null | undefined) => {
+    if (!date) return 'Unknown date'
+
+    try {
+      const dateObj = date instanceof Date ? date : new Date(date)
+      if (isNaN(dateObj.getTime())) {
+        return 'Invalid date'
+      }
+
+      return new Intl.DateTimeFormat('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(dateObj)
+    } catch (error) {
+      console.warn('Error formatting date:', date, error)
+      return 'Invalid date'
+    }
   }
 
   return (
@@ -191,7 +243,7 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
         )}
 
         {/* Admin Actions */}
-        {venue.approvalStatus === 'pending' && (userProfile?.role === 'admin') && (
+        {venue.claimStatus === 'pending' && (userProfile?.role === 'admin' || localStorage.getItem('voxxy_admin_session') === 'true') && (
           <div className="space-y-3 pt-4 border-t">
             {!showRejectForm ? (
               <>
@@ -300,7 +352,7 @@ export function VenueApprovalCard({ venue, onApprove, onReject }: VenueApprovalC
         )}
 
         {/* Rejection Details */}
-        {venue.approvalStatus === 'rejected' && venue.rejectedReason && (
+        {venue.claimStatus === 'rejected' && venue.rejectedReason && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3">
             <h4 className="font-medium text-red-900 text-sm mb-1">Rejection Reason</h4>
             <p className="text-red-800 text-sm">{venue.rejectedReason}</p>

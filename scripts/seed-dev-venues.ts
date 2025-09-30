@@ -73,7 +73,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -103,7 +103,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -133,7 +133,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -164,7 +164,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -193,7 +193,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -225,7 +225,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -255,7 +255,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -285,7 +285,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -315,7 +315,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': false,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'both'
   },
@@ -345,7 +345,7 @@ export const DEV_VENUES: Omit<Venue, 'id' | 'createdAt' | 'updatedAt'>[] = [
       '420Friendly': true,
       genderNeutralBathrooms: true
     },
-    approvalStatus: 'pending',
+    claimStatus: 'pending',
     ownerId: 'dev-owner-1',
     pricingType: 'free'
   }

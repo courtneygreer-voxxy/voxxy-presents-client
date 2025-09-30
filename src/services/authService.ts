@@ -19,6 +19,7 @@ export interface SignUpData {
   email: string
   password: string
   displayName: string
+  userType?: 'club-owner' | 'venue-owner' // Optional, defaults to club-owner for backwards compatibility
 }
 
 export interface SignInData {
@@ -108,28 +109,55 @@ class EmailVerificationLimiter {
 const emailVerificationLimiter = new EmailVerificationLimiter()
 
 // Sign up with email and password
-export const signUp = async ({ email, password, displayName }: SignUpData): Promise<AuthResult> => {
+export const signUp = async ({ email, password, displayName, userType = 'club-owner' }: SignUpData): Promise<AuthResult> => {
   let user: FirebaseUser | null = null
-  
+
   try {
     const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password)
     user = userCredential.user
-    
+
     // Update the user's display name
     await updateProfile(user, {
       displayName: displayName
     })
-    
-    // Create user profile in Firestore
-    await createUser(user.uid, {
+
+    // Determine role based on userType
+    const role: 'venue_owner' | 'organizer' = userType === 'venue-owner' ? 'venue_owner' : 'organizer'
+
+    // Create user profile with different fields based on user type
+    const baseUserData = {
       email: user.email!,
       name: displayName,
-      role: 'organizer', // All new users are club organizers
-      organizationIds: [], // Will be populated when they create clubs
+      role: role,
+      organizationIds: [], // Will be populated when they create clubs/venues
       emailNotifications: true,
-      betaStatus: 'pending', // New users start with pending beta access
-      betaRequestedAt: new Date()
-    })
+    }
+
+    // Club owners go through beta approval process
+    const clubOwnerData = userType === 'club-owner' ? {
+      betaStatus: 'pending' as const,
+      betaRequestedAt: new Date(),
+    } : {}
+
+    // Venue owners skip beta entirely and go straight to venue creation
+    const venueOwnerData = userType === 'venue-owner' ? {
+      venueOwnerProfile: {
+        venueIds: [],
+        businessInfo: '',
+        phone: '',
+        preferredContactMethod: 'email' as const,
+        onboardingCompleted: false
+      }
+    } : {}
+
+    // Create user profile in Firestore
+    const userData = {
+      ...baseUserData,
+      ...clubOwnerData,
+      ...venueOwnerData
+    } as any
+
+    await createUser(user.uid, userData)
     
     // Send email verification with rate limiting protection
     await sendEmailVerificationSafe(user)
