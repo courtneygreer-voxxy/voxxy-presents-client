@@ -6,8 +6,10 @@
  * Perfect for staging deployments and testing
  */
 
-import { cleanupFirebaseData } from './cleanup-firebase-data'
-import { seedTestData } from './seed-test-data'
+import { spawn } from 'child_process'
+import { promisify } from 'util'
+
+const execAsync = promisify(spawn)
 
 /**
  * Complete environment refresh
@@ -26,10 +28,36 @@ async function refreshEnvironment(env: string): Promise<void> {
 
     // Step 1: Cleanup
     console.log('📍 STEP 1: Cleaning existing data')
-    await cleanupFirebaseData(env)
+    await new Promise((resolve, reject) => {
+      const cleanupProcess = spawn('bash', ['-c', `echo "yes" | npm run cleanup-data ${env}`], {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      })
+
+      cleanupProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve(undefined)
+        } else {
+          reject(new Error(`Cleanup failed with exit code ${code}`))
+        }
+      })
+    })
 
     console.log('\n📍 STEP 2: Seeding fresh test data')
-    await seedTestData(env)
+    await new Promise((resolve, reject) => {
+      const seedProcess = spawn('npm', ['run', 'seed-data', env], {
+        stdio: 'inherit',
+        cwd: process.cwd()
+      })
+
+      seedProcess.on('close', (code) => {
+        if (code === 0) {
+          resolve(undefined)
+        } else {
+          reject(new Error(`Seeding failed with exit code ${code}`))
+        }
+      })
+    })
 
     const totalDuration = ((Date.now() - startTime) / 1000).toFixed(2)
 
@@ -61,7 +89,7 @@ async function refreshEnvironment(env: string): Promise<void> {
 }
 
 // CLI Usage
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const env = process.argv[2]
 
   if (!env || !['development', 'staging', 'production'].includes(env)) {

@@ -68,6 +68,7 @@
     "embla-carousel-react": "latest",
     "esbuild": "^0.25.10",
     "firebase": "^12.0.0",
+    "firebase-admin": "^13.5.0",
     "geist": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",

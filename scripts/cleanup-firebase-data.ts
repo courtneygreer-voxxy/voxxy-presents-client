@@ -9,6 +9,7 @@
 import admin from 'firebase-admin'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import { createInterface } from 'readline'
 
 // Environment configuration
 interface EnvironmentConfig {
@@ -69,6 +70,15 @@ function initializeFirebase(env: string): void {
   }
 
   try {
+    // Check if app already exists
+    try {
+      admin.getApp()
+      console.log(`✅ Firebase already initialized for ${env} environment`)
+      return
+    } catch {
+      // App doesn't exist, initialize it
+    }
+
     const serviceAccountPath = resolve(config.serviceAccountPath)
     const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'))
 
@@ -180,7 +190,7 @@ async function clearAuthUsers(): Promise<void> {
  */
 function confirmCleanup(env: string): Promise<boolean> {
   return new Promise((resolve) => {
-    const readline = require('readline').createInterface({
+    const readline = createInterface({
       input: process.stdin,
       output: process.stdout
     })
@@ -245,7 +255,7 @@ async function cleanupFirebaseData(env: string): Promise<void> {
 }
 
 // CLI Usage
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   const env = process.argv[2]
 
   if (!env || !environments[env]) {
