@@ -28,8 +28,8 @@ interface EnvironmentConfig {
 function validateEnvironmentVariables(): void {
   const required = [
     'VITE_FIREBASE_API_KEY',
-    'VITE_FIREBASE_PROJECT_ID',
-    'VITE_JWT_SECRET'
+    'VITE_FIREBASE_PROJECT_ID'
+    // VITE_JWT_SECRET is optional - only needed for QR code generation
   ];
 
   const missing = required.filter(key => !import.meta.env[key]);
@@ -38,14 +38,18 @@ function validateEnvironmentVariables(): void {
     throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
   }
 
-  // Additional validation for JWT secret
+  // Optional validation for JWT secret (only if provided)
   const jwtSecret = import.meta.env.VITE_JWT_SECRET;
-  if (jwtSecret && jwtSecret.length < 32) {
-    console.warn('⚠️ JWT secret should be at least 32 characters for security');
-  }
+  if (jwtSecret) {
+    if (jwtSecret.length < 32) {
+      console.warn('⚠️ JWT secret should be at least 32 characters for security');
+    }
 
-  if (jwtSecret && (jwtSecret.includes('dev-') || jwtSecret.includes('staging-')) && import.meta.env.VITE_ENVIRONMENT === 'production') {
-    throw new Error('🚨 Development/staging JWT secret detected in production environment!');
+    if ((jwtSecret.includes('dev-') || jwtSecret.includes('staging-')) && import.meta.env.VITE_ENVIRONMENT === 'production') {
+      throw new Error('🚨 Development/staging JWT secret detected in production environment!');
+    }
+  } else {
+    console.log('ℹ️ JWT secret not provided - QR code generation features will be disabled');
   }
 }
 
