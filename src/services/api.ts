@@ -263,7 +263,7 @@ export const venuesApi = {
     return fetchApi<any>(`/venues/by-id/${id}`)
   },
   async getByOwner(ownerId: string) {
-    return fetchApi<any>(`/venues/owner/${ownerId}`)
+    return fetchApi<any>(`/venues/by-owner/${ownerId}`)
   },
 
   async update(id: string, data: any) {
