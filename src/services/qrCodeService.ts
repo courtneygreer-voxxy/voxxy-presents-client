@@ -315,13 +315,9 @@ export const qrCodeService = {
     return _qrCodeServiceInstance;
   },
 
-  // Proxy methods to maintain the same API
+  // Proxy methods to maintain the same API (only public methods)
   async generateTicket(request: TicketGenerationRequest): Promise<TicketGenerationResponse> {
     return this.instance.generateTicket(request);
-  },
-
-  async generateQRCode(data: QRTicketData, options?: QRCodeOptions): Promise<string> {
-    return this.instance.generateQRCode(data, options);
   },
 
   async validateTicket(qrData: string): Promise<TicketValidationResult> {
@@ -330,6 +326,19 @@ export const qrCodeService = {
 
   async validateByAccessCode(accessCode: string): Promise<TicketValidationResult> {
     return this.instance.validateByAccessCode(accessCode);
+  },
+
+  async markTicketScanned(ticketId: string): Promise<boolean> {
+    return this.instance.markTicketScanned(ticketId);
+  },
+
+  async getTicketStats(eventId: string): Promise<{
+    totalGenerated: number;
+    totalScanned: number;
+    goingTickets: number;
+    maybeTickets: number;
+  }> {
+    return this.instance.getTicketStats(eventId);
   }
 };
 
