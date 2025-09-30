@@ -16,9 +16,13 @@ import {
  * Handles ticket creation, QR code generation, and validation
  */
 export class QRCodeService {
-  private readonly JWT_SECRET = import.meta.env.VITE_JWT_SECRET || (() => {
-    throw new Error('VITE_JWT_SECRET environment variable is required for ticket generation');
-  })();
+  private get JWT_SECRET(): string {
+    const secret = import.meta.env.VITE_JWT_SECRET;
+    if (!secret) {
+      throw new Error('VITE_JWT_SECRET environment variable is required for ticket generation');
+    }
+    return secret;
+  }
   private readonly DEFAULT_EXPIRY_HOURS = 24; // Tickets expire 24 hours after event end
 
   /**
