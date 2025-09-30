@@ -17,6 +17,17 @@ import {
 } from 'lucide-react'
 
 export function DebugPanel() {
+  // Only show in development and staging environments
+  const isDevelopment = import.meta.env.DEV
+  const isStaging = window.location.hostname.includes('staging') ||
+                   window.location.hostname.includes('dev') ||
+                   import.meta.env.VITE_ENVIRONMENT === 'staging'
+
+  // Hide in production
+  if (!isDevelopment && !isStaging) {
+    return null
+  }
+
   const {
     currentUser,
     userProfile,
