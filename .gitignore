@@ -27,6 +27,12 @@ yarn-error.log*
 .env.staging
 .env.production
 
+# Firebase Service Account Keys (NEVER commit these!)
+config/
+config/*.json
+*service-account*.json
+*firebase-adminsdk*.json
+
 # vercel
 .vercel
 

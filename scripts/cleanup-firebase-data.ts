@@ -18,6 +18,19 @@ interface EnvironmentConfig {
 }
 
 const environments: Record<string, EnvironmentConfig> = {
+  development: {
+    projectId: 'voxxy-presents-staging', // Use staging for dev
+    serviceAccountPath: './config/voxxy-presents-staging-service-account.json',
+    collections: [
+      'users',
+      'organizations',
+      'events',
+      'registrations',
+      'venues',
+      'beta_users',
+      'admin_users'
+    ]
+  },
   staging: {
     projectId: 'voxxy-presents-staging',
     serviceAccountPath: './config/voxxy-presents-staging-service-account.json',

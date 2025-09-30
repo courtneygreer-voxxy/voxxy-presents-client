@@ -64,9 +64,9 @@ async function refreshEnvironment(env: string): Promise<void> {
 if (require.main === module) {
   const env = process.argv[2]
 
-  if (!env || !['staging', 'production'].includes(env)) {
+  if (!env || !['development', 'staging', 'production'].includes(env)) {
     console.error('Usage: npm run refresh-env <environment>')
-    console.error('Environments: staging, production')
+    console.error('Environments: development, staging, production')
     process.exit(1)
   }
 
