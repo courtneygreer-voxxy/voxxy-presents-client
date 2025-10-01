@@ -27,6 +27,23 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024'
   }
 
+  // Add Firebase auth token for authenticated endpoints
+  if (endpoint.startsWith('/users/')) {
+    try {
+      const { auth } = await import('@/lib/firebase')
+      const currentUser = auth.currentUser
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken()
+        headers['Authorization'] = `Bearer ${idToken}`
+        console.log('🔐 Added Firebase auth token to API request')
+      } else {
+        console.warn('⚠️ No authenticated user for API request')
+      }
+    } catch (error) {
+      console.error('❌ Failed to get Firebase auth token:', error)
+    }
+  }
+
   // Debug logging
   console.log(`🌐 API DEBUG: ${options?.method || 'GET'} ${url}`)
   if (options?.body) {
