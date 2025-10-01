@@ -148,6 +148,8 @@ export interface User {
 
   // UNIFIED APPROVAL SYSTEM (replaces betaStatus + venue approval)
   approvalStatus: 'pending' | 'approved' | 'denied'
+  betaAccess?: boolean  // Legacy field support
+  betaStatus?: 'pending' | 'approved' | 'denied'  // Legacy field support
   approvedBy?: string // Admin user ID who approved
   approvedAt?: Date
   deniedAt?: Date

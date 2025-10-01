@@ -28,11 +28,17 @@ export function BetaAccessGuard({ children, requireNonVenueOwner = false }: Beta
   }
 
   // Check beta status for authenticated users (venue owners skip beta)
-  if (userProfile.betaStatus === 'pending') {
+  // Handle both old and new data formats
+  const betaStatus = userProfile.betaStatus || (userProfile.approvalStatus === 'approved' ? 'approved' : 'pending')
+  const hasBetaAccess = userProfile.betaAccess || betaStatus === 'approved'
+
+  console.log('🔍 BETA DEBUG: betaStatus:', betaStatus, 'betaAccess:', userProfile.betaAccess, 'approvalStatus:', userProfile.approvalStatus)
+
+  if (!hasBetaAccess && betaStatus === 'pending') {
     return <BetaPendingPage />
   }
 
-  if (userProfile.betaStatus === 'denied') {
+  if (betaStatus === 'denied') {
     // Could create a separate "BetaDeniedPage" if needed
     return <BetaPendingPage />
   }

@@ -165,8 +165,10 @@ export interface User {
   name?: string
   role: 'admin' | 'organizer' | 'venue_owner' | 'club_owner' | 'user'
 
-  // Beta Access Control
-  betaStatus: 'pending' | 'approved' | 'denied'
+  // Beta Access Control (support both old and new formats)
+  betaStatus?: 'pending' | 'approved' | 'denied'
+  betaAccess?: boolean  // Legacy field
+  approvalStatus?: 'pending' | 'approved' | 'denied'  // Current field
   betaRequestedAt?: Date
   betaApprovedAt?: Date
   betaApprovedBy?: string // Admin user ID who approved
