@@ -338,12 +338,20 @@ export const getUserProfile = async (uid: string): Promise<User | null> => {
     console.log('👤 USER DEBUG: Data source for users:', dataSource)
 
     if (dataSource === 'api') {
-      // Load user profile from API
+      // Load user profile from API with Firebase fallback
       console.log('Loading user profile via API')
-      const { usersApi } = await import('@/services/api')
-      const response = await usersApi.getCurrentUser()
-      console.log('👤 USER DEBUG: User profile from API:', response)
-      return response || null
+      try {
+        const { usersApi } = await import('@/services/api')
+        const response = await usersApi.getCurrentUser()
+        console.log('👤 USER DEBUG: User profile from API:', response)
+        return response || null
+      } catch (apiError) {
+        console.warn('API user profile failed, falling back to Firebase:', apiError)
+        // Fallback to Firebase if API fails
+        const profile = await getUser(uid)
+        console.log('👤 USER DEBUG: User profile from Firebase (fallback):', profile)
+        return profile
+      }
     } else {
       // Load user profile from Firebase
       console.log('Loading user profile via Firebase')
