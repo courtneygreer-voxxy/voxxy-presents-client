@@ -144,7 +144,7 @@ export interface User {
   id: string // Firebase Auth UID
   email: string
   name: string
-  role: 'admin' | 'organizer' | 'venue_owner' | 'guest'
+  role: 'admin' | 'organizer' | 'venue_owner' | 'club_owner' | 'guest'
 
   // UNIFIED APPROVAL SYSTEM (replaces betaStatus + venue approval)
   approvalStatus: 'pending' | 'approved' | 'denied'
