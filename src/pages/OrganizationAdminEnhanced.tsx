@@ -36,6 +36,7 @@ import SubscribersList from "@/components/SubscribersList"
 import { RSVPListModal } from "@/components/RSVPListModal"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
+import EventBudgetManager from '@/components/budget/EventBudgetManager'
 import type { Organization, Event } from '@/types/database'
 
 export default function OrganizationAdminEnhanced() {
@@ -689,76 +690,10 @@ export default function OrganizationAdminEnhanced() {
 
             {/* Budget Tab */}
             <TabsContent value="budget">
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h2 className="text-2xl font-bold text-white">Event Budget Management</h2>
-                    <p className="text-gray-300">Track expenses, revenue, and financial performance for your events</p>
-                  </div>
-                </div>
-
-                {/* Budget Overview Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-300">Total Revenue</p>
-                          <p className="text-2xl font-bold text-green-400">$0.00</p>
-                        </div>
-                        <div className="p-3 bg-green-500/20 rounded-full">
-                          <DollarSign className="h-6 w-6 text-green-400" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-300">Total Expenses</p>
-                          <p className="text-2xl font-bold text-red-400">$0.00</p>
-                        </div>
-                        <div className="p-3 bg-red-500/20 rounded-full">
-                          <DollarSign className="h-6 w-6 text-red-400" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-300">Net Profit</p>
-                          <p className="text-2xl font-bold text-white">$0.00</p>
-                        </div>
-                        <div className="p-3 bg-purple-500/20 rounded-full">
-                          <DollarSign className="h-6 w-6 text-purple-400" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Coming Soon Notice */}
-                <Card className="!bg-purple-500/10 !border-purple-400/30 backdrop-blur-sm">
-                  <CardContent className="p-8 text-center">
-                    <div className="text-4xl mb-4">📊</div>
-                    <h3 className="text-xl font-bold text-purple-300 mb-3">Budget Management Coming Soon</h3>
-                    <p className="text-purple-200 mb-6 max-w-md mx-auto">
-                      Track event expenses, ticket revenue, vendor costs, and generate financial reports for your events.
-                    </p>
-                    <div className="space-y-2 text-sm text-purple-300">
-                      <p>• 📈 Revenue tracking from ticket sales</p>
-                      <p>• 💰 Expense categorization and tracking</p>
-                      <p>• 📋 Financial reports and analytics</p>
-                      <p>• 🎯 Budget planning for future events</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <EventBudgetManager
+                events={events}
+                organizationId={organization.id}
+              />
             </TabsContent>
 
             {/* Settings Tab */}
