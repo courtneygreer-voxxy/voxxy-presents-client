@@ -461,6 +461,70 @@ export default function AdminDashboard() {
                 <p className="text-gray-600">Manage all clubs on the platform</p>
               </div>
             </div>
+
+            {/* Debug Section for Club Validation */}
+            <Card className="bg-yellow-50 border-yellow-200">
+              <CardHeader>
+                <CardTitle className="text-yellow-800 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  🔍 Club Debug Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                  <div>
+                    <div className="font-semibold text-gray-700">Database Query Status</div>
+                    <div className="mt-1">
+                      <div>Loading: {loading ? '⏳ Yes' : '✅ Complete'}</div>
+                      <div>Organizations Found: {organizations.length}</div>
+                      <div>Last Refresh: {lastRefresh.toLocaleTimeString()}</div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-700">Organization Details</div>
+                    <div className="mt-1">
+                      {organizations.map((org, index) => (
+                        <div key={org.id} className="text-xs bg-white p-1 rounded mb-1">
+                          {index + 1}. {org.name}
+                          <div className="text-gray-500">ID: {org.id}</div>
+                          <div className="text-gray-500">Status: {org.status || 'no status'}</div>
+                          <div className="text-gray-500">Owner: {org.ownerId}</div>
+                        </div>
+                      ))}
+                      {organizations.length === 0 && (
+                        <div className="text-red-600 font-bold">⚠️ NO ORGANIZATIONS FOUND</div>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-700">Test Account Check</div>
+                    <div className="mt-1 text-xs">
+                      <div>Test Org Expected: "Test Events Co"</div>
+                      <div>Expected Owner: starts with organizer test ID</div>
+                      <div className="mt-2">
+                        <Button
+                          onClick={() => {
+                            console.log('🔍 ADMIN DEBUG: Current organizations:', organizations)
+                            console.log('🔍 ADMIN DEBUG: Organization details:', organizations.map(org => ({
+                              id: org.id,
+                              name: org.name,
+                              ownerId: org.ownerId,
+                              status: org.status
+                            })))
+                          }}
+                          size="sm"
+                          variant="outline"
+                          className="text-xs"
+                        >
+                          Log Debug to Console
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             {loading ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>

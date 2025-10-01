@@ -188,11 +188,27 @@ export function DebugPanel() {
           )}
 
           {/* Organizer Profile */}
-          {(userProfile as any)?.organizerProfile && isExpanded && (
+          {isOrganizer && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-700">🎯 Organizer Profile</div>
+              <div className="font-semibold text-gray-700">🎯 Organizer Debug</div>
               <div className="bg-green-50 p-2 rounded text-xs">
-                <div><strong>Org IDs:</strong> {(userProfile as any).organizerProfile.organizationIds?.length || 0}</div>
+                <div><strong>Organization IDs:</strong> {userProfile?.organizationIds?.length || 0}</div>
+                {userProfile?.organizationIds?.length ? (
+                  <div className="mt-1">
+                    <div><strong>IDs:</strong></div>
+                    {userProfile.organizationIds.map((id, index) => (
+                      <div key={id} className="ml-2 text-green-700">
+                        {index + 1}. {id}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-red-600 font-bold">⚠️ NO ORGANIZATION IDS FOUND</div>
+                )}
+                <div className="mt-1 pt-1 border-t border-green-200">
+                  <div><strong>User Role:</strong> {userProfile?.role || 'undefined'}</div>
+                  <div><strong>isOrganizer:</strong> {isOrganizer ? '✅ True' : '❌ False'}</div>
+                </div>
               </div>
             </div>
           )}
