@@ -10,24 +10,42 @@ A modern event management platform that simplifies recurring community events wi
 
 **Production**: [https://www.voxxypresents.com](https://www.voxxypresents.com)
 
+## 🌟 **Recent Updates (v2.0)**
+
+- ✅ **Event Budget Calculator**: Complete financial planning with planned vs actual tracking
+- ✅ **Enhanced Analytics**: Mixpanel integration with comprehensive user behavior tracking
+- ✅ **Split-Screen Login**: Beautiful new authentication UX for venue owners and organizers
+- ✅ **Venue Owner Benefits**: Dedicated marketing page for venue acquisition
+- ✅ **Security Hardening**: Environment variable validation and secret management
+
 ## 📋 Overview
 
 Voxxy Presents is a comprehensive event management solution designed for creative communities, clubs, and recurring event organizers. The platform provides:
 
+### 🎯 **Core Features**
 - **Custom Organization Pages**: Branded landing pages with image carousels and rich content
 - **Venue Marketplace**: Complete venue discovery and booking platform with glass morphism UI
-- **Design Customization**: Background color, text color, and button color personalization
-- **Admin Dashboard**: Full-featured management interface for organization owners
-- **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series with improved page-based workflows
-- **Dynamic Event Management**: Support for free events, paid tickets, and presale systems
-- **Registration Workflows**: RSVP tracking with calendar integration, subscription management, and external ticketing integration
-- **Series & Recurring Events**: Advanced management with individual event customization
-- **Image Management**: File upload system with automatic compression and carousel display
-- **Club Creation Wizard**: Streamlined guided setup for new organizations
-- **Real-time Data**: Live event updates and registration management
-- **Multi-Environment Support**: Development, staging, production, and sandbox environments
+- **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series
+- **Event Budget Calculator**: Excel-style budget tracking with planned vs actual expense monitoring
+- **Registration Workflows**: RSVP tracking with calendar integration and subscription management
+- **Real-time Analytics**: Mixpanel integration for user behavior tracking and conversion metrics
+
+### 🎨 **Design & UX**
 - **Glass Morphism Design**: Modern UI with translucent components and backdrop blur effects
+- **Split-Screen Authentication**: Beautiful login/signup flows for venue owners and community organizers
+- **Design Customization**: Background color, text color, and button color personalization
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+
+### 🏢 **Venue Management**
 - **Venue Discovery**: Advanced search and filtering system for event venues
+- **Venue Owner Benefits**: Dedicated landing page highlighting revenue opportunities
+- **Venue Approval Workflow**: Admin-managed venue verification and approval process
+
+### 📊 **Analytics & Admin**
+- **Admin Dashboard**: Full-featured management interface with beta user management
+- **Traffic Source Tracking**: UTM parameter support and referrer analysis
+- **Conversion Metrics**: Track club creation, venue listings, and user engagement
+- **Multi-Environment Support**: Development, staging, production, and sandbox environments
 - **Peerspace-Inspired Layout**: Optimized venue profiles with image-first approach
 
 ## 🛠 Technology Stack
