@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
+import { analytics } from "@/lib/analytics"
 
 export default function HomePage() {
   const { isAuthenticated, currentUser } = useAuth()
@@ -15,6 +16,11 @@ export default function HomePage() {
 
   // Track page views and engagement
   usePageTracking('Home')
+
+  // Track landing page interactions
+  const trackLandingInteraction = (interactionType: string, elementName: string, sectionName?: string) => {
+    analytics.trackLandingPageInteraction(interactionType, elementName, sectionName)
+  }
   
   return (
     <div className="min-h-screen bg-gray-900 relative overflow-hidden">
@@ -301,42 +307,60 @@ export default function HomePage() {
           </div>
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Maybe RSVPs Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">"Maybe" RSVPs Kill Planning</h3>
               <p className="text-gray-300">
                 Soft commits make venue coordination and capacity planning impossible to manage
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Venue Coordination Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">Venue Coordination Nightmare</h3>
               <p className="text-gray-300">
                 Manually sharing guest lists, tracking capacity changes, constant email back-and-forth with venue staff
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Promotion Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">Promotion Scattered Everywhere</h3>
               <p className="text-gray-300">
                 Instagram posts, newsletter emails, word-of-mouth - nothing connects or tracks effectively
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Free Tools Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">Free Event Tools Don't Scale</h3>
               <p className="text-gray-300">
                 Eventbrite works for one-offs but breaks down for recurring club events and series management
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Contact Management Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">Manual Contact Management</h3>
               <p className="text-gray-300">
                 Pulling emails from multiple sources, no automated follow-up or member engagement
               </p>
             </div>
-            
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Venue Network Problem Card', 'Problems Section')}
+            >
               <h3 className="text-lg font-semibold text-purple-400 mb-3">No Venue Network</h3>
               <p className="text-gray-300">
                 Starting from scratch to find spaces for every event, no relationship management
@@ -360,7 +384,10 @@ export default function HomePage() {
           
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* 1. Recurring Event Series - First */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Recurring Event Series Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-pink-500/20 backdrop-blur-sm border border-pink-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Calendar className="h-6 w-6 text-pink-300" />
               </div>
@@ -371,7 +398,10 @@ export default function HomePage() {
             </div>
 
             {/* 2. Member Database & Engagement - Second */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Member Database Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-indigo-300" />
               </div>
@@ -382,7 +412,10 @@ export default function HomePage() {
             </div>
 
             {/* 3. Venue Integration Hub - Third */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Venue Integration Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center mb-4">
                 <ArrowRight className="h-6 w-6 text-blue-300" />
               </div>
@@ -393,7 +426,10 @@ export default function HomePage() {
             </div>
 
             {/* 4. Venue Discovery Network - Fourth */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Venue Discovery Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-lg flex items-center justify-center mb-4">
                 <MapPin className="h-6 w-6 text-orange-300" />
               </div>
@@ -404,7 +440,10 @@ export default function HomePage() {
             </div>
 
             {/* 5. Smart RSVP Management - Fifth */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Smart RSVP Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Sparkles className="h-6 w-6 text-purple-300" />
               </div>
@@ -415,7 +454,10 @@ export default function HomePage() {
             </div>
 
             {/* 6. Budget Tools - Sixth (replacing Integrated Promotion Tools) */}
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300">
+            <div
+              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
+              onClick={() => trackLandingInteraction('click', 'Budget Management Feature', 'Solutions Section')}
+            >
               <div className="w-12 h-12 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-green-300" />
               </div>
@@ -502,6 +544,7 @@ export default function HomePage() {
                 <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
                 <li><Link to="/products" className="hover:text-white transition-colors">Products</Link></li>
+                <li><Link to="/venue-owners" className="hover:text-white transition-colors">For Venue Owners</Link></li>
                 <li><Link to="/voxxy-shop" className="hover:text-white transition-colors">Voxxy Shop</Link></li>
               </ul>
             </div>

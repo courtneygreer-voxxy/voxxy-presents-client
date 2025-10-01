@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
-import { 
-  signUp, 
-  signIn, 
-  signOutUser, 
-  resetPassword, 
+import {
+  signUp,
+  signIn,
+  signOutUser,
+  resetPassword,
   resendEmailVerification,
   getUserProfile,
   handleEmailVerification,
@@ -15,6 +15,7 @@ import {
   type SignInData
 } from '@/services/authService'
 import type { User } from '@/types/database'
+import { analytics } from '@/lib/analytics'
 
 interface AuthContextType {
   // Current user state
@@ -98,12 +99,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setCurrentUser(user)
-      
+
       if (user) {
         // Load user profile from Firestore
         try {
           const profile = await getUserProfile(user.uid)
           setUserProfile(profile)
+
+          // Track user sign in for analytics (only if profile exists)
+          if (profile && user.email) {
+            analytics.trackUserSignIn(user.email, user.uid, profile.role)
+          }
         } catch (err) {
           console.warn('Failed to load user profile (this is normal for new users):', err)
           // Don't set error for profile loading issues - user can still use the app
@@ -112,7 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         setUserProfile(null)
       }
-      
+
       setLoading(false)
     })
 

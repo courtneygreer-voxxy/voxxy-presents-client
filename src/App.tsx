@@ -34,6 +34,7 @@ import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
 import VenueCreatePage from './pages/VenueCreatePage'
 import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
+import VenueOwnerBenefitsPage from './pages/VenueOwnerBenefitsPage'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
@@ -91,6 +92,7 @@ export default function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/venue-owners" element={<VenueOwnerBenefitsPage />} />
           <Route path="/analytics-test" element={<AnalyticsTestPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
           <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />

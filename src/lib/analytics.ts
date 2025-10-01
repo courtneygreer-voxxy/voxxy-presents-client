@@ -85,10 +85,27 @@ export interface UserProperties {
   pages_visited?: string[];
   total_sessions?: number;
   most_engaged_content?: string;
-  conversion_stage?: 'visitor' | 'interested' | 'submitted';
+  conversion_stage?: 'visitor' | 'interested' | 'submitted' | 'converted';
   preferred_device?: 'desktop' | 'mobile' | 'tablet';
   browser?: string;
   operating_system?: string;
+  // User identification
+  email?: string;
+  user_id?: string;
+  user_role?: 'admin' | 'organizer' | 'venue_owner' | 'user';
+  // Traffic source tracking
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_term?: string;
+  utm_content?: string;
+  referrer_domain?: string;
+  traffic_source?: 'direct' | 'organic' | 'social' | 'email' | 'paid' | 'referral';
+  // Conversion metrics
+  clubs_created?: number;
+  venues_listed?: number;
+  events_created?: number;
+  rsvps_made?: number;
   [key: string]: any; // Allow additional properties
 }
 
@@ -273,12 +290,26 @@ class Analytics {
     if (isFirstVisit) {
       localStorage.setItem('analytics_first_visit', new Date().toISOString());
 
+      const trafficSource = this.getTrafficSource();
+      const utmParams = this.getUTMParameters();
+
       this.setUserProperties({
         first_visit_date: new Date(),
         preferred_device: this.getDeviceType(),
         browser: this.getBrowser(),
         operating_system: navigator.platform,
         conversion_stage: 'visitor',
+        traffic_source: trafficSource.source,
+        referrer_domain: trafficSource.domain,
+        ...utmParams,
+      });
+
+      // Track first visit with source information
+      this.track('First Visit', {
+        traffic_source: trafficSource.source,
+        referrer_domain: trafficSource.domain,
+        referrer_url: document.referrer,
+        ...utmParams,
       });
     }
 
@@ -288,6 +319,169 @@ class Analytics {
 
     this.setUserProperties({
       total_sessions: totalSessions,
+    });
+  }
+
+  // Traffic source detection
+  private getTrafficSource(): { source: UserProperties['traffic_source']; domain: string | null } {
+    const referrer = document.referrer;
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmSource = urlParams.get('utm_source');
+
+    // Check for UTM parameters first
+    if (utmSource) {
+      if (utmSource.includes('google') || utmSource.includes('bing')) return { source: 'paid', domain: null };
+      if (utmSource.includes('facebook') || utmSource.includes('instagram') || utmSource.includes('twitter')) return { source: 'social', domain: null };
+      if (utmSource.includes('email') || utmSource.includes('newsletter')) return { source: 'email', domain: null };
+      return { source: 'referral', domain: null };
+    }
+
+    // No referrer = direct traffic
+    if (!referrer) return { source: 'direct', domain: null };
+
+    const referrerDomain = new URL(referrer).hostname;
+
+    // Social media sources
+    const socialDomains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'tiktok.com', 'youtube.com'];
+    if (socialDomains.some(domain => referrerDomain.includes(domain))) {
+      return { source: 'social', domain: referrerDomain };
+    }
+
+    // Search engines
+    const searchDomains = ['google.com', 'bing.com', 'yahoo.com', 'duckduckgo.com'];
+    if (searchDomains.some(domain => referrerDomain.includes(domain))) {
+      return { source: 'organic', domain: referrerDomain };
+    }
+
+    // Email clients
+    const emailDomains = ['gmail.com', 'outlook.com', 'yahoo.com', 'mail.'];
+    if (emailDomains.some(domain => referrerDomain.includes(domain))) {
+      return { source: 'email', domain: referrerDomain };
+    }
+
+    // Everything else is referral
+    return { source: 'referral', domain: referrerDomain };
+  }
+
+  // Extract UTM parameters
+  private getUTMParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return {
+      utm_source: urlParams.get('utm_source') || undefined,
+      utm_medium: urlParams.get('utm_medium') || undefined,
+      utm_campaign: urlParams.get('utm_campaign') || undefined,
+      utm_term: urlParams.get('utm_term') || undefined,
+      utm_content: urlParams.get('utm_content') || undefined,
+    };
+  }
+
+  // Track user authentication
+  trackUserSignIn(userEmail: string, userId: string, userRole?: string) {
+    this.identify(userId);
+
+    const userProperties: UserProperties = {
+      email: userEmail,
+      user_id: userId,
+      conversion_stage: 'converted',
+    };
+
+    if (userRole) {
+      userProperties.user_role = userRole as UserProperties['user_role'];
+    }
+
+    this.setUserProperties(userProperties);
+
+    this.track('User Signed In', {
+      user_email: userEmail,
+      user_role: userRole,
+      sign_in_method: 'email_password',
+    });
+  }
+
+  // Track conversion metrics
+  trackClubCreated(clubName: string, userId?: string) {
+    this.track('Club Created', {
+      club_name: clubName,
+      user_id: userId,
+    });
+
+    // Update user properties
+    const currentClubs = Number(localStorage.getItem('analytics_clubs_created') || '0') + 1;
+    localStorage.setItem('analytics_clubs_created', currentClubs.toString());
+
+    this.setUserProperties({
+      clubs_created: currentClubs,
+      conversion_stage: 'converted',
+    });
+  }
+
+  trackVenueListed(venueName: string, userId?: string) {
+    this.track('Venue Listed', {
+      venue_name: venueName,
+      user_id: userId,
+    });
+
+    // Update user properties
+    const currentVenues = Number(localStorage.getItem('analytics_venues_listed') || '0') + 1;
+    localStorage.setItem('analytics_venues_listed', currentVenues.toString());
+
+    this.setUserProperties({
+      venues_listed: currentVenues,
+      conversion_stage: 'converted',
+    });
+  }
+
+  trackEventCreated(eventTitle: string, eventType: string, userId?: string) {
+    this.track('Event Created', {
+      event_title: eventTitle,
+      event_type: eventType,
+      user_id: userId,
+    });
+
+    // Update user properties
+    const currentEvents = Number(localStorage.getItem('analytics_events_created') || '0') + 1;
+    localStorage.setItem('analytics_events_created', currentEvents.toString());
+
+    this.setUserProperties({
+      events_created: currentEvents,
+      conversion_stage: 'converted',
+    });
+  }
+
+  trackRSVPMade(eventId: string, rsvpType: string, userId?: string) {
+    this.track('RSVP Made', {
+      event_id: eventId,
+      rsvp_type: rsvpType,
+      user_id: userId,
+    });
+
+    // Update user properties
+    const currentRSVPs = Number(localStorage.getItem('analytics_rsvps_made') || '0') + 1;
+    localStorage.setItem('analytics_rsvps_made', currentRSVPs.toString());
+
+    this.setUserProperties({
+      rsvps_made: currentRSVPs,
+      conversion_stage: 'converted',
+    });
+  }
+
+  // Track general click events on page elements
+  trackElementClick(elementType: string, elementText: string, elementId?: string, pageName?: string) {
+    this.track('Element Clicked', {
+      element_type: elementType,
+      element_text: elementText,
+      element_id: elementId,
+      page_name: pageName,
+    });
+  }
+
+  // Track specific landing page interactions
+  trackLandingPageInteraction(interactionType: string, elementName: string, sectionName?: string) {
+    this.track('Landing Page Interaction', {
+      interaction_type: interactionType,
+      element_name: elementName,
+      section_name: sectionName,
+      page_name: 'Home',
     });
   }
 }
