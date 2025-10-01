@@ -69,14 +69,19 @@ export default function AdminDashboard() {
     // Load organizations
     const loadOrganizations = async () => {
       try {
-        const orgQuery = query(organizationsRef, where('status', '==', 'active'))
-        const snapshot = await getDocs(orgQuery)
+        // For staging/development, load all organizations
+        // For production, filter by active status
+        const snapshot = await getDocs(organizationsRef)
         const orgs = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         })) as Organization[]
 
-        setOrganizations(orgs)
+        // Filter for active organizations, but include those without status field (for test data compatibility)
+        const filteredOrgs = orgs.filter(org => !org.status || org.status === 'active')
+
+        console.log('Loaded organizations:', filteredOrgs)
+        setOrganizations(filteredOrgs)
       } catch (error) {
         console.error('Error loading organizations:', error)
       } finally {

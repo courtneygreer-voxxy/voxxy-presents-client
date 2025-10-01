@@ -119,14 +119,33 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
 
     setIsSubmitting(true)
     try {
-      // Submit RSVP
-      const result = await registrationsApi.create({
-        eventId: event.id,
-        name: formData.name,
-        email: formData.email || undefined,
-        registrationType: formData.registrationType,
-        source: 'website'
-      })
+      // Environment-aware RSVP submission
+      const { getDataSource } = await import('@/config/environments')
+      const dataSource = getDataSource()
+
+      let result
+      if (dataSource === 'firebase') {
+        // Use Firebase for staging/development
+        const { createRegistration } = await import('@/lib/database')
+        const registrationId = await createRegistration({
+          eventId: event.id,
+          name: formData.name,
+          email: formData.email || '',
+          registrationType: formData.registrationType,
+          source: 'website',
+          status: 'confirmed'
+        })
+        result = { registrationId }
+      } else {
+        // Use API for production
+        result = await registrationsApi.create({
+          eventId: event.id,
+          name: formData.name,
+          email: formData.email || undefined,
+          registrationType: formData.registrationType,
+          source: 'website'
+        })
+      }
 
       // Generate digital ticket
       setIsGeneratingTicket(true)

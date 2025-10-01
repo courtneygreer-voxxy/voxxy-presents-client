@@ -229,6 +229,7 @@ async function createTestOrganization(ownerId: string): Promise<string> {
           newEvents: true
         }
       },
+      status: 'active',
       ownerId: ownerId,
       createdAt: admin.firestore.Timestamp.now(),
       updatedAt: admin.firestore.Timestamp.now(),
