@@ -303,11 +303,11 @@ export default function OrganizationAdminEnhanced() {
               </TabsTrigger>
               {/* Events Subcategories */}
               <div className="ml-2 flex flex-col">
-                <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-4 py-3">
+                <TabsTrigger value="tickets" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm pl-2 pr-4 py-2">
                   <QrCode className="h-4 w-4 text-purple-400" />
                   Tickets
                 </TabsTrigger>
-                <TabsTrigger value="budget" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-4 py-3">
+                <TabsTrigger value="budget" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm pl-2 pr-4 py-2">
                   <DollarSign className="h-4 w-4 text-purple-400" />
                   Budget
                 </TabsTrigger>

@@ -75,20 +75,28 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
 
     try {
       const dataSource = getDataSource()
+      console.log('🔍 [Budget Debug] Loading budget data for event:', eventId, 'using data source:', dataSource)
 
       if (dataSource === 'api') {
         try {
+          console.log('📡 [Budget Debug] Making API call to get budget for event:', eventId)
           const response = await budgetsApi.getEventBudget(eventId)
+          console.log('✅ [Budget Debug] Budget API response:', response)
+
           setBudget(response.budget)
           setLineItems(response.lineItems || [])
 
           if (response.budget) {
+            console.log('📊 [Budget Debug] Loading budget summary for budget ID:', response.budget.id)
             const summaryResponse = await budgetsApi.getBudgetSummary(response.budget.id)
+            console.log('✅ [Budget Debug] Summary response:', summaryResponse)
             setSummary(summaryResponse.summary)
           }
         } catch (err: any) {
+          console.log('⚠️ [Budget Debug] API error:', err)
           if (err.status === 404) {
             // No budget exists for this event
+            console.log('📝 [Budget Debug] No budget found for event (404), setting null state')
             setBudget(null)
             setLineItems([])
             setSummary(null)
@@ -98,10 +106,10 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
         }
       } else {
         // Firebase implementation would go here
-        console.log('Firebase budget loading not implemented yet')
+        console.log('🔥 [Budget Debug] Firebase budget loading not implemented yet')
       }
     } catch (err) {
-      console.error('Failed to load budget data:', err)
+      console.error('❌ [Budget Debug] Failed to load budget data:', err)
       setError('Failed to load budget data')
     } finally {
       setLoading(false)
@@ -109,13 +117,18 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
   }
 
   const createBudget = async () => {
-    if (!selectedEvent) return
+    if (!selectedEvent) {
+      console.log('⚠️ [Budget Debug] No selected event for budget creation')
+      return
+    }
 
+    console.log('🚀 [Budget Debug] Starting budget creation for event:', selectedEvent.title, selectedEvent.id)
     setSaving(true)
     setError(null)
 
     try {
       const dataSource = getDataSource()
+      console.log('🔍 [Budget Debug] Using data source:', dataSource)
 
       if (dataSource === 'api') {
         const budgetData: CreateBudgetRequest = {
@@ -123,19 +136,24 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
           notes: `Budget for ${selectedEvent.title}`
         }
 
+        console.log('📡 [Budget Debug] Creating budget with data:', budgetData)
         const response = await budgetsApi.createEventBudget(selectedEvent.id, budgetData)
+        console.log('✅ [Budget Debug] Budget created successfully:', response)
+
         setBudget(response.budget)
         setLineItems([])
 
         // Load summary
+        console.log('📊 [Budget Debug] Loading summary for new budget:', response.budget.id)
         const summaryResponse = await budgetsApi.getBudgetSummary(response.budget.id)
+        console.log('✅ [Budget Debug] Summary loaded:', summaryResponse)
         setSummary(summaryResponse.summary)
       } else {
         // Firebase implementation would go here
-        console.log('Firebase budget creation not implemented yet')
+        console.log('🔥 [Budget Debug] Firebase budget creation not implemented yet - this should not happen in development')
       }
     } catch (err) {
-      console.error('Failed to create budget:', err)
+      console.error('❌ [Budget Debug] Failed to create budget:', err)
       setError('Failed to create budget')
     } finally {
       setSaving(false)
@@ -230,31 +248,51 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
         <CardHeader>
           <CardTitle className="text-white flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Select Event
+            Select Event to Budget
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Choose an event to manage its budget
+            Choose a published or completed event to create and manage its budget. Click the dropdown below to see available events.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <Select
-            value={selectedEvent?.id || ''}
-            onValueChange={(eventId) => {
-              const event = publishedEvents.find(e => e.id === eventId)
-              setSelectedEvent(event || null)
-            }}
-          >
-            <SelectTrigger className="bg-white/10 border-white/20 text-white">
-              <SelectValue placeholder="Select an event..." />
-            </SelectTrigger>
-            <SelectContent className="bg-white/15 backdrop-blur-md border-white/30">
-              {publishedEvents.map(event => (
-                <SelectItem key={event.id} value={event.id}>
-                  {event.title} - {new Date(event.date).toLocaleDateString()}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <CardContent className="space-y-4">
+          {publishedEvents.length === 0 ? (
+            <div className="text-center py-8">
+              <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-300 mb-2">No events available for budgeting</p>
+              <p className="text-gray-400 text-sm">
+                You need published or completed events to create budgets. Create an event first in the Events tab.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="text-sm text-gray-400">
+                📊 {publishedEvents.length} event{publishedEvents.length !== 1 ? 's' : ''} available for budget management
+              </div>
+              <Select
+                value={selectedEvent?.id || ''}
+                onValueChange={(eventId) => {
+                  const event = publishedEvents.find(e => e.id === eventId)
+                  setSelectedEvent(event || null)
+                }}
+              >
+                <SelectTrigger className="bg-white/10 border-white/20 text-white h-12 text-left">
+                  <SelectValue placeholder="Click here to select an event..." />
+                </SelectTrigger>
+                <SelectContent className="bg-white/15 backdrop-blur-md border-white/30">
+                  {publishedEvents.map(event => (
+                    <SelectItem key={event.id} value={event.id} className="py-3">
+                      <div className="flex flex-col">
+                        <span className="font-medium">{event.title}</span>
+                        <span className="text-xs text-gray-400">
+                          {new Date(event.date).toLocaleDateString()} • {event.status}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </CardContent>
       </Card>
 
