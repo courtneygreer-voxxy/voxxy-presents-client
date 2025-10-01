@@ -41,6 +41,7 @@ export interface Organization {
       }
     }
   }
+  status?: 'active' | 'inactive' | 'pending' // Organization status for admin management
   ownerId: string // References users collection
   createdAt: Date
   updatedAt: Date
@@ -162,7 +163,7 @@ export interface User {
   id: string // Firebase Auth UID
   email: string
   name?: string
-  role: 'admin' | 'organizer' | 'user'
+  role: 'admin' | 'organizer' | 'venue_owner' | 'user'
 
   // Beta Access Control
   betaStatus: 'pending' | 'approved' | 'denied'
@@ -176,6 +177,17 @@ export interface User {
 
   // Permissions
   organizationIds: string[] // Organizations they can manage
+
+  // Venue Owner Profile (new for v2.0.0)
+  venueOwnerProfile?: {
+    venueIds: string[] // Venues they own/manage
+    businessInfo?: string
+    phone?: string
+    preferredContactMethod: 'email' | 'phone'
+    businessType?: 'bar' | 'restaurant' | 'community_center' | 'outdoor' | 'event_space' | 'other'
+    onboardingCompleted: boolean
+    approvedAt?: Date // When they were approved as a venue owner
+  }
 
   // Settings
   emailNotifications: boolean

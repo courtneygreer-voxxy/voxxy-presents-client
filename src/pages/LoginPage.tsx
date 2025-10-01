@@ -1,25 +1,55 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { LoginForm } from '@/components/auth/LoginForm'
+import { UnifiedLoginForm } from '@/components/auth/UnifiedLoginForm'
 import { PasswordResetForm } from '@/components/auth/PasswordResetForm'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function LoginPage() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, userProfile, isOrganizer, isVenueOwner } = useAuth()
   const [showForgotPassword, setShowForgotPassword] = React.useState(false)
 
-  // If already authenticated, redirect to home
+  // If already authenticated, redirect based on role
   React.useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/')
+    if (isAuthenticated && userProfile) {
+      // Check if there's an intended redirect path
+      const intendedPath = new URLSearchParams(window.location.search).get('redirect')
+      if (intendedPath) {
+        navigate(intendedPath)
+        return
+      }
+
+      // Role-based redirect
+      if (isVenueOwner) {
+        // Check if venue owner has completed onboarding (created a venue)
+        const hasCompletedOnboarding = userProfile.venueOwnerProfile?.onboardingCompleted
+        if (hasCompletedOnboarding) {
+          navigate('/venues/dashboard')
+        } else {
+          // First time venue owner - redirect to venue creation
+          navigate('/venues/create')
+        }
+      } else if (isOrganizer) {
+        navigate('/profile')
+      } else {
+        // Fallback for other roles
+        navigate('/')
+      }
     }
-  }, [isAuthenticated, navigate])
+  }, [isAuthenticated, userProfile, isVenueOwner, isOrganizer, navigate])
 
   const handleSuccess = () => {
-    // After successful login, redirect to profile page or intended destination
+    // Check for intended destination first
     const intendedPath = new URLSearchParams(window.location.search).get('redirect')
-    navigate(intendedPath || '/profile')
+    if (intendedPath) {
+      navigate(intendedPath)
+      return
+    }
+
+    // Role-based redirect after successful login
+    // Note: userProfile might not be loaded immediately after login, so we need to wait for it
+    // We'll handle this in a useEffect that watches for userProfile changes
+    console.log('Login successful, waiting for user profile to load...')
   }
 
   const handleSwitchToSignUp = () => {
@@ -57,7 +87,7 @@ export default function LoginPage() {
               onBackToLogin={handleBackToLogin}
             />
           ) : (
-            <LoginForm
+            <UnifiedLoginForm
               onSuccess={handleSuccess}
               onSwitchToSignUp={handleSwitchToSignUp}
               onForgotPassword={handleForgotPassword}

@@ -30,15 +30,21 @@ import {
   Leaf,
   Share,
   Bell,
-  UserPlus
+  UserPlus,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+  Settings
 } from 'lucide-react'
 import { VenueGallery } from '@/components/venue/VenueGallery'
 import { VenueContactModal } from '@/components/venue/VenueContactModal'
 import { SubscriptionModal } from '@/components/SubscriptionModal'
 import { ShareButton } from '@/components/ShareButton'
 import { Venue, VenueType } from '@/types/venue'
+import { venuesApi } from '@/services/api'
+import { useAuth } from '@/contexts/AuthContext'
 
-// Mock data for development - replace with API call
+// Mock data for development - fallback only
 import { getDevVenues } from '../../scripts/seed-dev-venues'
 
 const AMENITY_ICONS: Record<string, React.ReactNode> = {
@@ -82,32 +88,88 @@ const ACCESSIBILITY_LABELS = {
 export default function VenueProfilePage() {
   const { venueSlug } = useParams<{ venueSlug: string }>()
   const navigate = useNavigate()
+  const { currentUser, isVenueOwner } = useAuth()
   const [venue, setVenue] = useState<Venue | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+  const [isPhotosExpanded, setIsPhotosExpanded] = useState(false)
+  const [isOwnerOfThisVenue, setIsOwnerOfThisVenue] = useState(false)
 
   useEffect(() => {
     const loadVenue = async () => {
       if (!venueSlug) {
+        console.error('🚨 VENUE PROFILE DEBUG: No venue slug provided')
         setError('Venue not found')
         setLoading(false)
         return
       }
 
-      try {
-        // For development, use mock data
-        const devVenues = getDevVenues()
-        const foundVenue = devVenues.find(v => v.slug === venueSlug)
+      console.log('🏢 VENUE PROFILE DEBUG: Loading venue with slug:', venueSlug)
 
-        if (foundVenue) {
-          setVenue(foundVenue)
+      try {
+        // First try to load from real API
+        console.log('🌐 VENUE PROFILE DEBUG: Attempting API call to venuesApi.getBySlug')
+        const apiResponse = await venuesApi.getBySlug(venueSlug)
+
+        console.log('🌐 VENUE PROFILE DEBUG: API response:', apiResponse)
+
+        if (apiResponse.success && apiResponse.venue) {
+          console.log('✅ VENUE PROFILE DEBUG: Found venue in API:', apiResponse.venue.name)
+          setVenue(apiResponse.venue)
+
+          // Check if current user owns this venue
+          if (currentUser && isVenueOwner && apiResponse.venue.ownerId === currentUser.uid) {
+            console.log('🏢 VENUE PROFILE DEBUG: Current user owns this venue')
+            setIsOwnerOfThisVenue(true)
+          }
         } else {
-          setError('Venue not found')
+          console.log('⚠️ VENUE PROFILE DEBUG: API call failed or no venue found, trying mock data')
+
+          // Fallback to mock data for development
+          const devVenues = getDevVenues()
+          const foundVenue = devVenues.find(v => v.slug === venueSlug)
+
+          if (foundVenue) {
+            console.log('✅ VENUE PROFILE DEBUG: Found venue in mock data:', foundVenue.name)
+            setVenue(foundVenue)
+
+            // Check if current user owns this venue
+            if (currentUser && isVenueOwner && foundVenue.ownerId === currentUser.uid) {
+              console.log('🏢 VENUE PROFILE DEBUG: Current user owns this venue (mock data)')
+              setIsOwnerOfThisVenue(true)
+            }
+          } else {
+            console.error('🚨 VENUE PROFILE DEBUG: Venue not found in API or mock data')
+            setError('Venue not found')
+          }
         }
       } catch (err) {
-        console.error('Error loading venue:', err)
-        setError('Failed to load venue information')
+        console.error('🚨 VENUE PROFILE DEBUG: Error loading venue:', err)
+
+        // Fallback to mock data if API fails
+        try {
+          console.log('⚠️ VENUE PROFILE DEBUG: API failed, trying mock data fallback')
+          const devVenues = getDevVenues()
+          const foundVenue = devVenues.find(v => v.slug === venueSlug)
+
+          if (foundVenue) {
+            console.log('✅ VENUE PROFILE DEBUG: Found venue in mock fallback:', foundVenue.name)
+            setVenue(foundVenue)
+
+            // Check if current user owns this venue
+            if (currentUser && isVenueOwner && foundVenue.ownerId === currentUser.uid) {
+              console.log('🏢 VENUE PROFILE DEBUG: Current user owns this venue (fallback)')
+              setIsOwnerOfThisVenue(true)
+            }
+          } else {
+            console.error('🚨 VENUE PROFILE DEBUG: No venue found in fallback either')
+            setError('Failed to load venue information')
+          }
+        } catch (fallbackErr) {
+          console.error('🚨 VENUE PROFILE DEBUG: Even fallback failed:', fallbackErr)
+          setError('Failed to load venue information')
+        }
       } finally {
         setLoading(false)
       }
@@ -189,13 +251,19 @@ export default function VenueProfilePage() {
       <div className="relative z-10">
         {/* Top Controls */}
         <div className="fixed top-4 left-4 right-4 z-50 flex justify-between">
-          <button
-            onClick={() => navigate('/voxxy-shop/venues')}
-            className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Venues
-          </button>
+          {/* Only show back to venues button if user is not a venue owner */}
+          {!isVenueOwner && (
+            <button
+              onClick={() => navigate('/voxxy-shop/venues')}
+              className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Venues
+            </button>
+          )}
+
+          {/* If venue owner, add spacing div to maintain layout */}
+          {isVenueOwner && <div></div>}
 
           <div className="flex gap-2">
             <ShareButton
@@ -207,51 +275,25 @@ export default function VenueProfilePage() {
               className="bg-white/10 hover:bg-white/20 backdrop-blur-sm border-white/20 text-white"
             />
 
-            <SubscriptionModal
-              organization={{
-                id: venue.id,
-                slug: venue.slug,
-                name: venue.name,
-                description: venue.description,
-                background: venue.description,
-                logoUrl: venue.photos[0] || '',
-                backgroundStyle: 'stars',
-                contactEmail: venue.contactInfo.email,
-                socialLinks: {
-                  instagram: venue.contactInfo.instagram || '',
-                  website: venue.contactInfo.website || ''
-                },
-                settings: {
-                  defaultLocation: venue.address,
-                  defaultAddress: venue.address,
-                  theme: {
-                    primaryColor: '#9333ea',
-                    backgroundColor: '#111827'
-                  }
-                },
-                ownerId: venue.ownerId || 'venue-owner',
-                createdAt: venue.createdAt,
-                updatedAt: venue.updatedAt
-              }}
-              trigger={
-                <Button
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                  size="sm"
-                >
-                  <Bell className="h-4 w-4 mr-2" />
-                  Subscribe
-                </Button>
-              }
-            />
-
-            <Button
-              onClick={() => setIsContactModalOpen(true)}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
-              size="sm"
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Contact
-            </Button>
+            {isOwnerOfThisVenue ? (
+              <Button
+                onClick={() => navigate('/venue-owner/dashboard')}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                size="sm"
+              >
+                <Settings className="h-4 w-4 mr-2" />
+                Dashboard
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setIsContactModalOpen(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+                size="sm"
+              >
+                <Mail className="h-4 w-4 mr-2" />
+                Contact
+              </Button>
+            )}
           </div>
         </div>
 
@@ -291,12 +333,51 @@ export default function VenueProfilePage() {
           </div>
         </section>
 
-        {/* Images Section - Moved up after hero */}
+        {/* Photos Section - Collapsible */}
         <section className="py-8">
           <div className="container mx-auto px-4 max-w-6xl">
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
-              <h3 className="text-xl font-bold text-white mb-6">Venue Photos</h3>
-              <VenueGallery photos={venue.photos} venueName={venue.name} />
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              {/* Header - Always visible */}
+              <button
+                onClick={() => setIsPhotosExpanded(!isPhotosExpanded)}
+                className="w-full bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors p-6 flex items-center justify-between text-left"
+              >
+                <div className="flex items-center gap-3">
+                  {venue.photos && venue.photos.length > 0 ? (
+                    <Camera className="h-5 w-5 text-purple-400" />
+                  ) : (
+                    <Plus className="h-5 w-5 text-gray-400" />
+                  )}
+                  <h3 className="text-xl font-bold text-white">
+                    {venue.photos && venue.photos.length > 0
+                      ? `Venue Photos (${venue.photos.length})`
+                      : 'Venue Photos'
+                    }
+                  </h3>
+                </div>
+                {isPhotosExpanded ? (
+                  <ChevronUp className="h-5 w-5 text-white" />
+                ) : (
+                  <ChevronDown className="h-5 w-5 text-white" />
+                )}
+              </button>
+
+              {/* Content - Collapsible */}
+              {isPhotosExpanded && (
+                <div className="bg-white/5 backdrop-blur-sm border-t border-white/10 p-8">
+                  {venue.photos && venue.photos.length > 0 ? (
+                    <VenueGallery photos={venue.photos} venueName={venue.name} />
+                  ) : (
+                    <div className="text-center py-12">
+                      <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                      <p className="text-gray-300 text-lg mb-2">No photos available</p>
+                      <p className="text-gray-400 text-sm">
+                        Photos of this venue will appear here when added
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </section>
@@ -406,14 +487,71 @@ export default function VenueProfilePage() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-center">
-                <Button
-                  onClick={() => setIsContactModalOpen(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Connect with venue
-                </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* Subscription Footer */}
+        <section className="py-8">
+          <div className="container mx-auto px-4 max-w-6xl">
+            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 text-center">
+              <h3 className="text-2xl font-bold text-white mb-4">Stay Updated</h3>
+              <p className="text-gray-300 mb-6">
+                Get notified about upcoming events and special offers at {venue.name}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                {isOwnerOfThisVenue ? (
+                  <Button
+                    onClick={() => navigate('/venue-owner/dashboard')}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setIsContactModalOpen(true)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Contact Venue
+                  </Button>
+                )}
+                <SubscriptionModal
+                  trigger={
+                    <Button
+                      variant="outline"
+                      className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    >
+                      <Bell className="h-4 w-4 mr-2" />
+                      Subscribe for Updates
+                    </Button>
+                  }
+                  organization={{
+                    id: venue.id,
+                    slug: venue.slug,
+                    name: venue.name,
+                    description: venue.description,
+                    background: venue.description,
+                    contactEmail: venue.contactInfo.email,
+                    logoUrl: venue.photos[0] || '',
+                    socialLinks: {
+                      instagram: venue.contactInfo.instagram || '',
+                      website: venue.contactInfo.website || ''
+                    },
+                    settings: {
+                      defaultLocation: venue.address,
+                      defaultAddress: venue.address,
+                      theme: {
+                        primaryColor: '#9333ea',
+                        backgroundColor: '#111827'
+                      }
+                    },
+                    ownerId: venue.ownerId,
+                    createdAt: venue.createdAt,
+                    updatedAt: venue.updatedAt
+                  }}
+                />
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 {
   "name": "voxxy-presents-client",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,6 +13,7 @@
     "start": "vite preview --host 0.0.0.0 --port ${PORT:-3000}",
     "seed:dev": "tsx scripts/seed-dev-data.ts",
     "sync:staging": "tsx scripts/sync-staging-data.ts",
+    "clear:venues": "tsx scripts/clear-venue-database.ts",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -23,7 +24,14 @@
     "build:production": "NODE_ENV=production VITE_ENVIRONMENT=production npm run build",
     "build:sandbox": "NODE_ENV=development VITE_ENVIRONMENT=sandbox npm run build",
     "mock-email-server": "node scripts/mock-email-server.mjs",
-    "security-check": "node scripts/check-security.js"
+    "security-check": "node scripts/check-security.js",
+    "cleanup-data": "tsx scripts/cleanup-firebase-data.ts",
+    "seed-data": "tsx scripts/seed-test-data.ts",
+    "refresh-env": "tsx scripts/refresh-environment.ts",
+    "pre-deploy": "tsx scripts/pre-deployment-tests.ts",
+    "deployment-ready": "tsx scripts/deployment-readiness.ts",
+    "health-check": "echo 'Health check available in browser: window.__voxxy_health_check()'",
+    "validate-env": "tsx scripts/validate-environment.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
@@ -64,6 +72,7 @@
     "embla-carousel-react": "latest",
     "esbuild": "^0.25.10",
     "firebase": "^12.0.0",
+    "firebase-admin": "^13.5.0",
     "geist": "latest",
     "input-otp": "latest",
     "lucide-react": "^0.454.0",
@@ -93,6 +102,7 @@
     "@typescript-eslint/eslint-plugin": "^8.38.0",
     "@typescript-eslint/parser": "^8.38.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.7",

@@ -271,7 +271,7 @@ export const createUser = async (uid: string, data: Omit<User, 'id' | 'createdAt
 export const getUser = async (uid: string): Promise<User | null> => {
   const docRef = doc(db, 'users', uid)
   const docSnap = await getDoc(docRef)
-  
+
   if (docSnap.exists()) {
     const data = docSnap.data()
     return {
@@ -282,4 +282,63 @@ export const getUser = async (uid: string): Promise<User | null> => {
     } as User
   }
   return null
+}
+
+export const updateUser = async (uid: string, data: Partial<Omit<User, 'id' | 'createdAt' | 'updatedAt'>>) => {
+  const docRef = doc(db, 'users', uid)
+  await updateDoc(docRef, {
+    ...data,
+    updatedAt: Timestamp.now()
+  })
+}
+
+// Venues
+export const venuesRef = collection(db, 'venues')
+
+export const getVenuesByOwner = async (ownerId: string) => {
+  const q = query(venuesRef, where('ownerId', '==', ownerId))
+  const querySnapshot = await getDocs(q)
+
+  return querySnapshot.docs.map(doc => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+      updatedAt: data.updatedAt?.toDate(),
+      approvedAt: data.approvedAt?.toDate()
+    }
+  })
+}
+
+export const getVenueById = async (venueId: string) => {
+  const docRef = doc(db, 'venues', venueId)
+  const docSnap = await getDoc(docRef)
+
+  if (docSnap.exists()) {
+    const data = docSnap.data()
+    return {
+      id: docSnap.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+      updatedAt: data.updatedAt?.toDate(),
+      approvedAt: data.approvedAt?.toDate()
+    }
+  }
+  return null
+}
+
+export const getAllVenues = async () => {
+  const querySnapshot = await getDocs(venuesRef)
+
+  return querySnapshot.docs.map(doc => {
+    const data = doc.data()
+    return {
+      id: doc.id,
+      ...data,
+      createdAt: data.createdAt?.toDate(),
+      updatedAt: data.updatedAt?.toDate(),
+      approvedAt: data.approvedAt?.toDate()
+    }
+  })
 }

@@ -306,8 +306,43 @@ export class QRCodeService {
   }
 }
 
-// Export singleton instance
-export const qrCodeService = new QRCodeService();
+// Export lazy singleton instance
+let _qrCodeServiceInstance: QRCodeService | null = null;
+
+export const qrCodeService = {
+  get instance(): QRCodeService {
+    if (!_qrCodeServiceInstance) {
+      _qrCodeServiceInstance = new QRCodeService();
+    }
+    return _qrCodeServiceInstance;
+  },
+
+  // Proxy methods to maintain the same API (only public methods)
+  async generateTicket(request: TicketGenerationRequest): Promise<TicketGenerationResponse> {
+    return this.instance.generateTicket(request);
+  },
+
+  async validateTicket(qrData: string): Promise<TicketValidationResult> {
+    return this.instance.validateTicket(qrData);
+  },
+
+  async validateByAccessCode(accessCode: string): Promise<TicketValidationResult> {
+    return this.instance.validateByAccessCode(accessCode);
+  },
+
+  async markTicketScanned(ticketId: string): Promise<boolean> {
+    return this.instance.markTicketScanned(ticketId);
+  },
+
+  async getTicketStats(eventId: string): Promise<{
+    totalGenerated: number;
+    totalScanned: number;
+    goingTickets: number;
+    maybeTickets: number;
+  }> {
+    return this.instance.getTicketStats(eventId);
+  }
+};
 
 // Export class for testing
 export { QRCodeService as QRCodeServiceClass };

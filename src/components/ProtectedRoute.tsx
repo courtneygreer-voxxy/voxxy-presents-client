@@ -112,11 +112,11 @@ interface RedirectIfAuthenticatedProps {
   redirectTo?: string
 }
 
-export function RedirectIfAuthenticated({ 
-  children, 
-  redirectTo = '/' 
+export function RedirectIfAuthenticated({
+  children,
+  redirectTo
 }: RedirectIfAuthenticatedProps) {
-  const { isAuthenticated, loading } = useAuth()
+  const { isAuthenticated, loading, userProfile, isOrganizer, isVenueOwner } = useAuth()
 
   // Show loading spinner while auth state is being determined
   if (loading) {
@@ -130,9 +130,33 @@ export function RedirectIfAuthenticated({
     )
   }
 
-  // If authenticated, redirect away from auth pages
-  if (isAuthenticated) {
-    return <Navigate to={redirectTo} replace />
+  // If authenticated, redirect away from auth pages based on role
+  if (isAuthenticated && userProfile) {
+    // Use custom redirectTo if provided, otherwise use role-based redirect
+    let targetPath = redirectTo
+    if (!targetPath) {
+      if (isVenueOwner) {
+        // Check if venue owner has completed onboarding and has approved venues
+        const hasCompletedOnboarding = userProfile.venueOwnerProfile?.onboardingCompleted
+        const venueIds = userProfile.venueOwnerProfile?.venueIds || []
+
+        if (!hasCompletedOnboarding) {
+          targetPath = '/venues/create'
+        } else if (venueIds.length === 0) {
+          // Has completed onboarding but no venues yet (should not happen, but safe fallback)
+          targetPath = '/venues/create'
+        } else {
+          // Go to dashboard - dashboard will check venue approval status
+          // and redirect to pending if all venues are still pending approval
+          targetPath = '/venues/dashboard'
+        }
+      } else if (isOrganizer) {
+        targetPath = '/profile'
+      } else {
+        targetPath = '/'
+      }
+    }
+    return <Navigate to={targetPath} replace />
   }
 
   // Not authenticated, show the auth page

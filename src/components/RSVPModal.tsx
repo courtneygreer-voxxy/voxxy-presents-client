@@ -119,14 +119,34 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
 
     setIsSubmitting(true)
     try {
-      // Submit RSVP
-      const result = await registrationsApi.create({
-        eventId: event.id,
-        name: formData.name,
-        email: formData.email || undefined,
-        registrationType: formData.registrationType,
-        source: 'website'
-      })
+      // Environment-aware RSVP submission
+      const { getDataSource } = await import('@/config/environments')
+      const dataSource = getDataSource()
+
+      let result
+      if (dataSource === 'firebase') {
+        // Use Firebase for staging/development
+        const { createRegistration } = await import('@/lib/database')
+        const registrationId = await createRegistration({
+          eventId: event.id,
+          organizationId: event.organizationId,
+          name: formData.name,
+          email: formData.email || '',
+          registrationType: formData.registrationType === 'rsvp_yes' ? 'confirmed' : 'confirmed', // Both rsvp_yes and rsvp_maybe map to confirmed
+          source: 'website',
+          emailSent: false
+        })
+        result = { registrationId }
+      } else {
+        // Use API for production
+        result = await registrationsApi.create({
+          eventId: event.id,
+          name: formData.name,
+          email: formData.email || undefined,
+          registrationType: formData.registrationType,
+          source: 'website'
+        })
+      }
 
       // Generate digital ticket
       setIsGeneratingTicket(true)
@@ -168,23 +188,28 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
         if (import.meta.env.DEV) {
           console.log('Development mode: Generating QR ticket despite duplicate registration');
 
-          const ticketResponse = await qrCodeService.generateTicket({
-            eventId: event.id,
-            attendeeEmail: formData.email || `guest_${Date.now()}@voxxypresents.com`,
-            attendeeName: formData.name,
-            rsvpStatus: formData.registrationType === 'rsvp_yes' ? 'going' : 'maybe',
-            organizationId: event.organizationId || 'voxxy-presents'
-          })
-
-          if (ticketResponse.success && ticketResponse.ticket) {
-            setDigitalTicket(ticketResponse.ticket)
-            setIsSuccess(true)
-
-            toast({
-              title: "🎫 Development Mode: Ticket Generated!",
-              description: "Generated QR ticket for testing (already registered)."
+          try {
+            const ticketResponse = await qrCodeService.generateTicket({
+              eventId: event.id,
+              attendeeEmail: formData.email || `guest_${Date.now()}@voxxypresents.com`,
+              attendeeName: formData.name,
+              rsvpStatus: formData.registrationType === 'rsvp_yes' ? 'going' : 'maybe',
+              organizationId: event.organizationId || 'voxxy-presents'
             })
-            return
+
+            if (ticketResponse.success && ticketResponse.ticket) {
+              setDigitalTicket(ticketResponse.ticket)
+              setIsSuccess(true)
+
+              toast({
+                title: "🎫 Development Mode: Ticket Generated!",
+                description: "Generated QR ticket for testing (already registered)."
+              })
+              return
+            }
+          } catch (ticketError) {
+            console.log('Development ticket generation failed (likely no JWT secret):', ticketError)
+            // Fall through to show regular 409 message
           }
         }
 
@@ -193,6 +218,7 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
           title: "Already Registered",
           description: "You're already registered for this event! Check your email for confirmation details."
         })
+        return // Ensure we don't continue processing
       } else {
         toast({
           variant: "destructive",

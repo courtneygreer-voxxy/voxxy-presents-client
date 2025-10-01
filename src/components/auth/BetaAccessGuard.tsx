@@ -1,13 +1,15 @@
 import React from 'react'
+import { Navigate } from 'react-router-dom'
 import { useAuth } from '@/contexts/AuthContext'
 import BetaPendingPage from '@/pages/BetaPendingPage'
 
 interface BetaAccessGuardProps {
   children: React.ReactNode
+  requireNonVenueOwner?: boolean
 }
 
-export function BetaAccessGuard({ children }: BetaAccessGuardProps) {
-  const { userProfile, loading } = useAuth()
+export function BetaAccessGuard({ children, requireNonVenueOwner = false }: BetaAccessGuardProps) {
+  const { userProfile, loading, isVenueOwner } = useAuth()
 
   // Show loading state while checking auth
   if (loading) {
@@ -19,7 +21,13 @@ export function BetaAccessGuard({ children }: BetaAccessGuardProps) {
     return <>{children}</>
   }
 
-  // Check beta status for authenticated users
+  // Check if this route requires non-venue-owner access
+  if (requireNonVenueOwner && isVenueOwner) {
+    // Redirect venue owners to their V2 dashboard instead of /profile
+    return <Navigate to="/venue-owner/dashboard" replace />
+  }
+
+  // Check beta status for authenticated users (venue owners skip beta)
   if (userProfile.betaStatus === 'pending') {
     return <BetaPendingPage />
   }
