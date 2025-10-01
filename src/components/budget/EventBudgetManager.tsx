@@ -100,6 +100,12 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
             setBudget(null)
             setLineItems([])
             setSummary(null)
+          } else if (err.status === 500) {
+            // Server error - might be index issue, treat as no budget for now
+            console.log('🔥 [Budget Debug] Server error (500), likely index issue, treating as no budget')
+            setBudget(null)
+            setLineItems([])
+            setSummary(null)
           } else {
             throw err
           }
@@ -152,9 +158,15 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
         // Firebase implementation would go here
         console.log('🔥 [Budget Debug] Firebase budget creation not implemented yet - this should not happen in development')
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('❌ [Budget Debug] Failed to create budget:', err)
-      setError('Failed to create budget')
+      if (err.status === 409) {
+        // Budget already exists, reload the page to show it
+        console.log('♻️ [Budget Debug] Budget already exists, reloading budget data')
+        await loadBudgetData(selectedEvent.id)
+      } else {
+        setError('Failed to create budget: ' + err.message)
+      }
     } finally {
       setSaving(false)
     }
