@@ -353,4 +353,96 @@ export const adminApi = {
   }
 }
 
+// Budget API
+export const budgetsApi = {
+  // Get budget for event
+  async getEventBudget(eventId: string) {
+    return fetchApi<{
+      success: boolean
+      budget: any
+      lineItems: any[]
+    }>(`/events/${eventId}/budget`)
+  },
+
+  // Create budget for event
+  async createEventBudget(eventId: string, data: any) {
+    return fetchApi<{
+      success: boolean
+      budget: any
+    }>(`/events/${eventId}/budget`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Update budget
+  async updateBudget(budgetId: string, data: any) {
+    return fetchApi<{
+      success: boolean
+      budget: any
+    }>(`/budgets/${budgetId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Delete budget
+  async deleteBudget(budgetId: string) {
+    return fetchApi<{
+      success: boolean
+      message: string
+    }>(`/budgets/${budgetId}`, {
+      method: 'DELETE',
+    })
+  },
+
+  // Get budget summary
+  async getBudgetSummary(budgetId: string) {
+    return fetchApi<{
+      success: boolean
+      summary: any
+    }>(`/budgets/${budgetId}/summary`)
+  },
+
+  // Get line items for budget
+  async getLineItems(budgetId: string) {
+    return fetchApi<{
+      success: boolean
+      lineItems: any[]
+    }>(`/budgets/${budgetId}/line-items`)
+  },
+
+  // Add line item to budget
+  async addLineItem(budgetId: string, data: any) {
+    return fetchApi<{
+      success: boolean
+      lineItem: any
+    }>(`/budgets/${budgetId}/line-items`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Update line item
+  async updateLineItem(lineItemId: string, data: any) {
+    return fetchApi<{
+      success: boolean
+      lineItem: any
+    }>(`/line-items/${lineItemId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    })
+  },
+
+  // Delete line item
+  async deleteLineItem(lineItemId: string) {
+    return fetchApi<{
+      success: boolean
+      message: string
+    }>(`/line-items/${lineItemId}`, {
+      method: 'DELETE',
+    })
+  }
+}
+
 export { ApiError }

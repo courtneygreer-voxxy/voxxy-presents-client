@@ -74,8 +74,8 @@ function getFirebaseConfigFromEnv() {
 const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
-    dataSource: 'firebase', // Direct Firebase for fast iteration
-    apiBaseUrl: 'http://localhost:3001/api', // Local API for RSVP system
+    dataSource: 'api', // Use API for budget calculator testing
+    apiBaseUrl: 'http://localhost:3001/api', // Local API for budget system
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -87,7 +87,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   staging: {
     name: 'staging',
-    dataSource: 'firebase', // Use Firebase directly for seeded test data
+    dataSource: 'api', // Use API for budget system testing in staging
     apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {

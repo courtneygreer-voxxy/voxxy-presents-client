@@ -300,3 +300,117 @@ export type CreateEmailMessageData = Omit<EmailMessage, 'id' | 'createdAt' | 'up
 export type CreateContactSubmissionData = Omit<ContactFormSubmission, 'id' | 'submittedAt' | 'status'>
 export type CreateEmailRecipientData = Omit<EmailRecipient, 'id' | 'createdAt' | 'updatedAt' | 'bounceCount'>
 export type UpdateEmailTemplateData = Partial<Omit<EmailTemplate, 'id' | 'organizationId' | 'createdAt' | 'updatedAt'>>
+
+// BUDGET MANAGEMENT SYSTEM - v1.11.0 (synced with API)
+export interface Budget {
+  id: string
+  eventId: string           // Links to existing Event
+  organizationId: string    // Links to existing Organization
+  createdBy: string         // User who created budget
+
+  // Status tracking
+  status: 'draft' | 'active' | 'completed'
+
+  // Financial totals (calculated from line items)
+  plannedRevenue: number
+  plannedExpenses: number
+  plannedProfit: number
+  actualRevenue: number
+  actualExpenses: number
+  actualProfit: number
+
+  // Metadata
+  notes?: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface BudgetLineItem {
+  id: string
+  budgetId: string
+
+  // Categorization
+  category: 'revenue' | 'expense'
+  type: 'ticket_sales' | 'venue' | 'staff' | 'food' | 'equipment' | 'marketing' | 'other'
+  description: string
+
+  // Planning phase
+  plannedAmount: number
+  plannedQuantity?: number    // For unit-based items (tickets, staff hours)
+  plannedUnitPrice?: number   // Price per unit
+
+  // Actual tracking
+  actualAmount?: number
+  actualQuantity?: number
+  actualUnitPrice?: number
+
+  // Metadata
+  notes?: string
+  dateIncurred?: Date        // When actual expense happened
+  createdAt: Date
+  updatedAt: Date
+}
+
+// Budget API Request/Response types
+export interface CreateBudgetRequest {
+  eventId: string
+  notes?: string
+}
+
+export interface UpdateBudgetRequest {
+  status?: 'draft' | 'active' | 'completed'
+  notes?: string
+}
+
+export interface CreateBudgetLineItemRequest {
+  category: 'revenue' | 'expense'
+  type: 'ticket_sales' | 'venue' | 'staff' | 'food' | 'equipment' | 'marketing' | 'other'
+  description: string
+  plannedAmount: number
+  plannedQuantity?: number
+  plannedUnitPrice?: number
+  notes?: string
+}
+
+export interface UpdateBudgetLineItemRequest {
+  description?: string
+  plannedAmount?: number
+  plannedQuantity?: number
+  plannedUnitPrice?: number
+  actualAmount?: number
+  actualQuantity?: number
+  actualUnitPrice?: number
+  notes?: string
+  dateIncurred?: Date
+}
+
+export interface BudgetSummary {
+  budgetId: string
+  eventId: string
+  status: 'draft' | 'active' | 'completed'
+
+  // Planned totals
+  plannedRevenue: number
+  plannedExpenses: number
+  plannedProfit: number
+  plannedProfitMargin: number // percentage
+
+  // Actual totals
+  actualRevenue: number
+  actualExpenses: number
+  actualProfit: number
+  actualProfitMargin: number // percentage
+
+  // Variance analysis
+  revenueVariance: number // actual - planned
+  expenseVariance: number // actual - planned
+  profitVariance: number // actual - planned
+
+  // Status indicators
+  isOverBudget: boolean
+  variancePercentage: number // overall variance as percentage
+
+  // Line item counts
+  totalLineItems: number
+  completedLineItems: number // items with actual amounts
+}
