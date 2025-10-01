@@ -235,6 +235,33 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
     }
   }
 
+  const handleDeleteLineItem = async (lineItem: BudgetLineItem) => {
+    if (!confirm(`Delete "${lineItem.description}"?`)) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const dataSource = getDataSource()
+
+      if (dataSource === 'api') {
+        await budgetsApi.deleteLineItem(lineItem.id)
+        setLineItems(prev => prev.filter(item => item.id !== lineItem.id))
+
+        // Refresh summary
+        if (budget) {
+          const summaryResponse = await budgetsApi.getBudgetSummary(budget.id)
+          setSummary(summaryResponse.summary)
+        }
+      }
+    } catch (err) {
+      console.error('Failed to delete line item:', err)
+      setError('Failed to delete line item')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -604,12 +631,13 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                             <TableHead className="text-white font-semibold text-right">Actual Amount</TableHead>
                             <TableHead className="text-white font-semibold text-right">Variance</TableHead>
                             <TableHead className="text-white font-semibold text-center">Status</TableHead>
+                            <TableHead className="text-white font-semibold text-center">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {lineItems.length === 0 ? (
                             <TableRow>
-                              <TableCell colSpan={7} className="text-center py-8 text-gray-400">
+                              <TableCell colSpan={8} className="text-center py-8 text-gray-400">
                                 No budget items yet. Click "Add Line Item" to get started.
                               </TableCell>
                             </TableRow>
@@ -661,6 +689,17 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                                     ) : (
                                       <AlertTriangle className="h-4 w-4 text-gray-400 mx-auto" />
                                     )}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onClick={() => handleDeleteLineItem(item)}
+                                      disabled={saving}
+                                      className="bg-red-600/20 border-red-400/30 text-red-300 hover:bg-red-600/30 hover:text-red-200 h-8 w-8 p-0"
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
                                   </TableCell>
                                 </TableRow>
                               )
