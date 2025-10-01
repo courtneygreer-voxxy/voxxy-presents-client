@@ -126,15 +126,18 @@ export function getCurrentEnvironment(): EnvironmentType {
   const envOverride = import.meta.env.VITE_ENVIRONMENT as EnvironmentType
   if (envOverride && environments[envOverride]) {
     cachedEnvironment = envOverride
+    console.log(`🔧 Environment explicitly set: ${envOverride}`)
     return envOverride
   }
 
   // Detect based on hostname
   const hostname = window.location.hostname
-  
+
   if (hostname === 'localhost' || hostname === '127.0.0.1') {
     cachedEnvironment = 'development'
-  } else if (hostname.includes('staging') || hostname.includes('dev') || hostname.includes('voxxy-presents-client-staging') || hostname.includes('onrender.com')) {
+  } else if (hostname.includes('onrender.com') || (hostname.includes('staging') && !hostname.includes('herokuapp.com'))) {
+    // Only consider it staging if it's on render.com OR contains staging but NOT on Heroku
+    // This fixes the issue where production Heroku URLs contain 'staging' in the app name
     cachedEnvironment = 'staging'
   } else {
     cachedEnvironment = 'production'
