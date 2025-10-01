@@ -74,8 +74,8 @@ function getFirebaseConfigFromEnv() {
 const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
-    dataSource: 'firebase', // Direct Firebase for fast iteration
-    apiBaseUrl: 'http://localhost:3001/api', // Local API for RSVP system
+    dataSource: 'api', // Use API for budget calculator testing
+    apiBaseUrl: 'http://localhost:3001/api', // Local API for budget system
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
