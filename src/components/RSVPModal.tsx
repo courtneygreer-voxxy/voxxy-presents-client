@@ -129,11 +129,12 @@ export function RSVPModal({ event, trigger }: RSVPModalProps) {
         const { createRegistration } = await import('@/lib/database')
         const registrationId = await createRegistration({
           eventId: event.id,
+          organizationId: event.organizationId,
           name: formData.name,
           email: formData.email || '',
-          registrationType: formData.registrationType,
+          registrationType: formData.registrationType === 'rsvp_yes' ? 'confirmed' : 'confirmed', // Both rsvp_yes and rsvp_maybe map to confirmed
           source: 'website',
-          status: 'confirmed'
+          emailSent: false
         })
         result = { registrationId }
       } else {

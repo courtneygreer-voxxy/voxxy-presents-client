@@ -41,6 +41,7 @@ export interface Organization {
       }
     }
   }
+  status?: 'active' | 'inactive' | 'pending' // Organization status for admin management
   ownerId: string // References users collection
   createdAt: Date
   updatedAt: Date
