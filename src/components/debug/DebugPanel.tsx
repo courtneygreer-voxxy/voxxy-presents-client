@@ -215,6 +215,8 @@ export function DebugPanel() {
             <div className="font-semibold text-gray-700">🌐 Current State</div>
             <div className="bg-gray-50 p-2 rounded text-xs">
               <div><strong>URL:</strong> {window.location.pathname}</div>
+              <div><strong>Firebase Project:</strong> {import.meta.env.VITE_FIREBASE_PROJECT_ID || 'Not Set'}</div>
+              <div><strong>Environment:</strong> {import.meta.env.VITE_ENVIRONMENT || 'Auto-detected'}</div>
               <div><strong>Timestamp:</strong> {new Date().toLocaleTimeString()}</div>
             </div>
           </div>
@@ -258,6 +260,27 @@ export function DebugPanel() {
                 Clear Admin Session
               </Button>
             )}
+
+            {/* Firebase Connection Test */}
+            <Button
+              onClick={async () => {
+                try {
+                  console.log('🔍 DEBUG: Testing Firebase connection...')
+                  const { testFirebaseConnection } = await import('@/debug/firebase-connection-test')
+                  const result = await testFirebaseConnection()
+                  console.log('🔍 DEBUG: Firebase test result:', result)
+                  alert(`Firebase Test:\nProject: ${result.projectId}\nOrganizations: ${result.organizationCount}`)
+                } catch (error) {
+                  console.error('🔍 DEBUG: Firebase test failed:', error)
+                  alert(`Firebase Test Failed: ${error}`)
+                }
+              }}
+              size="sm"
+              variant="outline"
+              className="w-full h-8 text-xs border-green-200 text-green-600"
+            >
+              🔍 Test Firebase Connection
+            </Button>
 
             {/* Venue Debug Controls */}
             {isVenueOwner && currentUser && (
