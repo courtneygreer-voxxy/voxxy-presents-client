@@ -100,7 +100,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   production: {
     name: 'production',
-    dataSource: 'firebase', // Use Firebase for data, API for RSVP functionality
+    dataSource: 'firebase', // Use Firebase for organizations, API for venues
     apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
@@ -187,4 +187,17 @@ export function getApiUrl(): string | undefined {
 export function getFirebaseConfig() {
   const config = getEnvironmentConfig()
   return config.firebaseConfig
+}
+
+// Get venue-specific data source (venues always use API in production)
+export function getVenueDataSource(): DataSourceType {
+  const currentEnv = getCurrentEnvironment()
+
+  // Venues always use API in production, regardless of general dataSource setting
+  if (currentEnv === 'production') {
+    return 'api'
+  }
+
+  // Use general data source for dev/staging
+  return getDataSource()
 }

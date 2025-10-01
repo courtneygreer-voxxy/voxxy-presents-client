@@ -64,9 +64,13 @@ export default function VenueOwnerDashboardNew() {
       try {
         console.log('Loading venues for owner:', currentUser.uid)
 
-        // Use environment-aware data source like useOrganization hook
-        const { getDataSource } = await import('@/config/environments')
-        const dataSource = getDataSource()
+        // Use venue-specific data source
+        const { getVenueDataSource, getCurrentEnvironment } = await import('@/config/environments')
+        const dataSource = getVenueDataSource()
+        const currentEnv = getCurrentEnvironment()
+
+        console.log('🏢 VENUE DEBUG: Current environment:', currentEnv)
+        console.log('🏢 VENUE DEBUG: Data source for venues:', dataSource)
 
         let venueData: any[] = []
 
