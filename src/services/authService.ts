@@ -326,10 +326,31 @@ export const checkForEmailVerificationInURL = (): string | null => {
   return null
 }
 
-// Get user profile from Firestore
+// Get user profile from appropriate data source (environment-aware)
 export const getUserProfile = async (uid: string): Promise<User | null> => {
   try {
-    return await getUser(uid)
+    // Use environment-aware data source
+    const { getUserDataSource, getCurrentEnvironment } = await import('@/config/environments')
+    const dataSource = getUserDataSource()
+    const currentEnv = getCurrentEnvironment()
+
+    console.log('👤 USER DEBUG: Current environment:', currentEnv)
+    console.log('👤 USER DEBUG: Data source for users:', dataSource)
+
+    if (dataSource === 'api') {
+      // Load user profile from API
+      console.log('Loading user profile via API')
+      const { usersApi } = await import('@/services/api')
+      const response = await usersApi.getCurrentUser()
+      console.log('👤 USER DEBUG: User profile from API:', response)
+      return response || null
+    } else {
+      // Load user profile from Firebase
+      console.log('Loading user profile via Firebase')
+      const profile = await getUser(uid)
+      console.log('👤 USER DEBUG: User profile from Firebase:', profile)
+      return profile
+    }
   } catch (error) {
     console.error('Get user profile error:', error)
     return null

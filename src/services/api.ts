@@ -294,6 +294,13 @@ export const venuesApi = {
   }
 }
 
+// Users API
+export const usersApi = {
+  async getCurrentUser() {
+    return fetchApi<any>('/users/me')
+  }
+}
+
 // Admin API
 export const adminApi = {
   async getAllUsers() {

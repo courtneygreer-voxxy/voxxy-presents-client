@@ -27,14 +27,12 @@ export function BetaAccessGuard({ children, requireNonVenueOwner = false }: Beta
     return <Navigate to="/venue-owner/dashboard" replace />
   }
 
-  // Check beta status for authenticated users (venue owners and club owners skip beta)
-  const skipsBetaCheck = isVenueOwner || userProfile.role === 'club_owner'
-
-  if (!skipsBetaCheck && userProfile.betaStatus === 'pending') {
+  // Check beta status for authenticated users (venue owners skip beta)
+  if (userProfile.betaStatus === 'pending') {
     return <BetaPendingPage />
   }
 
-  if (!skipsBetaCheck && userProfile.betaStatus === 'denied') {
+  if (userProfile.betaStatus === 'denied') {
     // Could create a separate "BetaDeniedPage" if needed
     return <BetaPendingPage />
   }

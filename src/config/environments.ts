@@ -204,3 +204,16 @@ export function getVenueDataSource(): DataSourceType {
   // Use general data source for dev/staging
   return getDataSource()
 }
+
+// Get user-specific data source (users use API in production for beta status consistency)
+export function getUserDataSource(): DataSourceType {
+  const currentEnv = getCurrentEnvironment()
+
+  // Users use API in production to ensure beta status sync with admin panel
+  if (currentEnv === 'production') {
+    return 'api'
+  }
+
+  // Use general data source for dev/staging
+  return getDataSource()
+}
