@@ -87,7 +87,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   staging: {
     name: 'staging',
-    dataSource: 'api', // Use API for RSVP system testing
+    dataSource: 'firebase', // Use Firebase directly for seeded test data
     apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
