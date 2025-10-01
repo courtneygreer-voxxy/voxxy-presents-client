@@ -33,38 +33,61 @@ export function ClubsManagement() {
   // Load club data
   useEffect(() => {
     const loadClubs = async () => {
-      console.log('🔍 CLUB DEBUG: Starting club load...')
-      console.log('🔍 CLUB DEBUG: userProfile:', userProfile)
-      console.log('🔍 CLUB DEBUG: organizationIds:', userProfile?.organizationIds)
-      console.log('🔍 CLUB DEBUG: organizationIds length:', userProfile?.organizationIds?.length)
+      // Only show debug logs in development and staging environments
+      const isDevelopment = import.meta.env.DEV
+      const isStaging = window.location.hostname.includes('staging') ||
+                       window.location.hostname.includes('dev') ||
+                       import.meta.env.VITE_ENVIRONMENT === 'staging'
+      const showDebugLogs = isDevelopment || isStaging
+
+      if (showDebugLogs) {
+        console.log('🔍 CLUB DEBUG: Starting club load...')
+        console.log('🔍 CLUB DEBUG: userProfile:', userProfile)
+        console.log('🔍 CLUB DEBUG: organizationIds:', userProfile?.organizationIds)
+        console.log('🔍 CLUB DEBUG: organizationIds length:', userProfile?.organizationIds?.length)
+      }
 
       if (!userProfile?.organizationIds?.length) {
-        console.log('🔍 CLUB DEBUG: No organizationIds found, setting loading to false')
+        if (showDebugLogs) {
+          console.log('🔍 CLUB DEBUG: No organizationIds found, setting loading to false')
+        }
         setIsLoading(false)
         return
       }
 
       setIsLoading(true)
       try {
-        console.log('🔍 CLUB DEBUG: Loading clubs for IDs:', userProfile.organizationIds)
+        if (showDebugLogs) {
+          console.log('🔍 CLUB DEBUG: Loading clubs for IDs:', userProfile.organizationIds)
+        }
         const clubPromises = userProfile.organizationIds.map(async (orgId) => {
           try {
-            console.log(`🔍 CLUB DEBUG: Loading club ${orgId}...`)
+            if (showDebugLogs) {
+              console.log(`🔍 CLUB DEBUG: Loading club ${orgId}...`)
+            }
             const org = await getOrganization(orgId)
-            console.log(`🔍 CLUB DEBUG: Loaded club ${orgId}:`, org?.name || 'null')
+            if (showDebugLogs) {
+              console.log(`🔍 CLUB DEBUG: Loaded club ${orgId}:`, org?.name || 'null')
+            }
             return org
           } catch (error) {
-            console.error(`🔍 CLUB DEBUG: Failed to load club ${orgId}:`, error)
+            if (showDebugLogs) {
+              console.error(`🔍 CLUB DEBUG: Failed to load club ${orgId}:`, error)
+            }
             return null
           }
         })
 
         const clubResults = await Promise.all(clubPromises)
         const validClubs = clubResults.filter((club): club is Organization => club !== null)
-        console.log('🔍 CLUB DEBUG: Final valid clubs:', validClubs)
+        if (showDebugLogs) {
+          console.log('🔍 CLUB DEBUG: Final valid clubs:', validClubs)
+        }
         setClubs(validClubs)
       } catch (error) {
-        console.error('🔍 CLUB DEBUG: Failed to load clubs:', error)
+        if (showDebugLogs) {
+          console.error('🔍 CLUB DEBUG: Failed to load clubs:', error)
+        }
       } finally {
         setIsLoading(false)
       }

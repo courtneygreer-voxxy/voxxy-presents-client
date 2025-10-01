@@ -23,8 +23,12 @@ export function DebugPanel() {
                    window.location.hostname.includes('dev') ||
                    import.meta.env.VITE_ENVIRONMENT === 'staging'
 
-  // Hide in production
-  if (!isDevelopment && !isStaging) {
+  // Hide in production (when NODE_ENV is production and not staging)
+  const isProduction = import.meta.env.PROD &&
+                      !isStaging &&
+                      import.meta.env.VITE_ENVIRONMENT !== 'staging'
+
+  if (isProduction) {
     return null
   }
 
