@@ -251,13 +251,19 @@ export default function VenueProfilePage() {
       <div className="relative z-10">
         {/* Top Controls */}
         <div className="fixed top-4 left-4 right-4 z-50 flex justify-between">
-          <button
-            onClick={() => navigate('/voxxy-shop/venues')}
-            className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Venues
-          </button>
+          {/* Only show back to venues button if user is not a venue owner */}
+          {!isVenueOwner && (
+            <button
+              onClick={() => navigate('/voxxy-shop/venues')}
+              className="flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Back to Venues
+            </button>
+          )}
+
+          {/* If venue owner, add spacing div to maintain layout */}
+          {isVenueOwner && <div></div>}
 
           <div className="flex gap-2">
             <ShareButton

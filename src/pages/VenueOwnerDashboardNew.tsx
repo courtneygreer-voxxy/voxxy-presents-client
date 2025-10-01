@@ -36,7 +36,7 @@ import type { Venue } from '@/types/venue'
 
 export default function VenueOwnerDashboardNew() {
   const navigate = useNavigate()
-  const { currentUser, userProfile, isVenueOwner, isOrganizer } = useAuth()
+  const { currentUser, userProfile, isVenueOwner, isOrganizer, signOut } = useAuth()
   const [venues, setVenues] = useState<Venue[]>([])
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null)
   const [loading, setLoading] = useState(true)
@@ -126,9 +126,13 @@ export default function VenueOwnerDashboardNew() {
     loadVenueData()
   }, [currentUser, isVenueOwner, isOrganizer, navigate])
 
-  const handleLogout = () => {
-    // TODO: Implement logout
-    navigate('/login')
+  const handleLogout = async () => {
+    try {
+      await signOut()
+      navigate('/login')
+    } catch (error) {
+      console.error('Logout error:', error)
+    }
   }
 
   const handlePreviewVenue = () => {
