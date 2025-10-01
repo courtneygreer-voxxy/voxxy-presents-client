@@ -20,6 +20,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { budgetsApi } from "@/services/api"
 import { getDataSource } from "@/config/environments"
 import type {
@@ -363,11 +364,8 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                 <TabsTrigger value="overview" className="data-[state=active]:bg-white/20">
                   Overview
                 </TabsTrigger>
-                <TabsTrigger value="line-items" className="data-[state=active]:bg-white/20">
-                  Line Items
-                </TabsTrigger>
-                <TabsTrigger value="analysis" className="data-[state=active]:bg-white/20">
-                  Analysis
+                <TabsTrigger value="budget-table" className="data-[state=active]:bg-white/20">
+                  Budget Table
                 </TabsTrigger>
               </TabsList>
 
@@ -484,15 +482,15 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                 </Card>
               </TabsContent>
 
-              {/* Line Items Tab */}
-              <TabsContent value="line-items">
+              {/* Budget Table Tab */}
+              <TabsContent value="budget-table">
                 <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
-                        <CardTitle className="text-white">Budget Line Items</CardTitle>
+                        <CardTitle className="text-white">Budget Table</CardTitle>
                         <CardDescription className="text-gray-300">
-                          Track individual revenue sources and expenses
+                          Manage your event budget in a familiar spreadsheet format
                         </CardDescription>
                       </div>
                       <Button
@@ -501,7 +499,7 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                         className="bg-purple-600 hover:bg-purple-700"
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Add Item
+                        Add Line Item
                       </Button>
                     </div>
                   </CardHeader>
@@ -509,7 +507,7 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                     {/* Add Form */}
                     {showAddForm && (
                       <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-                        <h4 className="text-white font-medium mb-4">Add Line Item</h4>
+                        <h4 className="text-white font-medium mb-4">Add New Line Item</h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                           <div>
                             <Label className="text-white">Category</Label>
@@ -551,18 +549,6 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                             </Select>
                           </div>
                           <div>
-                            <Label className="text-white">Amount</Label>
-                            <Input
-                              type="number"
-                              value={formData.plannedAmount}
-                              onChange={(e) =>
-                                setFormData(prev => ({ ...prev, plannedAmount: parseFloat(e.target.value) || 0 }))
-                              }
-                              className="bg-white/10 border-white/20 text-white"
-                              placeholder="0.00"
-                            />
-                          </div>
-                          <div>
                             <Label className="text-white">Description</Label>
                             <Input
                               value={formData.description}
@@ -571,6 +557,18 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                               }
                               className="bg-white/10 border-white/20 text-white"
                               placeholder="Item description..."
+                            />
+                          </div>
+                          <div>
+                            <Label className="text-white">Planned Amount</Label>
+                            <Input
+                              type="number"
+                              value={formData.plannedAmount}
+                              onChange={(e) =>
+                                setFormData(prev => ({ ...prev, plannedAmount: parseFloat(e.target.value) || 0 }))
+                              }
+                              className="bg-white/10 border-white/20 text-white"
+                              placeholder="0.00"
                             />
                           </div>
                         </div>
@@ -594,142 +592,119 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                       </div>
                     )}
 
-                    {/* Line Items List */}
-                    <div className="space-y-2">
-                      {lineItems.length === 0 ? (
-                        <div className="text-center py-8 text-gray-400">
-                          No line items yet. Add your first budget item above.
-                        </div>
-                      ) : (
-                        lineItems.map(item => (
-                          <div
-                            key={item.id}
-                            className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10"
-                          >
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <Badge variant={item.category === 'revenue' ? 'default' : 'secondary'}>
-                                  {item.category}
-                                </Badge>
-                                <Badge variant="outline" className="text-xs">
-                                  {item.type.replace('_', ' ')}
-                                </Badge>
-                                {item.actualAmount !== undefined && (
-                                  <CheckCircle className="h-4 w-4 text-green-400" />
-                                )}
-                              </div>
-                              <p className="text-white font-medium">{item.description}</p>
-                              <p className="text-sm text-gray-400">
-                                Planned: {formatCurrency(item.plannedAmount)}
-                                {item.actualAmount !== undefined && (
-                                  <> • Actual: {formatCurrency(item.actualAmount)}</>
-                                )}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              {item.actualAmount === undefined && (
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => {
-                                    const actualAmount = prompt(`Enter actual amount for "${item.description}":`)
-                                    if (actualAmount) {
-                                      handleUpdateLineItem(item, { actualAmount: parseFloat(actualAmount) })
-                                    }
-                                  }}
-                                  className="bg-white/10 border-white/20 text-white hover:bg-white/15"
-                                >
-                                  <Edit className="h-4 w-4" />
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        ))
-                      )}
+                    {/* Excel-Style Budget Table */}
+                    <div className="border border-white/20 rounded-lg overflow-hidden">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-white/5 border-white/20 hover:bg-white/5">
+                            <TableHead className="text-white font-semibold">Category</TableHead>
+                            <TableHead className="text-white font-semibold">Type</TableHead>
+                            <TableHead className="text-white font-semibold">Description</TableHead>
+                            <TableHead className="text-white font-semibold text-right">Planned Amount</TableHead>
+                            <TableHead className="text-white font-semibold text-right">Actual Amount</TableHead>
+                            <TableHead className="text-white font-semibold text-right">Variance</TableHead>
+                            <TableHead className="text-white font-semibold text-center">Status</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {lineItems.length === 0 ? (
+                            <TableRow>
+                              <TableCell colSpan={7} className="text-center py-8 text-gray-400">
+                                No budget items yet. Click "Add Line Item" to get started.
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            lineItems.map((item) => {
+                              const variance = item.actualAmount !== undefined ? item.actualAmount - item.plannedAmount : 0
+                              const isCompleted = item.actualAmount !== undefined
+
+                              return (
+                                <TableRow key={item.id} className="border-white/10 hover:bg-white/5">
+                                  <TableCell className="text-white">
+                                    <Badge variant={item.category === 'revenue' ? 'default' : 'secondary'} className="text-xs">
+                                      {item.category}
+                                    </Badge>
+                                  </TableCell>
+                                  <TableCell className="text-gray-300 text-sm">
+                                    {item.type.replace('_', ' ')}
+                                  </TableCell>
+                                  <TableCell className="text-white font-medium">
+                                    {item.description}
+                                  </TableCell>
+                                  <TableCell className="text-right text-white font-mono">
+                                    {formatCurrency(item.plannedAmount)}
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    <Input
+                                      type="number"
+                                      value={item.actualAmount || ''}
+                                      onChange={(e) => {
+                                        const actualAmount = parseFloat(e.target.value) || undefined
+                                        handleUpdateLineItem(item, { actualAmount })
+                                      }}
+                                      className="bg-white/10 border-white/20 text-white text-right font-mono h-8 w-24 ml-auto"
+                                      placeholder="0.00"
+                                    />
+                                  </TableCell>
+                                  <TableCell className="text-right">
+                                    {isCompleted ? (
+                                      <span className={`font-mono text-sm ${getVarianceColor(variance)}`}>
+                                        {variance >= 0 ? '+' : ''}{formatCurrency(variance)}
+                                      </span>
+                                    ) : (
+                                      <span className="text-gray-400 text-sm">-</span>
+                                    )}
+                                  </TableCell>
+                                  <TableCell className="text-center">
+                                    {isCompleted ? (
+                                      <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
+                                    ) : (
+                                      <AlertTriangle className="h-4 w-4 text-gray-400 mx-auto" />
+                                    )}
+                                  </TableCell>
+                                </TableRow>
+                              )
+                            })
+                          )}
+                        </TableBody>
+                      </Table>
                     </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
 
-              {/* Analysis Tab */}
-              <TabsContent value="analysis">
-                <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white">Budget Analysis</CardTitle>
-                    <CardDescription className="text-gray-300">
-                      Detailed financial analysis and insights
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    {summary ? (
-                      <div className="space-y-6">
-                        {/* Profit Margins */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <div className="bg-white/5 p-4 rounded-lg">
-                            <h4 className="text-white font-medium mb-2">Planned Profit Margin</h4>
-                            <p className="text-2xl font-bold text-purple-400">
-                              {summary.plannedProfitMargin.toFixed(1)}%
+                    {/* Summary Row */}
+                    {lineItems.length > 0 && summary && (
+                      <div className="mt-4 p-4 bg-white/5 rounded-lg border border-white/20">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-400">Total Planned</p>
+                            <p className="text-white font-semibold font-mono">
+                              {formatCurrency(summary.plannedRevenue - summary.plannedExpenses)}
                             </p>
                           </div>
-                          <div className="bg-white/5 p-4 rounded-lg">
-                            <h4 className="text-white font-medium mb-2">Actual Profit Margin</h4>
-                            <p className={`text-2xl font-bold ${summary.actualProfitMargin >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-                              {summary.actualProfitMargin.toFixed(1)}%
+                          <div>
+                            <p className="text-gray-400">Total Actual</p>
+                            <p className="text-white font-semibold font-mono">
+                              {formatCurrency(summary.actualRevenue - summary.actualExpenses)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Total Variance</p>
+                            <p className={`font-semibold font-mono ${getVarianceColor(summary.profitVariance)}`}>
+                              {summary.profitVariance >= 0 ? '+' : ''}{formatCurrency(summary.profitVariance)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Completion</p>
+                            <p className="text-white font-semibold">
+                              {summary.completedLineItems} / {summary.totalLineItems} items
                             </p>
                           </div>
                         </div>
-
-                        {/* Variance Summary */}
-                        <div className="bg-white/5 p-4 rounded-lg">
-                          <h4 className="text-white font-medium mb-4">Variance Summary</h4>
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                              <p className="text-sm text-gray-400">Revenue Variance</p>
-                              <p className={`text-lg font-semibold ${getVarianceColor(summary.revenueVariance)}`}>
-                                {formatCurrency(summary.revenueVariance)}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-400">Expense Variance</p>
-                              <p className={`text-lg font-semibold ${getVarianceColor(-summary.expenseVariance)}`}>
-                                {formatCurrency(summary.expenseVariance)}
-                              </p>
-                            </div>
-                            <div>
-                              <p className="text-sm text-gray-400">Overall Variance</p>
-                              <p className={`text-lg font-semibold ${getVarianceColor(summary.profitVariance)}`}>
-                                {summary.variancePercentage.toFixed(1)}%
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Budget Health */}
-                        <div className="bg-white/5 p-4 rounded-lg">
-                          <h4 className="text-white font-medium mb-2">Budget Health</h4>
-                          <div className="flex items-center gap-2">
-                            {summary.isOverBudget ? (
-                              <>
-                                <AlertTriangle className="h-5 w-5 text-red-400" />
-                                <span className="text-red-400">Over Budget</span>
-                              </>
-                            ) : (
-                              <>
-                                <CheckCircle className="h-5 w-5 text-green-400" />
-                                <span className="text-green-400">On Track</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-center py-8 text-gray-400">
-                        No analysis available. Add line items to see budget analysis.
                       </div>
                     )}
                   </CardContent>
                 </Card>
               </TabsContent>
+
             </Tabs>
           )}
         </>
