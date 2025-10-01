@@ -500,13 +500,23 @@ export default function VenueProfilePage() {
                 Get notified about upcoming events and special offers at {venue.name}
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Button
-                  onClick={() => setIsContactModalOpen(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white"
-                >
-                  <Mail className="h-4 w-4 mr-2" />
-                  Contact Venue
-                </Button>
+                {isOwnerOfThisVenue ? (
+                  <Button
+                    onClick={() => navigate('/venue-owner/dashboard')}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setIsContactModalOpen(true)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white"
+                  >
+                    <Mail className="h-4 w-4 mr-2" />
+                    Contact Venue
+                  </Button>
+                )}
                 <SubscriptionModal
                   trigger={
                     <Button
