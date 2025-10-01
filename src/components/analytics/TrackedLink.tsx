@@ -7,7 +7,7 @@ interface TrackedLinkProps extends LinkProps {
     link_text: string;
     destination_page: string;
     current_page: string;
-    link_position: 'header' | 'footer' | 'inline';
+    link_position: 'header' | 'footer' | 'inline' | 'hero';
   };
   children: React.ReactNode;
 }

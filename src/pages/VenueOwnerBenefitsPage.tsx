@@ -141,18 +141,19 @@ export default function VenueOwnerBenefitsPage() {
               Login
             </TrackedLink>
             <TrackedButton
-              as={Link}
-              to="/venues/create"
+              asChild
               variant="default"
               className="bg-blue-600 hover:bg-blue-700 text-white"
               trackingData={{
                 button_text: 'List Your Venue',
+                button_location: 'header',
+                page_name: 'Venue Owner Benefits',
                 action_type: 'navigation',
                 destination_page: 'Venue Create',
                 current_page: 'Venue Owner Benefits'
               }}
             >
-              List Your Venue
+              <Link to="/venues/create">List Your Venue</Link>
             </TrackedButton>
           </div>
         </div>
@@ -177,20 +178,23 @@ export default function VenueOwnerBenefitsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <TrackedButton
-                as={Link}
-                to="/venues/create"
+                asChild
                 size="lg"
                 className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-3"
                 trackingData={{
                   button_text: 'List Your Venue Now',
+                  button_location: 'hero',
+                  page_name: 'Venue Owner Benefits',
                   action_type: 'conversion',
                   destination_page: 'Venue Create',
                   current_page: 'Venue Owner Benefits',
                   button_position: 'hero'
                 }}
               >
-                <Building2 className="mr-2 h-5 w-5" />
-                List Your Venue Now
+                <Link to="/venues/create">
+                  <Building2 className="mr-2 h-5 w-5" />
+                  List Your Venue Now
+                </Link>
               </TrackedButton>
               <TrackedLink
                 to="/venues"
@@ -292,18 +296,19 @@ export default function VenueOwnerBenefitsPage() {
                     Join our growing community of successful venue owners
                   </p>
                   <TrackedButton
-                    as={Link}
-                    to="/venues/create"
+                    asChild
                     className="bg-blue-600 hover:bg-blue-700 text-white w-full"
                     trackingData={{
                       button_text: 'Create Your Venue Listing',
+                      button_location: 'inline',
+                      page_name: 'Venue Owner Benefits',
                       action_type: 'conversion',
                       destination_page: 'Venue Create',
                       current_page: 'Venue Owner Benefits',
                       button_position: 'features_cta'
                     }}
                   >
-                    Create Your Venue Listing
+                    <Link to="/venues/create">Create Your Venue Listing</Link>
                   </TrackedButton>
                 </div>
               </div>
@@ -349,20 +354,23 @@ export default function VenueOwnerBenefitsPage() {
               Start generating revenue from your space today. It's free to list and you keep 100% of what you charge.
             </p>
             <TrackedButton
-              as={Link}
-              to="/venues/create"
+              asChild
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-teal-600 hover:from-blue-700 hover:to-teal-700 text-white text-lg px-12 py-4"
               trackingData={{
                 button_text: 'List Your Venue - It\'s Free',
+                button_location: 'inline',
+                page_name: 'Venue Owner Benefits',
                 action_type: 'conversion',
                 destination_page: 'Venue Create',
                 current_page: 'Venue Owner Benefits',
                 button_position: 'final_cta'
               }}
             >
-              <Zap className="mr-2 h-5 w-5" />
-              List Your Venue - It's Free
+              <Link to="/venues/create">
+                <Zap className="mr-2 h-5 w-5" />
+                List Your Venue - It's Free
+              </Link>
             </TrackedButton>
           </div>
         </section>

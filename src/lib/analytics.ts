@@ -29,14 +29,18 @@ export interface NavigationProperties {
   link_text: string;
   destination_page: string;
   current_page: string;
-  link_position: 'header' | 'footer' | 'inline';
+  link_position: 'header' | 'footer' | 'inline' | 'hero';
 }
 
 export interface CTAClickProperties {
   button_text: string;
   button_location: string;
   page_name: string;
-  is_primary_cta: boolean;
+  is_primary_cta?: boolean;
+  action_type?: string;
+  destination_page?: string;
+  current_page?: string;
+  button_position?: string;
 }
 
 export interface ScrollProperties {
@@ -300,7 +304,7 @@ class Analytics {
         operating_system: navigator.platform,
         conversion_stage: 'visitor',
         traffic_source: trafficSource.source,
-        referrer_domain: trafficSource.domain,
+        referrer_domain: trafficSource.domain || undefined,
         ...utmParams,
       });
 
