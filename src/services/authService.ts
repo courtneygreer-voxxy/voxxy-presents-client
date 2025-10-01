@@ -344,6 +344,13 @@ export const getUserProfile = async (uid: string): Promise<User | null> => {
         const { usersApi } = await import('@/services/api')
         const response = await usersApi.getCurrentUser()
         console.log('👤 USER DEBUG: User profile from API:', response)
+
+        // Handle API response format {success: true, user: {...}}
+        if (response && response.success && response.user) {
+          console.log('👤 USER DEBUG: Extracted user from API response:', response.user)
+          return response.user
+        }
+        console.warn('👤 USER DEBUG: API response format unexpected:', response)
         return response || null
       } catch (apiError) {
         console.warn('API user profile failed, falling back to Firebase:', apiError)
