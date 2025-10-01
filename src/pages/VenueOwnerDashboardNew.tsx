@@ -64,18 +64,33 @@ export default function VenueOwnerDashboardNew() {
       try {
         console.log('Loading venues for owner:', currentUser.uid)
 
-        // Call real API to get venues by owner
-        const response = await venuesApi.getByOwner(currentUser.uid)
+        // Use environment-aware data source like useOrganization hook
+        const { getDataSource } = await import('@/config/environments')
+        const dataSource = getDataSource()
 
-        if (response.success && response.venues) {
-          setVenues(response.venues)
+        let venueData: any[] = []
 
-          // DEBUG: Log actual venue data received
-          console.log('🏢 VENUE DEBUG: Raw venue data from API:', response.venues)
+        if (dataSource === 'firebase') {
+          // Direct Firebase access for staging/development
+          console.log('Loading venues via Firebase')
+          const { getVenuesByOwner } = await import('@/lib/database')
+          venueData = await getVenuesByOwner(currentUser.uid)
+          console.log('🏢 VENUE DEBUG: Raw venue data from Firebase:', venueData)
+        } else {
+          // API access for production
+          console.log('Loading venues via API')
+          const response = await venuesApi.getByOwner(currentUser.uid)
+          if (response.success && response.venues) {
+            venueData = response.venues
+          }
+          console.log('🏢 VENUE DEBUG: Raw venue data from API:', venueData)
+        }
+
+        setVenues(venueData)
 
           // Check if any venues need approval
-          const pendingVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'pending')
-          const approvedVenues = response.venues.filter((venue: Venue) => venue.claimStatus === 'approved')
+          const pendingVenues = venueData.filter((venue: any) => venue.claimStatus === 'pending')
+          const approvedVenues = venueData.filter((venue: any) => venue.claimStatus === 'approved')
 
           console.log('🏢 VENUE DEBUG: Pending venues:', pendingVenues.length, pendingVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
           console.log('🏢 VENUE DEBUG: Approved venues:', approvedVenues.length, approvedVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
@@ -90,10 +105,11 @@ export default function VenueOwnerDashboardNew() {
           // Select the first approved venue, or first venue if all approved
           if (approvedVenues.length > 0) {
             setSelectedVenue(approvedVenues[0])
-          } else if (response.venues.length > 0) {
-            setSelectedVenue(response.venues[0])
+          } else if (venueData.length > 0) {
+            setSelectedVenue(venueData[0])
           }
-        } else {
+
+        if (venueData.length === 0) {
           // No venues found - redirect to create venue
           console.log('🏢 VENUE OWNER DEBUG: No venues found, redirecting to create')
           navigate('/venues/create')
