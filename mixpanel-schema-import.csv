@@ -1,0 +1,112 @@
+Type,Name,Display Name,Description,Tags,Platforms,Owners,Status,Example Value
+Event,Page Viewed,Page Viewed,User views a page on the website,Navigation;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Navigation Link Clicked,Navigation Link Clicked,User clicks on navigation links throughout the site,Navigation;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,CTA Button Clicked,CTA Button Clicked,User clicks on call-to-action buttons,Conversion;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Page Scroll,Page Scroll,User scrolls down a page (tracked in 25% increments),Engagement;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Page Engagement,Page Engagement,Measures time spent on page and engagement level,Engagement;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Form Started,Form Started,User begins filling out a form,Conversion;Forms,Web,team@voxxypresents.com,Visible,
+Event,Form Field Completed,Form Field Completed,User completes a form field,Conversion;Forms,Web,team@voxxypresents.com,Visible,
+Event,Form Submitted,Form Submitted,User successfully submits a form,Conversion;Forms,Web,team@voxxypresents.com,Visible,
+Event,Form Error,Form Error,User encounters an error while filling out a form,Conversion;Forms;Errors,Web,team@voxxypresents.com,Visible,
+Event,Feature Viewed,Feature Viewed,User views a specific feature on the platform,Product;Engagement,Web,team@voxxypresents.com,Visible,
+Event,Pricing Plan Viewed,Pricing Plan Viewed,User views pricing information for different plans,Conversion;Pricing,Web,team@voxxypresents.com,Visible,
+Event,Email Link Clicked,Email Link Clicked,User clicks on email contact links,Contact;Conversion,Web,team@voxxypresents.com,Visible,
+Event,External Link Clicked,External Link Clicked,User clicks on external links leaving the site,User Behavior;External,Web,team@voxxypresents.com,Visible,
+Event,First Visit,First Visit,User's first visit to the website with traffic source tracking,Acquisition;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,User Signed In,User Signed In,User successfully signs into their account,Authentication;User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Club Created,Club Created,User creates a new club/organization,Conversion;Product,Web,team@voxxypresents.com,Visible,
+Event,Venue Listed,Venue Listed,Venue owner lists their venue on the platform,Conversion;Product;Venues,Web,team@voxxypresents.com,Visible,
+Event,Event Created,Event Created,User creates a new event,Conversion;Product,Web,team@voxxypresents.com,Visible,
+Event,RSVP Made,RSVP Made,User RSVPs to an event,Conversion;Product,Web,team@voxxypresents.com,Visible,
+Event,Element Clicked,Element Clicked,User clicks on general page elements,User Behavior,Web,team@voxxypresents.com,Visible,
+Event,Landing Page Interaction,Landing Page Interaction,User interacts with elements on the landing page,Conversion;Landing Page,Web,team@voxxypresents.com,Visible,
+Property,page_name,Page Name,Name of the page being viewed,Page;Navigation,Web,team@voxxypresents.com,Visible,Home Page
+Property,page_url,Page URL,Full URL of the page being viewed,Page;Navigation,Web,team@voxxypresents.com,Visible,https://www.voxxypresents.com/
+Property,referrer,Referrer,The page that referred the user to current page,Traffic Source;Navigation,Web,team@voxxypresents.com,Visible,https://google.com
+Property,user_agent,User Agent,Browser user agent string,Technical;Browser,Web,team@voxxypresents.com,Visible,Mozilla/5.0...
+Property,link_text,Link Text,Text content of the clicked link,Navigation;User Behavior,Web,team@voxxypresents.com,Visible,Get Started
+Property,destination_page,Destination Page,Page the link navigates to,Navigation,Web,team@voxxypresents.com,Visible,Sign Up
+Property,current_page,Current Page,Page where the interaction occurred,Navigation,Web,team@voxxypresents.com,Visible,Home
+Property,link_position,Link Position,Location of link on page (header/footer/inline/hero),Navigation;Layout,Web,team@voxxypresents.com,Visible,header
+Property,button_text,Button Text,Text content of the clicked button,Conversion;User Behavior,Web,team@voxxypresents.com,Visible,List Your Venue
+Property,button_location,Button Location,General location of button on page,Conversion;Layout,Web,team@voxxypresents.com,Visible,hero
+Property,is_primary_cta,Is Primary CTA,Whether button is the primary call-to-action,Conversion,Web,team@voxxypresents.com,Visible,true
+Property,action_type,Action Type,Type of action the button performs,Conversion;Product,Web,team@voxxypresents.com,Visible,navigation
+Property,button_position,Button Position,Specific position identifier for button,Conversion;Layout,Web,team@voxxypresents.com,Visible,hero_primary
+Property,scroll_depth,Scroll Depth,Percentage of page scrolled (25% increments),Engagement,Web,team@voxxypresents.com,Visible,75
+Property,time_to_depth,Time to Depth,Seconds taken to reach scroll depth,Engagement;Time,Web,team@voxxypresents.com,Visible,45
+Property,time_spent,Time Spent,Total time spent on page in seconds,Engagement;Time,Web,team@voxxypresents.com,Visible,120
+Property,engagement_level,Engagement Level,Calculated engagement level (low/medium/high),Engagement,Web,team@voxxypresents.com,Visible,high
+Property,form_type,Form Type,Type of form being interacted with,Forms;Conversion,Web,team@voxxypresents.com,Visible,beta_access
+Property,form_location,Form Location,Location of form on page,Forms;Layout,Web,team@voxxypresents.com,Visible,hero
+Property,field_name,Field Name,Name of the form field,Forms,Web,team@voxxypresents.com,Visible,email
+Property,field_order,Field Order,Order of field in the form,Forms,Web,team@voxxypresents.com,Visible,1
+Property,time_to_complete,Time to Complete,Time taken to complete form in seconds,Forms;Time,Web,team@voxxypresents.com,Visible,180
+Property,completion_time,Completion Time,Total form completion time,Forms;Time,Web,team@voxxypresents.com,Visible,240
+Property,error_field,Error Field,Field where error occurred,Forms;Errors,Web,team@voxxypresents.com,Visible,email
+Property,error_message,Error Message,Error message displayed to user,Forms;Errors,Web,team@voxxypresents.com,Visible,Invalid email format
+Property,attempt_number,Attempt Number,Form submission attempt number,Forms,Web,team@voxxypresents.com,Visible,2
+Property,feature_name,Feature Name,Name of the feature being viewed,Product;Features,Web,team@voxxypresents.com,Visible,Budget Calculator
+Property,view_method,View Method,How the feature was accessed (scroll/click/navigation),Product;User Behavior,Web,team@voxxypresents.com,Visible,click
+Property,plan_name,Plan Name,Name of the pricing plan,Pricing;Conversion,Web,team@voxxypresents.com,Visible,Pro Plan
+Property,plan_price,Plan Price,Price of the pricing plan,Pricing;Conversion,Web,team@voxxypresents.com,Visible,$29/month
+Property,features_viewed,Features Viewed,List of features viewed,Pricing;Product,Web,team@voxxypresents.com,Visible,"Budget Tracking,Analytics"
+Property,time_spent_viewing,Time Spent Viewing,Time spent viewing pricing,Pricing;Time,Web,team@voxxypresents.com,Visible,90
+Property,email_address,Email Address,Email address clicked,Contact,Web,team@voxxypresents.com,Visible,team@voxxypresents.com
+Property,destination,Destination,External URL destination,External;Navigation,Web,team@voxxypresents.com,Visible,https://facebook.com
+Property,link_context,Link Context,Context where external link was clicked,External;User Behavior,Web,team@voxxypresents.com,Visible,social_media
+Property,traffic_source,Traffic Source,Primary traffic source category,Acquisition,Web,team@voxxypresents.com,Visible,organic
+Property,referrer_domain,Referrer Domain,Domain that referred the user,Acquisition,Web,team@voxxypresents.com,Visible,google.com
+Property,referrer_url,Referrer URL,Full referrer URL,Acquisition,Web,team@voxxypresents.com,Visible,https://google.com/search
+Property,utm_source,UTM Source,UTM source parameter,Acquisition;Marketing,Web,team@voxxypresents.com,Visible,facebook
+Property,utm_medium,UTM Medium,UTM medium parameter,Acquisition;Marketing,Web,team@voxxypresents.com,Visible,social
+Property,utm_campaign,UTM Campaign,UTM campaign parameter,Acquisition;Marketing,Web,team@voxxypresents.com,Visible,venue_owners
+Property,utm_term,UTM Term,UTM term parameter,Acquisition;Marketing,Web,team@voxxypresents.com,Visible,event venue
+Property,utm_content,UTM Content,UTM content parameter,Acquisition;Marketing,Web,team@voxxypresents.com,Visible,header_cta
+Property,user_email,User Email,Email address of the user,User;Authentication,Web,team@voxxypresents.com,Visible,user@example.com
+Property,user_id,User ID,Unique identifier for the user,User;Authentication,Web,team@voxxypresents.com,Visible,user_123456
+Property,user_role,User Role,Role of the user in the system,User;Authentication,Web,team@voxxypresents.com,Visible,organizer
+Property,sign_in_method,Sign In Method,Method used to sign in,Authentication,Web,team@voxxypresents.com,Visible,email_password
+Property,club_name,Club Name,Name of the club created,Product;Conversion,Web,team@voxxypresents.com,Visible,Brooklyn Arts Club
+Property,venue_name,Venue Name,Name of the venue listed,Product;Conversion;Venues,Web,team@voxxypresents.com,Visible,Downtown Gallery
+Property,event_title,Event Title,Title of the event created,Product;Conversion,Web,team@voxxypresents.com,Visible,Art Show Opening
+Property,event_type,Event Type,Type of event created,Product,Web,team@voxxypresents.com,Visible,art_exhibition
+Property,event_id,Event ID,Unique identifier for the event,Product,Web,team@voxxypresents.com,Visible,event_123456
+Property,rsvp_type,RSVP Type,Type of RSVP made,Product;Conversion,Web,team@voxxypresents.com,Visible,attending
+Property,element_type,Element Type,Type of element clicked,User Behavior,Web,team@voxxypresents.com,Visible,button
+Property,element_text,Element Text,Text content of clicked element,User Behavior,Web,team@voxxypresents.com,Visible,Learn More
+Property,element_id,Element ID,HTML ID of clicked element,User Behavior;Technical,Web,team@voxxypresents.com,Visible,hero-cta-button
+Property,interaction_type,Interaction Type,Type of interaction on landing page,Landing Page;User Behavior,Web,team@voxxypresents.com,Visible,click
+Property,element_name,Element Name,Name of landing page element,Landing Page,Web,team@voxxypresents.com,Visible,hero_banner
+Property,section_name,Section Name,Section of page where interaction occurred,Landing Page;Layout,Web,team@voxxypresents.com,Visible,hero
+Property,timestamp,Timestamp,ISO timestamp of when event occurred,Technical,Web,team@voxxypresents.com,Visible,2024-12-01T15:30:00Z
+Property,session_id,Session ID,Unique identifier for user session,Technical;Session,Web,team@voxxypresents.com,Visible,sess_123456789
+Property,viewport_width,Viewport Width,Width of browser viewport in pixels,Technical;Browser,Web,team@voxxypresents.com,Visible,1920
+Property,viewport_height,Viewport Height,Height of browser viewport in pixels,Technical;Browser,Web,team@voxxypresents.com,Visible,1080
+User Property,organization_name,Organization Name,Name of user's organization,User;Organization,Web,team@voxxypresents.com,Visible,Brooklyn Arts Collective
+User Property,event_frequency,Event Frequency,How often user hosts events,User;Product,Web,team@voxxypresents.com,Visible,monthly
+User Property,typical_attendance,Typical Attendance,Typical attendance at user's events,User;Product,Web,team@voxxypresents.com,Visible,50-100
+User Property,biggest_challenge,Biggest Challenge,User's biggest challenge in event organizing,User;Product,Web,team@voxxypresents.com,Visible,venue_booking
+User Property,first_visit_date,First Visit Date,Date of user's first visit,User;Acquisition,Web,team@voxxypresents.com,Visible,2024-12-01
+User Property,pages_visited,Pages Visited,List of pages user has visited,User;Behavior,Web,team@voxxypresents.com,Visible,"Home,Pricing,Features"
+User Property,total_sessions,Total Sessions,Total number of user sessions,User;Engagement,Web,team@voxxypresents.com,Visible,5
+User Property,most_engaged_content,Most Engaged Content,Content user engages with most,User;Engagement,Web,team@voxxypresents.com,Visible,Budget Calculator
+User Property,conversion_stage,Conversion Stage,Current stage in conversion funnel,User;Conversion,Web,team@voxxypresents.com,Visible,interested
+User Property,preferred_device,Preferred Device,User's preferred device type,User;Technical,Web,team@voxxypresents.com,Visible,desktop
+User Property,browser,Browser,User's browser,User;Technical,Web,team@voxxypresents.com,Visible,Chrome
+User Property,operating_system,Operating System,User's operating system,User;Technical,Web,team@voxxypresents.com,Visible,macOS
+User Property,email,Email,User's email address,User;Contact,Web,team@voxxypresents.com,Visible,user@example.com
+User Property,user_id,User ID,Unique user identifier,User;Identity,Web,team@voxxypresents.com,Visible,user_123456
+User Property,user_role,User Role,User's role in the platform,User;Identity,Web,team@voxxypresents.com,Visible,organizer
+User Property,utm_source,UTM Source,Initial UTM source,User;Acquisition,Web,team@voxxypresents.com,Visible,google
+User Property,utm_medium,UTM Medium,Initial UTM medium,User;Acquisition,Web,team@voxxypresents.com,Visible,cpc
+User Property,utm_campaign,UTM Campaign,Initial UTM campaign,User;Acquisition,Web,team@voxxypresents.com,Visible,launch
+User Property,utm_term,UTM Term,Initial UTM term,User;Acquisition,Web,team@voxxypresents.com,Visible,event management
+User Property,utm_content,UTM Content,Initial UTM content,User;Acquisition,Web,team@voxxypresents.com,Visible,ad_variant_a
+User Property,referrer_domain,Referrer Domain,Initial referrer domain,User;Acquisition,Web,team@voxxypresents.com,Visible,google.com
+User Property,traffic_source,Traffic Source,Initial traffic source,User;Acquisition,Web,team@voxxypresents.com,Visible,organic
+User Property,clubs_created,Clubs Created,Number of clubs user has created,User;Product,Web,team@voxxypresents.com,Visible,2
+User Property,venues_listed,Venues Listed,Number of venues user has listed,User;Product,Web,team@voxxypresents.com,Visible,1
+User Property,events_created,Events Created,Number of events user has created,User;Product,Web,team@voxxypresents.com,Visible,15
+User Property,rsvps_made,RSVPs Made,Number of RSVPs user has made,User;Product,Web,team@voxxypresents.com,Visible,8
+User Property,last_seen,Last Seen,Date user was last seen,User;Engagement,Web,team@voxxypresents.com,Visible,2024-12-01T15:30:00Z

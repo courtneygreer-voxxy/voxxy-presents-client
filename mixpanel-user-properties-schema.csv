@@ -1,0 +1,28 @@
+Name,Display Name,Description,Example Value,Status
+organization_name,Organization Name,Name of user's organization,Brooklyn Arts Collective,Visible
+event_frequency,Event Frequency,How often user hosts events,monthly,Visible
+typical_attendance,Typical Attendance,Typical attendance at user's events,50-100,Visible
+biggest_challenge,Biggest Challenge,User's biggest challenge in event organizing,venue_booking,Visible
+first_visit_date,First Visit Date,Date of user's first visit,2024-12-01,Visible
+pages_visited,Pages Visited,List of pages user has visited,"Home,Pricing,Features",Visible
+total_sessions,Total Sessions,Total number of user sessions,5,Visible
+most_engaged_content,Most Engaged Content,Content user engages with most,Budget Calculator,Visible
+conversion_stage,Conversion Stage,Current stage in conversion funnel,interested,Visible
+preferred_device,Preferred Device,User's preferred device type,desktop,Visible
+browser,Browser,User's browser,Chrome,Visible
+operating_system,Operating System,User's operating system,macOS,Visible
+email,Email,User's email address,user@example.com,Visible
+user_id,User ID,Unique user identifier,user_123456,Visible
+user_role,User Role,User's role in the platform,organizer,Visible
+utm_source,UTM Source,Initial UTM source,google,Visible
+utm_medium,UTM Medium,Initial UTM medium,cpc,Visible
+utm_campaign,UTM Campaign,Initial UTM campaign,launch,Visible
+utm_term,UTM Term,Initial UTM term,event management,Visible
+utm_content,UTM Content,Initial UTM content,ad_variant_a,Visible
+referrer_domain,Referrer Domain,Initial referrer domain,google.com,Visible
+traffic_source,Traffic Source,Initial traffic source,organic,Visible
+clubs_created,Clubs Created,Number of clubs user has created,2,Visible
+venues_listed,Venues Listed,Number of venues user has listed,1,Visible
+events_created,Events Created,Number of events user has created,15,Visible
+rsvps_made,RSVPs Made,Number of RSVPs user has made,8,Visible
+last_seen,Last Seen,Date user was last seen,2024-12-01T15:30:00Z,Visible

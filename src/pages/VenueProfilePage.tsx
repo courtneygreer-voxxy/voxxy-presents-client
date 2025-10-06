@@ -41,7 +41,10 @@ import { VenueContactModal } from '@/components/venue/VenueContactModal'
 import { SubscriptionModal } from '@/components/SubscriptionModal'
 import { ShareButton } from '@/components/ShareButton'
 import { Venue, VenueType } from '@/types/venue'
-import { venuesApi } from '@/services/api'
+import type { Event } from '@/types/database'
+import { venuesApi, eventsApi } from '@/services/api'
+import { getDataSource } from '@/config/environments'
+import { getEventsByVenueSlug } from '@/lib/database'
 import { useAuth } from '@/contexts/AuthContext'
 
 // Mock data for development - fallback only
@@ -95,6 +98,46 @@ export default function VenueProfilePage() {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [isPhotosExpanded, setIsPhotosExpanded] = useState(false)
   const [isOwnerOfThisVenue, setIsOwnerOfThisVenue] = useState(false)
+  const [venueEvents, setVenueEvents] = useState<Event[]>([])
+  const [eventsLoading, setEventsLoading] = useState(false)
+  const [eventsError, setEventsError] = useState<string | null>(null)
+
+  const normalizeEvent = (rawEvent: any): Event => {
+    const toDate = (value: any): Date => {
+      if (!value) return new Date()
+      if (value instanceof Date) return value
+      if (typeof value === 'object' && typeof value.toDate === 'function') {
+        return value.toDate()
+      }
+      return new Date(value)
+    }
+
+    return {
+      ...rawEvent,
+      date: toDate(rawEvent.date),
+      endDate: rawEvent.endDate ? toDate(rawEvent.endDate) : undefined,
+      createdAt: toDate(rawEvent.createdAt ?? new Date()),
+      updatedAt: toDate(rawEvent.updatedAt ?? new Date())
+    }
+  }
+
+  const formatDateLabel = (date: Date) => {
+    return date.toLocaleDateString(undefined, {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric'
+    })
+  }
+
+  const formatTimeRange = (event: Event) => {
+    if (!event.endDate) {
+      return event.time
+    }
+
+    const start = event.date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+    const end = event.endDate.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+    return `${start} – ${end}`
+  }
 
   useEffect(() => {
     const loadVenue = async () => {
@@ -177,6 +220,53 @@ export default function VenueProfilePage() {
 
     loadVenue()
   }, [venueSlug])
+
+  useEffect(() => {
+    const loadVenueEvents = async () => {
+      if (!venue) {
+        setVenueEvents([])
+        return
+      }
+
+      setEventsLoading(true)
+      setEventsError(null)
+
+      try {
+        const dataSource = getDataSource()
+        let fetchedEvents: Event[] = []
+
+        if (dataSource === 'firebase') {
+          fetchedEvents = await getEventsByVenueSlug(venue.slug)
+        } else {
+          try {
+            const apiResponse: any = await eventsApi.getAll()
+            const allEvents = Array.isArray(apiResponse)
+              ? apiResponse
+              : Array.isArray(apiResponse?.events)
+                ? apiResponse.events
+                : []
+
+            fetchedEvents = allEvents
+              .filter((event: any) => event.venueSlug === venue.slug)
+              .map(normalizeEvent)
+          } catch (apiError) {
+            console.warn('Falling back to Firebase for venue events', apiError)
+            fetchedEvents = await getEventsByVenueSlug(venue.slug)
+          }
+        }
+
+        fetchedEvents.sort((a, b) => a.date.getTime() - b.date.getTime())
+        setVenueEvents(fetchedEvents)
+      } catch (eventError) {
+        console.error('Error loading venue events:', eventError)
+        setEventsError('Unable to load upcoming events right now.')
+      } finally {
+        setEventsLoading(false)
+      }
+    }
+
+    loadVenueEvents()
+  }, [venue])
 
   const formatHours = (hours: Venue['hours']) => {
     const days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
@@ -408,15 +498,86 @@ export default function VenueProfilePage() {
               <h3 className="text-3xl font-bold text-center text-white mb-10">
                 Upcoming Events at {venue.name}
               </h3>
+              {eventsLoading ? (
+                <div className="text-center py-12">
+                  <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-400" />
+                  <p className="text-gray-300">Loading upcoming events...</p>
+                </div>
+              ) : venueEvents.length > 0 ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {venueEvents.map(event => (
+                    <div
+                      key={event.id}
+                      className="bg-white/10 border border-white/15 rounded-xl p-6 flex flex-col gap-4 hover:bg-white/15 transition-all duration-200"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="text-sm text-purple-300 font-semibold tracking-wide uppercase">
+                            {formatDateLabel(event.date)}
+                          </p>
+                          <h4 className="text-xl font-semibold text-white leading-tight">{event.title}</h4>
+                        </div>
+                        {event.organizationName && (
+                          <Badge className="bg-purple-500/20 border border-purple-400/40 text-purple-200">
+                            {event.organizationName}
+                          </Badge>
+                        )}
+                      </div>
 
-              {/* Placeholder for events - will integrate with event system later */}
-              <div className="text-center py-12">
-                <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-300 text-lg mb-2">No upcoming events</p>
-                <p className="text-gray-400 text-sm">
-                  Events happening at this venue will appear here
-                </p>
-              </div>
+                      <p className="text-gray-300 text-sm leading-relaxed">
+                        {event.description}
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-gray-200">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-purple-300" />
+                          <span>{event.date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-4 w-4 text-purple-300" />
+                          <span>{formatTimeRange(event)}</span>
+                        </div>
+                        {event.capacity && (
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-purple-300" />
+                            <span>Capacity {event.capacity}</span>
+                          </div>
+                        )}
+                        {event.price?.description && (
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="h-4 w-4 text-purple-300" />
+                            <span>{event.price.description}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {event.tags && event.tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {event.tags.map(tag => (
+                            <Badge
+                              key={tag}
+                              variant="outline"
+                              className="border-purple-400/40 text-purple-200 bg-purple-500/10"
+                            >
+                              #{tag.replace(/\s+/g, '').toLowerCase()}
+                            </Badge>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-300 text-lg mb-2">
+                    {eventsError ? 'No upcoming events at the moment' : 'No upcoming events scheduled yet'}
+                  </p>
+                  <p className="text-gray-400 text-sm max-w-xl mx-auto">
+                    {eventsError ?? 'As soon as organizers schedule events at this venue, they will appear here with full details.'}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>

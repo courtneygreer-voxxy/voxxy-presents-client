@@ -33,6 +33,35 @@ export const registrationsRef = collection(db, 'registrations')
 export const waitlistsRef = collection(db, 'waitlists')
 export const usersRef = collection(db, 'users')
 
+const toDate = (value: any): Date => {
+  if (!value) {
+    return new Date()
+  }
+
+  if (value instanceof Date) {
+    return value
+  }
+
+  if (typeof value === 'object' && typeof value.toDate === 'function') {
+    return value.toDate()
+  }
+
+  return new Date(value)
+}
+
+const mapEventDocument = (docSnap: any): Event => {
+  const data = docSnap.data()
+
+  return {
+    id: docSnap.id,
+    ...data,
+    date: toDate(data.date),
+    endDate: data.endDate ? toDate(data.endDate) : undefined,
+    createdAt: toDate(data.createdAt),
+    updatedAt: toDate(data.updatedAt)
+  } as Event
+}
+
 // Organizations
 export const createOrganization = async (data: Omit<Organization, 'id' | 'createdAt' | 'updatedAt'>) => {
   const docRef = await addDoc(organizationsRef, {
@@ -123,15 +152,7 @@ export const getEvent = async (id: string): Promise<Event | null> => {
   const docSnap = await getDoc(docRef)
   
   if (docSnap.exists()) {
-    const data = docSnap.data()
-    return {
-      id: docSnap.id,
-      ...data,
-      date: data.date.toDate(),
-      endDate: data.endDate?.toDate(),
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate()
-    } as Event
+    return mapEventDocument(docSnap)
   }
   return null
 }
@@ -144,17 +165,18 @@ export const getEventsByOrganization = async (organizationId: string): Promise<E
   )
   const querySnapshot = await getDocs(q)
   
-  return querySnapshot.docs.map(doc => {
-    const data = doc.data()
-    return {
-      id: doc.id,
-      ...data,
-      date: data.date.toDate(),
-      endDate: data.endDate?.toDate(),
-      createdAt: data.createdAt.toDate(),
-      updatedAt: data.updatedAt.toDate()
-    }
-  }) as Event[]
+  return querySnapshot.docs.map(mapEventDocument)
+}
+
+export const getEventsByVenueSlug = async (venueSlug: string): Promise<Event[]> => {
+  const q = query(
+    eventsRef,
+    where('venueSlug', '==', venueSlug),
+    orderBy('date', 'asc')
+  )
+
+  const querySnapshot = await getDocs(q)
+  return querySnapshot.docs.map(mapEventDocument)
 }
 
 export const updateEvent = async (id: string, data: UpdateEventData) => {

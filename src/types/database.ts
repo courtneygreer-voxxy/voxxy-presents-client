@@ -53,6 +53,9 @@ export interface Event {
   title: string
   description: string
   fullDescription: string
+  organizationName?: string
+  tags?: string[]
+  heroImageUrl?: string
   
   // Date and time
   date: Date
@@ -63,6 +66,9 @@ export interface Event {
   // Location
   location: string
   address: string
+  venueId?: string
+  venueSlug?: string
+  venueName?: string
   
   // Pricing
   price: {
@@ -102,6 +108,7 @@ export interface Event {
   
   // Status
   status: 'draft' | 'presale' | 'published' | 'sold_out' | 'cancelled' | 'completed'
+  demo?: boolean
   
   createdAt: Date
   updatedAt: Date

@@ -1,0 +1,64 @@
+Name,Display Name,Description,Example Value,Status
+page_name,Page Name,Name of the page being viewed,Home Page,Visible
+page_url,Page URL,Full URL of the page being viewed,https://www.voxxypresents.com/,Visible
+referrer,Referrer,The page that referred the user to current page,https://google.com,Visible
+user_agent,User Agent,Browser user agent string,Mozilla/5.0...,Visible
+link_text,Link Text,Text content of the clicked link,Get Started,Visible
+destination_page,Destination Page,Page the link navigates to,Sign Up,Visible
+current_page,Current Page,Page where the interaction occurred,Home,Visible
+link_position,Link Position,Location of link on page (header/footer/inline/hero),header,Visible
+button_text,Button Text,Text content of the clicked button,List Your Venue,Visible
+button_location,Button Location,General location of button on page,hero,Visible
+is_primary_cta,Is Primary CTA,Whether button is the primary call-to-action,true,Visible
+action_type,Action Type,Type of action the button performs,navigation,Visible
+button_position,Button Position,Specific position identifier for button,hero_primary,Visible
+scroll_depth,Scroll Depth,Percentage of page scrolled (25% increments),75,Visible
+time_to_depth,Time to Depth,Seconds taken to reach scroll depth,45,Visible
+time_spent,Time Spent,Total time spent on page in seconds,120,Visible
+engagement_level,Engagement Level,Calculated engagement level (low/medium/high),high,Visible
+form_type,Form Type,Type of form being interacted with,beta_access,Visible
+form_location,Form Location,Location of form on page,hero,Visible
+field_name,Field Name,Name of the form field,email,Visible
+field_order,Field Order,Order of field in the form,1,Visible
+time_to_complete,Time to Complete,Time taken to complete form in seconds,180,Visible
+completion_time,Completion Time,Total form completion time,240,Visible
+error_field,Error Field,Field where error occurred,email,Visible
+error_message,Error Message,Error message displayed to user,Invalid email format,Visible
+attempt_number,Attempt Number,Form submission attempt number,2,Visible
+feature_name,Feature Name,Name of the feature being viewed,Budget Calculator,Visible
+view_method,View Method,How the feature was accessed (scroll/click/navigation),click,Visible
+plan_name,Plan Name,Name of the pricing plan,Pro Plan,Visible
+plan_price,Plan Price,Price of the pricing plan,$29/month,Visible
+features_viewed,Features Viewed,List of features viewed,"Budget Tracking,Analytics",Visible
+time_spent_viewing,Time Spent Viewing,Time spent viewing pricing,90,Visible
+email_address,Email Address,Email address clicked,team@voxxypresents.com,Visible
+destination,Destination,External URL destination,https://facebook.com,Visible
+link_context,Link Context,Context where external link was clicked,social_media,Visible
+traffic_source,Traffic Source,Primary traffic source category,organic,Visible
+referrer_domain,Referrer Domain,Domain that referred the user,google.com,Visible
+referrer_url,Referrer URL,Full referrer URL,https://google.com/search,Visible
+utm_source,UTM Source,UTM source parameter,facebook,Visible
+utm_medium,UTM Medium,UTM medium parameter,social,Visible
+utm_campaign,UTM Campaign,UTM campaign parameter,venue_owners,Visible
+utm_term,UTM Term,UTM term parameter,event venue,Visible
+utm_content,UTM Content,UTM content parameter,header_cta,Visible
+user_email,User Email,Email address of the user,user@example.com,Visible
+user_id,User ID,Unique identifier for the user,user_123456,Visible
+user_role,User Role,Role of the user in the system,organizer,Visible
+sign_in_method,Sign In Method,Method used to sign in,email_password,Visible
+club_name,Club Name,Name of the club created,Brooklyn Arts Club,Visible
+venue_name,Venue Name,Name of the venue listed,Downtown Gallery,Visible
+event_title,Event Title,Title of the event created,Art Show Opening,Visible
+event_type,Event Type,Type of event created,art_exhibition,Visible
+event_id,Event ID,Unique identifier for the event,event_123456,Visible
+rsvp_type,RSVP Type,Type of RSVP made,attending,Visible
+element_type,Element Type,Type of element clicked,button,Visible
+element_text,Element Text,Text content of clicked element,Learn More,Visible
+element_id,Element ID,HTML ID of clicked element,hero-cta-button,Visible
+interaction_type,Interaction Type,Type of interaction on landing page,click,Visible
+element_name,Element Name,Name of landing page element,hero_banner,Visible
+section_name,Section Name,Section of page where interaction occurred,hero,Visible
+timestamp,Timestamp,ISO timestamp of when event occurred,2024-12-01T15:30:00Z,Visible
+session_id,Session ID,Unique identifier for user session,sess_123456789,Visible
+viewport_width,Viewport Width,Width of browser viewport in pixels,1920,Visible
+viewport_height,Viewport Height,Height of browser viewport in pixels,1080,Visible
