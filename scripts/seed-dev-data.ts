@@ -1,47 +1,34 @@
 #!/usr/bin/env tsx
 // Development seed script that ingests demo data from docs/demo-data/voxxy_presents_demo_seed_data.md
 
-import { initializeApp } from 'firebase/app'
-import {
-  getFirestore,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  where,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  Timestamp
-} from 'firebase/firestore'
+import admin from 'firebase-admin'
 import { readFileSync } from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import type { VenueHours } from '../src/types/venue'
 
 // ----------------------------------------------------------------------------
-// Firebase configuration (shared dev project)
+// Firebase Admin SDK configuration
 // ----------------------------------------------------------------------------
 
-const firebaseConfig = {
-  apiKey: 'AIzaSyDZ1_PgIRsVjHc7N2unw_AgTfvdP3yuCp4',
-  authDomain: 'voxxy-presents-dev.firebaseapp.com',
-  databaseURL: 'https://voxxy-presents-dev-default-rtdb.firebaseio.com',
-  projectId: 'voxxy-presents-dev',
-  storageBucket: 'voxxy-presents-dev.firebasestorage.app',
-  messagingSenderId: '21877606291',
-  appId: '1:21877606291:web:4a3cf58073acd5e2d84a66',
-  measurementId: 'G-FTKDVEVRNK'
-}
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
-const app = initializeApp(firebaseConfig)
-const db = getFirestore(app)
+const serviceAccountPath = path.resolve(__dirname, '../config/voxxy-presents-dev-service-account.json')
+const serviceAccount = JSON.parse(readFileSync(serviceAccountPath, 'utf8'))
 
-const organizationsRef = collection(db, 'organizations')
-const eventsRef = collection(db, 'events')
-const venuesRef = collection(db, 'venues')
-const usersRef = collection(db, 'users')
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount as admin.ServiceAccount),
+  databaseURL: 'https://voxxy-presents-dev-default-rtdb.firebaseio.com'
+})
+
+const db = admin.firestore()
+const Timestamp = admin.firestore.Timestamp
+
+const organizationsRef = db.collection('organizations')
+const eventsRef = db.collection('events')
+const venuesRef = db.collection('venues')
+const usersRef = db.collection('users')
 
 // ----------------------------------------------------------------------------
 // Types
@@ -151,8 +138,6 @@ type ParsedDataset = {
 // Markdown parsing helpers
 // ----------------------------------------------------------------------------
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = path.dirname(__filename)
 const SEED_FILE_PATH = path.resolve(__dirname, '../docs/demo-data/voxxy_presents_demo_seed_data.md')
 
 const SLUG_STATUS_MAP: Record<string, ParsedEvent['status']> = {
@@ -236,13 +221,21 @@ function parseTable(section: string): MarkdownRecord {
   const rows = section.match(/^\|.*\|$/gm) ?? []
   const record: MarkdownRecord = {}
 
-  rows.forEach(row => {
+  rows.forEach((row, index) => {
+    // Skip header and separator rows
+    if (index === 0 || row.includes('-----') || row.toLowerCase().includes('field')) {
+      return
+    }
+
     const parts = row.split('|').slice(1, -1).map(part => part.trim())
     if (parts.length >= 2) {
-      const field = parts[0].replace(/^`|`$/g, '')
-      const rawValue = parts[1]
-      if (field) {
-        record[field] = normalizeQuotes(rawValue.replace(/^`|`$/g, '').trim())
+      // Remove all backticks, then extract field name before parentheses
+      let field = parts[0].replace(/`/g, '').trim()
+      // Handle fields with parenthetical notes like "id (stable id)"
+      field = field.split(/\s+\(/)[0].trim()
+      const rawValue = parts[1].replace(/`/g, '').trim()
+      if (field && rawValue) {
+        record[field] = normalizeQuotes(rawValue)
       }
     }
   })
@@ -478,11 +471,12 @@ const ensureDemoUsers = async () => {
   }
 
   for (const user of dataset.users) {
-    const userRef = doc(usersRef, user.id)
-    const snapshot = await getDoc(userRef)
-    const createdAt = snapshot.exists() ? snapshot.data().createdAt ?? now : now
+    const userRef = usersRef.doc(user.id)
+    const snapshot = await userRef.get()
+    const createdAt = snapshot.exists ? snapshot.data()?.createdAt ?? now : now
+    const existingData = snapshot.data()
 
-    await setDoc(userRef, {
+    const userData: Record<string, any> = {
       name: user.name,
       email: user.email,
       role: user.role,
@@ -490,12 +484,18 @@ const ensureDemoUsers = async () => {
       betaStatus: 'approved',
       betaAccess: true,
       approvalStatus: 'approved',
-      organizationIds: snapshot.exists() ? snapshot.data().organizationIds ?? [] : [],
-      venueOwnerProfile: snapshot.exists() ? snapshot.data().venueOwnerProfile : undefined,
+      organizationIds: snapshot.exists ? existingData?.organizationIds ?? [] : [],
       demo: true,
       createdAt,
       updatedAt: now
-    }, { merge: true })
+    }
+
+    // Only add venueOwnerProfile if it exists
+    if (existingData?.venueOwnerProfile) {
+      userData.venueOwnerProfile = existingData.venueOwnerProfile
+    }
+
+    await userRef.set(userData, { merge: true })
   }
 }
 
@@ -503,28 +503,28 @@ const removeStaleDocuments = async () => {
   const keepOrgIds = new Set(dataset.organizations.map(org => org.id))
   const keepVenueIds = new Set(dataset.venues.map(venue => venue.slug))
 
-  const orgSnapshots = await getDocs(query(organizationsRef, where('demo', '==', true)))
+  const orgSnapshots = await organizationsRef.where('demo', '==', true).get()
   for (const docSnap of orgSnapshots.docs) {
     if (!keepOrgIds.has(docSnap.id)) {
-      await deleteDoc(docSnap.ref)
+      await docSnap.ref.delete()
     }
   }
 
-  const venueSnapshots = await getDocs(query(venuesRef, where('demo', '==', true)))
+  const venueSnapshots = await venuesRef.where('demo', '==', true).get()
   for (const docSnap of venueSnapshots.docs) {
     if (!keepVenueIds.has(docSnap.id)) {
-      await deleteDoc(docSnap.ref)
+      await docSnap.ref.delete()
     }
   }
 }
 
 const upsertOrganization = async (org: ParsedOrganization) => {
   const now = Timestamp.now()
-  const orgRef = doc(organizationsRef, org.id)
-  const snapshot = await getDoc(orgRef)
-  const createdAt = snapshot.exists() ? snapshot.data().createdAt ?? now : now
+  const orgRef = organizationsRef.doc(org.id)
+  const snapshot = await orgRef.get()
+  const createdAt = snapshot.exists ? snapshot.data()?.createdAt ?? now : now
 
-  await setDoc(orgRef, {
+  await orgRef.set({
     name: org.name,
     slug: org.slug,
     description: org.description,
@@ -547,11 +547,11 @@ const upsertOrganization = async (org: ParsedOrganization) => {
 
 const upsertVenue = async (venue: ParsedVenue, approvedBy: string) => {
   const now = Timestamp.now()
-  const venueRef = doc(venuesRef, venue.slug)
-  const snapshot = await getDoc(venueRef)
-  const createdAt = snapshot.exists() ? snapshot.data().createdAt ?? now : now
+  const venueRef = venuesRef.doc(venue.slug)
+  const snapshot = await venueRef.get()
+  const createdAt = snapshot.exists ? snapshot.data()?.createdAt ?? now : now
 
-  await setDoc(venueRef, {
+  await venueRef.set({
     slug: venue.slug,
     name: venue.name,
     description: venue.description,
@@ -568,7 +568,7 @@ const upsertVenue = async (venue: ParsedVenue, approvedBy: string) => {
     ownerId: venue.ownerId,
     claimStatus: 'approved',
     approvedBy,
-    approvedAt: snapshot.exists() ? snapshot.data().approvedAt ?? now : now,
+    approvedAt: snapshot.exists ? snapshot.data()?.approvedAt ?? now : now,
     demo: true,
     createdAt,
     updatedAt: now
@@ -576,18 +576,19 @@ const upsertVenue = async (venue: ParsedVenue, approvedBy: string) => {
 }
 
 const setUserOwnership = async (userId: string, organizationIds: string[], venueIds: string[]) => {
-  const userRef = doc(usersRef, userId)
-  const snapshot = await getDoc(userRef)
-  if (!snapshot.exists()) return
+  const userRef = usersRef.doc(userId)
+  const snapshot = await userRef.get()
+  if (!snapshot.exists) return
 
-  const profile = snapshot.data().venueOwnerProfile ?? {
+  const data = snapshot.data()
+  const profile = data?.venueOwnerProfile ?? {
     venueIds: [],
     onboardingCompleted: true,
     preferredContactMethod: 'email'
   }
 
-  await updateDoc(userRef, {
-    organizationIds: Array.from(new Set([...(snapshot.data().organizationIds ?? []), ...organizationIds])),
+  await userRef.update({
+    organizationIds: Array.from(new Set([...(data?.organizationIds ?? []), ...organizationIds])),
     venueOwnerProfile: {
       ...profile,
       venueIds: Array.from(new Set([...(profile.venueIds ?? []), ...venueIds])),
@@ -599,52 +600,69 @@ const setUserOwnership = async (userId: string, organizationIds: string[], venue
 }
 
 const clearExistingDemoEvents = async () => {
-  const existing = await getDocs(query(eventsRef, where('demo', '==', true)))
+  const existing = await eventsRef.where('demo', '==', true).get()
   for (const docSnap of existing.docs) {
-    await deleteDoc(doc(eventsRef, docSnap.id))
+    await docSnap.ref.delete()
   }
 }
 
 const addEvent = async (event: ParsedEvent, organizationId: string, venueId?: string) => {
   const now = Timestamp.now()
-  const eventRef = doc(eventsRef, event.id)
-  const snapshot = await getDoc(eventRef)
-  const createdAt = snapshot.exists() ? snapshot.data().createdAt ?? now : now
+  const eventRef = eventsRef.doc(event.id)
+  const snapshot = await eventRef.get()
+  const createdAt = snapshot.exists ? snapshot.data()?.createdAt ?? now : now
 
   const toTimestamp = (value?: string) => {
     if (!value) return null
     return Timestamp.fromDate(new Date(value))
   }
 
-  await setDoc(eventRef, {
+  // Build price object without undefined values
+  const price: Record<string, any> = {
+    type: event.price.type
+  }
+  if (event.price.amount !== undefined) price.amount = event.price.amount
+  if (event.price.description) price.description = event.price.description
+  if (event.price.advancePrice !== undefined) price.advancePrice = event.price.advancePrice
+
+  // Build event data, only including defined values
+  const eventData: Record<string, any> = {
     organizationId,
-    organizationName: event.organizationName,
     title: event.title,
-    description: event.description,
-    fullDescription: event.fullDescription,
     date: toTimestamp(event.date),
-    endDate: toTimestamp(event.endDate),
-    time: event.time,
-    duration: event.duration,
-    location: event.location,
-    address: event.address,
-    venueSlug: event.venueSlug,
-    venueName: event.venueName,
-    venueId,
-    price: event.price,
-    capacity: event.capacity,
+    price,
     registrationRequired: event.registrationRequired,
-    presaleEnabled: event.presaleEnabled,
     isRecurring: event.isRecurring,
-    series: event.series,
-    tags: event.tags,
-    imageUrl: event.imageUrl,
-    heroImageUrl: event.heroImageUrl,
     status: event.status ?? 'published',
     demo: true,
     createdAt,
     updatedAt: now
-  }, { merge: true })
+  }
+
+  // Add optional fields only if they exist
+  if (event.organizationName) eventData.organizationName = event.organizationName
+  if (event.description) eventData.description = event.description
+  if (event.fullDescription) eventData.fullDescription = event.fullDescription
+  if (event.endDate) eventData.endDate = toTimestamp(event.endDate)
+  if (event.time) eventData.time = event.time
+  if (event.duration) eventData.duration = event.duration
+  if (event.location) eventData.location = event.location
+  if (event.address) eventData.address = event.address
+  if (event.venueSlug) eventData.venueSlug = event.venueSlug
+  if (event.venueName) eventData.venueName = event.venueName
+  if (venueId) eventData.venueId = venueId
+  if (event.capacity !== undefined) eventData.capacity = event.capacity
+  if (event.presaleEnabled !== undefined) eventData.presaleEnabled = event.presaleEnabled
+  if (event.series) {
+    const series: Record<string, any> = { name: event.series.name }
+    if (event.series.description) series.description = event.series.description
+    eventData.series = series
+  }
+  if (event.tags && event.tags.length > 0) eventData.tags = event.tags
+  if (event.imageUrl) eventData.imageUrl = event.imageUrl
+  if (event.heroImageUrl) eventData.heroImageUrl = event.heroImageUrl
+
+  await eventRef.set(eventData, { merge: true })
 }
 
 // ----------------------------------------------------------------------------
@@ -693,6 +711,11 @@ const seedDevData = async () => {
     await clearExistingDemoEvents()
 
     for (const event of dataset.events) {
+      if (!event.id || event.id.trim() === '') {
+        console.warn(`⚠️ Skipping event with missing ID: ${event.title}`)
+        continue
+      }
+
       const organizationId = organizationIdMap.get(event.organizationSlug)
       if (!organizationId) {
         console.warn(`⚠️ Skipping event ${event.id}: organization ${event.organizationSlug} not found`)
