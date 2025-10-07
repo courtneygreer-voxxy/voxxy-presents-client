@@ -12,11 +12,12 @@ A modern event management platform that simplifies recurring community events wi
 
 ## 🌟 **Recent Updates (v2.0)**
 
-- ✅ **Event Budget Calculator**: Complete financial planning with planned vs actual tracking
-- ✅ **Enhanced Analytics**: Mixpanel integration with comprehensive user behavior tracking
-- ✅ **Split-Screen Login**: Beautiful new authentication UX for venue owners and organizers
-- ✅ **Venue Owner Benefits**: Dedicated marketing page for venue acquisition
-- ✅ **Security Hardening**: Environment variable validation and secret management
+- ✅ **Neon Authentication UI**: Modern purple-pink-blue gradient theme across all auth pages
+- ✅ **Enhanced Budget System**: Card-based event selection, inline editing, and template generator
+- ✅ **Split-Screen Auth Selection**: Beautiful login/signup UX for venue owners and club organizers
+- ✅ **Secure Admin Access**: Firebase-based authentication restricted to authorized email
+- ✅ **Improved Event Display**: Enhanced recurring event cards with better venue information
+- ✅ **Subscriber Management**: CSV export and streamlined announcement messaging
 
 ## 📋 Overview
 
@@ -26,13 +27,16 @@ Voxxy Presents is a comprehensive event management solution designed for creativ
 - **Custom Organization Pages**: Branded landing pages with image carousels and rich content
 - **Venue Marketplace**: Complete venue discovery and booking platform with glass morphism UI
 - **Smart Event Creation**: Dedicated flows for one-time events vs. recurring series
-- **Event Budget Calculator**: Excel-style budget tracking with planned vs actual expense monitoring
+- **Event Budget Management**: Card-based selection, inline editing, and template budget generator
 - **Registration Workflows**: RSVP tracking with calendar integration and subscription management
 - **Real-time Analytics**: Mixpanel integration for user behavior tracking and conversion metrics
+- **Neon Gradient Design**: Modern purple-pink-blue aesthetic with improved accessibility
 
 ### 🎨 **Design & UX**
-- **Glass Morphism Design**: Modern UI with translucent components and backdrop blur effects
-- **Split-Screen Authentication**: Beautiful login/signup flows for venue owners and community organizers
+- **Neon Gradient Theme**: Modern purple-pink-blue color palette with dark backgrounds
+- **Glass Morphism Design**: Translucent components with backdrop blur effects
+- **Split-Screen Authentication**: Beautiful auth selection with gradient branding panels
+- **Secure Admin Login**: Firebase-based authentication with single-email restriction
 - **Design Customization**: Background color, text color, and button color personalization
 - **Responsive Design**: Optimized for desktop, tablet, and mobile devices
 
@@ -168,15 +172,6 @@ src/
 ├── types/              # TypeScript type definitions
 └── styles/             # Global styles
 ```
-
-## 🐛 Known Issues
-
-### Image Upload on Organization Pages
-- **Issue**: Error when trying to add images to organization about section
-- **Error**: `Route /api/organizations/{id} not found` in production
-- **Status**: API endpoint exists but still debugging routing issue
-- **Workaround**: None currently
-- **Priority**: High - blocking organization customization
 
 ---
 
@@ -397,17 +392,32 @@ For development questions or technical support, please refer to:
 
 ---
 
-## 🎯 Latest Release: v1.9.0 Email Notifications System
+## 🎯 Latest Release: v2.0 - Modern UI & Enhanced Budget Management
 
-**🚀 Now Live**: Complete email notification system with DMARC compliance and brand messaging updates
+**🚀 Now Live**: Complete authentication redesign with modern neon gradients and powerful budget tools
 
-### What's New in v1.9.0:
-- 📧 **Email Notifications**: Full email delivery system for subscriptions and RSVPs
-- 🔐 **DMARC Compliance**: Proper SPF and DKIM configuration for reliable email delivery
-- 🏷️ **Brand Messaging**: Updated all "Voxxy AI" references to "Voxxy"
-- 🛠️ **Debug Logging**: Comprehensive logging system for troubleshooting email flow
-- ✅ **Production Ready**: Staging issues resolved, deployed to production
-- 🔄 **Subscriber Management**: Enhanced subscription and email delivery tracking
+### What's New in v2.0:
+
+**🎨 Authentication UI Revamp:**
+- Modern neon gradient theme (purple-pink-blue) across all auth pages
+- Split-screen auth selection with beautiful branding panels
+- Secure admin login restricted to authorized email only
+- Dark accessible backgrounds with improved contrast
+- Updated terms/privacy links to parent site
+
+**💰 Budget Management Enhancements:**
+- Card-based event selection with "In Progress" status badges
+- Full inline editing for budget line items (description, amounts, category)
+- One-click template budget generator for quick setup
+- Direct navigation from Events tab with pre-selected event
+- Support for all event statuses (published, completed, in-progress)
+
+**✨ Organization & UX Improvements:**
+- Enhanced event card layout with better spacing and visual hierarchy
+- Improved recurring event display with gradient cards
+- Clickable venue links on event details
+- CSV export functionality for subscriber lists
+- Streamlined to announcement-only messaging
 
 ---
 
