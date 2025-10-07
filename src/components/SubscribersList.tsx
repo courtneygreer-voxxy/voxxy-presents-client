@@ -73,19 +73,11 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
   const openTemplateModal = (templateType: string) => {
     setCurrentTemplate(templateType)
 
-    // Set default values based on template type
-    if (templateType === 'newsletter') {
-      setMessageTitle('Monthly Newsletter')
-      setMessageSubject('📰 Updates from our community')
-      setMessageContent('Exciting updates this month including new events and community features!')
-    } else if (templateType === 'announcement') {
+    // Set default values for announcement
+    if (templateType === 'announcement') {
       setMessageTitle('Important Announcement')
       setMessageSubject('📢 Important Updates from Our Community')
       setMessageContent('We have an important announcement to share with our community.')
-    } else if (templateType === 'welcome') {
-      setMessageTitle('Welcome to Our Community')
-      setMessageSubject('🎉 Welcome to our community!')
-      setMessageContent('We\'re excited to have you join our community! Here\'s what you can expect from us and how to get the most out of your membership.')
     }
 
     setIsModalOpen(true)
@@ -99,45 +91,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
       return
     }
 
-    // Handle welcome message as template save
-    if (currentTemplate === 'welcome') {
-      setSendingCampaign(currentTemplate)
-      setCampaignResult(null)
-      setIsModalOpen(false)
-
-      try {
-        // Save welcome template (you can implement API endpoint for saving templates)
-        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
-        const response = await fetch(`${apiUrl}/templates`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            organizationId,
-            title: messageTitle,
-            subject: messageSubject,
-            content: messageContent,
-            templateType: 'welcome'
-          })
-        })
-
-        if (response.ok) {
-          setCampaignResult(`✅ Welcome message template saved successfully!`)
-        } else {
-          setCampaignResult(`❌ Failed to save template`)
-        }
-      } catch (error) {
-        console.error('Template save error:', error)
-        setCampaignResult('✅ Welcome message template saved locally!')
-      } finally {
-        setSendingCampaign(null)
-        setTimeout(() => setCampaignResult(null), 5000)
-      }
-      return
-    }
-
-    // Handle newsletter and announcement campaigns
+    // Check if there are subscribers
     if (totalNewsletterSubscribers === 0) {
       setCampaignResult('❌ No subscribers to send to!')
       setTimeout(() => setCampaignResult(null), 3000)
@@ -190,6 +144,46 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
     setMessageContent('')
   }
 
+  // Export subscribers function
+  const exportSubscribers = () => {
+    if (newsletterSubscribers.length === 0) {
+      alert('No subscribers to export')
+      return
+    }
+
+    // Prepare data for export
+    const exportData = newsletterSubscribers.map(sub => ({
+      Name: sub.name || 'No name',
+      Email: sub.email,
+      'Event Title': sub.eventTitle,
+      'Subscribed Date': new Date(sub.subscribedAt).toLocaleDateString()
+    }))
+
+    // Convert to CSV
+    const headers = Object.keys(exportData[0])
+    const csvContent = [
+      headers.join(','),
+      ...exportData.map(row =>
+        headers.map(header => {
+          const value = row[header as keyof typeof row]
+          // Escape commas and quotes in CSV
+          return `"${String(value).replace(/"/g, '""')}"`
+        }).join(',')
+      )
+    ].join('\n')
+
+    // Create download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+    const link = document.createElement('a')
+    const url = URL.createObjectURL(blob)
+    link.setAttribute('href', url)
+    link.setAttribute('download', `subscribers-${organizationId}-${new Date().toISOString().split('T')[0]}.csv`)
+    link.style.visibility = 'hidden'
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
 
   if (loading) {
     return (
@@ -232,21 +226,6 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             </div>
             <div className="flex gap-3">
               <Button
-                onClick={() => openTemplateModal('newsletter')}
-                disabled={sendingCampaign !== null}
-                size="sm"
-                variant="outline"
-                className="bg-white/5 border-white/20 hover:bg-white/10 text-white flex items-center gap-2"
-              >
-                {sendingCampaign === 'newsletter' ? (
-                  <Loader className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Mail className="h-4 w-4" />
-                )}
-                Newsletter
-              </Button>
-
-              <Button
                 onClick={() => openTemplateModal('announcement')}
                 disabled={sendingCampaign !== null}
                 size="sm"
@@ -259,21 +238,6 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
                   <Megaphone className="h-4 w-4" />
                 )}
                 Announcement
-              </Button>
-
-              <Button
-                onClick={() => openTemplateModal('welcome')}
-                disabled={sendingCampaign !== null}
-                size="sm"
-                variant="outline"
-                className="bg-white/5 border-white/20 hover:bg-white/10 text-white flex items-center gap-2"
-              >
-                {sendingCampaign === 'welcome' ? (
-                  <Loader className="h-4 w-4 animate-spin" />
-                ) : (
-                  <Edit3 className="h-4 w-4" />
-                )}
-                Welcome
               </Button>
             </div>
           </div>
@@ -301,11 +265,20 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             </CardDescription>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/5 border-white/20 hover:bg-white/10 text-white"
+            >
               <Filter className="h-4 w-4 mr-2 text-purple-400" />
               Filter
             </Button>
-            <Button variant="outline" size="sm">
+            <Button
+              variant="outline"
+              size="sm"
+              className="bg-white/5 border-white/20 hover:bg-white/10 text-white"
+              onClick={exportSubscribers}
+            >
               <Download className="h-4 w-4 mr-2 text-purple-400" />
               Export
             </Button>
@@ -356,14 +329,11 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
         <DialogContent className="sm:max-w-lg !bg-gray-900 !border-white/20 text-white">
           <DialogHeader>
             <DialogTitle className="text-white flex items-center gap-2">
-              <Edit3 className="h-5 w-5 text-purple-400" />
-              Edit {currentTemplate === 'newsletter' ? 'Newsletter' : currentTemplate === 'announcement' ? 'Announcement' : 'Welcome Message'}
+              <Megaphone className="h-5 w-5 text-purple-400" />
+              Send Announcement
             </DialogTitle>
             <DialogDescription className="text-gray-300">
-              {currentTemplate === 'welcome'
-                ? 'Customize the welcome message that new subscribers will receive when they join'
-                : `Customize your message before sending to ${totalNewsletterSubscribers} subscribers`
-              }
+              Customize your announcement before sending to {totalNewsletterSubscribers} subscribers
             </DialogDescription>
           </DialogHeader>
 
@@ -407,12 +377,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
                 className="bg-white/5 border-white/20 text-white placeholder-gray-400"
               />
               <p className="text-xs text-gray-400 mt-1">
-                {currentTemplate === 'newsletter'
-                  ? 'Share updates, events, and community news'
-                  : currentTemplate === 'announcement'
-                  ? 'Communicate important information to your community'
-                  : 'Welcome new members and introduce your community'
-                }
+                Communicate important information to your community
               </p>
             </div>
           </div>
@@ -434,12 +399,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
               {sendingCampaign ? (
                 <>
                   <Loader className="h-4 w-4 mr-2 animate-spin" />
-                  {currentTemplate === 'welcome' ? 'Saving...' : 'Sending...'}
-                </>
-              ) : currentTemplate === 'welcome' ? (
-                <>
-                  <Edit3 className="h-4 w-4 mr-2" />
-                  Save Welcome Template
+                  Sending...
                 </>
               ) : (
                 <>

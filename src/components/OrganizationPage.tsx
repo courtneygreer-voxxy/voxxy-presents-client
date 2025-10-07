@@ -19,7 +19,6 @@ import {
   User
 } from "lucide-react"
 import { useOrganization } from "@/hooks/useOrganization"
-import { AddToCalendar } from "@/components/AddToCalendar"
 import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
 import { WelcomeSection } from "@/components/WelcomeSection"
@@ -243,14 +242,10 @@ export default function OrganizationPage({
                         )}
 
                         <p className="text-gray-300 mb-3">{event.description}</p>
-                        <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
+                        <div className="flex flex-col gap-2 text-sm text-gray-300 mb-3">
                           <div className="flex items-center">
                             <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                             {event.date instanceof Date ? event.date.toLocaleDateString() : new Date(event.date).toLocaleDateString()} • {event.time}
-                          </div>
-                          <div className="flex items-center">
-                            <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                            {event.location}
                           </div>
                         </div>
                         <div className="text-sm font-medium text-white">
@@ -278,11 +273,10 @@ export default function OrganizationPage({
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
                         <RSVPModal event={event} />
-                        <AddToCalendar event={event} organizationName={organization.name} />
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           onClick={() => toggleEventDetails(event.id)}
-                          className="flex items-center gap-2 border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
+                          className="flex items-center gap-2 bg-transparent border border-purple-400/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400/50"
                         >
                           Details
                           {expandedEvents.includes(event.id) ? (
@@ -296,35 +290,54 @@ export default function OrganizationPage({
 
                     {/* Expanded Details */}
                     {expandedEvents.includes(event.id) && (
-                      <div className="border-t pt-4 mt-4 space-y-4">
+                      <div className="border-t border-purple-400/30 pt-6 mt-6 space-y-6">
                         {event.series && (
-                          <div>
-                            <h5 className="font-semibold text-white mb-2">About {event.series.name}</h5>
-                            <p className="text-gray-300 text-sm">{event.series.description}</p>
+                          <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/20">
+                            <h5 className="font-semibold text-purple-300 mb-2 flex items-center gap-2">
+                              <Repeat className="h-4 w-4" />
+                              About {event.series.name}
+                            </h5>
+                            <p className="text-gray-300 text-sm leading-relaxed">{event.series.description}</p>
                           </div>
                         )}
 
-                        <div>
-                          <h5 className="font-semibold text-white mb-2">Event Details</h5>
-                          <p className="text-gray-300 text-sm mb-3">{event.fullDescription}</p>
-                          <div className="text-sm text-gray-300">
-                            <p>
-                              <strong>Address:</strong> {event.address}
-                            </p>
+                        <div className="space-y-4">
+                          <h5 className="font-semibold text-white text-lg">✨ What to Expect</h5>
+                          <p className="text-gray-300 leading-relaxed">{event.fullDescription}</p>
+
+                          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                            <div className="flex items-start gap-3">
+                              <MapPin className="h-5 w-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                              <div>
+                                <p className="font-medium text-white mb-1">Venue</p>
+                                {event.venueName && event.venueSlug ? (
+                                  <Link
+                                    to={`/venue/${event.venueSlug}`}
+                                    className="text-purple-300 hover:text-purple-200 hover:underline font-medium"
+                                  >
+                                    {event.venueName}
+                                  </Link>
+                                ) : (
+                                  <p className="text-gray-300">{event.venueName || event.location}</p>
+                                )}
+                                <p className="text-gray-400 text-sm mt-1">{event.address}</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
 
-
                         {event.isRecurring && event.recurringDates && (
                           <div>
-                            <h5 className="font-semibold text-white mb-2">Upcoming Dates & Themes</h5>
-                            <div className="space-y-2">
+                            <h5 className="font-semibold text-white mb-4 text-lg">📅 Upcoming Dates & Themes</h5>
+                            <div className="space-y-3">
                               {event.recurringDates.map((recurringDate, index) => (
-                                <div key={index} className="flex items-start gap-3 text-sm">
-                                  <span className="font-medium text-purple-600 min-w-[2rem]">{recurringDate.date}</span>
-                                  <div>
-                                    <span className="font-medium text-white">{recurringDate.theme}:</span>
-                                    <span className="text-gray-300 ml-1">{recurringDate.description}</span>
+                                <div key={index} className="bg-gradient-to-r from-purple-500/10 to-transparent rounded-lg p-3 border border-purple-400/20">
+                                  <div className="flex items-start gap-3">
+                                    <span className="font-bold text-purple-400 min-w-[3rem] text-sm">{recurringDate.date}</span>
+                                    <div className="flex-1">
+                                      <span className="font-semibold text-white">{recurringDate.theme}</span>
+                                      <p className="text-gray-300 text-sm mt-1">{recurringDate.description}</p>
+                                    </div>
                                   </div>
                                 </div>
                               ))}
@@ -387,14 +400,10 @@ export default function OrganizationPage({
                                   )}
 
                                   <p className="text-gray-300 mb-3">{event.description}</p>
-                                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 text-sm text-gray-300 mb-3">
+                                  <div className="flex flex-col gap-2 text-sm text-gray-300 mb-3">
                                     <div className="flex items-center">
                                       <Calendar className="h-4 w-4 mr-2 text-purple-400" />
                                       {event.time}
-                                    </div>
-                                    <div className="flex items-center">
-                                      <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                                      {event.location}
                                     </div>
                                   </div>
                                   <div className="text-sm font-medium text-white">
@@ -422,11 +431,10 @@ export default function OrganizationPage({
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
                                   <RSVPModal event={event} />
-                                  <AddToCalendar event={event} organizationName={organization.name} />
                                   <Button
-                                    variant="outline"
+                                    variant="ghost"
                                     onClick={() => toggleEventDetails(event.id)}
-                                    className="flex items-center gap-2 border-purple-400/50 text-purple-300 hover:bg-purple-500/20"
+                                    className="flex items-center gap-2 bg-transparent border border-purple-400/30 text-purple-300 hover:bg-purple-500/10 hover:border-purple-400/50"
                                   >
                                     Details & Schedule
                                     {expandedEvents.includes(event.id) ? (
@@ -440,38 +448,59 @@ export default function OrganizationPage({
 
                             {/* Expanded Details */}
                             {expandedEvents.includes(event.id) && (
-                              <div className="border-t pt-4 mt-4 space-y-4">
+                              <div className="border-t border-purple-400/30 pt-6 mt-6 space-y-6">
                                 {event.series && (
-                                  <div>
-                                    <h5 className="font-semibold text-white mb-2">About {event.series.name}</h5>
-                                    <p className="text-gray-200">{event.series.description}</p>
+                                  <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/20">
+                                    <h5 className="font-semibold text-purple-300 mb-2 flex items-center gap-2">
+                                      <Repeat className="h-4 w-4" />
+                                      About {event.series.name}
+                                    </h5>
+                                    <p className="text-gray-300 text-sm leading-relaxed">{event.series.description}</p>
                                   </div>
                                 )}
 
-                                {event.fullDescription && (
-                                  <div>
-                                    <h5 className="font-semibold text-white mb-2">Description</h5>
-                                    <p className="text-gray-200 leading-relaxed">{event.fullDescription}</p>
-                                  </div>
-                                )}
+                                <div className="space-y-4">
+                                  {event.fullDescription && (
+                                    <>
+                                      <h5 className="font-semibold text-white text-lg">✨ What to Expect</h5>
+                                      <p className="text-gray-300 leading-relaxed">{event.fullDescription}</p>
+                                    </>
+                                  )}
 
-                                <div>
-                                  <h5 className="font-semibold text-white mb-2">Location</h5>
-                                  <p className="text-gray-200">{event.address}</p>
+                                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                                    <div className="flex items-start gap-3">
+                                      <MapPin className="h-5 w-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                                      <div>
+                                        <p className="font-medium text-white mb-1">Venue</p>
+                                        {event.venueName && event.venueSlug ? (
+                                          <Link
+                                            to={`/venue/${event.venueSlug}`}
+                                            className="text-purple-300 hover:text-purple-200 hover:underline font-medium"
+                                          >
+                                            {event.venueName}
+                                          </Link>
+                                        ) : (
+                                          <p className="text-gray-300">{event.venueName || event.location}</p>
+                                        )}
+                                        <p className="text-gray-400 text-sm mt-1">{event.address}</p>
+                                      </div>
+                                    </div>
+                                  </div>
                                 </div>
-
 
                                 {/* Recurring Schedule */}
                                 {event.isRecurring && event.recurringDates && (
                                   <div>
-                                    <h5 className="font-semibold text-white mb-3">Upcoming Schedule</h5>
-                                    <div className="space-y-2">
+                                    <h5 className="font-semibold text-white mb-4 text-lg">📅 Upcoming Schedule</h5>
+                                    <div className="space-y-3">
                                       {event.recurringDates.map((recurringDate, index) => (
-                                        <div key={index} className="flex items-center gap-3 p-2 bg-white/10 rounded">
-                                          <span className="font-medium text-purple-600 min-w-[2rem]">{recurringDate.date}</span>
-                                          <div>
-                                            <span className="font-medium text-white">{recurringDate.theme}:</span>
-                                            <span className="text-gray-300 ml-1">{recurringDate.description}</span>
+                                        <div key={index} className="bg-gradient-to-r from-purple-500/10 to-transparent rounded-lg p-3 border border-purple-400/20">
+                                          <div className="flex items-start gap-3">
+                                            <span className="font-bold text-purple-400 min-w-[3rem] text-sm">{recurringDate.date}</span>
+                                            <div className="flex-1">
+                                              <span className="font-semibold text-white">{recurringDate.theme}</span>
+                                              <p className="text-gray-300 text-sm mt-1">{recurringDate.description}</p>
+                                            </div>
                                           </div>
                                         </div>
                                       ))}

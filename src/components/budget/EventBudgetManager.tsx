@@ -4,9 +4,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import {
   DollarSign,
   Plus,
@@ -18,7 +18,9 @@ import {
   Calendar,
   Loader,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Save,
+  X
 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { budgetsApi } from "@/services/api"
@@ -36,9 +38,10 @@ import type {
 interface EventBudgetManagerProps {
   events: Event[]
   organizationId: string
+  preSelectedEventId?: string | null
 }
 
-export default function EventBudgetManager({ events, organizationId }: EventBudgetManagerProps) {
+export default function EventBudgetManager({ events, organizationId, preSelectedEventId }: EventBudgetManagerProps) {
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
   const [budget, setBudget] = useState<Budget | null>(null)
   const [lineItems, setLineItems] = useState<BudgetLineItem[]>([])
@@ -46,10 +49,13 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
   const [loading, setLoading] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [eventBudgets, setEventBudgets] = useState<Record<string, boolean>>({})
 
   // Line item form state
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingItem, setEditingItem] = useState<BudgetLineItem | null>(null)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [editFormData, setEditFormData] = useState<Partial<BudgetLineItem>>({})
   const [formData, setFormData] = useState<Partial<CreateBudgetLineItemRequest>>({
     category: 'expense',
     type: 'venue',
@@ -58,10 +64,45 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
     notes: ''
   })
 
-  // Published events only
+  // Events available for budgeting (exclude only drafts and cancelled)
   const publishedEvents = events.filter(event =>
-    event.status === 'published' || event.status === 'completed'
+    event.status !== 'draft' && event.status !== 'cancelled'
   )
+
+  // Load budget status for all events on mount
+  useEffect(() => {
+    async function checkEventBudgets() {
+      const dataSource = getDataSource()
+      if (dataSource !== 'api') return
+
+      const budgetStatus: Record<string, boolean> = {}
+
+      for (const event of publishedEvents) {
+        try {
+          const response = await budgetsApi.getEventBudget(event.id)
+          budgetStatus[event.id] = !!response.budget
+        } catch (err: any) {
+          budgetStatus[event.id] = false
+        }
+      }
+
+      setEventBudgets(budgetStatus)
+    }
+
+    if (publishedEvents.length > 0) {
+      checkEventBudgets()
+    }
+  }, [publishedEvents.length])
+
+  // Handle pre-selected event
+  useEffect(() => {
+    if (preSelectedEventId && publishedEvents.length > 0) {
+      const event = publishedEvents.find(e => e.id === preSelectedEventId)
+      if (event && event.id !== selectedEvent?.id) {
+        setSelectedEvent(event)
+      }
+    }
+  }, [preSelectedEventId, publishedEvents])
 
   // Load budget data when event is selected
   useEffect(() => {
@@ -149,6 +190,9 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
 
         setBudget(response.budget)
         setLineItems([])
+
+        // Update event budgets state
+        setEventBudgets(prev => ({ ...prev, [selectedEvent.id]: true }))
 
         // Load summary
         console.log('📊 [Budget Debug] Loading summary for new budget:', response.budget.id)
@@ -262,6 +306,99 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
     }
   }
 
+  const startEditingLineItem = (lineItem: BudgetLineItem) => {
+    setEditingItemId(lineItem.id)
+    setEditFormData({
+      category: lineItem.category,
+      type: lineItem.type,
+      description: lineItem.description,
+      plannedAmount: lineItem.plannedAmount,
+      actualAmount: lineItem.actualAmount,
+      notes: lineItem.notes
+    })
+  }
+
+  const cancelEditingLineItem = () => {
+    setEditingItemId(null)
+    setEditFormData({})
+  }
+
+  const saveEditingLineItem = async () => {
+    if (!editingItemId) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const dataSource = getDataSource()
+
+      if (dataSource === 'api') {
+        const response = await budgetsApi.updateLineItem(editingItemId, editFormData as UpdateBudgetLineItemRequest)
+        setLineItems(prev => prev.map(item =>
+          item.id === editingItemId ? response.lineItem : item
+        ))
+
+        // Refresh summary
+        if (budget) {
+          const summaryResponse = await budgetsApi.getBudgetSummary(budget.id)
+          setSummary(summaryResponse.summary)
+        }
+
+        setEditingItemId(null)
+        setEditFormData({})
+      }
+    } catch (err) {
+      console.error('Failed to save line item:', err)
+      setError('Failed to save line item')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const generateTemplateBudget = async () => {
+    if (!budget) return
+
+    setSaving(true)
+    setError(null)
+
+    try {
+      const dataSource = getDataSource()
+
+      if (dataSource === 'api') {
+        // Define template line items for a typical social club event
+        const templateItems: Partial<CreateBudgetLineItemRequest>[] = [
+          // Revenue
+          { category: 'revenue', type: 'ticket_sales', description: 'Ticket Sales', plannedAmount: 1000, notes: 'Expected ticket revenue' },
+
+          // Expenses
+          { category: 'expense', type: 'venue', description: 'Venue Rental', plannedAmount: 300, notes: 'Venue rental fee' },
+          { category: 'expense', type: 'food', description: 'Catering & Food', plannedAmount: 250, notes: 'Food and beverage costs' },
+          { category: 'expense', type: 'staff', description: 'Entertainment/Performers', plannedAmount: 200, notes: 'DJ, musicians, or entertainment' },
+          { category: 'expense', type: 'staff', description: 'Event Staff', plannedAmount: 150, notes: 'Security, servers, coordinators' },
+          { category: 'expense', type: 'equipment', description: 'Audio/Visual Equipment', plannedAmount: 100, notes: 'Sound system, lighting, etc.' },
+          { category: 'expense', type: 'marketing', description: 'Marketing & Promotion', plannedAmount: 75, notes: 'Ads, flyers, social media promotion' },
+          { category: 'expense', type: 'other', description: 'Supplies & Decorations', plannedAmount: 50, notes: 'Event supplies, decorations, materials' },
+          { category: 'expense', type: 'other', description: 'Insurance & Permits', plannedAmount: 25, notes: 'Event insurance and permits' },
+        ]
+
+        // Add all template items
+        for (const item of templateItems) {
+          const response = await budgetsApi.addLineItem(budget.id, item)
+          setLineItems(prev => [...prev, response.lineItem])
+        }
+
+        // Refresh summary
+        const summaryResponse = await budgetsApi.getBudgetSummary(budget.id)
+        setSummary(summaryResponse.summary)
+      }
+    } catch (err) {
+      console.error('Failed to generate template budget:', err)
+      setError('Failed to generate template budget')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -291,7 +428,7 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
             Select Event to Budget
           </CardTitle>
           <CardDescription className="text-gray-300">
-            Choose a published or completed event to create and manage its budget. Click the dropdown below to see available events.
+            Choose an event to create and manage its budget. Click on an event card below.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -300,37 +437,57 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
               <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-300 mb-2">No events available for budgeting</p>
               <p className="text-gray-400 text-sm">
-                You need published or completed events to create budgets. Create an event first in the Events tab.
+                Create an event in the Events tab to get started with budget management.
               </p>
             </div>
           ) : (
             <>
-              <div className="text-sm text-gray-400">
+              <div className="text-sm text-gray-400 mb-4">
                 📊 {publishedEvents.length} event{publishedEvents.length !== 1 ? 's' : ''} available for budget management
               </div>
-              <Select
-                value={selectedEvent?.id || ''}
-                onValueChange={(eventId) => {
-                  const event = publishedEvents.find(e => e.id === eventId)
-                  setSelectedEvent(event || null)
-                }}
-              >
-                <SelectTrigger className="bg-white/10 border-white/20 text-white h-12 text-left">
-                  <SelectValue placeholder="Click here to select an event..." />
-                </SelectTrigger>
-                <SelectContent className="bg-white/15 backdrop-blur-md border-white/30">
-                  {publishedEvents.map(event => (
-                    <SelectItem key={event.id} value={event.id} className="py-3">
-                      <div className="flex flex-col">
-                        <span className="font-medium">{event.title}</span>
-                        <span className="text-xs text-gray-400">
-                          {new Date(event.date).toLocaleDateString()} • {event.status}
-                        </span>
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {publishedEvents.map(event => {
+                  const isSelected = selectedEvent?.id === event.id
+                  return (
+                    <Card
+                      key={event.id}
+                      className={`cursor-pointer transition-all hover:scale-105 ${
+                        isSelected
+                          ? '!bg-purple-500/20 !border-purple-400/50 ring-2 ring-purple-400/50'
+                          : '!bg-white/5 !border-white/10 hover:!bg-white/10'
+                      }`}
+                      onClick={() => setSelectedEvent(event)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex flex-col gap-2">
+                          <h3 className="font-semibold text-white text-sm line-clamp-2">
+                            {event.title}
+                          </h3>
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <Calendar className="h-3 w-3" />
+                            {new Date(event.date).toLocaleDateString()}
+                          </div>
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant={event.status === 'published' ? 'default' : 'secondary'} className="text-xs">
+                                {event.status}
+                              </Badge>
+                              {eventBudgets[event.id] && (
+                                <Badge variant="outline" className="text-xs bg-green-500/20 text-green-300 border-green-500/30">
+                                  In Progress
+                                </Badge>
+                              )}
+                            </div>
+                            {isSelected && (
+                              <CheckCircle className="h-4 w-4 text-purple-400" />
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
             </>
           )}
         </CardContent>
@@ -356,15 +513,27 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
             </Card>
           ) : !budget ? (
             /* No Budget - Create One */
-            <Card className="!bg-purple-500/10 !border-purple-400/30 backdrop-blur-sm">
-              <CardContent className="p-8 text-center">
-                <DollarSign className="h-12 w-12 text-purple-400 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-purple-300 mb-3">
-                  No Budget Found
-                </h3>
-                <p className="text-purple-200 mb-6">
-                  Create a budget for "{selectedEvent.title}" to start tracking expenses and revenue.
-                </p>
+            <>
+              <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-purple-400" />
+                    <div>
+                      <p className="text-sm text-gray-400">Budget for</p>
+                      <h3 className="text-lg font-semibold text-white">{selectedEvent.title}</h3>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="!bg-purple-500/10 !border-purple-400/30 backdrop-blur-sm">
+                <CardContent className="p-8 text-center">
+                  <DollarSign className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-purple-300 mb-3">
+                    No Budget Found
+                  </h3>
+                  <p className="text-purple-200 mb-6">
+                    Create a budget for this event to start tracking expenses and revenue.
+                  </p>
                 <Button
                   onClick={createBudget}
                   disabled={saving}
@@ -384,9 +553,22 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                 </Button>
               </CardContent>
             </Card>
+            </>
           ) : (
             /* Budget Management */
-            <Tabs defaultValue="overview" className="space-y-6">
+            <>
+              <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-purple-400" />
+                    <div>
+                      <p className="text-sm text-gray-400">Budget for</p>
+                      <h3 className="text-lg font-semibold text-white">{selectedEvent.title}</h3>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Tabs defaultValue="overview" className="space-y-6">
               <TabsList className="bg-white/10 border border-white/20">
                 <TabsTrigger value="overview" className="data-[state=active]:bg-white/20">
                   Overview
@@ -520,14 +702,25 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                           Manage your event budget in a familiar spreadsheet format
                         </CardDescription>
                       </div>
-                      <Button
-                        onClick={() => setShowAddForm(true)}
-                        disabled={saving}
-                        className="bg-purple-600 hover:bg-purple-700"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Line Item
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={generateTemplateBudget}
+                          disabled={saving}
+                          variant="outline"
+                          className="bg-white/5 border-white/20 hover:bg-white/10 text-white"
+                        >
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Generate Template
+                        </Button>
+                        <Button
+                          onClick={() => setShowAddForm(true)}
+                          disabled={saving}
+                          className="bg-purple-600 hover:bg-purple-700"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Line Item
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -630,14 +823,13 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                             <TableHead className="text-white font-semibold text-right">Planned Amount</TableHead>
                             <TableHead className="text-white font-semibold text-right">Actual Amount</TableHead>
                             <TableHead className="text-white font-semibold text-right">Variance</TableHead>
-                            <TableHead className="text-white font-semibold text-center">Status</TableHead>
                             <TableHead className="text-white font-semibold text-center">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
                           {lineItems.length === 0 ? (
                             <TableRow>
-                              <TableCell colSpan={8} className="text-center py-8 text-gray-400">
+                              <TableCell colSpan={7} className="text-center py-8 text-gray-400">
                                 No budget items yet. Click "Add Line Item" to get started.
                               </TableCell>
                             </TableRow>
@@ -645,35 +837,113 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                             lineItems.map((item) => {
                               const variance = item.actualAmount !== undefined ? item.actualAmount - item.plannedAmount : 0
                               const isCompleted = item.actualAmount !== undefined
+                              const isEditing = editingItemId === item.id
 
                               return (
                                 <TableRow key={item.id} className="border-white/10 hover:bg-white/5">
+                                  {/* Category */}
                                   <TableCell className="text-white">
-                                    <Badge variant={item.category === 'revenue' ? 'default' : 'secondary'} className="text-xs">
-                                      {item.category}
-                                    </Badge>
+                                    {isEditing ? (
+                                      <Select
+                                        value={editFormData.category}
+                                        onValueChange={(value: 'revenue' | 'expense') =>
+                                          setEditFormData(prev => ({ ...prev, category: value }))
+                                        }
+                                      >
+                                        <SelectTrigger className="bg-white/10 border-white/20 text-white h-8 w-28">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white/15 backdrop-blur-md border-white/30">
+                                          <SelectItem value="revenue">Revenue</SelectItem>
+                                          <SelectItem value="expense">Expense</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    ) : (
+                                      <Badge variant={item.category === 'revenue' ? 'default' : 'secondary'} className="text-xs">
+                                        {item.category}
+                                      </Badge>
+                                    )}
                                   </TableCell>
+
+                                  {/* Type */}
                                   <TableCell className="text-gray-300 text-sm">
-                                    {item.type.replace('_', ' ')}
+                                    {isEditing ? (
+                                      <Select
+                                        value={editFormData.type}
+                                        onValueChange={(value) =>
+                                          setEditFormData(prev => ({ ...prev, type: value as any }))
+                                        }
+                                      >
+                                        <SelectTrigger className="bg-white/10 border-white/20 text-white h-8 w-32">
+                                          <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-white/15 backdrop-blur-md border-white/30">
+                                          <SelectItem value="ticket_sales">Ticket Sales</SelectItem>
+                                          <SelectItem value="venue">Venue</SelectItem>
+                                          <SelectItem value="staff">Staff</SelectItem>
+                                          <SelectItem value="food">Food & Beverage</SelectItem>
+                                          <SelectItem value="equipment">Equipment</SelectItem>
+                                          <SelectItem value="marketing">Marketing</SelectItem>
+                                          <SelectItem value="other">Other</SelectItem>
+                                        </SelectContent>
+                                      </Select>
+                                    ) : (
+                                      item.type.replace('_', ' ')
+                                    )}
                                   </TableCell>
+
+                                  {/* Description */}
                                   <TableCell className="text-white font-medium">
-                                    {item.description}
+                                    {isEditing ? (
+                                      <Input
+                                        value={editFormData.description}
+                                        onChange={(e) =>
+                                          setEditFormData(prev => ({ ...prev, description: e.target.value }))
+                                        }
+                                        className="bg-white/10 border-white/20 text-white h-8"
+                                        placeholder="Description..."
+                                      />
+                                    ) : (
+                                      item.description
+                                    )}
                                   </TableCell>
-                                  <TableCell className="text-right text-white font-mono">
-                                    {formatCurrency(item.plannedAmount)}
+
+                                  {/* Planned Amount */}
+                                  <TableCell className="text-right">
+                                    {isEditing ? (
+                                      <Input
+                                        type="number"
+                                        value={editFormData.plannedAmount || ''}
+                                        onChange={(e) =>
+                                          setEditFormData(prev => ({ ...prev, plannedAmount: parseFloat(e.target.value) || 0 }))
+                                        }
+                                        className="bg-white/10 border-white/20 text-white text-right font-mono h-8 w-24 ml-auto"
+                                        placeholder="0.00"
+                                      />
+                                    ) : (
+                                      <span className="font-mono text-white">{formatCurrency(item.plannedAmount)}</span>
+                                    )}
                                   </TableCell>
+
+                                  {/* Actual Amount */}
                                   <TableCell className="text-right">
                                     <Input
                                       type="number"
-                                      value={item.actualAmount || ''}
+                                      value={isEditing ? (editFormData.actualAmount || '') : (item.actualAmount || '')}
                                       onChange={(e) => {
                                         const actualAmount = parseFloat(e.target.value) || undefined
-                                        handleUpdateLineItem(item, { actualAmount })
+                                        if (isEditing) {
+                                          setEditFormData(prev => ({ ...prev, actualAmount }))
+                                        } else {
+                                          handleUpdateLineItem(item, { actualAmount })
+                                        }
                                       }}
                                       className="bg-white/10 border-white/20 text-white text-right font-mono h-8 w-24 ml-auto"
                                       placeholder="0.00"
                                     />
                                   </TableCell>
+
+                                  {/* Variance */}
                                   <TableCell className="text-right">
                                     {isCompleted ? (
                                       <span className={`font-mono text-sm ${getVarianceColor(variance)}`}>
@@ -683,23 +953,54 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
                                       <span className="text-gray-400 text-sm">-</span>
                                     )}
                                   </TableCell>
+
+                                  {/* Actions */}
                                   <TableCell className="text-center">
-                                    {isCompleted ? (
-                                      <CheckCircle className="h-4 w-4 text-green-400 mx-auto" />
-                                    ) : (
-                                      <AlertTriangle className="h-4 w-4 text-gray-400 mx-auto" />
-                                    )}
-                                  </TableCell>
-                                  <TableCell className="text-center">
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      onClick={() => handleDeleteLineItem(item)}
-                                      disabled={saving}
-                                      className="bg-red-600/20 border-red-400/30 text-red-300 hover:bg-red-600/30 hover:text-red-200 h-8 w-8 p-0"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
+                                    <div className="flex items-center justify-center gap-2">
+                                      {isEditing ? (
+                                        <>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={saveEditingLineItem}
+                                            disabled={saving}
+                                            className="bg-green-600/20 border-green-400/30 text-green-300 hover:bg-green-600/30 hover:text-green-200 h-8 w-8 p-0"
+                                          >
+                                            <Save className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={cancelEditingLineItem}
+                                            disabled={saving}
+                                            className="bg-gray-600/20 border-gray-400/30 text-gray-300 hover:bg-gray-600/30 hover:text-gray-200 h-8 w-8 p-0"
+                                          >
+                                            <X className="h-4 w-4" />
+                                          </Button>
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => startEditingLineItem(item)}
+                                            disabled={saving}
+                                            className="bg-blue-600/20 border-blue-400/30 text-blue-300 hover:bg-blue-600/30 hover:text-blue-200 h-8 w-8 p-0"
+                                          >
+                                            <Edit className="h-4 w-4" />
+                                          </Button>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            onClick={() => handleDeleteLineItem(item)}
+                                            disabled={saving}
+                                            className="bg-red-600/20 border-red-400/30 text-red-300 hover:bg-red-600/30 hover:text-red-200 h-8 w-8 p-0"
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </>
+                                      )}
+                                    </div>
                                   </TableCell>
                                 </TableRow>
                               )
@@ -745,6 +1046,7 @@ export default function EventBudgetManager({ events, organizationId }: EventBudg
               </TabsContent>
 
             </Tabs>
+            </>
           )}
         </>
       )}

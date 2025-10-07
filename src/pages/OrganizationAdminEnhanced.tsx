@@ -48,6 +48,8 @@ export default function OrganizationAdminEnhanced() {
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [saveMessage, setSaveMessage] = useState<string | null>(null)
+  const [activeTab, setActiveTab] = useState('events')
+  const [selectedBudgetEventId, setSelectedBudgetEventId] = useState<string | null>(null)
 
   // Ticket validation state
   const [ticketCode, setTicketCode] = useState('')
@@ -290,7 +292,7 @@ export default function OrganizationAdminEnhanced() {
 
       {/* Main Content */}
       <div className="container mx-auto px-4 py-8">
-        <Tabs defaultValue="organization" className="flex gap-8" orientation="vertical">
+        <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="organization" className="flex gap-8" orientation="vertical">
           <div className="w-64 flex-shrink-0">
             <TabsList className="flex flex-col h-fit w-full !bg-transparent backdrop-blur-sm border border-white/20">
               <TabsTrigger value="organization" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
@@ -437,6 +439,18 @@ export default function OrganizationAdminEnhanced() {
 
                               <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
                                 <RSVPListModal event={event} />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-600/30"
+                                  onClick={() => {
+                                    setSelectedBudgetEventId(event.id)
+                                    setActiveTab('budget')
+                                  }}
+                                >
+                                  <DollarSign className="h-4 w-4 mr-2" />
+                                  Budget
+                                </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -693,6 +707,7 @@ export default function OrganizationAdminEnhanced() {
               <EventBudgetManager
                 events={events}
                 organizationId={organization.id}
+                preSelectedEventId={selectedBudgetEventId}
               />
             </TabsContent>
 
