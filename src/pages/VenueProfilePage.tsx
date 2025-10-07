@@ -288,14 +288,7 @@ export default function VenueProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center relative overflow-hidden">
-        {/* Animated Background */}
-        <div
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] flex items-center justify-center relative overflow-hidden">
         <div className="text-center relative z-10">
           <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-400" />
           <p className="text-gray-300">Loading venue...</p>
@@ -306,14 +299,7 @@ export default function VenueProfilePage() {
 
   if (error || !venue) {
     return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center relative overflow-hidden">
-        {/* Animated Background */}
-        <div
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}
-        />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] flex items-center justify-center relative overflow-hidden">
         <div className="text-center relative z-10">
           <h1 className="text-2xl font-bold text-white mb-4">Venue Not Found</h1>
           <p className="text-gray-300 mb-6">{error || 'The requested venue could not be found.'}</p>
@@ -329,15 +315,7 @@ export default function VenueProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background */}
-      <div
-        className="absolute inset-0 opacity-[0.5]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-        }}
-      />
-
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       <div className="relative z-10">
         {/* Top Controls */}
         <div className="fixed top-4 left-4 right-4 z-50 flex justify-between">

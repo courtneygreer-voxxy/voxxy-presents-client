@@ -160,15 +160,7 @@ export default function OrganizationAdminEnhanced() {
 
   if (!adminEnabled) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
-      {/* Animated Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.5] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex items-center justify-center">
       <div className="relative z-10">
         <div className="text-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
           <h1 className="text-2xl font-bold text-white mb-4">Admin Access Disabled</h1>
@@ -182,15 +174,7 @@ export default function OrganizationAdminEnhanced() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
-      {/* Animated Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.5] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex items-center justify-center">
       <div className="relative z-10">
         <div className="text-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
           <Loader className="h-8 w-8 animate-spin mx-auto mb-4 text-purple-400" />
@@ -203,15 +187,7 @@ export default function OrganizationAdminEnhanced() {
 
   if (error || !organization) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center">
-      {/* Animated Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.5] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex items-center justify-center">
       <div className="relative z-10">
         <div className="text-center bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-8">
           <h1 className="text-2xl font-bold text-white mb-4">Organization Not Found</h1>
@@ -225,16 +201,7 @@ export default function OrganizationAdminEnhanced() {
 
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden admin-dark">
-      {/* Animated Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.5] pointer-events-none"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.5'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
-      
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden admin-dark">
       <div className="relative z-10">
       {/* Header */}
       <div className="bg-white/10 backdrop-blur-sm border-b border-white/20">

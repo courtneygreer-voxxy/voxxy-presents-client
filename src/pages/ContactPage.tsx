@@ -167,15 +167,7 @@ export default function ContactPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center px-4">
-        {/* Animated Background */}
-        <div 
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            animation: 'pulse 8s ease-in-out infinite'
-          }}
-        />
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex items-center justify-center px-4">
         <Card className="max-w-md w-full text-center bg-white/10 backdrop-blur-sm border border-white/20 relative z-10">
           <CardHeader>
             <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -209,16 +201,7 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background */}
-      <div 
-        className="absolute inset-0 opacity-[0.5]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
-      
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       {/* Navigation */}
       <nav className="bg-gray-800 border-b border-white/10 relative z-10 px-4 py-6">
         <div className="container mx-auto max-w-6xl flex justify-between items-center">

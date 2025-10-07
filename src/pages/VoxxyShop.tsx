@@ -54,18 +54,7 @@ export default function VoxxyShop() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-900 relative">
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 opacity-[0.5]">
-        <div 
-          className="absolute inset-0 bg-repeat animate-pulse"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            animationDuration: '8s'
-          }}
-        />
-      </div>
-      
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative">
       {/* Header */}
       <div className="relative bg-gray-800 border-b border-gray-700">
         <div className="container mx-auto px-4 py-6">

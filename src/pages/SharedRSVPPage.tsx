@@ -127,17 +127,8 @@ export default function SharedRSVPPage() {
 
   if (loading && !rsvpData) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-        {/* Animated Background */}
-        <div
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            animation: 'pulse 8s ease-in-out infinite'
-          }}
-        />
-
-        <div className="container mx-auto px-4 max-w-4xl relative z-10 pt-12">
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+      <div className="container mx-auto px-4 max-w-4xl relative z-10 pt-12">
           <div className="flex items-center justify-center py-12">
             <Loader2 className="h-8 w-8 animate-spin text-purple-400" />
             <span className="ml-2 text-gray-300">Loading RSVPs...</span>
@@ -149,17 +140,8 @@ export default function SharedRSVPPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-        {/* Animated Background */}
-        <div
-          className="absolute inset-0 opacity-[0.5]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            animation: 'pulse 8s ease-in-out infinite'
-          }}
-        />
-
-        <div className="container mx-auto px-4 max-w-4xl relative z-10 pt-12">
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+      <div className="container mx-auto px-4 max-w-4xl relative z-10 pt-12">
           <div className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-red-400 mx-auto mb-4" />
             <h3 className="text-xl font-semibold text-white mb-2">Unable to Load RSVPs</h3>
@@ -180,16 +162,7 @@ export default function SharedRSVPPage() {
   if (!rsvpData) return null
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background */}
-      <div
-        className="absolute inset-0 opacity-[0.5]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
-
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       <div className="container mx-auto px-4 max-w-4xl relative z-10 py-8">
         {/* Header */}
         <div className="text-center mb-8">
