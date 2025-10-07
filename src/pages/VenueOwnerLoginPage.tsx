@@ -85,139 +85,166 @@ export default function VenueOwnerLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
-      {/* Animated Background */}
-      <div
-        className="absolute inset-0 opacity-[0.5]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
-        }}
-      />
+    <div className="min-h-screen flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#a855f7] via-[#ec4899] to-[#3b82f6] relative overflow-hidden">
+        {/* Animated Background Pattern */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2'/%3E%3Ccircle cx='53' cy='7' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='7' cy='53' r='2'/%3E%3Ccircle cx='53' cy='53' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
 
-      <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <Card className="w-full bg-white/15 backdrop-blur-md border border-white/30">
-            <CardHeader className="text-center">
-              <Button
-                onClick={() => navigate('/auth')}
-                variant="ghost"
-                size="sm"
-                className="absolute top-4 left-4 text-gray-300 hover:text-white"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Building2 className="h-6 w-6 text-green-400" />
-                <CardTitle className="text-2xl font-bold text-white">Venue Owner Login</CardTitle>
-              </div>
-              <CardDescription className="text-gray-300">
-                Sign in to manage your venue and bookings
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                {/* Email Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-white">Email</Label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="Enter your email"
-                      value={formData.email}
-                      onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-green-400"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  {errors.email && (
-                    <p className="text-red-400 text-sm">{errors.email}</p>
-                  )}
-                </div>
+        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-white">
+          <Building2 className="h-20 w-20 mb-6" />
+          <h1 className="text-4xl font-bold mb-4">Venue Owner Portal</h1>
+          <p className="text-xl text-center text-blue-100 max-w-md">
+            Connect with event organizers and showcase your space on Voxxy Presents
+          </p>
+        </div>
+      </div>
 
-                {/* Password Field */}
-                <div className="space-y-2">
-                  <Label htmlFor="password" className="text-white">Password</Label>
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="password"
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Enter your password"
-                      value={formData.password}
-                      onChange={(e) => handleInputChange('password', e.target.value)}
-                      className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-green-400"
-                      disabled={isSubmitting}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
-                      disabled={isSubmitting}
-                    >
-                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                    </button>
-                  </div>
-                  {errors.password && (
-                    <p className="text-red-400 text-sm">{errors.password}</p>
-                  )}
-                </div>
+      {/* Right Side - Login Form */}
+      <div className="w-full lg:w-1/2 bg-[#0f0b1f] relative overflow-hidden">
+        {/* Subtle Background Pattern for mobile */}
+        <div
+          className="absolute inset-0 opacity-[0.3] lg:opacity-10"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23a855f7' fillOpacity='0.3'%3E%3Ccircle cx='7' cy='7' r='2'/%3E%3Ccircle cx='53' cy='7' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='7' cy='53' r='2'/%3E%3Ccircle cx='53' cy='53' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}
+        />
 
-                {/* Submit Button */}
+        <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md w-full space-y-8">
+            {/* Mobile Logo */}
+            <div className="lg:hidden text-center mb-8">
+              <Building2 className="h-16 w-16 mx-auto text-pink-400 mb-4" />
+              <h1 className="text-3xl font-bold text-white">Venue Owner Login</h1>
+            </div>
+
+            <Card className="w-full bg-white/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+              <CardHeader className="text-center">
                 <Button
-                  type="submit"
-                  disabled={isSubmitting || loading}
-                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => navigate('/auth')}
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-4 left-4 text-gray-300 hover:text-white"
                 >
-                  {isSubmitting || loading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
-                    </>
-                  ) : (
-                    'Sign In'
-                  )}
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Back
                 </Button>
+                <div className="flex items-center justify-center gap-2 mb-3">
+                  <Building2 className="h-6 w-6 text-blue-400" />
+                  <CardTitle className="text-2xl font-bold text-white">Venue Owner Login</CardTitle>
+                </div>
+                <CardDescription className="text-gray-300">
+                  Sign in to manage your venue and bookings
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Email Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-white">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Enter your email"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        className="pl-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                    {errors.email && (
+                      <p className="text-red-400 text-sm">{errors.email}</p>
+                    )}
+                  </div>
 
-                {/* Error Display */}
-                {(error || errors.submit) && (
-                  <Alert className="bg-red-400/10 border-red-400/30">
-                    <AlertDescription className="text-red-300">
-                      {error || errors.submit}
-                    </AlertDescription>
-                  </Alert>
-                )}
-              </form>
+                  {/* Password Field */}
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-white">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Input
+                        id="password"
+                        type={showPassword ? 'text' : 'password'}
+                        placeholder="Enter your password"
+                        value={formData.password}
+                        onChange={(e) => handleInputChange('password', e.target.value)}
+                        className="pl-10 pr-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        disabled={isSubmitting}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                        disabled={isSubmitting}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p className="text-red-400 text-sm">{errors.password}</p>
+                    )}
+                  </div>
 
-              {/* Forgot Password */}
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => navigate('/forgot-password')}
-                  className="text-green-400 hover:text-green-300 text-sm transition-colors"
-                  disabled={isSubmitting}
-                >
-                  Forgot your password?
-                </button>
-              </div>
+                  {/* Submit Button */}
+                  <Button
+                    type="submit"
+                    disabled={isSubmitting || loading}
+                    className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)]"
+                  >
+                    {isSubmitting || loading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Signing in...
+                      </>
+                    ) : (
+                      'Sign In'
+                    )}
+                  </Button>
 
-              {/* Switch to Signup */}
-              <div className="mt-6 text-center">
-                <p className="text-gray-300 text-sm">
-                  Don't have a venue owner account?{' '}
+                  {/* Error Display */}
+                  {(error || errors.submit) && (
+                    <Alert className="bg-red-400/10 border-red-400/30">
+                      <AlertDescription className="text-red-300">
+                        {error || errors.submit}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </form>
+
+                {/* Forgot Password */}
+                <div className="mt-4 text-center">
                   <button
-                    onClick={() => navigate('/signup/venue-owner')}
-                    className="text-green-400 hover:text-green-300 font-medium transition-colors"
+                    onClick={() => navigate('/forgot-password')}
+                    className="text-pink-400 hover:text-pink-300 text-sm transition-colors"
                     disabled={isSubmitting}
                   >
-                    Sign up here
+                    Forgot your password?
                   </button>
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+                </div>
+
+                {/* Switch to Signup */}
+                <div className="mt-6 text-center">
+                  <p className="text-gray-300 text-sm">
+                    Don't have a venue owner account?{' '}
+                    <button
+                      onClick={() => navigate('/signup/venue-owner')}
+                      className="text-pink-400 hover:text-pink-300 font-medium transition-colors"
+                      disabled={isSubmitting}
+                    >
+                      Sign up here
+                    </button>
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
     </div>

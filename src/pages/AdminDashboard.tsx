@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Plus, Settings, Eye, Users, Calendar, ExternalLink, Mail, TrendingUp, BarChart3, LogOut, Shield, RefreshCw, Search, Filter, X, CheckCircle, XCircle, MapPin, Building2 } from "lucide-react"
 import { useAuth } from '@/contexts/AuthContext'
 import { organizationsRef } from '@/lib/database'
+import { auth } from '@/lib/firebase'
 import { getDocs, query, where } from 'firebase/firestore'
 import type { Organization } from '@/types/database'
 import type { Venue } from '@/types/venue'
@@ -56,9 +57,8 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState<'all' | 'beta_request' | 'newsletter_signup' | 'general_contact'>('all')
 
-  // Check if user is admin (either Firebase auth or localStorage session)
-  const isAdmin = currentUser?.email === 'team@voxxypresents.com' ||
-                  localStorage.getItem('voxxy_admin_session') === 'true'
+  // Check if user is admin (only courtneygreer@voxxyai.com)
+  const isAdmin = currentUser?.email === 'courtneygreer@voxxyai.com'
 
   useEffect(() => {
     if (!isAdmin) {
@@ -144,10 +144,9 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleLogout = () => {
-    // Clear admin session
-    localStorage.removeItem('voxxy_admin_session')
-    localStorage.removeItem('voxxy_admin_email')
+  const handleLogout = async () => {
+    // Sign out from Firebase
+    await auth.signOut()
     navigate('/admin/login')
   }
 

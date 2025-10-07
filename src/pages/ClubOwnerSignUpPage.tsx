@@ -136,31 +136,30 @@ export default function ClubOwnerSignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       {/* Animated Background */}
       <div
-        className="absolute inset-0 opacity-[0.5]"
+        className="absolute inset-0 opacity-20"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='1'%3E%3Ccircle cx='7' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='7' r='2' className='animate-pulse'/%3E%3Ccircle cx='30' cy='30' r='2' className='animate-pulse'/%3E%3Ccircle cx='7' cy='53' r='2' className='animate-pulse'/%3E%3Ccircle cx='53' cy='53' r='2' className='animate-pulse'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          animation: 'pulse 8s ease-in-out infinite'
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23a855f7' fillOpacity='0.4'%3E%3Ccircle cx='7' cy='7' r='2'/%3E%3Ccircle cx='53' cy='7' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='7' cy='53' r='2'/%3E%3Ccircle cx='53' cy='53' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       />
 
       <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full space-y-8">
-          <Card className="w-full bg-white/15 backdrop-blur-md border border-white/30">
-            <CardHeader className="text-center">
+        <div className="max-w-lg w-full space-y-8">
+          <Card className="w-full bg-white/5 backdrop-blur-xl border border-purple-500/20 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <CardHeader className="text-center relative pt-12">
               <Button
                 onClick={() => navigate('/auth')}
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 left-4 text-gray-300 hover:text-white"
+                className="absolute top-4 left-4 text-gray-400 hover:text-white hover:bg-white/10"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back
               </Button>
-              <div className="flex items-center justify-center gap-2 mb-3">
-                <Users className="h-6 w-6 text-purple-400" />
+              <div className="flex items-center justify-center gap-2 mb-3 mt-2">
+                <Users className="h-6 w-6 text-pink-400" />
                 <CardTitle className="text-2xl font-bold text-white">Club Owner Signup</CardTitle>
               </div>
               <CardDescription className="text-gray-300">
@@ -180,7 +179,7 @@ export default function ClubOwnerSignUpPage() {
                       placeholder="Enter your name"
                       value={formData.displayName}
                       onChange={(e) => handleInputChange('displayName', e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -200,7 +199,7 @@ export default function ClubOwnerSignUpPage() {
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                      className="pl-10 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -220,7 +219,7 @@ export default function ClubOwnerSignUpPage() {
                       placeholder="Create a password"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                      className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                       disabled={isSubmitting}
                     />
                     <button
@@ -252,7 +251,7 @@ export default function ClubOwnerSignUpPage() {
                       placeholder="Confirm your password"
                       value={formData.confirmPassword}
                       onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                      className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                      className="pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                       disabled={isSubmitting}
                     />
                     <button
@@ -277,16 +276,16 @@ export default function ClubOwnerSignUpPage() {
                       type="checkbox"
                       checked={formData.acceptTerms}
                       onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                      className="w-4 h-4 mt-1 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
+                      className="w-4 h-4 mt-1 text-pink-500 bg-white/10 border-white/20 rounded focus:ring-pink-400 focus:ring-2"
                       disabled={isSubmitting}
                     />
-                    <Label htmlFor="acceptTerms" className="text-gray-300 text-sm leading-relaxed">
+                    <Label htmlFor="acceptTerms" className="text-gray-200 text-sm leading-relaxed">
                       I agree to the{' '}
-                      <a href="/terms" className="text-purple-400 hover:text-purple-300 underline">
+                      <a href="https://www.heyvoxxy.com/#/terms" target="_blank" rel="noopener noreferrer" className="text-pink-300 hover:text-pink-200 underline">
                         Terms of Service
                       </a>{' '}
                       and{' '}
-                      <a href="/privacy" className="text-purple-400 hover:text-purple-300 underline">
+                      <a href="https://www.heyvoxxy.com/#/privacy" target="_blank" rel="noopener noreferrer" className="text-pink-300 hover:text-pink-200 underline">
                         Privacy Policy
                       </a>
                     </Label>
@@ -300,7 +299,7 @@ export default function ClubOwnerSignUpPage() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || loading}
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+                  className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)]"
                 >
                   {isSubmitting || loading ? (
                     <>
@@ -324,11 +323,11 @@ export default function ClubOwnerSignUpPage() {
 
               {/* Switch to Login */}
               <div className="mt-6 text-center">
-                <p className="text-gray-300 text-sm">
+                <p className="text-gray-200 text-sm">
                   Already have a club owner account?{' '}
                   <button
                     onClick={() => navigate('/login/club-owner')}
-                    className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                    className="text-pink-300 hover:text-pink-200 font-medium transition-colors"
                     disabled={isSubmitting}
                   >
                     Sign in here
