@@ -32,7 +32,7 @@ interface BetaFormData {
 
 export default function ContactPage() {
   usePageTracking('Contact')
-  const betaFormTracking = useFormTracking('beta_access', 'Contact')
+  const betaFormTracking = useFormTracking('beta_request', 'Contact')
 
   const [formData, setFormData] = useState<BetaFormData>({
     name: '',
@@ -61,7 +61,7 @@ export default function ContactPage() {
 
     try {
       const submissionData: CreateContactSubmissionData = {
-        type: 'beta_access',
+        type: 'beta_request',
         name: formData.name,
         email: formData.email,
         organizationName: formData.organizationName,
@@ -74,11 +74,10 @@ export default function ContactPage() {
 
       await contactFormApi.submitForm(submissionData)
       setIsSubmitted(true)
-      betaFormTracking.trackFormSuccess()
 
     } catch (error) {
       console.error('Beta access submission failed:', error)
-      betaFormTracking.trackFormError(error instanceof Error ? error.message : 'Unknown error')
+      betaFormTracking.trackFormError('submission', error instanceof Error ? error.message : 'Unknown error')
       if (error instanceof EmailServiceError) {
         setSubmissionError(`Failed to submit: ${error.message}`)
       } else {
@@ -201,7 +200,6 @@ export default function ContactPage() {
                       id="name"
                       value={formData.name}
                       onChange={(e) => handleInputChange('name', e.target.value)}
-                      onFocus={() => betaFormTracking.trackFieldFocus('name')}
                       required
                       className="bg-white/10 border-white/20 text-white"
                     />
@@ -214,7 +212,6 @@ export default function ContactPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      onFocus={() => betaFormTracking.trackFieldFocus('email')}
                       required
                       className="bg-white/10 border-white/20 text-white"
                     />
@@ -226,7 +223,6 @@ export default function ContactPage() {
                       id="organizationName"
                       value={formData.organizationName}
                       onChange={(e) => handleInputChange('organizationName', e.target.value)}
-                      onFocus={() => betaFormTracking.trackFieldFocus('organizationName')}
                       required
                       className="bg-white/10 border-white/20 text-white"
                     />
@@ -277,7 +273,6 @@ export default function ContactPage() {
                       id="biggestChallenge"
                       value={formData.biggestChallenge}
                       onChange={(e) => handleInputChange('biggestChallenge', e.target.value)}
-                      onFocus={() => betaFormTracking.trackFieldFocus('biggestChallenge')}
                       required
                       rows={3}
                       className="bg-white/10 border-white/20 text-white"
@@ -290,7 +285,6 @@ export default function ContactPage() {
                       id="description"
                       value={formData.description}
                       onChange={(e) => handleInputChange('description', e.target.value)}
-                      onFocus={() => betaFormTracking.trackFieldFocus('description')}
                       rows={3}
                       className="bg-white/10 border-white/20 text-white"
                     />

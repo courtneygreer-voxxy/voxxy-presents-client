@@ -50,7 +50,7 @@ export interface ScrollProperties {
 }
 
 export interface FormProperties {
-  form_type: 'beta_access' | 'contact';
+  form_type: 'beta_access' | 'beta_request' | 'contact';
   page_name: string;
   form_location?: string;
   field_name?: string;

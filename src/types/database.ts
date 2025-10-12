@@ -266,6 +266,9 @@ export interface ContactFormSubmission {
   name: string
   email: string
   organizationName?: string
+  eventFrequency?: string
+  typicalAttendance?: string
+  biggestChallenge?: string
   description?: string
   source: 'contact_page' | 'organization_page' | 'event_page'
   status: 'received' | 'processing' | 'responded' | 'closed'

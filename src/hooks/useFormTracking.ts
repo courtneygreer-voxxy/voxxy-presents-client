@@ -1,7 +1,7 @@
 import { useCallback, useRef } from 'react';
 import { analytics, FormProperties } from '@/lib/analytics';
 
-export const useFormTracking = (formType: 'beta_access' | 'contact', pageName: string) => {
+export const useFormTracking = (formType: 'beta_access' | 'beta_request' | 'contact', pageName: string) => {
   const startTimeRef = useRef<number>();
   const fieldTimesRef = useRef<Record<string, number>>({});
 
