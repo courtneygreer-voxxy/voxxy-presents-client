@@ -321,29 +321,6 @@ export default function CreateEventPage() {
 
       {/* Main Content */}
       <main className="relative z-10 container mx-auto max-w-4xl px-4 py-8">
-        {/* Coming Soon: Event Templates Banner */}
-        <Card className="bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 backdrop-blur-sm border-2 border-purple-400/50 mb-6 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="bg-purple-500/20 rounded-full p-3 flex-shrink-0">
-                <Sparkles className="h-6 w-6 text-purple-300" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-white text-lg mb-2 flex items-center gap-2">
-                  ✨ Coming Soon: Event Templates
-                </h3>
-                <p className="text-purple-100 mb-3">
-                  Generate new events from saved templates - no more recreating from scratch! Save your event as a template and reuse it with one click.
-                </p>
-                <div className="flex items-center gap-2 text-sm text-purple-200">
-                  <div className="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></div>
-                  <span>This feature is currently in development</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <Card className="bg-red-500/20 backdrop-blur-sm border border-red-400/30 text-white">

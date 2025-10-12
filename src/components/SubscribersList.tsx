@@ -257,11 +257,11 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
       )}
 
       {/* Club Subscribers */}
-      <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+      <Card className="!bg-gray-900/60 backdrop-blur-md !border-white/20">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle className="text-lg">Club Subscribers</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-lg text-white">Club Subscribers</CardTitle>
+            <CardDescription className="text-gray-300">
               People subscribed to your clubs's updates
             </CardDescription>
           </div>
@@ -269,7 +269,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             <Button
               variant="outline"
               size="sm"
-              className="bg-white/5 border-white/20 hover:bg-white/10 text-white"
+              className="bg-gray-800/60 border-white/20 hover:bg-gray-700/60 text-white"
             >
               <Filter className="h-4 w-4 mr-2 text-purple-400" />
               Filter
@@ -277,7 +277,7 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             <Button
               variant="outline"
               size="sm"
-              className="bg-white/5 border-white/20 hover:bg-white/10 text-white"
+              className="bg-gray-800/60 border-white/20 hover:bg-gray-700/60 text-white"
               onClick={exportSubscribers}
             >
               <Download className="h-4 w-4 mr-2 text-purple-400" />
@@ -289,37 +289,35 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
           {totalNewsletterSubscribers > 0 ? (
             <div className="space-y-4">
               {newsletterSubscribers.map((subscriber) => (
-                <div key={subscriber.id} className="flex items-center justify-between py-2 px-3 bg-white/5 rounded border border-white/10 hover:bg-white/10 transition-colors">
+                <div key={subscriber.id} className="flex items-center justify-between py-3 px-4 bg-gray-800/40 backdrop-blur-sm rounded border border-white/20 hover:bg-gray-700/50 hover:border-white/30 transition-colors">
                   <div className="flex items-center gap-3 flex-1">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="font-medium text-sm text-white">{subscriber.name || 'No name'}</p>
-                        {(subscriber as any).removeRequested && (
-                          <Badge className="bg-orange-500/20 text-orange-300 border-orange-400/30 text-xs flex items-center gap-1">
-                            <AlertCircle className="h-3 w-3" />
-                            Removal Requested
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-300">{subscriber.email}</p>
-                      <p className="text-xs text-gray-400">From: {subscriber.eventTitle}</p>
+                      <p className="font-medium text-sm text-white">{subscriber.name || 'No name'}</p>
+                      <p className="text-xs text-gray-200">{subscriber.email}</p>
+                      {subscriber.eventTitle && (
+                        <p className="text-xs text-gray-300">From: {subscriber.eventTitle}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
                       <Calendar className="h-3 w-3 text-purple-400" />
-                      {new Date(subscriber.subscribedAt).toLocaleDateString()}
+                      {subscriber.subscribedAt && !isNaN(new Date(subscriber.subscribedAt).getTime())
+                        ? new Date(subscriber.subscribedAt).toLocaleDateString()
+                        : 'Date unknown'}
                     </div>
                     <Button
                       size="sm"
                       variant="ghost"
                       className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
                       onClick={() => {
-                        // TODO: Implement remove subscriber functionality
-                        console.log('Remove subscriber:', subscriber.id)
-                        alert('Remove subscriber feature coming soon! This will flag the subscriber for removal.')
+                        if (confirm(`Delete ${subscriber.name || subscriber.email} from subscribers?`)) {
+                          // TODO: Call API to delete subscriber
+                          console.log('Delete subscriber:', subscriber.id)
+                          alert('Delete functionality will be connected to API')
+                        }
                       }}
-                      title="Flag for removal"
+                      title="Delete subscriber"
                     >
                       <X className="h-4 w-4" />
                     </Button>

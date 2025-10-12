@@ -20,19 +20,29 @@ export default function CreateClubPage() {
 
   // Show landing page with single create option
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex flex-col">
+      {/* Animated Background Pattern */}
+      <div
+        className="absolute inset-0 opacity-20"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23a855f7' fillOpacity='0.4'%3E%3Ccircle cx='7' cy='7' r='2'/%3E%3Ccircle cx='53' cy='7' r='2'/%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3Ccircle cx='7' cy='53' r='2'/%3E%3Ccircle cx='53' cy='53' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Header */}
-      <div className="bg-gray-900/95 backdrop-blur-sm border-b border-white/20 px-6 py-4">
+      <div className="relative z-10 bg-gradient-to-r from-purple-900/30 via-pink-900/30 to-purple-900/30 backdrop-blur-md border-b border-white/20 px-6 py-6">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-white">Create Your Club</h1>
-          <p className="text-gray-300 mt-2">Set up your community in just a few steps</p>
+          <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-200 via-pink-200 to-blue-200 bg-clip-text text-transparent">
+            Create Your Club
+          </h1>
+          <p className="text-gray-200 text-lg">Set up your community in just a few steps</p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex items-center justify-center p-6">
+      <div className="relative z-10 flex-1 flex items-center justify-center p-6">
         <div className="max-w-2xl w-full">
-          <Card className="bg-white/10 backdrop-blur-sm border border-white/20 hover:border-white/30 transition-all cursor-pointer group">
+          <Card className="bg-gradient-to-br from-white/10 via-purple-500/10 to-pink-500/10 backdrop-blur-lg border-2 border-white/20 hover:border-purple-400/50 transition-all duration-300 cursor-pointer group shadow-[0_0_30px_rgba(168,85,247,0.2)] hover:shadow-[0_0_50px_rgba(168,85,247,0.4)]">
             <CardHeader>
               <CardTitle className="flex items-center space-x-3 text-white">
                 <div className="w-12 h-12 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
@@ -66,11 +76,11 @@ export default function CreateClubPage() {
 
               <Button
                 onClick={() => setShowFlow(true)}
-                className="w-full bg-purple-600 hover:bg-purple-700 text-white group-hover:bg-purple-700 transition-colors"
+                className="w-full bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white font-bold text-lg py-6 shadow-[0_0_20px_rgba(168,85,247,0.5)] hover:shadow-[0_0_30px_rgba(168,85,247,0.7)] transition-all duration-300 hover:scale-105"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-5 w-5 mr-2" />
                 Get Started
-                <ArrowRight className="h-4 w-4 ml-2" />
+                <ArrowRight className="h-5 w-5 ml-2" />
               </Button>
             </CardContent>
           </Card>
