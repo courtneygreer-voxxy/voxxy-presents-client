@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Eye, EyeOff, Loader2, Mail, Lock, Users, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/services/authService'
+import { AuthNavbar } from '@/components/auth/AuthNavbar'
 
 interface FormData {
   email: string
@@ -107,6 +108,9 @@ export default function ClubOwnerLoginPage() {
 
       {/* Right Side - Login Form */}
       <div className="w-full lg:w-1/2 bg-[#0f0b1f] relative overflow-hidden">
+        {/* Auth Navbar */}
+        <AuthNavbar />
+
         {/* Subtle Background Pattern for mobile */}
         <div
           className="absolute inset-0 opacity-[0.3] lg:opacity-10"
@@ -115,7 +119,7 @@ export default function ClubOwnerLoginPage() {
           }}
         />
 
-        <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8 pt-20">
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
