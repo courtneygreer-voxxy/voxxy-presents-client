@@ -16,6 +16,7 @@ import {
 } from '@/services/authService'
 import type { User } from '@/types/database'
 import { analytics } from '@/lib/analytics'
+import { getCachedUserProfile, cacheUserProfile, removeCachedUserProfile } from '@/utils/cache'
 
 interface AuthContextType {
   // Current user state
@@ -101,25 +102,52 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setCurrentUser(user)
 
       if (user) {
-        // Load user profile from Firestore
+        // PERFORMANCE OPTIMIZATION: Try to load cached profile first
+        const cachedProfile = getCachedUserProfile<User>(user.uid)
+
+        if (cachedProfile) {
+          // Load cached profile immediately for instant UI
+          console.log('✓ Loading cached user profile (instant)')
+          setUserProfile(cachedProfile)
+          setLoading(false) // UI updates immediately!
+
+          // Track sign in with cached data
+          if (user.email) {
+            analytics.trackUserSignIn(user.email, user.uid, cachedProfile.role)
+          }
+        }
+
+        // Refresh profile in background (whether cached or not)
         try {
           const profile = await getUserProfile(user.uid)
           setUserProfile(profile)
 
+          // Cache the fresh profile
+          if (profile) {
+            cacheUserProfile(user.uid, profile)
+          }
+
           // Track user sign in for analytics (only if profile exists)
-          if (profile && user.email) {
+          if (profile && user.email && !cachedProfile) {
             analytics.trackUserSignIn(user.email, user.uid, profile.role)
+          }
+
+          // Only set loading false if we didn't have cache
+          if (!cachedProfile) {
+            setLoading(false)
           }
         } catch (err) {
           console.warn('Failed to load user profile (this is normal for new users):', err)
           // Don't set error for profile loading issues - user can still use the app
-          setUserProfile(null)
+          if (!cachedProfile) {
+            setUserProfile(null)
+            setLoading(false)
+          }
         }
       } else {
         setUserProfile(null)
+        setLoading(false)
       }
-
-      setLoading(false)
     })
 
     return unsubscribe
@@ -168,6 +196,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setLoading(true)
       setError(null)
+
+      // Clear cached profile before signing out
+      if (currentUser) {
+        removeCachedUserProfile(currentUser.uid)
+      }
+
       await signOutUser()
       // Note: onAuthStateChanged will handle clearing the user state
     } catch (err) {
@@ -224,6 +258,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const profile = await getUserProfile(currentUser.uid)
       setUserProfile(profile)
+
+      // Update cache with fresh profile
+      if (profile) {
+        cacheUserProfile(currentUser.uid, profile)
+      }
     } catch (err) {
       console.warn('Failed to refresh user profile:', err)
       // Don't show error to user - just continue without profile

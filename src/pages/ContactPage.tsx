@@ -54,6 +54,13 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // PERFORMANCE OPTIMIZATION: Prevent duplicate submissions
+    if (isSubmitting || isSubmitted) {
+      console.log('Form submission already in progress or completed')
+      return
+    }
+
     setIsSubmitting(true)
     setSubmissionError(null)
 
