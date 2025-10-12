@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { budgetsApi } from "@/services/api"
-import { getDataSource } from "@/config/environments"
+import { getBudgetDataSource } from "@/config/environments"
 import type {
   Event,
   Budget,
@@ -72,7 +72,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
   // Load budget status for all events on mount
   useEffect(() => {
     async function checkEventBudgets() {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
       if (dataSource !== 'api') return
 
       const budgetStatus: Record<string, boolean> = {}
@@ -116,7 +116,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
       console.log('🔍 [Budget Debug] Loading budget data for event:', eventId, 'using data source:', dataSource)
 
       if (dataSource === 'api') {
@@ -175,7 +175,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
       console.log('🔍 [Budget Debug] Using data source:', dataSource)
 
       if (dataSource === 'api') {
@@ -224,7 +224,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
 
       if (dataSource === 'api') {
         const response = await budgetsApi.addLineItem(budget.id, formData)
@@ -257,7 +257,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
 
       if (dataSource === 'api') {
         const response = await budgetsApi.updateLineItem(lineItem.id, updates)
@@ -286,7 +286,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
 
       if (dataSource === 'api') {
         await budgetsApi.deleteLineItem(lineItem.id)
@@ -330,7 +330,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
 
       if (dataSource === 'api') {
         const response = await budgetsApi.updateLineItem(editingItemId, editFormData as UpdateBudgetLineItemRequest)
@@ -362,7 +362,7 @@ export default function EventBudgetManager({ events, organizationId, preSelected
     setError(null)
 
     try {
-      const dataSource = getDataSource()
+      const dataSource = getBudgetDataSource()
 
       if (dataSource === 'api') {
         // Define template line items for a typical social club event

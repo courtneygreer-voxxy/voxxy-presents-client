@@ -217,3 +217,9 @@ export function getUserDataSource(): DataSourceType {
   // Use general data source for dev/staging
   return getDataSource()
 }
+
+// Get budget-specific data source (budgets always use API as there's no Firebase implementation)
+export function getBudgetDataSource(): DataSourceType {
+  // Budgets always use API in all environments (no Firebase implementation exists)
+  return 'api'
+}
