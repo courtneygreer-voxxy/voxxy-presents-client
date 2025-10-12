@@ -24,7 +24,8 @@ import {
   Megaphone,
   Loader,
   Edit3,
-  X
+  X,
+  AlertCircle
 } from "lucide-react"
 import { subscriptionService } from '@/services/subscriptionService'
 import type { Event } from '@/types/database'
@@ -288,17 +289,40 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
           {totalNewsletterSubscribers > 0 ? (
             <div className="space-y-4">
               {newsletterSubscribers.map((subscriber) => (
-                <div key={subscriber.id} className="flex items-center justify-between py-2 px-3 bg-white/5 rounded border border-white/10">
-                  <div className="flex items-center gap-3">
-                    <div>
-                      <p className="font-medium text-sm text-white">{subscriber.name || 'No name'}</p>
+                <div key={subscriber.id} className="flex items-center justify-between py-2 px-3 bg-white/5 rounded border border-white/10 hover:bg-white/10 transition-colors">
+                  <div className="flex items-center gap-3 flex-1">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="font-medium text-sm text-white">{subscriber.name || 'No name'}</p>
+                        {(subscriber as any).removeRequested && (
+                          <Badge className="bg-orange-500/20 text-orange-300 border-orange-400/30 text-xs flex items-center gap-1">
+                            <AlertCircle className="h-3 w-3" />
+                            Removal Requested
+                          </Badge>
+                        )}
+                      </div>
                       <p className="text-xs text-gray-300">{subscriber.email}</p>
                       <p className="text-xs text-gray-400">From: {subscriber.eventTitle}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <Calendar className="h-3 w-3 text-purple-400" />
-                    {new Date(subscriber.subscribedAt).toLocaleDateString()}
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-xs text-gray-400">
+                      <Calendar className="h-3 w-3 text-purple-400" />
+                      {new Date(subscriber.subscribedAt).toLocaleDateString()}
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                      onClick={() => {
+                        // TODO: Implement remove subscriber functionality
+                        console.log('Remove subscriber:', subscriber.id)
+                        alert('Remove subscriber feature coming soon! This will flag the subscriber for removal.')
+                      }}
+                      title="Flag for removal"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}

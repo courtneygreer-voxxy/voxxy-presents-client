@@ -298,6 +298,20 @@ export interface EmailRecipient {
   updatedAt: Date
 }
 
+// Newsletter/Club Subscriber (for organization updates)
+export interface NewsletterSubscriber {
+  id: string
+  organizationId: string
+  eventId?: string
+  eventTitle?: string
+  name?: string
+  email: string
+  subscribedAt: Date
+  removeRequested?: boolean          // Flag when subscriber wants to be removed
+  requestedRemovalAt?: Date          // Timestamp of removal request
+  unsubscribedAt?: Date              // Actual unsubscribe timestamp
+}
+
 // Utility types for forms and API
 export type CreateEventData = Omit<Event, 'id' | 'createdAt' | 'updatedAt'>
 export type UpdateEventData = Partial<CreateEventData>
