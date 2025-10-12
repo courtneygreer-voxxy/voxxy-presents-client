@@ -296,8 +296,8 @@ export default function HomePage() {
               Club organizers everywhere face the same recurring challenges
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+          <div className="grid md:grid-cols-3 gap-8">
             <div
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
               onClick={() => trackLandingInteraction('click', 'Maybe RSVPs Problem Card', 'Problems Section')}
@@ -327,36 +327,6 @@ export default function HomePage() {
                 Instagram posts, newsletter emails, word-of-mouth - nothing connects or tracks effectively
               </p>
             </div>
-
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Free Tools Problem Card', 'Problems Section')}
-            >
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Free Event Tools Don't Scale</h3>
-              <p className="text-gray-300">
-                Eventbrite works for one-offs but breaks down for recurring club events and series management
-              </p>
-            </div>
-
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Contact Management Problem Card', 'Problems Section')}
-            >
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">Manual Contact Management</h3>
-              <p className="text-gray-300">
-                Pulling emails from multiple sources, no automated follow-up or member engagement
-              </p>
-            </div>
-
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Venue Network Problem Card', 'Problems Section')}
-            >
-              <h3 className="text-lg font-semibold text-purple-400 mb-3">No Venue Network</h3>
-              <p className="text-gray-300">
-                Starting from scratch to find spaces for every event, no relationship management
-              </p>
-            </div>
           </div>
         </div>
       </section>
@@ -372,23 +342,9 @@ export default function HomePage() {
               Designed specifically for club organizers. Voxxy handles the logistics, you focus on the experience.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* 1. Recurring Event Series - First */}
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Recurring Event Series Feature', 'Solutions Section')}
-            >
-              <div className="w-12 h-12 bg-pink-500/20 backdrop-blur-sm border border-pink-400/30 rounded-lg flex items-center justify-center mb-4">
-                <Calendar className="h-6 w-6 text-pink-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Recurring Event Series</h3>
-              <p className="text-gray-300">
-                Set up your monthly pop-ups or weekly events once, manage them forever
-              </p>
-            </div>
 
-            {/* 2. Member Database & Engagement - Second */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Member Database & Engagement */}
             <div
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
               onClick={() => trackLandingInteraction('click', 'Member Database Feature', 'Solutions Section')}
@@ -402,13 +358,13 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 3. Venue Integration Hub - Third */}
+            {/* Venue Integration Hub */}
             <div
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
               onClick={() => trackLandingInteraction('click', 'Venue Integration Feature', 'Solutions Section')}
             >
               <div className="w-12 h-12 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-lg flex items-center justify-center mb-4">
-                <ArrowRight className="h-6 w-6 text-blue-300" />
+                <MapPin className="h-6 w-6 text-blue-300" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">Venue Integration Hub</h3>
               <p className="text-gray-300">
@@ -416,83 +372,17 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* 4. Venue Discovery Network - Fourth */}
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Venue Discovery Feature', 'Solutions Section')}
-            >
-              <div className="w-12 h-12 bg-orange-500/20 backdrop-blur-sm border border-orange-400/30 rounded-lg flex items-center justify-center mb-4">
-                <MapPin className="h-6 w-6 text-orange-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Venue Discovery Network</h3>
-              <p className="text-gray-300">
-                Access curated spaces that actively want recurring community events
-              </p>
-            </div>
-
-            {/* 5. Smart RSVP Management - Fifth */}
-            <div
-              className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
-              onClick={() => trackLandingInteraction('click', 'Smart RSVP Feature', 'Solutions Section')}
-            >
-              <div className="w-12 h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center mb-4">
-                <Sparkles className="h-6 w-6 text-purple-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">Smart RSVP Management</h3>
-              <p className="text-gray-300">
-                Convert "maybes" to "yes" with automated follow-up sequences and attendance prediction
-              </p>
-            </div>
-
-            {/* 6. Budget Tools - Sixth (replacing Integrated Promotion Tools) */}
+            {/* Budget Management Tools */}
             <div
               className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 hover:bg-white/15 hover:border-white/30 transition-all duration-300 cursor-pointer"
               onClick={() => trackLandingInteraction('click', 'Budget Management Feature', 'Solutions Section')}
             >
               <div className="w-12 h-12 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-green-300" />
+                <Calendar className="h-6 w-6 text-green-300" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">Budget Management Tools</h3>
               <p className="text-gray-300">
                 Track event costs, venue fees, and revenue with automated expense reporting and budget planning
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Success Stories Section */}
-      <section className="py-20 bg-gray-800/50 backdrop-blur-sm">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Club Organizers Choose Voxxy
-            </h2>
-            <p className="text-xl text-gray-200">
-              Join the recurring event organizers already building sustainable communities with Voxxy Presents
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="text-4xl mb-4">🎵</div>
-              <h3 className="font-semibold mb-2 text-white">Vinyl Listening Clubs</h3>
-              <p className="text-gray-300 text-sm">
-                "Voxxy turned our maybe RSVPs into actual attendees. Our Dumbo House events now consistently hit capacity."
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="text-4xl mb-4">🎉</div>
-              <h3 className="font-semibold mb-2 text-white">Pop-up Event Series</h3>
-              <p className="text-gray-300 text-sm">
-                "No more venue coordination headaches - Voxxy handles all the guest list sharing automatically so we can focus on programming."
-              </p>
-            </div>
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6 text-center hover:bg-white/15 hover:border-white/30 transition-all duration-300">
-              <div className="text-4xl mb-4">🤝</div>
-              <h3 className="font-semibold mb-2 text-white">Community Event Organizers</h3>
-              <p className="text-gray-300 text-sm">
-                "We went from 20% no-shows to 95% attendance with their RSVP management tools. Game changer for free events."
               </p>
             </div>
           </div>
