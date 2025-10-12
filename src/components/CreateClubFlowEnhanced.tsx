@@ -172,7 +172,7 @@ export default function CreateClubFlowEnhanced({
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-8 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+        <div className="mb-8 bg-gray-900/60 backdrop-blur-md border border-white/20 rounded-lg p-4">
           <div className="flex justify-between items-center mb-3">
             <span className="text-sm font-medium text-gray-200">
               Step {currentStep + 1} of {steps.length}
@@ -180,7 +180,7 @@ export default function CreateClubFlowEnhanced({
             <span className="text-sm text-gray-300">{steps[currentStep].title}</span>
           </div>
           <div className="w-full bg-gray-700/50 rounded-full h-2">
-            <div 
+            <div
               className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 ease-out"
               style={{ width: `${progress}%` }}
             />
@@ -188,7 +188,7 @@ export default function CreateClubFlowEnhanced({
         </div>
 
         {/* Step Content */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg mb-8">
+        <div className="bg-gray-900/60 backdrop-blur-md border border-white/20 rounded-lg mb-8">
           <div className="p-6">
             {renderCurrentStep()}
           </div>
@@ -199,7 +199,7 @@ export default function CreateClubFlowEnhanced({
           {currentStep > 0 ? (
             <button
               onClick={prevStep}
-              className="flex items-center gap-2 px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg font-medium"
+              className="flex items-center gap-2 px-6 py-3 bg-gray-800/60 backdrop-blur-sm border border-white/20 text-white hover:bg-gray-700/50 hover:border-white/30 transition-all duration-200 rounded-lg font-medium"
             >
               <ChevronLeft className="h-4 w-4" />
               Previous
@@ -212,7 +212,7 @@ export default function CreateClubFlowEnhanced({
             <button
               onClick={nextStep}
               disabled={!canProceed()}
-              className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium shadow-[0_0_15px_rgba(168,85,247,0.4)]"
             >
               Next
               <ChevronRight className="h-4 w-4" />
@@ -221,7 +221,7 @@ export default function CreateClubFlowEnhanced({
             <button
               onClick={handleCreate}
               disabled={!canProceed() || isCreating}
-              className="flex items-center gap-2 px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium"
+              className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white transition-colors duration-200 rounded-lg font-medium shadow-[0_0_15px_rgba(168,85,247,0.4)]"
             >
               {isCreating ? 'Creating...' : 'Create Club'}
             </button>
