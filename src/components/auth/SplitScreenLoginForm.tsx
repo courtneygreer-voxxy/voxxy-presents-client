@@ -20,7 +20,8 @@ import {
   TrendingUp,
   Coffee,
   Music,
-  ArrowLeft
+  ArrowLeft,
+  Home
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/services/authService'
@@ -389,6 +390,21 @@ export function SplitScreenLoginForm({
           </Card>
         </div>
       )}
+
+      {/* Footer with Home Link */}
+      <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/50 to-transparent backdrop-blur-sm border-t border-white/10 py-4">
+        <div className="container mx-auto px-4 flex justify-center">
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            size="sm"
+            className="text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

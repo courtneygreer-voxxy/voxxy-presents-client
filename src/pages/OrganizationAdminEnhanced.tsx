@@ -405,19 +405,6 @@ export default function OrganizationAdminEnhanced() {
                               </div>
 
                               <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                <RSVPListModal event={event} />
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="bg-blue-600/20 hover:bg-blue-600/30 text-blue-300 border-blue-600/30"
-                                  onClick={() => {
-                                    setSelectedBudgetEventId(event.id)
-                                    setActiveTab('budget')
-                                  }}
-                                >
-                                  <DollarSign className="h-4 w-4 mr-2" />
-                                  Budget
-                                </Button>
                                 <Button
                                   variant="outline"
                                   size="sm"
@@ -428,6 +415,19 @@ export default function OrganizationAdminEnhanced() {
                                     <Edit className="h-4 w-4 mr-2" />
                                     Edit
                                   </Link>
+                                </Button>
+                                <RSVPListModal event={event} />
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="bg-green-600/20 hover:bg-green-600/30 text-green-300 border-green-600/30"
+                                  onClick={() => {
+                                    setSelectedBudgetEventId(event.id)
+                                    setActiveTab('budget')
+                                  }}
+                                >
+                                  <DollarSign className="h-4 w-4 mr-2" />
+                                  Budget
                                 </Button>
                               </div>
                             </div>
