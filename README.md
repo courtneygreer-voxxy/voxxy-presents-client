@@ -10,14 +10,15 @@ A modern event management platform that simplifies recurring community events wi
 
 **Production**: [https://www.voxxypresents.com](https://www.voxxypresents.com)
 
-## 🌟 **Recent Updates (v2.0)**
+## 🌟 **Recent Updates (v2.0+)**
 
+- ✅ **Performance Optimizations**: User profile caching, form submission guards, and reduced API calls
+- ✅ **Enhanced Club Creation**: Gradient-rich landing page with dark glassmorphism forms
+- ✅ **Improved Navigation**: Footer navigation on auth pages, streamlined user flows
+- ✅ **Subscriber Management**: Simple CRUD operations with date validation and improved visibility
+- ✅ **UI/UX Polish**: Consistent dark theme, green budget buttons, reordered action buttons
 - ✅ **Neon Authentication UI**: Modern purple-pink-blue gradient theme across all auth pages
 - ✅ **Enhanced Budget System**: Card-based event selection, inline editing, and template generator
-- ✅ **Split-Screen Auth Selection**: Beautiful login/signup UX for venue owners and club organizers
-- ✅ **Secure Admin Access**: Firebase-based authentication restricted to authorized email
-- ✅ **Improved Event Display**: Enhanced recurring event cards with better venue information
-- ✅ **Subscriber Management**: CSV export and streamlined announcement messaging
 
 ## 📋 Overview
 
@@ -320,9 +321,10 @@ VITE_FIREBASE_PROJECT_ID=your-firebase-project
 ## 🧪 Development Workflows
 
 ### Branch Strategy
-- `develop`: Main development branch
-- `staging`: Pre-production testing
-- `main`: Production releases
+- `main`: Production releases (primary branch)
+- `develop`: Development work (deprecated - merge to main)
+- `staging`: Pre-production testing (deprecated - merge to main)
+- Feature branches should be short-lived and merged directly to main
 
 ### Multi-Environment Support
 Voxxy Presents supports multiple deployment environments:
@@ -392,11 +394,11 @@ For development questions or technical support, please refer to:
 
 ---
 
-## 🎯 Latest Release: v2.0 - Modern UI & Enhanced Budget Management
+## 🎯 Latest Release: v2.0+ - Performance & UX Refinements
 
-**🚀 Now Live**: Complete authentication redesign with modern neon gradients and powerful budget tools
+**🚀 Now Live**: Production-ready with performance optimizations and polished user experience
 
-### What's New in v2.0:
+### What's New in v2.0+:
 
 **🎨 Authentication UI Revamp:**
 - Modern neon gradient theme (purple-pink-blue) across all auth pages
@@ -418,6 +420,15 @@ For development questions or technical support, please refer to:
 - Clickable venue links on event details
 - CSV export functionality for subscriber lists
 - Streamlined to announcement-only messaging
+
+**⚡ Performance & Polish (Latest):**
+- User profile caching with TTL to reduce redundant API calls
+- Form submission guards to prevent duplicate submissions
+- Consistent dark glassmorphism theme across all forms
+- Reordered admin buttons (Edit → RSVPs → Budget) for better workflow
+- Green budget button styling for visual distinction
+- Footer navigation on authentication pages
+- Simplified subscriber CRUD operations with proper date validation
 
 ---
 
