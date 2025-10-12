@@ -56,18 +56,6 @@ export default function HomePage() {
               Pricing
             </TrackedLink>
             <TrackedLink
-              to="/products"
-              className="text-gray-300 hover:text-purple-400 transition-colors"
-              trackingData={{
-                link_text: 'Products',
-                destination_page: 'Products',
-                current_page: 'Home',
-                link_position: 'header'
-              }}
-            >
-              Products
-            </TrackedLink>
-            <TrackedLink
               to="/help"
               className="text-gray-300 hover:text-purple-400 transition-colors"
               trackingData={{
@@ -159,21 +147,14 @@ export default function HomePage() {
               >
                 Features
               </Link>
-              <Link 
-                to="/pricing" 
+              <Link
+                to="/pricing"
                 className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </Link>
-              <Link 
-                to="/products" 
-                className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Products
-              </Link>
-              <Link 
+              <Link
                 to="/help" 
                 className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
@@ -424,9 +405,7 @@ export default function HomePage() {
               <ul className="space-y-2 text-gray-300">
                 <li><Link to="/features" className="hover:text-white transition-colors">Features</Link></li>
                 <li><Link to="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-                <li><Link to="/products" className="hover:text-white transition-colors">Products</Link></li>
                 <li><Link to="/venue-owners" className="hover:text-white transition-colors">For Venue Owners</Link></li>
-                <li><Link to="/voxxy-shop" className="hover:text-white transition-colors">Voxxy Shop</Link></li>
               </ul>
             </div>
             <div>

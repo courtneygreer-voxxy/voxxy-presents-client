@@ -27,7 +27,6 @@ import PricingPage from './pages/PricingPage'
 import FeaturesPage from './pages/FeaturesPage'
 import HelpPage from './pages/HelpPage'
 import ContactPage from './pages/ContactPage'
-import ProductsPage from './pages/ProductsPage'
 import AdminLogin from './pages/AdminLogin'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
@@ -91,7 +90,6 @@ export default function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/products" element={<ProductsPage />} />
           <Route path="/venue-owners" element={<VenueOwnerBenefitsPage />} />
           <Route path="/analytics-test" element={<AnalyticsTestPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
