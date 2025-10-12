@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -18,7 +19,8 @@ import {
   MapPin,
   TrendingUp,
   Coffee,
-  Music
+  Music,
+  ArrowLeft
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/services/authService'
@@ -48,6 +50,7 @@ export function SplitScreenLoginForm({
   onSwitchToSignUp,
   onForgotPassword
 }: SplitScreenLoginFormProps) {
+  const navigate = useNavigate()
   const { signIn, loading, error, clearError } = useAuth()
   const [activeType, setActiveType] = useState<UserType>('club-owner')
   const [formData, setFormData] = useState<FormData>({
@@ -144,6 +147,17 @@ export function SplitScreenLoginForm({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden flex">
+      {/* Back Button */}
+      <Button
+        onClick={() => navigate('/')}
+        variant="ghost"
+        size="sm"
+        className="absolute top-4 left-4 z-50 text-gray-300 hover:text-white hover:bg-white/10"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Back to Home
+      </Button>
+
       {/* Club Owner Side */}
       <div
         className={`relative flex-1 transition-all duration-500 cursor-pointer ${

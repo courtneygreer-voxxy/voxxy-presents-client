@@ -250,32 +250,73 @@ export default function CreateClubPreview({ data, isCreating, onCreate }: Create
         </div>
       </div>
 
-      {/* Create Button */}
-      <div className="bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg">
-        <div className="p-6">
-          <div className="text-center">
-            <h3 className="text-xl font-bold text-purple-300 mb-2">Ready to launch your club? 🚀</h3>
-            <p className="text-purple-200 mb-4">
-              Once created, you can start planning events and building your community!
-            </p>
+      {/* Create Button - Enhanced Welcome Experience */}
+      <div className="bg-gradient-to-br from-purple-500/30 via-pink-500/20 to-blue-500/30 backdrop-blur-sm border-2 border-purple-400/50 rounded-lg shadow-xl">
+        <div className="p-8">
+          <div className="text-center space-y-4">
+            <div className="flex justify-center mb-4">
+              <div className="bg-purple-600/30 rounded-full p-4 border-2 border-purple-400/50">
+                <CheckCircle className="h-12 w-12 text-purple-300" />
+              </div>
+            </div>
+
+            <h3 className="text-3xl font-bold text-white mb-3">
+              🎉 You're Ready to Launch!
+            </h3>
+
+            <div className="max-w-2xl mx-auto space-y-3">
+              <p className="text-lg text-purple-100">
+                Your club is set up and ready to go! Here's what happens next:
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-4 my-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl mb-2">📅</div>
+                  <h4 className="font-semibold text-white mb-1">Create Events</h4>
+                  <p className="text-sm text-gray-300">Start planning your first event or use templates</p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl mb-2">👥</div>
+                  <h4 className="font-semibold text-white mb-1">Build Community</h4>
+                  <p className="text-sm text-gray-300">Share your club page and grow your audience</p>
+                </div>
+
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                  <div className="text-3xl mb-2">🎯</div>
+                  <h4 className="font-semibold text-white mb-1">Manage Everything</h4>
+                  <p className="text-sm text-gray-300">Track RSVPs, send updates, and more</p>
+                </div>
+              </div>
+            </div>
+
             <Button
               size="lg"
               onClick={onCreate}
               disabled={!requiredCompleted || isCreating}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3"
+              className="bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 hover:from-purple-700 hover:via-pink-700 hover:to-blue-700 text-white px-12 py-6 text-lg font-bold shadow-[0_0_30px_rgba(168,85,247,0.5)] transition-all duration-300 hover:shadow-[0_0_40px_rgba(168,85,247,0.7)] hover:scale-105"
             >
               {isCreating ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3" />
                   Creating Your Club...
                 </>
               ) : (
-                'Create My Club'
+                <>
+                  🚀 Create My Club
+                </>
               )}
             </Button>
+
             {!requiredCompleted && (
-              <p className="text-sm text-red-300 mt-2">
-                Please complete all required fields (marked with *) before creating your club.
+              <p className="text-sm text-red-300 mt-3 bg-red-500/20 rounded-lg p-3 border border-red-400/30">
+                ⚠️ Please complete all required fields (marked with *) before creating your club.
+              </p>
+            )}
+
+            {requiredCompleted && !isCreating && (
+              <p className="text-sm text-purple-200 mt-3">
+                💡 You can always customize and add more details later!
               </p>
             )}
           </div>

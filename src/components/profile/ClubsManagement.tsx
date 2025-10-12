@@ -5,15 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
-import { 
-  Plus, 
-  Building2, 
-  ExternalLink, 
-  Settings, 
+import {
+  Plus,
+  Building2,
+  ExternalLink,
+  Settings,
   Calendar,
   Users,
   MapPin,
-  Palette,
   Mail
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -214,23 +213,13 @@ export function ClubsManagement() {
                     <span>{club.settings.defaultLocation}</span>
                   </div>
                 )}
-                
-                <div className="flex items-center text-sm text-gray-200">
-                  <Palette className="h-4 w-4 mr-3 text-gray-400" />
-                  <span>Theme: {club.settings?.theme?.primaryColor || 'Default'}</span>
-                </div>
-                
+
                 {club.contactEmail && (
                   <div className="flex items-center text-sm text-gray-200">
                     <Mail className="h-4 w-4 mr-3 text-gray-400" />
                     <span>{club.contactEmail}</span>
                   </div>
                 )}
-
-                <div className="flex items-center text-sm text-gray-200">
-                  <Calendar className="h-4 w-4 mr-3 text-gray-400" />
-                  <span>Created {new Date(club.createdAt).toLocaleDateString()}</span>
-                </div>
               </div>
 
               {/* Action Buttons */}
