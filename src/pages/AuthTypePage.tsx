@@ -2,13 +2,13 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Users, Building2, ArrowRight } from 'lucide-react'
+import { Users, Building2, ArrowRight, Home } from 'lucide-react'
 
 export default function AuthTypePage() {
   const navigate = useNavigate()
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
+    <div className="min-h-screen flex flex-col md:flex-row relative">
       {/* Left Side - Club Owner */}
       <div className="w-full md:w-1/2 bg-gradient-to-br from-[#a855f7] via-[#ec4899] to-[#8b5cf6] relative overflow-hidden">
         {/* Animated Background Pattern */}
@@ -142,6 +142,21 @@ export default function AuthTypePage() {
               </Button>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Footer with Home Link */}
+      <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/50 to-transparent backdrop-blur-sm border-t border-white/10 py-4">
+        <div className="container mx-auto px-4 flex justify-center">
+          <Button
+            onClick={() => navigate('/')}
+            variant="ghost"
+            size="sm"
+            className="text-white hover:text-white hover:bg-white/20 transition-colors"
+          >
+            <Home className="h-4 w-4 mr-2" />
+            Back to Home
+          </Button>
         </div>
       </div>
     </div>
