@@ -158,6 +158,18 @@ export interface UserProperties {
   utm_content?: string;
   referrer_domain?: string;
   traffic_source?: 'direct' | 'organic' | 'social' | 'email' | 'paid' | 'referral';
+  // Marketing attribution
+  campaign_id?: string;
+  affiliate_id?: string;
+  sendgrid_campaign?: string;
+  landing_page?: string;
+  // Customer profile signals
+  customer_profile?: 'club_organizer' | 'venue_owner' | 'event_planner' | 'artist' | 'promoter' | 'unknown';
+  profile_confidence?: 'low' | 'medium' | 'high';
+  profile_signals?: string[]; // What indicated this profile
+  club_type?: string; // e.g., "music", "art", "social", "fitness"
+  venue_type?: string; // e.g., "bar", "gallery", "outdoor", "theater"
+  event_scale?: 'small' | 'medium' | 'large'; // Based on attendance
   // Conversion metrics
   clubs_created?: number;
   venues_listed?: number;
@@ -472,6 +484,8 @@ class Analytics {
 
       const trafficSource = this.getTrafficSource();
       const utmParams = this.getUTMParameters();
+      const customerProfile = this.detectCustomerProfile();
+      const demographics = this.extractDemographicSignals();
 
       this.setUserProperties({
         first_visit_date: new Date(),
@@ -481,16 +495,41 @@ class Analytics {
         conversion_stage: 'visitor',
         traffic_source: trafficSource.source,
         referrer_domain: trafficSource.domain || undefined,
+        landing_page: window.location.pathname + window.location.search,
         ...utmParams,
+        // Customer profile signals
+        customer_profile: customerProfile.profile,
+        profile_confidence: customerProfile.confidence,
+        profile_signals: customerProfile.signals,
+        ...demographics,
       });
 
-      // Track first visit with source information
+      // Track first visit with source information and profile
       this.track('First Visit', {
         traffic_source: trafficSource.source,
         referrer_domain: trafficSource.domain,
         referrer_url: document.referrer,
+        landing_page: window.location.pathname + window.location.search,
+        customer_profile: customerProfile.profile,
+        profile_confidence: customerProfile.confidence,
+        profile_signals: customerProfile.signals,
         ...utmParams,
+        ...demographics,
       });
+    } else {
+      // Not first visit, but check if we can refine the profile with new signals
+      const customerProfile = this.detectCustomerProfile();
+      const demographics = this.extractDemographicSignals();
+
+      // Only update if we have new signals
+      if (customerProfile.signals.length > 0) {
+        this.setUserProperties({
+          customer_profile: customerProfile.profile,
+          profile_confidence: customerProfile.confidence,
+          profile_signals: customerProfile.signals,
+          ...demographics,
+        });
+      }
     }
 
     // Update session properties
@@ -543,7 +582,7 @@ class Analytics {
     return { source: 'referral', domain: referrerDomain };
   }
 
-  // Extract UTM parameters
+  // Extract UTM parameters and marketing attribution
   private getUTMParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     return {
@@ -552,7 +591,122 @@ class Analytics {
       utm_campaign: urlParams.get('utm_campaign') || undefined,
       utm_term: urlParams.get('utm_term') || undefined,
       utm_content: urlParams.get('utm_content') || undefined,
+      // Marketing attribution parameters
+      campaign_id: urlParams.get('campaign_id') || urlParams.get('cid') || undefined,
+      affiliate_id: urlParams.get('affiliate_id') || urlParams.get('aff') || urlParams.get('ref') || undefined,
+      sendgrid_campaign: urlParams.get('sg_campaign') || urlParams.get('email_campaign') || undefined,
     };
+  }
+
+  // Detect customer profile based on behavior and signals
+  private detectCustomerProfile(): {
+    profile: UserProperties['customer_profile'];
+    confidence: UserProperties['profile_confidence'];
+    signals: string[];
+  } {
+    const signals: string[] = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentPath = window.location.pathname;
+
+    // Check UTM parameters for profile hints
+    const utmCampaign = urlParams.get('utm_campaign')?.toLowerCase() || '';
+    const utmContent = urlParams.get('utm_content')?.toLowerCase() || '';
+    const utmTerm = urlParams.get('utm_term')?.toLowerCase() || '';
+
+    // Check URL path for profile signals
+    if (currentPath.includes('/club') || currentPath.includes('/organizer')) {
+      signals.push('navigated_to_club_pages');
+    }
+    if (currentPath.includes('/venue')) {
+      signals.push('navigated_to_venue_pages');
+    }
+
+    // Detect from campaign parameters
+    if (utmCampaign.includes('club') || utmCampaign.includes('organizer') || utmContent.includes('club')) {
+      signals.push('campaign_club_targeted');
+    }
+    if (utmCampaign.includes('venue') || utmCampaign.includes('venue-owner') || utmContent.includes('venue')) {
+      signals.push('campaign_venue_targeted');
+    }
+    if (utmCampaign.includes('artist') || utmTerm.includes('artist')) {
+      signals.push('campaign_artist_targeted');
+    }
+    if (utmCampaign.includes('promoter') || utmTerm.includes('promoter')) {
+      signals.push('campaign_promoter_targeted');
+    }
+
+    // Check affiliate/referrer for profile hints
+    const affiliateId = urlParams.get('affiliate_id') || urlParams.get('aff') || urlParams.get('ref');
+    if (affiliateId) {
+      signals.push(`affiliate_${affiliateId}`);
+    }
+
+    // Determine profile based on signals
+    let profile: UserProperties['customer_profile'] = 'unknown';
+    let confidence: UserProperties['profile_confidence'] = 'low';
+
+    if (signals.some(s => s.includes('club') || s.includes('organizer'))) {
+      profile = 'club_organizer';
+      confidence = signals.filter(s => s.includes('club')).length > 1 ? 'high' : 'medium';
+    } else if (signals.some(s => s.includes('venue'))) {
+      profile = 'venue_owner';
+      confidence = signals.filter(s => s.includes('venue')).length > 1 ? 'high' : 'medium';
+    } else if (signals.some(s => s.includes('artist'))) {
+      profile = 'artist';
+      confidence = 'medium';
+    } else if (signals.some(s => s.includes('promoter'))) {
+      profile = 'promoter';
+      confidence = 'medium';
+    }
+
+    return { profile, confidence, signals };
+  }
+
+  // Extract demographic signals from campaign data
+  private extractDemographicSignals(): {
+    club_type?: string;
+    venue_type?: string;
+    event_scale?: 'small' | 'medium' | 'large';
+  } {
+    const urlParams = new URLSearchParams(window.location.search);
+    const utmCampaign = urlParams.get('utm_campaign')?.toLowerCase() || '';
+    const utmContent = urlParams.get('utm_content')?.toLowerCase() || '';
+    const utmTerm = urlParams.get('utm_term')?.toLowerCase() || '';
+
+    const demographics: {
+      club_type?: string;
+      venue_type?: string;
+      event_scale?: 'small' | 'medium' | 'large';
+    } = {};
+
+    // Detect club type from campaign parameters
+    const clubTypes = ['music', 'art', 'social', 'fitness', 'comedy', 'food', 'networking', 'cultural'];
+    for (const type of clubTypes) {
+      if (utmCampaign.includes(type) || utmContent.includes(type) || utmTerm.includes(type)) {
+        demographics.club_type = type;
+        break;
+      }
+    }
+
+    // Detect venue type from campaign parameters
+    const venueTypes = ['bar', 'gallery', 'outdoor', 'theater', 'restaurant', 'warehouse', 'rooftop', 'club', 'studio'];
+    for (const type of venueTypes) {
+      if (utmCampaign.includes(type) || utmContent.includes(type) || utmTerm.includes(type)) {
+        demographics.venue_type = type;
+        break;
+      }
+    }
+
+    // Detect event scale from campaign parameters
+    if (utmCampaign.includes('large') || utmCampaign.includes('500+') || utmCampaign.includes('enterprise')) {
+      demographics.event_scale = 'large';
+    } else if (utmCampaign.includes('medium') || utmCampaign.includes('100-500') || utmCampaign.includes('growing')) {
+      demographics.event_scale = 'medium';
+    } else if (utmCampaign.includes('small') || utmCampaign.includes('startup') || utmCampaign.includes('local')) {
+      demographics.event_scale = 'small';
+    }
+
+    return demographics;
   }
 
   // Track user authentication

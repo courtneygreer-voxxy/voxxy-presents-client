@@ -96,12 +96,27 @@ export default function ContactPage() {
 
       // Track successful conversion
       analytics.trackConversionStep('Form Submitted', 'Contact')
+
+      // Infer event scale from attendance
+      let eventScale: 'small' | 'medium' | 'large' | undefined;
+      const attendance = formData.typicalAttendance.toLowerCase();
+      if (attendance.includes('10-50') || attendance.includes('small')) {
+        eventScale = 'small';
+      } else if (attendance.includes('50-200') || attendance.includes('medium')) {
+        eventScale = 'medium';
+      } else if (attendance.includes('200+') || attendance.includes('large')) {
+        eventScale = 'large';
+      }
+
       analytics.setUserProperties({
         conversion_stage: 'submitted',
         organization_name: formData.organizationName,
         event_frequency: formData.eventFrequency,
         typical_attendance: formData.typicalAttendance,
         biggest_challenge: formData.biggestChallenge,
+        event_scale: eventScale,
+        // Increase profile confidence since we have form data
+        profile_confidence: 'high',
       })
 
     } catch (error) {
