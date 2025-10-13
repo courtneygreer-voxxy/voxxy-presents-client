@@ -15,9 +15,28 @@ import {
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
+import { useSectionTracking } from "@/hooks/useSectionTracking"
+import { TrackedButton } from "@/components/analytics/TrackedButton"
+import { analytics } from "@/lib/analytics"
 
 export default function FeaturesPage() {
   usePageTracking('Features')
+
+  // Section tracking for key features
+  const { sectionRef: rsvpRef } = useSectionTracking({
+    pageName: 'Features',
+    sectionName: 'RSVP Management',
+  })
+
+  const { sectionRef: venueRef } = useSectionTracking({
+    pageName: 'Features',
+    sectionName: 'Venue Coordination',
+  })
+
+  const { sectionRef: marketingRef } = useSectionTracking({
+    pageName: 'Features',
+    sectionName: 'Marketing Tools',
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
@@ -75,7 +94,7 @@ export default function FeaturesPage() {
       </section>
 
       {/* Core Features */}
-      <section className="py-20 bg-gray-800/50 backdrop-blur-sm relative z-10">
+      <section ref={rsvpRef} className="py-20 bg-gray-800/50 backdrop-blur-sm relative z-10">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-bold text-white mb-4">

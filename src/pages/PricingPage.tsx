@@ -12,9 +12,23 @@ import {
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
+import { useSectionTracking } from "@/hooks/useSectionTracking"
+import { analytics } from "@/lib/analytics"
+import { TrackedButton } from "@/components/analytics/TrackedButton"
 
 export default function PricingPage() {
   usePageTracking('Pricing')
+
+  // Section tracking
+  const { sectionRef: pricingCardRef, trackInteraction: trackPricingInteraction } = useSectionTracking({
+    pageName: 'Pricing',
+    sectionName: 'Pricing Card',
+  })
+
+  const { sectionRef: whyPilotRef } = useSectionTracking({
+    pageName: 'Pricing',
+    sectionName: 'Why Pilot',
+  })
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
@@ -58,7 +72,7 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Card */}
-      <section className="py-20 relative z-10">
+      <section ref={pricingCardRef} className="py-20 relative z-10">
         <div className="container mx-auto max-w-2xl px-4">
           <Card className="bg-white/10 backdrop-blur-sm border-2 border-purple-400/40 hover:border-purple-400/60 transition-all duration-300 shadow-2xl">
             <CardHeader className="text-center pb-8">
@@ -129,12 +143,27 @@ export default function PricingPage() {
 
               {/* CTA Button */}
               <div className="pt-4">
-                <Button size="lg" className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6" asChild>
+                <TrackedButton
+                  size="lg"
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6"
+                  trackingData={{
+                    button_text: 'Request Pilot Access',
+                    button_location: 'pricing_card',
+                    page_name: 'Pricing',
+                    is_primary_cta: true,
+                    destination_page: 'Contact',
+                  }}
+                  onClick={() => {
+                    trackPricingInteraction('cta_click', 'Request Pilot Access');
+                    analytics.trackConversionStep('Pricing CTA Clicked', 'Pricing');
+                  }}
+                  asChild
+                >
                   <Link to="/contact">
                     Request Pilot Access
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
-                </Button>
+                </TrackedButton>
                 <p className="text-center text-gray-300 text-sm mt-4">
                   <Users className="h-4 w-4 inline mr-1" />
                   Limited spots available - join the waitlist today
@@ -146,7 +175,7 @@ export default function PricingPage() {
       </section>
 
       {/* Why Pilot Section */}
-      <section className="py-20 bg-gray-800/50 backdrop-blur-sm relative z-10">
+      <section ref={whyPilotRef} className="py-20 bg-gray-800/50 backdrop-blur-sm relative z-10">
         <div className="container mx-auto max-w-4xl px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white mb-4">

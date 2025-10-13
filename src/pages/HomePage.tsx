@@ -6,6 +6,7 @@ import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus, Menu, X
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
+import { useSectionTracking } from "@/hooks/useSectionTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
 import { analytics } from "@/lib/analytics"
@@ -16,6 +17,22 @@ export default function HomePage() {
 
   // Track page views and engagement
   usePageTracking('Home')
+
+  // Section tracking
+  const { sectionRef: heroRef, trackInteraction: trackHeroInteraction } = useSectionTracking({
+    pageName: 'Home',
+    sectionName: 'Hero',
+  })
+
+  const { sectionRef: problemsRef } = useSectionTracking({
+    pageName: 'Home',
+    sectionName: 'Problems',
+  })
+
+  const { sectionRef: featuresRef } = useSectionTracking({
+    pageName: 'Home',
+    sectionName: 'Features',
+  })
 
   // Track landing page interactions
   const trackLandingInteraction = (interactionType: string, elementName: string, sectionName?: string) => {
@@ -211,7 +228,7 @@ export default function HomePage() {
         )}
       </nav>
       {/* Hero Section */}
-      <section className="relative py-20 px-4">
+      <section ref={heroRef} className="relative py-20 px-4">
         <div className="container mx-auto max-w-6xl text-center">
           <div className="mb-6">
             <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-medium rounded-full">
@@ -267,7 +284,7 @@ export default function HomePage() {
       </section>
 
       {/* Problem Section */}
-      <section className="py-20 bg-gray-800/50 backdrop-blur-sm">
+      <section ref={problemsRef} className="py-20 bg-gray-800/50 backdrop-blur-sm">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
@@ -313,7 +330,7 @@ export default function HomePage() {
       </section>
 
       {/* Solution Section */}
-      <section className="py-20 relative">
+      <section ref={featuresRef} className="py-20 relative">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">

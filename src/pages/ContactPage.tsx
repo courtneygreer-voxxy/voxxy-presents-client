@@ -19,6 +19,7 @@ import { contactFormApi, EmailServiceError } from "@/services/emailService"
 import { CreateContactSubmissionData } from "@/types/database"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { useFormTracking } from "@/hooks/useFormTracking"
+import { analytics } from "@/lib/analytics"
 
 interface BetaFormData {
   name: string
@@ -48,7 +49,14 @@ export default function ContactPage() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [submissionError, setSubmissionError] = useState<string | null>(null)
 
+  const [formStarted, setFormStarted] = useState(false)
+
   const handleInputChange = (field: keyof BetaFormData, value: string) => {
+    // Track form start on first input
+    if (!formStarted) {
+      setFormStarted(true)
+      betaFormTracking.trackFormStart('hero_form')
+    }
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -64,7 +72,11 @@ export default function ContactPage() {
     setIsSubmitting(true)
     setSubmissionError(null)
 
-    betaFormTracking.trackFormSubmit()
+    betaFormTracking.trackFormSubmit({
+      event_frequency: formData.eventFrequency,
+      typical_attendance: formData.typicalAttendance,
+      biggest_challenge: formData.biggestChallenge,
+    })
 
     try {
       const submissionData: CreateContactSubmissionData = {
@@ -81,6 +93,16 @@ export default function ContactPage() {
 
       await contactFormApi.submitForm(submissionData)
       setIsSubmitted(true)
+
+      // Track successful conversion
+      analytics.trackConversionStep('Form Submitted', 'Contact')
+      analytics.setUserProperties({
+        conversion_stage: 'submitted',
+        organization_name: formData.organizationName,
+        event_frequency: formData.eventFrequency,
+        typical_attendance: formData.typicalAttendance,
+        biggest_challenge: formData.biggestChallenge,
+      })
 
     } catch (error) {
       console.error('Beta access submission failed:', error)

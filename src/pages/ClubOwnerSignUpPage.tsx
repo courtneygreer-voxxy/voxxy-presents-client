@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/services/authService'
+import { usePageTracking } from '@/hooks/usePageTracking'
+import { analytics } from '@/lib/analytics'
 
 interface FormData {
   displayName: string
@@ -27,6 +29,8 @@ interface FormErrors {
 }
 
 export default function ClubOwnerSignUpPage() {
+  usePageTracking('Club Owner Sign Up')
+
   const navigate = useNavigate()
   const { signUp, loading, error, clearError } = useAuth()
   const [formData, setFormData] = useState<FormData>({
@@ -40,6 +44,7 @@ export default function ClubOwnerSignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formStarted, setFormStarted] = useState(false)
 
   // Validation
   const validateField = (field: keyof FormData, value: any): string | string[] | undefined => {
@@ -117,6 +122,9 @@ export default function ClubOwnerSignUpPage() {
     setIsSubmitting(true)
     setErrors(prev => ({ ...prev, submit: undefined }))
 
+    // Track form submission attempt
+    analytics.trackConversionStep('Sign Up Form Submitted', 'Club Owner Sign Up')
+
     try {
       await signUp({
         email: formData.email.trim(),
@@ -125,10 +133,22 @@ export default function ClubOwnerSignUpPage() {
         userType: 'club-owner'
       })
 
+      // Track successful signup
+      analytics.trackConversionStep('Sign Up Completed', 'Club Owner Sign Up')
+      analytics.setUserProperties({
+        user_role: 'organizer',
+        conversion_stage: 'converted',
+      })
+
       // Redirect to beta pending page
       navigate('/beta-pending')
     } catch (err) {
       console.error('Club owner signup error:', err)
+      analytics.track('Sign Up Error', {
+        page_name: 'Club Owner Sign Up',
+        error_type: 'submission_failed',
+        error_message: err instanceof Error ? err.message : 'Unknown error'
+      })
       setErrors(prev => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
     } finally {
       setIsSubmitting(false)

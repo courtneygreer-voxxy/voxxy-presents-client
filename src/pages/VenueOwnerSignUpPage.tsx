@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Eye, EyeOff, Loader2, Mail, User, Lock, Building2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/services/authService'
+import { usePageTracking } from '@/hooks/usePageTracking'
+import { analytics } from '@/lib/analytics'
 
 interface FormData {
   displayName: string
@@ -27,6 +29,8 @@ interface FormErrors {
 }
 
 export default function VenueOwnerSignUpPage() {
+  usePageTracking('Venue Owner Sign Up')
+
   const navigate = useNavigate()
   const { signUp, loading, error, clearError } = useAuth()
   const [formData, setFormData] = useState<FormData>({
@@ -117,12 +121,22 @@ export default function VenueOwnerSignUpPage() {
     setIsSubmitting(true)
     setErrors(prev => ({ ...prev, submit: undefined }))
 
+    // Track form submission attempt
+    analytics.trackConversionStep('Sign Up Form Submitted', 'Venue Owner Sign Up')
+
     try {
       await signUp({
         email: formData.email.trim(),
         password: formData.password,
         displayName: formData.displayName.trim(),
         userType: 'venue-owner'
+      })
+
+      // Track successful signup
+      analytics.trackConversionStep('Sign Up Completed', 'Venue Owner Sign Up')
+      analytics.setUserProperties({
+        user_role: 'venue_owner',
+        conversion_stage: 'converted',
       })
 
       // Account created successfully
@@ -137,6 +151,13 @@ export default function VenueOwnerSignUpPage() {
 
     } catch (err: any) {
       console.error('Venue owner signup error:', err)
+
+      // Track signup error
+      analytics.track('Sign Up Error', {
+        page_name: 'Venue Owner Sign Up',
+        error_type: 'submission_failed',
+        error_message: err?.message || 'Unknown error'
+      })
 
       // Extract meaningful error message
       let errorMessage = 'Failed to create account. Please try again.'
