@@ -3,7 +3,8 @@ import { registrationsApi } from '@/services/api'
 
 interface SubscriptionData {
   organizationId: string
-  email: string
+  email?: string
+  phone?: string
   name: string
   message?: string
   preferences: {
@@ -17,18 +18,34 @@ interface SubscriptionData {
 class SubscriptionService {
   async createSubscription(data: SubscriptionData) {
     try {
+      // Validate that we have either email or phone
+      if (!data.email && !data.phone) {
+        throw new Error('Either email or phone number is required')
+      }
+
       // Sanitize all text inputs
-      const sanitizedData = {
+      const sanitizedData: any = {
         ...data,
-        email: sanitizeInput(data.email.trim().toLowerCase()),
         name: sanitizeInput(data.name.trim()),
         message: data.message ? sanitizeInput(data.message.trim()) : undefined
       }
 
-      // Validate email format
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      if (!emailRegex.test(sanitizedData.email)) {
-        throw new Error('Invalid email format')
+      // Sanitize and validate email if provided
+      if (data.email) {
+        sanitizedData.email = sanitizeInput(data.email.trim().toLowerCase())
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(sanitizedData.email)) {
+          throw new Error('Invalid email format')
+        }
+      }
+
+      // Sanitize and validate phone if provided
+      if (data.phone) {
+        const digitsOnly = data.phone.replace(/\D/g, '')
+        if (digitsOnly.length < 10) {
+          throw new Error('Phone number must have at least 10 digits')
+        }
+        sanitizedData.phone = digitsOnly
       }
 
       // Validate name length
@@ -47,6 +64,7 @@ class SubscriptionService {
         organizationId: sanitizedData.organizationId,
         name: sanitizedData.name,
         email: sanitizedData.email,
+        phone: sanitizedData.phone,
         registrationType: 'subscription' as any,
         notes: sanitizedData.message,
         subscribeToUpdates: sanitizedData.preferences.updates,
@@ -94,14 +112,20 @@ class SubscriptionService {
     }
   }
 
-  async getOrganizationSubscribers(_organizationId: string) {
+  async getOrganizationSubscribers(organizationId: string) {
     try {
-      // For now, we'll create a dummy event ID for org subscriptions
-      // Later we can add a proper org subscribers endpoint
+      // Fetch all org subscriptions
       const subscriptions = await registrationsApi.getByEvent('org_subscription')
 
-      // Filter by organization if we have that data
-      return subscriptions.registrations?.subscription || []
+      // Filter by organizationId since the API returns all subscriptions
+      const allSubscribers = subscriptions.registrations?.subscription || []
+      const filteredSubscribers = allSubscribers.filter(
+        (sub: any) => sub.organizationId === organizationId
+      )
+
+      console.log(`📊 Filtered ${filteredSubscribers.length} subscribers for org ${organizationId} from ${allSubscribers.length} total`)
+
+      return filteredSubscribers
     } catch (error) {
       console.error('Failed to fetch subscribers:', error)
       return []

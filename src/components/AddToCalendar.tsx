@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Calendar, Download, ExternalLink } from "lucide-react"
+import { analytics } from '@/lib/analytics'
 import type { Event } from '@/types/database'
 
 interface AddToCalendarProps {
@@ -52,9 +53,17 @@ export function AddToCalendar({ event, organizationName }: AddToCalendarProps) {
   const handleGoogleCalendar = () => {
     setIsGenerating(true)
     const data = generateCalendarData()
-    
+
+    // Track calendar click
+    analytics.track('add_to_calendar_clicked', {
+      event_id: event.id,
+      event_title: event.title,
+      calendar_type: 'google',
+      organization_name: organizationName
+    })
+
     const googleUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${data.title}&dates=${data.startDate}/${data.endDate}&details=${data.description}&location=${data.location}`
-    
+
     window.open(googleUrl, '_blank')
     setTimeout(() => setIsGenerating(false), 1000)
   }
@@ -62,9 +71,17 @@ export function AddToCalendar({ event, organizationName }: AddToCalendarProps) {
   const handleOutlookCalendar = () => {
     setIsGenerating(true)
     const data = generateCalendarData()
-    
+
+    // Track calendar click
+    analytics.track('add_to_calendar_clicked', {
+      event_id: event.id,
+      event_title: event.title,
+      calendar_type: 'outlook',
+      organization_name: organizationName
+    })
+
     const outlookUrl = `https://outlook.live.com/calendar/0/deeplink/compose?subject=${data.title}&startdt=${data.startDate}&enddt=${data.endDate}&body=${data.description}&location=${data.location}`
-    
+
     window.open(outlookUrl, '_blank')
     setTimeout(() => setIsGenerating(false), 1000)
   }
@@ -72,6 +89,14 @@ export function AddToCalendar({ event, organizationName }: AddToCalendarProps) {
   const handleAppleCalendar = () => {
     setIsGenerating(true)
     const data = generateCalendarData()
+
+    // Track calendar click
+    analytics.track('add_to_calendar_clicked', {
+      event_id: event.id,
+      event_title: event.title,
+      calendar_type: 'apple',
+      organization_name: organizationName
+    })
     
     // Create ICS file content
     const icsContent = `BEGIN:VCALENDAR

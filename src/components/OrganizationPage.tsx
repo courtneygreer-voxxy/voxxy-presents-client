@@ -23,7 +23,7 @@ import ImageCarousel from "@/components/ImageCarousel"
 import { ShareButton } from "@/components/ShareButton"
 import { WelcomeSection } from "@/components/WelcomeSection"
 import { SubscriptionModal } from "@/components/SubscriptionModal"
-import { RSVPModal } from "@/components/RSVPModal"
+import { AddToCalendar } from "@/components/AddToCalendar"
 import { isFeatureEnabled } from '@/config/environments'
 // import { getDisplayAboutStory, getDisplayOfferings, isDefaultContent } from '@/utils/defaultContent'
 
@@ -272,7 +272,7 @@ export default function OrganizationPage({
                       </div>
 
                       <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                        <RSVPModal event={event} />
+                        <AddToCalendar event={event} organizationName={organization.name} />
                         <Button
                           variant="ghost"
                           onClick={() => toggleEventDetails(event.id)}
@@ -430,7 +430,7 @@ export default function OrganizationPage({
                                 </div>
 
                                 <div className="flex flex-col sm:flex-row gap-2 md:ml-6">
-                                  <RSVPModal event={event} />
+                                  <AddToCalendar event={event} organizationName={organization.name} />
                                   <Button
                                     variant="ghost"
                                     onClick={() => toggleEventDetails(event.id)}
