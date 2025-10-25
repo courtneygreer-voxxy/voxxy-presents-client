@@ -181,11 +181,21 @@ export const getEventsByVenueSlug = async (venueSlug: string): Promise<Event[]> 
 
 export const updateEvent = async (id: string, data: UpdateEventData) => {
   const docRef = doc(db, 'events', id)
+
+  // Filter out undefined values to prevent Firebase errors
+  const cleanData: any = {}
+
+  Object.entries(data).forEach(([key, value]) => {
+    if (value !== undefined) {
+      cleanData[key] = value
+    }
+  })
+
   const updateData: any = {
-    ...data,
+    ...cleanData,
     updatedAt: Timestamp.now()
   }
-  
+
   // Convert dates to Timestamps if they exist
   if (data.date) {
     updateData.date = Timestamp.fromDate(data.date)
@@ -193,7 +203,7 @@ export const updateEvent = async (id: string, data: UpdateEventData) => {
   if (data.endDate) {
     updateData.endDate = Timestamp.fromDate(data.endDate)
   }
-  
+
   await updateDoc(docRef, updateData)
 }
 
