@@ -1,10 +1,11 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import { BetaAccessGuard } from './components/auth/BetaAccessGuard'
+import { LoadingTransition } from './components/LoadingTransition'
 // V2 Architecture imports
 import ProtectedRouteV2, { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
 import { OrganizerDashboard, VenueOwnerDashboard, AdminDashboard as AdminDashboardV2, GuestDashboard } from './components/dashboard/DashboardShell'
@@ -44,12 +45,24 @@ import { DebugPanel } from './components/debug/DebugPanel'
 // Role-based dashboard redirect component
 function RoleBasedDashboardRedirect() {
   const { userProfile } = useAuth()
+  const [isRedirecting, setIsRedirecting] = useState(true)
+
+  // Show loading state for minimum 300ms to avoid flash
+  useEffect(() => {
+    const timer = setTimeout(() => setIsRedirecting(false), 300)
+    return () => clearTimeout(timer)
+  }, [])
 
   console.log('RoleBasedDashboardRedirect - User profile:', userProfile)
 
   if (!userProfile) {
     console.log('No user profile, redirecting to home')
     return <Navigate to="/" replace />
+  }
+
+  // Show loading transition during redirect evaluation
+  if (isRedirecting) {
+    return <LoadingTransition message="Taking you to your dashboard..." />
   }
 
   // Route based on user role

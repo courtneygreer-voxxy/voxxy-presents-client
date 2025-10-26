@@ -1,0 +1,29 @@
+Performance Baseline Test Results
+==================================
+Date: Sun Oct 26 19:53:53 EDT 2025
+Production URL: https://www.voxxypresents.com
+
+Lighthouse Scores:
+  Home Page:        62
+  Public Org Page:  62
+  Subscribe Page:   62
+  Login Page:       60
+
+Key Metrics (from Home Page):
+  FCP: 5.7 s
+  LCP: 7.2 s
+  TBT: 0 ms
+  TTI: 7.2 s
+  CLS: 0
+
+HTML Reports:
+  Home:      file:///Users/courtneygreer/Development/voxxy-presents-client/./test-results/baseline/home.report.html
+  Public:    file:///Users/courtneygreer/Development/voxxy-presents-client/./test-results/baseline/public-org.report.html
+  Subscribe: file:///Users/courtneygreer/Development/voxxy-presents-client/./test-results/baseline/subscribe.report.html
+  Login:     file:///Users/courtneygreer/Development/voxxy-presents-client/./test-results/baseline/login.report.html
+
+Next Steps:
+  1. Review HTML reports for specific recommendations
+  2. Record baseline metrics in PERFORMANCE_TEST_PLAN.md
+  3. Begin optimization implementation
+  4. Run final tests with: ./tests/scripts/run-final-tests.sh

@@ -2,14 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { organizationsApi, eventsApi } from '@/services/api'
 import { getOrganizationBySlug, getEventsByOrganization, updateOrganization as updateOrganizationInFirebase, deleteOrganization as deleteOrganizationInFirebase } from '@/lib/database'
 import { getDataSource, getApiUrl, getCurrentEnvironment } from '@/config/environments'
+import { dedupeRequest, invalidateCache } from '@/utils/requestCache'
 import type { Organization, Event } from '@/types/database'
 
 interface UseOrganizationOptions {
-  loadEvents?: boolean // Whether to automatically load events (default: true for backward compatibility)
+  loadEvents?: boolean // Whether to automatically load events (default: false for better performance)
 }
 
 export function useOrganization(organizationSlug: string, options: UseOrganizationOptions = {}) {
-  const { loadEvents = true } = options
+  const { loadEvents = false } = options
   
   const [organization, setOrganization] = useState<Organization | null>(null)
   const [events, setEvents] = useState<Event[]>([])
@@ -31,40 +32,48 @@ export function useOrganization(organizationSlug: string, options: UseOrganizati
       if (dataSource === 'firebase') {
         // Direct Firebase access (development/sandbox)
         console.log('Using Firebase directly')
-        
-        // Always load organization first
-        const org = await getOrganizationBySlug(organizationSlug)
+
+        // Always load organization first (with deduplication)
+        const org = await dedupeRequest(
+          `org:firebase:${organizationSlug}`,
+          () => getOrganizationBySlug(organizationSlug)
+        )
         if (!org) {
           throw new Error(`Organization '${organizationSlug}' not found in ${currentEnv} environment`)
         }
         setOrganization(org)
-        
+
         if (loadEvents) {
           // Load events after organization is loaded and available in UI
           console.log('Loading events...')
-          const eventsList = await getEventsByOrganization(org.id)
+          const eventsList = await dedupeRequest(
+            `events:firebase:${org.id}`,
+            () => getEventsByOrganization(org.id)
+          )
           setEvents(eventsList)
         }
-        
+
       } else if (dataSource === 'api' && apiUrl) {
         // API access (staging/production)
         console.log(`Using API: ${apiUrl}`)
-        
+
+        // Load organization (with deduplication)
+        const org = await dedupeRequest(
+          `org:api:${organizationSlug}`,
+          () => organizationsApi.getBySlug(organizationSlug)
+        )
+        setOrganization(org)
+
         if (loadEvents) {
-          // Load organization first, then events (API doesn't support parallel org+events by slug)
-          console.log('Loading organization, then events...')
-          const org = await organizationsApi.getBySlug(organizationSlug)
-          setOrganization(org)
-          
-          const eventsList = await eventsApi.getByOrganization(org.id)
+          // Load events (with deduplication)
+          console.log('Loading events...')
+          const eventsList = await dedupeRequest(
+            `events:api:${org.id}`,
+            () => eventsApi.getByOrganization(org.id)
+          )
           setEvents(eventsList)
-        } else {
-          // Load only organization
-          console.log('Loading organization only...')
-          const org = await organizationsApi.getBySlug(organizationSlug)
-          setOrganization(org)
         }
-        
+
       } else {
         throw new Error(`Invalid data source configuration for ${currentEnv} environment`)
       }

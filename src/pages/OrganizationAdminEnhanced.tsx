@@ -42,7 +42,8 @@ export default function OrganizationAdminEnhanced() {
   const { orgSlug } = useParams<{ orgSlug: string }>()
   const navigate = useNavigate()
   const { currentUser } = useAuth()
-  const { organization, events, loading, error, updateOrganization, deleteOrganization, refreshEvents } = useOrganization(orgSlug || '')
+  // Admin needs events, so load them explicitly
+  const { organization, events, loading, error, updateOrganization, deleteOrganization, refreshEvents } = useOrganization(orgSlug || '', { loadEvents: true })
   
   const [isSaving, setIsSaving] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
