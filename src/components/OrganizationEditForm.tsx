@@ -292,17 +292,7 @@ export function OrganizationEditForm({
                 />
               </div>
             </div>
-            
-            <div>
-              <Label htmlFor="description" className="text-white">Tagline</Label>
-              <Input
-                id="description"
-                value={formData.description}
-                onChange={(e) => handleInputChange('description', e.target.value)}
-                placeholder="Brief description for headers and previews"
-              />
-            </div>
-            
+
             <div>
               <Label htmlFor="background" className="text-white">Short Description</Label>
               <Textarea

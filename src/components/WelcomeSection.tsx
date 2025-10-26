@@ -26,13 +26,10 @@ export function WelcomeSection({ organization, logoImage, showAdminControls = fa
               
               {/* Welcome Content */}
               <div className="flex-1">
-                <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
                   {organization.name}
                 </h1>
-                <p className="text-xl text-gray-300 mb-6">
-                  {organization.description}
-                </p>
-                
+
                 {/* Welcome Message */}
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <h2 className="text-2xl font-semibold text-white mb-3">

@@ -33,7 +33,6 @@ import { OrganizationDangerZone } from "@/components/OrganizationDangerZone"
 import { ShareButton } from "@/components/ShareButton"
 import AboutImagesManager from "@/components/AboutImagesManager"
 import SubscribersList from "@/components/SubscribersList"
-import { RSVPListModal } from "@/components/RSVPListModal"
 import { PreviewBadge } from '@/components/ui/preview-badge'
 import { isFeatureEnabled } from '@/config/environments'
 import EventBudgetManager from '@/components/budget/EventBudgetManager'
@@ -272,10 +271,6 @@ export default function OrganizationAdminEnhanced() {
               </TabsTrigger>
               {/* Events Subcategories */}
               <div className="ml-2 flex gap-1">
-                <TabsTrigger value="tickets" className="flex items-center gap-2 !justify-start !text-left !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-3 py-2">
-                  <QrCode className="h-4 w-4 text-purple-400 flex-shrink-0" />
-                  <span className="text-left">Tickets</span>
-                </TabsTrigger>
                 <TabsTrigger value="budget" className="flex items-center gap-2 !justify-start !text-left !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-3 py-2">
                   <DollarSign className="h-4 w-4 text-purple-400 flex-shrink-0" />
                   <span className="text-left">Budget</span>
@@ -416,11 +411,10 @@ export default function OrganizationAdminEnhanced() {
                                     Edit
                                   </Link>
                                 </Button>
-                                <RSVPListModal event={event} />
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="bg-green-600/20 hover:bg-green-600/30 text-green-300 border-green-600/30"
+                                  className="bg-purple-600/20 hover:bg-purple-600/30 text-purple-300 border-purple-600/30"
                                   onClick={() => {
                                     setSelectedBudgetEventId(event.id)
                                     setActiveTab('budget')
