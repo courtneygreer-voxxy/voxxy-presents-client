@@ -292,45 +292,81 @@ export default function SubscribersList({ organizationId, organizationSlug, orga
             </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           {totalNewsletterSubscribers > 0 ? (
-            <div className="space-y-4">
-              {newsletterSubscribers.map((subscriber) => (
-                <div key={subscriber.id} className="flex items-center justify-between py-3 px-4 bg-gray-800/40 backdrop-blur-sm rounded border border-white/20 hover:bg-gray-700/50 hover:border-white/30 transition-colors">
-                  <div className="flex items-center gap-3 flex-1">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm text-white">{subscriber.name || 'No name'}</p>
-                      <p className="text-xs text-gray-200">{subscriber.email}</p>
-                      {subscriber.eventTitle && (
-                        <p className="text-xs text-gray-300">From: {subscriber.eventTitle}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                      <Calendar className="h-3 w-3 text-purple-400" />
-                      {subscriber.subscribedAt && !isNaN(new Date(subscriber.subscribedAt).getTime())
-                        ? new Date(subscriber.subscribedAt).toLocaleDateString()
-                        : 'Date unknown'}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
-                      onClick={() => {
-                        if (confirm(`Delete ${subscriber.name || subscriber.email} from subscribers?`)) {
-                          // TODO: Call API to delete subscriber
-                          console.log('Delete subscriber:', subscriber.id)
-                          alert('Delete functionality will be connected to API')
-                        }
-                      }}
-                      title="Delete subscriber"
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-purple-500/10 border-b border-white/10">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">Name</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">Phone</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-purple-300 uppercase tracking-wider">Joined</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-purple-300 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {newsletterSubscribers.map((subscriber, index) => (
+                    <tr
+                      key={subscriber.id}
+                      className={`hover:bg-purple-500/5 transition-colors ${index % 2 === 0 ? 'bg-white/5' : ''}`}
                     >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-white">{subscriber.name || 'No name'}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {subscriber.email ? (
+                            <>
+                              <Mail className="h-3 w-3 text-purple-400" />
+                              <span className="text-sm text-gray-200">{subscriber.email}</span>
+                            </>
+                          ) : (
+                            <span className="text-sm text-gray-500">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          {subscriber.phone ? (
+                            <>
+                              <Users className="h-3 w-3 text-purple-400" />
+                              <span className="text-sm text-gray-200">{subscriber.phone}</span>
+                            </>
+                          ) : (
+                            <span className="text-sm text-gray-500">—</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2 text-sm text-gray-300">
+                          <Calendar className="h-3 w-3 text-purple-400" />
+                          {subscriber.subscribedAt && !isNaN(new Date(subscriber.subscribedAt).getTime())
+                            ? new Date(subscriber.subscribedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : 'Unknown'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-8 w-8 p-0 text-gray-400 hover:text-red-400 hover:bg-red-500/10"
+                          onClick={() => {
+                            if (confirm(`Delete ${subscriber.name || subscriber.email || subscriber.phone} from subscribers?`)) {
+                              // TODO: Call API to delete subscriber
+                              console.log('Delete subscriber:', subscriber.id)
+                              alert('Delete functionality will be connected to API')
+                            }
+                          }}
+                          title="Delete subscriber"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-12">
