@@ -28,14 +28,17 @@ import {
   AlertCircle
 } from "lucide-react"
 import { subscriptionService } from '@/services/subscriptionService'
+import { SubscriberQRModal } from '@/components/SubscriberQRModal'
 import type { Event } from '@/types/database'
 
 interface SubscribersListProps {
   organizationId: string
+  organizationSlug: string
+  organizationName: string
   events: Event[]
 }
 
-export default function SubscribersList({ organizationId, events }: SubscribersListProps) {
+export default function SubscribersList({ organizationId, organizationSlug, organizationName, events }: SubscribersListProps) {
   const [newsletterSubscribers, setNewsletterSubscribers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -266,6 +269,10 @@ export default function SubscribersList({ organizationId, events }: SubscribersL
             </CardDescription>
           </div>
           <div className="flex gap-2">
+            <SubscriberQRModal
+              organizationSlug={organizationSlug}
+              organizationName={organizationName}
+            />
             <Button
               variant="outline"
               size="sm"

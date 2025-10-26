@@ -447,8 +447,10 @@ export default function OrganizationAdminEnhanced() {
                 </CardHeader>
                 <CardContent>
                   {organization && (
-                    <SubscribersList 
+                    <SubscribersList
                       organizationId={organization.id}
+                      organizationSlug={organization.slug}
+                      organizationName={organization.name}
                       events={events}
                     />
                   )}

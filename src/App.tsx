@@ -37,6 +37,7 @@ import VenueOwnerBenefitsPage from './pages/VenueOwnerBenefitsPage'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
+import SubscribePage from './pages/SubscribePage'
 import AnalyticsTestPage from './pages/AnalyticsTestPage'
 import { DebugPanel } from './components/debug/DebugPanel'
 
@@ -94,6 +95,7 @@ export default function App() {
           <Route path="/analytics-test" element={<AnalyticsTestPage />} />
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
           <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />
+          <Route path="/subscribe/:orgSlug" element={<SubscribePage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
           
           {/* Authentication routes - redirect if already logged in */}
