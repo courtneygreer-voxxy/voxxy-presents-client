@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { QrCode, Download, Share2, Copy, CheckCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import QRCodeStyling from 'qr-code-styling'
+import { QRCodeCanvas } from 'qrcode.react'
 
 interface SubscriberQRModalProps {
   organizationSlug: string
@@ -12,72 +12,20 @@ interface SubscriberQRModalProps {
 
 export function SubscriberQRModal({ organizationSlug, organizationName }: SubscriberQRModalProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const [qrCode, setQrCode] = useState<QRCodeStyling | null>(null)
   const [copied, setCopied] = useState(false)
+  const qrRef = useRef<HTMLDivElement>(null)
   const { toast } = useToast()
 
   const subscribeUrl = `${window.location.origin}/subscribe/${organizationSlug}`
 
-  useEffect(() => {
-    if (isOpen && !qrCode) {
-      // Create QR code with Voxxy styling
-      const qr = new QRCodeStyling({
-        width: 300,
-        height: 300,
-        data: subscribeUrl,
-        margin: 10,
-        qrOptions: {
-          typeNumber: 0,
-          mode: 'Byte',
-          errorCorrectionLevel: 'H'
-        },
-        imageOptions: {
-          hideBackgroundDots: true,
-          imageSize: 0.4,
-          margin: 4
-        },
-        dotsOptions: {
-          type: 'rounded',
-          color: '#9333ea', // Purple
-          gradient: {
-            type: 'linear',
-            rotation: 0,
-            colorStops: [
-              { offset: 0, color: '#9333ea' },
-              { offset: 1, color: '#ec4899' }
-            ]
-          }
-        },
-        backgroundOptions: {
-          color: '#ffffff'
-        },
-        cornersSquareOptions: {
-          type: 'extra-rounded',
-          color: '#7c3aed'
-        },
-        cornersDotOptions: {
-          type: 'dot',
-          color: '#a855f7'
-        }
-      })
-
-      setQrCode(qr)
-
-      // Append to container
-      const container = document.getElementById('qr-code-container')
-      if (container) {
-        container.innerHTML = '' // Clear previous
-        qr.append(container)
-      }
-    }
-  }, [isOpen, qrCode, subscribeUrl])
-
   const handleDownload = () => {
-    if (qrCode) {
-      qrCode.download({
-        name: `${organizationSlug}-subscribe-qr`,
-        extension: 'png'
-      })
+    const canvas = qrRef.current?.querySelector('canvas')
+    if (canvas) {
+      const url = canvas.toDataURL('image/png')
+      const link = document.createElement('a')
+      link.download = `${organizationSlug}-subscribe-qr.png`
+      link.href = url
+      link.click()
 
       toast({
         title: "QR Code Downloaded!",
@@ -142,8 +90,13 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
         <div className="space-y-6 mt-4">
           {/* QR Code Display */}
           <div className="flex justify-center">
-            <div className="bg-white p-4 rounded-lg shadow-lg">
-              <div id="qr-code-container"></div>
+            <div className="bg-white p-6 rounded-xl shadow-2xl" ref={qrRef}>
+              <QRCodeCanvas
+                value={subscribeUrl}
+                size={256}
+                level="H"
+                includeMargin={true}
+              />
             </div>
           </div>
 

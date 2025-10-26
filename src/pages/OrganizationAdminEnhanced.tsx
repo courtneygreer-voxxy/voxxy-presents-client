@@ -269,13 +269,10 @@ export default function OrganizationAdminEnhanced() {
                 <Calendar className="h-4 w-4 text-purple-400" />
                 Events
               </TabsTrigger>
-              {/* Events Subcategories */}
-              <div className="ml-2 flex gap-1">
-                <TabsTrigger value="budget" className="flex items-center gap-2 !justify-start !text-left !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors text-sm px-3 py-2">
-                  <DollarSign className="h-4 w-4 text-purple-400 flex-shrink-0" />
-                  <span className="text-left">Budget</span>
-                </TabsTrigger>
-              </div>
+              <TabsTrigger value="budget" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
+                <DollarSign className="h-4 w-4 text-purple-400" />
+                Budget
+              </TabsTrigger>
               <TabsTrigger value="subscribers" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Users className="h-4 w-4 text-purple-400" />
                 Subscribers
