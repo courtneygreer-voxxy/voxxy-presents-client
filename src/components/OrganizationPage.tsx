@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -39,8 +39,8 @@ interface OrganizationPageProps {
   }
 }
 
-export default function OrganizationPage({ 
-  organizationSlug, 
+export default function OrganizationPage({
+  organizationSlug,
   bannerImage,
   logoImage,
   aboutImage,
@@ -50,6 +50,13 @@ export default function OrganizationPage({
   const { organization, events, loading, eventsLoading, loadEventsOnDemand, error } = useOrganization(organizationSlug)
   const [expandedEvents, setExpandedEvents] = useState<string[]>([])
 
+  // Load events immediately after organization loads (but not in same request)
+  // This achieves the goal: org loads instantly, events load right after
+  useEffect(() => {
+    if (organization && events.length === 0 && !eventsLoading) {
+      loadEventsOnDemand()
+    }
+  }, [organization, events.length, eventsLoading, loadEventsOnDemand])
 
   const toggleEventDetails = (eventId: string) => {
     setExpandedEvents((prev) => (prev.includes(eventId) ? prev.filter((id) => id !== eventId) : [...prev, eventId]))
