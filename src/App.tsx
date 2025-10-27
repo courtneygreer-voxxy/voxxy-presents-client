@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
+import { initPerformanceTracking } from './utils/performanceTracking'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import { BetaAccessGuard } from './components/auth/BetaAccessGuard'
 import { LoadingTransition } from './components/LoadingTransition'
@@ -87,9 +88,10 @@ function RoleBasedDashboardRedirect() {
 }
 
 export default function App() {
-  // Initialize analytics on app start
+  // Initialize analytics and performance tracking on app start
   useEffect(() => {
     analytics.initializeUser();
+    initPerformanceTracking();
   }, []);
 
   return (
