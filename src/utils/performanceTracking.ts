@@ -249,8 +249,17 @@ export function trackCoreWebVitals(): void {
 /**
  * Initialize performance tracking
  * Call this once on app startup
+ *
+ * NOTE: Currently DISABLED in production to avoid cluttering Mixpanel reports
+ * These technical metrics are useful for development but not for business analytics
  */
 export function initPerformanceTracking(): void {
+  // Only track performance in development mode
+  if (!import.meta.env.DEV) {
+    console.log('📊 Performance tracking disabled in production')
+    return
+  }
+
   // Track core web vitals
   trackCoreWebVitals()
 
@@ -261,12 +270,10 @@ export function initPerformanceTracking(): void {
     window.addEventListener('load', () => trackPageLoad('app_init'), { once: true })
   }
 
-  if (import.meta.env.DEV) {
-    console.log('📊 Performance tracking initialized')
-  }
+  console.log('📊 Performance tracking initialized (DEV mode only)')
 }
 
-// Auto-initialize in production
-if (!import.meta.env.DEV && typeof window !== 'undefined') {
+// Only auto-initialize in development
+if (import.meta.env.DEV && typeof window !== 'undefined') {
   initPerformanceTracking()
 }

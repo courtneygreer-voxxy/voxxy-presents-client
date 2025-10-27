@@ -541,45 +541,132 @@ class Analytics {
     });
   }
 
-  // Traffic source detection
-  private getTrafficSource(): { source: UserProperties['traffic_source']; domain: string | null } {
+  // Traffic source detection with enhanced direct traffic breakdown
+  private getTrafficSource(): {
+    source: UserProperties['traffic_source'];
+    domain: string | null;
+    direct_type?: 'bookmark' | 'typed_url' | 'mobile_app' | 'qr_code' | 'dark_social' | 'unknown';
+    detail?: string;
+  } {
     const referrer = document.referrer;
     const urlParams = new URLSearchParams(window.location.search);
     const utmSource = urlParams.get('utm_source');
+    const currentUrl = window.location.href;
 
-    // Check for UTM parameters first
+    // Check for UTM parameters first (most reliable)
     if (utmSource) {
-      if (utmSource.includes('google') || utmSource.includes('bing')) return { source: 'paid', domain: null };
-      if (utmSource.includes('facebook') || utmSource.includes('instagram') || utmSource.includes('twitter')) return { source: 'social', domain: null };
-      if (utmSource.includes('email') || utmSource.includes('newsletter')) return { source: 'email', domain: null };
-      return { source: 'referral', domain: null };
+      if (utmSource.includes('google') || utmSource.includes('bing')) return { source: 'paid', domain: null, detail: utmSource };
+      if (utmSource.includes('facebook') || utmSource.includes('instagram') || utmSource.includes('twitter')) return { source: 'social', domain: null, detail: utmSource };
+      if (utmSource.includes('email') || utmSource.includes('newsletter')) return { source: 'email', domain: null, detail: utmSource };
+      return { source: 'referral', domain: null, detail: utmSource };
     }
 
-    // No referrer = direct traffic
-    if (!referrer) return { source: 'direct', domain: null };
+    // Check for other tracking parameters that indicate source
+    const fbclid = urlParams.get('fbclid'); // Facebook click ID
+    const gclid = urlParams.get('gclid'); // Google click ID
+    const msclkid = urlParams.get('msclkid'); // Microsoft click ID
+    const ttclid = urlParams.get('ttclid'); // TikTok click ID
+    const ref = urlParams.get('ref'); // Generic referral parameter
 
-    const referrerDomain = new URL(referrer).hostname;
+    if (fbclid) return { source: 'social', domain: 'facebook.com', detail: 'facebook_link' };
+    if (gclid) return { source: 'paid', domain: 'google.com', detail: 'google_ads' };
+    if (msclkid) return { source: 'paid', domain: 'bing.com', detail: 'microsoft_ads' };
+    if (ttclid) return { source: 'social', domain: 'tiktok.com', detail: 'tiktok_link' };
 
-    // Social media sources
-    const socialDomains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'tiktok.com', 'youtube.com'];
-    if (socialDomains.some(domain => referrerDomain.includes(domain))) {
-      return { source: 'social', domain: referrerDomain };
+    // Check for affiliate/referral parameters
+    if (ref) return { source: 'referral', domain: null, detail: `ref_${ref}` };
+
+    // Has referrer - analyze it
+    if (referrer) {
+      try {
+        const referrerDomain = new URL(referrer).hostname;
+
+        // Same domain = internal navigation (not a source)
+        if (referrerDomain === window.location.hostname) {
+          return { source: 'direct', domain: null, direct_type: 'typed_url', detail: 'same_domain_navigation' };
+        }
+
+        // Social media sources
+        const socialDomains = ['facebook.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'tiktok.com', 'youtube.com', 'reddit.com', 'pinterest.com'];
+        if (socialDomains.some(domain => referrerDomain.includes(domain))) {
+          return { source: 'social', domain: referrerDomain, detail: referrerDomain };
+        }
+
+        // Search engines
+        const searchDomains = ['google.com', 'bing.com', 'yahoo.com', 'duckduckgo.com', 'baidu.com', 'yandex.com'];
+        if (searchDomains.some(domain => referrerDomain.includes(domain))) {
+          return { source: 'organic', domain: referrerDomain, detail: referrerDomain };
+        }
+
+        // Email clients (webmail)
+        const emailDomains = ['gmail.com', 'outlook.com', 'yahoo.com', 'mail.', 'protonmail.com'];
+        if (emailDomains.some(domain => referrerDomain.includes(domain))) {
+          return { source: 'email', domain: referrerDomain, detail: referrerDomain };
+        }
+
+        // Everything else with a referrer is external referral
+        return { source: 'referral', domain: referrerDomain, detail: referrerDomain };
+      } catch (e) {
+        // Invalid referrer URL
+        console.warn('Invalid referrer URL:', referrer);
+      }
     }
 
-    // Search engines
-    const searchDomains = ['google.com', 'bing.com', 'yahoo.com', 'duckduckgo.com'];
-    if (searchDomains.some(domain => referrerDomain.includes(domain))) {
-      return { source: 'organic', domain: referrerDomain };
+    // No referrer - try to infer from context (DARK SOCIAL DETECTION)
+
+    // Check if URL has any parameters (likely from a link share)
+    const hasParams = urlParams.toString().length > 0;
+
+    // Check if landing on a deep page (not homepage)
+    const isDeepPage = window.location.pathname !== '/' && !window.location.pathname.match(/^\/(index|home)?$/);
+
+    // Check for mobile user agent (iOS/Android apps often strip referrer)
+    const userAgent = navigator.userAgent.toLowerCase();
+    const isMobile = /iphone|ipad|ipod|android/.test(userAgent);
+    const isInAppBrowser = /fban|fbav|instagram|twitter|linkedin/.test(userAgent);
+
+    // Check if URL contains share indicators
+    const hasShareIndicators = currentUrl.includes('?share') ||
+                                currentUrl.includes('&share') ||
+                                urlParams.has('s') ||
+                                urlParams.has('share');
+
+    // Infer dark social (shared links from messaging apps)
+    if (isInAppBrowser) {
+      // User is in a social media in-app browser but no referrer
+      return { source: 'social', domain: null, direct_type: 'mobile_app', detail: 'in_app_browser' };
     }
 
-    // Email clients
-    const emailDomains = ['gmail.com', 'outlook.com', 'yahoo.com', 'mail.'];
-    if (emailDomains.some(domain => referrerDomain.includes(domain))) {
-      return { source: 'email', domain: referrerDomain };
+    if (isMobile && (hasParams || isDeepPage)) {
+      // Mobile + parameters/deep page = likely shared link
+      return { source: 'direct', domain: null, direct_type: 'dark_social', detail: 'mobile_shared_link' };
     }
 
-    // Everything else is referral
-    return { source: 'referral', domain: referrerDomain };
+    if (hasShareIndicators) {
+      // Explicit share parameters
+      return { source: 'direct', domain: null, direct_type: 'dark_social', detail: 'explicit_share' };
+    }
+
+    if (isDeepPage && hasParams) {
+      // Deep page with parameters but no referrer = likely QR code or shared link
+      return { source: 'direct', domain: null, direct_type: 'qr_code', detail: 'deep_link_with_params' };
+    }
+
+    // Check if user came from bookmark (performance.navigation.type)
+    if (typeof performance !== 'undefined' && performance.getEntriesByType) {
+      const navEntry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
+      if (navEntry && navEntry.type === 'reload') {
+        return { source: 'direct', domain: null, direct_type: 'bookmark', detail: 'page_reload' };
+      }
+    }
+
+    // Default: truly direct (typed URL or bookmark)
+    return {
+      source: 'direct',
+      domain: null,
+      direct_type: isDeepPage ? 'unknown' : 'typed_url',
+      detail: isDeepPage ? 'direct_to_deep_page' : 'homepage_direct'
+    };
   }
 
   // Extract UTM parameters and marketing attribution

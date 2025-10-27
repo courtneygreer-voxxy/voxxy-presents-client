@@ -170,7 +170,7 @@ export interface User {
   id: string // Firebase Auth UID
   email: string
   name?: string
-  role: 'admin' | 'organizer' | 'venue_owner' | 'club_owner' | 'user'
+  role: 'admin' | 'organizer' | 'vendor' | 'venue_owner' | 'club_owner' | 'user'
 
   // Beta Access Control (support both old and new formats)
   betaStatus?: 'pending' | 'approved' | 'denied'
@@ -187,7 +187,19 @@ export interface User {
   // Permissions
   organizationIds: string[] // Organizations they can manage
 
-  // Venue Owner Profile (new for v2.0.0)
+  // Vendor Profile (generalized for v3.0.0 - supports all vendor types)
+  vendorProfile?: {
+    vendorIds: string[] // Vendors they own/manage (can be venues, catering, entertainment, market vendors)
+    vendorType: 'venue' | 'catering' | 'entertainment' | 'market_vendor' // Primary vendor type
+    businessInfo?: string
+    phone?: string
+    preferredContactMethod: 'email' | 'phone'
+    onboardingCompleted: boolean
+    approvedAt?: Date // When they were approved as a vendor
+  }
+
+  // DEPRECATED: Venue Owner Profile (for backward compatibility with v2.0.0)
+  // New code should use vendorProfile instead
   venueOwnerProfile?: {
     venueIds: string[] // Venues they own/manage
     businessInfo?: string

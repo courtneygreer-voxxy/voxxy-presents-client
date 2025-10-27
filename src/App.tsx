@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
-import { initPerformanceTracking } from './utils/performanceTracking'
+// Performance tracking removed - was cluttering Mixpanel with technical metrics
+// import { initPerformanceTracking } from './utils/performanceTracking'
 import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
 import { BetaAccessGuard } from './components/auth/BetaAccessGuard'
 import { LoadingTransition } from './components/LoadingTransition'
@@ -33,6 +34,9 @@ import AdminLogin from './pages/AdminLogin'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
 import VenueSearchPortal from './pages/VenueSearchPortal'
+// New vendor pages (backward compatible)
+import VendorProfilePage from './pages/VendorProfilePage'
+import VendorMarketplace from './pages/VendorMarketplace'
 import VenueCreatePage from './pages/VenueCreatePage'
 import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
 import VenueOwnerBenefitsPage from './pages/VenueOwnerBenefitsPage'
@@ -88,10 +92,10 @@ function RoleBasedDashboardRedirect() {
 }
 
 export default function App() {
-  // Initialize analytics and performance tracking on app start
+  // Initialize analytics on app start
   useEffect(() => {
     analytics.initializeUser();
-    initPerformanceTracking();
+    // Performance tracking disabled in production (was cluttering Mixpanel reports)
   }, []);
 
   return (
@@ -108,7 +112,14 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/venue-owners" element={<VenueOwnerBenefitsPage />} />
           <Route path="/analytics-test" element={<AnalyticsTestPage />} />
+
+          {/* Vendor routes (new) */}
+          <Route path="/vendor/:slug" element={<VendorProfilePage />} />
+          <Route path="/marketplace" element={<VendorMarketplace />} />
+
+          {/* Legacy venue routes (backward compatible) */}
           <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
+
           <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />
           <Route path="/subscribe/:orgSlug" element={<SubscribePage />} />
           <Route path="/:orgSlug" element={<OrganizationPublic />} />
