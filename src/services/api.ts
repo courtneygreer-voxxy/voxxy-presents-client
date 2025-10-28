@@ -24,7 +24,11 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
   // Add admin key for admin endpoints
   if (endpoint.startsWith('/admin/')) {
-    headers['x-admin-key'] = import.meta.env.VITE_ADMIN_API_KEY || 'voxxy-admin-2024'
+    const adminKey = import.meta.env.VITE_ADMIN_API_KEY
+    if (!adminKey) {
+      throw new Error('VITE_ADMIN_API_KEY is not configured. Cannot access admin endpoints.')
+    }
+    headers['x-admin-key'] = adminKey
   }
 
   // Add Firebase auth token for authenticated endpoints
