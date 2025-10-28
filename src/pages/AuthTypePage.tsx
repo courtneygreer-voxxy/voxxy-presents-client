@@ -77,7 +77,7 @@ export default function AuthTypePage() {
         </div>
       </div>
 
-      {/* Right Side - Venue Owner */}
+      {/* Right Side - Vendor */}
       <div className="w-full md:w-1/2 bg-gradient-to-br from-[#3b82f6] via-[#a855f7] to-[#ec4899] relative overflow-hidden">
         {/* Animated Background Pattern */}
         <div
@@ -94,9 +94,9 @@ export default function AuthTypePage() {
               <div className="mx-auto w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-6">
                 <Building2 className="h-10 w-10 text-white" />
               </div>
-              <h1 className="text-4xl font-bold mb-4">Venue Owner</h1>
+              <h1 className="text-4xl font-bold mb-4">Vendor</h1>
               <p className="text-xl text-blue-100 mb-8">
-                List your venue and connect with organizers
+                List your services and connect with organizers
               </p>
             </div>
 
@@ -106,7 +106,7 @@ export default function AuthTypePage() {
                 <ul className="text-white space-y-3 text-base">
                   <li className="flex items-start">
                     <span className="mr-3 text-blue-300">✓</span>
-                    <span>List and promote your venue</span>
+                    <span>List venues, catering, entertainment & more</span>
                   </li>
                   <li className="flex items-start">
                     <span className="mr-3 text-blue-300">✓</span>
