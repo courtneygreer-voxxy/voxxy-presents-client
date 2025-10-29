@@ -39,10 +39,13 @@ interface AuthContextType {
   isEmailVerified: boolean
   needsEmailVerification: boolean
 
-  // Role-specific helpers (v2.0.0)
+  // V3.0: Role-specific helpers (supports both old and new roles)
   isAdmin: boolean
-  isOrganizer: boolean
-  isVenueOwner: boolean
+  isProducer: boolean // NEW V3.0
+  isVendor: boolean   // NEW V3.0
+  isGuest: boolean    // NEW V3.0
+  isOrganizer: boolean // DEPRECATED - use isProducer
+  isVenueOwner: boolean // DEPRECATED - use isVendor
   hasRole: (role: User['role']) => boolean
 }
 
@@ -269,10 +272,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  // Role-specific helper functions (v2.0.0)
+  // V3.0: Role-specific helper functions (supports both old and new roles during migration)
   const isAdmin = userProfile?.role === 'admin'
-  const isOrganizer = userProfile?.role === 'organizer'
-  const isVenueOwner = userProfile?.role === 'venue_owner'
+
+  // NEW V3.0 roles
+  const isProducer = userProfile?.role === 'producer' || userProfile?.role === 'organizer' || userProfile?.role === 'club_owner'
+  const isVendor = userProfile?.role === 'vendor' || userProfile?.role === 'venue_owner'
+  const isGuest = userProfile?.role === 'guest' || userProfile?.role === 'user'
+
+  // DEPRECATED (but still work for backward compatibility)
+  const isOrganizer = isProducer // Maps to new producer role
+  const isVenueOwner = isVendor  // Maps to new vendor role
+
   const hasRole = (role: User['role']) => userProfile?.role === role
 
   const value: AuthContextType = {
@@ -291,8 +302,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isEmailVerified,
     needsEmailVerification,
     isAdmin,
-    isOrganizer,
-    isVenueOwner,
+    isProducer,
+    isVendor,
+    isGuest,
+    isOrganizer, // DEPRECATED - use isProducer
+    isVenueOwner, // DEPRECATED - use isVendor
     hasRole
   }
 

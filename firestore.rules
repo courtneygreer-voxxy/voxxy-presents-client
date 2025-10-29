@@ -50,11 +50,15 @@ service cloud.firestore {
     // Users - users can read/write their own profile, admins can read all
     match /users/{userId} {
       allow read, write: if isAuthenticated() && isUser(userId);
-      allow create: if isAuthenticated() && 
-                       request.auth.uid == userId && 
+      // V3.0: Support both old and new role values during migration
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == userId &&
                        request.resource.data.keys().hasAll(['email', 'name', 'role']) &&
-                       request.resource.data.role == 'organizer';
-      allow read: if isAuthenticated() && 
+                       (request.resource.data.role == 'producer' ||
+                        request.resource.data.role == 'vendor' ||
+                        request.resource.data.role == 'organizer' ||  // Legacy - will be removed
+                        request.resource.data.role == 'venue_owner'); // Legacy - will be removed
+      allow read: if isAuthenticated() &&
                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
     

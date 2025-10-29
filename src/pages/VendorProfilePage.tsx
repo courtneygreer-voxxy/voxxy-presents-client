@@ -28,22 +28,32 @@ import {
   Loader,
   Music,
   Utensils,
-  Calendar
+  Calendar,
+  Star,
+  Camera
 } from 'lucide-react'
 import { Vendor, VendorType, isVenue, isCatering, isEntertainment, isMarketVendor } from '@/types/vendor'
 import { vendorService } from '@/services/vendorService'
 
 const VENDOR_TYPE_ICONS: Record<VendorType, React.ReactNode> = {
   venue: <Building2 className="h-5 w-5" />,
-  catering: <ChefHat className="h-5 w-5" />,
+  artist: <Music className="h-5 w-5" />,
+  entertainer: <Mic2 className="h-5 w-5" />,
   entertainment: <Mic2 className="h-5 w-5" />,
+  lighting_tech: <Star className="h-5 w-5" />,
+  catering: <ChefHat className="h-5 w-5" />,
+  photographer: <Camera className="h-5 w-5" />,
   market_vendor: <ShoppingBag className="h-5 w-5" />
 }
 
 const VENDOR_TYPE_COLORS: Record<VendorType, string> = {
   venue: 'bg-purple-100 text-purple-800',
-  catering: 'bg-orange-100 text-orange-800',
+  artist: 'bg-blue-100 text-blue-800',
+  entertainer: 'bg-indigo-100 text-indigo-800',
   entertainment: 'bg-pink-100 text-pink-800',
+  lighting_tech: 'bg-yellow-100 text-yellow-800',
+  catering: 'bg-orange-100 text-orange-800',
+  photographer: 'bg-gray-100 text-gray-800',
   market_vendor: 'bg-green-100 text-green-800'
 }
 

@@ -170,7 +170,8 @@ export interface User {
   id: string // Firebase Auth UID
   email: string
   name?: string
-  role: 'admin' | 'organizer' | 'vendor' | 'venue_owner' | 'club_owner' | 'user'
+  // V3.0 ROLE REFACTORING: New roles (old roles supported temporarily for migration)
+  role: 'admin' | 'producer' | 'vendor' | 'guest' | 'organizer' | 'venue_owner' | 'club_owner' | 'user'
 
   // Beta Access Control (support both old and new formats)
   betaStatus?: 'pending' | 'approved' | 'denied'
@@ -187,15 +188,30 @@ export interface User {
   // Permissions
   organizationIds: string[] // Organizations they can manage
 
-  // Vendor Profile (generalized for v3.0.0 - supports all vendor types)
+  // V3.0: Producer Profile (renamed from organizationProfile)
+  producerProfile?: {
+    organizationId: string // 1:1 relationship
+    onboardingCompleted: boolean
+    approvedAt?: Date
+  }
+
+  // V3.0: Vendor Profile (generalized for all vendor types)
   vendorProfile?: {
     vendorIds: string[] // Vendors they own/manage (can be venues, catering, entertainment, market vendors)
-    vendorType: 'venue' | 'catering' | 'entertainment' | 'market_vendor' // Primary vendor type
+    vendorType: 'venue' | 'artist' | 'entertainer' | 'entertainment' | 'lighting_tech' | 'catering' | 'photographer' | 'market_vendor'
     businessInfo?: string
     phone?: string
     preferredContactMethod: 'email' | 'phone'
     onboardingCompleted: boolean
     approvedAt?: Date // When they were approved as a vendor
+  }
+
+  // DEPRECATED: Organization Profile (for backward compatibility)
+  // New code should use producerProfile instead
+  organizationProfile?: {
+    organizationId: string
+    onboardingCompleted: boolean
+    approvedAt?: Date
   }
 
   // DEPRECATED: Venue Owner Profile (for backward compatibility with v2.0.0)

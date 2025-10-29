@@ -8,23 +8,35 @@ import { getCurrentEnvironment } from '@/config/environments'
 import { User as UserV2 } from '@/types/database-v2'
 import { User as UserV1 } from '@/types/database'
 
-// Helper function to convert V1 user to V2 compatible structure
+// V3.0: Helper function to convert V1 user to V2 compatible structure
 const normalizeUserForV2 = (user: UserV1): UserV2 => {
-  // For venue owners, approval is based on having approved venues rather than betaStatus
+  // For vendors (including legacy venue_owner), approval is based on having approved listings
   let approvalStatus: 'pending' | 'approved' | 'denied' = 'pending'
 
-  if (user.role === 'venue_owner') {
-    // SIMPLIFIED: Venue owners are always approved for routing purposes
-    // Individual venue approval is handled in the dashboard itself
+  if (user.role === 'vendor' || user.role === 'venue_owner') {
+    // SIMPLIFIED: Vendors are always approved for routing purposes
+    // Individual vendor listing approval is handled in the dashboard itself
     approvalStatus = 'approved'
   } else {
-    // For organizers and others, use betaStatus
+    // For producers (including legacy organizer/club_owner) and others, use betaStatus
     approvalStatus = user.betaStatus || 'pending'
+  }
+
+  // V3.0: Normalize legacy roles to new roles
+  let normalizedRole: UserV2['role']
+  if (user.role === 'organizer' || user.role === 'club_owner') {
+    normalizedRole = 'producer' // Legacy → producer
+  } else if (user.role === 'venue_owner') {
+    normalizedRole = 'vendor' // Legacy → vendor
+  } else if (user.role === 'user') {
+    normalizedRole = 'guest' // Legacy → guest
+  } else {
+    normalizedRole = user.role as UserV2['role']
   }
 
   return {
     ...user,
-    role: user.role === 'user' ? 'guest' : user.role as UserV2['role'],
+    role: normalizedRole,
     approvalStatus,
     requestedAt: user.betaRequestedAt || user.createdAt,
     deniedReason: undefined,
@@ -39,16 +51,24 @@ interface ProtectedRouteV2Props {
   fallbackPath?: string
 }
 
-// Default role-based redirect paths
+// V3.0: Default role-based redirect paths
 const getRoleBasedDashboard = (role: UserV2['role']): string => {
   switch (role) {
     case 'admin':
       return '/admin/dashboard'
-    case 'organizer':
-      return '/organizer/dashboard'
-    case 'venue_owner':
-      return '/venue-owner/dashboard'
+    case 'producer':
+      return '/producer/dashboard'
+    case 'vendor':
+      return '/vendor/dashboard'
     case 'guest':
+      return '/guest/dashboard'
+    // LEGACY roles (should be normalized above, but handle just in case)
+    case 'organizer':
+    case 'club_owner':
+      return '/producer/dashboard'
+    case 'venue_owner':
+      return '/vendor/dashboard'
+    case 'user':
       return '/guest/dashboard'
     default:
       return '/'
@@ -172,8 +192,8 @@ export default function ProtectedRouteV2({
                     <div>
                       <h3 className="font-semibold text-blue-800">Approval Pending</h3>
                       <p className="text-sm text-blue-700 mt-1">
-                        Your {normalizedUser.role === 'organizer' ? 'organizer' : 'venue owner'} account
-                        is currently being reviewed by our team.
+                        Your {normalizedUser.role === 'producer' ? 'producer' : normalizedUser.role === 'vendor' ? 'vendor' : 'account'}
+                        {' '}account is currently being reviewed by our team.
                       </p>
                     </div>
 
@@ -224,8 +244,8 @@ export default function ProtectedRouteV2({
                     <div>
                       <h3 className="font-semibold text-red-800">Application Denied</h3>
                       <p className="text-sm text-red-700 mt-1">
-                        Unfortunately, your {normalizedUser.role === 'organizer' ? 'organizer' : 'venue owner'} application
-                        was not approved at this time.
+                        Unfortunately, your {normalizedUser.role === 'producer' ? 'producer' : normalizedUser.role === 'vendor' ? 'vendor' : ''}
+                        {' '}application was not approved at this time.
                       </p>
                     </div>
 

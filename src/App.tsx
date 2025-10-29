@@ -70,23 +70,35 @@ function RoleBasedDashboardRedirect() {
     return <LoadingTransition message="Taking you to your dashboard..." />
   }
 
-  // Route based on user role
+  // V3.0: Route based on user role (supports both old and new roles)
   switch (userProfile.role) {
+    // NEW V3.0 roles
+    case 'producer':
+      console.log('Producer detected, redirecting to producer dashboard')
+      return <Navigate to="/producer/dashboard" replace />
+
+    case 'vendor':
+      console.log('Vendor detected, redirecting to vendor dashboard')
+      return <Navigate to="/vendor/dashboard" replace />
+
+    // LEGACY roles (still supported during migration)
     case 'venue_owner':
-      console.log('Venue owner detected, redirecting to venue dashboard')
-      return <Navigate to="/venue-owner/dashboard" replace />
+      console.log('Venue owner (legacy) detected, redirecting to vendor dashboard')
+      return <Navigate to="/vendor/dashboard" replace />
 
     case 'organizer':
-      console.log('Organizer (club owner) detected, redirecting to organizer dashboard')
-      return <Navigate to="/organizer/dashboard" replace />
+    case 'club_owner':
+      console.log('Organizer/Club owner (legacy) detected, redirecting to producer dashboard')
+      return <Navigate to="/producer/dashboard" replace />
 
     case 'admin':
       console.log('Admin detected, redirecting to admin dashboard')
       return <Navigate to="/admin/dashboard" replace />
 
+    case 'guest':
     case 'user':
     default:
-      console.log('User or unknown role, redirecting to home')
+      console.log('Guest/User or unknown role, redirecting to home')
       return <Navigate to="/" replace />
   }
 }
@@ -143,27 +155,34 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Specific user type authentication routes */}
-          <Route path="/signup/club-owner" element={
+          {/* V3.0: Specific user type authentication routes */}
+          {/* NEW V3.0 routes */}
+          <Route path="/signup/producer" element={
             <RedirectIfAuthenticatedV2>
               <ClubOwnerSignUpPage />
             </RedirectIfAuthenticatedV2>
           } />
-          <Route path="/signup/venue-owner" element={
+          <Route path="/signup/vendor" element={
             <RedirectIfAuthenticatedV2>
               <VenueOwnerSignUpPage />
             </RedirectIfAuthenticatedV2>
           } />
-          <Route path="/login/club-owner" element={
+          <Route path="/login/producer" element={
             <RedirectIfAuthenticatedV2>
               <ClubOwnerLoginPage />
             </RedirectIfAuthenticatedV2>
           } />
-          <Route path="/login/venue-owner" element={
+          <Route path="/login/vendor" element={
             <RedirectIfAuthenticatedV2>
               <VenueOwnerLoginPage />
             </RedirectIfAuthenticatedV2>
           } />
+
+          {/* LEGACY routes (redirect to new V3.0 routes) */}
+          <Route path="/signup/club-owner" element={<Navigate to="/signup/producer" replace />} />
+          <Route path="/signup/venue-owner" element={<Navigate to="/signup/vendor" replace />} />
+          <Route path="/login/club-owner" element={<Navigate to="/login/producer" replace />} />
+          <Route path="/login/venue-owner" element={<Navigate to="/login/vendor" replace />} />
 
           {/* Beta pending page */}
           <Route path="/beta-pending" element={<BetaPendingPage />} />
@@ -230,49 +249,83 @@ export default function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
 
-          {/* V2 Architecture Dashboard Routes */}
-          {/* Organizer Dashboard - Restored Original Beautiful Styling */}
-          <Route path="/organizer/dashboard" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+          {/* ========================================
+              V3.0 PRODUCER ROUTES (NEW)
+              ======================================== */}
+          <Route path="/producer/dashboard" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />
-          <Route path="/organizer/organizations" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+          <Route path="/producer/organizations" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />
-          <Route path="/organizer/events" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+          <Route path="/producer/events" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />
-          <Route path="/organizer/audience" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['organizer', 'admin']}>
+          <Route path="/producer/audience" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />
 
-          {/* Venue Owner Dashboard */}
-          <Route path="/venue-owner/dashboard" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
+          {/* ========================================
+              V3.0 VENDOR ROUTES (NEW)
+              ======================================== */}
+          <Route path="/vendor/dashboard" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
               <VenueOwnerDashboardNew />
             </ProtectedRouteV2>
+          } />
+          <Route path="/vendor/vendors" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/vendor/bookings" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/vendor/profile" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
+              <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+
+          {/* ========================================
+              LEGACY ROUTES - REDIRECT TO NEW V3.0
+              ======================================== */}
+          {/* Organizer routes → Producer routes */}
+          <Route path="/organizer/dashboard" element={
+            <Navigate to="/producer/dashboard" replace />
+          } />
+          <Route path="/organizer/organizations" element={
+            <Navigate to="/producer/organizations" replace />
+          } />
+          <Route path="/organizer/events" element={
+            <Navigate to="/producer/events" replace />
+          } />
+          <Route path="/organizer/audience" element={
+            <Navigate to="/producer/audience" replace />
+          } />
+
+          {/* Venue Owner routes → Vendor routes */}
+          <Route path="/venue-owner/dashboard" element={
+            <Navigate to="/vendor/dashboard" replace />
           } />
           <Route path="/venue-owner/venues" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
+            <Navigate to="/vendor/vendors" replace />
           } />
           <Route path="/venue-owner/bookings" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
+            <Navigate to="/vendor/bookings" replace />
           } />
           <Route path="/venue-owner/profile" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
+            <Navigate to="/vendor/profile" replace />
           } />
 
           {/* Admin V2 Dashboard */}

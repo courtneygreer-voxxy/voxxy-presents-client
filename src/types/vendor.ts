@@ -14,7 +14,8 @@
 // COMMON TYPES (shared across vendor types)
 // ==========================================
 
-export type VendorType = 'venue' | 'catering' | 'entertainment' | 'market_vendor'
+// V3.0: Expanded vendor types to match business requirements
+export type VendorType = 'venue' | 'artist' | 'entertainer' | 'entertainment' | 'lighting_tech' | 'catering' | 'photographer' | 'market_vendor'
 
 export type VendorClaimStatus = 'pending' | 'approved' | 'rejected'
 

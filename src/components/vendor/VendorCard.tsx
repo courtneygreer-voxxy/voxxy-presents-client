@@ -19,22 +19,34 @@ import { Vendor, VendorType, isVenue, isCatering, isEntertainment, isMarketVendo
 // Vendor type styling
 const VENDOR_TYPE_COLORS: Record<VendorType, string> = {
   'venue': 'bg-purple-100 text-purple-800',
-  'catering': 'bg-orange-100 text-orange-800',
+  'artist': 'bg-blue-100 text-blue-800',
+  'entertainer': 'bg-indigo-100 text-indigo-800',
   'entertainment': 'bg-pink-100 text-pink-800',
+  'lighting_tech': 'bg-yellow-100 text-yellow-800',
+  'catering': 'bg-orange-100 text-orange-800',
+  'photographer': 'bg-gray-100 text-gray-800',
   'market_vendor': 'bg-green-100 text-green-800'
 }
 
 const VENDOR_TYPE_LABELS: Record<VendorType, string> = {
   'venue': 'Venue',
-  'catering': 'Catering',
+  'artist': 'Artist',
+  'entertainer': 'Entertainer',
   'entertainment': 'Entertainment',
+  'lighting_tech': 'Lighting & Tech',
+  'catering': 'Catering',
+  'photographer': 'Photographer',
   'market_vendor': 'Market Vendor'
 }
 
 const VENDOR_TYPE_ICONS: Record<VendorType, React.ReactNode> = {
   'venue': <Building2 className="h-4 w-4" />,
-  'catering': <ChefHat className="h-4 w-4" />,
+  'artist': <Music className="h-4 w-4" />,
+  'entertainer': <Mic2 className="h-4 w-4" />,
   'entertainment': <Mic2 className="h-4 w-4" />,
+  'lighting_tech': <Star className="h-4 w-4" />,
+  'catering': <ChefHat className="h-4 w-4" />,
+  'photographer': <Star className="h-4 w-4" />,
   'market_vendor': <ShoppingBag className="h-4 w-4" />
 }
 
