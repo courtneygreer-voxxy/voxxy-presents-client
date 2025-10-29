@@ -19,16 +19,26 @@ export default function VendorEditPage() {
   useEffect(() => {
     const loadVendor = async () => {
       if (!slug) {
+        console.error('❌ No vendor slug provided')
         setError('No vendor slug provided')
         setLoading(false)
         return
       }
 
+      console.log('📥 Loading vendor with slug:', slug)
+
       try {
+        console.log('🌐 Calling vendorService.getVendorBySlug...')
         const vendorData = await vendorService.getVendorBySlug(slug)
+        console.log('✅ Vendor loaded successfully:', vendorData)
         setVendor(vendorData)
       } catch (err: any) {
-        console.error('Error loading vendor:', err)
+        console.error('❌ Error loading vendor:', err)
+        console.error('Error details:', {
+          message: err.message,
+          status: err.status,
+          response: err.response
+        })
         setError(err.message || 'Failed to load vendor')
       } finally {
         setLoading(false)
@@ -157,7 +167,7 @@ export default function VendorEditPage() {
             <Input
               id="email"
               type="email"
-              value={vendor.contactInfo.email}
+              value={vendor.contactInfo?.email || ''}
               onChange={(e) => setVendor({
                 ...vendor,
                 contactInfo: { ...vendor.contactInfo, email: e.target.value }
@@ -170,7 +180,7 @@ export default function VendorEditPage() {
             <Label htmlFor="phone" className="text-gray-300">Phone (Optional)</Label>
             <Input
               id="phone"
-              value={vendor.contactInfo.phone || ''}
+              value={vendor.contactInfo?.phone || ''}
               onChange={(e) => setVendor({
                 ...vendor,
                 contactInfo: { ...vendor.contactInfo, phone: e.target.value }
@@ -184,7 +194,7 @@ export default function VendorEditPage() {
             <Label htmlFor="website" className="text-gray-300">Website (Optional)</Label>
             <Input
               id="website"
-              value={vendor.contactInfo.website || ''}
+              value={vendor.contactInfo?.website || ''}
               onChange={(e) => setVendor({
                 ...vendor,
                 contactInfo: { ...vendor.contactInfo, website: e.target.value }
@@ -198,7 +208,7 @@ export default function VendorEditPage() {
             <Label htmlFor="instagram" className="text-gray-300">Instagram (Optional)</Label>
             <Input
               id="instagram"
-              value={vendor.contactInfo.instagram || ''}
+              value={vendor.contactInfo?.instagram || ''}
               onChange={(e) => setVendor({
                 ...vendor,
                 contactInfo: { ...vendor.contactInfo, instagram: e.target.value }
