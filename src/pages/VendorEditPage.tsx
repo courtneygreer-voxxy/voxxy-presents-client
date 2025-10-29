@@ -49,17 +49,29 @@ export default function VendorEditPage() {
   }, [slug])
 
   const handleSave = async () => {
-    if (!vendor) return
+    if (!vendor || !slug) return
 
     setSaving(true)
     setError('')
 
     try {
-      // TODO: Implement vendor update API call
-      console.log('Saving vendor:', vendor)
-      alert('Vendor saved! (API update not implemented yet)')
+      console.log('💾 Saving vendor:', vendor)
+
+      // Call API to update vendor
+      const updatedVendor = await vendorService.updateVendorBySlug(slug, {
+        name: vendor.name,
+        description: vendor.description,
+        contactInfo: vendor.contactInfo,
+        address: vendor.address
+      })
+
+      console.log('✅ Vendor saved successfully!')
+      setVendor(updatedVendor)
+
+      // Show success message
+      alert('Vendor saved successfully!')
     } catch (err: any) {
-      console.error('Error saving vendor:', err)
+      console.error('❌ Error saving vendor:', err)
       setError(err.message || 'Failed to save vendor')
     } finally {
       setSaving(false)

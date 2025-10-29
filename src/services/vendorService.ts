@@ -177,6 +177,39 @@ class VendorService {
   }
 
   /**
+   * Update vendor by slug
+   */
+  async updateVendorBySlug(slug: string, updates: Partial<Vendor>): Promise<Vendor> {
+    try {
+      console.log('🌐 Calling API:', `${API_BASE_URL}/vendors/by-slug/${slug}`)
+      console.log('📦 Update data:', JSON.stringify(updates, null, 2))
+
+      const response = await fetch(`${API_BASE_URL}/vendors/by-slug/${slug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      })
+
+      console.log('📡 API Response status:', response.status, response.statusText)
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ API Error response:', errorData)
+        throw new Error(errorData.message || errorData.error || `API error: ${response.status} ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('✅ API Success response:', result)
+      return result.vendor
+    } catch (error) {
+      console.error('💥 Error updating vendor:', error)
+      throw error
+    }
+  }
+
+  /**
    * Create a new vendor profile
    */
   async createVendor(request: VendorCreationRequest): Promise<Vendor> {
