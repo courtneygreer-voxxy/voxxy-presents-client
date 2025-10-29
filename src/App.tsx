@@ -22,7 +22,7 @@ import SignUpPage from './pages/SignUpPage'
 import LoginPage from './pages/LoginPage'
 import AuthTypePage from './pages/AuthTypePage'
 import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
-import VenueOwnerSignUpPage from './pages/VenueOwnerSignUpPage'
+import VendorSignUpPage from './pages/VenueOwnerSignUpPage'
 import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
 import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
 import PricingPage from './pages/PricingPage'
@@ -163,7 +163,7 @@ export default function App() {
           } />
           <Route path="/signup/vendor" element={
             <RedirectIfAuthenticatedV2>
-              <VenueOwnerSignUpPage />
+              <VendorSignUpPage />
             </RedirectIfAuthenticatedV2>
           } />
           <Route path="/login/producer" element={

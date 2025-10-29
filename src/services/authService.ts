@@ -20,6 +20,8 @@ export interface SignUpData {
   password: string
   displayName: string
   userType?: 'club-owner' | 'venue-owner' // Optional, defaults to club-owner for backwards compatibility
+  vendorType?: 'venue' | 'artist' | 'entertainer' | 'entertainment' | 'lighting_tech' | 'catering' | 'photographer' | 'market_vendor'
+  businessName?: string
 }
 
 export interface SignInData {
@@ -109,7 +111,7 @@ class EmailVerificationLimiter {
 const emailVerificationLimiter = new EmailVerificationLimiter()
 
 // Sign up with email and password
-export const signUp = async ({ email, password, displayName, userType = 'club-owner' }: SignUpData): Promise<AuthResult> => {
+export const signUp = async ({ email, password, displayName, userType = 'club-owner', vendorType, businessName }: SignUpData): Promise<AuthResult> => {
   let user: FirebaseUser | null = null
 
   try {
@@ -145,7 +147,8 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     const vendorData = userType === 'venue-owner' ? {
       vendorProfile: {
         vendorIds: [],
-        vendorType: 'venue' as const,
+        vendorType: vendorType || 'venue' as const,
+        businessName: businessName || displayName,
         businessInfo: '',
         phone: '',
         preferredContactMethod: 'email' as const,

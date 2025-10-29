@@ -199,6 +199,7 @@ export interface User {
   vendorProfile?: {
     vendorIds: string[] // Vendors they own/manage (can be venues, catering, entertainment, market vendors)
     vendorType: 'venue' | 'artist' | 'entertainer' | 'entertainment' | 'lighting_tech' | 'catering' | 'photographer' | 'market_vendor'
+    businessName?: string // Business/artist name
     businessInfo?: string
     phone?: string
     preferredContactMethod: 'email' | 'phone'
