@@ -121,8 +121,8 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
       displayName: displayName
     })
 
-    // Determine role based on userType
-    const role: 'venue_owner' | 'organizer' = userType === 'venue-owner' ? 'venue_owner' : 'organizer'
+    // V3.0: Determine role based on userType (using new role names)
+    const role: 'vendor' | 'producer' = userType === 'venue-owner' ? 'vendor' : 'producer'
 
     // Create user profile with different fields based on user type
     const baseUserData = {
@@ -133,16 +133,17 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
       emailNotifications: true,
     }
 
-    // Club owners go through beta approval process
-    const clubOwnerData = userType === 'club-owner' ? {
+    // V3.0: Producers (club owners) go through beta approval process
+    const producerData = userType === 'club-owner' ? {
       betaStatus: 'pending' as const,
       betaRequestedAt: new Date(),
     } : {}
 
-    // Venue owners skip beta entirely and go straight to venue creation
-    const venueOwnerData = userType === 'venue-owner' ? {
-      venueOwnerProfile: {
-        venueIds: [],
+    // V3.0: Vendors skip beta entirely and go straight to vendor listing creation
+    const vendorData = userType === 'venue-owner' ? {
+      vendorProfile: {
+        vendorIds: [],
+        vendorType: 'venue' as const,
         businessInfo: '',
         phone: '',
         preferredContactMethod: 'email' as const,
@@ -153,8 +154,8 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
     // Create user profile in Firestore
     const userData = {
       ...baseUserData,
-      ...clubOwnerData,
-      ...venueOwnerData
+      ...producerData,
+      ...vendorData
     } as any
 
     await createUser(user.uid, userData)

@@ -149,7 +149,8 @@ export interface UserProperties {
   // User identification
   email?: string;
   user_id?: string;
-  user_role?: 'admin' | 'organizer' | 'venue_owner' | 'user';
+  // V3.0: Support both old and new roles during migration
+  user_role?: 'admin' | 'producer' | 'vendor' | 'guest' | 'organizer' | 'venue_owner' | 'club_owner' | 'user';
   // Traffic source tracking
   utm_source?: string;
   utm_medium?: string;

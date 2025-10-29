@@ -133,9 +133,9 @@ export default function VenueOwnerSignUpPage() {
       })
 
       // Track successful signup
-      analytics.trackConversionStep('Sign Up Completed', 'Venue Owner Sign Up')
+      analytics.trackConversionStep('Sign Up Completed', 'Vendor Sign Up')
       analytics.setUserProperties({
-        user_role: 'venue_owner',
+        user_role: 'vendor',
         conversion_stage: 'converted',
       })
 
