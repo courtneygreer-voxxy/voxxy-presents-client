@@ -39,19 +39,10 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
       if (currentUser) {
         const idToken = await currentUser.getIdToken()
         headers['Authorization'] = `Bearer ${idToken}`
-        console.log('🔐 Added Firebase auth token to API request')
-      } else {
-        console.warn('⚠️ No authenticated user for API request')
       }
     } catch (error) {
-      console.error('❌ Failed to get Firebase auth token:', error)
+      console.error('Failed to get Firebase auth token:', error)
     }
-  }
-
-  // Debug logging
-  console.log(`🌐 API DEBUG: ${options?.method || 'GET'} ${url}`)
-  if (options?.body) {
-    console.log(`📦 API DEBUG: Request body:`, JSON.parse(options.body as string))
   }
 
   try {
@@ -79,7 +70,6 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     }
 
     const data = await response.json()
-    console.log(`✅ API DEBUG: ${options?.method || 'GET'} ${url} - Success:`, data)
     return data
     
   } catch (error) {

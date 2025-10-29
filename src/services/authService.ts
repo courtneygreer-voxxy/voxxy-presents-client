@@ -330,40 +330,29 @@ export const checkForEmailVerificationInURL = (): string | null => {
 export const getUserProfile = async (uid: string): Promise<User | null> => {
   try {
     // Use environment-aware data source
-    const { getUserDataSource, getCurrentEnvironment } = await import('@/config/environments')
+    const { getUserDataSource } = await import('@/config/environments')
     const dataSource = getUserDataSource()
-    const currentEnv = getCurrentEnvironment()
-
-    console.log('👤 USER DEBUG: Current environment:', currentEnv)
-    console.log('👤 USER DEBUG: Data source for users:', dataSource)
 
     if (dataSource === 'api') {
       // Load user profile from API with Firebase fallback
-      console.log('Loading user profile via API')
       try {
         const { usersApi } = await import('@/services/api')
         const response = await usersApi.getCurrentUser()
-        console.log('👤 USER DEBUG: User profile from API:', response)
 
         // Handle API response format {success: true, user: {...}}
         if (response && response.success && response.user) {
-          console.log('👤 USER DEBUG: Extracted user from API response:', response.user)
           return response.user
         }
-        console.warn('👤 USER DEBUG: API response format unexpected:', response)
         return response || null
       } catch (apiError) {
         console.warn('API user profile failed, falling back to Firebase:', apiError)
         // Fallback to Firebase if API fails
         const profile = await getUser(uid)
-        console.log('👤 USER DEBUG: User profile from Firebase (fallback):', profile)
         return profile
       }
     } else {
       // Load user profile from Firebase
-      console.log('Loading user profile via Firebase')
       const profile = await getUser(uid)
-      console.log('👤 USER DEBUG: User profile from Firebase:', profile)
       return profile
     }
   } catch (error) {
