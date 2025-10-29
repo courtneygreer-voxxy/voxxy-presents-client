@@ -45,78 +45,59 @@ export default function VenueOwnerDashboardNew() {
   useEffect(() => {
     // Check authentication and role
     if (!currentUser) {
-      navigate('/login/venue-owner')
+      navigate('/login/vendor')
       return
     }
 
-    // Only allow venue owners to access venue dashboard
+    // Only allow vendors to access vendor dashboard
     if (!isVenueOwner) {
       navigate('/')
       return
     }
 
-    // SIMPLIFIED VENUE OWNER LOGIC: Skip onboarding checks, just load venues
-    console.log('🏢 VENUE OWNER DEBUG: Loading venues for owner:', currentUser.uid)
-    console.log('🏢 VENUE OWNER DEBUG: User profile:', userProfile)
-
     // Load venue data for this owner
     const loadVenueData = async () => {
       try {
-        console.log('Loading venues for owner:', currentUser.uid)
-
         // Use venue-specific data source
-        const { getVenueDataSource, getCurrentEnvironment } = await import('@/config/environments')
+        const { getVenueDataSource } = await import('@/config/environments')
         const dataSource = getVenueDataSource()
-        const currentEnv = getCurrentEnvironment()
-
-        console.log('🏢 VENUE DEBUG: Current environment:', currentEnv)
-        console.log('🏢 VENUE DEBUG: Data source for venues:', dataSource)
 
         let venueData: any[] = []
 
         if (dataSource === 'firebase') {
           // Direct Firebase access for staging/development
-          console.log('Loading venues via Firebase')
           const { getVenuesByOwner } = await import('@/lib/database')
           venueData = await getVenuesByOwner(currentUser.uid)
-          console.log('🏢 VENUE DEBUG: Raw venue data from Firebase:', venueData)
         } else {
           // API access for production
-          console.log('Loading venues via API')
           const response = await venuesApi.getByOwner(currentUser.uid)
           if (response.success && response.venues) {
             venueData = response.venues
           }
-          console.log('🏢 VENUE DEBUG: Raw venue data from API:', venueData)
         }
 
         setVenues(venueData)
 
-          // Check if any venues need approval
-          const pendingVenues = venueData.filter((venue: any) => venue.claimStatus === 'pending')
-          const approvedVenues = venueData.filter((venue: any) => venue.claimStatus === 'approved')
+        // Check if any venues need approval
+        const pendingVenues = venueData.filter((venue: any) => venue.claimStatus === 'pending')
+        const approvedVenues = venueData.filter((venue: any) => venue.claimStatus === 'approved')
 
-          console.log('🏢 VENUE DEBUG: Pending venues:', pendingVenues.length, pendingVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
-          console.log('🏢 VENUE DEBUG: Approved venues:', approvedVenues.length, approvedVenues.map((v: any) => ({ id: v.id, name: v.name, claimStatus: v.claimStatus })))
+        if (pendingVenues.length > 0 && approvedVenues.length === 0) {
+          // All venues are pending, redirect to pending page
+          navigate('/venues/pending')
+          return
+        }
 
-          if (pendingVenues.length > 0 && approvedVenues.length === 0) {
-            // All venues are pending, redirect to pending page
-            console.log('🏢 VENUE DEBUG: All venues pending, redirecting to pending page')
-            navigate('/venues/pending')
-            return
-          }
-
-          // Select the first approved venue, or first venue if all approved
-          if (approvedVenues.length > 0) {
-            setSelectedVenue(approvedVenues[0])
-          } else if (venueData.length > 0) {
-            setSelectedVenue(venueData[0])
-          }
+        // Select the first approved venue, or first venue if all approved
+        if (approvedVenues.length > 0) {
+          setSelectedVenue(approvedVenues[0])
+        } else if (venueData.length > 0) {
+          setSelectedVenue(venueData[0])
+        }
 
         if (venueData.length === 0) {
-          // No venues found - redirect to create venue
-          console.log('🏢 VENUE OWNER DEBUG: No venues found, redirecting to create')
-          navigate('/venues/create')
+          // No venues found - stay on this page to show empty state
+          setLoading(false)
           return
         }
       } catch (err) {
@@ -128,7 +109,7 @@ export default function VenueOwnerDashboardNew() {
     }
 
     loadVenueData()
-  }, [currentUser, isVenueOwner, isOrganizer, navigate])
+  }, [currentUser, isVenueOwner, navigate])
 
   const handleLogout = async () => {
     try {
@@ -141,24 +122,21 @@ export default function VenueOwnerDashboardNew() {
 
   const handlePreviewVenue = () => {
     if (selectedVenue) {
-      console.log('🔗 VENUE DEBUG: Navigating to public venue page:', `/venue/${selectedVenue.slug}`)
-      navigate(`/venue/${selectedVenue.slug}`)
+      navigate(`/vendor/${selectedVenue.slug}`)
     }
   }
 
   const handleShareVenue = async () => {
     if (selectedVenue) {
-      const publicUrl = `${window.location.origin}/venue/${selectedVenue.slug}`
-      console.log('🔗 VENUE DEBUG: Sharing venue URL:', publicUrl)
+      const publicUrl = `${window.location.origin}/vendor/${selectedVenue.slug}`
 
       try {
         await navigator.clipboard.writeText(publicUrl)
         // TODO: Add toast notification for successful copy
-        console.log('✅ VENUE DEBUG: URL copied to clipboard')
       } catch (err) {
-        console.error('❌ VENUE DEBUG: Failed to copy URL:', err)
+        console.error('Failed to copy URL:', err)
         // Fallback: show the URL in an alert
-        alert(`Venue URL: ${publicUrl}`)
+        alert(`Vendor URL: ${publicUrl}`)
       }
     }
   }
@@ -217,22 +195,8 @@ export default function VenueOwnerDashboardNew() {
   }
 
   if (!selectedVenue) {
-    // DEBUG: Log why no venue is selected
-    console.log('🚨 VENUE DEBUG: No selected venue')
-    console.log('🚨 VENUE DEBUG: Total venues loaded:', venues?.length || 0, venues)
-    console.log('🚨 VENUE DEBUG: Current user ID:', currentUser?.uid)
-
     return (
       <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center p-4">
-        {/* Debug info overlay */}
-        <div className="absolute top-4 left-4 bg-red-900/80 text-white p-4 rounded text-sm max-w-md z-50">
-          <div className="font-bold mb-2">🚨 DEBUG: No Venue Selected</div>
-          <div>User ID: {currentUser?.uid}</div>
-          <div>Venues loaded: {venues?.length || 0}</div>
-          <div>Loading: {loading ? 'true' : 'false'}</div>
-          <div>Error: {error || 'none'}</div>
-        </div>
-
         {/* Animated background dots */}
         <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-indigo-900/20">
           <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
@@ -242,15 +206,15 @@ export default function VenueOwnerDashboardNew() {
 
         <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-8 w-full max-w-md relative z-10 text-center">
           <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Venue Found</h2>
+          <h2 className="text-xl font-bold text-white mb-2">No Vendor Listing Found</h2>
           <p className="text-gray-300 mb-6">
-            You don't have any venues associated with your account yet.
+            You don't have any vendor listings associated with your account yet.
           </p>
           <Button
             onClick={() => navigate('/venues/create')}
             className="w-full bg-purple-600 hover:bg-purple-700 text-white"
           >
-            Create Your Venue
+            Create Your Vendor Listing
           </Button>
         </div>
       </div>
@@ -297,8 +261,8 @@ export default function VenueOwnerDashboardNew() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-white">My Venue</h1>
-              <p className="text-gray-300 text-sm">Manage your venue profile and bookings</p>
+              <h1 className="text-2xl font-bold text-white">My Vendor Listing</h1>
+              <p className="text-gray-300 text-sm">Manage your vendor profile and bookings</p>
             </div>
             <div className="flex items-center gap-3">
               {venues.length > 1 && (
@@ -338,7 +302,7 @@ export default function VenueOwnerDashboardNew() {
             <TabsList className="flex flex-col h-fit w-full !bg-transparent backdrop-blur-sm border border-white/20">
               <TabsTrigger value="venue" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Building2 className="h-4 w-4 text-purple-400" />
-                My Venue
+                My Listing
               </TabsTrigger>
               <TabsTrigger value="events" className="flex items-center gap-2 w-full justify-start !bg-transparent text-gray-400 hover:text-white hover:bg-white/10 data-[state=active]:!bg-white/20 data-[state=active]:!text-white transition-colors">
                 <Calendar className="h-4 w-4 text-purple-400" />
@@ -352,7 +316,7 @@ export default function VenueOwnerDashboardNew() {
           </div>
 
           <div className="flex-1 min-w-0">
-            {/* My Venue Tab */}
+            {/* My Listing Tab */}
             <TabsContent value="venue">
               <div className="space-y-6">
                 <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
@@ -364,7 +328,7 @@ export default function VenueOwnerDashboardNew() {
                           {getStatusBadge()}
                         </CardTitle>
                         <CardDescription className="text-gray-300">
-                          Manage your venue profile and information that appears on the public listing.
+                          Manage your vendor profile and information that appears on the public listing.
                         </CardDescription>
                       </div>
                       <div className="flex gap-2">
@@ -439,9 +403,9 @@ export default function VenueOwnerDashboardNew() {
                 {/* Admin Management */}
                 <Card className="!bg-white/10 backdrop-blur-sm !border-white/20 text-white">
                   <CardHeader>
-                    <CardTitle className="text-white">Venue Administrators</CardTitle>
+                    <CardTitle className="text-white">Vendor Administrators</CardTitle>
                     <CardDescription className="text-gray-300">
-                      Add other administrators to help manage your venue.
+                      Add other administrators to help manage your vendor listing.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
@@ -449,7 +413,7 @@ export default function VenueOwnerDashboardNew() {
                       <div className="flex items-center justify-between">
                         <div>
                           <p className="text-white font-medium">Current administrators</p>
-                          <p className="text-gray-400 text-sm">People who can manage this venue</p>
+                          <p className="text-gray-400 text-sm">People who can manage this vendor listing</p>
                         </div>
                         <Button className="bg-purple-600 hover:bg-purple-700 text-white">
                           <UserPlus className="h-4 w-4 mr-2" />
