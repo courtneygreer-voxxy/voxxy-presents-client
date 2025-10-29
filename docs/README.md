@@ -40,7 +40,7 @@
 ### Architecture & Design
 - [Project V2 Architecture](./PROJECT-V2-ARCHITECTURE.md) - System architecture
 - [User Flow Test Plan](./USER_FLOW_TEST_PLAN.md) - Testing documentation
-- [Deployment Guide](./DEPLOYMENT.md) - How to deploy
+- [Deployment Guide](./deployment/DEPLOYMENT.md) - How to deploy
 
 ---
 
@@ -77,7 +77,7 @@ See [Phase Reports](./phase-reports/) for detailed daily updates.
 - [Deprecations List](./v3-migration/DEPRECATIONS.md)
 
 ### For DevOps
-- [Deployment Guide](./DEPLOYMENT.md)
+- [Deployment Guide](./deployment/DEPLOYMENT.md)
 - [Deployment Checklist](./v3-migration/DEPLOYMENT-CHECKLIST-V3.md)
 - [Phase 0 Security Fixes](./phase-reports/PHASE_0_SECURITY_FIXES_COMPLETE.md)
 

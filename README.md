@@ -177,7 +177,7 @@ npm run build
 - **[Phase 1 Day 1 Report](./docs/phase-reports/PHASE-1-DAY-1-COMPLETE.md)** - Latest progress
 - **[Project Handoff](./docs/PROJECT_HANDOFF.md)** - Onboarding for new engineers
 - **[Contributing Guide](./docs/CONTRIBUTING.md)** - Development workflow
-- **[Deployment Guide](./docs/DEPLOYMENT.md)** - How to deploy
+- **[Deployment Guide](./docs/deployment/DEPLOYMENT.md)** - How to deploy
 
 ### Documentation Structure
 
