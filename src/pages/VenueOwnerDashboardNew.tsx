@@ -28,6 +28,7 @@ import {
   Share,
   Copy
 } from "lucide-react"
+import { CreateVendorListingForm } from '../components/vendor/CreateVendorListingForm'
 import { useAuth } from '@/contexts/AuthContext'
 import { VenueProfileEditor } from '@/components/venue/VenueProfileEditor'
 import { EventPipelineCRM } from '@/components/venue/EventPipelineCRM'
@@ -195,30 +196,7 @@ export default function VenueOwnerDashboardNew() {
   }
 
   if (!selectedVenue) {
-    return (
-      <div className="min-h-screen bg-gray-900 relative overflow-hidden flex items-center justify-center p-4">
-        {/* Animated background dots */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-indigo-900/20">
-          <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/30 rounded-full animate-pulse"></div>
-          <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-purple-400/40 rounded-full animate-pulse delay-1000"></div>
-          <div className="absolute bottom-1/4 left-1/3 w-1.5 h-1.5 bg-indigo-400/30 rounded-full animate-pulse delay-500"></div>
-        </div>
-
-        <div className="bg-white/15 backdrop-blur-md border border-white/30 rounded-xl p-8 w-full max-w-md relative z-10 text-center">
-          <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-white mb-2">No Vendor Listing Found</h2>
-          <p className="text-gray-300 mb-6">
-            You don't have any vendor listings associated with your account yet.
-          </p>
-          <Button
-            onClick={() => navigate('/venues/create')}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            Create Your Vendor Listing
-          </Button>
-        </div>
-      </div>
-    )
+    return <CreateVendorListingForm />
   }
 
   const getStatusIcon = () => {
