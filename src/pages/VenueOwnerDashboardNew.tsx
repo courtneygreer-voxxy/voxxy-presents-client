@@ -56,12 +56,22 @@ export default function VenueOwnerDashboardNew() {
       return
     }
 
+    console.log('🔍 VenueOwnerDashboardNew - Debug Info:')
+    console.log('  - User ID:', currentUser.uid)
+    console.log('  - User Profile:', userProfile)
+    console.log('  - Vendor Profile:', userProfile?.vendorProfile)
+    console.log('  - Vendor IDs:', userProfile?.vendorProfile?.vendorIds)
+    console.log('  - Vendor Type:', userProfile?.vendorProfile?.vendorType)
+    console.log('  - Business Name:', userProfile?.vendorProfile?.businessName)
+
     // Load venue data for this owner
     const loadVenueData = async () => {
       try {
         // Use venue-specific data source
         const { getVenueDataSource } = await import('@/config/environments')
         const dataSource = getVenueDataSource()
+
+        console.log('  - Data Source:', dataSource)
 
         let venueData: any[] = []
 
@@ -77,14 +87,20 @@ export default function VenueOwnerDashboardNew() {
           }
         }
 
+        console.log('  - Loaded Venues:', venueData.length, venueData)
+
         setVenues(venueData)
 
         // Check if any venues need approval
         const pendingVenues = venueData.filter((venue: any) => venue.claimStatus === 'pending')
         const approvedVenues = venueData.filter((venue: any) => venue.claimStatus === 'approved')
 
+        console.log('  - Pending Venues:', pendingVenues.length)
+        console.log('  - Approved Venues:', approvedVenues.length)
+
         if (pendingVenues.length > 0 && approvedVenues.length === 0) {
           // All venues are pending, redirect to pending page
+          console.log('  - Redirecting to /venues/pending')
           navigate('/venues/pending')
           return
         }
@@ -97,7 +113,8 @@ export default function VenueOwnerDashboardNew() {
         }
 
         if (venueData.length === 0) {
-          // No venues found - stay on this page to show empty state
+          // No venues found - stay on this page to show empty state / creation form
+          console.log('  - No venues found, showing creation form')
           setLoading(false)
           return
         }
@@ -110,7 +127,7 @@ export default function VenueOwnerDashboardNew() {
     }
 
     loadVenueData()
-  }, [currentUser, isVenueOwner, navigate])
+  }, [currentUser, isVenueOwner, navigate, userProfile])
 
   const handleLogout = async () => {
     try {
@@ -196,6 +213,9 @@ export default function VenueOwnerDashboardNew() {
   }
 
   if (!selectedVenue) {
+    console.log('🎯 No selected venue - showing CreateVendorListingForm')
+    console.log('  - venues array:', venues)
+    console.log('  - selectedVenue:', selectedVenue)
     return <CreateVendorListingForm />
   }
 

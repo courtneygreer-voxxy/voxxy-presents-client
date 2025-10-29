@@ -68,6 +68,12 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
 
   const vendorInfo = VENDOR_TYPE_INFO[vendorType as VendorType]
 
+  console.log('📝 CreateVendorListingForm - Rendering')
+  console.log('  - User Profile:', userProfile)
+  console.log('  - Vendor Type:', vendorType)
+  console.log('  - Business Name:', businessName)
+  console.log('  - Contact Email:', contactEmail)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
