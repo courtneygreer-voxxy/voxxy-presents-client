@@ -181,6 +181,9 @@ class VendorService {
    */
   async createVendor(request: VendorCreationRequest): Promise<Vendor> {
     try {
+      console.log('🌐 Calling API:', `${API_BASE_URL}/vendors`)
+      console.log('📦 Request body:', JSON.stringify(request, null, 2))
+
       const response = await fetch(`${API_BASE_URL}/vendors`, {
         method: 'POST',
         headers: {
@@ -189,14 +192,19 @@ class VendorService {
         body: JSON.stringify(request),
       })
 
+      console.log('📡 API Response status:', response.status, response.statusText)
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message || 'Failed to create vendor')
+        const errorData = await response.json().catch(() => ({}))
+        console.error('❌ API Error response:', errorData)
+        throw new Error(errorData.message || errorData.error || `API error: ${response.status} ${response.statusText}`)
       }
 
-      return await response.json()
+      const result = await response.json()
+      console.log('✅ API Success response:', result)
+      return result
     } catch (error) {
-      console.error('Error creating vendor:', error)
+      console.error('💥 Error creating vendor:', error)
       throw error
     }
   }
