@@ -15,7 +15,8 @@ A two-sided marketplace platform connecting event producers with service vendors
 ## 📋 Overview
 
 **Current Version**: 3.0
-**Status**: Phase 1 In Progress (Day 1 Complete ✅)
+**Status**: Phase 1 In Progress (Day 2 Complete ✅)
+**Last Updated**: October 29, 2025, 2:30 AM
 
 Voxxy Presents is a marketplace platform that connects:
 - **Producers** (event organizers) who create organizations, post events, and discover vendors
@@ -173,9 +174,10 @@ npm run build
 
 ### Quick Links
 
+- **[🚀 Engineer Onboarding](./docs/ENGINEER_ONBOARDING.md)** - **START HERE** for new team members
 - **[V3.0 Technical Requirements](./docs/v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md)** - Complete project spec
-- **[Phase 1 Day 1 Report](./docs/phase-reports/PHASE-1-DAY-1-COMPLETE.md)** - Latest progress
-- **[Project Handoff](./docs/PROJECT_HANDOFF.md)** - Onboarding for new engineers
+- **[Phase 1 Day 2 Report](./docs/phase-reports/PHASE-1-DAY-2-VENDOR-SAVE-COMPLETE.md)** - Latest progress
+- **[Known Issues](./docs/v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md#-known-issues--technical-debt)** - Current bugs and technical debt
 - **[Contributing Guide](./docs/CONTRIBUTING.md)** - Development workflow
 - **[Deployment Guide](./docs/deployment/DEPLOYMENT.md)** - How to deploy
 
@@ -196,7 +198,7 @@ npm run build
 - Dependency locking (33 packages)
 - Production deployment verified
 
-### Phase 1 Day 1 ✅ Complete
+### Phase 1 Day 1 ✅ Complete (Oct 28)
 - Database role refactoring (`organizer`→`producer`, `venue_owner`→`vendor`)
 - Profile object renaming (`organizationProfile`→`producerProfile`, `venueOwnerProfile`→`vendorProfile`)
 - Beta approval logic removed
@@ -204,10 +206,18 @@ npm run build
 - Production migration executed (4 users)
 - Vendor dashboard bug fixes
 
-### Current Work 🔄
-- **Day 2**: Vendor discovery system
-- **Day 3**: Application system
-- **Day 4**: Event command center
+### Phase 1 Day 2 ✅ Complete (Oct 29)
+- 2-step vendor signup form with type selection
+- Vendor listing creation flow
+- Vendor profile edit page with full CRUD
+- API endpoint: `PUT /api/vendors/by-slug/:slug`
+- Cloud Run deployment with environment configuration
+- Logout/escape functionality for error states
+
+### Current Work 🔄 (Day 3 - Oct 29)
+- **Vendor Discovery**: Browse/save vendors, filtering
+- **Application System**: Database setup, vendor applies to events
+- **Producer Review**: Application review interface
 
 See [Phase Reports](./docs/phase-reports/) for detailed updates.
 
@@ -239,4 +249,4 @@ For questions or issues:
 ---
 
 **Built with ❤️ by the Voxxy team**
-**Last Updated**: October 28, 2025
+**Last Updated**: October 29, 2025
