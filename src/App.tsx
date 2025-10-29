@@ -240,12 +240,12 @@ export default function App() {
               V3.0 PRODUCER ROUTES (NEW)
               ======================================== */}
           <Route path="/producer/dashboard" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
+            <ProtectedRouteV2 requireApproval={false} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />
           <Route path="/producer/organizations" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
+            <ProtectedRouteV2 requireApproval={false} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
               <ProfilePage />
             </ProtectedRouteV2>
           } />

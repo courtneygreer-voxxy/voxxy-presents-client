@@ -63,10 +63,10 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Get vendor info from user profile
+  // Get vendor info from user profile (with fallbacks for legacy accounts)
   const hasVendorProfile = !!userProfile?.vendorProfile
-  const vendorType = userProfile?.vendorProfile?.vendorType || 'venue'
-  const businessName = userProfile?.vendorProfile?.businessName || userProfile?.name || ''
+  const vendorType = userProfile?.vendorProfile?.vendorType || userProfile?.venueOwnerProfile?.businessType || 'venue'
+  const businessName = userProfile?.vendorProfile?.businessName || userProfile?.name || 'My Business'
   const contactEmail = userProfile?.email || ''
 
   const vendorInfo = VENDOR_TYPE_INFO[vendorType as VendorType]
@@ -77,6 +77,7 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
   console.log('  - Vendor Type:', vendorType)
   console.log('  - Business Name:', businessName)
   console.log('  - Contact Email:', contactEmail)
+  console.log('  - Legacy Profile:', userProfile?.venueOwnerProfile)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -89,11 +90,6 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
 
     if (!userProfile) {
       setError('You must be logged in to create a vendor listing')
-      return
-    }
-
-    if (!hasVendorProfile) {
-      setError('Your account is missing vendor information. Please contact support.')
       return
     }
 
@@ -132,13 +128,8 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
 
       console.log('✅ Vendor listing created:', newVendor.id)
 
-      // Call success callback or navigate
-      if (onSuccess) {
-        onSuccess()
-      } else {
-        // Refresh the page to load the new vendor listing
-        window.location.reload()
-      }
+      // Redirect to edit form for the new vendor listing
+      navigate(`/vendor/edit/${newVendor.slug || newVendor.id}`)
     } catch (err: any) {
       console.error('❌ Error creating vendor listing:', err)
       console.error('Error details:', {
@@ -229,7 +220,7 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
           <div className="flex gap-4">
             <Button
               type="submit"
-              disabled={loading || !description.trim() || !hasVendorProfile}
+              disabled={loading || !description.trim()}
               className="flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating...' : 'Create Listing'}
