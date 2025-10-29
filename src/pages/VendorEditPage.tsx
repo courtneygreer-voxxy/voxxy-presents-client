@@ -4,13 +4,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
-import { ArrowLeft, Eye, Save } from 'lucide-react'
+import { ArrowLeft, Eye, Save, LogOut } from 'lucide-react'
+import { useAuth } from '@/contexts/AuthContext'
 import vendorService from '@/services/vendorService'
 import type { Vendor } from '@/types/vendor'
 
 export default function VendorEditPage() {
   const { slug } = useParams<{ slug: string }>()
   const navigate = useNavigate()
+  const { signOut } = useAuth()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -84,6 +86,15 @@ export default function VendorEditPage() {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await signOut()
+      navigate('/login')
+    } catch (err) {
+      console.error('Error logging out:', err)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-900 flex items-center justify-center">
@@ -101,13 +112,23 @@ export default function VendorEditPage() {
         <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-8 max-w-md">
           <h2 className="text-xl font-bold text-white mb-4">Error Loading Vendor</h2>
           <p className="text-gray-300 mb-6">{error || 'Vendor not found'}</p>
-          <Button
-            onClick={() => navigate('/vendor/dashboard')}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
+          <div className="flex flex-col gap-3">
+            <Button
+              onClick={() => navigate('/vendor/dashboard')}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="w-full border-white/20 text-gray-300 hover:bg-white/5"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
+          </div>
         </div>
       </div>
     )
@@ -130,6 +151,14 @@ export default function VendorEditPage() {
             <h1 className="text-xl font-bold text-white">Edit Vendor Profile</h1>
           </div>
           <div className="flex gap-2">
+            <Button
+              variant="outline"
+              onClick={handleLogout}
+              className="border-white/20 text-gray-300 hover:bg-white/5"
+            >
+              <LogOut className="h-4 w-4 mr-2" />
+              Logout
+            </Button>
             <Button
               variant="outline"
               onClick={handlePreview}
