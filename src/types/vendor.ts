@@ -279,6 +279,7 @@ export interface VenueSearchResult {
 export interface VendorCreationRequest {
   // Common vendor details
   name: string
+  slug: string
   description: string
   vendorType: VendorType
   photos: string[]

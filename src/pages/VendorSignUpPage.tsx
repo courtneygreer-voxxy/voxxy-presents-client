@@ -37,34 +37,28 @@ interface FormErrors {
 
 const VENDOR_TYPES: { value: VendorType; label: string; icon: React.ReactNode; description: string }[] = [
   {
+    value: 'artist',
+    label: 'Artist',
+    icon: <Music className="h-6 w-6" />,
+    description: 'Visual artists, crafters, makers'
+  },
+  {
+    value: 'market_vendor',
+    label: 'Market Vendor',
+    icon: <ShoppingBag className="h-6 w-6" />,
+    description: 'Product vendors, goods, crafts'
+  },
+  {
+    value: 'entertainment',
+    label: 'Entertainment',
+    icon: <Music className="h-6 w-6" />,
+    description: 'DJs, performers, live acts'
+  },
+  {
     value: 'venue',
     label: 'Venue',
     icon: <Building2 className="h-6 w-6" />,
     description: 'Event spaces, bars, restaurants'
-  },
-  {
-    value: 'artist',
-    label: 'Artist/Performer',
-    icon: <Music className="h-6 w-6" />,
-    description: 'Musicians, DJs, live performers'
-  },
-  {
-    value: 'photographer',
-    label: 'Photographer',
-    icon: <Camera className="h-6 w-6" />,
-    description: 'Event photography services'
-  },
-  {
-    value: 'lighting_tech',
-    label: 'Lighting Tech',
-    icon: <Zap className="h-6 w-6" />,
-    description: 'Lighting design and production'
-  },
-  {
-    value: 'entertainer',
-    label: 'Entertainment',
-    icon: <Music className="h-6 w-6" />,
-    description: 'Acts, performers, entertainment'
   },
   {
     value: 'catering',
@@ -73,10 +67,16 @@ const VENDOR_TYPES: { value: VendorType; label: string; icon: React.ReactNode; d
     description: 'Food and beverage services'
   },
   {
-    value: 'market_vendor',
-    label: 'Market Vendor',
-    icon: <ShoppingBag className="h-6 w-6" />,
-    description: 'Product vendors, crafts, goods'
+    value: 'photographer',
+    label: 'Photography',
+    icon: <Camera className="h-6 w-6" />,
+    description: 'Event photography services'
+  },
+  {
+    value: 'lighting_tech',
+    label: 'Lighting + Tech',
+    icon: <Zap className="h-6 w-6" />,
+    description: 'Lighting, sound, technical services'
   },
 ]
 

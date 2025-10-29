@@ -63,17 +63,10 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Get vendor info from user profile (or allow selection for legacy accounts)
+  // Get vendor info from user profile
   const hasVendorProfile = !!userProfile?.vendorProfile
-  const [selectedVendorType, setSelectedVendorType] = useState<VendorType | ''>(
-    userProfile?.vendorProfile?.vendorType || ''
-  )
-  const [businessNameInput, setBusinessNameInput] = useState(
-    userProfile?.vendorProfile?.businessName || userProfile?.name || ''
-  )
-
-  const vendorType = selectedVendorType || 'venue'
-  const businessName = businessNameInput || userProfile?.name || ''
+  const vendorType = userProfile?.vendorProfile?.vendorType || 'venue'
+  const businessName = userProfile?.vendorProfile?.businessName || userProfile?.name || ''
   const contactEmail = userProfile?.email || ''
 
   const vendorInfo = VENDOR_TYPE_INFO[vendorType as VendorType]
@@ -89,16 +82,6 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
     e.preventDefault()
     setError('')
 
-    if (!selectedVendorType) {
-      setError('Please select a vendor type')
-      return
-    }
-
-    if (!businessNameInput.trim()) {
-      setError('Please provide a business name')
-      return
-    }
-
     if (!description.trim()) {
       setError('Please provide a description of your services')
       return
@@ -109,12 +92,24 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
       return
     }
 
+    if (!hasVendorProfile) {
+      setError('Your account is missing vendor information. Please contact support.')
+      return
+    }
+
     setLoading(true)
 
     try {
+      // Generate slug from business name
+      const slug = businessName
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+
       // Create the vendor listing
       console.log('📤 Sending vendor creation request:', {
         name: businessName,
+        slug: slug,
         vendorType: vendorType,
         ownerName: userProfile.name || 'Unknown',
         ownerEmail: userProfile.email || contactEmail,
@@ -122,6 +117,7 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
 
       const newVendor = await vendorService.createVendor({
         name: businessName,
+        slug: slug,
         description: description.trim(),
         vendorType: vendorType as VendorType,
         photos: [],
@@ -185,75 +181,26 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
           </div>
         </div>
 
-        {/* Info summary (only show if vendor profile exists) */}
-        {hasVendorProfile && (
-          <div className="bg-white/5 rounded-lg p-4 mb-6 space-y-2">
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white font-medium">{businessName}</p>
-                <p className="text-gray-400 text-sm">{vendorInfo.label}</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-2">
-              <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white font-medium">{contactEmail}</p>
-                <p className="text-gray-400 text-sm">Contact email</p>
-              </div>
+        {/* Info summary - show what was collected at signup */}
+        <div className="bg-white/5 rounded-lg p-4 mb-6 space-y-2">
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-white font-medium">{businessName}</p>
+              <p className="text-gray-400 text-sm">{vendorInfo.label}</p>
             </div>
           </div>
-        )}
+          <div className="flex items-start gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-400 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-white font-medium">{contactEmail}</p>
+              <p className="text-gray-400 text-sm">Contact email</p>
+            </div>
+          </div>
+        </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Vendor Type Selection (for legacy accounts) */}
-          {!hasVendorProfile && (
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">
-                Vendor Type *
-              </label>
-              <div className="grid grid-cols-2 gap-3">
-                {(['artist', 'market_vendor', 'entertainment', 'venue', 'catering', 'photographer', 'lighting_tech'] as VendorType[]).map((type) => (
-                  <button
-                    key={type}
-                    type="button"
-                    onClick={() => setSelectedVendorType(type)}
-                    className={`p-4 rounded-lg border-2 transition-all ${
-                      selectedVendorType === type
-                        ? 'border-purple-500 bg-purple-500/20'
-                        : 'border-white/10 bg-white/5 hover:border-white/20'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className={`${selectedVendorType === type ? 'text-purple-400' : 'text-gray-400'}`}>
-                        {VENDOR_TYPE_INFO[type].icon}
-                      </div>
-                      <span className="text-white text-sm font-medium">{VENDOR_TYPE_INFO[type].label}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Business Name (for legacy accounts) */}
-          {!hasVendorProfile && (
-            <div>
-              <label htmlFor="businessName" className="block text-sm font-medium text-gray-300 mb-2">
-                Business Name *
-              </label>
-              <input
-                type="text"
-                id="businessName"
-                value={businessNameInput}
-                onChange={(e) => setBusinessNameInput(e.target.value)}
-                placeholder="Your business or artist name"
-                className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-gray-500 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                required
-              />
-            </div>
-          )}
 
           <div>
             <label htmlFor="description" className="block text-sm font-medium text-gray-300 mb-2">
@@ -282,7 +229,7 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
           <div className="flex gap-4">
             <Button
               type="submit"
-              disabled={loading || !description.trim() || !selectedVendorType || !businessNameInput.trim()}
+              disabled={loading || !description.trim() || !hasVendorProfile}
               className="flex-1 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating...' : 'Create Listing'}

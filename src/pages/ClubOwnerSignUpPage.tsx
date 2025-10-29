@@ -136,12 +136,12 @@ export default function ClubOwnerSignUpPage() {
       // Track successful signup
       analytics.trackConversionStep('Sign Up Completed', 'Club Owner Sign Up')
       analytics.setUserProperties({
-        user_role: 'organizer',
+        user_role: 'producer',  // V3.0: Use new role name
         conversion_stage: 'converted',
       })
 
-      // Redirect to beta pending page
-      navigate('/beta-pending')
+      // Redirect to producer dashboard (V3.0: No more beta approval needed)
+      navigate('/producer/dashboard')
     } catch (err) {
       console.error('Club owner signup error:', err)
       analytics.track('Sign Up Error', {
