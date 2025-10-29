@@ -126,10 +126,18 @@ export const CreateVendorListingForm: React.FC<CreateVendorListingFormProps> = (
         preferredContactMethod: userProfile.vendorProfile?.preferredContactMethod || 'email',
       })
 
-      console.log('✅ Vendor listing created:', newVendor.id)
+      console.log('✅ Vendor listing created successfully!')
+      console.log('Response data:', newVendor)
+      console.log('  - ID:', newVendor.id)
+      console.log('  - Slug:', newVendor.slug)
+      console.log('  - Generated slug:', slug)
+
+      // Use the slug we generated (API might not return it)
+      const vendorSlug = newVendor.slug || slug
+      console.log('  - Using slug for redirect:', vendorSlug)
 
       // Redirect to edit form for the new vendor listing
-      navigate(`/vendor/edit/${newVendor.slug || newVendor.id}`)
+      navigate(`/vendor/edit/${vendorSlug}`)
     } catch (err: any) {
       console.error('❌ Error creating vendor listing:', err)
       console.error('Error details:', {

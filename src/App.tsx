@@ -36,6 +36,7 @@ import VenueSearchPortal from './pages/VenueSearchPortal'
 // New vendor pages (backward compatible)
 import VendorProfilePage from './pages/VendorProfilePage'
 import VendorMarketplace from './pages/VendorMarketplace'
+import VendorEditPage from './pages/VendorEditPage'
 import VenueCreatePage from './pages/VenueCreatePage'
 import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
 import VenueOwnerBenefitsPage from './pages/VenueOwnerBenefitsPage'
@@ -266,6 +267,11 @@ export default function App() {
           <Route path="/vendor/dashboard" element={
             <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
               <VenueOwnerDashboardNew />
+            </ProtectedRouteV2>
+          } />
+          <Route path="/vendor/edit/:slug" element={
+            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
+              <VendorEditPage />
             </ProtectedRouteV2>
           } />
           <Route path="/vendor/vendors" element={
