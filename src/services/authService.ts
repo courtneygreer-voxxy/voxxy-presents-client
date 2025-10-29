@@ -133,13 +133,15 @@ export const signUp = async ({ email, password, displayName, userType = 'club-ow
       emailNotifications: true,
     }
 
-    // V3.0: Producers (club owners) go through beta approval process
+    // V3.0: Producers (club owners) - no beta approval needed
     const producerData = userType === 'club-owner' ? {
-      betaStatus: 'pending' as const,
-      betaRequestedAt: new Date(),
+      producerProfile: {
+        organizationId: '', // Will be populated when they create their organization
+        onboardingCompleted: false
+      }
     } : {}
 
-    // V3.0: Vendors skip beta entirely and go straight to vendor listing creation
+    // V3.0: Vendors - no beta approval needed
     const vendorData = userType === 'venue-owner' ? {
       vendorProfile: {
         vendorIds: [],
