@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, ArrowLeft, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/services/authService'
 import { usePageTracking } from '@/hooks/usePageTracking'
@@ -44,7 +44,9 @@ export default function ClubOwnerSignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [formStarted, setFormStarted] = useState(false)
+
+  // Debug: Log when errors state changes
+  console.log('📝 ClubOwnerSignUpPage render - errors:', errors)
 
   // Validation
   const validateField = (field: keyof FormData, value: any): string | string[] | undefined => {
@@ -83,10 +85,17 @@ export default function ClubOwnerSignUpPage() {
   const handleInputChange = (field: keyof FormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }))
 
+    // Clear field-specific errors
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
     }
 
+    // Clear submit error only when user starts typing again
+    if (errors.submit) {
+      setErrors(prev => ({ ...prev, submit: undefined }))
+    }
+
+    // Clear AuthContext error
     if (error) {
       clearError()
     }
@@ -140,16 +149,34 @@ export default function ClubOwnerSignUpPage() {
         conversion_stage: 'converted',
       })
 
-      // Redirect to producer dashboard (V3.0: No more beta approval needed)
-      navigate('/producer/dashboard')
+      // Redirect to email verification page
+      // Note: Verification email is automatically sent by Rails on signup
+      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`)
     } catch (err) {
       console.error('Club owner signup error:', err)
+
+      // Extract user-friendly error message
+      let errorMessage = 'Failed to create account. Please try again.'
+
+      if (err instanceof Error) {
+        // Use the main error message (which is user-friendly)
+        errorMessage = err.message
+      }
+
       analytics.track('Sign Up Error', {
         page_name: 'Club Owner Sign Up',
         error_type: 'submission_failed',
-        error_message: err instanceof Error ? err.message : 'Unknown error'
+        error_message: errorMessage
       })
-      setErrors(prev => ({ ...prev, submit: 'Failed to create account. Please try again.' }))
+
+      setErrors(prev => {
+        const newErrors = { ...prev, submit: errorMessage }
+        console.log('🔴 Setting error state:', newErrors)
+        return newErrors
+      })
+
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } finally {
       setIsSubmitting(false)
     }
@@ -187,6 +214,19 @@ export default function ClubOwnerSignUpPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
+              {/* Error Display - At the top for visibility */}
+              {(error || errors.submit) && (
+                <Alert className="bg-red-500/20 border-red-500 border-2 mb-6 shadow-lg">
+                  <AlertDescription className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                    <div className="text-white font-medium">
+                      {error || errors.submit}
+                      {console.log('🔴 Rendering error alert:', error || errors.submit)}
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
+
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Display Name Field */}
                 <div className="space-y-2">
@@ -330,15 +370,6 @@ export default function ClubOwnerSignUpPage() {
                     'Create Club Owner Account'
                   )}
                 </Button>
-
-                {/* Error Display */}
-                {(error || errors.submit) && (
-                  <Alert className="bg-red-400/10 border-red-400/30">
-                    <AlertDescription className="text-red-300">
-                      {error || errors.submit}
-                    </AlertDescription>
-                  </Alert>
-                )}
               </form>
 
               {/* Switch to Login */}

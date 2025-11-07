@@ -3,12 +3,41 @@ import { getApiUrl } from '@/config/environments'
 
 const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
+// Token management for Rails JWT authentication
+const TOKEN_KEY = 'railsAuthToken'
+
+export function saveAuthToken(token: string): void {
+  try {
+    localStorage.setItem(TOKEN_KEY, token)
+  } catch (error) {
+    console.error('Failed to save auth token:', error)
+  }
+}
+
+export function getAuthToken(): string | null {
+  try {
+    return localStorage.getItem(TOKEN_KEY)
+  } catch (error) {
+    console.error('Failed to get auth token:', error)
+    return null
+  }
+}
+
+export function clearAuthToken(): void {
+  try {
+    localStorage.removeItem(TOKEN_KEY)
+  } catch (error) {
+    console.error('Failed to clear auth token:', error)
+  }
+}
 
 class ApiError extends Error {
   status: number
-  constructor(message: string, status: number) {
+  errors?: string[]
+  constructor(message: string, status: number, errors?: string[]) {
     super(message)
     this.status = status
+    this.errors = errors
     this.name = 'ApiError'
   }
 }
@@ -16,7 +45,6 @@ class ApiError extends Error {
 async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`
 
-  // Add admin key for admin endpoints
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(options?.headers as Record<string, string> || {}),
@@ -31,17 +59,16 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     headers['x-admin-key'] = adminKey
   }
 
-  // Add Firebase auth token for authenticated endpoints
-  if (endpoint.startsWith('/users/')) {
-    try {
-      const { auth } = await import('@/lib/firebase')
-      const currentUser = auth.currentUser
-      if (currentUser) {
-        const idToken = await currentUser.getIdToken()
-        headers['Authorization'] = `Bearer ${idToken}`
-      }
-    } catch (error) {
-      console.error('Failed to get Firebase auth token:', error)
+  // Add Rails JWT token for authenticated endpoints (exclude public auth endpoints)
+  const isPublicAuthEndpoint =
+    (endpoint.startsWith('/v1/shared/login') && options?.method === 'POST') ||
+    (endpoint.startsWith('/v1/shared/users') && options?.method === 'POST') ||
+    endpoint.startsWith('/v1/shared/password_reset')
+
+  if (!isPublicAuthEndpoint) {
+    const token = getAuthToken()
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`
     }
   }
 
@@ -58,32 +85,297 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
       } catch {
         errorData = { message: `HTTP ${response.status}: ${response.statusText}` }
       }
-      
+
       console.error('API Error:', {
         url,
         status: response.status,
-        message: errorData.message || errorData.error
+        message: errorData.message || errorData.error,
+        errors: errorData.errors
       })
-      
+
       const errorMessage = errorData.message || errorData.error || `API request failed (${response.status})`
-      throw new ApiError(errorMessage, response.status)
+      throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
     const data = await response.json()
     return data
-    
+
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
     }
-    
+
     console.error('Network Error:', {
       url,
       error: error instanceof Error ? error.message : 'Unknown error'
     })
-    
+
     throw new ApiError(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`, 0)
   }
+}
+
+// Authentication API (Rails JWT)
+export const authApi = {
+  /**
+   * Login with email and password
+   * POST /login (legacy endpoint)
+   */
+  async login(email: string, password: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Mobile-App': 'true', // Required to get JWT token from Rails
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        product: 'presents', // Important: specify product context
+      }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Login failed',
+        response.status,
+        data.errors
+      )
+    }
+
+    // Validate response
+    if (!data.token || !data.id) {
+      throw new ApiError('Invalid response from server', 500)
+    }
+
+    // Save token
+    saveAuthToken(data.token)
+
+    return data
+  },
+
+  /**
+   * Sign up new user
+   * POST /users (legacy endpoint until v1/shared controllers are created)
+   *
+   * If user already exists (e.g., from Mobile app), attempt to login instead
+   */
+  async signup(data: {
+    email: string
+    password: string
+    name: string
+    role?: 'consumer' | 'vendor' | 'venue_owner' | 'producer'
+  }) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        user: {
+          email: data.email,
+          password: data.password,
+          password_confirmation: data.password,
+          name: data.name,
+          role: data.role || 'consumer',
+          product_context: 'presents',
+        },
+      }),
+    })
+
+    const responseData = await response.json()
+
+    if (!response.ok) {
+      // Check if user already exists (from Mobile app or previous signup)
+      if (response.status === 422 && responseData.errors?.includes('Email has already been taken')) {
+        // User exists - try to login with provided credentials
+        try {
+          console.log('Email already registered. Attempting login...')
+          const loginResponse = await this.login(data.email, data.password)
+
+          // TODO: Update product_context to 'both' if needed
+          // This should be handled by the backend when user logs in from different product
+
+          return loginResponse
+        } catch (loginError) {
+          // Login failed - wrong password or other issue
+          throw new ApiError(
+            'An account with this email already exists. Please login instead or reset your password.',
+            401,
+            ['Email has already been taken']
+          )
+        }
+      }
+
+      throw new ApiError(
+        responseData.error || 'Signup failed',
+        response.status,
+        responseData.errors
+      )
+    }
+
+    // Signup successful - now login to get token
+    const loginResponse = await this.login(data.email, data.password)
+    return loginResponse
+  },
+
+  /**
+   * Logout current user
+   * DELETE /logout (legacy endpoint)
+   */
+  async logout() {
+    try {
+      // Use legacy endpoint since v1/shared/logout controller doesn't exist yet
+      await fetch(`${API_BASE_URL.replace('/api', '')}/logout`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getAuthToken()}`
+        },
+      })
+    } finally {
+      // Always clear token even if request fails
+      clearAuthToken()
+    }
+  },
+
+  /**
+   * Get current user profile
+   * GET /me (legacy endpoint until v1/shared controllers are created)
+   */
+  async getCurrentUser() {
+    // Note: Using legacy /me endpoint since /v1/shared/me controller doesn't exist yet
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/me`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      throw new ApiError(`Failed to get current user: ${response.statusText}`, response.status)
+    }
+
+    const data = await response.json()
+    return data
+  },
+
+  /**
+   * Update user profile
+   * PATCH /v1/shared/users/:id
+   */
+  async updateUser(userId: number, updates: any) {
+    return fetchApi<any>(`/v1/shared/users/${userId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ user: updates }),
+    })
+  },
+
+  /**
+   * Request password reset
+   * POST /password_reset (legacy endpoint)
+   */
+  async requestPasswordReset(email: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/password_reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password_reset: { email } }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Failed to send password reset email',
+        response.status,
+        data.errors
+      )
+    }
+
+    return data
+  },
+
+  /**
+   * Reset password with token
+   * PATCH /password_reset (legacy endpoint)
+   */
+  async resetPasswordWithToken(token: string, password: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/password_reset`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ token, password }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Failed to reset password',
+        response.status,
+        data.errors
+      )
+    }
+
+    return data
+  },
+
+  /**
+   * Verify email with code
+   * POST /verify_code
+   */
+  async verifyEmailCode(code: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/verify_code`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ code: code.trim() }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Verification failed',
+        response.status,
+        data.errors
+      )
+    }
+
+    return data
+  },
+
+  /**
+   * Resend verification email
+   * POST /resend_verification
+   */
+  async resendVerificationEmail(email: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/resend_verification`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email }),
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Failed to resend verification email',
+        response.status,
+        data.errors
+      )
+    }
+
+    return data
+  },
 }
 
 // Organizations API
@@ -308,7 +600,8 @@ export const venuesApi = {
 // Users API
 export const usersApi = {
   async getCurrentUser() {
-    return fetchApi<any>('/users/me')
+    // Delegate to authApi for consistency
+    return authApi.getCurrentUser()
   }
 }
 

@@ -222,8 +222,9 @@ export default function VendorSignUpPage() {
         conversion_stage: 'converted',
       })
 
-      // Redirect to vendor dashboard
-      navigate('/vendor/dashboard')
+      // Redirect to email verification page
+      // Note: Verification email is automatically sent by Rails on signup
+      navigate(`/verify-email?email=${encodeURIComponent(formData.email)}`)
 
     } catch (err: any) {
       console.error('Vendor signup error:', err)

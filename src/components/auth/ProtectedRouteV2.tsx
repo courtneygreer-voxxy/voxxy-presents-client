@@ -60,6 +60,8 @@ const getRoleBasedDashboard = (role: UserV2['role']): string => {
       return '/producer/dashboard'
     case 'vendor':
       return '/vendor/dashboard'
+    case 'consumer':
+      return '/consumer/dashboard'
     case 'guest':
       return '/guest/dashboard'
     // LEGACY roles (should be normalized above, but handle just in case)
@@ -334,7 +336,7 @@ export function RedirectIfAuthenticatedV2({
   children,
   redirectTo
 }: RedirectIfAuthenticatedV2Props) {
-  const { isAuthenticated, loading, userProfile } = useAuth()
+  const { isAuthenticated, loading, userProfile, isEmailVerified } = useAuth()
 
   // Show loading spinner while auth state is being determined
   if (loading) {
@@ -348,10 +350,18 @@ export function RedirectIfAuthenticatedV2({
     )
   }
 
-  // If authenticated, redirect to appropriate dashboard
+  // If authenticated, check email verification first
   if (isAuthenticated && userProfile) {
+    // If email is not verified, redirect to email verification page
+    if (!isEmailVerified) {
+      console.log('✉️  User not verified, redirecting to email verification page')
+      return <Navigate to={`/verify-email?email=${encodeURIComponent(userProfile.email)}`} replace />
+    }
+
+    // Email verified - redirect to appropriate dashboard
     const normalizedUser = normalizeUserForV2(userProfile)
     const targetPath = redirectTo || getRoleBasedDashboard(normalizedUser.role)
+    console.log('✓ User verified, redirecting to:', targetPath)
     return <Navigate to={targetPath} replace />
   }
 

@@ -1,51 +1,61 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { User as FirebaseUser, onAuthStateChanged } from 'firebase/auth'
-import { auth } from '@/lib/firebase'
-import {
-  signUp,
-  signIn,
-  signOutUser,
-  resetPassword,
-  resendEmailVerification,
-  getUserProfile,
-  handleEmailVerification,
-  checkForEmailVerificationInURL,
-  AuthServiceError,
-  type SignUpData,
-  type SignInData
-} from '@/services/authService'
-import type { User } from '@/types/database'
+import { authApi, getAuthToken, clearAuthToken, ApiError } from '@/services/api'
 import { analytics } from '@/lib/analytics'
 import { getCachedUserProfile, cacheUserProfile, removeCachedUserProfile } from '@/utils/cache'
 
+// Rails User type
+interface User {
+  id: number
+  email: string
+  name: string
+  role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest'
+  confirmed_at: string | null
+  avatar?: string
+  profile_pic?: string
+  username?: string
+  status?: 'active' | 'suspended' | 'banned'
+  product_context?: 'mobile' | 'presents' | 'both'
+}
+
+interface SignUpData {
+  email: string
+  password: string
+  displayName: string
+  userType?: 'club-owner' | 'venue-owner' | 'consumer' | 'producer' | 'vendor'
+  role?: User['role']
+}
+
+interface SignInData {
+  email: string
+  password: string
+}
+
 interface AuthContextType {
   // Current user state
-  currentUser: FirebaseUser | null
+  currentUser: User | null
   userProfile: User | null
   loading: boolean
   error: string | null
-  
+
   // Auth actions
   signUp: (data: SignUpData) => Promise<void>
   signIn: (data: SignInData) => Promise<void>
   signOut: () => Promise<void>
   resetPassword: (email: string) => Promise<void>
-  resendVerification: () => Promise<void>
   clearError: () => void
   refreshUserProfile: () => Promise<void>
-  
+
   // Helper methods
   isAuthenticated: boolean
   isEmailVerified: boolean
-  needsEmailVerification: boolean
 
-  // V3.0: Role-specific helpers (supports both old and new roles)
+  // Role-specific helpers
   isAdmin: boolean
-  isProducer: boolean // NEW V3.0
-  isVendor: boolean   // NEW V3.0
-  isGuest: boolean    // NEW V3.0
-  isOrganizer: boolean // DEPRECATED - use isProducer
-  isVenueOwner: boolean // DEPRECATED - use isVendor
+  isProducer: boolean
+  isVendor: boolean
+  isGuest: boolean
+  isOrganizer: boolean // DEPRECATED - alias for isProducer
+  isVenueOwner: boolean // DEPRECATED - alias for isVendor
   hasRole: (role: User['role']) => boolean
 }
 
@@ -64,134 +74,174 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
-  const [currentUser, setCurrentUser] = useState<FirebaseUser | null>(null)
+  const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [userProfile, setUserProfile] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   // Derived state
   const isAuthenticated = !!currentUser
-  const isEmailVerified = !!currentUser?.emailVerified
-  const needsEmailVerification = isAuthenticated && !isEmailVerified
 
   // Clear error helper
   const clearError = () => setError(null)
 
-  // Handle email verification from URL parameters
+  // Check for existing auth token on mount
   useEffect(() => {
-    const actionCode = checkForEmailVerificationInURL()
-    if (actionCode) {
-      handleEmailVerification(actionCode)
-        .then(() => {
-          // Clear URL parameters after successful verification
-          const url = new URL(window.location.href)
-          url.searchParams.delete('mode')
-          url.searchParams.delete('oobCode')
-          window.history.replaceState({}, '', url.toString())
-          
-          // Show success message or redirect
-          console.log('Email verified successfully!')
-        })
-        .catch((error) => {
-          console.error('Email verification failed:', error)
-          setError(error.message)
-        })
-    }
-  }, [])
+    const checkAuth = async () => {
+      const token = getAuthToken()
 
-  // Handle auth state changes
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user)
+      if (!token) {
+        setLoading(false)
+        return
+      }
 
-      if (user) {
-        // PERFORMANCE OPTIMIZATION: Try to load cached profile first
-        const cachedProfile = getCachedUserProfile<User>(user.uid)
+      // Try to load cached profile first
+      const cachedProfile = getCachedUserProfile<User>('rails-user')
 
-        if (cachedProfile) {
-          // Load cached profile immediately for instant UI
-          console.log('✓ Loading cached user profile (instant)')
-          setUserProfile(cachedProfile)
-          setLoading(false) // UI updates immediately!
+      if (cachedProfile) {
+        console.log('✓ Loading cached user profile (instant)')
+        setCurrentUser(cachedProfile)
+        setUserProfile(cachedProfile)
+        setLoading(false)
 
-          // Track sign in with cached data
-          if (user.email) {
-            analytics.trackUserSignIn(user.email, user.uid, cachedProfile.role)
-          }
+        // Track sign in with cached data
+        analytics.trackUserSignIn(cachedProfile.email, String(cachedProfile.id), cachedProfile.role)
+      }
+
+      // Fetch fresh profile from API
+      try {
+        const user = await authApi.getCurrentUser()
+        setCurrentUser(user)
+        setUserProfile(user)
+
+        // Cache the fresh profile
+        if (user) {
+          cacheUserProfile('rails-user', user)
         }
 
-        // Refresh profile in background (whether cached or not)
-        try {
-          const profile = await getUserProfile(user.uid)
-          setUserProfile(profile)
-
-          // Cache the fresh profile
-          if (profile) {
-            cacheUserProfile(user.uid, profile)
-          }
-
-          // Track user sign in for analytics (only if profile exists)
-          if (profile && user.email && !cachedProfile) {
-            analytics.trackUserSignIn(user.email, user.uid, profile.role)
-          }
-
-          // Only set loading false if we didn't have cache
-          if (!cachedProfile) {
-            setLoading(false)
-          }
-        } catch (err) {
-          console.warn('Failed to load user profile (this is normal for new users):', err)
-          // Don't set error for profile loading issues - user can still use the app
-          if (!cachedProfile) {
-            setUserProfile(null)
-            setLoading(false)
-          }
+        // Track user sign in (only if not cached)
+        if (user && !cachedProfile) {
+          analytics.trackUserSignIn(user.email, String(user.id), user.role)
         }
-      } else {
+
+        if (!cachedProfile) {
+          setLoading(false)
+        }
+      } catch (err) {
+        console.warn('Failed to load user profile:', err)
+        // Token might be expired
+        clearAuthToken()
+        removeCachedUserProfile('rails-user')
+        setCurrentUser(null)
         setUserProfile(null)
         setLoading(false)
       }
-    })
+    }
 
-    return unsubscribe
+    checkAuth()
   }, [])
 
   // Sign up function
   const handleSignUp = async (data: SignUpData) => {
+    // Don't set loading to true for signup - causes unnecessary re-renders
+    // The signup page has its own loading state (isSubmitting)
     try {
-      setLoading(true)
       setError(null)
-      await signUp(data)
-      // Note: onAuthStateChanged will handle setting the user state
+
+      // Map userType to role, or use explicit role if provided
+      let role: User['role'] = 'consumer' // Default fallback
+
+      if (data.role) {
+        role = data.role
+      } else if (data.userType) {
+        // Map legacy userType to V3.0 roles
+        switch (data.userType) {
+          case 'club-owner':
+            role = 'producer'
+            break
+          case 'venue-owner':
+            role = 'vendor'
+            break
+          case 'producer':
+            role = 'producer'
+            break
+          case 'vendor':
+            role = 'vendor'
+            break
+          default:
+            role = 'consumer'
+        }
+      }
+
+      console.log(`✓ Signing up user with role: ${role}`)
+
+      const response = await authApi.signup({
+        email: data.email,
+        password: data.password,
+        name: data.displayName,
+        role: role
+      })
+
+      // Login automatically saves the token
+      if (response.token) {
+        const user = await authApi.getCurrentUser()
+        setCurrentUser(user)
+        setUserProfile(user)
+        cacheUserProfile('rails-user', user)
+
+        // Track sign up
+        analytics.trackUserSignIn(user.email, String(user.id), user.role)
+      }
     } catch (err) {
-      if (err instanceof AuthServiceError) {
+      if (err instanceof ApiError) {
+        // Use the main error message (which is user-friendly)
+        // Don't use err.errors as it contains raw backend validation errors
         setError(err.message)
       } else {
         setError('An unexpected error occurred during sign up')
       }
       throw err
-    } finally {
-      setLoading(false)
     }
+    // Note: No finally block - don't change loading state for signup
+    // The signup page manages its own loading state with isSubmitting
   }
 
   // Sign in function
   const handleSignIn = async (data: SignInData) => {
+    // Don't set loading to true for login - causes unnecessary re-renders
+    // The login page has its own loading state (isSubmitting)
     try {
-      setLoading(true)
       setError(null)
-      await signIn(data)
-      // Note: onAuthStateChanged will handle setting the user state
+
+      // Step 1: Login to get JWT token
+      const loginResponse = await authApi.login(data.email, data.password)
+      // authApi.login() saves the token automatically
+
+      // Step 2: Fetch full user profile (includes role and other fields)
+      // This is critical because login response may not include all user fields
+      console.log('✓ Login successful, fetching full user profile...')
+      const user = await authApi.getCurrentUser()
+
+      // Step 3: Set user data from full profile
+      setCurrentUser(user)
+      setUserProfile(user)
+      cacheUserProfile('rails-user', user)
+
+      // Track sign in
+      analytics.trackUserSignIn(user.email, String(user.id), user.role)
+
+      console.log('✓ User profile loaded:', { email: user.email, role: user.role, confirmed: !!user.confirmed_at })
     } catch (err) {
-      if (err instanceof AuthServiceError) {
+      if (err instanceof ApiError) {
+        // Use the main error message (which is user-friendly)
         setError(err.message)
       } else {
         setError('An unexpected error occurred during sign in')
       }
       throw err
-    } finally {
-      setLoading(false)
     }
+    // Note: No finally block - don't change loading state for login
+    // The login page manages its own loading state with isSubmitting
   }
 
   // Sign out function
@@ -200,15 +250,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setLoading(true)
       setError(null)
 
-      // Clear cached profile before signing out
-      if (currentUser) {
-        removeCachedUserProfile(currentUser.uid)
-      }
+      // Clear cached profile
+      removeCachedUserProfile('rails-user')
 
-      await signOutUser()
-      // Note: onAuthStateChanged will handle clearing the user state
+      // Call logout endpoint and clear token
+      await authApi.logout()
+
+      // Clear state
+      setCurrentUser(null)
+      setUserProfile(null)
     } catch (err) {
-      if (err instanceof AuthServiceError) {
+      if (err instanceof ApiError) {
         setError(err.message)
       } else {
         setError('An unexpected error occurred during sign out')
@@ -223,9 +275,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const handleResetPassword = async (email: string) => {
     try {
       setError(null)
-      await resetPassword(email)
+      await authApi.requestPasswordReset(email)
     } catch (err) {
-      if (err instanceof AuthServiceError) {
+      if (err instanceof ApiError) {
         setError(err.message)
       } else {
         setError('An unexpected error occurred while resetting password')
@@ -234,37 +286,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  // Resend email verification
-  const handleResendVerification = async () => {
-    if (!currentUser) {
-      setError('No user is currently signed in')
-      return
-    }
-
-    try {
-      setError(null)
-      await resendEmailVerification(currentUser)
-    } catch (err) {
-      if (err instanceof AuthServiceError) {
-        setError(err.message)
-      } else {
-        setError('An unexpected error occurred while sending verification email')
-      }
-      throw err
-    }
-  }
-
-  // Refresh user profile from Firestore
+  // Refresh user profile from API
   const handleRefreshUserProfile = async () => {
     if (!currentUser) return
 
     try {
-      const profile = await getUserProfile(currentUser.uid)
-      setUserProfile(profile)
+      const user = await authApi.getCurrentUser()
+      setCurrentUser(user)
+      setUserProfile(user)
 
       // Update cache with fresh profile
-      if (profile) {
-        cacheUserProfile(currentUser.uid, profile)
+      if (user) {
+        cacheUserProfile('rails-user', user)
       }
     } catch (err) {
       console.warn('Failed to refresh user profile:', err)
@@ -272,17 +305,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   }
 
-  // V3.0: Role-specific helper functions (supports both old and new roles during migration)
+  // Role-specific helper functions
   const isAdmin = userProfile?.role === 'admin'
-
-  // NEW V3.0 roles
-  const isProducer = userProfile?.role === 'producer' || userProfile?.role === 'organizer' || userProfile?.role === 'club_owner'
+  const isProducer = userProfile?.role === 'producer'
   const isVendor = userProfile?.role === 'vendor' || userProfile?.role === 'venue_owner'
-  const isGuest = userProfile?.role === 'guest' || userProfile?.role === 'user'
+  const isGuest = userProfile?.role === 'guest' || userProfile?.role === 'consumer'
+
+  // Email verification status
+  const isEmailVerified = !!userProfile?.confirmed_at
 
   // DEPRECATED (but still work for backward compatibility)
-  const isOrganizer = isProducer // Maps to new producer role
-  const isVenueOwner = isVendor  // Maps to new vendor role
+  const isOrganizer = isProducer // Maps to producer role
+  const isVenueOwner = isVendor  // Maps to vendor role
 
   const hasRole = (role: User['role']) => userProfile?.role === role
 
@@ -295,12 +329,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     signIn: handleSignIn,
     signOut: handleSignOut,
     resetPassword: handleResetPassword,
-    resendVerification: handleResendVerification,
     clearError,
     refreshUserProfile: handleRefreshUserProfile,
     isAuthenticated,
     isEmailVerified,
-    needsEmailVerification,
     isAdmin,
     isProducer,
     isVendor,

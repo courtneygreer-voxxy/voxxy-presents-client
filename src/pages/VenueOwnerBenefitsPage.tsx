@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -20,13 +20,19 @@ import {
   MessageCircle,
   Star,
   Zap,
-  Target
+  Target,
+  LogIn
 } from 'lucide-react'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { TrackedLink } from '@/components/analytics/TrackedLink'
 import { TrackedButton } from '@/components/analytics/TrackedButton'
 
 export default function VenueOwnerBenefitsPage() {
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Track page views
   usePageTracking('Venue Owner Benefits')
 
@@ -105,47 +111,105 @@ export default function VenueOwnerBenefitsPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       {/* Navigation */}
       <nav className="relative z-50 px-4 py-6 bg-gray-800/50 backdrop-blur-sm border-b border-white/10">
-        <div className="container mx-auto max-w-6xl flex justify-between items-center">
-          <TrackedLink
-            to="/"
-            className="text-2xl font-bold text-white hover:text-purple-400 transition-colors"
-            trackingData={{
-              link_text: 'Voxxy Presents Logo',
-              destination_page: 'Home',
-              current_page: 'Venue Owner Benefits',
-              link_position: 'header'
-            }}
-          >
-            Voxxy Presents
-          </TrackedLink>
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-3 items-center">
+            {/* Logo - Left */}
             <TrackedLink
-              to="/login"
-              className="text-gray-300 hover:text-white transition-colors"
+              to="/"
+              className="text-2xl font-bold text-white justify-self-start"
               trackingData={{
-                link_text: 'Login',
-                destination_page: 'Login',
+                link_text: 'Voxxy Presents Logo',
+                destination_page: 'Home',
                 current_page: 'Venue Owner Benefits',
                 link_position: 'header'
               }}
             >
-              Login
+              Voxxy Presents
             </TrackedLink>
-            <TrackedButton
-              asChild
-              variant="default"
-              className="bg-blue-600 hover:bg-blue-700 text-white"
-              trackingData={{
-                button_text: 'List Your Venue',
-                button_location: 'header',
-                page_name: 'Venue Owner Benefits',
-                action_type: 'navigation',
-                destination_page: 'Venue Create',
-                current_page: 'Venue Owner Benefits'
-              }}
-            >
-              <Link to="/venues/create">List Your Venue</Link>
-            </TrackedButton>
+
+            {/* Navigation - Center */}
+            <div className="hidden md:flex items-center gap-6 justify-self-center">
+              <TrackedLink
+                to="/features"
+                className="text-gray-300 hover:text-purple-400 transition-colors"
+                trackingData={{
+                  link_text: 'Features',
+                  destination_page: 'Features',
+                  current_page: 'Venue Owner Benefits',
+                  link_position: 'header'
+                }}
+              >
+                Features
+              </TrackedLink>
+              <TrackedLink
+                to="/pricing"
+                className="text-gray-300 hover:text-purple-400 transition-colors"
+                trackingData={{
+                  link_text: 'Pricing',
+                  destination_page: 'Pricing',
+                  current_page: 'Venue Owner Benefits',
+                  link_position: 'header'
+                }}
+              >
+                Pricing
+              </TrackedLink>
+              <TrackedLink
+                to="/help"
+                className="text-gray-300 hover:text-purple-400 transition-colors"
+                trackingData={{
+                  link_text: 'Help Center',
+                  destination_page: 'Help',
+                  current_page: 'Venue Owner Benefits',
+                  link_position: 'header'
+                }}
+              >
+                Help Center
+              </TrackedLink>
+              <TrackedLink
+                to="/contact"
+                className="text-gray-300 hover:text-purple-400 transition-colors"
+                trackingData={{
+                  link_text: 'Contact',
+                  destination_page: 'Contact',
+                  current_page: 'Venue Owner Benefits',
+                  link_position: 'header'
+                }}
+              >
+                Contact
+              </TrackedLink>
+            </div>
+
+            {/* Actions - Right */}
+            <div className="flex items-center gap-4 justify-self-end">
+              <TrackedLink
+                to="/login"
+                className="hidden md:flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
+                trackingData={{
+                  link_text: 'Sign In',
+                  destination_page: 'Login',
+                  current_page: 'Venue Owner Benefits',
+                  link_position: 'header'
+                }}
+              >
+                <LogIn className="mr-2 h-4 w-4" />
+                Sign In
+              </TrackedLink>
+              <TrackedButton
+                asChild
+                variant="default"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg"
+                trackingData={{
+                  button_text: 'List Your Venue',
+                  button_location: 'header',
+                  page_name: 'Venue Owner Benefits',
+                  action_type: 'navigation',
+                  destination_page: 'Venue Create',
+                  current_page: 'Venue Owner Benefits'
+                }}
+              >
+                <Link to="/venues/create">List Your Venue</Link>
+              </TrackedButton>
+            </div>
           </div>
         </div>
       </nav>

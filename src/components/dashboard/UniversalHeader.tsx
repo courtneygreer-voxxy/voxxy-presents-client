@@ -89,12 +89,9 @@ export default function UniversalHeader({ user }: UniversalHeaderProps) {
           <div className="flex items-center">
             <button
               onClick={() => navigate('/')}
-              className="flex items-center space-x-3"
+              className="text-xl font-bold text-gray-900"
             >
-              <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">V</span>
-              </div>
-              <span className="text-xl font-bold text-gray-900">Voxxy Presents</span>
+              Voxxy Presents
             </button>
           </div>
 

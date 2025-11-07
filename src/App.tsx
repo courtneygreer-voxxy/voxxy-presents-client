@@ -25,10 +25,14 @@ import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
 import VendorSignUpPage from './pages/VendorSignUpPage'
 import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
 import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import PricingPage from './pages/PricingPage'
 import FeaturesPage from './pages/FeaturesPage'
 import HelpPage from './pages/HelpPage'
 import ContactPage from './pages/ContactPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/TermsOfServicePage'
 import AdminLogin from './pages/AdminLogin'
 import VoxxyShop from './pages/VoxxyShop'
 import VenueProfilePage from './pages/VenueProfilePage'
@@ -39,12 +43,13 @@ import VendorMarketplace from './pages/VendorMarketplace'
 import VendorEditPage from './pages/VendorEditPage'
 import VenueCreatePage from './pages/VenueCreatePage'
 import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
-import VenueOwnerBenefitsPage from './pages/VenueOwnerBenefitsPage'
+import ConsumerDashboard from './pages/ConsumerDashboard'
 import CreateEventPage from './pages/CreateEventPage'
 import EditEventPage from './pages/EditEventPage'
 import SharedRSVPPage from './pages/SharedRSVPPage'
 import SubscribePage from './pages/SubscribePage'
 import AnalyticsTestPage from './pages/AnalyticsTestPage'
+import EmailVerificationPage from './pages/EmailVerificationPage'
 import { DebugPanel } from './components/debug/DebugPanel'
 
 // Role-based dashboard redirect component
@@ -95,10 +100,17 @@ function RoleBasedDashboardRedirect() {
       console.log('Admin detected, redirecting to admin dashboard')
       return <Navigate to="/admin/dashboard" replace />
 
+    case 'consumer':
+      console.log('Consumer role detected, redirecting to consumer dashboard')
+      return <Navigate to="/consumer/dashboard" replace />
+
     case 'guest':
     case 'user':
+      console.log('Guest/User role detected, redirecting to home')
+      return <Navigate to="/" replace />
+
     default:
-      console.log('Guest/User or unknown role, redirecting to home')
+      console.log('Unknown role, redirecting to home')
       return <Navigate to="/" replace />
   }
 }
@@ -122,7 +134,8 @@ export default function App() {
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
-          <Route path="/venue-owners" element={<VenueOwnerBenefitsPage />} />
+          <Route path="/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/terms" element={<TermsOfServicePage />} />
           <Route path="/analytics-test" element={<AnalyticsTestPage />} />
 
           {/* Vendor routes (new) */}
@@ -184,8 +197,23 @@ export default function App() {
           <Route path="/login/club-owner" element={<Navigate to="/login/producer" replace />} />
           <Route path="/login/venue-owner" element={<Navigate to="/login/vendor" replace />} />
 
+          {/* Password Reset */}
+          <Route path="/forgot-password" element={
+            <RedirectIfAuthenticatedV2>
+              <ForgotPasswordPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+          <Route path="/reset-password" element={
+            <RedirectIfAuthenticatedV2>
+              <ResetPasswordPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
           {/* Beta pending page */}
           <Route path="/beta-pending" element={<BetaPendingPage />} />
+
+          {/* Email Verification */}
+          <Route path="/verify-email" element={<EmailVerificationPage />} />
 
           {/* Protected routes - require authentication */}
           <Route path="/voxxy-shop" element={
@@ -340,6 +368,13 @@ export default function App() {
           <Route path="/admin/content" element={
             <ProtectedRouteV2 allowedRoles={['admin']}>
               <AdminDashboardV2 />
+            </ProtectedRouteV2>
+          } />
+
+          {/* Consumer Dashboard */}
+          <Route path="/consumer/dashboard" element={
+            <ProtectedRouteV2 allowedRoles={['consumer', 'guest', 'user', 'admin']}>
+              <ConsumerDashboard />
             </ProtectedRouteV2>
           } />
 

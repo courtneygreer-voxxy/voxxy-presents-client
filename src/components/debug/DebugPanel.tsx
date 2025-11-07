@@ -47,7 +47,7 @@ export function DebugPanel() {
 
   if (!isVisible) {
     return (
-      <div className="fixed top-4 right-4 z-50">
+      <div className="fixed top-4 right-4 z-[9999]">
         <Button
           onClick={() => setIsVisible(true)}
           size="sm"
@@ -88,11 +88,11 @@ export function DebugPanel() {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-50 max-w-sm">
-      <Card className="border-2 border-red-500 bg-white shadow-lg">
+    <div className="fixed top-4 right-4 z-[9999] max-w-sm">
+      <Card className="border-2 border-red-500/50 bg-slate-900/95 backdrop-blur-sm shadow-2xl">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-bold text-red-600 flex items-center gap-2">
+            <CardTitle className="text-sm font-bold text-red-400 flex items-center gap-2">
               <Shield className="h-4 w-4" />
               DEBUG PANEL
             </CardTitle>
@@ -101,7 +101,7 @@ export function DebugPanel() {
                 onClick={() => setIsExpanded(!isExpanded)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 text-gray-300 border-gray-600 hover:bg-slate-800"
               >
                 {isExpanded ? '−' : '+'}
               </Button>
@@ -109,7 +109,7 @@ export function DebugPanel() {
                 onClick={() => setIsVisible(false)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0"
+                className="h-6 w-6 p-0 text-gray-300 border-gray-600 hover:bg-slate-800"
               >
                 <EyeOff className="h-3 w-3" />
               </Button>
@@ -120,7 +120,7 @@ export function DebugPanel() {
         <CardContent className="space-y-3 text-xs">
           {/* Auth State */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-700">🔐 Auth State</div>
+            <div className="font-semibold text-gray-300">🔐 Auth State</div>
             <div className="grid grid-cols-2 gap-2">
               <Badge variant={isAuthenticated ? 'default' : 'secondary'}>
                 {isAuthenticated ? '✅ Authenticated' : '❌ Not Auth'}
@@ -134,11 +134,11 @@ export function DebugPanel() {
           {/* User Info */}
           {currentUser && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-700">👤 Firebase User</div>
-              <div className="bg-gray-50 p-2 rounded text-xs">
-                <div><strong>UID:</strong> {currentUser.uid}</div>
-                <div><strong>Email:</strong> {currentUser.email}</div>
-                <div><strong>Email Verified:</strong> {currentUser.emailVerified ? '✅' : '❌'}</div>
+              <div className="font-semibold text-gray-300">👤 Firebase User</div>
+              <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
+                <div><strong className="text-gray-100">UID:</strong> {currentUser.uid}</div>
+                <div><strong className="text-gray-100">Email:</strong> {currentUser.email}</div>
+                <div><strong className="text-gray-100">Email Verified:</strong> {currentUser.emailVerified ? '✅' : '❌'}</div>
               </div>
             </div>
           )}
@@ -146,7 +146,7 @@ export function DebugPanel() {
           {/* User Profile */}
           {userProfile && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-700">📋 User Profile</div>
+              <div className="font-semibold text-gray-300">📋 User Profile</div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
                   <Badge className={getRoleColor(userProfile.role)}>
@@ -157,9 +157,9 @@ export function DebugPanel() {
                   </Badge>
                 </div>
 
-                <div className="bg-gray-50 p-2 rounded">
-                  <div><strong>Name:</strong> {userProfile.name || 'N/A'}</div>
-                  <div><strong>Created:</strong> {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'N/A'}</div>
+                <div className="bg-slate-800/50 p-2 rounded text-gray-200">
+                  <div><strong className="text-gray-100">Name:</strong> {userProfile.name || 'N/A'}</div>
+                  <div><strong className="text-gray-100">Created:</strong> {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'N/A'}</div>
                 </div>
               </div>
             </div>
@@ -167,7 +167,7 @@ export function DebugPanel() {
 
           {/* Role Flags */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-700">🏷️ Role Flags</div>
+            <div className="font-semibold text-gray-300">🏷️ Role Flags</div>
             <div className="grid grid-cols-2 gap-1">
               <Badge variant={isVenueOwner ? 'default' : 'secondary'} className="text-xs">
                 {isVenueOwner ? '🏢 Venue Owner' : '⭕ Not Venue'}
@@ -181,12 +181,12 @@ export function DebugPanel() {
           {/* Venue Owner Profile */}
           {userProfile?.venueOwnerProfile && isExpanded && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-700">🏢 Venue Owner Profile</div>
-              <div className="bg-blue-50 p-2 rounded text-xs">
-                <div><strong>Onboarding:</strong> {userProfile.venueOwnerProfile.onboardingCompleted ? '✅ Complete' : '❌ Incomplete'}</div>
-                <div><strong>Venue IDs:</strong> {userProfile.venueOwnerProfile.venueIds?.length || 0}</div>
-                <div><strong>Business Info:</strong> {userProfile.venueOwnerProfile.businessInfo || 'N/A'}</div>
-                <div><strong>Phone:</strong> {userProfile.venueOwnerProfile.phone || 'N/A'}</div>
+              <div className="font-semibold text-gray-300">🏢 Venue Owner Profile</div>
+              <div className="bg-blue-900/30 p-2 rounded text-xs text-blue-200">
+                <div><strong className="text-blue-100">Onboarding:</strong> {userProfile.venueOwnerProfile.onboardingCompleted ? '✅ Complete' : '❌ Incomplete'}</div>
+                <div><strong className="text-blue-100">Venue IDs:</strong> {userProfile.venueOwnerProfile.venueIds?.length || 0}</div>
+                <div><strong className="text-blue-100">Business Info:</strong> {userProfile.venueOwnerProfile.businessInfo || 'N/A'}</div>
+                <div><strong className="text-blue-100">Phone:</strong> {userProfile.venueOwnerProfile.phone || 'N/A'}</div>
               </div>
             </div>
           )}
@@ -194,24 +194,24 @@ export function DebugPanel() {
           {/* Organizer Profile */}
           {isOrganizer && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-700">🎯 Organizer Debug</div>
-              <div className="bg-green-50 p-2 rounded text-xs">
-                <div><strong>Organization IDs:</strong> {userProfile?.organizationIds?.length || 0}</div>
+              <div className="font-semibold text-gray-300">🎯 Organizer Debug</div>
+              <div className="bg-green-900/30 p-2 rounded text-xs text-green-200">
+                <div><strong className="text-green-100">Organization IDs:</strong> {userProfile?.organizationIds?.length || 0}</div>
                 {userProfile?.organizationIds?.length ? (
                   <div className="mt-1">
-                    <div><strong>IDs:</strong></div>
+                    <div><strong className="text-green-100">IDs:</strong></div>
                     {userProfile.organizationIds.map((id, index) => (
-                      <div key={id} className="ml-2 text-green-700">
+                      <div key={id} className="ml-2 text-green-200">
                         {index + 1}. {id}
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="text-red-600 font-bold">⚠️ NO ORGANIZATION IDS FOUND</div>
+                  <div className="text-red-400 font-bold">⚠️ NO ORGANIZATION IDS FOUND</div>
                 )}
-                <div className="mt-1 pt-1 border-t border-green-200">
-                  <div><strong>User Role:</strong> {userProfile?.role || 'undefined'}</div>
-                  <div><strong>isOrganizer:</strong> {isOrganizer ? '✅ True' : '❌ False'}</div>
+                <div className="mt-1 pt-1 border-t border-green-700/50">
+                  <div><strong className="text-green-100">User Role:</strong> {userProfile?.role || 'undefined'}</div>
+                  <div><strong className="text-green-100">isOrganizer:</strong> {isOrganizer ? '✅ True' : '❌ False'}</div>
                 </div>
               </div>
             </div>
@@ -219,30 +219,30 @@ export function DebugPanel() {
 
           {/* Admin Session State */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-700">👑 Admin Session</div>
-            <div className="bg-red-50 p-2 rounded text-xs">
-              <div><strong>Admin Session:</strong> {localStorage.getItem('voxxy_admin_session') || 'false'}</div>
-              <div><strong>Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
-              <div><strong>⚠️ Firebase User:</strong> {currentUser?.email || 'N/A'}</div>
+            <div className="font-semibold text-gray-300">👑 Admin Session</div>
+            <div className="bg-red-900/30 p-2 rounded text-xs text-gray-200">
+              <div><strong className="text-gray-100">Admin Session:</strong> {localStorage.getItem('voxxy_admin_session') || 'false'}</div>
+              <div><strong className="text-gray-100">Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
+              <div><strong className="text-gray-100">⚠️ Firebase User:</strong> {currentUser?.email || 'N/A'}</div>
               {localStorage.getItem('voxxy_admin_session') === 'true' && currentUser?.email !== 'team@voxxypresents.com' && (
-                <div className="text-red-600 font-bold">🔥 SPLIT BRAIN: Admin localStorage but different Firebase user!</div>
+                <div className="text-red-400 font-bold">🔥 SPLIT BRAIN: Admin localStorage but different Firebase user!</div>
               )}
             </div>
           </div>
 
           {/* Current URL */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-700">🌐 Current State</div>
-            <div className="bg-gray-50 p-2 rounded text-xs">
-              <div><strong>URL:</strong> {window.location.pathname}</div>
-              <div><strong>Firebase Project:</strong> {import.meta.env.VITE_FIREBASE_PROJECT_ID || 'Not Set'}</div>
-              <div><strong>Environment:</strong> {import.meta.env.VITE_ENVIRONMENT || 'Auto-detected'}</div>
-              <div><strong>Timestamp:</strong> {new Date().toLocaleTimeString()}</div>
+            <div className="font-semibold text-gray-300">🌐 Current State</div>
+            <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
+              <div><strong className="text-gray-100">URL:</strong> {window.location.pathname}</div>
+              <div><strong className="text-gray-100">Firebase Project:</strong> {import.meta.env.VITE_FIREBASE_PROJECT_ID || 'Not Set'}</div>
+              <div><strong className="text-gray-100">Environment:</strong> {import.meta.env.VITE_ENVIRONMENT || 'Auto-detected'}</div>
+              <div><strong className="text-gray-100">Timestamp:</strong> {new Date().toLocaleTimeString()}</div>
             </div>
           </div>
 
           {/* Actions */}
-          <div className="space-y-2 pt-2 border-t">
+          <div className="space-y-2 pt-2 border-t border-slate-700">
             <div className="flex gap-2">
               <Button
                 onClick={handleLogout}
@@ -257,7 +257,7 @@ export function DebugPanel() {
                 onClick={() => window.location.reload()}
                 size="sm"
                 variant="outline"
-                className="flex-1 h-8 text-xs"
+                className="flex-1 h-8 text-xs text-gray-200 border-gray-600 hover:bg-slate-800"
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Reload
@@ -275,7 +275,7 @@ export function DebugPanel() {
                 }}
                 size="sm"
                 variant="outline"
-                className="w-full h-8 text-xs border-red-200 text-red-600"
+                className="w-full h-8 text-xs border-red-500/50 text-red-400 hover:bg-red-900/30"
               >
                 Clear Admin Session
               </Button>
@@ -297,7 +297,7 @@ export function DebugPanel() {
               }}
               size="sm"
               variant="outline"
-              className="w-full h-8 text-xs border-green-200 text-green-600"
+              className="w-full h-8 text-xs border-green-500/50 text-green-400 hover:bg-green-900/30"
             >
               🔍 Test Firebase Connection
             </Button>
@@ -318,7 +318,7 @@ export function DebugPanel() {
                 }}
                 size="sm"
                 variant="outline"
-                className="w-full h-8 text-xs border-blue-200 text-blue-600"
+                className="w-full h-8 text-xs border-blue-500/50 text-blue-400 hover:bg-blue-900/30"
               >
                 🔍 Manual Venue Lookup
               </Button>

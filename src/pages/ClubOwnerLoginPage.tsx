@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Eye, EyeOff, Loader2, Mail, Lock, Users, ArrowLeft } from 'lucide-react'
+import { Eye, EyeOff, Loader2, Mail, Lock, Users, ArrowLeft, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/services/authService'
 
@@ -34,10 +34,17 @@ export default function ClubOwnerLoginPage() {
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }))
 
+    // Clear field-specific errors
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: undefined }))
     }
 
+    // Clear submit error only when user starts typing again
+    if (errors.submit) {
+      setErrors(prev => ({ ...prev, submit: undefined }))
+    }
+
+    // Clear AuthContext error
     if (error) {
       clearError()
     }
@@ -78,7 +85,22 @@ export default function ClubOwnerLoginPage() {
       // No manual navigation needed here
     } catch (err) {
       console.error('Club owner login error:', err)
-      setErrors(prev => ({ ...prev, submit: 'Invalid email or password. Please try again.' }))
+
+      // Extract meaningful error message from the error object
+      let errorMessage = 'Invalid email or password. Please try again.'
+
+      if (err instanceof Error) {
+        errorMessage = err.message
+      }
+
+      setErrors(prev => {
+        const newErrors = { ...prev, submit: errorMessage }
+        console.log('🔴 Login error state:', newErrors)
+        return newErrors
+      })
+
+      // Scroll to top to show error message
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     } finally {
       setIsSubmitting(false)
     }
@@ -154,6 +176,19 @@ export default function ClubOwnerLoginPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
+                {/* Error Display - At the top for visibility */}
+                {(error || errors.submit) && (
+                  <Alert className="bg-red-500/20 border-red-500 border-2 mb-6 shadow-lg">
+                    <AlertDescription className="flex items-start gap-3">
+                      <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
+                      <div className="text-white font-medium">
+                        {error || errors.submit}
+                        {console.log('🔴 Rendering login error alert:', error || errors.submit)}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
+
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Field */}
                   <div className="space-y-2">
@@ -218,15 +253,6 @@ export default function ClubOwnerLoginPage() {
                       'Sign In'
                     )}
                   </Button>
-
-                  {/* Error Display */}
-                  {(error || errors.submit) && (
-                    <Alert className="bg-red-400/10 border-red-400/30">
-                      <AlertDescription className="text-red-300">
-                        {error || errors.submit}
-                      </AlertDescription>
-                    </Alert>
-                  )}
                 </form>
 
                 {/* Forgot Password */}
