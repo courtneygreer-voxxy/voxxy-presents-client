@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Lock, AlertCircle, CheckCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 import { authApi, ApiError } from '@/services/api'
-import { validatePassword } from '@/services/authService'
+import { validatePassword } from '@/utils/validation'
 
 export default function ResetPasswordPage() {
   const navigate = useNavigate()

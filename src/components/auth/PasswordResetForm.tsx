@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Mail, Loader2, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail } from '@/services/authService'
+import { validateEmail } from '@/utils/validation'
 
 interface PasswordResetFormProps {
   onSuccess?: () => void

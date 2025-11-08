@@ -15,8 +15,41 @@ import {
   Building
 } from "lucide-react"
 import { Link } from "react-router-dom"
-import { contactFormApi, EmailServiceError } from "@/services/emailService"
-import { CreateContactSubmissionData } from "@/types/database"
+// Inline types and API for contact form
+interface CreateContactSubmissionData {
+  type: string
+  name: string
+  email: string
+  organizationName?: string
+  eventFrequency?: string
+  typicalAttendance?: string
+  biggestChallenge?: string
+  description?: string
+  source?: string
+}
+
+class EmailServiceError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'EmailServiceError'
+  }
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+
+const contactFormApi = {
+  async submitForm(data: CreateContactSubmissionData) {
+    const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_submission: data })
+    })
+    if (!response.ok) {
+      throw new EmailServiceError('Failed to submit contact form')
+    }
+    return response.json()
+  }
+}
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { useFormTracking } from "@/hooks/useFormTracking"
 import { analytics } from "@/lib/analytics"

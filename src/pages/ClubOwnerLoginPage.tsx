@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Eye, EyeOff, Loader2, Mail, Lock, Users, ArrowLeft, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail } from '@/services/authService'
+import { validateEmail } from '@/utils/validation'
 
 interface FormData {
   email: string
@@ -183,7 +183,6 @@ export default function ClubOwnerLoginPage() {
                       <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                       <div className="text-white font-medium">
                         {error || errors.submit}
-                        {console.log('🔴 Rendering login error alert:', error || errors.submit)}
                       </div>
                     </AlertDescription>
                   </Alert>

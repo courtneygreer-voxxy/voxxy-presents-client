@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus } from "lucide-react"
+import { Calendar, Users, MapPin, ArrowRight, Sparkles, LogIn, UserPlus, Menu, X } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
@@ -10,11 +10,11 @@ import { useSectionTracking } from "@/hooks/useSectionTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
 import { analytics } from "@/lib/analytics"
-import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 
 export default function HomePage() {
   const { isAuthenticated, currentUser, isProducer, userProfile } = useAuth()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Scroll to top on page load
   useEffect(() => {

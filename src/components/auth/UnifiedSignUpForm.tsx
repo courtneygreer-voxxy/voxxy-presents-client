@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Separator } from '@/components/ui/separator'
 import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Building2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail, validatePassword } from '@/services/authService'
+import { validateEmail, validatePassword } from '@/utils/validation'
 
 interface UnifiedSignUpFormProps {
   onSuccess?: () => void

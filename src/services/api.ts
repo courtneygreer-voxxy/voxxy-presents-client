@@ -165,7 +165,7 @@ export const authApi = {
     email: string
     password: string
     name: string
-    role?: 'consumer' | 'vendor' | 'venue_owner' | 'producer'
+    role?: 'consumer' | 'vendor' | 'venue_owner' | 'producer' | 'admin' | 'guest'
   }) {
     const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users`, {
       method: 'POST',
@@ -246,6 +246,8 @@ export const authApi = {
    */
   async getCurrentUser() {
     // Note: Using legacy /me endpoint since /v1/shared/me controller doesn't exist yet
+    console.log('🔍 Fetching current user from /me endpoint...')
+
     const response = await fetch(`${API_BASE_URL.replace('/api', '')}/me`, {
       method: 'GET',
       headers: {
@@ -259,18 +261,39 @@ export const authApi = {
     }
 
     const data = await response.json()
+    console.log('📥 Current user response:', { email: data.email, role: data.role, id: data.id })
+
     return data
   },
 
   /**
    * Update user profile
-   * PATCH /v1/shared/users/:id
+   * PATCH /users/:id (legacy endpoint until v1/shared controllers are created)
    */
   async updateUser(userId: number, updates: any) {
-    return fetchApi<any>(`/v1/shared/users/${userId}`, {
+    console.log('📝 Updating user:', { userId, updates })
+
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users/${userId}`, {
       method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
       body: JSON.stringify({ user: updates }),
     })
+
+    const data = await response.json()
+    console.log('📥 Update user response:', data)
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Failed to update user',
+        response.status,
+        data.errors
+      )
+    }
+
+    return data
   },
 
   /**

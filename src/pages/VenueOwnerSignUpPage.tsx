@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Eye, EyeOff, Loader2, Mail, User, Lock, Building2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail, validatePassword } from '@/services/authService'
+import { validateEmail, validatePassword } from '@/utils/validation'
 import { usePageTracking } from '@/hooks/usePageTracking'
 import { analytics } from '@/lib/analytics'
 

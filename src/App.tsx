@@ -3,58 +3,39 @@ import { useEffect, useState } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
-// Performance tracking removed - was cluttering Mixpanel with technical metrics
-// import { initPerformanceTracking } from './utils/performanceTracking'
-import { ProtectedRoute, RedirectIfAuthenticated } from './components/ProtectedRoute'
+import { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
 import { LoadingTransition } from './components/LoadingTransition'
-// V2 Architecture imports
-import ProtectedRouteV2, { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
-import { OrganizerDashboard, VenueOwnerDashboard, AdminDashboard as AdminDashboardV2, GuestDashboard } from './components/dashboard/DashboardShell'
-import VenueOwnerDashboardNew from './pages/VenueOwnerDashboardNew'
-import ProfilePage from './pages/ProfilePage'
+
+// Public Pages
 import HomePage from './pages/HomePage'
-import BetaPendingPage from './pages/BetaPendingPage'
-import OrganizationPublic from './pages/OrganizationPublic'
-import OrganizationAdminEnhanced from './pages/OrganizationAdminEnhanced'
-import AdminDashboard from './pages/AdminDashboard'
-import CreateClubPage from './pages/CreateClubPage'
-import SignUpPage from './pages/SignUpPage'
-import LoginPage from './pages/LoginPage'
+import FeaturesPage from './pages/FeaturesPage'
+import PricingPage from './pages/PricingPage'
+import HelpPage from './pages/HelpPage'
+import ContactPage from './pages/ContactPage'
+import AboutPage from './pages/AboutPage'
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
+import TermsOfServicePage from './pages/TermsOfServicePage'
+
+// Auth Pages
 import AuthTypePage from './pages/AuthTypePage'
 import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
-import VendorSignUpPage from './pages/VendorSignUpPage'
 import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
 import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
-import PricingPage from './pages/PricingPage'
-import FeaturesPage from './pages/FeaturesPage'
-import HelpPage from './pages/HelpPage'
-import ContactPage from './pages/ContactPage'
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
-import TermsOfServicePage from './pages/TermsOfServicePage'
-import AdminLogin from './pages/AdminLogin'
-import VoxxyShop from './pages/VoxxyShop'
-import VenueProfilePage from './pages/VenueProfilePage'
-import VenueSearchPortal from './pages/VenueSearchPortal'
-// New vendor pages (backward compatible)
-import VendorProfilePage from './pages/VendorProfilePage'
-import VendorMarketplace from './pages/VendorMarketplace'
-import VendorEditPage from './pages/VendorEditPage'
-import VenueCreatePage from './pages/VenueCreatePage'
-import VenuePendingApprovalPage from './pages/VenuePendingApprovalPage'
-import ConsumerDashboard from './pages/ConsumerDashboard'
-import CreateEventPage from './pages/CreateEventPage'
-import EditEventPage from './pages/EditEventPage'
-import SharedRSVPPage from './pages/SharedRSVPPage'
-import SubscribePage from './pages/SubscribePage'
-import AnalyticsTestPage from './pages/AnalyticsTestPage'
 import EmailVerificationPage from './pages/EmailVerificationPage'
+
+// Holding Screens
+import BetaPendingPage from './pages/BetaPendingPage'
+import ProducerPendingPage from './pages/ProducerPendingPage'
+import VendorPendingPage from './pages/VendorPendingPage'
+
+// Debug Panel
 import { DebugPanel } from './components/debug/DebugPanel'
 
-// Role-based dashboard redirect component
+// Role-based redirect component - routes authenticated users to their holding screen
 function RoleBasedDashboardRedirect() {
-  const { userProfile } = useAuth()
+  const { userProfile, loading } = useAuth()
   const [isRedirecting, setIsRedirecting] = useState(true)
 
   // Show loading state for minimum 300ms to avoid flash
@@ -65,124 +46,103 @@ function RoleBasedDashboardRedirect() {
 
   console.log('RoleBasedDashboardRedirect - User profile:', userProfile)
 
+  if (loading || isRedirecting) {
+    return <LoadingTransition message="Taking you to your dashboard..." />
+  }
+
   if (!userProfile) {
     console.log('No user profile, redirecting to home')
     return <Navigate to="/" replace />
   }
 
-  // Show loading transition during redirect evaluation
-  if (isRedirecting) {
-    return <LoadingTransition message="Taking you to your dashboard..." />
+  // V3.0: Route to holding screens based on user role
+  const role = userProfile.role
+
+  // Producer roles
+  if (role === 'producer') {
+    console.log('Producer detected, redirecting to producer holding screen')
+    return <Navigate to="/producer/pending" replace />
   }
 
-  // V3.0: Route based on user role (supports both old and new roles)
-  switch (userProfile.role) {
-    // NEW V3.0 roles
-    case 'producer':
-      console.log('Producer detected, redirecting to producer dashboard')
-      return <Navigate to="/producer/dashboard" replace />
-
-    case 'vendor':
-      console.log('Vendor detected, redirecting to vendor dashboard')
-      return <Navigate to="/vendor/dashboard" replace />
-
-    // LEGACY roles (still supported during migration)
-    case 'venue_owner':
-      console.log('Venue owner (legacy) detected, redirecting to vendor dashboard')
-      return <Navigate to="/vendor/dashboard" replace />
-
-    case 'organizer':
-    case 'club_owner':
-      console.log('Organizer/Club owner (legacy) detected, redirecting to producer dashboard')
-      return <Navigate to="/producer/dashboard" replace />
-
-    case 'admin':
-      console.log('Admin detected, redirecting to admin dashboard')
-      return <Navigate to="/admin/dashboard" replace />
-
-    case 'consumer':
-      console.log('Consumer role detected, redirecting to consumer dashboard')
-      return <Navigate to="/consumer/dashboard" replace />
-
-    case 'guest':
-    case 'user':
-      console.log('Guest/User role detected, redirecting to home')
-      return <Navigate to="/" replace />
-
-    default:
-      console.log('Unknown role, redirecting to home')
-      return <Navigate to="/" replace />
+  // Vendor roles
+  if (role === 'vendor' || role === 'venue_owner') {
+    console.log('Vendor detected, redirecting to vendor holding screen')
+    return <Navigate to="/vendor/pending" replace />
   }
+
+  // Consumer/Guest roles
+  if (role === 'consumer' || role === 'guest') {
+    console.log('Consumer/Guest detected, redirecting to consumer holding screen')
+    return <Navigate to="/pending" replace />
+  }
+
+  // Admin (for now, treat as producer)
+  if (role === 'admin') {
+    console.log('Admin detected, redirecting to producer holding screen')
+    return <Navigate to="/producer/pending" replace />
+  }
+
+  // Unknown role - redirect to home
+  console.log('Unknown role, redirecting to home')
+  return <Navigate to="/" replace />
 }
 
 export default function App() {
   // Initialize analytics on app start
   useEffect(() => {
-    analytics.initializeUser();
-    // Performance tracking disabled in production (was cluttering Mixpanel reports)
-  }, []);
+    analytics.initializeUser()
+  }, [])
 
   return (
     <AuthProvider>
       <Router>
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
+
         <Routes>
-          {/* Public routes */}
+          {/* ==========================================
+              PUBLIC ROUTES
+              ========================================== */}
           <Route path="/" element={<HomePage />} />
-          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<ContactPage />} />
+          <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
-          <Route path="/analytics-test" element={<AnalyticsTestPage />} />
 
-          {/* Vendor routes (new) */}
-          <Route path="/vendor/:slug" element={<VendorProfilePage />} />
-          <Route path="/marketplace" element={<VendorMarketplace />} />
+          {/* ==========================================
+              AUTH ROUTES - Redirect if already logged in
+              ========================================== */}
 
-          {/* Legacy venue routes (backward compatible) */}
-          <Route path="/venue/:venueSlug" element={<VenueProfilePage />} />
-
-          <Route path="/shared-rsvps/:eventId" element={<SharedRSVPPage />} />
-          <Route path="/subscribe/:orgSlug" element={<SubscribePage />} />
-          <Route path="/:orgSlug" element={<OrganizationPublic />} />
-          
-          {/* Authentication routes - redirect if already logged in */}
+          {/* Auth Selection */}
           <Route path="/auth" element={
             <RedirectIfAuthenticatedV2>
               <AuthTypePage />
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Legacy routes - redirect to auth selection */}
-          <Route path="/sign-up" element={
-            <RedirectIfAuthenticatedV2 redirectTo="/auth">
-              <AuthTypePage />
-            </RedirectIfAuthenticatedV2>
-          } />
-          <Route path="/login" element={
-            <RedirectIfAuthenticatedV2 redirectTo="/auth">
-              <AuthTypePage />
-            </RedirectIfAuthenticatedV2>
-          } />
+          {/* Legacy auth routes - redirect to /auth */}
+          <Route path="/sign-up" element={<Navigate to="/auth" replace />} />
+          <Route path="/login" element={<Navigate to="/auth" replace />} />
 
-          {/* V3.0: Specific user type authentication routes */}
-          {/* NEW V3.0 routes */}
+          {/* Producer (Club Owner) Auth */}
           <Route path="/signup/producer" element={
             <RedirectIfAuthenticatedV2>
               <ClubOwnerSignUpPage />
             </RedirectIfAuthenticatedV2>
           } />
-          <Route path="/signup/vendor" element={
-            <RedirectIfAuthenticatedV2>
-              <VendorSignUpPage />
-            </RedirectIfAuthenticatedV2>
-          } />
           <Route path="/login/producer" element={
             <RedirectIfAuthenticatedV2>
               <ClubOwnerLoginPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
+          {/* Vendor (Venue Owner) Auth */}
+          <Route path="/signup/vendor" element={
+            <RedirectIfAuthenticatedV2>
+              <ClubOwnerSignUpPage />
             </RedirectIfAuthenticatedV2>
           } />
           <Route path="/login/vendor" element={
@@ -191,7 +151,7 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* LEGACY routes (redirect to new V3.0 routes) */}
+          {/* Legacy role-specific auth routes */}
           <Route path="/signup/club-owner" element={<Navigate to="/signup/producer" replace />} />
           <Route path="/signup/venue-owner" element={<Navigate to="/signup/vendor" replace />} />
           <Route path="/login/club-owner" element={<Navigate to="/login/producer" replace />} />
@@ -209,210 +169,34 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Beta pending page */}
-          <Route path="/beta-pending" element={<BetaPendingPage />} />
-
           {/* Email Verification */}
           <Route path="/verify-email" element={<EmailVerificationPage />} />
 
-          {/* Protected routes - require authentication */}
-          <Route path="/voxxy-shop" element={
-            <ProtectedRoute>
-              <VoxxyShop />
-            </ProtectedRoute>
-          } />
-          <Route path="/voxxy-shop/venues" element={
-            <ProtectedRoute>
-              <VenueSearchPortal />
-            </ProtectedRoute>
-          } />
-          {/* Legacy venue routes - redirect to V2 paths */}
-          <Route path="/venues/create" element={
-            <ProtectedRouteV2 requireEmailVerification={true} allowedRoles={['venue_owner', 'admin']}>
-              <VenueCreatePage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/venues/pending" element={
-            <ProtectedRouteV2 requireEmailVerification={true} allowedRoles={['venue_owner', 'admin']}>
-              <VenuePendingApprovalPage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/venues/dashboard" element={
-            <Navigate to="/venue-owner/dashboard" replace />
-          } />
-          <Route path="/create-club" element={
-            <ProtectedRoute requireEmailVerification={true}>
-              <CreateClubPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/:orgSlug/admin" element={
-            <ProtectedRoute>
-              <OrganizationAdminEnhanced />
-            </ProtectedRoute>
-          } />
-          <Route path="/:orgSlug/create-event" element={
-            <ProtectedRoute>
-              <CreateEventPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/:orgSlug/edit-event/:eventId" element={
-            <ProtectedRoute>
-              <EditEventPage />
-            </ProtectedRoute>
-          } />
-          {/* Admin routes */}
-          <Route path="/admin/login" element={<AdminLogin />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          {/* ==========================================
+              HOLDING SCREENS (Role-based)
+              ========================================== */}
 
-          {/* ========================================
-              V3.0 PRODUCER ROUTES (NEW)
-              ======================================== */}
-          <Route path="/producer/dashboard" element={
-            <ProtectedRouteV2 requireApproval={false} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
-              <ProfilePage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/producer/organizations" element={
-            <ProtectedRouteV2 requireApproval={false} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
-              <ProfilePage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/producer/events" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
-              <ProfilePage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/producer/audience" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['producer', 'organizer', 'club_owner', 'admin']}>
-              <ProfilePage />
-            </ProtectedRouteV2>
-          } />
+          {/* Consumer Holding Screen */}
+          <Route path="/pending" element={<BetaPendingPage />} />
 
-          {/* ========================================
-              V3.0 VENDOR ROUTES (NEW)
-              ======================================== */}
-          <Route path="/vendor/dashboard" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/vendor/edit/:slug" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
-              <VendorEditPage />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/vendor/vendors" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/vendor/bookings" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/vendor/profile" element={
-            <ProtectedRouteV2 requireApproval={true} allowedRoles={['vendor', 'venue_owner', 'admin']} requireEmailVerification={true}>
-              <VenueOwnerDashboardNew />
-            </ProtectedRouteV2>
-          } />
+          {/* Producer Holding Screen */}
+          <Route path="/producer/pending" element={<ProducerPendingPage />} />
 
-          {/* ========================================
-              LEGACY ROUTES - REDIRECT TO NEW V3.0
-              ======================================== */}
-          {/* Organizer routes → Producer routes */}
-          <Route path="/organizer/dashboard" element={
-            <Navigate to="/producer/dashboard" replace />
-          } />
-          <Route path="/organizer/organizations" element={
-            <Navigate to="/producer/organizations" replace />
-          } />
-          <Route path="/organizer/events" element={
-            <Navigate to="/producer/events" replace />
-          } />
-          <Route path="/organizer/audience" element={
-            <Navigate to="/producer/audience" replace />
-          } />
+          {/* Vendor Holding Screen */}
+          <Route path="/vendor/pending" element={<VendorPendingPage />} />
 
-          {/* Venue Owner routes → Vendor routes */}
-          <Route path="/venue-owner/dashboard" element={
-            <Navigate to="/vendor/dashboard" replace />
-          } />
-          <Route path="/venue-owner/venues" element={
-            <Navigate to="/vendor/vendors" replace />
-          } />
-          <Route path="/venue-owner/bookings" element={
-            <Navigate to="/vendor/bookings" replace />
-          } />
-          <Route path="/venue-owner/profile" element={
-            <Navigate to="/vendor/profile" replace />
-          } />
+          {/* ==========================================
+              CATCH-ALL & REDIRECTS
+              ========================================== */}
 
-          {/* Admin V2 Dashboard */}
-          <Route path="/admin/v2" element={
-            <ProtectedRouteV2 allowedRoles={['admin']}>
-              <AdminDashboardV2 />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/admin/approvals" element={
-            <ProtectedRouteV2 allowedRoles={['admin']}>
-              <AdminDashboardV2 />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/admin/users" element={
-            <ProtectedRouteV2 allowedRoles={['admin']}>
-              <AdminDashboardV2 />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/admin/content" element={
-            <ProtectedRouteV2 allowedRoles={['admin']}>
-              <AdminDashboardV2 />
-            </ProtectedRouteV2>
-          } />
+          {/* Legacy /profile route - redirect to role-based holding screen */}
+          <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
 
-          {/* Consumer Dashboard */}
-          <Route path="/consumer/dashboard" element={
-            <ProtectedRouteV2 allowedRoles={['consumer', 'guest', 'user', 'admin']}>
-              <ConsumerDashboard />
-            </ProtectedRouteV2>
-          } />
+          {/* Any authenticated user accessing root is redirected */}
+          <Route path="/dashboard" element={<RoleBasedDashboardRedirect />} />
 
-          {/* Guest Dashboard (Future) */}
-          <Route path="/guest/dashboard" element={
-            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
-              <GuestDashboard />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/guest/registrations" element={
-            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
-              <GuestDashboard />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/guest/favorites" element={
-            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
-              <GuestDashboard />
-            </ProtectedRouteV2>
-          } />
-          <Route path="/guest/social" element={
-            <ProtectedRouteV2 allowedRoles={['guest', 'admin']}>
-              <GuestDashboard />
-            </ProtectedRouteV2>
-          } />
-
-          {/* Universal Settings Route */}
-          <Route path="/settings" element={
-            <ProtectedRouteV2>
-              <div>Settings page coming soon...</div>
-            </ProtectedRouteV2>
-          } />
-
-          {/* Legacy Route Redirects for V2 - Role-based dashboard routing */}
-          <Route path="/profile" element={
-            <ProtectedRouteV2>
-              <RoleBasedDashboardRedirect />
-            </ProtectedRouteV2>
-          } />
+          {/* 404 - Redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

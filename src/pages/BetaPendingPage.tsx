@@ -15,8 +15,8 @@ export default function BetaPendingPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-4">
-        <div className="w-full max-w-2xl space-y-8">
+      <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-12 md:py-16">
+        <div className="w-full max-w-2xl space-y-8 my-8 md:my-12">
 
           {/* Main Beta Status Card */}
           <Card className="bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
@@ -49,9 +49,9 @@ export default function BetaPendingPage() {
                     <p className="text-sm text-gray-300">
                       <strong className="text-white">Account:</strong> {userProfile.email}
                     </p>
-                    {userProfile.betaRequestedAt && (
+                    {userProfile.name && (
                       <p className="text-sm text-gray-300 mt-1">
-                        <strong className="text-white">Requested:</strong> {new Date(userProfile.betaRequestedAt).toLocaleDateString()}
+                        <strong className="text-white">Name:</strong> {userProfile.name}
                       </p>
                     )}
                   </div>

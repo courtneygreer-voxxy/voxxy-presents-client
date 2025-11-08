@@ -288,9 +288,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Refresh user profile from API
   const handleRefreshUserProfile = async () => {
-    if (!currentUser) return
-
     try {
+      console.log('🔄 Refreshing user profile from API...')
       const user = await authApi.getCurrentUser()
       setCurrentUser(user)
       setUserProfile(user)
@@ -299,8 +298,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (user) {
         cacheUserProfile('rails-user', user)
       }
+
+      console.log('✅ User profile refreshed:', { email: user.email, role: user.role })
     } catch (err) {
-      console.warn('Failed to refresh user profile:', err)
+      console.error('❌ Failed to refresh user profile:', err)
       // Don't show error to user - just continue without profile
     }
   }

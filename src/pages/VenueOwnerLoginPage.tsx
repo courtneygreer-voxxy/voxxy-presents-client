@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Eye, EyeOff, Loader2, Mail, Lock, Building2, ArrowLeft } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail } from '@/services/authService'
+import { validateEmail } from '@/utils/validation'
 
 interface FormData {
   email: string

@@ -24,7 +24,7 @@ import {
   Home
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
-import { validateEmail } from '@/services/authService'
+import { validateEmail } from '@/utils/validation'
 
 interface SplitScreenLoginFormProps {
   onSuccess?: () => void

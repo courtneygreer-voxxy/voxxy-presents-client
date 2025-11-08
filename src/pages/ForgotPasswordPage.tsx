@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Mail, ArrowLeft, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { authApi, ApiError } from '@/services/api'
-import { validateEmail } from '@/services/authService'
+import { validateEmail } from '@/utils/validation'
 
 export default function ForgotPasswordPage() {
   const navigate = useNavigate()

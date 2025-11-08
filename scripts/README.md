@@ -1,91 +1,81 @@
-# Environment Management Scripts
+# Development Scripts
 
-Automated scripts for managing Firebase data across environments.
+Utility scripts for Voxxy Presents client development and security.
 
-## Quick Commands
+---
 
+## 📜 Available Scripts
+
+### 🔒 Security Check (`check-security.js`)
+
+Scans your codebase for exposed API keys, secrets, and sensitive data before committing or deploying.
+
+**Usage:**
 ```bash
-# Complete environment refresh (cleanup + seed)
-npm run refresh-env staging
-npm run refresh-env production
-
-# Individual operations
-npm run cleanup-data staging    # Clear all data
-npm run seed-data staging      # Add test accounts/data
+node scripts/check-security.js
 ```
 
-## Test Accounts Created
+**What it checks for:**
+- API keys (Firebase, SendGrid, Google)
+- Hardcoded passwords, secrets, and tokens
+- Private keys (RSA, SSL certificates)
+- Sensitive patterns in code
 
-After running `refresh-env` or `seed-data`, you'll have these ready-to-use accounts:
+**Exit codes:**
+- `0` - No security issues found ✅
+- `1` - Security issues detected ⚠️
 
-### Venue Owner
-- **Email**: `venue-test@voxxypresents.com`
-- **Password**: `VenueTest123!`
-- **Includes**: Pre-approved "Brooklyn Loft" venue
+**Best Practice:** Run this before:
+- Committing to Git
+- Creating Pull Requests
+- Deploying to production
 
-### Organization Owner
-- **Email**: `org-test@voxxypresents.com`
-- **Password**: `OrgTest123!`
-- **Includes**: "Test Events Co" organization with sample event
-
-### Admin
-- **Email**: `admin-test@voxxypresents.com`
-- **Password**: `AdminTest123!`
-- **Access**: Full admin dashboard access
-
-## Setup Requirements
-
-1. **Service Account Keys**: Place Firebase service account JSON files in `./config/`:
-   - `voxxy-presents-staging-service-account.json`
-   - `voxxy-presents-production-service-account.json`
-
-2. **Dependencies**: Scripts use `tsx` for TypeScript execution and `firebase-admin`
-
-## Usage Examples
-
-### Staging Deployment
+**Example output:**
 ```bash
-# Before deploying to staging
-npm run refresh-env staging
-# Deploy your code
-# Test with clean data
+🔍 Scanning Voxxy Presents Client for security issues...
+
+✅ No security issues found!
+
+Scanned for:
+  • Firebase API Key
+  • Google API Key
+  • SendGrid API Key
+  • Hardcoded Password
+  • Hardcoded Secret
+  • Hardcoded Token
+  • Private Key
+  • RSA Private Key
 ```
 
-### Production Deployment
-```bash
-# For production launch (use carefully!)
-npm run refresh-env production
+---
+
+## 🏗 Adding New Scripts
+
+When adding new utility scripts:
+
+1. **Place in `/scripts`** directory
+2. **Add shebang** for executable scripts: `#!/usr/bin/env node`
+3. **Document** in this README with usage examples
+4. **Update package.json** if the script should be an npm command
+5. **Add to `.gitignore`** if it generates temporary files
+
+**Example package.json command:**
+```json
+{
+  "scripts": {
+    "check:security": "node scripts/check-security.js"
+  }
+}
 ```
 
-### Development Testing
-```bash
-# Just add test data to existing environment
-npm run seed-data staging
-```
+---
 
-## Safety Features
+## 🔗 Related Documentation
 
-- **Confirmation prompts** for destructive operations
-- **Environment validation** to prevent accidents
-- **Batch operations** for performance
-- **Error handling** with detailed logging
-- **Test data flagging** (isTestData: true)
+- [Main README](../README.md) - Project overview
+- [API Documentation](https://github.com/courtneygreer-voxxy/voxxy-presents-api) - Rails backend API
+- [Contributing Guide](../docs/CONTRIBUTING.md) - Development workflow
 
-## What Gets Created
+---
 
-### Venues
-- Brooklyn Loft (approved, ready for events)
-
-### Organizations
-- Test Events Co (with sample wine tasting event)
-
-### Events
-- Community Wine Tasting (2 weeks from run date)
-
-### User Profiles
-- Complete user profiles with proper roles
-- Email verification enabled
-- Beta access granted
-- Approval status set
-
-All test data is flagged with `isTestData: true` for easy identification and future cleanup.
+**Last Updated:** November 8, 2024
