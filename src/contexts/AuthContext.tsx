@@ -99,7 +99,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const cachedProfile = getCachedUserProfile<User>('rails-user')
 
       if (cachedProfile) {
-        console.log('✓ Loading cached user profile (instant)')
+        console.log('✓ Loading cached user profile (instant)', {
+          email: cachedProfile.email,
+          role: cachedProfile.role,
+          id: cachedProfile.id
+        })
         setCurrentUser(cachedProfile)
         setUserProfile(cachedProfile)
         setLoading(false)
@@ -308,8 +312,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Role-specific helper functions
   const isAdmin = userProfile?.role === 'admin'
-  const isProducer = userProfile?.role === 'producer'
-  const isVendor = userProfile?.role === 'vendor' || userProfile?.role === 'venue_owner'
+  const isProducer = userProfile?.role === 'producer' || userProfile?.role === 'venue_owner' // venue_owner = Producer
+  const isVendor = userProfile?.role === 'vendor'
   const isGuest = userProfile?.role === 'guest' || userProfile?.role === 'consumer'
 
   // Email verification status

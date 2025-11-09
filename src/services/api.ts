@@ -50,14 +50,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     ...(options?.headers as Record<string, string> || {}),
   }
 
-  // Add admin key for admin endpoints
-  if (endpoint.startsWith('/admin/')) {
-    const adminKey = import.meta.env.VITE_ADMIN_API_KEY
-    if (!adminKey) {
-      throw new Error('VITE_ADMIN_API_KEY is not configured. Cannot access admin endpoints.')
-    }
-    headers['x-admin-key'] = adminKey
-  }
+  // Admin endpoints use JWT authentication (no separate admin key needed)
+  // The backend checks if the current user has admin role via JWT token
 
   // Add Rails JWT token for authenticated endpoints (exclude public auth endpoints)
   const isPublicAuthEndpoint =
@@ -271,28 +265,43 @@ export const authApi = {
    * PATCH /users/:id (legacy endpoint until v1/shared controllers are created)
    */
   async updateUser(userId: number, updates: any) {
-    console.log('📝 Updating user:', { userId, updates })
+    const endpoint = `${API_BASE_URL.replace('/api', '')}/users/${userId}`
+    const payload = { user: updates }
 
-    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users/${userId}`, {
+    console.log('📝 [API] updateUser - Starting request')
+    console.log('📝 [API] Endpoint:', endpoint)
+    console.log('📝 [API] Payload:', payload)
+    console.log('📝 [API] Token:', getAuthToken() ? 'Present' : 'Missing')
+
+    const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${getAuthToken()}`
       },
-      body: JSON.stringify({ user: updates }),
+      body: JSON.stringify(payload),
     })
 
+    console.log('📥 [API] Response status:', response.status, response.statusText)
+
     const data = await response.json()
-    console.log('📥 Update user response:', data)
+    console.log('📥 [API] Response data:', data)
 
     if (!response.ok) {
+      console.error('❌ [API] Update failed:', {
+        status: response.status,
+        error: data.error,
+        errors: data.errors,
+        message: data.message
+      })
       throw new ApiError(
-        data.error || 'Failed to update user',
+        data.error || data.message || 'Failed to update user',
         response.status,
         data.errors
       )
     }
 
+    console.log('✅ [API] Update successful')
     return data
   },
 
@@ -631,7 +640,23 @@ export const usersApi = {
 // Admin API
 export const adminApi = {
   async getAllUsers() {
-    return fetchApi<any[]>('/admin/users')
+    // Admin endpoints are at root level (not /api prefix)
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/user_breakdown`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch users' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch users', response.status)
+    }
+
+    const data = await response.json()
+    // Rails endpoint returns paginated data with { users: [...], pagination: {...} }
+    return data.users || data
   },
 
   async updateUserBetaStatus(userId: string, status: 'approved' | 'denied', notes?: string) {

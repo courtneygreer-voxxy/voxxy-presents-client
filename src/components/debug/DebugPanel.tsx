@@ -92,41 +92,80 @@ export function DebugPanel() {
       // V3.0 Roles
       case 'admin': return 'bg-purple-100 text-purple-800'
       case 'producer': return 'bg-green-100 text-green-800'
+      case 'venue_owner': return 'bg-green-100 text-green-800' // Maps to Producer
       case 'vendor': return 'bg-blue-100 text-blue-800'
       case 'consumer': return 'bg-amber-100 text-amber-800'
       case 'guest': return 'bg-gray-100 text-gray-800'
       // Legacy Roles (deprecated)
-      case 'venue_owner': return 'bg-blue-100 text-blue-800'
       case 'organizer': return 'bg-green-100 text-green-800'
       default: return 'bg-gray-100 text-gray-800'
+    }
+  }
+
+  const getDisplayRole = (role?: string) => {
+    // Map backend roles to user-facing labels
+    switch (role) {
+      case 'venue_owner': return 'PRODUCER'
+      case 'organizer': return 'PRODUCER (Legacy)'
+      default: return role?.toUpperCase() || 'NO ROLE'
     }
   }
 
   const handleRoleSwitch = async (newRole: UserRole) => {
     if (!userProfile || !currentUser) {
       console.error('❌ No user profile found')
+      alert('Error: No user profile found')
       return
     }
 
     try {
       setIsSwitchingRole(true)
-      console.log(`🔄 Switching role from ${userProfile.role} to ${newRole}`)
+      console.log(`🔄 [ROLE SWITCH] Starting: ${userProfile.role} → ${newRole}`)
+      console.log(`🔄 [ROLE SWITCH] User ID: ${userProfile.id}`)
 
-      // Update user role via API
-      await authApi.updateUser(userProfile.id, { role: newRole })
+      // Step 1: Update user role via API
+      console.log(`📡 [ROLE SWITCH] Calling API to update role...`)
+      const updateResponse = await authApi.updateUser(userProfile.id, { role: newRole })
+      console.log(`📥 [ROLE SWITCH] API update response:`, updateResponse)
 
-      console.log(`✅ Role switched to ${newRole}, refreshing user profile...`)
+      // Step 2: Wait a moment for database to update
+      await new Promise(resolve => setTimeout(resolve, 500))
 
-      // Refresh user profile to get updated data
+      // Step 3: Verify the role was actually changed by fetching current user
+      console.log(`🔍 [ROLE SWITCH] Verifying role change by fetching current user...`)
+      const verifyResponse = await authApi.getCurrentUser()
+      console.log(`📥 [ROLE SWITCH] Verification response:`, verifyResponse)
+
+      if (verifyResponse.role !== newRole) {
+        console.error(`❌ [ROLE SWITCH] Role verification failed!`)
+        console.error(`❌ [ROLE SWITCH] Expected: ${newRole}, Got: ${verifyResponse.role}`)
+        alert(`Role switch failed!\n\nExpected: ${newRole}\nActual: ${verifyResponse.role}\n\nCheck Rails server logs for errors.`)
+        setIsSwitchingRole(false)
+        return
+      }
+
+      console.log(`✅ [ROLE SWITCH] Role verified as ${verifyResponse.role}`)
+
+      // Step 4: Clear cached profile so new role is used on reload
+      console.log(`🗑️ [ROLE SWITCH] Clearing cached profile...`)
+      const { removeCachedUserProfile, cacheUserProfile } = await import('@/utils/cache')
+      removeCachedUserProfile('rails-user')
+
+      // Cache the new profile
+      cacheUserProfile('rails-user', verifyResponse)
+      console.log(`💾 [ROLE SWITCH] Cached new profile with role: ${verifyResponse.role}`)
+
+      // Step 5: Refresh auth context
+      console.log(`🔄 [ROLE SWITCH] Refreshing auth context...`)
       await refreshUserProfile()
 
-      console.log(`✅ Profile refreshed, reloading page to apply changes...`)
+      console.log(`✅ [ROLE SWITCH] Success! Navigating to dashboard...`)
 
-      // Force page reload to apply new role routing
-      window.location.reload()
+      // Navigate to dashboard route which will trigger role-based redirect
+      window.location.href = '/dashboard'
     } catch (error) {
-      console.error('❌ Failed to switch role:', error)
-      alert(`Failed to switch role: ${error}`)
+      console.error('❌ [ROLE SWITCH] Failed:', error)
+      alert(`Failed to switch role: ${error instanceof Error ? error.message : String(error)}`)
       setIsSwitchingRole(false)
     }
   }
@@ -184,7 +223,7 @@ export function DebugPanel() {
               </div>
               <div className="flex items-center justify-center">
                 <Badge className={`${getRoleColor(userProfile.role)} text-base px-4 py-2 font-bold`}>
-                  {userProfile.role?.toUpperCase() || 'NO ROLE'}
+                  {getDisplayRole(userProfile.role)}
                 </Badge>
               </div>
 
@@ -192,11 +231,11 @@ export function DebugPanel() {
                 <div className="font-semibold text-yellow-300 text-center">Switch Role (Testing)</div>
                 <div className="grid grid-cols-2 gap-1">
                   <Button
-                    onClick={() => handleRoleSwitch('producer')}
-                    disabled={isSwitchingRole || userProfile.role === 'producer'}
+                    onClick={() => handleRoleSwitch('venue_owner')}
+                    disabled={isSwitchingRole || userProfile.role === 'venue_owner'}
                     size="sm"
                     variant="outline"
-                    className={`h-7 text-xs ${userProfile.role === 'producer' ? 'bg-green-900/50 border-green-500' : 'border-green-500/50 text-green-400 hover:bg-green-900/30'}`}
+                    className={`h-7 text-xs ${userProfile.role === 'venue_owner' ? 'bg-green-900/50 border-green-500' : 'border-green-500/50 text-green-400 hover:bg-green-900/30'}`}
                   >
                     🎯 Producer
                   </Button>

@@ -35,7 +35,7 @@ export function RedirectIfAuthenticatedV2({ children }: { children: React.ReactN
 
     // Admin
     if (role === 'admin') {
-      return <Navigate to="/producer/pending" replace />
+      return <Navigate to="/admin/dashboard" replace />
     }
 
     // Default fallback

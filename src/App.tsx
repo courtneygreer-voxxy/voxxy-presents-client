@@ -1,36 +1,40 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useAuth } from './contexts/AuthContext'
 import { AuthProvider } from './contexts/AuthContext'
 import { analytics } from './lib/analytics'
 import { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
+import { AdminRoute } from './components/auth/AdminRoute'
 import { LoadingTransition } from './components/LoadingTransition'
 
-// Public Pages
+// Eager load: Homepage (critical for first paint)
 import HomePage from './pages/HomePage'
-import FeaturesPage from './pages/FeaturesPage'
-import PricingPage from './pages/PricingPage'
-import HelpPage from './pages/HelpPage'
-import ContactPage from './pages/ContactPage'
-import AboutPage from './pages/AboutPage'
-import PrivacyPolicyPage from './pages/PrivacyPolicyPage'
-import TermsOfServicePage from './pages/TermsOfServicePage'
 
-// Auth Pages
-import AuthTypePage from './pages/AuthTypePage'
-import ClubOwnerSignUpPage from './pages/ClubOwnerSignUpPage'
-import ClubOwnerLoginPage from './pages/ClubOwnerLoginPage'
-import VenueOwnerLoginPage from './pages/VenueOwnerLoginPage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
-import EmailVerificationPage from './pages/EmailVerificationPage'
+// Lazy load: Public Pages (load on-demand)
+const FeaturesPage = lazy(() => import('./pages/FeaturesPage'))
+const PricingPage = lazy(() => import('./pages/PricingPage'))
+const HelpPage = lazy(() => import('./pages/HelpPage'))
+const ContactPage = lazy(() => import('./pages/ContactPage'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
+const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
 
-// Holding Screens
-import BetaPendingPage from './pages/BetaPendingPage'
-import ProducerPendingPage from './pages/ProducerPendingPage'
-import VendorPendingPage from './pages/VendorPendingPage'
+// Lazy load: Auth Pages (load on-demand)
+const AuthTypePage = lazy(() => import('./pages/AuthTypePage'))
+const ClubOwnerSignUpPage = lazy(() => import('./pages/ClubOwnerSignUpPage'))
+const ClubOwnerLoginPage = lazy(() => import('./pages/ClubOwnerLoginPage'))
+const VenueOwnerLoginPage = lazy(() => import('./pages/VenueOwnerLoginPage'))
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
+const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
+const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage'))
 
-// Debug Panel
+// Lazy load: Holding Screens (load on-demand)
+const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
+const ProducerPendingPage = lazy(() => import('./pages/ProducerPendingPage'))
+const VendorPendingPage = lazy(() => import('./pages/VendorPendingPage'))
+const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'))
+
+// Debug Panel (keep eager for development)
 import { DebugPanel } from './components/debug/DebugPanel'
 
 // Role-based redirect component - routes authenticated users to their holding screen
@@ -44,42 +48,44 @@ function RoleBasedDashboardRedirect() {
     return () => clearTimeout(timer)
   }, [])
 
-  console.log('RoleBasedDashboardRedirect - User profile:', userProfile)
+  console.log('🔀 RoleBasedDashboardRedirect - User profile:', userProfile)
+  console.log('🔀 RoleBasedDashboardRedirect - Role:', userProfile?.role)
+  console.log('🔀 RoleBasedDashboardRedirect - Loading:', loading, 'Redirecting:', isRedirecting)
 
   if (loading || isRedirecting) {
     return <LoadingTransition message="Taking you to your dashboard..." />
   }
 
   if (!userProfile) {
-    console.log('No user profile, redirecting to home')
+    console.log('🔀 No user profile, redirecting to home')
     return <Navigate to="/" replace />
   }
 
   // V3.0: Route to holding screens based on user role
   const role = userProfile.role
 
-  // Producer roles
-  if (role === 'producer') {
-    console.log('Producer detected, redirecting to producer holding screen')
+  // Producer roles (venue_owner = Producer in UI)
+  if (role === 'producer' || role === 'venue_owner') {
+    console.log('🟢 Producer detected (role:', role, '), redirecting to producer holding screen')
     return <Navigate to="/producer/pending" replace />
   }
 
   // Vendor roles
-  if (role === 'vendor' || role === 'venue_owner') {
-    console.log('Vendor detected, redirecting to vendor holding screen')
+  if (role === 'vendor') {
+    console.log('🔵 Vendor detected, redirecting to vendor holding screen')
     return <Navigate to="/vendor/pending" replace />
   }
 
   // Consumer/Guest roles
   if (role === 'consumer' || role === 'guest') {
-    console.log('Consumer/Guest detected, redirecting to consumer holding screen')
+    console.log('🟣 Consumer/Guest detected (role:', role, '), redirecting to consumer holding screen')
     return <Navigate to="/pending" replace />
   }
 
-  // Admin (for now, treat as producer)
+  // Admin - route to admin dashboard
   if (role === 'admin') {
-    console.log('Admin detected, redirecting to producer holding screen')
-    return <Navigate to="/producer/pending" replace />
+    console.log('🟣 Admin detected, redirecting to admin dashboard')
+    return <Navigate to="/admin/dashboard" replace />
   }
 
   // Unknown role - redirect to home
@@ -99,7 +105,8 @@ export default function App() {
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
 
-        <Routes>
+        <Suspense fallback={<LoadingTransition />}>
+          <Routes>
           {/* ==========================================
               PUBLIC ROUTES
               ========================================== */}
@@ -185,6 +192,13 @@ export default function App() {
           {/* Vendor Holding Screen */}
           <Route path="/vendor/pending" element={<VendorPendingPage />} />
 
+          {/* Admin Dashboard - Protected */}
+          <Route path="/admin/dashboard" element={
+            <AdminRoute>
+              <AdminDashboardPage />
+            </AdminRoute>
+          } />
+
           {/* ==========================================
               CATCH-ALL & REDIRECTS
               ========================================== */}
@@ -198,6 +212,7 @@ export default function App() {
           {/* 404 - Redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   )

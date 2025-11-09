@@ -10,6 +10,34 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core libraries (changes rarely, cache separately)
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+
+          // Radix UI components (large, cache separately)
+          'radix-ui': [
+            '@radix-ui/react-dialog',
+            '@radix-ui/react-dropdown-menu',
+            '@radix-ui/react-select',
+            '@radix-ui/react-tabs',
+            '@radix-ui/react-toast',
+            '@radix-ui/react-popover',
+            '@radix-ui/react-label',
+            '@radix-ui/react-slot',
+          ],
+
+          // Form libraries (used in signup/login pages)
+          'form-vendor': ['react-hook-form', '@hookform/resolvers'],
+
+          // Icons and UI utilities
+          'ui-vendor': ['lucide-react', 'clsx', 'class-variance-authority'],
+        },
+      },
+    },
+  },
   preview: {
     host: '0.0.0.0',
     port: process.env.PORT ? parseInt(process.env.PORT) : 3000,
