@@ -102,9 +102,7 @@ export default function ContactPage() {
     setIsSubmitting(true)
     setSubmissionError(null)
 
-    betaFormTracking.trackFormSubmit({
-      message: formData.message
-    })
+    betaFormTracking.trackFormSubmit({})
 
     try {
       const submissionData: CreateContactSubmissionData = {
