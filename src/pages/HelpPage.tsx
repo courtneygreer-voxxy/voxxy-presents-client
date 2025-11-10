@@ -38,7 +38,7 @@ export default function HelpPage() {
           </h1>
 
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            We're here to support you during the pilot program
+            We're here to support you during the pilot program and beyond
           </p>
         </div>
       </section>
@@ -56,16 +56,19 @@ export default function HelpPage() {
                 <CardTitle className="text-2xl text-white">Email Support</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-200 mb-6">
-                  Get in touch with our team directly for any questions or support needs.
+                <p className="text-gray-200 mb-4">
+                  Questions about the pilot program? Want to learn more? Reach out directly.
                 </p>
                 <a
                   href="mailto:team@voxxypresents.com"
-                  className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors font-medium"
+                  className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors font-medium mb-4"
                 >
                   team@voxxypresents.com
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </a>
+                <p className="text-gray-300 text-sm">
+                  Response time: Within 24-48 hours
+                </p>
               </CardContent>
             </Card>
 
@@ -79,7 +82,7 @@ export default function HelpPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-200 mb-6">
-                  Ready to join the pilot program? Fill out our quick application form.
+                  Ready to join? We're accepting 5 producers into our pilot program.
                 </p>
                 <Button className="bg-purple-600 hover:bg-purple-700 text-white" asChild>
                   <Link to="/contact">
@@ -117,8 +120,8 @@ export default function HelpPage() {
                 <p className="text-gray-300 mb-4 leading-relaxed">
                   Simple, transparent pricing at $15/month for pilot program members
                 </p>
-                <Link to="/pricing" className="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
-                  View Pricing
+                <Link to="/contact" className="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
+                  Learn More
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </CardContent>

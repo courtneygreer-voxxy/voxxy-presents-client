@@ -71,18 +71,6 @@ export default function HomePage() {
                 Features
               </TrackedLink>
               <TrackedLink
-                to="/pricing"
-                className="text-gray-300 hover:text-purple-400 transition-colors"
-                trackingData={{
-                  link_text: 'Pricing',
-                  destination_page: 'Pricing',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                Pricing
-              </TrackedLink>
-              <TrackedLink
                 to="/help"
                 className="text-gray-300 hover:text-purple-400 transition-colors"
                 trackingData={{
@@ -156,29 +144,22 @@ export default function HomePage() {
         {mobileMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-gray-800/95 backdrop-blur-sm border-b border-white/10 md:hidden">
             <div className="container mx-auto px-4 py-4 space-y-4">
-              <Link 
-                to="/features" 
+              <Link
+                to="/features"
                 className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Features
               </Link>
               <Link
-                to="/pricing"
-                className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <Link
-                to="/help" 
+                to="/help"
                 className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Help Center
               </Link>
-              <Link 
-                to="/contact" 
+              <Link
+                to="/contact"
                 className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
@@ -231,19 +212,19 @@ export default function HomePage() {
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold text-white mb-8 tracking-tight leading-tight">
-            Recurring {" "}
+            The Operating System for {" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-            Event Platform Building Real Communities
+            Recurring Event Producers
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Recurring event management tools that help club organizers build sustainable communities with consistent attendance and engaged members.
+            Event coordination tools that help producers manage vendor relationships, automate logistics, and scale without burning out.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <TrackedButton
-              className="inline-flex items-center px-8 py-4 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="inline-flex items-center px-8 py-6 bg-purple-600 hover:bg-purple-700 text-white text-lg font-semibold rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl min-h-[56px]"
               trackingData={{
                 button_text: 'Request Paid Beta Access',
                 button_location: 'hero',
@@ -258,7 +239,7 @@ export default function HomePage() {
               </Link>
             </TrackedButton>
             <TrackedButton
-              className="inline-flex items-center px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 text-lg font-semibold rounded-lg"
+              className="inline-flex items-center px-8 py-6 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 text-lg font-semibold rounded-lg min-h-[56px]"
               trackingData={{
                 button_text: 'Get Product Updates',
                 button_location: 'hero',
@@ -284,38 +265,38 @@ export default function HomePage() {
               Event Coordination is Broken
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Club organizers everywhere face the same recurring challenges
+              Event producers managing recurring events face the same operational bottlenecks
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Maybe RSVPs Problem Card', 'Problems Section')}
+              onClick={() => trackLandingInteraction('click', 'Communication Chaos Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">"Maybe" RSVPs Kill Planning</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Scattered Communication Chaos</h3>
               <p className="text-gray-300 leading-relaxed">
-                Soft commits make venue coordination and capacity planning impossible to manage
+                Vendor coordination scattered across texts, emails, Instagram DMs, and spreadsheets - you can't find conversations when you need them most
               </p>
             </div>
 
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Venue Coordination Problem Card', 'Problems Section')}
+              onClick={() => trackLandingInteraction('click', 'Manual Work Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Venue Coordination Nightmare</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Manual Work Eating Your Time</h3>
               <p className="text-gray-300 leading-relaxed">
-                Manually sharing guest lists, tracking capacity changes, constant email back-and-forth with venue staff
+                Spending 15-20 hours per event on vendor logistics instead of creating experiences - coordination becomes unpaid labor that doesn't scale
               </p>
             </div>
 
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Promotion Problem Card', 'Problems Section')}
+              onClick={() => trackLandingInteraction('click', 'Application Review Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Promotion Scattered Everywhere</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Application Review Bottleneck</h3>
               <p className="text-gray-300 leading-relaxed">
-                Instagram posts, newsletter emails, word-of-mouth - nothing connects or tracks effectively
+                Drowning in 200+ vendor applications across PDFs, emails, and Instagram profiles with no easy way to compare and decide
               </p>
             </div>
           </div>
@@ -327,53 +308,67 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Built for Recurring Event Organizers
+              Built for Recurring Event Producers
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Designed specifically for club organizers. Voxxy handles the logistics, you focus on the experience.
+              Voxxy handles vendor coordination so you can focus on creating unforgettable experiences.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            {/* Member Database & Engagement */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Unified Communication Hub */}
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-indigo-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Member Database Feature', 'Solutions Section')}
+              onClick={() => trackLandingInteraction('click', 'Unified Communication Hub Feature', 'Solutions Section')}
             >
               <div className="w-14 h-14 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-indigo-500/30 transition-all">
                 <Users className="h-7 w-7 text-indigo-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-indigo-300 transition-colors">Member Database & Engagement</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-indigo-300 transition-colors">Unified Communication Hub</h3>
               <p className="text-gray-300 leading-relaxed">
-                Contact management across all events with automated member engagement between events
+                All vendor conversations in one place - no more switching between texts, emails, Instagram DMs, and WhatsApp to find what you need
               </p>
             </div>
 
-            {/* Venue Integration Hub */}
+            {/* Vendor CRM That Scales */}
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Venue Integration Feature', 'Solutions Section')}
+              onClick={() => trackLandingInteraction('click', 'Vendor CRM Feature', 'Solutions Section')}
             >
               <div className="w-14 h-14 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-500/30 transition-all">
                 <MapPin className="h-7 w-7 text-blue-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-300 transition-colors">Venue Integration Hub</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-300 transition-colors">Vendor CRM That Scales</h3>
               <p className="text-gray-300 leading-relaxed">
-                Automated guest list sharing, capacity tracking, and streamlined venue communication
+                Track vendor relationships across all your events with notes, history, and performance data that travels with them from show to show
               </p>
             </div>
 
-            {/* Budget Management Tools */}
+            {/* Fast Application Review */}
             <div
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 cursor-pointer group"
-              onClick={() => trackLandingInteraction('click', 'Budget Management Feature', 'Solutions Section')}
+              onClick={() => trackLandingInteraction('click', 'Fast Application Review Feature', 'Solutions Section')}
             >
               <div className="w-14 h-14 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-500/30 transition-all">
                 <Calendar className="h-7 w-7 text-green-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-green-300 transition-colors">Budget Management Tools</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-green-300 transition-colors">Fast Application Review</h3>
               <p className="text-gray-300 leading-relaxed">
-                Track event costs, venue fees, and revenue with automated expense reporting and budget planning
+                Side-by-side portfolio comparison with one-click approve, waitlist, or reject - turn 200 applications into decisions in hours, not days
+              </p>
+            </div>
+
+            {/* Email Automation */}
+            <div
+              className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
+              onClick={() => trackLandingInteraction('click', 'Email Automation Feature', 'Solutions Section')}
+            >
+              <div className="w-14 h-14 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-500/30 transition-all">
+                <ArrowRight className="h-7 w-7 text-purple-300" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-purple-300 transition-colors">Email Automation Without the Setup</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Application confirmations, approvals, rejections, payment reminders, and day-of logistics - automated and customizable without needing Mailgun or technical expertise
               </p>
             </div>
           </div>
@@ -384,10 +379,10 @@ export default function HomePage() {
       <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to let Voxxy handle your event logistics?
+            Ready to stop coordinating and start producing?
           </h2>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Join club organizers everywhere who are building sustainable recurring events with Voxxy
+            Join event producers who are building sustainable recurring events with Voxxy
           </p>
           <Link
             to="/contact"

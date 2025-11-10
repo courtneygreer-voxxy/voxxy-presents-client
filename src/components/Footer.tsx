@@ -10,8 +10,8 @@ export default function Footer() {
           <div className="md:col-span-5">
             <h3 className="text-2xl font-bold text-white mb-4">Voxxy Presents</h3>
             <p className="text-gray-300 leading-relaxed">
-              Event infrastructure for recurring club organizers.
-              Focus on building community experiences, we'll handle the coordination logistics.
+              Event infrastructure for recurring event producers.
+              Focus on creating experiences, we'll handle the vendor coordination.
             </p>
           </div>
 
@@ -27,8 +27,8 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/pricing" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
-                    Pricing
+                  <Link to="/contact" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                    For Vendors
                   </Link>
                 </li>
               </ul>

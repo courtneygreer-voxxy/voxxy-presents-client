@@ -56,7 +56,7 @@ export default function FeaturesPage() {
           <div className="mb-8">
             <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-medium rounded-full">
               <Sparkles className="h-4 w-4 mr-2" />
-              Built for Recurring Event Organizers
+              Built for Recurring Event Producers
             </div>
           </div>
 
@@ -68,7 +68,7 @@ export default function FeaturesPage() {
           </h1>
 
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Everything you need to manage recurring events, engage your community, and coordinate with venues—all in one place.
+            Everything you need to coordinate vendors, automate logistics, and scale your recurring events—all in one platform.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -76,11 +76,6 @@ export default function FeaturesPage() {
               <Link to="/contact">
                 Request Beta Access
                 <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 font-semibold" size="lg" asChild>
-              <Link to="/pricing">
-                View Pricing
               </Link>
             </Button>
           </div>
@@ -95,122 +90,122 @@ export default function FeaturesPage() {
               Core Voxxy Presents Features
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Purpose-built tools for club organizers running recurring events
+              Purpose-built tools for producers managing recurring events with the same vendor pool
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Budget Management Tools */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500/30 transition-all">
-                  <DollarSign className="h-7 w-7 text-green-300" />
-                </div>
-                <CardTitle className="text-white text-xl mb-2">Budget Management Tools</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Track event costs, venue fees, and revenue with automated expense reporting. Plan budgets for your entire event series and see real-time profitability.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    Event budget planning and tracking
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    Automated expense categorization
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    Revenue and profitability reports
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Recurring Event Tools */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
-                  <Calendar className="h-7 w-7 text-purple-300" />
-                </div>
-                <CardTitle className="text-white text-xl mb-2">Recurring Event Tools</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Set up monthly pop-ups or weekly events once. Generate event templates and manage your entire series with automated scheduling and notifications.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    Event template generation
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    Automated recurring schedules
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    Series management dashboard
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
-
-            {/* Centralized Dashboard */}
+            {/* Unified Communication Hub */}
             <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-indigo-400/30 transition-all duration-300 group">
               <CardHeader>
                 <div className="w-14 h-14 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/30 transition-all">
                   <Users className="h-7 w-7 text-indigo-300" />
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Centralized Subscriber Dashboard</CardTitle>
+                <CardTitle className="text-white text-xl mb-2">Unified Communication Hub</CardTitle>
                 <CardDescription className="text-gray-300 leading-relaxed">
-                  Give your community a home base. Members can view all your events, manage their RSVPs, and stay engaged with your club—all from one beautiful page.
+                  All vendor coordination in one place - no more texts, emails, Instagram DMs, and WhatsApp chaos. Conversation history that persists across events so your team can see full vendor context instantly.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Branded organization pages
+                    All communication in one platform
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Member engagement tracking
+                    Conversation history across events
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Automated notifications
+                    Team collaboration tools
                   </li>
                 </ul>
               </CardContent>
             </Card>
 
-            {/* Vendor Support */}
+            {/* Vendor CRM */}
+            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-14 h-14 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
+                  <MapPin className="h-7 w-7 text-purple-300" />
+                </div>
+                <CardTitle className="text-white text-xl mb-2">Vendor CRM Across All Events</CardTitle>
+                <CardDescription className="text-gray-300 leading-relaxed">
+                  Track vendor relationships across all your events with unified profiles, notes, tags, and performance history. CSV import for existing vendor lists, searchable and filterable database.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
+                    Unified vendor profiles
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
+                    Notes and performance tracking
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
+                    CSV import capability
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Fast Application Review */}
+            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 group">
+              <CardHeader>
+                <div className="w-14 h-14 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500/30 transition-all">
+                  <Calendar className="h-7 w-7 text-green-300" />
+                </div>
+                <CardTitle className="text-white text-xl mb-2">Fast Application Review</CardTitle>
+                <CardDescription className="text-gray-300 leading-relaxed">
+                  Side-by-side portfolio comparison with one-click approve, waitlist, or reject. Integrated social profiles and portfolios with bulk actions for faster decisions.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    Side-by-side comparison
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    One-click decisions
+                  </li>
+                  <li className="flex items-center text-gray-300">
+                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
+                    Bulk actions
+                  </li>
+                </ul>
+              </CardContent>
+            </Card>
+
+            {/* Email Automation */}
             <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 group">
               <CardHeader>
                 <div className="w-14 h-14 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-all">
-                  <MapPin className="h-7 w-7 text-blue-300" />
+                  <DollarSign className="h-7 w-7 text-blue-300" />
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Vendor Support & Coordination</CardTitle>
+                <CardTitle className="text-white text-xl mb-2">Email Automation Without Technical Setup</CardTitle>
                 <CardDescription className="text-gray-300 leading-relaxed">
-                  Streamline venue coordination with automated guest list sharing, capacity tracking, and direct venue communication tools. Access our growing venue network.
+                  Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics - all automated and customizable without needing Mailgun or SendGrid.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    Automated guest list sharing
+                    Automated email triggers
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    Real-time capacity tracking
+                    Event-specific customization
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    Venue network access
+                    No technical setup required
                   </li>
                 </ul>
               </CardContent>
@@ -276,14 +271,14 @@ export default function FeaturesPage() {
       <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Build Your Community?
+            Ready to Build Your Next Event?
           </h2>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Join the pilot program and help shape the future of Voxxy Presents
+            Join event producers everywhere who are scaling their recurring events with Voxxy
           </p>
           <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
             <Link to="/contact">
-              Request Pilot Access
+              Request Beta Access
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

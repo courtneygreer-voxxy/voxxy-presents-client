@@ -51,6 +51,7 @@ This document serves as the source of truth for all landing page copy across the
 - **Main Headline**: Voxxy Presents Features
 - **Subheadline**: Everything you need to coordinate vendors, automate logistics, and scale your recurring events—all in one platform.
 - **Primary CTA**: Request Beta Access
+- **Secondary CTA**: View Pricing
 
 ### Core Features Section
 **Headline**: Core Voxxy Presents Features
@@ -134,16 +135,10 @@ This document serves as the source of truth for all landing page copy across the
 **Description**: We'll review your application and get back to you within 2-3 business days.
 **CTA**: Return to Home
 
-### Vendor Coming Soon Section
-**Badge**: Coming Soon
+### Vendor CTA Section
 **Headline**: Are You a Vendor?
-**Subheadline**: Voxxy vendor sign up is coming soon. We're building the platform to make your life easier.
-
-**Feature Preview - "Here's what you can look forward to":**
-- **Easy Application**: One-click sign-up for events in your area
-- **Visibility to Markets**: See upcoming markets and events near you
-- **Centralized Messaging**: All event communication in one hub - no emails or texts
-- **Simple Coordination**: Everything you need for each event in one place
+**Subheadline**: Voxxy will soon connect you with more event opportunities - stay tuned
+**CTA**: Get Vendor Updates
 
 ---
 
@@ -170,7 +165,7 @@ This document serves as the source of truth for all landing page copy across the
 
 **Links**:
 1. **Features**: Learn about what Voxxy Presents can do for your recurring events
-2. **Pricing**: Simple, transparent pricing at $15/month for pilot program members (links to /contact)
+2. **Pricing**: Simple, transparent pricing at $15/month for pilot program members
 3. **Contact Us**: Have questions? Reach out to our team
 
 ---
@@ -223,8 +218,8 @@ This document serves as the source of truth for all landing page copy across the
 
 ### Header Navigation
 - Logo: Voxxy Presents
-- Links: Features | Help Center | Contact
-- CTA: Sign In
+- Links: Features | Pricing | Help Center | Contact
+- CTA: Request Beta Access / Request Access / Sign In (varies by page)
 
 ### Footer
 **Column 1**:
@@ -234,7 +229,8 @@ This document serves as the source of truth for all landing page copy across the
 
 **Column 2 - Product**:
 - Features
-- For Vendors (links to /contact)
+- Pricing
+- For Vendors
 
 **Column 3 - Company**:
 - About Us (links to heyvoxxy.com/#/about-us)

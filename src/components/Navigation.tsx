@@ -33,7 +33,6 @@ export default function Navigation({ activePage }: NavigationProps) {
           {/* Navigation - Center */}
           <div className="hidden md:flex items-center gap-6 justify-self-center">
             <Link to="/features" className={getLinkClass('features')}>Features</Link>
-            <Link to="/pricing" className={getLinkClass('pricing')}>Pricing</Link>
             <Link to="/help" className={getLinkClass('help')}>Help Center</Link>
             <Link to="/contact" className={getLinkClass('contact')}>Contact</Link>
           </div>
@@ -69,13 +68,6 @@ export default function Navigation({ activePage }: NavigationProps) {
               onClick={() => setMobileMenuOpen(false)}
             >
               Features
-            </Link>
-            <Link
-              to="/pricing"
-              className={getMobileLinkClass('pricing')}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Pricing
             </Link>
             <Link
               to="/help"

@@ -2,9 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import {
   Mail,
@@ -59,11 +57,7 @@ import Footer from "@/components/Footer"
 interface BetaFormData {
   name: string
   email: string
-  organizationName: string
-  eventFrequency: string
-  typicalAttendance: string
-  biggestChallenge: string
-  description: string
+  message: string
 }
 
 export default function ContactPage() {
@@ -78,11 +72,7 @@ export default function ContactPage() {
   const [formData, setFormData] = useState<BetaFormData>({
     name: '',
     email: '',
-    organizationName: '',
-    eventFrequency: '',
-    typicalAttendance: '',
-    biggestChallenge: '',
-    description: ''
+    message: ''
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -113,9 +103,7 @@ export default function ContactPage() {
     setSubmissionError(null)
 
     betaFormTracking.trackFormSubmit({
-      event_frequency: formData.eventFrequency,
-      typical_attendance: formData.typicalAttendance,
-      biggest_challenge: formData.biggestChallenge,
+      message: formData.message
     })
 
     try {
@@ -123,11 +111,7 @@ export default function ContactPage() {
         type: 'beta_request',
         name: formData.name,
         email: formData.email,
-        organizationName: formData.organizationName,
-        eventFrequency: formData.eventFrequency,
-        typicalAttendance: formData.typicalAttendance,
-        biggestChallenge: formData.biggestChallenge,
-        description: formData.description,
+        description: formData.message,
         source: 'contact_page'
       }
 
@@ -137,24 +121,8 @@ export default function ContactPage() {
       // Track successful conversion
       analytics.trackConversionStep('Form Submitted', 'Contact')
 
-      // Infer event scale from attendance
-      let eventScale: 'small' | 'medium' | 'large' | undefined;
-      const attendance = formData.typicalAttendance.toLowerCase();
-      if (attendance.includes('10-50') || attendance.includes('small')) {
-        eventScale = 'small';
-      } else if (attendance.includes('50-200') || attendance.includes('medium')) {
-        eventScale = 'medium';
-      } else if (attendance.includes('200+') || attendance.includes('large')) {
-        eventScale = 'large';
-      }
-
       analytics.setUserProperties({
         conversion_stage: 'submitted',
-        organization_name: formData.organizationName,
-        event_frequency: formData.eventFrequency,
-        typical_attendance: formData.typicalAttendance,
-        biggest_challenge: formData.biggestChallenge,
-        event_scale: eventScale,
         // Increase profile confidence since we have form data
         profile_confidence: 'high',
       })
@@ -194,7 +162,7 @@ export default function ContactPage() {
           </h1>
 
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Limited spots available - be part of building the future of recurring event management
+            Limited spots available - be part of building the future of event coordination
           </p>
         </div>
       </section>
@@ -214,15 +182,15 @@ export default function ContactPage() {
             <div className="flex items-start space-x-3">
               <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
               <div>
-                <h3 className="text-lg font-semibold text-white mb-1">Venue Network Access</h3>
-                <p className="text-gray-200">Connect with our growing marketplace of venues</p>
+                <h3 className="text-lg font-semibold text-white mb-1">Vendor Coordination Tools</h3>
+                <p className="text-gray-200">Unified communication hub and vendor CRM</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
               <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="text-lg font-semibold text-white mb-1">Locked-In Pricing</h3>
-                <p className="text-gray-200">Your rate stays at $15/month forever</p>
+                <p className="text-gray-200">Your rate stays at $15/month for years 1-2</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
@@ -259,7 +227,7 @@ export default function ContactPage() {
               <CardHeader className="text-center pb-8">
                 <CardTitle className="text-3xl font-bold text-white mb-3">Request Pilot Access</CardTitle>
                 <CardDescription className="text-gray-300 text-lg">
-                  Tell us about your events and we'll get you set up
+                  Tell us about yourself and we'll get you set up
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -283,64 +251,13 @@ export default function ContactPage() {
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
                   />
 
-                  <Input
-                    id="organizationName"
-                    placeholder="Organization/Club Name *"
-                    value={formData.organizationName}
-                    onChange={(e) => handleInputChange('organizationName', e.target.value)}
-                    required
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
-                  />
-
-                  <Select
-                    value={formData.eventFrequency}
-                    onValueChange={(value) => handleInputChange('eventFrequency', value)}
-                    required
-                  >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all">
-                      <SelectValue placeholder="How often do you host events? *" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="biweekly">Bi-weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                      <SelectItem value="quarterly">Quarterly</SelectItem>
-                      <SelectItem value="planning">Planning to start</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  <Select
-                    value={formData.typicalAttendance}
-                    onValueChange={(value) => handleInputChange('typicalAttendance', value)}
-                    required
-                  >
-                    <SelectTrigger className="bg-white/10 border-white/20 text-white h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all">
-                      <SelectValue placeholder="Typical event attendance *" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1-20">1-20 people</SelectItem>
-                      <SelectItem value="21-50">21-50 people</SelectItem>
-                      <SelectItem value="51-100">51-100 people</SelectItem>
-                      <SelectItem value="100+">100+ people</SelectItem>
-                    </SelectContent>
-                  </Select>
-
                   <Textarea
-                    id="biggestChallenge"
-                    placeholder="What's your biggest event management challenge? *"
-                    value={formData.biggestChallenge}
-                    onChange={(e) => handleInputChange('biggestChallenge', e.target.value)}
+                    id="message"
+                    placeholder="Tell us about yourself and your events *"
+                    value={formData.message}
+                    onChange={(e) => handleInputChange('message', e.target.value)}
                     required
-                    rows={4}
-                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all resize-none"
-                  />
-
-                  <Textarea
-                    id="description"
-                    placeholder="Anything else we should know?"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange('description', e.target.value)}
-                    rows={4}
+                    rows={6}
                     className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all resize-none"
                   />
 
@@ -365,26 +282,48 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Venue CTA */}
+      {/* Vendor Coming Soon */}
       <section className="py-24 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="flex justify-center mb-6">
-            <div className="w-20 h-20 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full flex items-center justify-center">
-              <Building className="h-10 w-10 text-blue-300" />
+            <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-300 text-sm font-medium rounded-full">
+              <Sparkles className="h-4 w-4 mr-2" />
+              Coming Soon
             </div>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Are You a Venue Owner?
+            Are You a Vendor?
           </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Join Voxxy's Venue Network and connect with recurring event organizers looking for spaces
+          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+            Voxxy vendor sign up is coming soon. We're building the platform to make your life easier.
           </p>
-          <Button size="lg" className="bg-white text-blue-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
-            <Link to="/signup/venue-owner">
-              <MapPin className="mr-2 h-5 w-5" />
-              Add Your Venue to the Network
-            </Link>
-          </Button>
+
+          {/* Feature Preview */}
+          <div className="max-w-3xl mx-auto mb-10">
+            <p className="text-lg text-gray-200 mb-6 font-semibold">Here's what you can look forward to:</p>
+            <div className="grid md:grid-cols-2 gap-4 text-left">
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+                <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
+                <h3 className="text-white font-medium mb-1">Easy Application</h3>
+                <p className="text-gray-300 text-sm">One-click sign-up for events in your area</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+                <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
+                <h3 className="text-white font-medium mb-1">Visibility to Markets</h3>
+                <p className="text-gray-300 text-sm">See upcoming markets and events near you</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+                <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
+                <h3 className="text-white font-medium mb-1">Centralized Messaging</h3>
+                <p className="text-gray-300 text-sm">All event communication in one hub - no emails or texts</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
+                <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
+                <h3 className="text-white font-medium mb-1">Simple Coordination</h3>
+                <p className="text-gray-300 text-sm">Everything you need for each event in one place</p>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
