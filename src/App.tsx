@@ -21,6 +21,7 @@ const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
 
 // Lazy load: Auth Pages (load on-demand)
 const AuthTypePage = lazy(() => import('./pages/AuthTypePage'))
+const LoginPage = lazy(() => import('./pages/LoginPage'))
 const ClubOwnerSignUpPage = lazy(() => import('./pages/ClubOwnerSignUpPage'))
 const ClubOwnerLoginPage = lazy(() => import('./pages/ClubOwnerLoginPage'))
 const VenueOwnerLoginPage = lazy(() => import('./pages/VenueOwnerLoginPage'))
@@ -130,9 +131,15 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Legacy auth routes - redirect to /auth */}
+          {/* Unified Login Page */}
+          <Route path="/login" element={
+            <RedirectIfAuthenticatedV2>
+              <LoginPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
+          {/* Legacy sign-up route - redirect to /auth */}
           <Route path="/sign-up" element={<Navigate to="/auth" replace />} />
-          <Route path="/login" element={<Navigate to="/auth" replace />} />
 
           {/* Producer (Club Owner) Auth */}
           <Route path="/signup/producer" element={

@@ -131,28 +131,13 @@ export default function HomePage() {
                   )}
                 </>
               ) : (
-                <>
-                  <Link
-                    to="/login"
-                    className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg flex items-center"
-                  >
-                    <LogIn className="mr-2 h-4 w-4" />
-                    Sign In
-                  </Link>
-                  <TrackedButton
-                    asChild
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white transition-colors duration-200 rounded-lg"
-                    trackingData={{
-                      button_text: 'Request Access',
-                      button_location: 'header',
-                      page_name: 'Home',
-                      is_primary_cta: true,
-                      destination_page: 'Contact'
-                    }}
-                  >
-                    <Link to="/contact">Request Access</Link>
-                  </TrackedButton>
-                </>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg flex items-center"
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                  Sign In
+                </Link>
               )}
             </div>
             
@@ -222,22 +207,13 @@ export default function HomePage() {
                     )}
                   </>
                 ) : (
-                  <>
-                    <Link 
-                      to="/login" 
-                      className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Sign In
-                    </Link>
-                    <Link 
-                      to="/contact" 
-                      className="block bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Request Beta Access
-                    </Link>
-                  </>
+                  <Link
+                    to="/login"
+                    className="block text-gray-300 hover:text-purple-400 transition-colors py-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
                 )}
               </div>
             </div>
