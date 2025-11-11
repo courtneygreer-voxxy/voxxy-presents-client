@@ -62,12 +62,12 @@ export default function ProducerDashboard() {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
               <span className="text-white font-semibold text-sm">
-                {userProfile?.full_name?.charAt(0)?.toUpperCase() || 'P'}
+                {userProfile?.name?.charAt(0)?.toUpperCase() || 'P'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {userProfile?.full_name || 'Producer'}
+                {userProfile?.name || 'Producer'}
               </p>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -90,7 +90,7 @@ export default function ProducerDashboard() {
         {/* Top Navbar */}
         <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-6">
           <h2 className="text-white font-medium">
-            {userProfile?.full_name || 'Producer Dashboard'}
+            {userProfile?.name || 'Producer Dashboard'}
           </h2>
         </header>
 

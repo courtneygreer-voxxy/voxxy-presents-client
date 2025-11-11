@@ -160,7 +160,7 @@ export default function AdminDashboard() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-white truncate">
-                {userProfile?.full_name || 'Admin'}
+                {userProfile?.name || 'Admin'}
               </p>
               <div className="flex items-center gap-1.5">
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
@@ -183,7 +183,7 @@ export default function AdminDashboard() {
         {/* Top Navbar */}
         <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-6">
           <h2 className="text-white font-medium">
-            {userProfile?.full_name || 'Admin Dashboard'}
+            {userProfile?.name || 'Admin Dashboard'}
           </h2>
         </header>
 
