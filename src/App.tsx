@@ -20,20 +20,18 @@ const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
 
 // Lazy load: Auth Pages (load on-demand)
-const AuthTypePage = lazy(() => import('./pages/AuthTypePage'))
 const LoginPage = lazy(() => import('./pages/LoginPage'))
-const ClubOwnerSignUpPage = lazy(() => import('./pages/ClubOwnerSignUpPage'))
-const ClubOwnerLoginPage = lazy(() => import('./pages/ClubOwnerLoginPage'))
-const VenueOwnerLoginPage = lazy(() => import('./pages/VenueOwnerLoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage'))
 
 // Lazy load: Holding Screens (load on-demand)
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
-const ProducerPendingPage = lazy(() => import('./pages/ProducerPendingPage'))
-const VendorPendingPage = lazy(() => import('./pages/VendorPendingPage'))
-const AdminDashboardPage = lazy(() => import('./pages/AdminDashboardPage'))
+
+// Lazy load: Dashboards (load on-demand)
+const ProducerDashboard = lazy(() => import('./pages/ProducerDashboard'))
+const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
+const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 
 // Debug Panel (keep eager for development)
 import { DebugPanel } from './components/debug/DebugPanel'
@@ -124,13 +122,6 @@ export default function App() {
               AUTH ROUTES - Redirect if already logged in
               ========================================== */}
 
-          {/* Auth Selection */}
-          <Route path="/auth" element={
-            <RedirectIfAuthenticatedV2>
-              <AuthTypePage />
-            </RedirectIfAuthenticatedV2>
-          } />
-
           {/* Unified Login Page */}
           <Route path="/login" element={
             <RedirectIfAuthenticatedV2>
@@ -138,38 +129,20 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Legacy sign-up route - redirect to /auth */}
-          <Route path="/sign-up" element={<Navigate to="/auth" replace />} />
+          {/* All signup routes redirect to contact page for beta access requests */}
+          <Route path="/auth" element={<Navigate to="/contact" replace />} />
+          <Route path="/sign-up" element={<Navigate to="/contact" replace />} />
+          <Route path="/signup" element={<Navigate to="/contact" replace />} />
+          <Route path="/signup/producer" element={<Navigate to="/contact" replace />} />
+          <Route path="/signup/vendor" element={<Navigate to="/contact" replace />} />
+          <Route path="/signup/club-owner" element={<Navigate to="/contact" replace />} />
+          <Route path="/signup/venue-owner" element={<Navigate to="/contact" replace />} />
 
-          {/* Producer (Club Owner) Auth */}
-          <Route path="/signup/producer" element={
-            <RedirectIfAuthenticatedV2>
-              <ClubOwnerSignUpPage />
-            </RedirectIfAuthenticatedV2>
-          } />
-          <Route path="/login/producer" element={
-            <RedirectIfAuthenticatedV2>
-              <ClubOwnerLoginPage />
-            </RedirectIfAuthenticatedV2>
-          } />
-
-          {/* Vendor (Venue Owner) Auth */}
-          <Route path="/signup/vendor" element={
-            <RedirectIfAuthenticatedV2>
-              <ClubOwnerSignUpPage />
-            </RedirectIfAuthenticatedV2>
-          } />
-          <Route path="/login/vendor" element={
-            <RedirectIfAuthenticatedV2>
-              <VenueOwnerLoginPage />
-            </RedirectIfAuthenticatedV2>
-          } />
-
-          {/* Legacy role-specific auth routes */}
-          <Route path="/signup/club-owner" element={<Navigate to="/signup/producer" replace />} />
-          <Route path="/signup/venue-owner" element={<Navigate to="/signup/vendor" replace />} />
-          <Route path="/login/club-owner" element={<Navigate to="/login/producer" replace />} />
-          <Route path="/login/venue-owner" element={<Navigate to="/login/vendor" replace />} />
+          {/* Legacy login routes - redirect to unified login */}
+          <Route path="/login/producer" element={<Navigate to="/login" replace />} />
+          <Route path="/login/vendor" element={<Navigate to="/login" replace />} />
+          <Route path="/login/club-owner" element={<Navigate to="/login" replace />} />
+          <Route path="/login/venue-owner" element={<Navigate to="/login" replace />} />
 
           {/* Password Reset */}
           <Route path="/forgot-password" element={
@@ -187,22 +160,22 @@ export default function App() {
           <Route path="/verify-email" element={<EmailVerificationPage />} />
 
           {/* ==========================================
-              HOLDING SCREENS (Role-based)
+              DASHBOARDS & HOLDING SCREENS (Role-based)
               ========================================== */}
 
           {/* Consumer Holding Screen */}
           <Route path="/pending" element={<BetaPendingPage />} />
 
-          {/* Producer Holding Screen */}
-          <Route path="/producer/pending" element={<ProducerPendingPage />} />
+          {/* Producer Dashboard */}
+          <Route path="/producer/pending" element={<ProducerDashboard />} />
 
-          {/* Vendor Holding Screen */}
-          <Route path="/vendor/pending" element={<VendorPendingPage />} />
+          {/* Vendor Dashboard */}
+          <Route path="/vendor/pending" element={<VendorDashboard />} />
 
           {/* Admin Dashboard - Protected */}
           <Route path="/admin/dashboard" element={
             <AdminRoute>
-              <AdminDashboardPage />
+              <AdminDashboard />
             </AdminRoute>
           } />
 

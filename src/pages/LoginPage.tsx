@@ -275,18 +275,18 @@ export default function LoginPage() {
                   </Button>
                 </form>
 
-                {/* Switch to Signup */}
+                {/* Request Beta Access */}
                 <div className="mt-6">
                   <Separator className="bg-white/20" />
                   <div className="text-center mt-4">
                     <p className="text-gray-300 text-sm">
                       Don't have an account?{' '}
                       <button
-                        onClick={() => navigate('/auth')}
+                        onClick={() => navigate('/contact')}
                         className="text-pink-400 hover:text-pink-300 font-medium transition-colors"
                         disabled={isSubmitting}
                       >
-                        Sign up here
+                        Request beta access
                       </button>
                     </p>
                   </div>

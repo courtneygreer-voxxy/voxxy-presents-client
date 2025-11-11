@@ -26,8 +26,8 @@ export default function Navigation({ activePage }: NavigationProps) {
       <div className="container mx-auto max-w-6xl">
         <div className="grid grid-cols-3 items-center">
           {/* Logo - Left */}
-          <Link to="/" className="text-2xl font-bold text-white justify-self-start">
-            Voxxy Presents
+          <Link to="/" className="justify-self-start">
+            <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20" />
           </Link>
 
           {/* Navigation - Center */}
