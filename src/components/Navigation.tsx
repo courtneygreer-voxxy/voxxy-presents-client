@@ -22,12 +22,12 @@ export default function Navigation({ activePage }: NavigationProps) {
   }
 
   return (
-    <nav className="relative z-50 px-4 py-6 bg-gray-800/50 backdrop-blur-sm border-b border-white/10">
+    <nav className="relative z-50 px-4 py-3 md:py-6 bg-gray-800/50 backdrop-blur-sm border-b border-white/10">
       <div className="container mx-auto max-w-6xl">
-        <div className="grid grid-cols-3 items-center">
+        <div className="flex items-center justify-between md:grid md:grid-cols-3">
           {/* Logo - Left */}
-          <Link to="/" className="justify-self-start">
-            <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20" />
+          <Link to="/" className="md:justify-self-start">
+            <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-16 md:h-20" />
           </Link>
 
           {/* Navigation - Center */}
@@ -38,7 +38,7 @@ export default function Navigation({ activePage }: NavigationProps) {
           </div>
 
           {/* Actions - Right */}
-          <div className="flex items-center gap-4 justify-self-end">
+          <div className="flex items-center gap-4 md:justify-self-end">
             <Link
               to="/login"
               className="hidden md:flex items-center px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30 transition-all duration-200 rounded-lg"
