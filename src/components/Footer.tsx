@@ -8,7 +8,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-12 gap-8 md:gap-12">
           {/* Brand Column - Takes more space like header logo */}
           <div className="md:col-span-5">
-            <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-10 mb-4" />
+            <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-16 md:h-20 mb-4" />
             <p className="text-gray-300 leading-relaxed">
               Event infrastructure for recurring event producers.
               Focus on creating experiences, we'll handle the vendor coordination.

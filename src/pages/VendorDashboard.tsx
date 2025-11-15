@@ -1,19 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, LogOut } from 'lucide-react';
+import { Calendar, Users, Settings, Store, Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import SettingsPage from './SettingsPage';
 
 type NavItem = 'events' | 'network' | 'settings';
 
 export default function VendorDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('events');
-  const { userProfile, signOut } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { userProfile, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
 
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
@@ -23,12 +27,36 @@ export default function VendorDashboard() {
 
   return (
     <div className="flex h-screen bg-[#1a0d2e] overflow-hidden">
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar */}
-      <aside className="w-[220px] bg-[#0f0820] flex flex-col">
+      <aside className={`
+        w-[220px]
+        bg-[#0f0820] flex flex-col transition-all duration-300
+        fixed lg:relative inset-y-0 left-0 z-50
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         {/* Sidebar Header */}
         <div className="p-6 border-b border-white/10">
-          <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20 mb-2" />
-          <p className="text-sm text-white/60">Vendor</p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20 mb-2" />
+              <p className="text-sm text-white/60">Vendor</p>
+            </div>
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden text-white/70 hover:text-white p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -40,7 +68,10 @@ export default function VendorDashboard() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveNav(item.id)}
+                onClick={() => {
+                  setActiveNav(item.id);
+                  setIsMobileMenuOpen(false);
+                }}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-lg
                   text-sm font-medium transition-all
@@ -56,50 +87,37 @@ export default function VendorDashboard() {
             );
           })}
         </nav>
-
-        {/* User Profile Section */}
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {userProfile?.name?.charAt(0)?.toUpperCase() || 'V'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {userProfile?.name || 'Vendor'}
-              </p>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-xs text-white/60">Online</span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-6">
+        <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-4 lg:px-6">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden text-white/70 hover:text-white mr-4"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
           <h2 className="text-white font-medium">
             {userProfile?.name || 'Vendor Dashboard'}
           </h2>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto p-6">
-          {/* Empty for now - content will be added later */}
-          <div className="text-white/40 text-center mt-20">
-            <p className="text-lg">Dashboard content coming soon...</p>
-          </div>
+        <main className="flex-1 overflow-auto">
+          {activeNav === 'settings' ? (
+            <SettingsPage onBack={() => setActiveNav('events')} />
+          ) : (
+            <div className="p-4 lg:p-6">
+              {/* Empty for now - content will be added later */}
+              <div className="text-white/40 text-center mt-20">
+                <p className="text-base lg:text-lg">Dashboard content coming soon...</p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

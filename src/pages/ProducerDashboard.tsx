@@ -1,18 +1,269 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, LogOut } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { eventsApi, organizationsApi } from '@/services/api';
+import SettingsPage from './SettingsPage';
+import EventsEmptyState from '@/components/producer/EventsEmptyState';
+import CreateEventForm from '@/components/producer/CreateEventForm';
+import EditEventForm from '@/components/producer/EditEventForm';
+import EventsList from '@/components/producer/EventsList';
+import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
+import CommandCenter from '@/components/producer/CommandCenter';
 
 type NavItem = 'events' | 'network' | 'settings';
+type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
+
+interface Organization {
+  id: number;
+  slug: string;
+  name: string;
+  user_id: number;
+}
+
+interface Event {
+  id: number;
+  slug: string;
+  title: string;
+  description?: string;
+  dates?: {
+    start?: string;
+    end?: string;
+  };
+  event_date?: string;
+  event_end_date?: string;
+  location?: string;
+  status?: {
+    published?: boolean;
+    registration_open?: boolean;
+    status?: 'draft' | 'published' | 'cancelled' | 'completed';
+  };
+  published?: boolean;
+  registered_count?: number;
+  capacity?: {
+    total?: number;
+    registered?: number;
+    remaining?: number;
+    is_full?: boolean;
+  };
+}
 
 export default function ProducerDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('events');
-  const { userProfile, signOut } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [eventsView, setEventsView] = useState<EventsView>('empty');
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [loadingOrg, setLoadingOrg] = useState(true);
+  const [loadingEvents, setLoadingEvents] = useState(false);
+  const [loadingCommandCenter, setLoadingCommandCenter] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { userProfile, isAuthenticated, loading: authLoading } = useAuth();
   const navigate = useNavigate();
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      navigate('/');
+    }
+  }, [isAuthenticated, authLoading, navigate]);
+
+  // Fetch user's organization
+  useEffect(() => {
+    const fetchOrCreateOrganization = async () => {
+      if (!userProfile?.id) return;
+
+      try {
+        setLoadingOrg(true);
+        setError(null);
+
+        // Get all organizations and find the one belonging to current user
+        console.log('Fetching all organizations for user:', userProfile.id);
+        const orgs = await organizationsApi.getAll();
+        console.log('All organizations:', orgs);
+        console.log('Looking for organization with user_id:', userProfile.id);
+
+        let userOrg = orgs.find((org: Organization) => org.user_id === userProfile.id);
+        console.log('Found user organization:', userOrg);
+
+        // If no organization exists, create one automatically
+        if (!userOrg) {
+          console.log('No organization found, creating one for user...');
+          try {
+            const newOrg = await organizationsApi.create({
+              name: userProfile.name || 'My Organization',
+              description: 'Event production and venue management',
+            });
+            console.log('Organization created:', newOrg);
+            userOrg = newOrg;
+          } catch (createErr: any) {
+            console.error('Failed to create organization:', createErr);
+            console.log('Error details:', {
+              status: createErr?.status,
+              message: createErr?.message,
+              errors: createErr?.errors
+            });
+
+            // If creation failed due to duplicate, the org already exists
+            // Just fetch all orgs again and find it
+            if (createErr?.status === 422) {
+              console.log('422 error - organization already exists. Fetching all organizations again...');
+              const orgsRetry = await organizationsApi.getAll();
+              console.log('All organizations (retry):', orgsRetry);
+
+              userOrg = orgsRetry.find((org: Organization) => org.user_id === userProfile.id);
+              console.log('Found organization on retry:', userOrg);
+
+              if (!userOrg) {
+                // Still not found - show more helpful error
+                console.error('Organization still not found after retry. All orgs:', orgsRetry);
+                setError('Organization exists but could not be loaded. Please contact support or try logging out and back in.');
+                setLoadingOrg(false);
+                return;
+              }
+            } else {
+              setError(`Failed to create organization: ${createErr?.message || 'Unknown error'}`);
+              setLoadingOrg(false);
+              return;
+            }
+          }
+        }
+
+        if (userOrg) {
+          console.log('Setting organization:', userOrg);
+          setOrganization(userOrg);
+          // Fetch events for this organization
+          await fetchEvents(userOrg.slug);
+        }
+      } catch (err) {
+        console.error('Failed to fetch organization:', err);
+        setError('Failed to load organization data');
+      } finally {
+        setLoadingOrg(false);
+      }
+    };
+
+    if (userProfile) {
+      fetchOrCreateOrganization();
+    }
+  }, [userProfile]);
+
+  // Fetch events for organization
+  const fetchEvents = async (orgSlug: string) => {
+    try {
+      setLoadingEvents(true);
+      console.log('Fetching events for organization:', orgSlug);
+      const fetchedEvents = await eventsApi.getByOrganization(orgSlug);
+      console.log('Fetched events:', fetchedEvents);
+      console.log('Number of events:', fetchedEvents.length);
+      setEvents(fetchedEvents);
+
+      // Set view based on whether there are events
+      if (fetchedEvents.length === 0) {
+        console.log('No events found, setting view to empty');
+        setEventsView('empty');
+      } else {
+        console.log('Events found, setting view to list');
+        setEventsView('list');
+      }
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
+      setError('Failed to load events');
+    } finally {
+      setLoadingEvents(false);
+    }
+  };
+
+  // Handle create event
+  const handleCreateEvent = async (eventData: {
+    title: string;
+    description: string;
+    event_date: string;
+    location: string;
+  }) => {
+    console.log('handleCreateEvent called with:', eventData);
+    console.log('Current organization:', organization);
+
+    if (!organization) {
+      console.error('No organization found');
+      return;
+    }
+
+    try {
+      console.log('Creating event for organization:', organization.slug);
+      const newEvent = await eventsApi.create(organization.slug, {
+        ...eventData,
+        status: 'draft',
+        published: false,
+      });
+      console.log('Event created:', newEvent);
+
+      // Refresh events list
+      console.log('Refreshing events list...');
+      await fetchEvents(organization.slug);
+
+      // Navigate back to list
+      console.log('Navigating to list view');
+      setEventsView('list');
+    } catch (err) {
+      console.error('Failed to create event:', err);
+      throw err; // Re-throw to let form handle the error
+    }
+  };
+
+  // Handle update event
+  const handleUpdateEvent = async (eventSlug: string, eventData: {
+    title: string;
+    description: string;
+    event_date: string;
+    location: string;
+  }) => {
+    if (!organization) {
+      console.error('No organization found');
+      return;
+    }
+
+    try {
+      console.log('Updating event:', eventSlug);
+      await eventsApi.update(eventSlug, eventData);
+      console.log('Event updated successfully');
+
+      // Refresh events list
+      await fetchEvents(organization.slug);
+
+      // Navigate back to list
+      setEventsView('list');
+      setSelectedEvent(null);
+    } catch (err) {
+      console.error('Failed to update event:', err);
+      throw err;
+    }
+  };
+
+  // Handle delete event
+  const handleDeleteEvent = async (eventSlug: string) => {
+    if (!organization) {
+      console.error('No organization found');
+      return;
+    }
+
+    try {
+      console.log('Deleting event:', eventSlug);
+      await eventsApi.delete(eventSlug);
+      console.log('Event deleted successfully');
+
+      // Refresh events list
+      await fetchEvents(organization.slug);
+
+      // Navigate back to list
+      setEventsView(events.length > 1 ? 'list' : 'empty');
+      setSelectedEvent(null);
+    } catch (err) {
+      console.error('Failed to delete event:', err);
+      throw err;
+    }
   };
 
   const navItems = [
@@ -21,14 +272,143 @@ export default function ProducerDashboard() {
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
+  // Render events content based on current view
+  const renderEventsContent = () => {
+    if (loadingOrg || loadingEvents) {
+      return (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <p className="text-red-400 mb-4">{error}</p>
+            <button
+              onClick={() => organization && fetchEvents(organization.slug)}
+              className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (eventsView === 'empty') {
+      return <EventsEmptyState onCreateEvent={() => setEventsView('create')} />;
+    }
+
+    if (eventsView === 'create') {
+      return (
+        <CreateEventForm
+          onCancel={() => setEventsView(events.length > 0 ? 'list' : 'empty')}
+          onSubmit={handleCreateEvent}
+        />
+      );
+    }
+
+    if (eventsView === 'edit' && selectedEvent) {
+      return (
+        <EditEventForm
+          event={selectedEvent}
+          onCancel={() => {
+            setEventsView('list');
+            setSelectedEvent(null);
+          }}
+          onUpdate={handleUpdateEvent}
+          onDelete={handleDeleteEvent}
+        />
+      );
+    }
+
+    if (eventsView === 'command-center') {
+      if (loadingCommandCenter && selectedEvent) {
+        return <LoadingCommandCenter eventName={selectedEvent.title} />;
+      }
+
+      if (selectedEvent) {
+        return (
+          <CommandCenter
+            event={selectedEvent}
+            onBack={() => {
+              setEventsView('list');
+              setSelectedEvent(null);
+            }}
+            onUpdateEvent={handleUpdateEvent}
+            onDeleteEvent={async (eventSlug: string) => {
+              await handleDeleteEvent(eventSlug);
+              setEventsView('list');
+              setSelectedEvent(null);
+            }}
+          />
+        );
+      }
+    }
+
+    return (
+      <EventsList
+        events={events}
+        onCreateEvent={() => setEventsView('create')}
+        onEditEvent={(slug) => {
+          const event = events.find(e => e.slug === slug);
+          if (event) {
+            setSelectedEvent(event);
+            setEventsView('edit');
+          }
+        }}
+        onCommandCenter={(slug) => {
+          const event = events.find(e => e.slug === slug);
+          if (event) {
+            setSelectedEvent(event);
+            setLoadingCommandCenter(true);
+            setEventsView('command-center');
+
+            // Simulate loading delay
+            setTimeout(() => {
+              setLoadingCommandCenter(false);
+            }, 2000);
+          }
+        }}
+      />
+    );
+  };
+
   return (
     <div className="flex h-screen bg-[#1a0d2e] overflow-hidden">
+      {/* Mobile Menu Backdrop */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Left Sidebar */}
-      <aside className="w-[220px] bg-[#0f0820] flex flex-col">
+      <aside className={`
+        w-[220px]
+        bg-[#0f0820] flex flex-col transition-all duration-300
+        fixed lg:relative inset-y-0 left-0 z-50
+        ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+      `}>
         {/* Sidebar Header */}
         <div className="p-6 border-b border-white/10">
-          <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20 mb-2" />
-          <p className="text-sm text-white/60">Event Producer</p>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20 mb-2" />
+              <p className="text-sm text-white/60">Event Producer</p>
+            </div>
+            {/* Mobile Close Button */}
+            <button
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="lg:hidden text-white/70 hover:text-white p-1"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
 
         {/* Navigation */}
@@ -40,7 +420,14 @@ export default function ProducerDashboard() {
             return (
               <button
                 key={item.id}
-                onClick={() => setActiveNav(item.id)}
+                onClick={() => {
+                  setActiveNav(item.id);
+                  setIsMobileMenuOpen(false);
+                  // Reset to appropriate events view when clicking Events nav
+                  if (item.id === 'events' && eventsView === 'create') {
+                    setEventsView(events.length > 0 ? 'list' : 'empty');
+                  }
+                }}
                 className={`
                   w-full flex items-center gap-3 px-4 py-3 rounded-lg
                   text-sm font-medium transition-all
@@ -56,50 +443,38 @@ export default function ProducerDashboard() {
             );
           })}
         </nav>
-
-        {/* User Profile Section */}
-        <div className="p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {userProfile?.name?.charAt(0)?.toUpperCase() || 'P'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {userProfile?.name || 'Producer'}
-              </p>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-xs text-white/60">Online</span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={handleSignOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/5 transition-all"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-6">
+        <header className="h-14 bg-[#0f0820] border-b border-white/10 flex items-center px-4 lg:px-6">
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="lg:hidden text-white/70 hover:text-white mr-4"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+
           <h2 className="text-white font-medium">
             {userProfile?.name || 'Producer Dashboard'}
           </h2>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto p-6">
-          {/* Empty for now - content will be added later */}
-          <div className="text-white/40 text-center mt-20">
-            <p className="text-lg">Dashboard content coming soon...</p>
-          </div>
+        <main className="flex-1 overflow-auto">
+          {activeNav === 'settings' ? (
+            <SettingsPage onBack={() => setActiveNav('events')} />
+          ) : activeNav === 'events' ? (
+            renderEventsContent()
+          ) : (
+            <div className="p-4 lg:p-6">
+              <div className="text-white/40 text-center mt-20">
+                <p className="text-base lg:text-lg">{activeNav} content coming soon...</p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
     </div>

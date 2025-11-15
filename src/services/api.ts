@@ -91,6 +91,11 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
       throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
+    // Handle 204 No Content responses (e.g., DELETE)
+    if (response.status === 204) {
+      return null as T
+    }
+
     const data = await response.json()
     return data
 
@@ -410,76 +415,179 @@ export const authApi = {
   },
 }
 
-// Organizations API
+// Organizations API (Voxxy Presents)
 export const organizationsApi = {
+  /**
+   * Get all organizations
+   * GET /api/v1/presents/organizations
+   */
+  async getAll(params?: { verified?: boolean }) {
+    const queryParams = new URLSearchParams()
+    if (params?.verified !== undefined) {
+      queryParams.append('verified', String(params.verified))
+    }
+    const query = queryParams.toString() ? `?${queryParams}` : ''
+    return fetchApi<any[]>(`/v1/presents/organizations${query}`)
+  },
+
+  /**
+   * Get organization by slug
+   * GET /api/v1/presents/organizations/:slug
+   */
   async getBySlug(slug: string) {
-    return fetchApi<any>(`/organizations/${slug}`)
+    return fetchApi<any>(`/v1/presents/organizations/${slug}`)
   },
 
-  async create(data: any) {
-    return fetchApi<any>('/organizations', {
+  /**
+   * Create new organization
+   * POST /api/v1/presents/organizations
+   */
+  async create(orgData: {
+    name: string
+    description?: string
+    logo_url?: string
+    website?: string
+    instagram_handle?: string
+    phone?: string
+    email?: string
+    address?: string
+    city?: string
+    state?: string
+    zip_code?: string
+    latitude?: number
+    longitude?: number
+  }) {
+    return fetchApi<any>('/v1/presents/organizations', {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ organization: orgData }),
     })
   },
 
-  async update(id: string, data: any) {
-    return fetchApi<any>(`/organizations/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
+  /**
+   * Update organization
+   * PATCH /api/v1/presents/organizations/:slug
+   */
+  async update(slug: string, orgData: Partial<{
+    name: string
+    description: string
+    logo_url: string
+    website: string
+    instagram_handle: string
+    phone: string
+    email: string
+    address: string
+    city: string
+    state: string
+    zip_code: string
+    latitude: number
+    longitude: number
+  }>) {
+    return fetchApi<any>(`/v1/presents/organizations/${slug}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ organization: orgData }),
     })
   },
 
-  async updateBySlug(slug: string, data: any) {
-    return fetchApi<any>(`/organizations/slug/${slug}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
-    })
-  },
-
-  async delete(id: string) {
-    return fetchApi<any>(`/organizations/${id}`, {
-      method: 'DELETE',
-    })
-  },
-
-  async deleteBySlug(slug: string) {
-    return fetchApi<any>(`/organizations/slug/${slug}`, {
+  /**
+   * Delete organization
+   * DELETE /api/v1/presents/organizations/:slug
+   */
+  async delete(slug: string) {
+    return fetchApi<any>(`/v1/presents/organizations/${slug}`, {
       method: 'DELETE',
     })
   },
 }
 
-// Events API
+// Events API (Voxxy Presents)
 export const eventsApi = {
+  /**
+   * Get event by ID or slug
+   * GET /api/v1/presents/events/:id
+   */
   async getById(id: string) {
-    return fetchApi<any>(`/events/${id}`)
+    return fetchApi<any>(`/v1/presents/events/${id}`)
   },
 
-  async getByOrganization(organizationId: string) {
-    return fetchApi<any[]>(`/events?organization=${organizationId}`)
+  /**
+   * Get all events for an organization
+   * GET /api/v1/presents/organizations/:organization_id/events
+   */
+  async getByOrganization(organizationSlug: string) {
+    return fetchApi<any[]>(`/v1/presents/organizations/${organizationSlug}/events`)
   },
 
-  async getAll() {
-    return fetchApi<any[]>('/events')
+  /**
+   * Get all events (optionally filtered by organization or status)
+   * GET /api/v1/presents/events
+   */
+  async getAll(params?: { organization_id?: string; status?: 'upcoming' | 'past' }) {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    const query = queryParams.toString() ? `?${queryParams}` : ''
+    return fetchApi<any[]>(`/v1/presents/events${query}`)
   },
 
-  async create(data: any) {
-    return fetchApi<any>('/events', {
+  /**
+   * Create event under an organization
+   * POST /api/v1/presents/organizations/:organization_id/events
+   */
+  async create(organizationSlug: string, eventData: {
+    title: string
+    description?: string
+    event_date?: string
+    event_end_date?: string
+    location?: string
+    poster_url?: string
+    ticket_url?: string
+    ticket_price?: number
+    capacity?: number
+    published?: boolean
+    registration_open?: boolean
+    status?: 'draft' | 'published' | 'cancelled' | 'completed'
+  }) {
+    return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({ event: eventData }),
     })
   },
 
-  async update(id: string, data: any) {
-    return fetchApi<any>(`/events/${id}`, {
-      method: 'PUT',
-      body: JSON.stringify(data),
+  /**
+   * Update event
+   * PATCH /api/v1/presents/events/:id
+   */
+  async update(eventSlug: string, eventData: Partial<{
+    title: string
+    description: string
+    event_date: string
+    event_end_date: string
+    location: string
+    poster_url: string
+    ticket_url: string
+    ticket_price: number
+    capacity: number
+    published: boolean
+    registration_open: boolean
+    status: 'draft' | 'published' | 'cancelled' | 'completed'
+  }>) {
+    return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ event: eventData }),
     })
   },
 
-  async delete(id: string) {
-    return fetchApi<any>(`/events/${id}`, {
+  /**
+   * Delete event
+   * DELETE /api/v1/presents/events/:id
+   */
+  async delete(eventSlug: string) {
+    return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
       method: 'DELETE',
     })
   },
