@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { ArrowLeft, MessageSquare, Users, Building2, Settings } from 'lucide-react';
 import MessageBoard from './MessageBoard';
 import EventSettings from './EventSettings';
+import ApplicationsTab from './ApplicationsTab';
+import VendorsTab from './VendorsTab';
 
 interface Event {
   id: number;
@@ -50,16 +52,18 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
         return <MessageBoard eventSlug={event.slug} />;
       case 'applications':
         return (
-          <div className="text-white/60 text-center py-20">
-            Applications view coming soon...
-          </div>
+          <ApplicationsTab
+            eventSlug={event.slug}
+            event={{
+              slug: event.slug,
+              title: event.title,
+              event_date: event.event_date,
+              location: event.location,
+            }}
+          />
         );
       case 'vendors':
-        return (
-          <div className="text-white/60 text-center py-20">
-            Vendors view coming soon...
-          </div>
-        );
+        return <VendorsTab eventSlug={event.slug} />;
       case 'settings':
         return (
           <EventSettings

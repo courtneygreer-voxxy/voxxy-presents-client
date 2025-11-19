@@ -19,6 +19,13 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
 const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
 
+// Lazy load: Public Event & Vendor Application Pages (load on-demand)
+const PublicEventDetailPage = lazy(() => import('./pages/PublicEventDetailPage'))
+const VendorApplicationForm = lazy(() => import('./pages/VendorApplicationForm'))
+const ApplicationConfirmationPage = lazy(() => import('./pages/ApplicationConfirmationPage'))
+const ApplicationTrackingPage = lazy(() => import('./pages/ApplicationTrackingPage'))
+const ShortLinkRedirectPage = lazy(() => import('./pages/ShortLinkRedirectPage'))
+
 // Lazy load: Auth Pages (load on-demand)
 const LoginPage = lazy(() => import('./pages/LoginPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
@@ -117,6 +124,13 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPolicyPage />} />
           <Route path="/terms" element={<TermsOfServicePage />} />
+
+          {/* Public Event & Vendor Application Routes */}
+          <Route path="/events/:slug" element={<PublicEventDetailPage />} />
+          <Route path="/events/:slug/apply" element={<VendorApplicationForm />} />
+          <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
+          <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
+          <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />
 
           {/* ==========================================
               AUTH ROUTES - Redirect if already logged in

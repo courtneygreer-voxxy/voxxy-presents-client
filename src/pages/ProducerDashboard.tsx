@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
@@ -60,7 +60,7 @@ export default function ProducerDashboard() {
   const [loadingCommandCenter, setLoadingCommandCenter] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const { userProfile, isAuthenticated, loading: authLoading } = useAuth();
+  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if not authenticated
@@ -266,6 +266,15 @@ export default function ProducerDashboard() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
@@ -443,6 +452,45 @@ export default function ProducerDashboard() {
             );
           })}
         </nav>
+
+        {/* Sidebar Footer - Organization & User Profile */}
+        <div className="border-t border-white/10">
+          {/* Organization Info */}
+          {organization && (
+            <div className="p-4 border-b border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center">
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-white truncate">
+                    {organization.name}
+                  </p>
+                  <p className="text-xs text-white/60">Organization</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* User Profile & Sign Out */}
+          <div className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-white truncate">
+                  {userProfile?.name || userProfile?.email}
+                </p>
+                <p className="text-xs text-white/60">Producer</p>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        </div>
       </aside>
 
       {/* Main Content Area */}

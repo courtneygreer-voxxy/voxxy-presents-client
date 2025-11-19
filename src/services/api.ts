@@ -622,6 +622,132 @@ export const registrationsApi = {
       method: 'PATCH',
     })
   },
+
+  /**
+   * Submit vendor application (public, no auth required)
+   * POST /api/v1/presents/events/:event_slug/registrations
+   */
+  async submitVendorApplication(eventSlug: string, data: {
+    email: string
+    phone?: string
+    business_name: string
+    vendor_category: string
+    vendor_application_id: number
+    subscribed?: boolean
+  }) {
+    return fetchApi<any>(`/v1/presents/events/${eventSlug}/registrations`, {
+      method: 'POST',
+      body: JSON.stringify({ registration: data }),
+    })
+  },
+
+  /**
+   * Track application status by ticket code (public, no auth required)
+   * GET /api/v1/presents/registrations/track/:ticket_code
+   */
+  async trackByTicketCode(ticketCode: string) {
+    return fetchApi<any>(`/v1/presents/registrations/track/${ticketCode}`)
+  },
+
+  /**
+   * Update registration status (producer/venue owner only)
+   * PATCH /api/v1/presents/registrations/:id
+   */
+  async updateStatus(registrationId: number, status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed') {
+    return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ registration: { status } }),
+    })
+  },
+}
+
+// Vendor Applications API
+export const vendorApplicationsApi = {
+  /**
+   * Get all vendor applications for an event
+   * GET /api/v1/presents/events/:event_slug/vendor_applications
+   */
+  async getByEvent(eventSlug: string) {
+    return fetchApi<any[]>(`/v1/presents/events/${eventSlug}/vendor_applications`)
+  },
+
+  /**
+   * Get vendor application by ID
+   * GET /api/v1/presents/vendor_applications/:id
+   */
+  async getById(id: number) {
+    return fetchApi<any>(`/v1/presents/vendor_applications/${id}`)
+  },
+
+  /**
+   * Create vendor application for an event
+   * POST /api/v1/presents/events/:event_slug/vendor_applications
+   */
+  async create(eventSlug: string, data: {
+    name: string
+    description?: string
+    status?: 'active' | 'inactive'
+    categories?: string[]
+  }) {
+    return fetchApi<any>(`/v1/presents/events/${eventSlug}/vendor_applications`, {
+      method: 'POST',
+      body: JSON.stringify({ vendor_application: data }),
+    })
+  },
+
+  /**
+   * Update vendor application
+   * PATCH /api/v1/presents/vendor_applications/:id
+   */
+  async update(id: number, data: Partial<{
+    name: string
+    description: string
+    status: 'active' | 'inactive'
+    categories: string[]
+  }>) {
+    return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ vendor_application: data }),
+    })
+  },
+
+  /**
+   * Delete vendor application
+   * DELETE /api/v1/presents/vendor_applications/:id
+   */
+  async delete(id: number) {
+    return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  /**
+   * Get submissions for a vendor application
+   * GET /api/v1/presents/vendor_applications/:id/submissions
+   */
+  async getSubmissions(id: number, params?: {
+    category?: string
+    status?: string
+  }) {
+    const queryParams = new URLSearchParams()
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          queryParams.append(key, String(value))
+        }
+      })
+    }
+    const query = queryParams.toString() ? `?${queryParams}` : ''
+    return fetchApi<any[]>(`/v1/presents/vendor_applications/${id}/submissions${query}`)
+  },
+
+  /**
+   * Lookup event by shareable code (public, no auth required)
+   * GET /api/v1/presents/vendor_applications/lookup/:code
+   */
+  async lookupByCode(code: string) {
+    return fetchApi<any>(`/v1/presents/vendor_applications/lookup/${code}`)
+  },
 }
 
 // Email API endpoints

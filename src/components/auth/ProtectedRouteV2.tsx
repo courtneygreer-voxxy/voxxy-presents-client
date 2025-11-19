@@ -18,13 +18,13 @@ export function RedirectIfAuthenticatedV2({ children }: { children: React.ReactN
   if (isAuthenticated && userProfile) {
     const role = userProfile.role
 
-    // Producer roles
-    if (role === 'producer') {
+    // Producer roles (venue_owner = Producer in UI)
+    if (role === 'producer' || role === 'venue_owner') {
       return <Navigate to="/producer/pending" replace />
     }
 
     // Vendor roles
-    if (role === 'vendor' || role === 'venue_owner') {
+    if (role === 'vendor') {
       return <Navigate to="/vendor/pending" replace />
     }
 

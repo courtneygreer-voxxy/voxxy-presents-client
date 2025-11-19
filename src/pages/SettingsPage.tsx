@@ -1,13 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { authApi, organizationsApi } from '@/services/api';
 import { AlertTriangle } from 'lucide-react';
 
 interface SettingsPageProps {
   onBack?: () => void;
 }
 
+interface Organization {
+  id: number;
+  slug: string;
+  name: string;
+  user_id: number;
+}
+
 export default function SettingsPage({ onBack }: SettingsPageProps) {
-  const { userProfile } = useAuth();
+  const { userProfile, refreshUserProfile } = useAuth();
+  const [organization, setOrganization] = useState<Organization | null>(null);
+  const [loadingOrg, setLoadingOrg] = useState(true);
 
   // Profile form state
   const [profileData, setProfileData] = useState({
@@ -16,6 +26,34 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
     companyName: '',
     bio: '',
   });
+
+  // Fetch user's organization
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!userProfile?.id) return;
+
+      try {
+        setLoadingOrg(true);
+        const orgs = await organizationsApi.getAll();
+        const userOrg = orgs.find((org: Organization) => org.user_id === userProfile.id);
+
+        if (userOrg) {
+          setOrganization(userOrg);
+          // Update companyName with organization name
+          setProfileData(prev => ({
+            ...prev,
+            companyName: userOrg.name || '',
+          }));
+        }
+      } catch (err) {
+        console.error('Failed to fetch organization:', err);
+      } finally {
+        setLoadingOrg(false);
+      }
+    };
+
+    fetchOrganization();
+  }, [userProfile]);
 
   // Notification preferences state
   const [notifications, setNotifications] = useState({
@@ -28,15 +66,43 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
 
   const handleSaveChanges = async () => {
+    if (!userProfile?.id) {
+      alert('User profile not loaded');
+      return;
+    }
+
     setIsSaving(true);
     try {
-      // TODO: Implement save to API
-      console.log('Saving profile:', profileData);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API call
-      alert('Profile updated successfully!');
-    } catch (error) {
-      console.error('Failed to save profile:', error);
-      alert('Failed to save changes. Please try again.');
+      console.log('🔵 [Settings] Current profile before update:', userProfile);
+      console.log('🔵 [Settings] Current organization:', organization);
+      console.log('🔵 [Settings] Saving profile data:', profileData);
+
+      // Update user profile via API
+      const userPayload = {
+        name: profileData.fullName,
+        email: profileData.email,
+      };
+      console.log('🔵 [Settings] Updating user with:', userPayload);
+      await authApi.updateUser(userProfile.id, userPayload);
+
+      // Update organization if exists and name changed
+      if (organization && profileData.companyName && profileData.companyName !== organization.name) {
+        console.log('🔵 [Settings] Updating organization name to:', profileData.companyName);
+        await organizationsApi.update(organization.slug, {
+          name: profileData.companyName,
+        });
+        console.log('✅ [Settings] Organization updated');
+      }
+
+      // Refresh the user profile to get updated data
+      console.log('🔵 [Settings] Refreshing user profile...');
+      await refreshUserProfile();
+      console.log('🔵 [Settings] User profile refreshed');
+
+      alert('Profile and organization updated successfully! Check the sidebar.');
+    } catch (error: any) {
+      console.error('❌ [Settings] Failed to save profile:', error);
+      alert(`Failed to save changes: ${error.message || 'Please try again.'}`);
     } finally {
       setIsSaving(false);
     }
