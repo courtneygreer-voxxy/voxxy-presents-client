@@ -75,7 +75,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
     dataSource: 'api', // Use API for budget calculator testing
-    apiBaseUrl: 'http://localhost:3001/api', // Local API for budget system
+    apiBaseUrl: 'https://voxxyai.com/api', // Development API
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -88,7 +88,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   staging: {
     name: 'staging',
     dataSource: 'api', // Use API for budget system testing in staging
-    apiBaseUrl: 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
+    apiBaseUrl: 'https://voxxyai.com/api', // Staging API
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -101,7 +101,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   production: {
     name: 'production',
     dataSource: 'firebase', // Use Firebase for organizations, API for venues
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app/api',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://heyvoxxy.com/api', // Production API
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true, // Controlled admin access
