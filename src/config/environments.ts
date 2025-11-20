@@ -75,7 +75,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
     dataSource: 'api', // Use API for budget calculator testing
-    apiBaseUrl: 'https://voxxyai.com/api', // Development API
+    apiBaseUrl: 'https://www.voxxyai.com/api', // Development API
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,
@@ -88,7 +88,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   staging: {
     name: 'staging',
     dataSource: 'api', // Use API for budget system testing in staging
-    apiBaseUrl: 'https://voxxyai.com/api', // Staging API
+    apiBaseUrl: 'https://www.voxxyai.com/api', // Staging API
     firebaseConfig: getFirebaseConfigFromEnv(),
     features: {
       adminControls: true,

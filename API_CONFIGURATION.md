@@ -10,7 +10,7 @@ The Voxxy Presents client application connects to a Rails backend API that suppo
 
 ### Development
 ```
-Base URL: https://voxxyai.com/api
+Base URL: https://www.voxxyai.com/api
 Environment: development
 Hostname: localhost or 127.0.0.1
 ```
@@ -25,7 +25,7 @@ Hostname: localhost or 127.0.0.1
 
 ### Staging
 ```
-Base URL: https://voxxyai.com/api
+Base URL: https://www.voxxyai.com/api
 Environment: staging
 Hostname: Contains 'onrender.com' OR 'staging'
 ```
@@ -57,22 +57,34 @@ Hostname: voxxypresents.com (or any domain not matching dev/staging)
 
 The API uses two route patterns:
 
-### 1. Legacy Routes (Backward Compatibility)
+### 1. Legacy Routes (10 Total - Backward Compatibility)
 
-These routes **strip** `/api` from the base URL:
+These routes **strip** `/api` from the base URL for backward compatibility with the mobile app:
 
 ```javascript
 // Implementation in api.ts
 fetch(`${API_BASE_URL.replace('/api', '')}/login`)
 ```
 
-**Examples:**
+#### Authentication & User Management (5 routes)
 - `POST /login` → `https://voxxyai.com/login`
-- `GET /me` → `https://voxxyai.com/me`
-- `POST /users` → `https://voxxyai.com/users`
+- `POST /users` → `https://voxxyai.com/users` (signup)
+- `PATCH /users/:id` → `https://voxxyai.com/users/123` (update profile)
 - `DELETE /logout` → `https://voxxyai.com/logout`
+- `GET /me` → `https://voxxyai.com/me`
+
+#### Password Reset (2 routes)
+- `POST /password_reset` → `https://voxxyai.com/password_reset` (request reset)
+- `PATCH /password_reset` → `https://voxxyai.com/password_reset` (reset with token)
+
+#### Email Verification (2 routes)
 - `POST /verify_code` → `https://voxxyai.com/verify_code`
-- `POST /password_reset` → `https://voxxyai.com/password_reset`
+- `POST /resend_verification` → `https://voxxyai.com/resend_verification`
+
+#### Admin (1 route)
+- `GET /admin/user_breakdown` → `https://voxxyai.com/admin/user_breakdown`
+
+> **Note:** These legacy routes exist for backward compatibility with the Voxxy mobile app. All new Presents-specific features use the versioned API below.
 
 ### 2. Versioned API Routes (New Structure)
 
@@ -90,64 +102,95 @@ fetch(`${API_BASE_URL}/v1/presents/organizations`)
 
 ---
 
+## Route Usage Summary
+
+### What Uses Legacy Routes?
+- **Authentication** (login, signup, logout, get current user)
+- **User Profile Updates**
+- **Password Reset Flow**
+- **Email Verification**
+- **Admin User Management**
+
+### What Uses Versioned API Routes?
+- **Organizations** (venues/producers)
+- **Events** (event management)
+- **Vendor Applications** (application forms)
+- **Registrations** (vendor submissions, RSVPs)
+- **Budgets** (event budgeting)
+
+> **Rule of Thumb:** If it's shared with the mobile app (auth, users), it uses legacy routes. If it's Presents-specific (events, vendors), it uses `/api/v1/presents/*`.
+
+---
+
 ## Key API Endpoints
 
-### Authentication (Legacy Routes)
+### Authentication & User Management (Legacy Routes)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/login` | User login with email/password |
-| DELETE | `/logout` | User logout |
-| GET | `/me` | Get current user profile |
-| POST | `/users` | Create new user account |
-| PATCH | `/users/:id` | Update user profile |
-| POST | `/verify_code` | Verify email with code |
-| POST | `/resend_verification` | Resend verification email |
-| POST | `/password_reset` | Request password reset |
-| PATCH | `/password_reset` | Reset password with token |
+**Base URL:** `https://voxxyai.com` (strips `/api`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/login` | User login with email/password | ❌ Public |
+| POST | `/users` | Create new user account (signup) | ❌ Public |
+| DELETE | `/logout` | User logout | ✅ Yes |
+| GET | `/me` | Get current user profile | ✅ Yes |
+| PATCH | `/users/:id` | Update user profile | ✅ Yes |
+| POST | `/verify_code` | Verify email with code | ❌ Public |
+| POST | `/resend_verification` | Resend verification email | ❌ Public |
+| POST | `/password_reset` | Request password reset | ❌ Public |
+| PATCH | `/password_reset` | Reset password with token | ❌ Public |
+| GET | `/admin/user_breakdown` | Get all users (admin only) | ✅ Admin |
 
 ### Organizations (Versioned Routes)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/v1/presents/organizations` | List all organizations |
-| GET | `/v1/presents/organizations/:slug` | Get organization by slug |
-| POST | `/v1/presents/organizations` | Create new organization |
-| PATCH | `/v1/presents/organizations/:slug` | Update organization |
-| DELETE | `/v1/presents/organizations/:slug` | Delete organization |
+**Base URL:** `https://voxxyai.com/api` (keeps `/api`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/v1/presents/organizations` | List all organizations | ✅ Yes |
+| GET | `/v1/presents/organizations/:slug` | Get organization by slug | ✅ Yes |
+| POST | `/v1/presents/organizations` | Create new organization | ✅ Yes |
+| PATCH | `/v1/presents/organizations/:slug` | Update organization | ✅ Yes (owner) |
+| DELETE | `/v1/presents/organizations/:slug` | Delete organization | ✅ Yes (owner) |
 
 ### Events (Versioned Routes)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/v1/presents/events` | List all events |
-| GET | `/v1/presents/events/:slug` | Get event by slug |
-| GET | `/v1/presents/organizations/:slug/events` | List organization's events |
-| POST | `/v1/presents/organizations/:slug/events` | Create event for organization |
-| PATCH | `/v1/presents/events/:slug` | Update event |
-| DELETE | `/v1/presents/events/:slug` | Delete event |
+**Base URL:** `https://voxxyai.com/api` (keeps `/api`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/v1/presents/events` | List all events | ✅ Yes |
+| GET | `/v1/presents/events/:slug` | Get event by slug | ✅ Yes |
+| GET | `/v1/presents/organizations/:slug/events` | List organization's events | ✅ Yes |
+| POST | `/v1/presents/organizations/:slug/events` | Create event for organization | ✅ Yes (owner) |
+| PATCH | `/v1/presents/events/:slug` | Update event | ✅ Yes (owner) |
+| DELETE | `/v1/presents/events/:slug` | Delete event | ✅ Yes (owner) |
 
 ### Vendor Applications (Versioned Routes)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/v1/presents/events/:slug/vendor_applications` | List event's vendor applications |
-| POST | `/v1/presents/events/:slug/vendor_applications` | Create vendor application |
-| GET | `/v1/presents/vendor_applications/:id` | Get application by ID |
-| PATCH | `/v1/presents/vendor_applications/:id` | Update application |
-| DELETE | `/v1/presents/vendor_applications/:id` | Delete application |
-| GET | `/v1/presents/vendor_applications/:id/submissions` | Get application submissions |
-| GET | `/v1/presents/vendor_applications/lookup/:code` | Lookup by shareable code (public) |
+**Base URL:** `https://voxxyai.com/api` (keeps `/api`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/v1/presents/events/:slug/vendor_applications` | List event's vendor applications | ✅ Yes (owner) |
+| POST | `/v1/presents/events/:slug/vendor_applications` | Create vendor application | ✅ Yes (owner) |
+| GET | `/v1/presents/vendor_applications/:id` | Get application by ID | ✅ Yes (owner) |
+| PATCH | `/v1/presents/vendor_applications/:id` | Update application | ✅ Yes (owner) |
+| DELETE | `/v1/presents/vendor_applications/:id` | Delete application | ✅ Yes (owner) |
+| GET | `/v1/presents/vendor_applications/:id/submissions` | Get application submissions | ✅ Yes (owner) |
+| GET | `/v1/presents/vendor_applications/lookup/:code` | Lookup by shareable code | ❌ Public |
 
 ### Registrations (Versioned Routes)
 
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/v1/presents/events/:slug/registrations` | List event registrations |
-| POST | `/v1/presents/events/:slug/registrations` | Create registration (public) |
-| GET | `/v1/presents/registrations/:id` | Get registration by ID |
-| PATCH | `/v1/presents/registrations/:id` | Update registration status |
-| GET | `/v1/presents/registrations/track/:ticket_code` | Track by ticket code (public) |
+**Base URL:** `https://voxxyai.com/api` (keeps `/api`)
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/v1/presents/events/:slug/registrations` | List event registrations | ✅ Yes (owner) |
+| POST | `/v1/presents/events/:slug/registrations` | Create registration (vendor submit) | ❌ Public |
+| GET | `/v1/presents/registrations/:id` | Get registration by ID | ✅ Yes (owner/submitter) |
+| PATCH | `/v1/presents/registrations/:id` | Update registration status | ✅ Yes (owner) |
+| GET | `/v1/presents/registrations/track/:ticket_code` | Track by ticket code | ❌ Public |
 
 ---
 
