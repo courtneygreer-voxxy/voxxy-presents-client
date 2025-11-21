@@ -20,7 +20,6 @@ interface UnifiedLoginFormProps {
 interface FormData {
   email: string
   password: string
-  rememberMe: boolean
 }
 
 interface FormErrors {
@@ -41,8 +40,7 @@ export function UnifiedLoginForm({
   const [activeTab, setActiveTab] = useState<UserType>(defaultTab)
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    password: '',
-    rememberMe: false
+    password: ''
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -166,7 +164,17 @@ export function UnifiedLoginForm({
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-white">Password</Label>
+              <button
+                type="button"
+                onClick={onForgotPassword}
+                className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                disabled={isSubmitting}
+              >
+                Forgot password?
+              </button>
+            </div>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
@@ -190,31 +198,6 @@ export function UnifiedLoginForm({
             {errors.password && (
               <p className="text-red-400 text-sm">{errors.password}</p>
             )}
-          </div>
-
-          {/* Remember Me & Forgot Password */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <input
-                id="rememberMe"
-                type="checkbox"
-                checked={formData.rememberMe}
-                onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
-                className="w-4 h-4 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
-                disabled={isSubmitting}
-              />
-              <Label htmlFor="rememberMe" className="text-gray-300 text-sm">
-                Remember me
-              </Label>
-            </div>
-            <button
-              type="button"
-              onClick={onForgotPassword}
-              className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
-              disabled={isSubmitting}
-            >
-              Forgot password?
-            </button>
           </div>
 
           {/* Submit Button */}
