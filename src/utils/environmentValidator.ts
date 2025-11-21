@@ -29,7 +29,6 @@ const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
       'VITE_FIREBASE_APP_ID'
     ],
     optional: [
-      'VITE_JWT_SECRET',
       'VITE_API_BASE_URL',
       'VITE_ENVIRONMENT',
       'VITE_APP_VERSION'
@@ -63,7 +62,6 @@ const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
       'VITE_ENVIRONMENT'
     ],
     optional: [
-      'VITE_JWT_SECRET',
       'VITE_API_BASE_URL',
       'VITE_APP_VERSION'
     ],
@@ -223,11 +221,6 @@ export class EnvironmentValidator {
     // Ensure HTTPS
     if (typeof window !== 'undefined' && window.location.protocol !== 'https:') {
       errors.push('Production must use HTTPS')
-    }
-
-    // Check JWT secret is not set (security)
-    if (import.meta.env.VITE_JWT_SECRET) {
-      warnings.push('JWT_SECRET should not be exposed in production frontend')
     }
   }
 

@@ -11,6 +11,15 @@ export default defineConfig({
     },
   },
   build: {
+    // Use terser for minification to enable console.log stripping
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,     // Remove all console.* calls in production
+        drop_debugger: true,    // Remove debugger statements
+        pure_funcs: ['console.log', 'console.info', 'console.debug'], // Extra safety
+      },
+    },
     rollupOptions: {
       output: {
         manualChunks: {
