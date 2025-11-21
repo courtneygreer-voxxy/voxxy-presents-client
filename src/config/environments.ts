@@ -1,21 +1,11 @@
 // Environment configuration and data source routing
 export type EnvironmentType = 'development' | 'staging' | 'production'
-export type DataSourceType = 'firebase' | 'api' | 'hybrid'
+export type DataSourceType = 'api'
 
 interface EnvironmentConfig {
   name: EnvironmentType
   dataSource: DataSourceType
-  apiBaseUrl?: string
-  firebaseConfig: {
-    apiKey: string
-    authDomain: string
-    databaseURL: string
-    projectId: string
-    storageBucket: string
-    messagingSenderId: string
-    appId: string
-    measurementId: string
-  }
+  apiBaseUrl: string
   features: {
     adminControls: boolean
     debugMode: boolean
@@ -24,44 +14,13 @@ interface EnvironmentConfig {
   }
 }
 
-// Validate critical environment variables (only Firebase required for initial load)
-function validateCoreEnvironmentVariables(): void {
-  const required = [
-    'VITE_FIREBASE_API_KEY',
-    'VITE_FIREBASE_PROJECT_ID'
-  ];
-
-  const missing = required.filter(key => !import.meta.env[key]);
-
-  if (missing.length > 0) {
-    throw new Error(`Missing required environment variables: ${missing.join(', ')}`);
-  }
-}
-
-// Get Firebase config from environment variables
-function getFirebaseConfigFromEnv() {
-  // Only validate core Firebase variables needed for app initialization
-  validateCoreEnvironmentVariables();
-
-  return {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID,
-    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
-  }
-}
 
 // Environment configurations
 const environments: Record<EnvironmentType, EnvironmentConfig> = {
   development: {
     name: 'development',
-    dataSource: 'api', // Use API for budget calculator testing
-    apiBaseUrl: 'https://www.voxxyai.com/api', // Development API
-    firebaseConfig: getFirebaseConfigFromEnv(),
+    dataSource: 'api',
+    apiBaseUrl: 'https://www.voxxyai.com/api',
     features: {
       adminControls: true,
       debugMode: true,
@@ -72,25 +31,23 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
 
   staging: {
     name: 'staging',
-    dataSource: 'api', // Use API for budget system testing in staging
-    apiBaseUrl: 'https://www.voxxyai.com/api', // Staging API
-    firebaseConfig: getFirebaseConfigFromEnv(),
+    dataSource: 'api',
+    apiBaseUrl: 'https://www.voxxyai.com/api',
     features: {
       adminControls: true,
       debugMode: true,
       experimentalFeatures: false,
-      dataSyncFromProduction: true // Sync data from production for testing
+      dataSyncFromProduction: true
     }
   },
 
   production: {
     name: 'production',
-    dataSource: 'firebase', // Use Firebase for organizations, API for venues
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://heyvoxxy.com/api', // Production API
-    firebaseConfig: getFirebaseConfigFromEnv(),
+    dataSource: 'api',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://www.heyvoxxy.com/api',
     features: {
-      adminControls: true, // Controlled admin access
-      debugMode: false, // Debug mode disabled
+      adminControls: true,
+      debugMode: false,
       experimentalFeatures: false,
       dataSyncFromProduction: false
     }
@@ -165,46 +122,8 @@ export function getDataSource(): DataSourceType {
   return config.dataSource
 }
 
-// Get API URL for current environment (if using API)
-export function getApiUrl(): string | undefined {
+// Get API URL for current environment
+export function getApiUrl(): string {
   const config = getEnvironmentConfig()
   return config.apiBaseUrl
-}
-
-// Get Firebase config for current environment
-export function getFirebaseConfig() {
-  const config = getEnvironmentConfig()
-  return config.firebaseConfig
-}
-
-// Get venue-specific data source (venues always use API in production)
-export function getVenueDataSource(): DataSourceType {
-  const currentEnv = getCurrentEnvironment()
-
-  // Venues always use API in production, regardless of general dataSource setting
-  if (currentEnv === 'production') {
-    return 'api'
-  }
-
-  // Use general data source for dev/staging
-  return getDataSource()
-}
-
-// Get user-specific data source (users use API in production for beta status consistency)
-export function getUserDataSource(): DataSourceType {
-  const currentEnv = getCurrentEnvironment()
-
-  // Users use API in production to ensure beta status sync with admin panel
-  if (currentEnv === 'production') {
-    return 'api'
-  }
-
-  // Use general data source for dev/staging
-  return getDataSource()
-}
-
-// Get budget-specific data source (budgets always use API as there's no Firebase implementation)
-export function getBudgetDataSource(): DataSourceType {
-  // Budgets always use API in all environments (no Firebase implementation exists)
-  return 'api'
 }

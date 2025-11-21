@@ -5,34 +5,18 @@
  */
 
 interface EnvConfig {
-  // Firebase Config (required)
-  VITE_FIREBASE_API_KEY: string
-  VITE_FIREBASE_AUTH_DOMAIN: string
-  VITE_FIREBASE_PROJECT_ID: string
-  VITE_FIREBASE_STORAGE_BUCKET: string
-  VITE_FIREBASE_MESSAGING_SENDER_ID: string
-  VITE_FIREBASE_APP_ID: string
-
-  // API Config (required)
+  // API Config (required for production)
   VITE_API_BASE_URL: string
 
-  // Optional but recommended
-  VITE_ADMIN_API_KEY?: string
+  // Optional
   VITE_ENVIRONMENT?: string
 }
 
 const REQUIRED_ENV_VARS: (keyof EnvConfig)[] = [
-  'VITE_FIREBASE_API_KEY',
-  'VITE_FIREBASE_AUTH_DOMAIN',
-  'VITE_FIREBASE_PROJECT_ID',
-  'VITE_FIREBASE_STORAGE_BUCKET',
-  'VITE_FIREBASE_MESSAGING_SENDER_ID',
-  'VITE_FIREBASE_APP_ID',
   'VITE_API_BASE_URL',
 ]
 
 const RECOMMENDED_ENV_VARS: (keyof EnvConfig)[] = [
-  'VITE_ADMIN_API_KEY',
   'VITE_ENVIRONMENT',
 ]
 

@@ -20,61 +20,22 @@ export interface EnvironmentConfig {
 
 const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
   development: {
-    required: [
-      'VITE_FIREBASE_API_KEY',
-      'VITE_FIREBASE_AUTH_DOMAIN',
-      'VITE_FIREBASE_PROJECT_ID',
-      'VITE_FIREBASE_STORAGE_BUCKET',
-      'VITE_FIREBASE_MESSAGING_SENDER_ID',
-      'VITE_FIREBASE_APP_ID'
+    required: [],
+    optional: [
+      'VITE_API_BASE_URL',
+      'VITE_ENVIRONMENT',
+      'VITE_APP_VERSION'
     ],
+    validators: {}
+  },
+  staging: {
+    required: [],
     optional: [
       'VITE_API_BASE_URL',
       'VITE_ENVIRONMENT',
       'VITE_APP_VERSION'
     ],
     validators: {
-      VITE_FIREBASE_PROJECT_ID: (value) => {
-        if (value.includes('demo-') || value.includes('test-')) {
-          return null // OK for development
-        }
-        return value.length > 0 ? null : 'Project ID cannot be empty'
-      },
-      VITE_FIREBASE_API_KEY: (value) => {
-        if (value.length < 20) {
-          return 'API key appears to be too short'
-        }
-        if (value.includes('placeholder') || value.includes('your-')) {
-          return 'API key appears to be a placeholder'
-        }
-        return null
-      }
-    }
-  },
-  staging: {
-    required: [
-      'VITE_FIREBASE_API_KEY',
-      'VITE_FIREBASE_AUTH_DOMAIN',
-      'VITE_FIREBASE_PROJECT_ID',
-      'VITE_FIREBASE_STORAGE_BUCKET',
-      'VITE_FIREBASE_MESSAGING_SENDER_ID',
-      'VITE_FIREBASE_APP_ID',
-      'VITE_ENVIRONMENT'
-    ],
-    optional: [
-      'VITE_API_BASE_URL',
-      'VITE_APP_VERSION'
-    ],
-    validators: {
-      VITE_FIREBASE_PROJECT_ID: (value) => {
-        if (value.includes('demo-') || value.includes('test-')) {
-          return null // OK for staging
-        }
-        if (!value.includes('staging') && !value.includes('dev')) {
-          return 'Staging should use a staging/dev Firebase project'
-        }
-        return null
-      },
       VITE_ENVIRONMENT: (value) => {
         if (value !== 'staging') {
           return 'Environment should be set to "staging" for staging deployment'
@@ -85,37 +46,22 @@ const ENVIRONMENT_CONFIGS: Record<string, EnvironmentConfig> = {
   },
   production: {
     required: [
-      'VITE_FIREBASE_API_KEY',
-      'VITE_FIREBASE_AUTH_DOMAIN',
-      'VITE_FIREBASE_PROJECT_ID',
-      'VITE_FIREBASE_STORAGE_BUCKET',
-      'VITE_FIREBASE_MESSAGING_SENDER_ID',
-      'VITE_FIREBASE_APP_ID',
-      'VITE_ENVIRONMENT'
+      'VITE_API_BASE_URL'
     ],
     optional: [
-      'VITE_API_BASE_URL',
+      'VITE_ENVIRONMENT',
       'VITE_APP_VERSION'
     ],
     validators: {
-      VITE_FIREBASE_PROJECT_ID: (value) => {
-        if (value.includes('demo-') || value.includes('test-') || value.includes('staging')) {
-          return 'Production should not use demo, test, or staging project IDs'
-        }
-        return null
-      },
       VITE_ENVIRONMENT: (value) => {
         if (value !== 'production') {
           return 'Environment should be set to "production" for production deployment'
         }
         return null
       },
-      VITE_FIREBASE_API_KEY: (value) => {
-        if (value.length < 30) {
-          return 'Production API key appears to be too short'
-        }
-        if (value.includes('placeholder') || value.includes('your-') || value.includes('test')) {
-          return 'Production API key appears to be invalid'
+      VITE_API_BASE_URL: (value) => {
+        if (!value.startsWith('https://')) {
+          return 'Production API URL must use HTTPS'
         }
         return null
       }
@@ -226,15 +172,9 @@ export class EnvironmentValidator {
 
   private validateStagingEnvironment(errors: string[], warnings: string[]): void {
     // Staging-specific validations
-    if (!import.meta.env.VITE_FIREBASE_PROJECT_ID?.includes('staging') &&
-        !import.meta.env.VITE_FIREBASE_PROJECT_ID?.includes('dev')) {
-      warnings.push('Staging should typically use a staging/dev Firebase project')
-    }
-
-    // Check for production URLs in staging
-    const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN
-    if (authDomain && !authDomain.includes('staging') && !authDomain.includes('dev')) {
-      warnings.push('Staging should use staging/dev Firebase domain')
+    const apiUrl = import.meta.env.VITE_API_BASE_URL
+    if (apiUrl && !apiUrl.includes('voxxyai.com')) {
+      warnings.push('Staging should use voxxyai.com API')
     }
   }
 
@@ -242,12 +182,6 @@ export class EnvironmentValidator {
     // Development-specific validations
     if (!import.meta.env.DEV) {
       warnings.push('Expected development mode but not detected')
-    }
-
-    // Check for production values in development
-    const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID
-    if (projectId && !projectId.includes('demo-') && !projectId.includes('test-') && !projectId.includes('dev')) {
-      warnings.push('Development should use demo/test Firebase project')
     }
   }
 
