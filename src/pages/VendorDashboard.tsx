@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Store, Menu, X } from 'lucide-react';
+import { Calendar, Users, Settings, Store, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import SettingsPage from './SettingsPage';
 
@@ -9,7 +9,7 @@ type NavItem = 'events' | 'network' | 'settings';
 export default function VendorDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('events');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { userProfile, isAuthenticated, loading: authLoading } = useAuth();
+  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
 
   // Redirect if not authenticated
@@ -18,6 +18,15 @@ export default function VendorDashboard() {
       navigate('/');
     }
   }, [isAuthenticated, authLoading, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate('/');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
@@ -87,6 +96,25 @@ export default function VendorDashboard() {
             );
           })}
         </nav>
+
+        {/* User Profile & Sign Out */}
+        <div className="p-4 border-t border-white/10">
+          <div className="flex items-center justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {userProfile?.name || userProfile?.email}
+              </p>
+              <p className="text-xs text-white/60">Vendor</p>
+            </div>
+            <button
+              onClick={handleLogout}
+              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
+              title="Sign Out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
       </aside>
 
       {/* Main Content Area */}
