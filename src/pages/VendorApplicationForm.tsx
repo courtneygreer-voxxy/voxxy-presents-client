@@ -113,10 +113,10 @@ export default function VendorApplicationForm() {
           <h1 className="text-2xl font-bold text-white mb-4">Unable to Load Application</h1>
           <p className="text-white/60 mb-6">{error}</p>
           <button
-            onClick={() => navigate(`/events/${slug}`)}
+            onClick={() => navigate('/')}
             className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
           >
-            Back to Event
+            Back to Voxxy Presents
           </button>
         </div>
       </div>
@@ -128,11 +128,11 @@ export default function VendorApplicationForm() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <button
-          onClick={() => navigate(`/events/${slug}`)}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Back to Event
+          Back to Voxxy Presents
         </button>
 
         <div className="bg-white/5 border border-white/10 rounded-lg p-8">
@@ -243,7 +243,7 @@ export default function VendorApplicationForm() {
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => navigate(`/events/${slug}`)}
+                onClick={() => navigate('/')}
                 className="flex-1 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
               >
                 Cancel

@@ -67,11 +67,13 @@ fetch(`${API_BASE_URL.replace('/api', '')}/login`)
 ```
 
 #### Authentication & User Management (5 routes)
-- `POST /login` → `https://voxxyai.com/login`
-- `POST /users` → `https://voxxyai.com/users` (signup)
+- `POST /login` → `https://voxxyai.com/login` (requires `X-Mobile-App: true` header)
+- `POST /users` → `https://voxxyai.com/users` (signup - see note below)
 - `PATCH /users/:id` → `https://voxxyai.com/users/123` (update profile)
 - `DELETE /logout` → `https://voxxyai.com/logout`
 - `GET /me` → `https://voxxyai.com/me`
+
+> **Current Signup Flow:** All `/signup/*` routes redirect to `/contact` for beta access requests. The `/users` endpoint exists but is currently only used for admin-created accounts.
 
 #### Password Reset (2 routes)
 - `POST /password_reset` → `https://voxxyai.com/password_reset` (request reset)
@@ -273,6 +275,7 @@ VITE_ENVIRONMENT=staging
 ```javascript
 // Development
 POST https://voxxyai.com/login
+Headers: { "X-Mobile-App": "true" }  // Required for JWT response
 {
   "email": "user@example.com",
   "password": "password123",
@@ -281,6 +284,7 @@ POST https://voxxyai.com/login
 
 // Production
 POST https://heyvoxxy.com/login
+Headers: { "X-Mobile-App": "true" }  // Required for JWT response
 {
   "email": "user@example.com",
   "password": "password123",
@@ -412,5 +416,5 @@ end
 
 ---
 
-**Last Updated:** 2025-01-19
-**Version:** 2.0.0 (Custom Domain Migration)
+**Last Updated:** 2025-11-22
+**Version:** 2.1.0 (Documentation Consolidation)

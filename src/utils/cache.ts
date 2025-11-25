@@ -24,9 +24,50 @@ export function setCache<T>(key: string, value: T, ttl: number = 5 * 60 * 1000):
     }
     localStorage.setItem(key, JSON.stringify(entry))
   } catch (error) {
-    console.warn('Failed to set cache:', error)
-    // Silently fail - caching is optional
+    // Handle QuotaExceededError by clearing old cache and retrying
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      try {
+        // Clear expired cache entries first
+        cleanupExpiredCacheSync()
+        // Clear all user profile caches (they'll be refetched)
+        clearCacheByPrefix('user_profile_')
+        // Retry the save
+        const entry: CacheEntry<T> = {
+          data: value,
+          timestamp: Date.now(),
+          ttl
+        }
+        localStorage.setItem(key, JSON.stringify(entry))
+      } catch {
+        // Still failed - silently give up, caching is optional
+      }
+    }
+    // Silently fail for other errors - caching is optional
   }
+}
+
+/**
+ * Synchronous version of cleanup for use in error recovery
+ */
+function cleanupExpiredCacheSync(): void {
+  const keys = Object.keys(localStorage)
+  keys.forEach(key => {
+    try {
+      const item = localStorage.getItem(key)
+      if (!item) return
+
+      const entry: CacheEntry<any> = JSON.parse(item)
+      if (entry.timestamp && entry.ttl) {
+        const now = Date.now()
+        const isExpired = now - entry.timestamp > entry.ttl
+        if (isExpired) {
+          localStorage.removeItem(key)
+        }
+      }
+    } catch {
+      // Skip non-cache items
+    }
+  })
 }
 
 /**

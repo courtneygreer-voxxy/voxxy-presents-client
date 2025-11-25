@@ -2,7 +2,7 @@
 
 **Welcome to the team!** This document will get you up to speed on the Voxxy Presents platform.
 
-**Last Updated**: October 29, 2025, 2:30 AM
+**Last Updated**: November 22, 2025 (Updated for Rails API migration)
 **Current Sprint**: Phase 1 Day 3 - Application System
 
 ---
@@ -85,13 +85,12 @@ See the **[Day 3 Task List](#day-3-tasks)** below for immediate priorities.
 - Vite (build tool)
 - Tailwind CSS + shadcn/ui components
 - React Router for navigation
-- Firebase Firestore (database)
 - Mixpanel (analytics)
 
 **Backend** (separate repo):
-- Node.js + Express + TypeScript
-- Firebase Admin SDK
-- Google Cloud Run (deployment)
+- Ruby on Rails API
+- PostgreSQL database
+- Render.com (deployment)
 - SendGrid (email notifications)
 
 **Repositories**:
@@ -122,7 +121,7 @@ src/
 │   ├── database.ts     # Database schema types
 │   └── vendor.ts       # Vendor-specific types
 └── lib/                # Utilities
-    ├── database.ts     # Firestore helpers
+    ├── api.ts          # API client helpers
     └── analytics.ts    # Mixpanel wrapper
 ```
 
@@ -151,10 +150,11 @@ cd voxxy-presents-client
 npm install
 ```
 
-**API**:
+**API** (Rails):
 ```bash
 cd voxxy-presents-api
-npm install
+bundle install
+rails db:create db:migrate db:seed
 ```
 
 ### 3. Environment Setup
@@ -164,26 +164,20 @@ npm install
 VITE_ENVIRONMENT=development
 VITE_API_BASE_URL=http://localhost:3001/api
 
-# Firebase config (get from team)
-VITE_FIREBASE_PROJECT_ID=voxxy-presents-dev
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-
 # Mixpanel (optional for local dev)
 VITE_MIXPANEL_TOKEN=...
 ```
 
-**API** - Create `.env`:
+**API** (Rails) - Create `.env`:
 ```env
-NODE_ENV=development
+RAILS_ENV=development
 PORT=3001
 
-# Firebase Admin SDK (get serviceAccountKey-dev.json from team)
-FIREBASE_PROJECT_ID=voxxy-presents-dev
-FIREBASE_PRIVATE_KEY="..." # From service account JSON
-FIREBASE_CLIENT_EMAIL=... # From service account JSON
+# Database
+DATABASE_URL=postgresql://localhost/voxxy_presents_development
+
+# JWT Secret (for authentication)
+JWT_SECRET=your-development-secret-key
 
 # CORS
 ALLOWED_ORIGINS=http://localhost:5173,https://staging-voxxy-presents.onrender.com,https://www.voxxypresents.com
@@ -195,7 +189,7 @@ EMAIL_TEST_MODE=true
 ```
 
 **Get Credentials From**:
-- Firebase service account keys: Ask team for `serviceAccountKey-dev.json` and `serviceAccountKey-prod.json`
+- Database setup: Run `rails db:create db:migrate db:seed` in the API repo
 - Mixpanel token: Check existing `.env.example` or ask team
 - SendGrid API key: Ask team (optional for local development)
 
@@ -204,7 +198,7 @@ EMAIL_TEST_MODE=true
 **Terminal 1 - API**:
 ```bash
 cd voxxy-presents-api
-npm run dev
+rails s -p 3001
 # API runs on http://localhost:3001
 ```
 
@@ -258,28 +252,28 @@ Git workflow, PR process, code standards.
 
 ### High Priority - Application System Setup
 
-#### 1. Database Schema: Vendor Applications Collection (4-6h)
+#### 1. Database Schema: Vendor Applications Table (4-6h)
 
-**Goal**: Create the `vendorApplications` collection structure in Firestore.
+**Goal**: Create the `vendor_applications` table in PostgreSQL via Rails migration.
 
 **Tasks**:
 - [ ] Review the [VendorApplication interface](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md#1-vendorapplications-critical---phase-1) in the main spec
-- [ ] Create Firestore security rules for `vendorApplications` collection
-- [ ] Add required Firestore indexes:
-  - `eventId` (for getting all applications to an event)
-  - `vendorId` (for getting all applications by a vendor)
+- [ ] Create Rails migration for `vendor_applications` table
+- [ ] Add database indexes:
+  - `event_id` (for getting all applications to an event)
+  - `vendor_id` (for getting all applications by a vendor)
   - `status` (for filtering pending/accepted/rejected)
-  - Composite: `eventId + status`
-  - Composite: `vendorId + status`
-- [ ] Create test data (2-3 sample applications) to work with
+  - Composite: `event_id + status`
+  - Composite: `vendor_id + status`
+- [ ] Create seed data (2-3 sample applications) to work with
 
 **Files to Create/Modify**:
-- `/Users/courtneygreer/Development/voxxy-presents-client/firestore.rules`
-- Test script to create sample applications
+- `voxxy-presents-api/db/migrate/xxx_create_vendor_applications.rb`
+- `voxxy-presents-api/db/seeds.rb` (add sample applications)
 
 **Reference**:
-- Firestore security rules pattern: Look at existing `vendors` and `users` rules
-- Index creation: May need to create via Firebase Console or get errors that tell you what to create
+- Look at existing migrations in `db/migrate/` for patterns
+- Run `rails db:migrate` after creating migration
 
 ---
 
@@ -336,17 +330,18 @@ export interface VendorApplication {
 - [ ] Implement `PATCH /api/applications/:applicationId` (producer updates status)
 - [ ] Implement `DELETE /api/applications/:applicationId` (vendor withdraws)
 - [ ] Add authentication guards (vendor can only submit, producer can only approve)
-- [ ] Register routes in `src/app.ts`
+- [ ] Register routes in Rails router
 
 **Files to Create**:
-- `voxxy-presents-api/src/routes/applications.ts`
+- `voxxy-presents-api/app/controllers/api/applications_controller.rb`
+- `voxxy-presents-api/app/models/vendor_application.rb`
 
 **Files to Modify**:
-- `voxxy-presents-api/src/app.ts` (register routes)
+- `voxxy-presents-api/config/routes.rb` (register routes)
 
 **Testing**:
 - Use `curl` or Postman to test each endpoint
-- Verify Firestore security rules allow/deny appropriately
+- Verify authorization via controller before_actions
 
 ---
 
@@ -486,7 +481,7 @@ export interface VendorApplication {
    - [ ] Sign up as producer → verify organization created
    - [ ] Test the specific feature you built (e.g., submit application)
    - [ ] Check Network tab for API errors
-   - [ ] Verify Firestore data looks correct in Firebase Console
+   - [ ] Verify database data via Rails console (`rails c`)
 
 2. **Build Before Committing**:
    ```bash
@@ -503,7 +498,7 @@ export interface VendorApplication {
 ### Deployment
 
 - **Automatic**: Pushing to `main` branch auto-deploys to production via Render
-- **Manual API Deploy**: See API repo README for Cloud Run deployment
+- **Manual API Deploy**: See API repo README for Render deployment
 - **Always test locally first!** Don't push broken code to main
 
 ---
@@ -651,8 +646,8 @@ console.log('📦 Data:', JSON.stringify(data, null, 2))
 **Issue**: TypeScript errors about missing types
 - **Solution**: Check `src/types/database.ts` and `src/types/vendor.ts` for type definitions, or create new ones
 
-**Issue**: Firestore permission denied
-- **Solution**: Check `firestore.rules` - you may need to add a rule for the collection you're trying to access
+**Issue**: API authorization error (401/403)
+- **Solution**: Check that you're sending the correct auth token in headers and that the user has the required role
 
 **Issue**: "Cannot read property X of undefined"
 - **Solution**: Add optional chaining `?.` or null checks before accessing nested properties
@@ -663,11 +658,11 @@ console.log('📦 Data:', JSON.stringify(data, null, 2))
 
 By end of day, you should have:
 
-- [ ] `vendorApplications` collection created in Firestore
-- [ ] Firestore security rules and indexes configured
+- [ ] `vendor_applications` table created in PostgreSQL via Rails migration
+- [ ] Database indexes configured for efficient queries
 - [ ] TypeScript types defined for applications
 - [ ] At least 3 API endpoints working (submit, get for event, get for vendor)
-- [ ] Basic test data created (2-3 sample applications)
+- [ ] Basic seed data created (2-3 sample applications)
 - [ ] Local testing successful (can submit and retrieve applications)
 
 **Stretch Goals**:
@@ -688,8 +683,8 @@ Share this in team communication:
 **Example**:
 ```
 Yesterday: Set up local environment, read V3.0 spec, reviewed vendor signup flow
-Today: Creating vendorApplications Firestore collection and security rules, building API endpoints
-Blockers: None - need Firebase Console access to create indexes
+Today: Creating vendor_applications Rails migration and building API endpoints
+Blockers: None - waiting for database credentials
 ```
 
 ---
@@ -708,5 +703,4 @@ You now have everything you need to get started. Remember:
 
 ---
 
-*Last Updated: October 29, 2025, 2:30 AM*
-*Next Update: After Day 3 completion*
+*Last Updated: November 22, 2025 - Updated for Rails API migration*

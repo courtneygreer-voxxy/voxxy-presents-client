@@ -1,0 +1,456 @@
+================================================================================
+VOXXY PRESENTS CLIENT - ARCHITECTURE DIAGRAM
+================================================================================
+
+ENTRY POINT FLOW
+================================================================================
+
+index.html
+    └── main.tsx (validateEnv)
+        └── App.tsx
+            ├── AuthProvider
+            │   └── Router (BrowserRouter)
+            │       └── Routes
+            │           ├── Public Routes
+            │           ├── Auth Routes (with RedirectIfAuthenticatedV2)
+            │           ├── Protected Routes (with AdminRoute)
+            │           └── Role-Based Redirects
+
+
+AUTH SYSTEM ARCHITECTURE
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                          LOCAL STORAGE                                   │
+├─────────────────────────────────────────────────────────────────────────┤
+│  Key: railsAuthToken                 │  Key: user_profile_rails-user     │
+│  Value: JWT token string             │  Value: User object (TTL: 5min)   │
+└─────────────────────────────────────────────────────────────────────────┘
+        ↑                                       ↑
+        │                                       │
+        │         ┌──────────────────────────────────────────────┐
+        │         │  AuthContext (contexts/AuthContext.tsx)      │
+        │         ├──────────────────────────────────────────────┤
+        │         │ State:                                       │
+        │         │  - currentUser: User | null                 │
+        │         │  - userProfile: User | null                 │
+        │         │  - loading: boolean                         │
+        │         │  - error: string | null                     │
+        │         │                                              │
+        │         │ Methods:                                     │
+        │         │  - signIn(email, password)                  │
+        │         │  - signUp(data)                             │
+        │         │  - signOut()                                │
+        │         │  - resetPassword(email)                     │
+        │         │  - refreshUserProfile()                     │
+        │         │                                              │
+        │         │ Computed:                                    │
+        │         │  - isAuthenticated                          │
+        │         │  - isAdmin, isProducer, isVendor, isGuest   │
+        │         │  - hasRole(role)                            │
+        │         │                                              │
+        │         └────────────┬─────────────────────────────────┘
+        │                      │
+        │                      └─→ useAuth() Hook
+        │                              (any component)
+        │
+        └────────────────────────────────────────┐
+                                                 │
+                                    ┌────────────▼─────────────────────┐
+                                    │  API Service (services/api.ts)   │
+                                    ├────────────────────────────────┤
+                                    │ authApi:                        │
+                                    │  - login()                      │
+                                    │  - signup()                     │
+                                    │  - logout()                     │
+                                    │  - getCurrentUser()             │
+                                    │  - updateUser()                 │
+                                    │  - requestPasswordReset()       │
+                                    │  - resetPasswordWithToken()     │
+                                    │  - verifyEmailCode()            │
+                                    │  - resendVerificationEmail()    │
+                                    │                                 │
+                                    │ Token management:               │
+                                    │  - saveAuthToken()              │
+                                    │  - getAuthToken()               │
+                                    │  - clearAuthToken()             │
+                                    └────────────┬────────────────────┘
+                                                 │
+                                                 │ HTTP Requests
+                                                 │
+                                    ┌────────────▼──────────────┐
+                                    │  Rails Backend API        │
+                                    │  (voxxyai.com/api)        │
+                                    │                           │
+                                    │  Endpoints:               │
+                                    │  POST /login              │
+                                    │  POST /users              │
+                                    │  DELETE /logout           │
+                                    │  GET /me                  │
+                                    │  PATCH /users/:id         │
+                                    │  POST /password_reset     │
+                                    │  PATCH /password_reset    │
+                                    │  POST /verify_code        │
+                                    └───────────────────────────┘
+
+
+ROUTING ARCHITECTURE
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        ROUTE TYPES & PROTECTION                          │
+├─────────────────────────────────────────────────────────────────────────┤
+
+PUBLIC ROUTES (No protection)
+├─ /                           → HomePage
+├─ /features                   → FeaturesPage
+├─ /pricing                    → PricingPage
+├─ /help                       → HelpPage
+├─ /contact                    → ContactPage
+├─ /about                      → AboutPage
+├─ /privacy                    → PrivacyPolicyPage
+├─ /terms                      → TermsOfServicePage
+├─ /events/:slug               → PublicEventDetailPage
+├─ /events/:slug/apply         → VendorApplicationForm
+├─ /applications/success       → ApplicationConfirmationPage
+├─ /applications/track/:code   → ApplicationTrackingPage
+└─ /apply/:code                → ShortLinkRedirectPage
+
+AUTH ROUTES (Protected with RedirectIfAuthenticatedV2)
+├─ /login                      → LoginPage
+├─ /forgot-password            → ForgotPasswordPage
+├─ /reset-password             → ResetPasswordPage
+└─ /verify-email               → EmailVerificationPage
+
+PROTECTED USER ROUTES (Require authentication)
+├─ /pending                    → BetaPendingPage (consumer/guest)
+├─ /producer/pending           → ProducerDashboard (producer/venue_owner)
+├─ /vendor/pending             → VendorDashboard (vendor)
+└─ /admin/dashboard            → AdminDashboard (admin only, AdminRoute)
+
+LEGACY ROUTES (Auto-redirect)
+├─ /auth                       → /contact
+├─ /sign-up                    → /contact
+├─ /signup                     → /contact
+├─ /login/producer             → /login
+├─ /login/vendor               → /login
+├─ /profile                    → RoleBasedDashboardRedirect
+└─ /dashboard                  → RoleBasedDashboardRedirect
+
+└─────────────────────────────────────────────────────────────────────────┘
+
+
+ROUTE PROTECTION COMPONENTS
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ RedirectIfAuthenticatedV2 (components/auth/ProtectedRouteV2.tsx)   │
+├─────────────────────────────────────────────────────────────────────┤
+│ Purpose: Keep authenticated users off auth pages (login, etc.)     │
+│                                                                      │
+│ Logic:                                                               │
+│  if (loading) return null                                           │
+│  if (isAuthenticated) {                                             │
+│    if (role === 'producer' || 'venue_owner')                       │
+│      → Navigate to /producer/pending                               │
+│    else if (role === 'vendor')                                     │
+│      → Navigate to /vendor/pending                                 │
+│    else if (role === 'consumer' || 'guest')                        │
+│      → Navigate to /pending                                        │
+│    else if (role === 'admin')                                      │
+│      → Navigate to /admin/dashboard                                │
+│  } else {                                                            │
+│    render children (the auth page)                                 │
+│  }                                                                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ AdminRoute (components/auth/AdminRoute.tsx)                         │
+├─────────────────────────────────────────────────────────────────────┤
+│ Purpose: Restrict routes to admin users only                        │
+│                                                                      │
+│ Logic:                                                               │
+│  if (loading) return LoadingTransition("Verifying admin access...")│
+│  if (!isAuthenticated) → Navigate to /auth                          │
+│  if (!isAdmin) → Navigate to /                                      │
+│  else render children (AdminDashboard)                              │
+└─────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────┐
+│ RoleBasedDashboardRedirect (App.tsx)                                │
+├─────────────────────────────────────────────────────────────────────┤
+│ Purpose: Route authenticated users to their appropriate holding     │
+│ screen based on role                                                │
+│                                                                      │
+│ Redirect Map:                                                        │
+│  'producer' || 'venue_owner' → /producer/pending                   │
+│  'vendor'                     → /vendor/pending                     │
+│  'consumer' || 'guest'        → /pending                            │
+│  'admin'                      → /admin/dashboard                    │
+│  unknown                      → /                                   │
+└─────────────────────────────────────────────────────────────────────┘
+
+
+LOGIN FLOW SEQUENCE DIAGRAM
+================================================================================
+
+User
+  │
+  ├─→ LoginPage (pages/LoginPage.tsx)
+  │     │
+  │     └─→ User enters email/password
+  │         │
+  │         └─→ Form validation
+  │             │
+  │             └─→ handleSubmit()
+  │                 │
+  │                 └─→ signIn({ email, password })
+  │                     │
+  │                     └─→ AuthContext.handleSignIn()
+  │                         │
+  │                         ├─→ authApi.login(email, password)
+  │                         │   │
+  │                         │   └─→ POST /login
+  │                         │       Backend returns: { token, id, ... }
+  │                         │       │
+  │                         │       └─→ saveAuthToken(token)
+  │                         │           (localStorage: railsAuthToken)
+  │                         │
+  │                         ├─→ authApi.getCurrentUser()
+  │                         │   │
+  │                         │   └─→ GET /me (with Bearer token)
+  │                         │       Backend returns: User object
+  │                         │
+  │                         ├─→ setCurrentUser(user)
+  │                         ├─→ setUserProfile(user)
+  │                         └─→ cacheUserProfile('rails-user', user)
+  │                             (localStorage: user_profile_rails-user)
+  │
+  └─→ RedirectIfAuthenticatedV2 checks role
+      │
+      └─→ Navigate to role-based dashboard:
+          ├─ /producer/pending (if producer)
+          ├─ /vendor/pending (if vendor)
+          ├─ /pending (if consumer/guest)
+          └─ /admin/dashboard (if admin)
+
+
+LOGOUT FLOW SEQUENCE DIAGRAM
+================================================================================
+
+User (in Dashboard)
+  │
+  └─→ Clicks "Sign Out"
+      │
+      └─→ handleSignOut()
+          │
+          ├─→ removeCachedUserProfile('rails-user')
+          │   (Removes from localStorage)
+          │
+          ├─→ authApi.logout()
+          │   │
+          │   └─→ DELETE /logout (with Bearer token)
+          │       Backend invalidates session
+          │
+          ├─→ clearAuthToken()
+          │   (Removes railsAuthToken from localStorage)
+          │
+          ├─→ setCurrentUser(null)
+          ├─→ setUserProfile(null)
+          └─→ setLoading(false)
+              │
+              └─→ navigate('/')
+                  (Redirect to home page)
+
+
+COMPONENT HIERARCHY
+================================================================================
+
+App
+├── AuthProvider
+│   ├── Router
+│   │   ├── Public Routes
+│   │   │   ├── HomePage
+│   │   │   ├── FeaturesPage
+│   │   │   └── ...
+│   │   ├── Auth Routes
+│   │   │   ├── RedirectIfAuthenticatedV2
+│   │   │   │   ├── LoginPage
+│   │   │   │   ├── ForgotPasswordPage
+│   │   │   │   ├── ResetPasswordPage
+│   │   │   │   └── EmailVerificationPage
+│   │   ├── Protected Routes
+│   │   │   ├── BetaPendingPage
+│   │   │   ├── ProducerDashboard
+│   │   │   │   ├── CreateEventForm
+│   │   │   │   ├── EventsList
+│   │   │   │   ├── CommandCenter
+│   │   │   │   └── SettingsPage
+│   │   │   ├── VendorDashboard
+│   │   │   ├── AdminRoute
+│   │   │   │   └── AdminDashboard
+│   ├── DebugPanel (dev only)
+
+
+ENVIRONMENT & CONFIGURATION
+================================================================================
+
+┌─────────────────────────────────────────┐
+│  environments.ts (config/environments)  │
+├─────────────────────────────────────────┤
+│  Detects environment by hostname        │
+│                                         │
+│  Development:                           │
+│    ├─ localhost/127.0.0.1               │
+│    └─ API: https://www.voxxyai.com/api  │
+│                                         │
+│  Staging:                               │
+│    ├─ onrender.com or 'staging'         │
+│    └─ API: https://www.voxxyai.com/api  │
+│                                         │
+│  Production:                            │
+│    ├─ All other hosts                   │
+│    └─ API: https://www.heyvoxxy.com/api │
+└─────────────────────────────────────────┘
+
+Environment Variables:
+├─ VITE_ENVIRONMENT          (dev|staging|production)
+├─ VITE_API_BASE_URL         (API endpoint URL)
+├─ VITE_MIXPANEL_TOKEN       (Analytics token)
+├─ VITE_DEBUG_MODE           (true|false)
+└─ VITE_EXPERIMENTAL_FEATURES (true|false)
+
+
+ROLE HIERARCHY & PERMISSIONS
+================================================================================
+
+┌─────────────────────────┐
+│      User Roles         │
+├─────────────────────────┤
+│ admin                   │ → Full system access
+│                         │    - Admin dashboard
+│                         │    - User management
+│                         │
+│ producer (venue_owner)  │ → Event management
+│                         │    - Organization creation
+│                         │    - Event creation/editing
+│                         │    - Dashboard: /producer/pending
+│                         │
+│ vendor                  │ → Vendor operations
+│                         │    - Apply to events
+│                         │    - Registration
+│                         │    - Dashboard: /vendor/pending
+│                         │
+│ consumer (guest)        │ → Limited access
+│                         │    - Beta pending page
+│                         │    - Awaiting approval
+│                         │    - Dashboard: /pending
+│                         │
+│ venue_owner (legacy)    │ → Maps to 'producer'
+│                         │    (backward compatibility)
+│
+└─────────────────────────┘
+
+
+CACHING STRATEGY
+================================================================================
+
+Cache Type: localStorage (client-side)
+
+User Profile Cache
+├─ Key: user_profile_rails-user
+├─ Value: User object (JSON string)
+├─ TTL: 5 minutes
+└─ Usage:
+    ├─ Loaded on app mount for instant UX
+    ├─ Fresh profile fetched in background
+    ├─ Cleared on logout
+    └─ Cleared on token expiration
+
+Token Storage
+├─ Key: railsAuthToken
+├─ Value: JWT token string
+├─ Persistence: Persistent (no TTL)
+└─ Usage:
+    ├─ Added to Authorization headers
+    ├─ Checked on app mount
+    └─ Cleared on logout
+
+
+STATE MANAGEMENT (React Context)
+================================================================================
+
+AuthContext
+├─ Provider: AuthProvider (App.tsx)
+├─ Hook: useAuth() (any component)
+│
+├─ State Variables:
+│  ├─ currentUser: User | null
+│  ├─ userProfile: User | null
+│  ├─ loading: boolean
+│  └─ error: string | null
+│
+├─ State Setters:
+│  ├─ setCurrentUser()
+│  ├─ setUserProfile()
+│  ├─ setLoading()
+│  └─ setError()
+│
+├─ Action Methods:
+│  ├─ handleSignIn(data)
+│  ├─ handleSignUp(data)
+│  ├─ handleSignOut()
+│  ├─ handleResetPassword(email)
+│  ├─ handleRefreshUserProfile()
+│  └─ clearError()
+│
+└─ Computed Properties:
+   ├─ isAuthenticated (Boolean)
+   ├─ isEmailVerified (Boolean)
+   ├─ isAdmin (Boolean)
+   ├─ isProducer (Boolean)
+   ├─ isVendor (Boolean)
+   ├─ isGuest (Boolean)
+   └─ hasRole(role) (Function)
+
+
+ERROR HANDLING
+================================================================================
+
+API Errors
+├─ ApiError class (services/api.ts)
+│  ├─ message: string (user-friendly)
+│  ├─ status: number (HTTP status)
+│  └─ errors?: string[] (detailed errors)
+│
+├─ Error Scenarios:
+│  ├─ Invalid credentials → "Invalid email or password"
+│  ├─ Email exists → "Email has already been taken"
+│  ├─ Network error → Connection/timeout message
+│  ├─ Expired token → Token cleared, user logged out
+│  └─ API errors → Caught and re-thrown
+│
+└─ Error Display:
+   ├─ LoginPage: Alert component at form top
+   ├─ AuthContext: Stored in error state
+   └─ Components: Call clearError() to dismiss
+
+
+KEY FILES REFERENCE
+================================================================================
+
+Authentication (Most Important)
+1. /src/contexts/AuthContext.tsx (356 lines)
+2. /src/services/api.ts (800+ lines)
+3. /src/App.tsx (213 lines)
+4. /src/components/auth/AdminRoute.tsx (34 lines)
+5. /src/components/auth/ProtectedRouteV2.tsx (50 lines)
+
+Supporting Files
+6. /src/utils/cache.ts (155 lines)
+7. /src/config/environments.ts (129 lines)
+8. /src/pages/LoginPage.tsx (284 lines)
+9. /src/pages/BetaPendingPage.tsx (162 lines)
+10. /src/main.tsx (15 lines)
+
+================================================================================

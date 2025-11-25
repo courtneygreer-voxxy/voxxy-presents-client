@@ -431,6 +431,14 @@ export const organizationsApi = {
   },
 
   /**
+   * Get the current user's organization
+   * GET /api/v1/presents/me/organization
+   */
+  async getMine() {
+    return fetchApi<any>(`/v1/presents/me/organization`)
+  },
+
+  /**
    * Get organization by slug
    * GET /api/v1/presents/organizations/:slug
    */

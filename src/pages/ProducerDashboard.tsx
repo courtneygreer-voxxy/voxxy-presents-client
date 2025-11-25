@@ -79,14 +79,17 @@ export default function ProducerDashboard() {
         setLoadingOrg(true);
         setError(null);
 
-        // Get all organizations and find the one belonging to current user
-        console.log('Fetching all organizations for user:', userProfile.id);
-        const orgs = await organizationsApi.getAll();
-        console.log('All organizations:', orgs);
-        console.log('Looking for organization with user_id:', userProfile.id);
+        // Get current user's organization directly
+        console.log('Fetching organization for current user...');
+        const response = await organizationsApi.getMine();
+        console.log('My organization response:', response);
 
-        let userOrg = orgs.find((org: Organization) => org.user_id === userProfile.id);
-        console.log('Found user organization:', userOrg);
+        let userOrg = response?.organization !== null ? response : null;
+
+        // Handle case where response is { organization: null }
+        if (response?.organization === null) {
+          userOrg = null;
+        }
 
         // If no organization exists, create one automatically
         if (!userOrg) {
@@ -106,19 +109,15 @@ export default function ProducerDashboard() {
               errors: createErr?.errors
             });
 
-            // If creation failed due to duplicate, the org already exists
-            // Just fetch all orgs again and find it
+            // If creation failed due to duplicate, refetch the user's organization
             if (createErr?.status === 422) {
-              console.log('422 error - organization already exists. Fetching all organizations again...');
-              const orgsRetry = await organizationsApi.getAll();
-              console.log('All organizations (retry):', orgsRetry);
+              console.log('422 error - organization may already exist. Refetching...');
+              const retryResponse = await organizationsApi.getMine();
+              console.log('Retry response:', retryResponse);
 
-              userOrg = orgsRetry.find((org: Organization) => org.user_id === userProfile.id);
-              console.log('Found organization on retry:', userOrg);
-
-              if (!userOrg) {
-                // Still not found - show more helpful error
-                console.error('Organization still not found after retry. All orgs:', orgsRetry);
+              if (retryResponse && retryResponse.organization !== null) {
+                userOrg = retryResponse;
+              } else {
                 setError('Organization exists but could not be loaded. Please contact support or try logging out and back in.');
                 setLoadingOrg(false);
                 return;

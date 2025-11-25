@@ -1,8 +1,8 @@
 # Voxxy Presents Documentation
 
-**Last Updated**: October 28, 2025
+**Last Updated**: November 22, 2025
 **Current Version**: 3.0
-**Status**: Phase 1 In Progress
+**Status**: Rails API Migration Complete
 
 ---
 
@@ -15,9 +15,7 @@
 - **[deployment/](./deployment/)** - Deployment guides and checklists
 
 ### Reference Documentation
-- **[archive/](./archive/)** - Historical documents and old versions
 - **[design/](./design/)** - Design specs and mockups
-- **[legacy/](./legacy/)** - Old architecture documentation
 - **[projects/](./projects/)** - Individual project documentation
 - **[releases/](./releases/)** - Release notes and changelogs
 
@@ -83,19 +81,11 @@ See [Phase Reports](./phase-reports/) for detailed daily updates.
 
 ---
 
-## 🗂️ Archive
-
-Historical documents are organized in [archive/](./archive/):
-- **old-phases/** - Previous phase reports (pre-V3)
-- **old-analytics/** - Legacy analytics documentation
-- **old-performance/** - Legacy performance guides
-
----
-
 ## 🔗 External Resources
 
 - **Production**: https://www.voxxypresents.com
-- **API**: https://voxxy-presents-api-dlr7d5geuq-uc.a.run.app
+- **API (Production)**: https://www.heyvoxxy.com/api
+- **API (Development)**: https://www.voxxyai.com/api
 - **GitHub Client**: https://github.com/courtneygreer-voxxy/voxxy-presents-client
 - **GitHub API**: https://github.com/courtneygreer-voxxy/voxxy-presents-api
 

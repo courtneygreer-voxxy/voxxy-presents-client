@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { CheckCircle, Search, Mail } from 'lucide-react';
+import { CheckCircle, Mail } from 'lucide-react';
 
 export default function ApplicationConfirmationPage() {
   const [searchParams] = useSearchParams();
@@ -82,22 +82,13 @@ export default function ApplicationConfirmationPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3">
+          <div className="flex justify-center">
             <button
-              onClick={() => navigate(`/applications/track/${ticketCode}`)}
-              className="flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+              onClick={() => navigate('/')}
+              className="px-8 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
             >
-              <Search className="w-5 h-5" />
-              Track Application Status
+              Back to Voxxy Presents
             </button>
-            {eventSlug && (
-              <button
-                onClick={() => navigate(`/events/${eventSlug}`)}
-                className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
-              >
-                Back to Event
-              </button>
-            )}
           </div>
         </div>
       </div>
