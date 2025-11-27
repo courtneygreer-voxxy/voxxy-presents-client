@@ -91,8 +91,10 @@ export default function VendorApplicationForm() {
       // Redirect to confirmation page with ticket code
       navigate(`/applications/success?ticket_code=${response.ticket_code}&event=${event.slug}`);
     } catch (err: any) {
-      console.error('Failed to submit application:', err);
-      setError(err.message || 'Failed to submit application. Please try again.');
+      console.log('Failed to submit application:', err);
+      // Check for errors array first (Rails validation errors), then fallback to message
+      const errorMessage = err.errors?.[0] || err.message || 'Failed to submit application. Please try again.';
+      setError(errorMessage);
     } finally {
       setSubmitting(false);
     }
