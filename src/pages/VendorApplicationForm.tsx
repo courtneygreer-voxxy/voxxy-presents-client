@@ -28,6 +28,7 @@ export default function VendorApplicationForm() {
   const [error, setError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     phone: '',
     business_name: '',
@@ -70,7 +71,7 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    if (!formData.email || !formData.business_name || !formData.vendor_category) {
+    if (!formData.name || !formData.email || !formData.business_name || !formData.vendor_category) {
       setError('Please fill in all required fields');
       return;
     }
@@ -80,6 +81,7 @@ export default function VendorApplicationForm() {
       setError(null);
 
       const response = await registrationsApi.submitVendorApplication(event.slug, {
+        name: formData.name,
         email: formData.email,
         phone: formData.phone || undefined,
         business_name: formData.business_name,
@@ -156,6 +158,21 @@ export default function VendorApplicationForm() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Contact Name */}
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Contact Name *
+              </label>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="Your full name"
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                required
+              />
+            </div>
+
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">

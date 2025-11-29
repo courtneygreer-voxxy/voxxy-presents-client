@@ -636,6 +636,7 @@ export const registrationsApi = {
    * POST /api/v1/presents/events/:event_slug/registrations
    */
   async submitVendorApplication(eventSlug: string, data: {
+    name: string
     email: string
     phone?: string
     business_name: string
