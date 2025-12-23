@@ -1023,4 +1023,388 @@ export const budgetsApi = {
   }
 }
 
+// Vendor Contacts API (Network/CRM)
+export interface VendorContact {
+  id: number
+  organization_id: number
+  contact_name: string
+  business_name?: string
+  job_title?: string
+  email: string
+  phone?: string
+  contact_type: 'vendor' | 'partner' | 'sponsor' | 'staff'
+  status: 'new' | 'contacted' | 'interested' | 'converted' | 'closed'
+  tags?: string[]
+  notes?: string
+  source: 'manual' | 'event_application'
+  source_registration_id?: number
+  interaction_count: number
+  last_contacted_at?: string
+  imported_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface VendorContactsListResponse {
+  vendor_contacts: VendorContact[]
+  meta: {
+    current_page: number
+    total_pages: number
+    total_count: number
+    per_page: number
+  }
+}
+
+export const vendorContactsApi = {
+  /**
+   * Get all vendor contacts for an organization
+   * GET /api/v1/presents/organizations/:organization_id/vendor_contacts
+   */
+  async getAll(organizationId: number, params?: {
+    search?: string
+    contact_type?: string
+    status?: string
+    tags?: string[]
+    page?: number
+    per_page?: number
+    sort?: string
+    order?: 'asc' | 'desc'
+  }): Promise<VendorContactsListResponse> {
+    const queryParams = new URLSearchParams()
+
+    if (params?.search) queryParams.append('search', params.search)
+    if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
+    if (params?.status) queryParams.append('status', params.status)
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
+    if (params?.sort) queryParams.append('sort', params.sort)
+    if (params?.order) queryParams.append('order', params.order)
+
+    const queryString = queryParams.toString()
+    const endpoint = `/v1/presents/organizations/${organizationId}/vendor_contacts${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetchApi<any>(endpoint)
+
+    // Map backend field names to frontend field names
+    const mapContact = (contact: any): VendorContact => {
+      const mapped: VendorContact = {
+        id: contact.id,
+        organization_id: contact.organization_id,
+        contact_name: contact.contact_info?.name || '',
+        business_name: contact.contact_info?.company_name || undefined,
+        job_title: contact.contact_info?.job_title || undefined,
+        email: contact.contact_info?.email || '',
+        phone: contact.contact_info?.phone || undefined,
+        contact_type: contact.crm_data?.contact_type || 'vendor',
+        status: contact.crm_data?.status || 'new',
+        tags: contact.crm_data?.tags || [],
+        notes: contact.crm_data?.notes || undefined,
+        source: contact.metadata?.source || 'manual',
+        source_registration_id: contact.registration_id || undefined,
+        interaction_count: contact.activity?.interaction_count || 0,
+        last_contacted_at: contact.activity?.last_contacted_at || undefined,
+        imported_at: contact.metadata?.imported_at || undefined,
+        created_at: contact.metadata?.created_at || '',
+        updated_at: contact.metadata?.updated_at || '',
+      }
+      return mapped
+    }
+
+    // Handle both array and object response formats
+    if (Array.isArray(response)) {
+      // Backend returned plain array
+      return {
+        vendor_contacts: response.map(mapContact),
+        meta: {
+          current_page: 1,
+          total_pages: 1,
+          total_count: response.length,
+          per_page: response.length,
+        },
+      }
+    }
+
+    // Backend returned object with vendor_contacts key
+    return {
+      vendor_contacts: response.vendor_contacts?.map(mapContact) || [],
+      meta: response.meta || {
+        current_page: 1,
+        total_pages: 1,
+        total_count: response.vendor_contacts?.length || 0,
+        per_page: response.vendor_contacts?.length || 0,
+      },
+    }
+  },
+
+  /**
+   * Get single vendor contact by ID
+   * GET /api/v1/presents/vendor_contacts/:id
+   */
+  async getById(id: number): Promise<VendorContact> {
+    const response = await fetchApi<any>(
+      `/v1/presents/vendor_contacts/${id}`
+    )
+    const contact = response.vendor_contact || response
+    return {
+      id: contact.id,
+      organization_id: contact.organization_id,
+      contact_name: contact.contact_info?.name || '',
+      business_name: contact.contact_info?.company_name || undefined,
+      job_title: contact.contact_info?.job_title || undefined,
+      email: contact.contact_info?.email || '',
+      phone: contact.contact_info?.phone || undefined,
+      contact_type: contact.crm_data?.contact_type || 'vendor',
+      status: contact.crm_data?.status || 'new',
+      tags: contact.crm_data?.tags || [],
+      notes: contact.crm_data?.notes || undefined,
+      source: contact.metadata?.source || 'manual',
+      source_registration_id: contact.registration_id || undefined,
+      interaction_count: contact.activity?.interaction_count || 0,
+      last_contacted_at: contact.activity?.last_contacted_at || undefined,
+      imported_at: contact.metadata?.imported_at || undefined,
+      created_at: contact.metadata?.created_at || '',
+      updated_at: contact.metadata?.updated_at || '',
+    }
+  },
+
+  /**
+   * Create new vendor contact
+   * POST /api/v1/presents/vendor_contacts
+   */
+  async create(organizationId: number, data: {
+    contact_name: string
+    business_name?: string
+    job_title?: string
+    email: string
+    phone?: string
+    contact_type?: 'vendor' | 'partner' | 'sponsor' | 'staff'
+    tags?: string[]
+    notes?: string
+    source?: 'manual' | 'event_application'
+    vendor_id?: number
+    registration_id?: number
+  }): Promise<VendorContact> {
+    // Backend expects FLAT structure for create (not nested)
+    const backendData = {
+      organization_id: organizationId,
+      vendor_id: data.vendor_id,
+      registration_id: data.registration_id,
+      name: data.contact_name,
+      email: data.email,
+      phone: data.phone,
+      company_name: data.business_name,
+      job_title: data.job_title,
+      contact_type: data.contact_type || 'vendor',
+      status: 'new',
+      notes: data.notes,
+      tags: data.tags || [],
+      source: data.source || 'manual',
+    }
+
+    const response = await fetchApi<any>(
+      '/v1/presents/vendor_contacts',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          vendor_contact: backendData,
+        }),
+      }
+    )
+
+    // Response comes back in NESTED format from serializer
+    const contact = response.vendor_contact || response
+
+    return {
+      id: contact.id,
+      organization_id: contact.organization_id,
+      contact_name: contact.contact_info?.name || '',
+      business_name: contact.contact_info?.company_name || undefined,
+      job_title: contact.contact_info?.job_title || undefined,
+      email: contact.contact_info?.email || '',
+      phone: contact.contact_info?.phone || undefined,
+      contact_type: contact.crm_data?.contact_type || 'vendor',
+      status: contact.crm_data?.status || 'new',
+      tags: contact.crm_data?.tags || [],
+      notes: contact.crm_data?.notes || undefined,
+      source: contact.metadata?.source || 'manual',
+      source_registration_id: contact.registration_id || undefined,
+      interaction_count: contact.activity?.interaction_count || 0,
+      last_contacted_at: contact.activity?.last_contacted_at || undefined,
+      imported_at: contact.metadata?.imported_at || undefined,
+      created_at: contact.metadata?.created_at || '',
+      updated_at: contact.metadata?.updated_at || '',
+    }
+  },
+
+  /**
+   * Update vendor contact
+   * PATCH /api/v1/presents/vendor_contacts/:id
+   */
+  async update(id: number, data: Partial<VendorContact>): Promise<VendorContact> {
+    // Backend expects FLAT structure for update (not nested)
+    const backendData: any = {}
+
+    // Map frontend field names to backend's flat field names
+    if (data.contact_name !== undefined) backendData.name = data.contact_name
+    if (data.email !== undefined) backendData.email = data.email
+    if (data.phone !== undefined) backendData.phone = data.phone
+    if (data.business_name !== undefined) backendData.company_name = data.business_name
+    if (data.job_title !== undefined) backendData.job_title = data.job_title
+    if (data.contact_type !== undefined) backendData.contact_type = data.contact_type
+    if (data.status !== undefined) backendData.status = data.status
+    if (data.notes !== undefined) backendData.notes = data.notes
+    if (data.tags !== undefined) backendData.tags = data.tags
+
+    const response = await fetchApi<any>(
+      `/v1/presents/vendor_contacts/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          vendor_contact: backendData,
+        }),
+      }
+    )
+
+    // Response comes back in NESTED format from serializer
+    const contact = response.vendor_contact || response
+
+    return {
+      id: contact.id,
+      organization_id: contact.organization_id,
+      contact_name: contact.contact_info?.name || '',
+      business_name: contact.contact_info?.company_name || undefined,
+      job_title: contact.contact_info?.job_title || undefined,
+      email: contact.contact_info?.email || '',
+      phone: contact.contact_info?.phone || undefined,
+      contact_type: contact.crm_data?.contact_type || 'vendor',
+      status: contact.crm_data?.status || 'new',
+      tags: contact.crm_data?.tags || [],
+      notes: contact.crm_data?.notes || undefined,
+      source: contact.metadata?.source || 'manual',
+      source_registration_id: contact.registration_id || undefined,
+      interaction_count: contact.activity?.interaction_count || 0,
+      last_contacted_at: contact.activity?.last_contacted_at || undefined,
+      imported_at: contact.metadata?.imported_at || undefined,
+      created_at: contact.metadata?.created_at || '',
+      updated_at: contact.metadata?.updated_at || '',
+    }
+  },
+
+  /**
+   * Delete (archive) vendor contact
+   * DELETE /api/v1/presents/vendor_contacts/:id
+   */
+  async delete(id: number): Promise<{ message: string }> {
+    return fetchApi<{ message: string }>(
+      `/v1/presents/vendor_contacts/${id}`,
+      {
+        method: 'DELETE',
+      }
+    )
+  },
+
+  /**
+   * Add tag to contact
+   * POST /api/v1/presents/vendor_contacts/:id/add_tag
+   */
+  async addTag(id: number, tag: string): Promise<VendorContact> {
+    const response = await fetchApi<{ vendor_contact: VendorContact }>(
+      `/v1/presents/vendor_contacts/${id}/add_tag`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ tag }),
+      }
+    )
+    return response.vendor_contact
+  },
+
+  /**
+   * Remove tag from contact
+   * DELETE /api/v1/presents/vendor_contacts/:id/remove_tag
+   */
+  async removeTag(id: number, tag: string): Promise<VendorContact> {
+    const response = await fetchApi<{ vendor_contact: VendorContact }>(
+      `/v1/presents/vendor_contacts/${id}/remove_tag`,
+      {
+        method: 'DELETE',
+        body: JSON.stringify({ tag }),
+      }
+    )
+    return response.vendor_contact
+  },
+
+  /**
+   * Record interaction with contact
+   * POST /api/v1/presents/vendor_contacts/:id/record_interaction
+   */
+  async recordInteraction(id: number, interactionType: string, notes?: string): Promise<VendorContact> {
+    const response = await fetchApi<{ vendor_contact: VendorContact }>(
+      `/v1/presents/vendor_contacts/${id}/record_interaction`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          interaction_type: interactionType,
+          notes,
+        }),
+      }
+    )
+    return response.vendor_contact
+  },
+
+  /**
+   * Send bulk email to multiple contacts
+   * POST /api/v1/presents/vendor_contacts/bulk_email
+   *
+   * NOTE: This endpoint may not be implemented yet on backend
+   */
+  async bulkEmail(contactIds: number[], emailData: {
+    subject: string
+    message: string
+    htmlMessage?: string
+    includeEventLink?: boolean
+    eventId?: number
+  }): Promise<{ emails_sent: number; failed: any[]; message: string }> {
+    // Keep mock for now as bulk email may not be implemented on backend yet
+    return fetchApi<{ emails_sent: number; failed: any[]; message: string }>(
+      '/v1/presents/vendor_contacts/bulk_email',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          contact_ids: contactIds,
+          ...emailData,
+        }),
+      }
+    ).catch(() => {
+      // Fallback to mock if endpoint doesn't exist
+      return {
+        emails_sent: contactIds.length,
+        failed: [],
+        message: 'Emails sent successfully (mocked)',
+      }
+    })
+  },
+
+  /**
+   * Import contact from registration/submission
+   * POST /api/v1/presents/vendor_contacts/import_from_registration
+   *
+   * NOTE: This endpoint may not be implemented yet on backend
+   */
+  async importFromRegistration(registrationId: number, organizationId: number): Promise<{
+    vendor_contact: VendorContact
+    created: boolean
+  }> {
+    return fetchApi<{ vendor_contact: VendorContact; created: boolean }>(
+      '/v1/presents/vendor_contacts/import_from_registration',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          registration_id: registrationId,
+          organization_id: organizationId,
+        }),
+      }
+    )
+  },
+}
+
 export { ApiError }

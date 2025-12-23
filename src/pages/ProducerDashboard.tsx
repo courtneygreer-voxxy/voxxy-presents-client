@@ -10,6 +10,7 @@ import EditEventForm from '@/components/producer/EditEventForm';
 import EventsList from '@/components/producer/EventsList';
 import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
+import { NetworkPage } from '@/components/producer/Network';
 
 type NavItem = 'events' | 'network' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
@@ -515,6 +516,16 @@ export default function ProducerDashboard() {
             <SettingsPage onBack={() => setActiveNav('events')} />
           ) : activeNav === 'events' ? (
             renderEventsContent()
+          ) : activeNav === 'network' ? (
+            <div className="p-4 lg:p-6">
+              {organization ? (
+                <NetworkPage organizationId={organization.id} />
+              ) : (
+                <div className="flex items-center justify-center py-12">
+                  <p className="text-white/60">Loading organization...</p>
+                </div>
+              )}
+            </div>
           ) : (
             <div className="p-4 lg:p-6">
               <div className="text-white/40 text-center mt-20">
