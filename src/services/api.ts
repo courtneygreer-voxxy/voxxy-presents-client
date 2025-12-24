@@ -1039,6 +1039,7 @@ export interface VendorContact {
   source: 'manual' | 'event_application'
   source_registration_id?: number
   interaction_count: number
+  events_participated?: number
   last_contacted_at?: string
   imported_at?: string
   created_at: string
