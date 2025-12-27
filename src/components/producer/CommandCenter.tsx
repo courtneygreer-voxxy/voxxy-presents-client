@@ -49,7 +49,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
   const renderTabContent = () => {
     switch (activeTab) {
       case 'messages':
-        return <MessageBoard eventSlug={event.slug} />;
+        return <MessageBoard />;
       case 'applications':
         return (
           <ApplicationsTab

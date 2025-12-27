@@ -2,10 +2,10 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
-import CreateEventForm from '@/components/producer/CreateEventForm';
+import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
 import EditEventForm from '@/components/producer/EditEventForm';
 import EventsList from '@/components/producer/EventsList';
 import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
@@ -177,39 +177,57 @@ export default function ProducerDashboard() {
   };
 
   // Handle create event
-  const handleCreateEvent = async (eventData: {
-    title: string;
-    description: string;
-    event_date: string;
-    location: string;
-  }) => {
-    console.log('handleCreateEvent called with:', eventData);
-    console.log('Current organization:', organization);
-
+  const handleCreateEvent = async (wizardState: WizardState) => {
     if (!organization) {
       console.error('No organization found');
       return;
     }
 
     try {
-      console.log('Creating event for organization:', organization.slug);
+      // Step 1: Create the event with application_deadline
       const newEvent = await eventsApi.create(organization.slug, {
-        ...eventData,
+        title: wizardState.eventDetails.title,
+        description: wizardState.eventDetails.description,
+        event_date: wizardState.eventDetails.event_date,
+        application_deadline: wizardState.eventDetails.application_deadline,
+        location: wizardState.eventDetails.location,
         status: 'draft',
         published: false,
       });
-      console.log('Event created:', newEvent);
 
-      // Refresh events list
-      console.log('Refreshing events list...');
+      // Step 2: Batch create vendor applications with booth_price
+      if (wizardState.applicationDetails.applications.length > 0) {
+        const applicationPromises = wizardState.applicationDetails.applications.map((app) => {
+          return vendorApplicationsApi.create(newEvent.slug, {
+            name: app.name,
+            description: app.description || undefined,
+            booth_price: app.booth_price,
+            status: 'active',
+          });
+        });
+
+        const results = await Promise.allSettled(applicationPromises);
+
+        // Check for any failures
+        const failures = results.filter(r => r.status === 'rejected');
+        if (failures.length > 0) {
+          console.error(`${failures.length} applications failed to create:`, failures);
+        }
+      }
+
+      // Step 3: Handle invited contacts (if any)
+      if (wizardState.inviteList.invitedContactIds.length > 0) {
+        console.log(`Inviting ${wizardState.inviteList.invitedContactIds.length} contacts to event`);
+        // TODO: Create event invitations via API when backend endpoint is ready
+        // await eventInvitationsApi.createBatch(newEvent.slug, wizardState.inviteList.invitedContactIds);
+      }
+
+      // Step 4: Refresh events list and navigate back
       await fetchEvents(organization.slug);
-
-      // Navigate back to list
-      console.log('Navigating to list view');
       setEventsView('list');
     } catch (err) {
       console.error('Failed to create event:', err);
-      throw err; // Re-throw to let form handle the error
+      throw err; // Re-throw to let wizard handle the error
     }
   };
 
@@ -313,9 +331,10 @@ export default function ProducerDashboard() {
 
     if (eventsView === 'create') {
       return (
-        <CreateEventForm
+        <CreateEventWizard
           onCancel={() => setEventsView(events.length > 0 ? 'list' : 'empty')}
           onSubmit={handleCreateEvent}
+          organizationId={organization?.id || 0}
         />
       );
     }

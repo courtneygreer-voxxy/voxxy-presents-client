@@ -552,6 +552,7 @@ export const eventsApi = {
     event_date?: string
     event_end_date?: string
     location?: string
+    application_deadline?: string
     poster_url?: string
     ticket_url?: string
     ticket_price?: number
@@ -695,6 +696,7 @@ export const vendorApplicationsApi = {
   async create(eventSlug: string, data: {
     name: string
     description?: string
+    booth_price?: number
     status?: 'active' | 'inactive'
     categories?: string[]
   }) {
@@ -711,6 +713,7 @@ export const vendorApplicationsApi = {
   async update(id: number, data: Partial<{
     name: string
     description: string
+    booth_price: number
     status: 'active' | 'inactive'
     categories: string[]
   }>) {

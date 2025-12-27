@@ -15,6 +15,10 @@ interface VendorApplication {
   shareable_url: string;
   created_at: string;
   updated_at: string;
+  pricing?: {
+    booth_price: number;
+    currency: string;
+  };
 }
 
 interface Event {
@@ -190,6 +194,14 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
 
                   <div className="flex items-center gap-4 text-sm text-white/60 mb-3">
                     <span>{application.submissions_count} submissions</span>
+                    {application.pricing?.booth_price !== undefined && (
+                      <>
+                        <span>•</span>
+                        <span className="text-green-400 font-medium">
+                          ${application.pricing.booth_price.toFixed(2)} booth price
+                        </span>
+                      </>
+                    )}
                     <span>•</span>
                     <span>Created {formatDate(application.created_at)}</span>
                   </div>

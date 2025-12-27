@@ -17,6 +17,10 @@ interface CreateApplicationFormProps {
     id: number;
     name: string;
     description?: string;
+    pricing?: {
+      booth_price: number;
+      currency: string;
+    };
     categories: string[];
     status: 'active' | 'inactive';
   };
@@ -31,6 +35,7 @@ export default function CreateApplicationForm({
   const [formData, setFormData] = useState({
     name: existingApplication?.name || '',
     description: existingApplication?.description || '',
+    booth_price: existingApplication?.pricing?.booth_price || 0,
     status: existingApplication?.status || 'active' as 'active' | 'inactive',
   });
   const [categories, setCategories] = useState<string[]>(existingApplication?.categories || []);
@@ -58,6 +63,11 @@ export default function CreateApplicationForm({
       return;
     }
 
+    if (formData.booth_price === undefined || formData.booth_price < 0) {
+      setError('Booth price must be $0 or greater');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -65,6 +75,7 @@ export default function CreateApplicationForm({
       const data = {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
+        booth_price: formData.booth_price,
         status: formData.status,
         categories,
       };
@@ -138,6 +149,36 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               rows={6}
               className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
             />
+          </div>
+
+          {/* Booth Price */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-white mb-2">
+              Booth Price *
+            </label>
+            <p className="text-white/50 text-sm mb-2">
+              Price vendors will pay for this booth type
+            </p>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60">
+                $
+              </span>
+              <input
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.booth_price ?? ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    booth_price: parseFloat(e.target.value) || 0,
+                  })
+                }
+                placeholder="150.00"
+                className="w-full pl-8 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                required
+              />
+            </div>
           </div>
 
           {/* Event Info (Read-only) */}
