@@ -256,7 +256,7 @@ export default function ApplicationTrackingPage() {
             onClick={() => navigate('/')}
             className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
           >
-            Browse More Events
+            Voxxy Presents Home
           </button>
         </div>
       </div>

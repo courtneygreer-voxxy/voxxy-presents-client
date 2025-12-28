@@ -1,28 +1,40 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Check } from 'lucide-react';
+import { Check, Calendar, MapPin, Clock } from 'lucide-react';
 import { eventsApi, registrationsApi } from '@/services/api';
+
+interface VendorApplication {
+  id: number;
+  name: string;
+  description?: string;
+  categories: string[];
+  booth_price?: number;
+  submissions_count?: number;
+}
 
 interface Event {
   id: number;
   title: string;
   slug: string;
+  description?: string;
   dates: {
     start?: string;
   };
   location?: string;
-  vendor_application?: {
+  poster_url?: string;
+  application_deadline?: string;
+  organization?: {
     id: number;
     name: string;
-    description?: string;
-    categories: string[];
   };
+  vendor_applications?: VendorApplication[];
 }
 
 export default function VendorApplicationForm() {
-  const { slug } = useParams<{ slug: string }>();
+  const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
+  const [application, setApplication] = useState<VendorApplication | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,23 +49,29 @@ export default function VendorApplicationForm() {
   });
 
   useEffect(() => {
-    if (slug) {
-      fetchEvent(slug);
+    if (slug && applicationId) {
+      fetchEvent(slug, applicationId);
     }
-  }, [slug]);
+  }, [slug, applicationId]);
 
-  const fetchEvent = async (eventSlug: string) => {
+  const fetchEvent = async (eventSlug: string, appId: string) => {
     try {
       setLoading(true);
       setError(null);
       const data = await eventsApi.getById(eventSlug);
 
-      if (!data.vendor_application) {
-        setError('This event is not accepting vendor applications.');
+      // Find the specific application by ID
+      const specificApplication = data.vendor_applications?.find(
+        (app: VendorApplication) => app.id === parseInt(appId)
+      );
+
+      if (!specificApplication) {
+        setError('This vendor application is not available or has been closed.');
         return;
       }
 
       setEvent(data);
+      setApplication(specificApplication);
     } catch (err: any) {
       console.error('Failed to fetch event:', err);
       setError(err.message || 'Failed to load event');
@@ -65,7 +83,7 @@ export default function VendorApplicationForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!event?.vendor_application) {
+    if (!application || !event) {
       setError('No vendor application found for this event');
       return;
     }
@@ -86,7 +104,7 @@ export default function VendorApplicationForm() {
         phone: formData.phone || undefined,
         business_name: formData.business_name,
         vendor_category: formData.vendor_category,
-        vendor_application_id: event.vendor_application.id,
+        vendor_application_id: application.id,
         subscribed: formData.subscribed,
       });
 
@@ -127,37 +145,79 @@ export default function VendorApplicationForm() {
     );
   }
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'TBA';
+    return new Date(dateString).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] py-12 px-4">
-      <div className="max-w-2xl mx-auto">
-        {/* Header */}
-        <button
-          onClick={() => navigate('/')}
-          className="flex items-center gap-2 text-white/60 hover:text-white mb-6 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to Voxxy Presents
-        </button>
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+      {/* Hero Section */}
+      <div className="relative h-[160px] md:h-[250px] overflow-hidden">
+        {event?.poster_url ? (
+          <img
+            src={event.poster_url}
+            alt={event.title}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-r from-purple-900 to-blue-900" />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0d2e] via-[#1a0d2e]/80 to-transparent" />
 
-        <div className="bg-white/5 border border-white/10 rounded-lg p-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Apply as Vendor
-          </h1>
-          <p className="text-white/60 mb-2">{event?.title}</p>
-          <p className="text-purple-300 text-lg mb-6">
-            {event?.vendor_application?.name}
-          </p>
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
+              {event?.title}
+            </h1>
+            <p className="text-white/80 text-base md:text-lg">
+              {event?.organization ? `Presented by ${event.organization.name}` : 'Vendor Application'}
+            </p>
+          </div>
+        </div>
+      </div>
 
-          {event?.vendor_application?.description && (
-            <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mb-6">
-              <p className="text-white/80 text-sm whitespace-pre-wrap">
-                {event.vendor_application.description}
-              </p>
-            </div>
-          )}
+      {/* Content */}
+      <div className="max-w-4xl mx-auto px-4 lg:px-8 py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content - Application Form */}
+          <div className="lg:col-span-2">
+            <div className="bg-white/5 border border-white/10 rounded-lg p-8">
+              <h2 className="text-2xl font-bold text-white mb-4">
+                {application?.name || 'Apply as Vendor'}
+              </h2>
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+              {application?.booth_price && (
+                <p className="text-2xl font-bold text-white mb-4">
+                  ${Number(application.booth_price).toFixed(2)}
+                </p>
+              )}
+
+              {application?.description && (
+                <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mb-6">
+                  <p className="text-white/80 text-sm whitespace-pre-wrap">
+                    {application.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-6">
             {/* Contact Name */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
@@ -229,7 +289,7 @@ export default function VendorApplicationForm() {
                 required
               >
                 <option value="" className="bg-[#1a0d2e]">Select a category...</option>
-                {event?.vendor_application?.categories.map((category) => (
+                {application?.categories.map((category) => (
                   <option key={category} value={category} className="bg-[#1a0d2e]">
                     {category}
                   </option>
@@ -258,34 +318,113 @@ export default function VendorApplicationForm() {
               </div>
             )}
 
-            {/* Submit Button */}
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => navigate('/')}
-                className="flex-1 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={submitting}
-                className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {submitting ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Submitting...
-                  </>
-                ) : (
-                  <>
-                    <Check className="w-5 h-5" />
-                    Submit Application
-                  </>
-                )}
-              </button>
+                {/* Submit Button */}
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => window.close()}
+                    className="flex-1 px-4 md:px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all text-sm md:text-base"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="flex-1 px-4 md:px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
+                  >
+                    {submitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span>Submitting...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-4 h-4 md:w-5 md:h-5" />
+                        <span>Submit Application</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
-          </form>
+          </div>
+
+          {/* Sidebar - Event Info */}
+          <div className="space-y-6">
+            {/* Event Description */}
+            {event?.description && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">About This Event</h3>
+                <p className="text-white/80 text-sm whitespace-pre-wrap">
+                  {event.description}
+                </p>
+              </div>
+            )}
+
+            {/* Event Details */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Event Details</h3>
+              <div className="space-y-4">
+                {event?.dates?.start && (
+                  <div className="flex items-start gap-3">
+                    <Calendar className="w-5 h-5 text-purple-400 mt-0.5" />
+                    <div>
+                      <p className="text-white/60 text-sm">Event Date</p>
+                      <p className="text-white text-sm">{formatDate(event.dates.start)}</p>
+                    </div>
+                  </div>
+                )}
+                {event?.location && (
+                  <div className="flex items-start gap-3">
+                    <MapPin className="w-5 h-5 text-purple-400 mt-0.5" />
+                    <div>
+                      <p className="text-white/60 text-sm">Location</p>
+                      <p className="text-white text-sm">{event.location}</p>
+                    </div>
+                  </div>
+                )}
+                {event?.application_deadline && (
+                  <div className="flex items-start gap-3">
+                    <Clock className="w-5 h-5 text-purple-400 mt-0.5" />
+                    <div>
+                      <p className="text-white/60 text-sm">Application Deadline</p>
+                      <p className="text-white text-sm">{formatDateTime(event.application_deadline)}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Categories */}
+            {application?.categories && application.categories.length > 0 && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-3">Vendor Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {application.categories.map((category) => (
+                    <span
+                      key={category}
+                      className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
+                    >
+                      {category}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Powered by Voxxy Presents */}
+        <div className="mt-12 pt-8 border-t border-white/10">
+          <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
+            <span>Powered by</span>
+            <img
+              src="/VoxxyTriangle.svg"
+              alt="Voxxy"
+              className="w-4 h-4 opacity-60"
+            />
+            <span className="font-semibold">Voxxy Presents</span>
+          </div>
         </div>
       </div>
     </div>

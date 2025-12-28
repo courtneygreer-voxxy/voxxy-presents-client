@@ -1430,7 +1430,20 @@ export interface EventInvitation {
     description: string
     event_date: string
     location: string
+    poster_url?: string
     application_deadline: string
+    organization?: {
+      id: number
+      name: string
+    }
+    vendor_applications?: Array<{
+      id: number
+      name: string
+      description?: string
+      categories: string[]
+      booth_price?: number
+      submissions_count: number
+    }>
   }
   status: 'pending' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired'
   invitation_token?: string

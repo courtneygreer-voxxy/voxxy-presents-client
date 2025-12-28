@@ -128,7 +128,7 @@ export default function App() {
 
           {/* Public Event & Vendor Application Routes */}
           <Route path="/events/:slug" element={<PublicEventDetailPage />} />
-          <Route path="/events/:slug/apply" element={<VendorApplicationForm />} />
+          <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
           <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
           <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
           <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />

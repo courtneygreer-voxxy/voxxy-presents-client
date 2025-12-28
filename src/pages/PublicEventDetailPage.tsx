@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Users, DollarSign, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock } from 'lucide-react';
 import { eventsApi } from '@/services/api';
+
+interface VendorApplication {
+  id: number;
+  name: string;
+  description?: string;
+  categories: string[];
+  booth_price?: number;
+  submissions_count: number;
+}
 
 interface Event {
   id: number;
@@ -15,8 +24,10 @@ interface Event {
   location?: string;
   poster_url?: string;
   ticket_url?: string;
+  application_deadline?: string;
   pricing: {
     ticket_price?: number;
+    booth_price?: number;
     currency: string;
   };
   capacity: {
@@ -31,13 +42,7 @@ interface Event {
     city?: string;
     state?: string;
   };
-  vendor_application?: {
-    id: number;
-    name: string;
-    description?: string;
-    categories: string[];
-    submissions_count: number;
-  };
+  vendor_applications?: VendorApplication[];
 }
 
 export default function PublicEventDetailPage() {
@@ -46,6 +51,18 @@ export default function PublicEventDetailPage() {
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const getDaysUntilDeadline = (deadline: string) => {
+    const now = new Date();
+    const deadlineDate = new Date(deadline);
+    const diffTime = deadlineDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return 'Applications closed';
+    if (diffDays === 0) return 'Applications close today';
+    if (diffDays === 1) return '1 day left until applications close';
+    return `${diffDays} days left until applications close`;
+  };
 
   useEffect(() => {
     if (slug) {
@@ -113,7 +130,7 @@ export default function PublicEventDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
       {/* Hero Section */}
-      <div className="relative h-[400px] overflow-hidden">
+      <div className="relative h-[180px] md:h-[300px] overflow-hidden">
         {event.poster_url ? (
           <img
             src={event.poster_url}
@@ -124,12 +141,12 @@ export default function PublicEventDetailPage() {
           <div className="w-full h-full bg-gradient-to-r from-purple-900 to-blue-900" />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-[#1a0d2e] via-[#1a0d2e]/80 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-8">
+        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
           <div className="max-w-6xl mx-auto">
-            <h1 className="text-4xl lg:text-5xl font-bold text-white mb-2">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
               {event.title}
             </h1>
-            <p className="text-white/80 text-lg">
+            <p className="text-white/80 text-base md:text-lg">
               Presented by {event.organization.name}
             </p>
           </div>
@@ -149,51 +166,79 @@ export default function PublicEventDetailPage() {
               </p>
             </div>
 
-            {/* Vendor Application Section */}
-            {event.vendor_application && (
+            {/* Vendor Applications Section */}
+            {event.vendor_applications && event.vendor_applications.length > 0 && (
               <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-white mb-4">
+                <h2 className="text-2xl font-bold text-white mb-2">
                   Vendor Opportunities
                 </h2>
-                <p className="text-lg text-purple-300 mb-4">
-                  {event.vendor_application.name}
-                </p>
-                {event.vendor_application.description && (
-                  <p className="text-white/80 mb-6 whitespace-pre-wrap">
-                    {event.vendor_application.description}
-                  </p>
-                )}
 
-                {/* Categories */}
-                {event.vendor_application.categories.length > 0 && (
-                  <div className="mb-6">
-                    <h3 className="text-sm font-semibold text-white/60 mb-2">
-                      Seeking Vendors In:
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {event.vendor_application.categories.map((category) => (
-                        <span
-                          key={category}
-                          className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
-                        >
-                          {category}
-                        </span>
-                      ))}
-                    </div>
+                {/* Application Deadline Timer */}
+                {event.application_deadline && (
+                  <div className="mb-6 flex items-center gap-2 text-purple-300">
+                    <Clock className="w-4 h-4" />
+                    <p className="text-sm font-medium">
+                      {getDaysUntilDeadline(event.application_deadline)}
+                    </p>
                   </div>
                 )}
 
-                <button
-                  onClick={() => navigate(`/events/${event.slug}/apply`)}
-                  className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
-                >
-                  Apply as Vendor
-                  <ArrowRight className="w-5 h-5" />
-                </button>
+                {/* Map through all vendor applications */}
+                <div className="space-y-6">
+                  {event.vendor_applications.map((application) => (
+                    <div key={application.id} className="pb-6 last:pb-0 border-b border-white/10 last:border-0">
+                      <p className="text-lg text-purple-300 mb-2">
+                        {application.name}
+                      </p>
 
-                <p className="text-white/40 text-sm mt-4">
-                  {event.vendor_application.submissions_count} vendors have applied
-                </p>
+                      {/* Booth Price */}
+                      {application.booth_price && (
+                        <p className="text-2xl font-bold text-white mb-4">
+                          ${Number(application.booth_price).toFixed(2)}
+                        </p>
+                      )}
+
+                      {application.description && (
+                        <p className="text-white/80 mb-6 whitespace-pre-wrap">
+                          {application.description}
+                        </p>
+                      )}
+
+                      {/* Categories */}
+                      {application.categories.length > 0 && (
+                        <div className="mb-6">
+                          <h3 className="text-sm font-semibold text-white/60 mb-2">
+                            Seeking Vendors In:
+                          </h3>
+                          <div className="flex flex-wrap gap-2">
+                            {application.categories.map((category) => (
+                              <span
+                                key={category}
+                                className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
+                              >
+                                {category}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <a
+                        href={`/events/${event.slug}/apply/${application.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
+                      >
+                        Apply as Vendor
+                        <ArrowRight className="w-5 h-5" />
+                      </a>
+
+                      <p className="text-white/40 text-sm mt-4">
+                        {application.submissions_count} vendors have applied
+                      </p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -266,6 +311,19 @@ export default function PublicEventDetailPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Powered by Voxxy Presents */}
+        <div className="mt-12 pt-8 border-t border-white/10">
+          <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
+            <span>Powered by</span>
+            <img
+              src="/VoxxyTriangle.svg"
+              alt="Voxxy"
+              className="w-4 h-4 opacity-60"
+            />
+            <span className="font-semibold">Voxxy Presents</span>
           </div>
         </div>
       </div>
