@@ -1411,4 +1411,108 @@ export const vendorContactsApi = {
   },
 }
 
+// Event Invitations API
+export interface EventInvitation {
+  id: number
+  event_id: number
+  vendor_contact_id: number
+  vendor_contact?: {
+    id: number
+    name: string
+    email: string
+    company_name: string
+    contact_type: string
+  }
+  event?: {
+    id: number
+    title: string
+    slug: string
+    description: string
+    event_date: string
+    location: string
+    application_deadline: string
+  }
+  status: 'pending' | 'sent' | 'viewed' | 'accepted' | 'declined' | 'expired'
+  invitation_token?: string
+  sent_at?: string
+  responded_at?: string
+  response_notes?: string
+  expires_at: string
+  created_at: string
+  updated_at: string
+  can_respond?: boolean
+  is_expired?: boolean
+}
+
+export const eventInvitationsApi = {
+  /**
+   * Create batch invitations for an event
+   * POST /api/v1/presents/events/:event_slug/invitations/batch
+   */
+  async createBatch(eventSlug: string, vendorContactIds: number[]) {
+    return fetchApi<{
+      invitations: EventInvitation[]
+      created_count: number
+      errors: any[]
+    }>(
+      `/v1/presents/events/${eventSlug}/invitations/batch`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ vendor_contact_ids: vendorContactIds }),
+      }
+    )
+  },
+
+  /**
+   * Get all invitations for an event
+   * GET /api/v1/presents/events/:event_slug/invitations
+   */
+  async getByEvent(eventSlug: string, params?: { status?: string }) {
+    const queryParams = new URLSearchParams()
+    if (params?.status) queryParams.append('status', params.status)
+
+    const query = queryParams.toString()
+    return fetchApi<{
+      invitations: EventInvitation[]
+      meta: {
+        total_count: number
+        pending_count: number
+        sent_count: number
+        accepted_count: number
+        declined_count: number
+        expired_count: number
+      }
+    }>(
+      `/v1/presents/events/${eventSlug}/invitations${query ? `?${query}` : ''}`
+    )
+  },
+
+  /**
+   * View invitation by token (public)
+   * GET /api/v1/presents/invitations/:token
+   */
+  async getByToken(token: string) {
+    return fetchApi<{ invitation: EventInvitation }>(
+      `/v1/presents/invitations/${token}`
+    )
+  },
+
+  /**
+   * Respond to invitation (public)
+   * PATCH /api/v1/presents/invitations/:token/respond
+   */
+  async respond(token: string, status: 'accepted' | 'declined', responseNotes?: string) {
+    return fetchApi<{ invitation: EventInvitation; message: string }>(
+      `/v1/presents/invitations/${token}/respond`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          status,
+          response_notes: responseNotes,
+        }),
+      }
+    )
+  },
+}
+
 export { ApiError }

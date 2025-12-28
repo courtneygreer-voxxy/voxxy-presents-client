@@ -194,7 +194,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
 
                   <div className="flex items-center gap-4 text-sm text-white/60 mb-3">
                     <span>{application.submissions_count} submissions</span>
-                    {application.pricing?.booth_price !== undefined && (
+                    {application.pricing?.booth_price != null && (
                       <>
                         <span>•</span>
                         <span className="text-green-400 font-medium">

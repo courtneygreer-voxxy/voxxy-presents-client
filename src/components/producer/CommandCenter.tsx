@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, MessageSquare, Users, Building2, Settings } from 'lucide-react';
-import MessageBoard from './MessageBoard';
+import { ArrowLeft, Users, Building2, Settings } from 'lucide-react';
 import EventSettings from './EventSettings';
 import ApplicationsTab from './ApplicationsTab';
 import VendorsTab from './VendorsTab';
@@ -34,13 +33,12 @@ interface CommandCenterProps {
   onDeleteEvent?: (eventSlug: string) => Promise<void>;
 }
 
-type Tab = 'messages' | 'applications' | 'vendors' | 'settings';
+type Tab = 'applications' | 'vendors' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent }: CommandCenterProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('messages');
+  const [activeTab, setActiveTab] = useState<Tab>('applications');
 
   const tabs = [
-    { id: 'messages' as Tab, label: 'Message Board', icon: MessageSquare },
     { id: 'applications' as Tab, label: 'Applications', icon: Users },
     { id: 'vendors' as Tab, label: 'Vendors', icon: Building2 },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
@@ -48,8 +46,6 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'messages':
-        return <MessageBoard />;
       case 'applications':
         return (
           <ApplicationsTab

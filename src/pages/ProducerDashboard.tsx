@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi, vendorApplicationsApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -218,8 +218,19 @@ export default function ProducerDashboard() {
       // Step 3: Handle invited contacts (if any)
       if (wizardState.inviteList.invitedContactIds.length > 0) {
         console.log(`Inviting ${wizardState.inviteList.invitedContactIds.length} contacts to event`);
-        // TODO: Create event invitations via API when backend endpoint is ready
-        // await eventInvitationsApi.createBatch(newEvent.slug, wizardState.inviteList.invitedContactIds);
+        try {
+          const result = await eventInvitationsApi.createBatch(
+            newEvent.slug,
+            wizardState.inviteList.invitedContactIds
+          );
+          console.log(`✅ ${result.created_count} invitations sent successfully`);
+          if (result.errors.length > 0) {
+            console.warn('Some invitations failed:', result.errors);
+          }
+        } catch (error) {
+          console.error('Failed to send invitations:', error);
+          // Don't throw - invitations are optional, event creation succeeded
+        }
       }
 
       // Step 4: Refresh events list and navigate back

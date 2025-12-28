@@ -25,6 +25,7 @@ const VendorApplicationForm = lazy(() => import('./pages/VendorApplicationForm')
 const ApplicationConfirmationPage = lazy(() => import('./pages/ApplicationConfirmationPage'))
 const ApplicationTrackingPage = lazy(() => import('./pages/ApplicationTrackingPage'))
 const ShortLinkRedirectPage = lazy(() => import('./pages/ShortLinkRedirectPage'))
+const InvitationViewPage = lazy(() => import('./pages/InvitationViewPage'))
 
 // Lazy load: Auth Pages (load on-demand)
 const LoginPage = lazy(() => import('./pages/LoginPage'))
@@ -131,6 +132,9 @@ export default function App() {
           <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
           <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
           <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />
+
+          {/* Public Invitation View Route */}
+          <Route path="/invitations/:token" element={<InvitationViewPage />} />
 
           {/* ==========================================
               AUTH ROUTES - Redirect if already logged in
