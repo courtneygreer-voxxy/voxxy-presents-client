@@ -46,7 +46,6 @@ export default function ViewApplicationSubmissions({
   const [filteredSubmissions, setFilteredSubmissions] = useState<Submission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedStatus, setSelectedStatus] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
 
@@ -56,7 +55,7 @@ export default function ViewApplicationSubmissions({
 
   useEffect(() => {
     filterSubmissions();
-  }, [submissions, selectedCategory, selectedStatus]);
+  }, [submissions, selectedStatus]);
 
   const fetchSubmissions = async () => {
     try {
@@ -74,10 +73,6 @@ export default function ViewApplicationSubmissions({
 
   const filterSubmissions = () => {
     let filtered = [...submissions];
-
-    if (selectedCategory) {
-      filtered = filtered.filter(s => s.vendor_category === selectedCategory);
-    }
 
     if (selectedStatus) {
       filtered = filtered.filter(s => s.status === selectedStatus);
@@ -162,22 +157,7 @@ export default function ViewApplicationSubmissions({
       {/* Filters */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-2">
-          <span className="text-white/60 text-sm self-center mr-2">Filter:</span>
-
-          {/* Category Filters */}
-          {application.categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(selectedCategory === category ? null : category)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                selectedCategory === category
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white/10 text-white/80 hover:bg-white/20'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+          <span className="text-white/60 text-sm self-center mr-2">Filter by Status:</span>
 
           {/* Status Filters */}
           {Object.entries(STATUS_LABELS).map(([status, label]) => (
@@ -194,15 +174,12 @@ export default function ViewApplicationSubmissions({
             </button>
           ))}
 
-          {(selectedCategory || selectedStatus) && (
+          {selectedStatus && (
             <button
-              onClick={() => {
-                setSelectedCategory(null);
-                setSelectedStatus(null);
-              }}
+              onClick={() => setSelectedStatus(null)}
               className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
             >
-              Clear Filters
+              Clear Filter
             </button>
           )}
 

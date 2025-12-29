@@ -54,6 +54,13 @@ export default function VendorApplicationForm() {
     }
   }, [slug, applicationId]);
 
+  // Auto-set vendor_category to application name when application loads
+  useEffect(() => {
+    if (application?.name) {
+      setFormData(prev => ({ ...prev, vendor_category: application.name }));
+    }
+  }, [application]);
+
   const fetchEvent = async (eventSlug: string, appId: string) => {
     try {
       setLoading(true);
@@ -277,26 +284,6 @@ export default function VendorApplicationForm() {
               />
             </div>
 
-            {/* Vendor Category */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Vendor Category *
-              </label>
-              <select
-                value={formData.vendor_category}
-                onChange={(e) => setFormData({ ...formData, vendor_category: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
-                required
-              >
-                <option value="" className="bg-[#1a0d2e]">Select a category...</option>
-                {application?.categories.map((category) => (
-                  <option key={category} value={category} className="bg-[#1a0d2e]">
-                    {category}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Subscribe Checkbox */}
             <div className="flex items-start gap-3">
               <input
@@ -395,22 +382,6 @@ export default function VendorApplicationForm() {
               </div>
             </div>
 
-            {/* Categories */}
-            {application?.categories && application.categories.length > 0 && (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-3">Vendor Categories</h3>
-                <div className="flex flex-wrap gap-2">
-                  {application.categories.map((category) => (
-                    <span
-                      key={category}
-                      className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
-                    >
-                      {category}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 

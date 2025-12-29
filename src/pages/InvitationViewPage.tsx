@@ -134,14 +134,6 @@ export default function InvitationViewPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Event Details */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">About This Event</h2>
-              <p className="text-white/80 whitespace-pre-wrap">
-                {invitation.event?.description || 'No description available.'}
-              </p>
-            </div>
-
             {/* Vendor Opportunities Section */}
             {invitation.event?.vendor_applications && invitation.event.vendor_applications.length > 0 && (
               <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
@@ -220,6 +212,35 @@ export default function InvitationViewPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Event Details from Organization */}
+            {invitation.event && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+                <div className="flex items-start gap-3">
+                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
+                  <div className="flex-1">
+                    <h3 className="text-sm font-semibold text-white/60 mb-1">
+                      Presented By
+                    </h3>
+                    <p className="text-white font-medium mb-2">
+                      {invitation.event.organization?.name || 'Event Organizer'}
+                    </p>
+                    {invitation.event.description && (
+                      <div className="mt-4 pt-4 border-t border-white/10">
+                        <div className="border-l-4 border-purple-400 pl-4">
+                          <p className="text-white/90 italic text-sm leading-relaxed whitespace-pre-wrap">
+                            "{invitation.event.description}"
+                          </p>
+                        </div>
+                        <p className="text-white/60 text-xs mt-3">
+                          — {invitation.event.organization?.name || 'Event Organizer'}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Date & Time */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <div className="flex items-start gap-3 mb-4">

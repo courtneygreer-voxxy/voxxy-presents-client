@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock } from 'lucide-react';
+import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock, Building2 } from 'lucide-react';
 import { eventsApi } from '@/services/api';
 
 interface VendorApplication {
@@ -158,14 +158,6 @@ export default function PublicEventDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
-            {/* Event Details */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h2 className="text-2xl font-bold text-white mb-4">About This Event</h2>
-              <p className="text-white/80 whitespace-pre-wrap">
-                {event.description || 'No description available.'}
-              </p>
-            </div>
-
             {/* Vendor Applications Section */}
             {event.vendor_applications && event.vendor_applications.length > 0 && (
               <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
@@ -245,6 +237,38 @@ export default function PublicEventDetailPage() {
 
           {/* Sidebar */}
           <div className="space-y-6">
+            {/* Organization Details */}
+            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+              <div className="flex items-start gap-3">
+                <Building2 className="w-5 h-5 text-purple-400 mt-1" />
+                <div className="flex-1">
+                  <h3 className="text-sm font-semibold text-white/60 mb-1">
+                    Presented By
+                  </h3>
+                  <p className="text-white font-medium mb-2">
+                    {event.organization.name}
+                  </p>
+                  {event.organization.city && event.organization.state && (
+                    <p className="text-white/60 text-sm mb-4">
+                      {event.organization.city}, {event.organization.state}
+                    </p>
+                  )}
+                  {event.description && (
+                    <div className="mt-4 pt-4 border-t border-white/10">
+                      <div className="border-l-4 border-purple-400 pl-4">
+                        <p className="text-white/90 italic text-sm leading-relaxed whitespace-pre-wrap">
+                          "{event.description}"
+                        </p>
+                      </div>
+                      <p className="text-white/60 text-xs mt-3">
+                        — {event.organization.name}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Date & Time */}
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <div className="flex items-start gap-3 mb-4">
