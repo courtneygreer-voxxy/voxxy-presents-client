@@ -22,6 +22,13 @@ interface CreateApplicationFormProps {
       currency: string;
     };
     categories: string[];
+    install?: {
+      install_date?: string;
+      install_start_time?: string;
+      install_end_time?: string;
+    };
+    payment_link?: string;
+    application_tags?: string;
     status: 'active' | 'inactive';
   };
 }
@@ -36,23 +43,33 @@ export default function CreateApplicationForm({
     name: existingApplication?.name || '',
     description: existingApplication?.description || '',
     booth_price: existingApplication?.pricing?.booth_price || 0,
+    install_date: existingApplication?.install?.install_date || '',
+    install_start_time: existingApplication?.install?.install_start_time || '',
+    install_end_time: existingApplication?.install?.install_end_time || '',
+    payment_link: existingApplication?.payment_link || '',
     status: existingApplication?.status || 'active' as 'active' | 'inactive',
   });
-  const [categories, setCategories] = useState<string[]>(existingApplication?.categories || []);
-  const [newCategory, setNewCategory] = useState('');
+
+  // Initialize tags from application_tags (comma-separated string)
+  const [tags, setTags] = useState<string[]>(
+    existingApplication?.application_tags
+      ? existingApplication.application_tags.split(',').map(t => t.trim()).filter(t => t)
+      : []
+  );
+  const [newTag, setNewTag] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAddCategory = () => {
-    const trimmed = newCategory.trim();
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategories([...categories, trimmed]);
-      setNewCategory('');
+  const handleAddTag = () => {
+    const trimmed = newTag.trim();
+    if (trimmed && !tags.includes(trimmed)) {
+      setTags([...tags, trimmed]);
+      setNewTag('');
     }
   };
 
-  const handleRemoveCategory = (category: string) => {
-    setCategories(categories.filter(c => c !== category));
+  const handleRemoveTag = (tag: string) => {
+    setTags(tags.filter(t => t !== tag));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -77,7 +94,11 @@ export default function CreateApplicationForm({
         description: formData.description.trim() || undefined,
         booth_price: formData.booth_price,
         status: formData.status,
-        categories,
+        install_date: formData.install_date || undefined,
+        install_start_time: formData.install_start_time || undefined,
+        install_end_time: formData.install_end_time || undefined,
+        payment_link: formData.payment_link || undefined,
+        application_tags: tags.length > 0 ? tags.join(',') : undefined,
       };
 
       if (existingApplication) {
@@ -181,6 +202,73 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
             </div>
           </div>
 
+          {/* Install Date */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-white mb-2">
+              Install Date (Optional)
+            </label>
+            <p className="text-white/50 text-sm mb-2">
+              When vendors should arrive to set up their booth
+            </p>
+            <input
+              type="date"
+              value={formData.install_date}
+              onChange={(e) =>
+                setFormData({ ...formData, install_date: e.target.value })
+              }
+              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+            />
+          </div>
+
+          {/* Install Times */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Install Start Time
+              </label>
+              <input
+                type="time"
+                value={formData.install_start_time}
+                onChange={(e) =>
+                  setFormData({ ...formData, install_start_time: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-white mb-2">
+                Install End Time
+              </label>
+              <input
+                type="time"
+                value={formData.install_end_time}
+                onChange={(e) =>
+                  setFormData({ ...formData, install_end_time: e.target.value })
+                }
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+              />
+            </div>
+          </div>
+
+          {/* Payment Link */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-white mb-2">
+              Payment Link (Optional)
+            </label>
+            <p className="text-white/50 text-sm mb-2">
+              URL where vendors can pay for this booth type
+            </p>
+            <input
+              type="url"
+              value={formData.payment_link}
+              onChange={(e) =>
+                setFormData({ ...formData, payment_link: e.target.value })
+              }
+              placeholder="https://example.com/pay"
+              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+            />
+          </div>
+
           {/* Event Info (Read-only) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -209,62 +297,62 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
           </div>
         </div>
 
-        {/* Vendor Categories */}
+        {/* Application Tags */}
         <div className="bg-white/5 border border-white/10 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-semibold text-white">Vendor Categories</h2>
+            <h2 className="text-xl font-semibold text-white">Application Tags</h2>
           </div>
           <p className="text-sm text-white/60 mb-4">
-            Define categories with descriptions that vendors will see
+            Add tags to help categorize this application type
           </p>
 
-          {/* Add Category Input */}
+          {/* Add Tag Input */}
           <div className="flex gap-2 mb-4">
             <input
               type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
+              value={newTag}
+              onChange={(e) => setNewTag(e.target.value)}
               onKeyPress={(e) => {
                 if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleAddCategory();
+                  handleAddTag();
                 }
               }}
-              placeholder="e.g., Artist, Food Vendor, Crafts"
+              placeholder="e.g., handmade, food, jewelry"
               className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
             />
             <button
               type="button"
-              onClick={handleAddCategory}
+              onClick={handleAddTag}
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Add Category
+              Add Tag
             </button>
           </div>
 
-          {/* Categories List */}
-          {categories.length === 0 ? (
+          {/* Tags List */}
+          {tags.length === 0 ? (
             <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
-              <p className="text-white/40 text-sm">No categories added yet</p>
+              <p className="text-white/40 text-sm">No tags added yet</p>
               <p className="text-white/30 text-xs mt-1">
-                Categories help vendors understand what you're looking for
+                Tags help categorize and organize applications
               </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              {categories.map((category, index) => (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className="flex items-center justify-between px-4 py-3 rounded-lg bg-white/10 border border-white/20"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-sm"
                 >
-                  <span className="text-white">{category}</span>
+                  <span>{tag}</span>
                   <button
                     type="button"
-                    onClick={() => handleRemoveCategory(category)}
-                    className="text-white/60 hover:text-red-400 transition-colors"
+                    onClick={() => handleRemoveTag(tag)}
+                    className="text-white/70 hover:text-white transition-colors"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3 h-3" />
                   </button>
                 </div>
               ))}

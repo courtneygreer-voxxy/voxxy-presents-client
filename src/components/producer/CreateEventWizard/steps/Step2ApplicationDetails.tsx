@@ -1,4 +1,5 @@
-import { Plus, X } from 'lucide-react';
+import { useState } from 'react';
+import { Plus, X, Tag } from 'lucide-react';
 import { WizardStepProps, ApplicationRow } from '../types';
 
 const MAX_APPLICATIONS = 20;
@@ -10,6 +11,9 @@ export default function Step2ApplicationDetails({
   setErrors,
 }: WizardStepProps) {
   const { applicationDetails } = wizardState;
+
+  // State to manage tag input values for each application
+  const [tagInputs, setTagInputs] = useState<Record<string, string>>({});
 
   const handleApplicationChange = (
     id: string,
@@ -46,6 +50,11 @@ export default function Step2ApplicationDetails({
       name: '',
       booth_price: 0,
       description: '',
+      install_date: '',
+      install_start_time: '',
+      install_end_time: '',
+      payment_link: '',
+      application_tags: [],
     };
 
     updateWizardState({
@@ -74,6 +83,55 @@ export default function Step2ApplicationDetails({
       }
     });
     setErrors(newErrors);
+  };
+
+  const addTag = (appId: string) => {
+    const tagValue = tagInputs[appId]?.trim();
+    if (!tagValue) return;
+
+    const app = applicationDetails.applications.find((a) => a.id === appId);
+    if (!app) return;
+
+    const currentTags = app.application_tags || [];
+
+    // Prevent duplicate tags
+    if (currentTags.includes(tagValue)) {
+      return;
+    }
+
+    const updatedApplications = applicationDetails.applications.map((a) =>
+      a.id === appId
+        ? { ...a, application_tags: [...currentTags, tagValue] }
+        : a
+    );
+
+    updateWizardState({
+      applicationDetails: {
+        ...applicationDetails,
+        applications: updatedApplications,
+      },
+    });
+
+    // Clear the input
+    setTagInputs((prev) => ({ ...prev, [appId]: '' }));
+  };
+
+  const removeTag = (appId: string, tagToRemove: string) => {
+    const app = applicationDetails.applications.find((a) => a.id === appId);
+    if (!app) return;
+
+    const updatedTags = (app.application_tags || []).filter((tag) => tag !== tagToRemove);
+
+    const updatedApplications = applicationDetails.applications.map((a) =>
+      a.id === appId ? { ...a, application_tags: updatedTags } : a
+    );
+
+    updateWizardState({
+      applicationDetails: {
+        ...applicationDetails,
+        applications: updatedApplications,
+      },
+    });
   };
 
   return (
@@ -216,6 +274,158 @@ export default function Step2ApplicationDetails({
                         rows={2}
                         className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
                       />
+                    </div>
+
+                    {/* Install Date */}
+                    <div>
+                      <label
+                        htmlFor={`app_install_date_${app.id}`}
+                        className="block text-white/90 text-sm font-medium mb-2"
+                      >
+                        Install Date (Optional)
+                      </label>
+                      <p className="text-white/50 text-xs mb-2">
+                        When vendors should arrive to set up their booth
+                      </p>
+                      <input
+                        id={`app_install_date_${app.id}`}
+                        type="date"
+                        value={app.install_date || ''}
+                        onChange={(e) =>
+                          handleApplicationChange(app.id, 'install_date', e.target.value)
+                        }
+                        className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+
+                    {/* Install Times */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label
+                          htmlFor={`app_install_start_${app.id}`}
+                          className="block text-white/90 text-sm font-medium mb-2"
+                        >
+                          Install Start Time
+                        </label>
+                        <input
+                          id={`app_install_start_${app.id}`}
+                          type="time"
+                          value={app.install_start_time || ''}
+                          onChange={(e) =>
+                            handleApplicationChange(app.id, 'install_start_time', e.target.value)
+                          }
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        />
+                      </div>
+
+                      <div>
+                        <label
+                          htmlFor={`app_install_end_${app.id}`}
+                          className="block text-white/90 text-sm font-medium mb-2"
+                        >
+                          Install End Time
+                        </label>
+                        <input
+                          id={`app_install_end_${app.id}`}
+                          type="time"
+                          value={app.install_end_time || ''}
+                          onChange={(e) =>
+                            handleApplicationChange(app.id, 'install_end_time', e.target.value)
+                          }
+                          className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Payment Link */}
+                    <div>
+                      <label
+                        htmlFor={`app_payment_link_${app.id}`}
+                        className="block text-white/90 text-sm font-medium mb-2"
+                      >
+                        Payment Link (Optional)
+                      </label>
+                      <p className="text-white/50 text-xs mb-2">
+                        URL where vendors can pay for this booth type
+                      </p>
+                      <input
+                        id={`app_payment_link_${app.id}`}
+                        type="url"
+                        value={app.payment_link || ''}
+                        onChange={(e) =>
+                          handleApplicationChange(app.id, 'payment_link', e.target.value)
+                        }
+                        placeholder="https://example.com/pay"
+                        className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                      />
+                    </div>
+
+                    {/* Application Tags */}
+                    <div>
+                      <label
+                        htmlFor={`app_tags_${app.id}`}
+                        className="block text-white/90 text-sm font-medium mb-2"
+                      >
+                        Application Tags (Optional)
+                      </label>
+                      <p className="text-white/50 text-xs mb-2">
+                        Add tags to help categorize this application type
+                      </p>
+
+                      {/* Tag Input with Add Button */}
+                      <div className="flex gap-2 mb-3">
+                        <div className="relative flex-1">
+                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
+                          <input
+                            id={`app_tags_${app.id}`}
+                            type="text"
+                            value={tagInputs[app.id] || ''}
+                            onChange={(e) =>
+                              setTagInputs((prev) => ({ ...prev, [app.id]: e.target.value }))
+                            }
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addTag(app.id);
+                              }
+                            }}
+                            placeholder="e.g., handmade, food, jewelry"
+                            className="w-full pl-10 pr-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => addTag(app.id)}
+                          className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors flex items-center gap-2"
+                          aria-label="Add tag"
+                        >
+                          <Plus className="w-4 h-4" />
+                          Add
+                        </button>
+                      </div>
+
+                      {/* Display Added Tags */}
+                      {app.application_tags && app.application_tags.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {app.application_tags.map((tag, tagIndex) => (
+                            <div
+                              key={tagIndex}
+                              className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-sm"
+                            >
+                              <Tag className="w-3 h-3" />
+                              <span>{tag}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeTag(app.id, tag)}
+                                className="text-white/70 hover:text-white transition-colors"
+                                aria-label={`Remove ${tag} tag`}
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

@@ -21,8 +21,14 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       title: '',
       description: '',
       event_date: '',
-      application_deadline: '',
+      event_end_date: '',
+      start_time: '',
+      end_time: '',
+      venue: '',
       location: '',
+      age_restriction: '',
+      ticket_link: '',
+      application_deadline: '',
     },
     applicationDetails: {
       applications: [],
@@ -48,18 +54,14 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
     const newErrors: Record<string, string> = {};
     const { eventDetails } = wizardState;
 
+    // Event name (required)
     if (!eventDetails.title.trim()) {
       newErrors.title = 'Event name is required';
     } else if (eventDetails.title.trim().length < 3) {
       newErrors.title = 'Event name must be at least 3 characters';
     }
 
-    if (!eventDetails.description.trim()) {
-      newErrors.description = 'Description is required';
-    } else if (eventDetails.description.trim().length < 10) {
-      newErrors.description = 'Description must be at least 10 characters';
-    }
-
+    // Event date (required)
     if (!eventDetails.event_date) {
       newErrors.event_date = 'Event date is required';
     } else {
@@ -71,6 +73,16 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       }
     }
 
+    // End date validation (if provided, must be after start date)
+    if (eventDetails.event_end_date && eventDetails.event_date) {
+      const startDate = new Date(eventDetails.event_date);
+      const endDate = new Date(eventDetails.event_end_date);
+      if (endDate < startDate) {
+        newErrors.event_end_date = 'End date must be on or after the start date';
+      }
+    }
+
+    // Application deadline (required)
     if (!eventDetails.application_deadline) {
       newErrors.application_deadline = 'Application deadline is required';
     } else if (eventDetails.event_date) {
@@ -81,9 +93,12 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       }
     }
 
+    // Location (required)
     if (!eventDetails.location.trim()) {
       newErrors.location = 'Location is required';
     }
+
+    // Description is now optional - no validation needed
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

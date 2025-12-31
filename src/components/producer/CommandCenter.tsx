@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, Building2, Settings } from 'lucide-react';
+import { ArrowLeft, Users, Building2, Settings, Info } from 'lucide-react';
 import EventSettings from './EventSettings';
 import ApplicationsTab from './ApplicationsTab';
 import VendorsTab from './VendorsTab';
+import EventDetailsTab from './EventDetailsTab';
 
 interface Event {
   id: number;
@@ -11,7 +12,13 @@ interface Event {
   description?: string;
   event_date?: string;
   event_end_date?: string;
+  start_time?: string;
+  end_time?: string;
+  venue?: string;
   location?: string;
+  age_restriction?: string;
+  ticket_link?: string;
+  application_deadline?: string;
   status?: {
     published?: boolean;
     registration_open?: boolean;
@@ -33,12 +40,13 @@ interface CommandCenterProps {
   onDeleteEvent?: (eventSlug: string) => Promise<void>;
 }
 
-type Tab = 'applications' | 'vendors' | 'settings';
+type Tab = 'details' | 'applications' | 'vendors' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent }: CommandCenterProps) {
-  const [activeTab, setActiveTab] = useState<Tab>('applications');
+  const [activeTab, setActiveTab] = useState<Tab>('details');
 
   const tabs = [
+    { id: 'details' as Tab, label: 'Event Details', icon: Info },
     { id: 'applications' as Tab, label: 'Applications', icon: Users },
     { id: 'vendors' as Tab, label: 'Vendors', icon: Building2 },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
@@ -46,6 +54,13 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
 
   const renderTabContent = () => {
     switch (activeTab) {
+      case 'details':
+        return (
+          <EventDetailsTab
+            event={event}
+            onUpdate={onUpdateEvent}
+          />
+        );
       case 'applications':
         return (
           <ApplicationsTab

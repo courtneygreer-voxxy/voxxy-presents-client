@@ -1,0 +1,237 @@
+// Google Places Service for Voxxy Presents Web App
+// Uses backend proxy to keep API key secure (matches mobile app pattern)
+
+import { getApiUrl } from '@/config/environments';
+
+const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+
+// Types matching Google Places API responses
+export interface PlacePrediction {
+  place_id: string;
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+    main_text_matched_substrings?: Array<{
+      offset: number;
+      length: number;
+    }>;
+  };
+  types: string[];
+}
+
+export interface PlaceDetails {
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  formatted_address: string;
+  address_components: Array<{
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }>;
+}
+
+export interface LocationData {
+  neighborhood: string;
+  city: string;
+  state: string;
+  country: string;
+  formatted: string;
+  latitude: number | null;
+  longitude: number | null;
+  place_id: string;
+}
+
+class GooglePlacesService {
+  /**
+   * Search for places using Google Places Autocomplete API (via backend proxy)
+   * @param input - Search query
+   * @param types - Place types ('geocode' for all locations, '(cities)' for cities only, 'establishment' for businesses)
+   * @returns Array of place predictions
+   */
+  async searchPlaces(
+    input: string,
+    types: string = 'establishment'
+  ): Promise<PlacePrediction[]> {
+    if (!input || input.length < 2) {
+      return [];
+    }
+
+    try {
+      const url = `${API_BASE_URL}/places/search?query=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Places search failed:', response.status);
+        return [];
+      }
+
+      const data = await response.json();
+
+      if (data.results && Array.isArray(data.results)) {
+        return data.results;
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Error searching places:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get place details including coordinates
+   * @param placeId - Google Places place ID
+   * @returns Place details with geometry
+   */
+  async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
+    try {
+      const url = `${API_BASE_URL}/places/details?place_id=${encodeURIComponent(placeId)}`;
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.error('Place details fetch failed:', response.status);
+        return null;
+      }
+
+      const data = await response.json();
+
+      if (data.details) {
+        return data.details;
+      }
+
+      return null;
+    } catch (error) {
+      console.error('Error fetching place details:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Parse location data from place prediction and details
+   * Extracts city, state, coordinates, etc. in a standardized format
+   * Prioritizes address_components for accuracy (ignores street addresses)
+   * @param place - Place prediction from autocomplete
+   * @param placeDetails - Optional detailed place info
+   * @returns Standardized location data object
+   */
+  parseLocationData(
+    place: PlacePrediction,
+    placeDetails: PlaceDetails | null = null
+  ): LocationData {
+    let neighborhood = '';
+    let city = '';
+    let state = '';
+    let country = '';
+    let latitude: number | null = null;
+    let longitude: number | null = null;
+
+    // PRIORITY 1: Extract from address_components if available (most reliable)
+    if (placeDetails?.address_components) {
+      placeDetails.address_components.forEach((component) => {
+        const types = component.types;
+
+        if (types.includes('neighborhood') || types.includes('sublocality')) {
+          neighborhood = component.long_name;
+        } else if (types.includes('locality')) {
+          city = component.long_name;
+        } else if (types.includes('administrative_area_level_1')) {
+          state = component.short_name;
+        } else if (types.includes('country')) {
+          country = component.short_name;
+        }
+      });
+    }
+
+    // Extract coordinates
+    if (placeDetails?.geometry?.location) {
+      latitude = placeDetails.geometry.location.lat;
+      longitude = placeDetails.geometry.location.lng;
+    }
+
+    // PRIORITY 2: Fallback to structured_formatting ONLY if we don't have city/state
+    // This ensures we don't override accurate address_components with street addresses
+    if ((!city || !state) && place.structured_formatting) {
+      const secondary = place.structured_formatting.secondary_text;
+
+      if (secondary && secondary.includes(',')) {
+        const secondaryParts = secondary.split(', ').map(part => part.trim());
+
+        // For venues, secondary text might be:
+        // "123 Main St, Brooklyn, NY" (3+ parts - skip first if it's a street)
+        // "Brooklyn, NY" (2 parts - this is what we want)
+        // "New York, NY, USA" (3 parts - middle is what we want)
+
+        if (secondaryParts.length >= 3) {
+          // Likely format: "Street, City, State" or "City, State, Country"
+          // Take the second-to-last as city, last as state (skip street/country)
+          if (!city) {
+            city = secondaryParts[secondaryParts.length - 2];
+          }
+          if (!state) {
+            state = secondaryParts[secondaryParts.length - 1];
+          }
+        } else if (secondaryParts.length === 2) {
+          // Format: "City, State" - perfect!
+          if (!city) {
+            city = secondaryParts[0];
+          }
+          if (!state) {
+            state = secondaryParts[1];
+          }
+        }
+      }
+    }
+
+    // Create formatted address (always just city, state - never street address)
+    let formattedAddress = '';
+    if (city && state) {
+      formattedAddress = `${city}, ${state}`;
+    } else if (city) {
+      formattedAddress = city;
+    }
+
+    return {
+      neighborhood,
+      city,
+      state,
+      country,
+      formatted: formattedAddress,
+      latitude,
+      longitude,
+      place_id: place.place_id,
+    };
+  }
+
+  /**
+   * Extract just the city from a location for auto-filling the location field
+   * @param locationData - Parsed location data
+   * @returns City and state formatted for display
+   */
+  getCityDisplay(locationData: LocationData): string {
+    if (locationData.city && locationData.state) {
+      return `${locationData.city}, ${locationData.state}`;
+    } else if (locationData.city) {
+      return locationData.city;
+    }
+    return '';
+  }
+}
+
+export default new GooglePlacesService();

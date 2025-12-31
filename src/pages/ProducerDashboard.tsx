@@ -184,24 +184,37 @@ export default function ProducerDashboard() {
     }
 
     try {
-      // Step 1: Create the event with application_deadline
+      // Step 1: Create the event with all event fields including new ones
       const newEvent = await eventsApi.create(organization.slug, {
         title: wizardState.eventDetails.title,
-        description: wizardState.eventDetails.description,
+        description: wizardState.eventDetails.description || undefined,
         event_date: wizardState.eventDetails.event_date,
-        application_deadline: wizardState.eventDetails.application_deadline,
+        event_end_date: wizardState.eventDetails.event_end_date || undefined,
+        start_time: wizardState.eventDetails.start_time || undefined,
+        end_time: wizardState.eventDetails.end_time || undefined,
+        venue: wizardState.eventDetails.venue || undefined,
         location: wizardState.eventDetails.location,
+        age_restriction: wizardState.eventDetails.age_restriction || undefined,
+        ticket_link: wizardState.eventDetails.ticket_link || undefined,
+        application_deadline: wizardState.eventDetails.application_deadline,
         status: 'draft',
         published: false,
       });
 
-      // Step 2: Batch create vendor applications with booth_price
+      // Step 2: Batch create vendor applications with all application fields
       if (wizardState.applicationDetails.applications.length > 0) {
         const applicationPromises = wizardState.applicationDetails.applications.map((app) => {
           return vendorApplicationsApi.create(newEvent.slug, {
             name: app.name,
             description: app.description || undefined,
             booth_price: app.booth_price,
+            install_date: app.install_date || undefined,
+            install_start_time: app.install_start_time || undefined,
+            install_end_time: app.install_end_time || undefined,
+            payment_link: app.payment_link || undefined,
+            application_tags: app.application_tags && app.application_tags.length > 0
+              ? app.application_tags.join(',')
+              : undefined,
             status: 'active',
           });
         });

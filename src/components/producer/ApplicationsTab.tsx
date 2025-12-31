@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Eye, Calendar, Link2, Check } from 'lucide-react';
+import { Plus, Edit, Eye, Calendar, Link2, Check, Clock, DollarSign, Tag } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import ViewApplicationSubmissions from './ViewApplicationSubmissions';
@@ -19,6 +19,13 @@ interface VendorApplication {
     booth_price: number;
     currency: string;
   };
+  install?: {
+    install_date?: string;
+    install_start_time?: string;
+    install_end_time?: string;
+  };
+  payment_link?: string;
+  application_tags?: string;
 }
 
 interface Event {
@@ -67,6 +74,22 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
       month: 'short',
       day: 'numeric',
     });
+  };
+
+  const formatTime = (timeString?: string) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
   };
 
   const handleSuccess = () => {
@@ -205,6 +228,66 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                     <span>•</span>
                     <span>Created {formatDate(application.created_at)}</span>
                   </div>
+
+                  {/* Application Details */}
+                  {(application.install?.install_date || application.payment_link || application.application_tags) && (
+                    <div className="bg-white/5 border border-white/10 rounded-lg p-3 mb-3 space-y-2">
+                      {/* Install Info */}
+                      {application.install?.install_date && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <Calendar className="w-4 h-4 text-white/60 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <span className="text-white/60">Install Date:</span>{' '}
+                            <span className="text-white">{formatDate(application.install.install_date)}</span>
+                            {(application.install?.install_start_time || application.install?.install_end_time) && (
+                              <span className="text-white/80">
+                                {' '}({formatTime(application.install.install_start_time)}
+                                {application.install.install_end_time && ` - ${formatTime(application.install.install_end_time)}`})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Payment Link */}
+                      {application.payment_link && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <DollarSign className="w-4 h-4 text-white/60 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <span className="text-white/60">Payment Link:</span>{' '}
+                            <a
+                              href={application.payment_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-purple-400 hover:text-purple-300 underline break-all"
+                            >
+                              {application.payment_link}
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Tags */}
+                      {application.application_tags && (
+                        <div className="flex items-start gap-2 text-sm">
+                          <Tag className="w-4 h-4 text-white/60 mt-0.5 flex-shrink-0" />
+                          <div className="flex-1">
+                            <span className="text-white/60">Tags:</span>{' '}
+                            <div className="flex flex-wrap gap-1.5 mt-1">
+                              {application.application_tags.split(',').map((tag, idx) => (
+                                <span
+                                  key={idx}
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-xs"
+                                >
+                                  {tag.trim()}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
                   {/* Shareable Link */}
                   <div className="bg-white/5 border border-white/10 rounded-lg p-3">

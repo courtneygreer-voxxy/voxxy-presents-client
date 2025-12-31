@@ -18,8 +18,16 @@ export default function ShortLinkRedirectPage() {
         // Lookup the event by shareable code
         const eventData = await vendorApplicationsApi.lookupByCode(code);
 
+        // Extract the application ID from the vendor_applications array
+        if (!eventData.vendor_applications || eventData.vendor_applications.length === 0) {
+          setError('No active applications found for this event');
+          return;
+        }
+
+        const applicationId = eventData.vendor_applications[0].id;
+
         // Redirect to the vendor application form for this event
-        navigate(`/events/${eventData.slug}/apply`, { replace: true });
+        navigate(`/events/${eventData.slug}/apply/${applicationId}`, { replace: true });
       } catch (err: any) {
         console.error('Failed to lookup application:', err);
         setError(err.message || 'Application not found');

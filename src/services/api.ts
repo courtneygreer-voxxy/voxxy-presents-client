@@ -551,7 +551,12 @@ export const eventsApi = {
     description?: string
     event_date?: string
     event_end_date?: string
+    start_time?: string
+    end_time?: string
+    venue?: string
     location?: string
+    age_restriction?: string
+    ticket_link?: string
     application_deadline?: string
     poster_url?: string
     ticket_url?: string
@@ -576,7 +581,12 @@ export const eventsApi = {
     description: string
     event_date: string
     event_end_date: string
+    start_time: string
+    end_time: string
+    venue: string
     location: string
+    age_restriction: string
+    ticket_link: string
     poster_url: string
     ticket_url: string
     ticket_price: number
@@ -699,6 +709,11 @@ export const vendorApplicationsApi = {
     booth_price?: number
     status?: 'active' | 'inactive'
     categories?: string[]
+    install_date?: string
+    install_start_time?: string
+    install_end_time?: string
+    payment_link?: string
+    application_tags?: string
   }) {
     return fetchApi<any>(`/v1/presents/events/${eventSlug}/vendor_applications`, {
       method: 'POST',
@@ -716,6 +731,11 @@ export const vendorApplicationsApi = {
     booth_price: number
     status: 'active' | 'inactive'
     categories: string[]
+    install_date: string
+    install_start_time: string
+    install_end_time: string
+    payment_link: string
+    application_tags: string
   }>) {
     return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
       method: 'PATCH',
