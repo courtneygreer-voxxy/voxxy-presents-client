@@ -10,6 +10,13 @@ interface VendorApplication {
   categories: string[];
   booth_price?: number;
   submissions_count?: number;
+  install?: {
+    install_date?: string;
+    install_start_time?: string;
+    install_end_time?: string;
+  };
+  payment_link?: string;
+  application_tags?: string;
 }
 
 interface Event {
@@ -170,6 +177,22 @@ export default function VendorApplicationForm() {
       hour: 'numeric',
       minute: '2-digit',
     });
+  };
+
+  const formatTimeString = (timeString?: string) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
   };
 
   return (
@@ -345,6 +368,67 @@ export default function VendorApplicationForm() {
                 <p className="text-white/80 text-sm whitespace-pre-wrap">
                   {event.description}
                 </p>
+              </div>
+            )}
+
+            {/* Application Details */}
+            {(application?.install?.install_date || application?.payment_link || application?.application_tags) && (
+              <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Application Details</h3>
+                <div className="space-y-4">
+                  {/* Install Information */}
+                  {application.install?.install_date && (
+                    <div className="flex items-start gap-3">
+                      <Calendar className="w-5 h-5 text-purple-400 mt-0.5" />
+                      <div>
+                        <p className="text-white/60 text-sm">Setup/Install Date</p>
+                        <p className="text-white text-sm">{formatDate(application.install.install_date)}</p>
+                        {(application.install.install_start_time || application.install.install_end_time) && (
+                          <p className="text-white/80 text-xs mt-1">
+                            {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
+                            {application.install.install_start_time && application.install.install_end_time && ' - '}
+                            {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Payment Link */}
+                  {application.payment_link && (
+                    <div className="flex items-start gap-3">
+                      <Clock className="w-5 h-5 text-purple-400 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-white/60 text-sm mb-1">Payment</p>
+                        <a
+                          href={application.payment_link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-purple-400 hover:text-purple-300 text-sm underline break-all"
+                        >
+                          Payment Link
+                        </a>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {application.application_tags && (
+                    <div>
+                      <p className="text-white/60 text-sm mb-2">Categories</p>
+                      <div className="flex flex-wrap gap-2">
+                        {application.application_tags.split(',').map((tag, idx) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs"
+                          >
+                            {tag.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

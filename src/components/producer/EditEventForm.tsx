@@ -9,8 +9,14 @@ interface Event {
   dates?: {
     start?: string;
     end?: string;
+    start_time?: string;
+    end_time?: string;
   };
+  venue?: string;
   location?: string;
+  age_restriction?: string;
+  ticket_link?: string;
+  application_deadline?: string;
   status?: {
     published?: boolean;
     status?: string;
@@ -24,7 +30,14 @@ interface EditEventFormProps {
     title: string;
     description: string;
     event_date: string;
+    event_end_date?: string;
+    start_time?: string;
+    end_time?: string;
+    venue?: string;
     location: string;
+    age_restriction?: string;
+    ticket_link?: string;
+    application_deadline?: string;
   }) => Promise<void>;
   onDelete: (eventSlug: string) => Promise<void>;
 }
@@ -37,7 +50,14 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
     title: event.title || '',
     description: event.description || '',
     event_date: event.dates?.start ? event.dates.start.split('T')[0] : '',
+    event_end_date: event.dates?.end ? event.dates.end.split('T')[0] : '',
+    start_time: event.dates?.start_time || '',
+    end_time: event.dates?.end_time || '',
+    venue: event.venue || '',
     location: event.location || '',
+    age_restriction: event.age_restriction || '',
+    ticket_link: event.ticket_link || '',
+    application_deadline: event.application_deadline ? event.application_deadline.split('T')[0] : '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -207,13 +227,14 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
             )}
           </div>
 
-          {/* Date and Location Row */}
+          {/* Event Dates */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Date */}
+            {/* Event Date */}
             <div>
               <label htmlFor="event_date" className="block text-white/90 font-medium mb-2">
-                Date *
+                Event Date *
               </label>
+              <p className="text-white/50 text-xs mb-2">Start date for multi-day events</p>
               <input
                 id="event_date"
                 type="date"
@@ -228,17 +249,81 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               )}
             </div>
 
-            {/* Location */}
+            {/* Event End Date */}
+            <div>
+              <label htmlFor="event_end_date" className="block text-white/90 font-medium mb-2">
+                Event End Date
+              </label>
+              <p className="text-white/50 text-xs mb-2">Optional for multi-day events</p>
+              <input
+                id="event_end_date"
+                type="date"
+                value={formData.event_end_date}
+                onChange={(e) => handleChange('event_end_date', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Event Times */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Start Time */}
+            <div>
+              <label htmlFor="start_time" className="block text-white/90 font-medium mb-2">
+                Start Time
+              </label>
+              <input
+                id="start_time"
+                type="time"
+                value={formData.start_time}
+                onChange={(e) => handleChange('start_time', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            {/* End Time */}
+            <div>
+              <label htmlFor="end_time" className="block text-white/90 font-medium mb-2">
+                End Time
+              </label>
+              <input
+                id="end_time"
+                type="time"
+                value={formData.end_time}
+                onChange={(e) => handleChange('end_time', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Venue & Location */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Venue */}
+            <div>
+              <label htmlFor="venue" className="block text-white/90 font-medium mb-2">
+                Venue
+              </label>
+              <input
+                id="venue"
+                type="text"
+                value={formData.venue}
+                onChange={(e) => handleChange('venue', e.target.value)}
+                placeholder="e.g., Brooklyn Steel"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            {/* Location (City) */}
             <div>
               <label htmlFor="location" className="block text-white/90 font-medium mb-2">
-                Location *
+                Location (City) *
               </label>
               <input
                 id="location"
                 type="text"
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
-                placeholder="e.g., Central Park Plaza"
+                placeholder="e.g., Brooklyn, NY"
                 className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
                   errors.location ? 'border-red-500' : 'border-white/10'
                 } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
@@ -247,6 +332,50 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 <p className="mt-1 text-sm text-red-400">{errors.location}</p>
               )}
             </div>
+          </div>
+
+          {/* Age Restriction */}
+          <div>
+            <label htmlFor="age_restriction" className="block text-white/90 font-medium mb-2">
+              Age Restriction
+            </label>
+            <input
+              id="age_restriction"
+              type="text"
+              value={formData.age_restriction}
+              onChange={(e) => handleChange('age_restriction', e.target.value)}
+              placeholder="e.g., All Ages, 18+, 21+"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Ticket Link */}
+          <div>
+            <label htmlFor="ticket_link" className="block text-white/90 font-medium mb-2">
+              Ticket Link
+            </label>
+            <input
+              id="ticket_link"
+              type="url"
+              value={formData.ticket_link}
+              onChange={(e) => handleChange('ticket_link', e.target.value)}
+              placeholder="https://example.com/tickets"
+              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+            />
+          </div>
+
+          {/* Application Deadline */}
+          <div>
+            <label htmlFor="application_deadline" className="block text-white/90 font-medium mb-2">
+              Application Deadline
+            </label>
+            <input
+              id="application_deadline"
+              type="date"
+              value={formData.application_deadline}
+              onChange={(e) => handleChange('application_deadline', e.target.value)}
+              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+            />
           </div>
         </div>
 

@@ -61,6 +61,22 @@ export default function InvitationViewPage() {
     });
   };
 
+  const formatTimeString = (timeString?: string) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
@@ -226,13 +242,11 @@ export default function InvitationViewPage() {
                     </p>
                     {invitation.event.description && (
                       <div className="mt-4 pt-4 border-t border-white/10">
-                        <div className="border-l-4 border-purple-400 pl-4">
-                          <p className="text-white/90 italic text-sm leading-relaxed whitespace-pre-wrap">
-                            "{invitation.event.description}"
-                          </p>
-                        </div>
-                        <p className="text-white/60 text-xs mt-3">
-                          — {invitation.event.organization?.name || 'Event Organizer'}
+                        <h4 className="text-sm font-semibold text-white/60 mb-2">
+                          Event Description
+                        </h4>
+                        <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+                          {invitation.event.description}
                         </p>
                       </div>
                     )}
@@ -245,13 +259,40 @@ export default function InvitationViewPage() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <div className="flex items-start gap-3 mb-4">
                 <Calendar className="w-5 h-5 text-purple-400 mt-1" />
-                <div>
+                <div className="flex-1">
                   <h3 className="text-sm font-semibold text-white/60 mb-1">Date & Time</h3>
                   <p className="text-white">
-                    {invitation.event?.event_date ? formatDate(invitation.event.event_date) : 'TBA'}
+                    {invitation.event?.dates?.start
+                      ? formatDate(invitation.event.dates.start)
+                      : invitation.event?.event_date
+                        ? formatDate(invitation.event.event_date)
+                        : 'TBA'}
                   </p>
+                  {invitation.event?.dates?.end && (
+                    <p className="text-white/80 text-sm mt-1">
+                      to {formatDate(invitation.event.dates.end)}
+                    </p>
+                  )}
+                  {(invitation.event?.dates?.start_time || invitation.event?.dates?.end_time) && (
+                    <p className="text-white/60 text-sm mt-2">
+                      {invitation.event.dates.start_time && formatTimeString(invitation.event.dates.start_time)}
+                      {invitation.event.dates.start_time && invitation.event.dates.end_time && ' - '}
+                      {invitation.event.dates.end_time && formatTimeString(invitation.event.dates.end_time)}
+                    </p>
+                  )}
                 </div>
               </div>
+
+              {/* Venue */}
+              {invitation.event?.venue && (
+                <div className="flex items-start gap-3 mb-4">
+                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/60 mb-1">Venue</h3>
+                    <p className="text-white">{invitation.event.venue}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Location */}
               {invitation.event?.location && (
@@ -260,6 +301,17 @@ export default function InvitationViewPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-white/60 mb-1">Location</h3>
                     <p className="text-white">{invitation.event.location}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Age Restriction */}
+              {invitation.event?.age_restriction && (
+                <div className="flex items-start gap-3 mb-4">
+                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/60 mb-1">Age Restriction</h3>
+                    <p className="text-white">{invitation.event.age_restriction}</p>
                   </div>
                 </div>
               )}

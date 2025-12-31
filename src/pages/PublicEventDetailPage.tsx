@@ -20,10 +20,15 @@ interface Event {
   dates: {
     start?: string;
     end?: string;
+    start_time?: string;
+    end_time?: string;
   };
+  venue?: string;
   location?: string;
+  age_restriction?: string;
   poster_url?: string;
   ticket_url?: string;
+  ticket_link?: string;
   application_deadline?: string;
   pricing: {
     ticket_price?: number;
@@ -100,6 +105,22 @@ export default function PublicEventDetailPage() {
       hour: 'numeric',
       minute: '2-digit',
     });
+  };
+
+  const formatTimeString = (timeString?: string) => {
+    if (!timeString) return '';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
   };
 
   if (loading) {
@@ -255,13 +276,11 @@ export default function PublicEventDetailPage() {
                   )}
                   {event.description && (
                     <div className="mt-4 pt-4 border-t border-white/10">
-                      <div className="border-l-4 border-purple-400 pl-4">
-                        <p className="text-white/90 italic text-sm leading-relaxed whitespace-pre-wrap">
-                          "{event.description}"
-                        </p>
-                      </div>
-                      <p className="text-white/60 text-xs mt-3">
-                        — {event.organization.name}
+                      <h4 className="text-sm font-semibold text-white/60 mb-2">
+                        Event Description
+                      </h4>
+                      <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+                        {event.description}
                       </p>
                     </div>
                   )}
@@ -273,18 +292,36 @@ export default function PublicEventDetailPage() {
             <div className="bg-white/5 border border-white/10 rounded-lg p-6">
               <div className="flex items-start gap-3 mb-4">
                 <Calendar className="w-5 h-5 text-purple-400 mt-1" />
-                <div>
+                <div className="flex-1">
                   <h3 className="text-sm font-semibold text-white/60 mb-1">Date & Time</h3>
                   <p className="text-white">
                     {formatDate(event.dates.start)}
                   </p>
-                  {event.dates.start && (
-                    <p className="text-white/60 text-sm">
-                      {formatTime(event.dates.start)}
+                  {event.dates.end && (
+                    <p className="text-white/80 text-sm mt-1">
+                      to {formatDate(event.dates.end)}
+                    </p>
+                  )}
+                  {(event.dates.start_time || event.dates.end_time) && (
+                    <p className="text-white/60 text-sm mt-2">
+                      {event.dates.start_time && formatTimeString(event.dates.start_time)}
+                      {event.dates.start_time && event.dates.end_time && ' - '}
+                      {event.dates.end_time && formatTimeString(event.dates.end_time)}
                     </p>
                   )}
                 </div>
               </div>
+
+              {/* Venue */}
+              {event.venue && (
+                <div className="flex items-start gap-3 mb-4">
+                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/60 mb-1">Venue</h3>
+                    <p className="text-white">{event.venue}</p>
+                  </div>
+                </div>
+              )}
 
               {/* Location */}
               {event.location && (
@@ -293,6 +330,17 @@ export default function PublicEventDetailPage() {
                   <div>
                     <h3 className="text-sm font-semibold text-white/60 mb-1">Location</h3>
                     <p className="text-white">{event.location}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Age Restriction */}
+              {event.age_restriction && (
+                <div className="flex items-start gap-3 mb-4">
+                  <Users className="w-5 h-5 text-purple-400 mt-1" />
+                  <div>
+                    <h3 className="text-sm font-semibold text-white/60 mb-1">Age Restriction</h3>
+                    <p className="text-white">{event.age_restriction}</p>
                   </div>
                 </div>
               )}
@@ -323,9 +371,9 @@ export default function PublicEventDetailPage() {
                     </p>
                   </div>
                 </div>
-                {event.ticket_url && (
+                {(event.ticket_link || event.ticket_url) && (
                   <a
-                    href={event.ticket_url}
+                    href={event.ticket_link || event.ticket_url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-4 block text-center px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"

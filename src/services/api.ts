@@ -1448,8 +1448,16 @@ export interface EventInvitation {
     title: string
     slug: string
     description: string
-    event_date: string
+    dates?: {
+      start?: string
+      end?: string
+      start_time?: string
+      end_time?: string
+    }
+    event_date?: string  // Legacy support
+    venue?: string
     location: string
+    age_restriction?: string
     poster_url?: string
     application_deadline: string
     organization?: {
