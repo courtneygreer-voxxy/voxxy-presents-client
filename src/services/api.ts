@@ -1079,6 +1079,28 @@ export interface VendorContactsListResponse {
   }
 }
 
+export interface BulkImportResult {
+  success: boolean
+  summary: {
+    total_rows: number
+    created: number
+    updated: number
+    skipped: number
+    failed: number
+  }
+  errors: Array<{
+    row: number
+    field: string
+    message: string
+  }>
+}
+
+export interface BulkImportOptions {
+  skipDuplicates?: boolean
+  updateExisting?: boolean
+  tags?: string[]
+}
+
 export const vendorContactsApi = {
   /**
    * Get all vendor contacts for an organization
@@ -1428,6 +1450,43 @@ export const vendorContactsApi = {
         }),
       }
     )
+  },
+
+  /**
+   * Bulk import vendor contacts from CSV file
+   * POST /api/v1/presents/vendor_contacts/bulk_import
+   */
+  async bulkImport(
+    file: File,
+    options: BulkImportOptions = {}
+  ): Promise<BulkImportResult> {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('skip_duplicates', String(options.skipDuplicates ?? true))
+    formData.append('update_existing', String(options.updateExisting ?? false))
+
+    if (options.tags && options.tags.length > 0) {
+      formData.append('tags', JSON.stringify(options.tags))
+    }
+
+    const response = await fetch(
+      `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+          // Don't set Content-Type - browser will set it with boundary for multipart
+        },
+        body: formData,
+      }
+    )
+
+    if (!response.ok) {
+      const error = await response.json()
+      throw new Error(error.error || 'Import failed')
+    }
+
+    return response.json()
   },
 }
 

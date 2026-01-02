@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
+import { CSVUploadModal } from './CSVUploadModal';
 
 interface NetworkPageProps {
   organizationId: number;
@@ -16,6 +17,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showCSVUploadModal, setShowCSVUploadModal] = useState(false);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
 
   useEffect(() => {
@@ -237,13 +239,22 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'}
           </p>
         </div>
-        <button
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-        >
-          <UserPlus className="w-4 h-4" />
-          Add Contact
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCSVUploadModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all"
+          >
+            <Upload className="w-4 h-4" />
+            Import CSV
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+          >
+            <UserPlus className="w-4 h-4" />
+            Add Contact
+          </button>
+        </div>
       </div>
 
       {/* Search & Actions bar */}
@@ -312,6 +323,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               prev.map(c => (c.id === updatedContact.id ? updatedContact : c))
             );
             setEditingContact(null);
+          }}
+        />
+      )}
+
+      {showCSVUploadModal && (
+        <CSVUploadModal
+          open={showCSVUploadModal}
+          onClose={() => setShowCSVUploadModal(false)}
+          onSuccess={() => {
+            // Refresh contacts list after successful import
+            fetchContacts();
           }}
         />
       )}
