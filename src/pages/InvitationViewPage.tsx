@@ -181,6 +181,24 @@ export default function InvitationViewPage() {
                 </div>
               )}
 
+              {/* Tickets */}
+              {(invitation.event?.ticket_link || invitation.event?.ticket_url) && (
+                <div className="flex items-start gap-3">
+                  <DollarSign className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Event Info</p>
+                    <a
+                      href={invitation.event.ticket_link || invitation.event.ticket_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-400 hover:text-purple-300 text-sm"
+                    >
+                      View Details
+                    </a>
+                  </div>
+                </div>
+              )}
+
               {/* Invited By */}
               {invitation.vendor_contact && (
                 <div className="flex items-start gap-3">

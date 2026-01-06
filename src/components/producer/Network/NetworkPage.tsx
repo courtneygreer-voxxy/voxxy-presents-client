@@ -20,9 +20,14 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [showCSVUploadModal, setShowCSVUploadModal] = useState(false);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
 
+  // Filter states
+  const [locationFilter, setLocationFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [featuredFilter, setFeaturedFilter] = useState('');
+
   useEffect(() => {
     fetchContacts();
-  }, [organizationId]);
+  }, [organizationId, locationFilter, categoryFilter, featuredFilter]);
 
   const fetchContacts = async () => {
     try {
@@ -31,6 +36,9 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
+        location: locationFilter || undefined,
+        category: categoryFilter || undefined,
+        featured: featuredFilter || undefined,
       });
 
       // Handle different response formats
@@ -85,6 +93,27 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       alert(err.message || 'Failed to delete contact');
     }
   };
+
+  const handleToggleFeatured = async (contactId: number) => {
+    try {
+      const contact = contacts.find(c => c.id === contactId);
+      if (!contact) return;
+
+      const updatedContact = await vendorContactsApi.update(contactId, {
+        featured: !contact.featured,
+      });
+
+      setContacts(prev =>
+        prev.map(c => (c.id === contactId ? updatedContact : c))
+      );
+    } catch (err: any) {
+      alert(err.message || 'Failed to update featured status');
+    }
+  };
+
+  // Get unique locations and categories for filter dropdowns
+  const uniqueLocations = Array.from(new Set(contacts.map(c => c.location).filter(Boolean))) as string[];
+  const uniqueCategories = Array.from(new Set(contacts.flatMap(c => c.categories || []))).sort();
 
   // Loading state
   if (loading) {
@@ -257,6 +286,66 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         </div>
       </div>
 
+      {/* Filter dropdowns */}
+      <div className="flex items-center gap-3 flex-wrap">
+        {/* Location Filter */}
+        <div className="relative">
+          <select
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+            className="pl-3 pr-8 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white appearance-none cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="" className="bg-gray-900">All Locations</option>
+            {uniqueLocations.map(location => (
+              <option key={location} value={location} className="bg-gray-900">{location}</option>
+            ))}
+          </select>
+          <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+        </div>
+
+        {/* Category Filter */}
+        <div className="relative">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="pl-3 pr-8 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white appearance-none cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="" className="bg-gray-900">All Categories</option>
+            {uniqueCategories.map(category => (
+              <option key={category} value={category} className="bg-gray-900">{category}</option>
+            ))}
+          </select>
+          <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+        </div>
+
+        {/* Featured/Voxxy Card Filter */}
+        <div className="relative">
+          <select
+            value={featuredFilter}
+            onChange={(e) => setFeaturedFilter(e.target.value)}
+            className="pl-3 pr-8 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white appearance-none cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="" className="bg-gray-900">All Contacts</option>
+            <option value="true" className="bg-gray-900">Voxxy Cards Only</option>
+          </select>
+          <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+        </div>
+
+        {/* Clear Filters Button */}
+        {(locationFilter || categoryFilter || featuredFilter) && (
+          <button
+            onClick={() => {
+              setLocationFilter('');
+              setCategoryFilter('');
+              setFeaturedFilter('');
+            }}
+            className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
+          >
+            Clear Filters
+          </button>
+        )}
+      </div>
+
       {/* Search & Actions bar */}
       <div className="flex items-center gap-2">
         <div className="flex-1 relative">
@@ -300,6 +389,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         onSelectAll={handleSelectAll}
         onDeleteContact={handleDeleteContact}
         onEditContact={(contact) => setEditingContact(contact)}
+        onToggleFeatured={handleToggleFeatured}
       />
 
       {/* Modals */}

@@ -1424,6 +1424,9 @@ export const vendorContactsApi = {
     contact_type?: string
     status?: string
     tags?: string[]
+    location?: string
+    category?: string
+    featured?: string
     page?: number
     per_page?: number
     sort?: string
@@ -1434,6 +1437,9 @@ export const vendorContactsApi = {
     if (params?.search) queryParams.append('search', params.search)
     if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
     if (params?.status) queryParams.append('status', params.status)
+    if (params?.location) queryParams.append('location', params.location)
+    if (params?.category) queryParams.append('category', params.category)
+    if (params?.featured) queryParams.append('featured', params.featured)
     if (params?.page) queryParams.append('page', params.page.toString())
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
     if (params?.sort) queryParams.append('sort', params.sort)
