@@ -61,7 +61,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
           <EventDetailsTab
             event={event}
             onUpdate={onUpdateEvent}
-            onNavigateToTab={setActiveTab}
+            onNavigateToTab={(tab) => setActiveTab(tab as Tab)}
           />
         );
       case 'applications':
