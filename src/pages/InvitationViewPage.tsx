@@ -205,7 +205,7 @@ export default function InvitationViewPage() {
                   <Mail className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-white/60 text-xs mb-1">Invited By</p>
-                    <p className="text-white text-sm">{invitation.event?.organization?.name || invitation.vendor_contact.company_name || invitation.vendor_contact.name}</p>
+                    <p className="text-white text-sm">{invitation.event?.organization?.name || invitation.vendor_contact.business_name || invitation.vendor_contact.name}</p>
                   </div>
                 </div>
               )}
