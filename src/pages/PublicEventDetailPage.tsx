@@ -129,6 +129,16 @@ export default function PublicEventDetailPage() {
     }
   };
 
+  const normalizeUrl = (url?: string) => {
+    if (!url) return '';
+    // If URL already has a protocol, return as-is
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return url;
+    }
+    // Otherwise, prepend https://
+    return `https://${url}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
@@ -230,7 +240,7 @@ export default function PublicEventDetailPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-white/60 text-xs mb-1">Tickets</p>
                     <a
-                      href={event.ticket_link || event.ticket_url}
+                      href={normalizeUrl(event.ticket_link || event.ticket_url)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-purple-400 hover:text-purple-300 text-sm"
