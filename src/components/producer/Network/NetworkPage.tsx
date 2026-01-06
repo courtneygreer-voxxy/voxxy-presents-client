@@ -230,26 +230,26 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-white">My Vendor Network</h2>
-          <p className="text-white/50 text-xs mt-0.5">
-            {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'}
+          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">Network</h2>
+          <p className="text-base text-white/60">
+            Manage your professional contacts and relationships
           </p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowCSVUploadModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
           >
             <Upload className="w-4 h-4" />
-            Import CSV
+            <span className="hidden sm:inline">Import CSV</span>
           </button>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
           >
             <UserPlus className="w-4 h-4" />
             Add Contact

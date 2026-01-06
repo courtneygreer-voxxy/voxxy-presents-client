@@ -86,14 +86,14 @@ export default function EventsList({
   return (
     <div className="px-4 lg:px-6 py-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white mb-1">Events</h1>
-          <p className="text-white/60">Manage your event bookings and applications</p>
+          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Events</h1>
+          <p className="text-base text-white/60">Manage your event postings and applications</p>
         </div>
         <button
           onClick={onCreateEvent}
-          className="flex items-center gap-2 px-4 py-2 lg:px-6 lg:py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-105 transition-all text-sm lg:text-base"
+          className="flex items-center gap-2 px-4 py-2.5 lg:px-6 lg:py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg hover:scale-105 transition-all text-sm lg:text-base"
         >
           <Plus className="w-4 h-4 lg:w-5 lg:h-5" />
           <span className="hidden sm:inline">Create New Event</span>
@@ -116,37 +116,43 @@ export default function EventsList({
             return (
               <div
                 key={event.id}
-                className="bg-white/5 rounded-xl p-4 lg:p-6 border border-white/10 hover:border-purple-500/30 transition-all"
+                className="bg-[#1e1536] rounded-xl p-5 lg:p-6 border border-purple-500/20 hover:border-purple-500/40 transition-all shadow-lg"
               >
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                   {/* Event Info */}
                   <div className="flex-1">
-                    <div className="flex items-start gap-3 mb-2">
-                      <h3 className="text-lg lg:text-xl font-semibold text-white">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-xl lg:text-2xl font-bold text-white">
                         {event.title}
                       </h3>
                       <span
-                        className={`px-2.5 py-1 rounded-full text-xs font-medium ${badge.color}`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${badge.color}`}
                       >
                         {badge.label}
                       </span>
                     </div>
 
                     {event.description && (
-                      <p className="text-white/60 text-sm mb-3 line-clamp-2">
+                      <p className="text-white/70 text-sm mb-3 line-clamp-2">
                         {event.description}
                       </p>
                     )}
 
                     {/* Event Meta */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-white/50">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-4 h-4" />
+                    <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-purple-400" />
                         <span>{formatEventDate(event)}</span>
                       </div>
-                      <span>•</span>
+                      {event.location && (
+                        <>
+                          <span className="text-white/30">•</span>
+                          <span>{event.location}</span>
+                        </>
+                      )}
+                      <span className="text-white/30">•</span>
                       <span>{applicantCount} applicants</span>
-                      <span>•</span>
+                      <span className="text-white/30">•</span>
                       <span>{acceptedCount} accepted</span>
                     </div>
                   </div>
@@ -154,17 +160,17 @@ export default function EventsList({
                   {/* Action Buttons */}
                   <div className="flex gap-2 lg:gap-3">
                     <button
-                      onClick={() => onEditEvent(event.slug)}
-                      className="flex items-center gap-2 px-3 py-2 lg:px-4 lg:py-2 rounded-lg border border-white/20 text-white/90 hover:bg-white/5 hover:text-white transition-all text-sm"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                      <span className="hidden sm:inline">Edit</span>
-                    </button>
-                    <button
                       onClick={() => onCommandCenter(event.slug)}
-                      className="px-3 py-2 lg:px-4 lg:py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-105 transition-all text-sm"
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/30 hover:scale-105 transition-all text-sm whitespace-nowrap"
                     >
                       Command Center
+                    </button>
+                    <button
+                      onClick={() => onEditEvent(event.slug)}
+                      className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/30 text-white/90 hover:bg-white/5 hover:text-white hover:border-white/50 transition-all text-sm"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      <span>Edit</span>
                     </button>
                   </div>
                 </div>

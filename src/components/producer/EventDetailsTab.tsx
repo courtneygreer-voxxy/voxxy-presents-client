@@ -12,15 +12,23 @@ import {
   Tag,
   AlertCircle,
   Check,
-  Copy
+  Copy,
+  Mail,
+  Settings,
+  ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
-import { eventsApi } from '@/services/api';
+import { eventsApi, vendorApplicationsApi } from '@/services/api';
 
 interface Event {
   id: number;
   slug: string;
   title: string;
   description?: string;
+  event_date?: string;
+  event_end_date?: string;
+  start_time?: string;
+  end_time?: string;
   dates?: {
     start?: string;
     end?: string;
@@ -37,20 +45,35 @@ interface Event {
 interface EventDetailsTabProps {
   event: Event;
   onUpdate?: (eventSlug: string, updates: any) => Promise<void>;
+  onNavigateToTab?: (tab: string) => void;
 }
 
-export default function EventDetailsTab({ event, onUpdate }: EventDetailsTabProps) {
+interface ApplicationStats {
+  total: number;
+  new: number;
+  approved: number;
+  waitlisted: number;
+}
+
+export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: EventDetailsTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [stats, setStats] = useState<ApplicationStats>({
+    total: 0,
+    new: 0,
+    approved: 0,
+    waitlisted: 0,
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
   const [formData, setFormData] = useState({
     title: event.title || '',
     description: event.description || '',
-    event_date: event.dates?.start || '',
-    event_end_date: event.dates?.end || '',
-    start_time: event.dates?.start_time || '',
-    end_time: event.dates?.end_time || '',
+    event_date: event.event_date || event.dates?.start || '',
+    event_end_date: event.event_end_date || event.dates?.end || '',
+    start_time: event.start_time || event.dates?.start_time || '',
+    end_time: event.end_time || event.dates?.end_time || '',
     venue: event.venue || '',
     location: event.location || '',
     age_restriction: event.age_restriction || '',
@@ -63,10 +86,10 @@ export default function EventDetailsTab({ event, onUpdate }: EventDetailsTabProp
     setFormData({
       title: event.title || '',
       description: event.description || '',
-      event_date: event.dates?.start || '',
-      event_end_date: event.dates?.end || '',
-      start_time: event.dates?.start_time || '',
-      end_time: event.dates?.end_time || '',
+      event_date: event.event_date || event.dates?.start || '',
+      event_end_date: event.event_end_date || event.dates?.end || '',
+      start_time: event.start_time || event.dates?.start_time || '',
+      end_time: event.end_time || event.dates?.end_time || '',
       venue: event.venue || '',
       location: event.location || '',
       age_restriction: event.age_restriction || '',
@@ -74,6 +97,50 @@ export default function EventDetailsTab({ event, onUpdate }: EventDetailsTabProp
       application_deadline: event.application_deadline || '',
     });
   }, [event]);
+
+  // Fetch application stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoadingStats(true);
+        const applications = await vendorApplicationsApi.getByEvent(event.slug);
+
+        // Calculate stats from all applications
+        let totalApplicants = 0;
+        let newApplicants = 0;
+        let approvedApplicants = 0;
+        let waitlistedApplicants = 0;
+
+        for (const app of applications) {
+          try {
+            const submissions = await vendorApplicationsApi.getSubmissions(app.id);
+            totalApplicants += submissions.length;
+
+            submissions.forEach((sub: any) => {
+              if (sub.status === 'pending') newApplicants++;
+              if (sub.status === 'approved') approvedApplicants++;
+              if (sub.status === 'waitlist') waitlistedApplicants++;
+            });
+          } catch (err) {
+            console.error('Failed to fetch submissions for app', app.id, err);
+          }
+        }
+
+        setStats({
+          total: totalApplicants,
+          new: newApplicants,
+          approved: approvedApplicants,
+          waitlisted: waitlistedApplicants,
+        });
+      } catch (err) {
+        console.error('Failed to fetch stats:', err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, [event.slug]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -84,10 +151,10 @@ export default function EventDetailsTab({ event, onUpdate }: EventDetailsTabProp
     setFormData({
       title: event.title || '',
       description: event.description || '',
-      event_date: event.dates?.start || '',
-      event_end_date: event.dates?.end || '',
-      start_time: event.dates?.start_time || '',
-      end_time: event.dates?.end_time || '',
+      event_date: event.event_date || event.dates?.start || '',
+      event_end_date: event.event_end_date || event.dates?.end || '',
+      start_time: event.start_time || event.dates?.start_time || '',
+      end_time: event.end_time || event.dates?.end_time || '',
       venue: event.venue || '',
       location: event.location || '',
       age_restriction: event.age_restriction || '',
@@ -161,366 +228,426 @@ export default function EventDetailsTab({ event, onUpdate }: EventDetailsTabProp
     }
   };
 
-  if (isEditing) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-white">Edit Event Details</h2>
-            <p className="text-white/60 text-sm mt-1">Update your event information</p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={handleCancel}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50"
-            >
-              <X className="w-4 h-4" />
-              Cancel
-            </button>
-            <button
-              onClick={handleSave}
-              disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg transition-all disabled:opacity-50"
-            >
-              <Save className="w-4 h-4" />
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
-          </div>
-        </div>
-
-        {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-            <span>{error}</span>
-          </div>
-        )}
-
-        <div className="bg-white/5 rounded-xl p-6 space-y-6">
-          {/* Event Name */}
-          <div>
-            <label className="block text-white/90 font-medium mb-2">Event Name *</label>
-            <input
-              type="text"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Event Description */}
-          <div>
-            <label className="block text-white/90 font-medium mb-2">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={4}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
-            />
-          </div>
-
-          {/* Venue & Location */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Venue</label>
-              <input
-                type="text"
-                value={formData.venue}
-                onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
-                placeholder="e.g., Brooklyn Steel"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Location (City) *</label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g., Brooklyn, NY"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Event Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Event Date *</label>
-              <p className="text-white/50 text-xs mb-2">Start date for multi-day events</p>
-              <input
-                type="date"
-                value={formData.event_date}
-                onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Event End Date</label>
-              <p className="text-white/50 text-xs mb-2">Optional for multi-day events</p>
-              <input
-                type="date"
-                value={formData.event_end_date}
-                onChange={(e) => setFormData({ ...formData, event_end_date: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Event Times */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Start Time</label>
-              <input
-                type="time"
-                value={formData.start_time}
-                onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-            <div>
-              <label className="block text-white/90 font-medium mb-2">End Time</label>
-              <input
-                type="time"
-                value={formData.end_time}
-                onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-          </div>
-
-          {/* Age Restriction */}
-          <div>
-            <label className="block text-white/90 font-medium mb-2">Age Restriction</label>
-            <input
-              type="text"
-              value={formData.age_restriction}
-              onChange={(e) => setFormData({ ...formData, age_restriction: e.target.value })}
-              placeholder="e.g., All Ages, 18+, 21+"
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Ticket Link */}
-          <div>
-            <label className="block text-white/90 font-medium mb-2">Ticket Link</label>
-            <input
-              type="url"
-              value={formData.ticket_link}
-              onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
-              placeholder="https://example.com/tickets"
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-
-          {/* Application Deadline */}
-          <div>
-            <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
-            <input
-              type="date"
-              value={formData.application_deadline}
-              onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // View Mode
   return (
     <div className="p-6 space-y-6">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Event Details</h2>
-          <p className="text-white/60 text-sm mt-1">View and manage your event information</p>
-        </div>
-        <button
-          onClick={handleEdit}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg transition-all"
+      {/* Dashboard Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Applicants Card */}
+        <div
+          onClick={() => onNavigateToTab?.('applications')}
+          className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all group cursor-pointer"
         >
-          <Edit2 className="w-4 h-4" />
-          Edit Details
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-3 rounded-lg bg-purple-500/20">
+              <Users className="w-6 h-6 text-purple-400" />
+            </div>
+            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          </div>
+          <div className="mb-2">
+            <p className="text-white/60 text-sm mb-1">Total Applicants</p>
+            <p className="text-3xl font-bold text-white">
+              {loadingStats ? '...' : stats.total}
+            </p>
+          </div>
+          <div className="flex items-center gap-3 text-xs text-white/50">
+            <span>{stats.new} new</span>
+            <span>•</span>
+            <span>{stats.approved} approved</span>
+            <span>•</span>
+            <span>{stats.waitlisted} waitlisted</span>
+          </div>
+        </div>
+
+        {/* Confirmed Vendors Card */}
+        <div
+          onClick={() => onNavigateToTab?.('vendors')}
+          className="bg-[#1e1536] rounded-xl p-5 border border-green-500/20 hover:border-green-500/40 transition-all group cursor-pointer"
+        >
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-3 rounded-lg bg-green-500/20">
+              <Check className="w-6 h-6 text-green-400" />
+            </div>
+            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          </div>
+          <div className="mb-2">
+            <p className="text-white/60 text-sm mb-1">Confirmed Vendors</p>
+            <p className="text-3xl font-bold text-white">
+              {loadingStats ? '...' : stats.approved}
+            </p>
+          </div>
+          <p className="text-xs text-white/50">Approved & paid vendors ready for event</p>
+        </div>
+
+        {/* Next Scheduled Email Card */}
+        <div className="bg-[#1e1536] rounded-xl p-5 border border-blue-500/20 hover:border-blue-500/40 transition-all group cursor-pointer opacity-60">
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-3 rounded-lg bg-blue-500/20">
+              <Mail className="w-6 h-6 text-blue-400" />
+            </div>
+            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          </div>
+          <div className="mb-2">
+            <p className="text-white/60 text-sm mb-1">Next Scheduled Email</p>
+            <p className="text-lg font-semibold text-white">Coming Soon</p>
+          </div>
+          <p className="text-xs text-white/50">Email automation features coming soon</p>
+        </div>
+
+        {/* Event Settings Card */}
+        <div
+          onClick={handleEdit}
+          className="bg-[#1e1536] rounded-xl p-5 border border-orange-500/20 hover:border-orange-500/40 transition-all group cursor-pointer"
+        >
+          <div className="flex items-start justify-between mb-3">
+            <div className="p-3 rounded-lg bg-orange-500/20">
+              <Settings className="w-6 h-6 text-orange-400" />
+            </div>
+            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          </div>
+          <div className="mb-2">
+            <p className="text-white/60 text-sm mb-1">Event Settings</p>
+            <p className="text-lg font-semibold text-white">Edit Event Details</p>
+          </div>
+          <p className="text-xs text-white/50">Update venue, dates, categories, and more</p>
+        </div>
+      </div>
+
+      {/* Link Sharing Buttons */}
+      <div className="grid grid-cols-2 gap-4">
+        {/* Copy Link Button */}
+        <button
+          onClick={handleCopyUrl}
+          className="flex items-center justify-between p-4 bg-[#1e1536] rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+              {copied ? (
+                <Check className="w-5 h-5 text-green-400" />
+              ) : (
+                <Copy className="w-5 h-5 text-purple-400" />
+              )}
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">
+                {copied ? 'Link Copied!' : 'Copy Link'}
+              </p>
+              <p className="text-xs text-white/60">Share event URL</p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
         </button>
+
+        {/* View Link Button */}
+        <a
+          href={publicEventUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-between p-4 bg-[#1e1536] rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-all group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-lg bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors">
+              <ExternalLink className="w-5 h-5 text-blue-400" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-white">View Link</p>
+              <p className="text-xs text-white/60">Open event page</p>
+            </div>
+          </div>
+          <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+        </a>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Basic Info Card */}
-        <div className="bg-white/5 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
-
-          <div>
-            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-              <Tag className="w-4 h-4" />
-              Event Name
-            </div>
-            <p className="text-white font-medium">{event.title}</p>
-          </div>
-
-          {event.description && (
+      {/* Edit Form (Hidden by default) */}
+      {isEditing && (
+        <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
+          <div className="flex items-center justify-between pb-4 border-b border-white/10">
             <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <AlertCircle className="w-4 h-4" />
-                Description
-              </div>
-              <p className="text-white/80">{event.description}</p>
+              <h3 className="text-xl font-bold text-white">Edit Event Details</h3>
+              <p className="text-white/60 text-sm mt-1">Update your event information</p>
             </div>
-          )}
-
-          {event.venue && (
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Building2 className="w-4 h-4" />
-                Venue
-              </div>
-              <p className="text-white">{event.venue}</p>
-            </div>
-          )}
-
-          <div>
-            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-              <MapPin className="w-4 h-4" />
-              Location
-            </div>
-            <p className="text-white">{event.location || 'Not set'}</p>
-          </div>
-
-          {event.age_restriction && (
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Users className="w-4 h-4" />
-                Age Restriction
-              </div>
-              <p className="text-white">{event.age_restriction}</p>
-            </div>
-          )}
-
-          {event.ticket_link && (
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <LinkIcon className="w-4 h-4" />
-                Ticket Link
-              </div>
-              <a
-                href={event.ticket_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 underline break-all"
+            <div className="flex gap-2">
+              <button
+                onClick={handleCancel}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all disabled:opacity-50"
               >
-                {event.ticket_link}
-              </a>
+                <X className="w-4 h-4" />
+                Cancel
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                <Save className="w-4 h-4" />
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
             </div>
-          )}
-        </div>
-
-        {/* Date & Time Card */}
-        <div className="bg-white/5 rounded-xl p-6 space-y-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Date & Time</h3>
-
-          <div>
-            <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-              <Calendar className="w-4 h-4" />
-              Event Date
-            </div>
-            <p className="text-white">{formatDate(event.dates?.start)}</p>
           </div>
 
-          {event.dates?.end && (
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Calendar className="w-4 h-4" />
-                Event End Date
-              </div>
-              <p className="text-white">{formatDate(event.dates.end)}</p>
+          {error && (
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+              <span>{error}</span>
             </div>
           )}
 
-          {event.dates?.start_time && (
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-6">
+            {/* Event Name */}
             <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Clock className="w-4 h-4" />
-                Start Time
-              </div>
-              <p className="text-white">{formatTime(event.dates.start_time)}</p>
+              <label className="block text-white/90 font-medium mb-2">Event Name *</label>
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
             </div>
-          )}
 
-          {event.dates?.end_time && (
+            {/* Event Description */}
             <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Clock className="w-4 h-4" />
-                End Time
-              </div>
-              <p className="text-white">{formatTime(event.dates.end_time)}</p>
+              <label className="block text-white/90 font-medium mb-2">Description</label>
+              <textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              />
             </div>
-          )}
 
-          {event.application_deadline && (
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Calendar className="w-4 h-4" />
-                Application Deadline
-              </div>
-              <p className="text-white">{formatDate(event.application_deadline)}</p>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Public Event URL Card - Split Design */}
-      <div className="bg-gradient-to-r from-purple-600/10 to-blue-600/10 border-2 border-purple-500/30 rounded-xl overflow-hidden">
-        <div className="grid grid-cols-2 divide-x divide-purple-500/30">
-          {/* Left Side - Copy Link */}
-          <button
-            onClick={handleCopyUrl}
-            className="group relative p-6 hover:bg-purple-600/20 transition-all text-left"
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
-                {copied ? (
-                  <Check className="w-5 h-5 text-green-400" />
-                ) : (
-                  <Copy className="w-5 h-5 text-purple-400" />
-                )}
+            {/* Venue & Location */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Venue</label>
+                <input
+                  type="text"
+                  value={formData.venue}
+                  onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
+                  placeholder="e.g., Brooklyn Steel"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
               <div>
-                <h3 className="text-base font-semibold text-white group-hover:text-purple-300 transition-colors">
-                  {copied ? 'Copied!' : 'Copy Link'}
-                </h3>
-                <p className="text-xs text-white/60">
-                  {copied ? 'Link copied to clipboard' : 'Click to copy URL'}
-                </p>
+                <label className="block text-white/90 font-medium mb-2">Location (City) *</label>
+                <input
+                  type="text"
+                  value={formData.location}
+                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                  placeholder="e.g., Brooklyn, NY"
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
             </div>
-            <div className="text-xs text-purple-300/80 font-mono bg-black/20 px-3 py-2 rounded break-all">
-              {publicEventUrl}
-            </div>
-          </button>
 
-          {/* Right Side - Open Link */}
-          <a
-            href={publicEventUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group relative p-6 hover:bg-blue-600/20 transition-all flex items-center justify-center"
-          >
-            <div className="text-center">
-              <div className="inline-flex items-center justify-center p-3 rounded-lg bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors mb-3">
-                <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
+            {/* Event Dates */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Event Date *</label>
+                <p className="text-white/50 text-xs mb-2">Start date for multi-day events</p>
+                <input
+                  type="date"
+                  value={formData.event_date}
+                  onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
-              <h3 className="text-base font-semibold text-white group-hover:text-blue-300 transition-colors mb-1">
-                Open Event Page
-              </h3>
-              <p className="text-xs text-white/60">
-                View in new window
-              </p>
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Event End Date</label>
+                <p className="text-white/50 text-xs mb-2">Optional for multi-day events</p>
+                <input
+                  type="date"
+                  value={formData.event_end_date}
+                  onChange={(e) => setFormData({ ...formData, event_end_date: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
             </div>
-          </a>
+
+            {/* Event Times */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Start Time</label>
+                <input
+                  type="time"
+                  value={formData.start_time}
+                  onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-white/90 font-medium mb-2">End Time</label>
+                <input
+                  type="time"
+                  value={formData.end_time}
+                  onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            </div>
+
+            {/* Age Restriction */}
+            <div>
+              <label className="block text-white/90 font-medium mb-2">Age Restriction</label>
+              <input
+                type="text"
+                value={formData.age_restriction}
+                onChange={(e) => setFormData({ ...formData, age_restriction: e.target.value })}
+                placeholder="e.g., All Ages, 18+, 21+"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Ticket Link */}
+            <div>
+              <label className="block text-white/90 font-medium mb-2">Ticket Link</label>
+              <input
+                type="url"
+                value={formData.ticket_link}
+                onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
+                placeholder="https://example.com/tickets"
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+
+            {/* Application Deadline */}
+            <div>
+              <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
+              <input
+                type="date"
+                value={formData.application_deadline}
+                onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
+                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Event Details Display (Always visible) */}
+      {!isEditing && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Basic Info Card */}
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
+
+            <div>
+              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <Tag className="w-4 h-4" />
+                Event Name
+              </div>
+              <p className="text-white font-medium">{event.title}</p>
+            </div>
+
+            {event.description && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <AlertCircle className="w-4 h-4" />
+                  Description
+                </div>
+                <p className="text-white/80">{event.description}</p>
+              </div>
+            )}
+
+            {event.venue && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Building2 className="w-4 h-4" />
+                  Venue
+                </div>
+                <p className="text-white">{event.venue}</p>
+              </div>
+            )}
+
+            <div>
+              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <MapPin className="w-4 h-4" />
+                Location
+              </div>
+              <p className="text-white">{event.location || 'Not set'}</p>
+            </div>
+
+            {event.age_restriction && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Users className="w-4 h-4" />
+                  Age Restriction
+                </div>
+                <p className="text-white">{event.age_restriction}</p>
+              </div>
+            )}
+
+            {event.ticket_link && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <LinkIcon className="w-4 h-4" />
+                  Ticket Link
+                </div>
+                <a
+                  href={event.ticket_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:text-purple-300 underline break-all"
+                >
+                  {event.ticket_link}
+                </a>
+              </div>
+            )}
+          </div>
+
+          {/* Date & Time Card */}
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
+            <h3 className="text-lg font-semibold text-white mb-4">Date & Time</h3>
+
+            <div>
+              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <Calendar className="w-4 h-4" />
+                Event Date
+              </div>
+              <p className="text-white">{formatDate(event.event_date || event.dates?.start)}</p>
+            </div>
+
+            {(event.event_end_date || event.dates?.end) && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Calendar className="w-4 h-4" />
+                  Event End Date
+                </div>
+                <p className="text-white">{formatDate(event.event_end_date || event.dates?.end)}</p>
+              </div>
+            )}
+
+            {(event.start_time || event.dates?.start_time) && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Clock className="w-4 h-4" />
+                  Start Time
+                </div>
+                <p className="text-white">{formatTime(event.start_time || event.dates?.start_time)}</p>
+              </div>
+            )}
+
+            {(event.end_time || event.dates?.end_time) && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Clock className="w-4 h-4" />
+                  End Time
+                </div>
+                <p className="text-white">{formatTime(event.end_time || event.dates?.end_time)}</p>
+              </div>
+            )}
+
+            {event.application_deadline && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Calendar className="w-4 h-4" />
+                  Application Deadline
+                </div>
+                <p className="text-white">{formatDate(event.application_deadline)}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

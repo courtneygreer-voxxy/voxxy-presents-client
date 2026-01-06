@@ -1,5 +1,21 @@
 // API service for connecting to voxxy-presents-api backend
 import { getApiUrl } from '@/config/environments'
+import type {
+  EmailCampaignTemplate,
+  EmailTemplateItem,
+  ScheduledEmail,
+  EmailDelivery,
+  CreateTemplateRequest,
+  UpdateTemplateRequest,
+  CreateEmailTemplateItemRequest,
+  UpdateEmailRequest,
+  SaveAsTemplateRequest,
+  EmailPreviewRequest,
+  EmailPreviewResponse,
+  SendNowResponse,
+  GenerateScheduledEmailsRequest,
+  GenerateScheduledEmailsResponse,
+} from '@/types/email'
 
 const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
@@ -654,6 +670,10 @@ export const registrationsApi = {
     vendor_category: string
     vendor_application_id: number
     subscribed?: boolean
+    instagram_handle?: string
+    tiktok_handle?: string
+    website?: string
+    note_to_host?: string
   }) {
     return fetchApi<any>(`/v1/presents/events/${eventSlug}/registrations`, {
       method: 'POST',
@@ -824,6 +844,293 @@ export const emailApi = {
     const endpoint = organizationId ? `/email/threads?organization=${organizationId}` : '/email/threads'
     return fetchApi<any[]>(endpoint)
   }
+}
+
+// Email Campaign Templates API (Email Automation System)
+export const emailCampaignTemplatesApi = {
+  /**
+   * Get all email campaign templates (system + user templates)
+   * GET /api/v1/presents/email_campaign_templates
+   */
+  async getAll() {
+    return fetchApi<EmailCampaignTemplate[]>('/v1/presents/email_campaign_templates')
+  },
+
+  /**
+   * Get single template with all email items
+   * GET /api/v1/presents/email_campaign_templates/:id
+   */
+  async getById(id: number) {
+    return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}`)
+  },
+
+  /**
+   * Create custom template (clone from existing)
+   * POST /api/v1/presents/email_campaign_templates
+   */
+  async create(data: CreateTemplateRequest) {
+    return fetchApi<EmailCampaignTemplate>('/v1/presents/email_campaign_templates', {
+      method: 'POST',
+      body: JSON.stringify({ email_campaign_template: data }),
+    })
+  },
+
+  /**
+   * Clone template
+   * POST /api/v1/presents/email_campaign_templates/:id/clone
+   */
+  async clone(id: number, name: string, description?: string) {
+    return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}/clone`, {
+      method: 'POST',
+      body: JSON.stringify({ name, description }),
+    })
+  },
+
+  /**
+   * Update user template
+   * PATCH /api/v1/presents/email_campaign_templates/:id
+   */
+  async update(id: number, data: UpdateTemplateRequest) {
+    return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ email_campaign_template: data }),
+    })
+  },
+
+  /**
+   * Delete user template
+   * DELETE /api/v1/presents/email_campaign_templates/:id
+   */
+  async delete(id: number) {
+    return fetchApi<void>(`/v1/presents/email_campaign_templates/${id}`, {
+      method: 'DELETE',
+    })
+  },
+}
+
+// Email Template Items API (Individual emails within templates)
+export const emailTemplateItemsApi = {
+  /**
+   * Get all email items for a template
+   * GET /api/v1/presents/email_campaign_templates/:template_id/email_template_items
+   */
+  async getByTemplate(templateId: number) {
+    return fetchApi<EmailTemplateItem[]>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items`
+    )
+  },
+
+  /**
+   * Create email item in template
+   * POST /api/v1/presents/email_campaign_templates/:template_id/email_template_items
+   */
+  async create(templateId: number, data: CreateEmailTemplateItemRequest) {
+    return fetchApi<EmailTemplateItem>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ email_template_item: data }),
+      }
+    )
+  },
+
+  /**
+   * Update email item in template
+   * PATCH /api/v1/presents/email_template_items/:id
+   */
+  async update(id: number, data: UpdateEmailRequest) {
+    return fetchApi<EmailTemplateItem>(`/v1/presents/email_template_items/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ email_template_item: data }),
+    })
+  },
+
+  /**
+   * Reorder email items in template
+   * POST /api/v1/presents/email_campaign_templates/:template_id/email_template_items/reorder
+   */
+  async reorder(templateId: number, emailItemIds: number[]) {
+    return fetchApi<EmailTemplateItem[]>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items/reorder`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ email_item_ids: emailItemIds }),
+      }
+    )
+  },
+
+  /**
+   * Delete email item from template
+   * DELETE /api/v1/presents/email_template_items/:id
+   */
+  async delete(id: number) {
+    return fetchApi<void>(`/v1/presents/email_template_items/${id}`, {
+      method: 'DELETE',
+    })
+  },
+}
+
+// Scheduled Emails API (Event-specific email instances)
+export const scheduledEmailsApi = {
+  /**
+   * Get all scheduled emails for an event
+   * GET /api/v1/presents/events/:event_slug/scheduled_emails
+   */
+  async getByEvent(eventSlug: string) {
+    return fetchApi<ScheduledEmail[]>(`/v1/presents/events/${eventSlug}/scheduled_emails`)
+  },
+
+  /**
+   * Get single scheduled email
+   * GET /api/v1/presents/events/:event_slug/scheduled_emails/:id
+   */
+  async getById(eventSlug: string, id: number) {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`)
+  },
+
+  /**
+   * Generate scheduled emails for event from template
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/generate
+   */
+  async generate(eventSlug: string, data?: GenerateScheduledEmailsRequest) {
+    return fetchApi<GenerateScheduledEmailsResponse>(
+      `/v1/presents/events/${eventSlug}/scheduled_emails/generate`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data || {}),
+      }
+    )
+  },
+
+  /**
+   * Update scheduled email (event-specific customization)
+   * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id
+   */
+  async update(eventSlug: string, id: number, data: UpdateEmailRequest) {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ scheduled_email: data }),
+    })
+  },
+
+  /**
+   * Pause scheduled email
+   * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
+   */
+  async pause(eventSlug: string, id: number) {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/pause`, {
+      method: 'PATCH',
+    })
+  },
+
+  /**
+   * Resume paused scheduled email
+   * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
+   */
+  async resume(eventSlug: string, id: number) {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/resume`, {
+      method: 'PATCH',
+    })
+  },
+
+  /**
+   * Send scheduled email immediately
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/send_now
+   */
+  async sendNow(eventSlug: string, id: number) {
+    return fetchApi<SendNowResponse>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/send_now`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Preview email with resolved variables for a specific registration
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/preview
+   */
+  async preview(eventSlug: string, id: number, data: EmailPreviewRequest) {
+    return fetchApi<EmailPreviewResponse>(
+      `/v1/presents/events/${eventSlug}/scheduled_emails/${id}/preview`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    )
+  },
+
+  /**
+   * Delete/cancel scheduled email
+   * DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
+   */
+  async delete(eventSlug: string, id: number) {
+    return fetchApi<void>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  /**
+   * Save event's scheduled emails as new reusable template
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/save_as_template
+   */
+  async saveAsTemplate(eventSlug: string, data: SaveAsTemplateRequest) {
+    return fetchApi<EmailCampaignTemplate>(
+      `/v1/presents/events/${eventSlug}/scheduled_emails/save_as_template`,
+      {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }
+    )
+  },
+}
+
+// Email Deliveries API (Delivery tracking and statistics)
+export const emailDeliveriesApi = {
+  /**
+   * Get all deliveries for a scheduled email
+   * GET /api/v1/presents/scheduled_emails/:scheduled_email_id/email_deliveries
+   */
+  async getByScheduledEmail(scheduledEmailId: number) {
+    return fetchApi<EmailDelivery[]>(`/v1/presents/scheduled_emails/${scheduledEmailId}/email_deliveries`)
+  },
+
+  /**
+   * Get delivery statistics for an event
+   * GET /api/v1/presents/events/:event_slug/email_deliveries/stats
+   */
+  async getEventStats(eventSlug: string) {
+    return fetchApi<{
+      total_sent: number
+      delivered: number
+      bounced: number
+      dropped: number
+      unsubscribed: number
+      delivery_rate: number
+    }>(`/v1/presents/events/${eventSlug}/email_deliveries/stats`)
+  },
+
+  /**
+   * Get delivery statistics for a scheduled email
+   * GET /api/v1/presents/scheduled_emails/:id/delivery_stats
+   */
+  async getScheduledEmailStats(scheduledEmailId: number) {
+    return fetchApi<{
+      total_sent: number
+      delivered: number
+      bounced: number
+      dropped: number
+      pending: number
+      delivery_rate: number
+    }>(`/v1/presents/scheduled_emails/${scheduledEmailId}/delivery_stats`)
+  },
+
+  /**
+   * Retry failed delivery
+   * POST /api/v1/presents/email_deliveries/:id/retry
+   */
+  async retry(deliveryId: number) {
+    return fetchApi<EmailDelivery>(`/v1/presents/email_deliveries/${deliveryId}/retry`, {
+      method: 'POST',
+    })
+  },
 }
 
 // Venues API

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, MapPin, Mail, Building2, ArrowRight, Clock } from 'lucide-react';
+import { Calendar, MapPin, Mail, Building2, Clock, Users, DollarSign } from 'lucide-react';
 import { eventInvitationsApi, EventInvitation } from '@/services/api';
 
 export default function InvitationViewPage() {
@@ -95,7 +95,7 @@ export default function InvitationViewPage() {
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
+            className="px-6 py-3 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white hover:opacity-90 transition-all"
           >
             Go Home
           </button>
@@ -106,249 +106,217 @@ export default function InvitationViewPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
-      {/* Hero Section with Event Title */}
-      <div className="relative h-[180px] md:h-[300px] overflow-hidden">
-        {invitation.event?.poster_url ? (
-          <img
-            src={invitation.event.poster_url}
-            alt={invitation.event.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-purple-900 to-blue-900" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0d2e] via-[#1a0d2e]/80 to-transparent" />
-
-        {/* Invitation Badge */}
-        <div className="absolute top-4 md:top-8 left-1/2 -translate-x-1/2">
-          <div className="flex items-center gap-2 px-4 py-2 md:px-6 md:py-3 rounded-full bg-purple-500/90 backdrop-blur-sm border border-purple-400/50 shadow-lg">
-            <Mail className="w-4 h-4 md:w-5 md:h-5 text-white" />
-            <span className="text-white font-semibold text-sm md:text-base">You're Invited!</span>
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
-              {invitation.event?.title}
-            </h1>
-            {invitation.event?.organization ? (
-              <p className="text-white/80 text-base md:text-lg">
-                Presented by {invitation.event.organization.name}
-              </p>
-            ) : invitation.vendor_contact?.company_name ? (
-              <p className="text-white/80 text-base md:text-lg">
-                Invited by {invitation.vendor_contact.company_name}
-              </p>
-            ) : null}
-          </div>
+      {/* Header */}
+      <div className="bg-[#1a0d2e]/80 border-b border-white/10">
+        <div className="max-w-4xl mx-auto px-4 py-4 text-center">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+            voxxy
+          </h1>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-6xl mx-auto px-4 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Vendor Opportunities Section */}
-            {invitation.event?.vendor_applications && invitation.event.vendor_applications.length > 0 && (
-              <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  Vendor Opportunities
-                </h2>
-
-                {/* Application Deadline Timer */}
-                {invitation.event.application_deadline && (
-                  <div className="mb-4 flex items-center gap-2 text-purple-300">
-                    <Clock className="w-4 h-4" />
-                    <p className="text-sm font-medium">
-                      {getDaysUntilDeadline(invitation.event.application_deadline)}
-                    </p>
-                  </div>
-                )}
-
-                {invitation.event.vendor_applications.map((application: any) => (
-                  <div key={application.id} className="mb-6 last:mb-0 pb-6 last:pb-0 border-b border-white/10 last:border-0">
-                    <p className="text-lg text-purple-300 mb-2">
-                      {application.name}
-                    </p>
-
-                    {/* Booth Price */}
-                    {application.booth_price && (
-                      <p className="text-2xl font-bold text-white mb-4">
-                        ${Number(application.booth_price).toFixed(2)}
-                      </p>
-                    )}
-
-                    {application.description && (
-                      <p className="text-white/80 mb-6 whitespace-pre-wrap">
-                        {application.description}
-                      </p>
-                    )}
-
-                    {/* Categories */}
-                    {application.categories && application.categories.length > 0 && (
-                      <div className="mb-6">
-                        <h3 className="text-sm font-semibold text-white/60 mb-2">
-                          Seeking Vendors In:
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {application.categories.map((category: string) => (
-                            <span
-                              key={category}
-                              className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
-                            >
-                              {category}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <a
-                      href={`/events/${invitation.event!.slug}/apply/${application.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
-                    >
-                      Apply as Vendor
-                      <ArrowRight className="w-5 h-5" />
-                    </a>
-
-                    {application.submissions_count > 0 && (
-                      <p className="text-white/40 text-sm mt-4">
-                        {application.submissions_count} vendors have applied
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        {/* Main Card Container */}
+        <div className="bg-[#1e1b2e] border border-white/10 rounded-lg p-6 md:p-8">
+          {/* You're Invited Badge */}
+          <div className="flex justify-center mb-6">
+            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-purple-500/90 backdrop-blur-sm border border-purple-400/50 shadow-lg">
+              <Mail className="w-5 h-5 text-white" />
+              <span className="text-white font-semibold">You're Invited!</span>
+            </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Event Details from Organization */}
-            {invitation.event && (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+          {/* Event Title and Location */}
+          <div className="mb-6">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+              {invitation.event?.title}
+            </h1>
+            <div className="flex items-center gap-2 text-white/60">
+              <MapPin className="w-4 h-4" />
+              <span>{invitation.event?.location}</span>
+            </div>
+          </div>
+
+          {/* Event Details Grid */}
+          <div className="py-6 border-t border-b border-white/10 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+              {/* Event Date */}
+              {invitation.event?.dates?.start && (
                 <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
-                  <div className="flex-1">
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">
-                      Presented By
-                    </h3>
-                    <p className="text-white font-medium mb-2">
-                      {invitation.event.organization?.name || 'Event Organizer'}
+                  <Calendar className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Event Date</p>
+                    <p className="text-white text-sm">
+                      {new Date(invitation.event.dates.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {invitation.event.dates.end && ` - ${new Date(invitation.event.dates.end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
                     </p>
-                    {invitation.event.description && (
-                      <div className="mt-4 pt-4 border-t border-white/10">
-                        <h4 className="text-sm font-semibold text-white/60 mb-2">
-                          Event Description
-                        </h4>
-                        <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
-                          {invitation.event.description}
-                        </p>
-                      </div>
-                    )}
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Date & Time */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <div className="flex items-start gap-3 mb-4">
-                <Calendar className="w-5 h-5 text-purple-400 mt-1" />
-                <div className="flex-1">
-                  <h3 className="text-sm font-semibold text-white/60 mb-1">Date & Time</h3>
-                  <p className="text-white">
-                    {invitation.event?.dates?.start
-                      ? formatDate(invitation.event.dates.start)
-                      : invitation.event?.event_date
-                        ? formatDate(invitation.event.event_date)
-                        : 'TBA'}
-                  </p>
-                  {invitation.event?.dates?.end && (
-                    <p className="text-white/80 text-sm mt-1">
-                      to {formatDate(invitation.event.dates.end)}
-                    </p>
-                  )}
-                  {(invitation.event?.dates?.start_time || invitation.event?.dates?.end_time) && (
-                    <p className="text-white/60 text-sm mt-2">
+              {/* Time */}
+              {(invitation.event?.dates?.start_time || invitation.event?.dates?.end_time) && (
+                <div className="flex items-start gap-3">
+                  <Clock className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Time</p>
+                    <p className="text-white text-sm">
                       {invitation.event.dates.start_time && formatTimeString(invitation.event.dates.start_time)}
                       {invitation.event.dates.start_time && invitation.event.dates.end_time && ' - '}
                       {invitation.event.dates.end_time && formatTimeString(invitation.event.dates.end_time)}
                     </p>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Venue */}
               {invitation.event?.venue && (
-                <div className="flex items-start gap-3 mb-4">
-                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">Venue</h3>
-                    <p className="text-white">{invitation.event.venue}</p>
+                <div className="flex items-start gap-3">
+                  <Building2 className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Venue</p>
+                    <p className="text-white text-sm">{invitation.event.venue}</p>
                   </div>
                 </div>
               )}
 
-              {/* Location */}
-              {invitation.event?.location && (
-                <div className="flex items-start gap-3 mb-4">
-                  <MapPin className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">Location</h3>
-                    <p className="text-white">{invitation.event.location}</p>
+              {/* Invited By */}
+              {invitation.vendor_contact && (
+                <div className="flex items-start gap-3">
+                  <Mail className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Invited By</p>
+                    <p className="text-white text-sm">{invitation.event?.organization?.name || invitation.vendor_contact.company_name || invitation.vendor_contact.name}</p>
                   </div>
                 </div>
               )}
 
-              {/* Age Restriction */}
-              {invitation.event?.age_restriction && (
-                <div className="flex items-start gap-3 mb-4">
-                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">Age Restriction</h3>
-                    <p className="text-white">{invitation.event.age_restriction}</p>
-                  </div>
-                </div>
-              )}
-
-              {/* Application Deadline */}
+              {/* Apply By */}
               {invitation.event?.application_deadline && (
                 <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">Application Deadline</h3>
-                    <p className="text-white">{formatDateTime(invitation.event.application_deadline)}</p>
+                  <Calendar className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Apply By</p>
+                    <p className="text-white text-sm">
+                      {new Date(invitation.event.application_deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Age */}
+              {invitation.event?.age_restriction && (
+                <div className="flex items-start gap-3">
+                  <Users className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white/60 text-xs mb-1">Age</p>
+                    <p className="text-white text-sm">{invitation.event.age_restriction}</p>
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Invitation Info */}
-            {invitation.vendor_contact && (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-purple-400 mt-1" />
-                  <div>
-                    <h3 className="text-sm font-semibold text-white/60 mb-1">Invited By</h3>
-                    <p className="text-white font-medium">{invitation.vendor_contact.name}</p>
-                    {invitation.vendor_contact.company_name && (
-                      <p className="text-white/80 text-sm">{invitation.vendor_contact.company_name}</p>
-                    )}
-                    <p className="text-white/60 text-sm mt-2">{invitation.vendor_contact.email}</p>
-                  </div>
-                </div>
-              </div>
-            )}
           </div>
+
+          {/* About This Event */}
+          {invitation.event?.description && (
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-white mb-4">About This Event</h2>
+              <p className="text-white/80 text-sm leading-relaxed whitespace-pre-wrap">
+                {invitation.event.description}
+              </p>
+            </div>
+          )}
+
+          {/* Application Categories */}
+          {invitation.event?.vendor_applications && invitation.event.vendor_applications.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold text-white mb-4">Application Categories</h2>
+
+              {/* Map through all vendor applications */}
+              <div className="space-y-4">
+                {invitation.event.vendor_applications.map((application: any) => (
+                  <div key={application.id} className="bg-white/5 border border-white/10 rounded-lg p-6">
+                    {/* Title and Price Row */}
+                    <div className="flex items-start justify-between mb-3">
+                      <h3 className="text-lg font-bold text-white">
+                        {application.name}
+                      </h3>
+                      <div className="text-right">
+                        {application.booth_price && (
+                          <>
+                            <p className="text-2xl font-bold text-purple-400">
+                              ${Number(application.booth_price).toFixed(0)}
+                            </p>
+                            {invitation.event?.application_deadline && (
+                              <p className="text-white/60 text-xs mt-1">
+                                Early bird: {new Date(invitation.event.application_deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    {application.description && (
+                      <p className="text-white/80 text-sm mb-4">
+                        {application.description}
+                      </p>
+                    )}
+
+                    {/* Tags */}
+                    {application.application_tags && (
+                      <div className="flex flex-wrap gap-2 mb-4">
+                        {application.application_tags.split(',').map((tag: string, idx: number) => (
+                          <span
+                            key={idx}
+                            className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs"
+                          >
+                            {tag.trim()}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Install Date & Time */}
+                    {application.install?.install_date && (
+                      <div className="flex items-center gap-4 text-white/80 text-sm mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-purple-400" />
+                          <span>Install: {new Date(application.install.install_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                        {(application.install.install_start_time || application.install.install_end_time) && (
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-purple-400" />
+                            <span>
+                              {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
+                              {application.install.install_start_time && application.install.install_end_time && ' - '}
+                              {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Apply Now Button */}
+                    <a
+                      href={`/events/${invitation.event!.slug}/apply/${application.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full text-center px-6 py-3 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all shadow-lg"
+                    >
+                      Apply Now
+                    </a>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Powered by Voxxy Presents */}
-        <div className="mt-12 pt-8 border-t border-white/10">
+        <div className="mt-8 pt-8 border-t border-white/10">
           <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
             <span>Powered by</span>
             <img

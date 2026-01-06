@@ -52,6 +52,11 @@ export default function VendorApplicationForm() {
     phone: '',
     business_name: '',
     vendor_category: '',
+    instagram_handle: '',
+    tiktok_handle: '',
+    website: '',
+    note_to_host: '',
+    agreed_to_terms: false,
     subscribed: true,
   });
 
@@ -108,6 +113,11 @@ export default function VendorApplicationForm() {
       return;
     }
 
+    if (!formData.agreed_to_terms) {
+      setError('You must agree to the Privacy Policy and Terms of Service to submit your application');
+      return;
+    }
+
     try {
       setSubmitting(true);
       setError(null);
@@ -120,6 +130,10 @@ export default function VendorApplicationForm() {
         vendor_category: formData.vendor_category,
         vendor_application_id: application.id,
         subscribed: formData.subscribed,
+        instagram_handle: formData.instagram_handle || undefined,
+        tiktok_handle: formData.tiktok_handle || undefined,
+        website: formData.website || undefined,
+        note_to_host: formData.note_to_host || undefined,
       });
 
       // Redirect to confirmation page with ticket code
@@ -197,128 +211,261 @@ export default function VendorApplicationForm() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
-      {/* Hero Section */}
-      <div className="relative h-[160px] md:h-[250px] overflow-hidden">
-        {event?.poster_url ? (
-          <img
-            src={event.poster_url}
-            alt={event.title}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full bg-gradient-to-r from-purple-900 to-blue-900" />
-        )}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#1a0d2e] via-[#1a0d2e]/80 to-transparent" />
-
-        <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-1">
-              {event?.title}
-            </h1>
-            <p className="text-white/80 text-base md:text-lg">
-              {event?.organization ? `Presented by ${event.organization.name}` : 'Vendor Application'}
-            </p>
-          </div>
+      {/* Header */}
+      <div className="bg-[#1a0d2e]/80 border-b border-white/10">
+        <div className="max-w-3xl mx-auto px-4 py-6">
+          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
+            Apply to {event?.title}
+          </h1>
+          <p className="text-white/60 text-sm md:text-base">
+            {event?.location && `${event.location} • `}
+            {event?.dates?.start && formatDate(event.dates.start)}
+          </p>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-4 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content - Application Form */}
-          <div className="lg:col-span-2">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-8">
-              <h2 className="text-2xl font-bold text-white mb-4">
-                {application?.name || 'Apply as Vendor'}
-              </h2>
+      <div className="max-w-3xl mx-auto px-4 py-8">
+        {/* Application Details Card */}
+        <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-6 mb-8">
+          <p className="text-white/60 text-sm mb-1">Applying for</p>
+          <h2 className="text-2xl font-bold text-white mb-3">
+            {application?.name || 'Vendor Application'}
+          </h2>
 
-              {application?.booth_price && (
-                <p className="text-2xl font-bold text-white mb-4">
-                  ${Number(application.booth_price).toFixed(2)}
+          {application?.description && (
+            <p className="text-white/80 text-sm mb-4 whitespace-pre-wrap">
+              {application.description}
+            </p>
+          )}
+
+          {/* Tags */}
+          {application?.application_tags && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {application.application_tags.split(',').map((tag, idx) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs"
+                >
+                  {tag.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Install Date & Time */}
+          <div className="flex flex-wrap gap-4 text-sm">
+            {application?.install?.install_date && (
+              <div className="flex items-center gap-2 text-white/80">
+                <Calendar className="w-4 h-4 text-purple-400" />
+                <span>Install: {formatDate(application.install.install_date)}</span>
+              </div>
+            )}
+            {(application?.install?.install_start_time || application?.install?.install_end_time) && (
+              <div className="flex items-center gap-2 text-white/80">
+                <Clock className="w-4 h-4 text-purple-400" />
+                <span>
+                  {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
+                  {application.install.install_start_time && application.install.install_end_time && ' - '}
+                  {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Price */}
+          {application?.booth_price && (
+            <div className="mt-4 pt-4 border-t border-white/10">
+              <div>
+                <p className="text-white/60 text-sm mb-1">Booth Price</p>
+                <p className="text-3xl font-bold text-purple-400">
+                  ${Number(application.booth_price).toFixed(0)}
                 </p>
-              )}
+              </div>
+            </div>
+          )}
+        </div>
 
-              {application?.description && (
-                <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mb-6">
-                  <p className="text-white/80 text-sm whitespace-pre-wrap">
-                    {application.description}
-                  </p>
+        {/* Application Form */}
+        <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8">
+
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Your Information */}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Your Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Business/Brand Name */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Business/Brand Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.business_name}
+                    onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+                    placeholder="Your business or brand name"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    required
+                  />
                 </div>
-              )}
 
-              {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Contact Name */}
+                {/* Contact Name */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Contact Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your full name"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    required
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Email <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="your@email.com"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    required
+                  />
+                </div>
+
+                {/* Phone Number */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Phone Number <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="(555) 123-4567"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Social & Portfolio (Optional) */}
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-4">Social & Portfolio (Optional)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Instagram */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Instagram
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.instagram_handle}
+                    onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
+                    placeholder="@yourhandle"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* TikTok */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    TikTok
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.tiktok_handle}
+                    onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
+                    placeholder="@yourhandle"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+
+                {/* Website/Portfolio */}
+                <div>
+                  <label className="block text-sm font-medium text-white mb-2">
+                    Website/Portfolio
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                    placeholder="https://yoursite.com"
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Note to Host (Optional) */}
             <div>
               <label className="block text-sm font-medium text-white mb-2">
-                Contact Name *
+                Note to Host (Optional)
               </label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Your full name"
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                required
+              <textarea
+                value={formData.note_to_host}
+                onChange={(e) => setFormData({ ...formData, note_to_host: e.target.value })}
+                placeholder="Tell the event organizer about your products, experience, or anything else you'd like them to know..."
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
               />
             </div>
 
-            {/* Email */}
+            {/* Permissions & Preferences */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Email Address *
-              </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="your@email.com"
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                required
-              />
-            </div>
+              <h3 className="text-lg font-semibold text-white mb-4">Permissions & Preferences</h3>
+              <div className="space-y-3">
+                {/* Terms Agreement */}
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="agreed_to_terms"
+                    checked={formData.agreed_to_terms}
+                    onChange={(e) => setFormData({ ...formData, agreed_to_terms: e.target.checked })}
+                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
+                    required
+                  />
+                  <label htmlFor="agreed_to_terms" className="text-sm text-white/80">
+                    I agree to the{' '}
+                    <a
+                      href="https://www.voxxypresents.com/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-400 hover:text-purple-300 underline"
+                    >
+                      Privacy Policy
+                    </a>{' '}
+                    and Terms of Service <span className="text-red-400">*</span>
+                    <p className="text-white/60 text-xs mt-1">
+                      Your information will be shared with the event organizer for this application.
+                    </p>
+                  </label>
+                </div>
 
-            {/* Phone */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="(555) 123-4567"
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-              />
-            </div>
-
-            {/* Business Name */}
-            <div>
-              <label className="block text-sm font-medium text-white mb-2">
-                Business Name *
-              </label>
-              <input
-                type="text"
-                value={formData.business_name}
-                onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                placeholder="Your Business Name"
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                required
-              />
-            </div>
-
-            {/* Subscribe Checkbox */}
-            <div className="flex items-start gap-3">
-              <input
-                type="checkbox"
-                id="subscribed"
-                checked={formData.subscribed}
-                onChange={(e) => setFormData({ ...formData, subscribed: e.target.checked })}
-                className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
-              />
-              <label htmlFor="subscribed" className="text-sm text-white/80">
-                Keep me updated about this event and future vendor opportunities
-              </label>
+                {/* Application Updates */}
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="subscribed"
+                    checked={formData.subscribed}
+                    onChange={(e) => setFormData({ ...formData, subscribed: e.target.checked })}
+                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
+                  />
+                  <label htmlFor="subscribed" className="text-sm text-white/80">
+                    Receive email updates about my application <span className="text-red-400">*</span>
+                    <p className="text-white/60 text-xs mt-1">
+                      Get notified about application status changes and event updates. You can unsubscribe at any time.
+                    </p>
+                  </label>
+                </div>
+              </div>
             </div>
 
             {/* Error Message */}
@@ -328,145 +475,24 @@ export default function VendorApplicationForm() {
               </div>
             )}
 
-                {/* Submit Button */}
-                <div className="flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => window.close()}
-                    className="flex-1 px-4 md:px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all text-sm md:text-base"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex-1 px-4 md:px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
-                  >
-                    {submitting ? (
-                      <>
-                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Submitting...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Check className="w-4 h-4 md:w-5 md:h-5" />
-                        <span>Submit Application</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          {/* Sidebar - Event Info */}
-          <div className="space-y-6">
-            {/* Event Description */}
-            {event?.description && (
-              <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">About This Event</h3>
-                <p className="text-white/80 text-sm whitespace-pre-wrap">
-                  {event.description}
-                </p>
-              </div>
-            )}
-
-            {/* Application Details */}
-            {(application?.install?.install_date || application?.payment_link || application?.application_tags) && (
-              <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Application Details</h3>
-                <div className="space-y-4">
-                  {/* Install Information */}
-                  {application.install?.install_date && (
-                    <div className="flex items-start gap-3">
-                      <Calendar className="w-5 h-5 text-purple-400 mt-0.5" />
-                      <div>
-                        <p className="text-white/60 text-sm">Setup/Install Date</p>
-                        <p className="text-white text-sm">{formatDate(application.install.install_date)}</p>
-                        {(application.install.install_start_time || application.install.install_end_time) && (
-                          <p className="text-white/80 text-xs mt-1">
-                            {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
-                            {application.install.install_start_time && application.install.install_end_time && ' - '}
-                            {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Payment Link */}
-                  {application.payment_link && (
-                    <div className="flex items-start gap-3">
-                      <Clock className="w-5 h-5 text-purple-400 mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-white/60 text-sm mb-1">Payment</p>
-                        <a
-                          href={application.payment_link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-purple-400 hover:text-purple-300 text-sm underline break-all"
-                        >
-                          Payment Link
-                        </a>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  {application.application_tags && (
-                    <div>
-                      <p className="text-white/60 text-sm mb-2">Categories</p>
-                      <div className="flex flex-wrap gap-2">
-                        {application.application_tags.split(',').map((tag, idx) => (
-                          <span
-                            key={idx}
-                            className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs"
-                          >
-                            {tag.trim()}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Event Details */}
-            <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Event Details</h3>
-              <div className="space-y-4">
-                {event?.dates?.start && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-purple-400 mt-0.5" />
-                    <div>
-                      <p className="text-white/60 text-sm">Event Date</p>
-                      <p className="text-white text-sm">{formatDate(event.dates.start)}</p>
-                    </div>
-                  </div>
-                )}
-                {event?.location && (
-                  <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-purple-400 mt-0.5" />
-                    <div>
-                      <p className="text-white/60 text-sm">Location</p>
-                      <p className="text-white text-sm">{event.location}</p>
-                    </div>
-                  </div>
-                )}
-                {event?.application_deadline && (
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-purple-400 mt-0.5" />
-                    <div>
-                      <p className="text-white/60 text-sm">Application Deadline</p>
-                      <p className="text-white text-sm">{formatDateTime(event.application_deadline)}</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-          </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={submitting}
+              className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+            >
+              {submitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span>Submitting...</span>
+                </>
+              ) : (
+                <>
+                  <span>Submit Application</span>
+                </>
+              )}
+            </button>
+          </form>
         </div>
 
         {/* Powered by Voxxy Presents */}
