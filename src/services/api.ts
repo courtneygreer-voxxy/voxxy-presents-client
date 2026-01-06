@@ -1860,7 +1860,7 @@ export interface EventInvitation {
     id: number
     name: string
     email: string
-    company_name: string
+    business_name?: string
     contact_type: string
   }
   event?: {
@@ -1879,6 +1879,8 @@ export interface EventInvitation {
     location: string
     age_restriction?: string
     poster_url?: string
+    ticket_url?: string
+    ticket_link?: string
     application_deadline: string
     organization?: {
       id: number
