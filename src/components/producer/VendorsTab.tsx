@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Building2, Mail, Phone, Tag, Filter, Users } from 'lucide-react';
-import { vendorApplicationsApi, registrationsApi } from '@/services/api';
+import { useState, useEffect, useMemo } from 'react';
+import { Building2, Mail, Phone, Globe, Instagram, Music, Link as LinkIcon, Star, Search, ArrowUpDown } from 'lucide-react';
+import { vendorApplicationsApi } from '@/services/api';
 
 interface VendorSubmission {
   id: number;
@@ -11,6 +11,12 @@ interface VendorSubmission {
   status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed';
   ticket_code: string;
   created_at: string;
+  contact_name?: string;
+  website?: string;
+  instagram_handle?: string;
+  tiktok_handle?: string;
+  portfolio?: string;
+  payment_status?: 'paid' | 'pending' | 'unpaid';
   vendor_application: {
     id: number;
     name: string;
@@ -21,14 +27,18 @@ interface VendorsTabProps {
   eventSlug: string;
 }
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected';
+type SortField = 'business_name' | 'category' | 'email' | 'phone' | 'payment';
+type SortDirection = 'asc' | 'desc';
 
 export default function VendorsTab({ eventSlug }: VendorsTabProps) {
   const [vendors, setVendors] = useState<VendorSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [paymentFilter, setPaymentFilter] = useState<string>('all');
+  const [sortField, setSortField] = useState<SortField>('business_name');
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   useEffect(() => {
     fetchVendors();
@@ -61,7 +71,12 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
         }
       }
 
-      setVendors(allSubmissions);
+      // Filter to only approved/confirmed vendors
+      const approvedVendors = allSubmissions.filter(
+        (v) => v.status === 'approved' || v.status === 'confirmed'
+      );
+
+      setVendors(approvedVendors);
     } catch (err: any) {
       console.error('Failed to fetch vendors:', err);
       setError(err.message || 'Failed to load vendors');
@@ -70,65 +85,93 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+  };
+
+  const getPaymentBadge = (status?: string) => {
     switch (status) {
-      case 'approved':
-      case 'confirmed':
-        return 'bg-green-500/20 text-green-400';
+      case 'paid':
+        return { label: 'Paid', color: 'bg-green-500/20 text-green-400' };
       case 'pending':
-        return 'bg-yellow-500/20 text-yellow-400';
-      case 'waitlist':
-        return 'bg-blue-500/20 text-blue-400';
-      case 'rejected':
-        return 'bg-red-500/20 text-red-400';
+        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400' };
       default:
-        return 'bg-gray-500/20 text-gray-400';
+        return { label: 'Pending', color: 'bg-gray-500/20 text-gray-400' };
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
+  // Get unique categories
+  const categories = useMemo(() => {
+    return ['all', ...Array.from(new Set(vendors.map(v => v.vendor_category)))];
+  }, [vendors]);
 
-  const handleUpdateStatus = async (
-    vendorId: number,
-    newStatus: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
-  ) => {
-    try {
-      setUpdatingId(vendorId);
-      await registrationsApi.updateStatus(vendorId, newStatus);
+  // Filter and sort vendors
+  const filteredAndSortedVendors = useMemo(() => {
+    let result = [...vendors];
 
-      // Update local state
-      setVendors((prev) =>
-        prev.map((vendor) =>
-          vendor.id === vendorId ? { ...vendor, status: newStatus } : vendor
-        )
+    // Search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (v) =>
+          v.business_name.toLowerCase().includes(query) ||
+          v.email.toLowerCase().includes(query) ||
+          v.contact_name?.toLowerCase().includes(query)
       );
-    } catch (err: any) {
-      console.error('Failed to update vendor status:', err);
-      alert(`Failed to update status: ${err.message}`);
-    } finally {
-      setUpdatingId(null);
     }
-  };
 
-  const filteredVendors = vendors.filter((vendor) => {
-    if (statusFilter === 'all') return true;
-    return vendor.status === statusFilter;
-  });
+    // Category filter
+    if (categoryFilter !== 'all') {
+      result = result.filter((v) => v.vendor_category === categoryFilter);
+    }
 
-  const statusCounts = {
-    all: vendors.length,
-    pending: vendors.filter((v) => v.status === 'pending').length,
-    approved: vendors.filter((v) => v.status === 'approved').length,
-    confirmed: vendors.filter((v) => v.status === 'confirmed').length,
-    waitlist: vendors.filter((v) => v.status === 'waitlist').length,
-    rejected: vendors.filter((v) => v.status === 'rejected').length,
-  };
+    // Payment filter
+    if (paymentFilter !== 'all') {
+      result = result.filter((v) => (v.payment_status || 'pending') === paymentFilter);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      let aVal: any;
+      let bVal: any;
+
+      switch (sortField) {
+        case 'business_name':
+          aVal = a.business_name.toLowerCase();
+          bVal = b.business_name.toLowerCase();
+          break;
+        case 'category':
+          aVal = a.vendor_category.toLowerCase();
+          bVal = b.vendor_category.toLowerCase();
+          break;
+        case 'email':
+          aVal = a.email.toLowerCase();
+          bVal = b.email.toLowerCase();
+          break;
+        case 'phone':
+          aVal = a.phone || '';
+          bVal = b.phone || '';
+          break;
+        case 'payment':
+          aVal = a.payment_status || 'pending';
+          bVal = b.payment_status || 'pending';
+          break;
+        default:
+          return 0;
+      }
+
+      if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+      if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [vendors, searchQuery, categoryFilter, paymentFilter, sortField, sortDirection]);
 
   if (loading) {
     return (
@@ -158,176 +201,226 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
     <div className="p-6">
       {/* Header */}
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-white mb-2">Vendor Submissions</h2>
-        <p className="text-white/60">
-          Manage all vendor applications and submissions for this event
-        </p>
+        <div className="flex items-center gap-3 mb-2">
+          <h2 className="text-2xl font-bold text-white">Event Vendors</h2>
+          <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-semibold">
+            {vendors.length}
+          </span>
+        </div>
+        <p className="text-white/60">Approved vendors participating in your event</p>
       </div>
 
-      {/* Status Filter Pills */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
-        <Filter className="w-4 h-4 text-white/40 flex-shrink-0" />
-        {(
-          [
-            { key: 'all', label: 'All' },
-            { key: 'pending', label: 'Pending' },
-            { key: 'approved', label: 'Approved' },
-            { key: 'confirmed', label: 'Confirmed' },
-            { key: 'waitlist', label: 'Waitlist' },
-            { key: 'rejected', label: 'Rejected' },
-          ] as const
-        ).map(({ key, label }) => (
-          <button
-            key={key}
-            onClick={() => setStatusFilter(key)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-              statusFilter === key
-                ? 'bg-purple-600 text-white'
-                : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-            }`}
+      {/* Search and Filters */}
+      <div className="mb-6 space-y-4">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <input
+            type="text"
+            placeholder="Search vendors..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          />
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-3">
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           >
-            {label} ({statusCounts[key]})
-          </button>
-        ))}
+            <option value="all">Category: All</option>
+            {categories.filter(c => c !== 'all').map((category) => (
+              <option key={category} value={category}>{category}</option>
+            ))}
+          </select>
+
+          <select
+            value={paymentFilter}
+            onChange={(e) => setPaymentFilter(e.target.value)}
+            className="px-4 py-2 rounded-lg bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          >
+            <option value="all">Payment: All</option>
+            <option value="paid">Paid</option>
+            <option value="pending">Pending</option>
+          </select>
+        </div>
       </div>
 
-      {/* Vendors List */}
-      {filteredVendors.length === 0 ? (
+      {/* Vendors Table */}
+      {filteredAndSortedVendors.length === 0 ? (
         <div className="text-center py-20">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
-            <Users className="w-8 h-8 text-white/40" />
+            <Building2 className="w-8 h-8 text-white/40" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
-            {statusFilter === 'all' ? 'No Vendor Submissions Yet' : `No ${statusFilter} Vendors`}
-          </h3>
+          <h3 className="text-xl font-semibold text-white mb-2">No Approved Vendors</h3>
           <p className="text-white/60">
-            {statusFilter === 'all'
-              ? 'Vendor submissions will appear here once vendors apply through your application forms.'
-              : `There are no vendors with status "${statusFilter}" at this time.`}
+            {searchQuery || categoryFilter !== 'all' || paymentFilter !== 'all'
+              ? 'Try adjusting your filters or search query.'
+              : 'Approved vendors will appear here.'}
           </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {filteredVendors.map((vendor) => (
-            <div
-              key={vendor.id}
-              className="bg-white/5 border border-white/10 rounded-lg p-6 hover:bg-white/10 transition-all"
+        <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-[2fr_1.5fr_2fr_1.5fr_1fr_1fr] gap-4 px-6 py-4 bg-white/5 border-b border-white/10">
+            <button
+              onClick={() => handleSort('business_name')}
+              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
             >
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  {/* Business Name & Status */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <Building2 className="w-5 h-5 text-purple-400" />
-                    <h3 className="text-lg font-semibold text-white">
-                      {vendor.business_name}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(
-                        vendor.status
-                      )}`}
-                    >
-                      {vendor.status.charAt(0).toUpperCase() + vendor.status.slice(1)}
+              Business Name
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => handleSort('category')}
+              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+            >
+              Category
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => handleSort('email')}
+              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+            >
+              Email
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => handleSort('phone')}
+              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+            >
+              Phone
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
+            <button
+              onClick={() => handleSort('payment')}
+              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+            >
+              Payment
+              <ArrowUpDown className="w-3 h-3" />
+            </button>
+            <div className="text-sm font-semibold text-white/80">Links</div>
+          </div>
+
+          {/* Table Body */}
+          <div>
+            {filteredAndSortedVendors.map((vendor) => {
+              const paymentBadge = getPaymentBadge(vendor.payment_status);
+
+              return (
+                <div
+                  key={vendor.id}
+                  className="grid grid-cols-[2fr_1.5fr_2fr_1.5fr_1fr_1fr] gap-4 px-6 py-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
+                >
+                  {/* Business Name */}
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-white font-medium truncate">{vendor.business_name}</p>
+                      {vendor.contact_name && (
+                        <p className="text-white/60 text-xs truncate">{vendor.contact_name}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
+                      {vendor.vendor_category}
                     </span>
                   </div>
 
-                  {/* Contact Information */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-white/60">
-                      <Mail className="w-4 h-4" />
-                      <a
-                        href={`mailto:${vendor.email}`}
-                        className="hover:text-purple-400 transition-colors"
-                      >
-                        {vendor.email}
-                      </a>
-                    </div>
-                    {vendor.phone && (
-                      <div className="flex items-center gap-2 text-sm text-white/60">
-                        <Phone className="w-4 h-4" />
+                  {/* Email */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Mail className="w-4 h-4 text-white/40 flex-shrink-0" />
+                    <a
+                      href={`mailto:${vendor.email}`}
+                      className="text-purple-400 hover:text-purple-300 text-sm truncate"
+                    >
+                      {vendor.email}
+                    </a>
+                  </div>
+
+                  {/* Phone */}
+                  <div className="flex items-center gap-2 min-w-0">
+                    {vendor.phone ? (
+                      <>
+                        <Phone className="w-4 h-4 text-white/40 flex-shrink-0" />
                         <a
                           href={`tel:${vendor.phone}`}
-                          className="hover:text-purple-400 transition-colors"
+                          className="text-purple-400 hover:text-purple-300 text-sm truncate"
                         >
                           {vendor.phone}
                         </a>
-                      </div>
+                      </>
+                    ) : (
+                      <span className="text-white/40 text-sm">—</span>
                     )}
                   </div>
 
-                  {/* Category & Metadata */}
-                  <div className="flex items-center gap-4 text-sm text-white/60">
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-4 h-4" />
-                      <span>{vendor.vendor_category}</span>
-                    </div>
-                    <span>•</span>
-                    <span>Applied {formatDate(vendor.created_at)}</span>
-                    <span>•</span>
-                    <span className="font-mono text-xs bg-black/20 px-2 py-0.5 rounded">
-                      {vendor.ticket_code}
+                  {/* Payment Status */}
+                  <div>
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
+                      {paymentBadge.label}
                     </span>
                   </div>
 
-                  {/* Application Form Used */}
-                  <div className="mt-3 pt-3 border-t border-white/10">
-                    <p className="text-xs text-white/40">
-                      Applied via:{' '}
-                      <span className="text-white/60 font-medium">
-                        {vendor.vendor_application.name}
-                      </span>
-                    </p>
+                  {/* Links */}
+                  <div className="flex items-center gap-2">
+                    {vendor.instagram_handle && (
+                      <a
+                        href={vendor.instagram_handle}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/60 hover:text-purple-400 transition-colors"
+                        title="Instagram"
+                      >
+                        <Instagram className="w-4 h-4" />
+                      </a>
+                    )}
+                    {vendor.tiktok_handle && (
+                      <a
+                        href={vendor.tiktok_handle}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/60 hover:text-purple-400 transition-colors"
+                        title="TikTok"
+                      >
+                        <Music className="w-4 h-4" />
+                      </a>
+                    )}
+                    {vendor.website && (
+                      <a
+                        href={vendor.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/60 hover:text-purple-400 transition-colors"
+                        title="Website"
+                      >
+                        <Globe className="w-4 h-4" />
+                      </a>
+                    )}
+                    {vendor.portfolio && (
+                      <a
+                        href={vendor.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-white/60 hover:text-purple-400 transition-colors"
+                        title="Portfolio"
+                      >
+                        <Star className="w-4 h-4" />
+                      </a>
+                    )}
+                    {!vendor.instagram_handle && !vendor.tiktok_handle && !vendor.website && !vendor.portfolio && (
+                      <span className="text-white/40 text-sm">—</span>
+                    )}
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex flex-col gap-2 ml-4">
-                  {updatingId === vendor.id ? (
-                    <div className="flex items-center justify-center py-2">
-                      <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                    </div>
-                  ) : vendor.status === 'pending' ? (
-                    <>
-                      <button
-                        onClick={() => handleUpdateStatus(vendor.id, 'approved')}
-                        className="px-3 py-1.5 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors text-sm"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(vendor.id, 'waitlist')}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors text-sm"
-                      >
-                        Waitlist
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(vendor.id, 'rejected')}
-                        className="px-3 py-1.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors text-sm"
-                      >
-                        Reject
-                      </button>
-                    </>
-                  ) : (
-                    <select
-                      value={vendor.status}
-                      onChange={(e) =>
-                        handleUpdateStatus(
-                          vendor.id,
-                          e.target.value as 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
-                        )
-                      }
-                      className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition-colors"
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="approved">Approved</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="waitlist">Waitlist</option>
-                      <option value="rejected">Rejected</option>
-                    </select>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))}
+              );
+            })}
+          </div>
         </div>
       )}
     </div>

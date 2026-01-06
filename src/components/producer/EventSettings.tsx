@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { Settings, Eye, EyeOff, Users, Calendar, Trash2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Settings, Eye, EyeOff, Users, Calendar, Trash2, MapPin, FileText, Edit, Pause } from 'lucide-react';
+import { vendorApplicationsApi } from '@/services/api';
+import CreateApplicationForm from './CreateApplicationForm';
 
 interface Event {
   id: number;
@@ -8,7 +10,14 @@ interface Event {
   description?: string;
   event_date?: string;
   event_end_date?: string;
+  start_time?: string;
+  end_time?: string;
+  venue?: string;
   location?: string;
+  application_deadline?: string;
+  payment_due_date?: string;
+  ticket_link?: string;
+  age_restriction?: string;
   status?: {
     published?: boolean;
     registration_open?: boolean;
@@ -23,13 +32,38 @@ interface Event {
   };
 }
 
+interface VendorApplication {
+  id: number;
+  name: string;
+  description?: string;
+  status: 'active' | 'inactive';
+  categories: string[];
+  submissions_count: number;
+  shareable_code: string;
+  shareable_url: string;
+  created_at: string;
+  updated_at: string;
+  pricing?: {
+    booth_price: number;
+    currency: string;
+  };
+}
+
 interface EventSettingsProps {
   event: Event;
   onUpdate?: (eventSlug: string, updates: any) => Promise<void>;
   onDelete?: (eventSlug: string) => Promise<void>;
 }
 
+type View = 'settings' | 'create_app' | 'edit_app';
+
 export default function EventSettings({ event, onUpdate, onDelete }: EventSettingsProps) {
+  const [currentView, setCurrentView] = useState<View>('settings');
+  const [applications, setApplications] = useState<VendorApplication[]>([]);
+  const [selectedApplication, setSelectedApplication] = useState<VendorApplication | null>(null);
+  const [loadingApps, setLoadingApps] = useState(false);
+
+  // Original settings state
   const [isPublished, setIsPublished] = useState(event.published || event.status?.published || false);
   const [registrationOpen, setRegistrationOpen] = useState(event.status?.registration_open || false);
   const [eventStatus, setEventStatus] = useState<'draft' | 'published' | 'cancelled' | 'completed'>(
@@ -38,6 +72,22 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [capacity, setCapacity] = useState(event.capacity?.total?.toString() || '');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    fetchApplications();
+  }, [event.slug]);
+
+  const fetchApplications = async () => {
+    try {
+      setLoadingApps(true);
+      const data = await vendorApplicationsApi.getByEvent(event.slug);
+      setApplications(data);
+    } catch (err: any) {
+      console.error('Failed to fetch applications:', err);
+    } finally {
+      setLoadingApps(false);
+    }
+  };
 
   const handleSaveSettings = async () => {
     if (!onUpdate) {
@@ -77,14 +127,272 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     }
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not set';
+    try {
+      return new Date(dateString).toLocaleDateString('en-US', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      });
+    } catch {
+      return dateString;
+    }
+  };
+
+  const formatTime = (timeString?: string) => {
+    if (!timeString) return 'Not set';
+    try {
+      const [hours, minutes] = timeString.split(':');
+      const date = new Date();
+      date.setHours(parseInt(hours), parseInt(minutes));
+      return date.toLocaleTimeString('en-US', {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+    } catch {
+      return timeString;
+    }
+  };
+
+  const handleApplicationSuccess = () => {
+    fetchApplications();
+    setCurrentView('settings');
+    setSelectedApplication(null);
+  };
+
+  // Show create/edit form
+  if (currentView === 'create_app' || currentView === 'edit_app') {
+    return (
+      <CreateApplicationForm
+        event={{
+          slug: event.slug,
+          title: event.title,
+          event_date: event.event_date,
+          location: event.location,
+        }}
+        onBack={() => {
+          setCurrentView('settings');
+          setSelectedApplication(null);
+        }}
+        onSuccess={handleApplicationSuccess}
+        existingApplication={currentView === 'edit_app' ? selectedApplication || undefined : undefined}
+      />
+    );
+  }
+
   return (
-    <div className="p-6 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white mb-2">Event Settings</h2>
-        <p className="text-white/60 text-sm">Manage visibility, registration, and other event configurations</p>
+    <div className="p-6 max-w-6xl mx-auto space-y-8">
+      {/* Event Details Section */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-purple-500/20">
+            <MapPin className="w-5 h-5 text-purple-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Event Details</h2>
+            <p className="text-white/60 text-sm">Core event information • Changes will notify all applicants</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column */}
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
+            <div>
+              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Event Name</p>
+              <p className="text-white text-lg font-semibold">{event.title}</p>
+            </div>
+
+            <div>
+              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Date & Time</p>
+              <p className="text-white">{formatDate(event.event_date)}</p>
+              <p className="text-white/80 text-sm">
+                {formatTime(event.start_time)} - {formatTime(event.end_time)}
+              </p>
+            </div>
+
+            <div>
+              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Venue</p>
+              <p className="text-white">{event.venue || 'Not set'}</p>
+              {event.location && (
+                <p className="text-white/80 text-sm">{event.location}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
+            <div>
+              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Application Deadline</p>
+              <p className="text-white">{formatDate(event.application_deadline)}</p>
+            </div>
+
+            <div>
+              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Payment Due Date</p>
+              <p className="text-white">{formatDate(event.payment_due_date)}</p>
+            </div>
+
+            {event.ticket_link && (
+              <div>
+                <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Ticket Link</p>
+                <a
+                  href={event.ticket_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:text-purple-300 text-sm underline break-all"
+                >
+                  {event.ticket_link}
+                </a>
+              </div>
+            )}
+
+            {event.age_restriction && (
+              <div>
+                <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Age Restriction</p>
+                <p className="text-white">{event.age_restriction}</p>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
+      {/* Application Settings Section */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-orange-500/20">
+            <FileText className="w-5 h-5 text-orange-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Application Settings</h2>
+            <p className="text-white/60 text-sm">Control which categories are accepting applications</p>
+          </div>
+        </div>
+
+        {/* All Applications Master Toggle */}
+        <div className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20 mb-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-white font-semibold">All Applications</h3>
+              <p className="text-white/60 text-sm">Master toggle for all categories</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-sm font-semibold ${registrationOpen ? 'text-green-400' : 'text-white/60'}`}>
+                {registrationOpen ? 'Open' : 'Closed'}
+              </span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={registrationOpen}
+                  onChange={(e) => setRegistrationOpen(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-green-600 peer-checked:to-green-500 transition-all"></div>
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Controls */}
+        <div className="space-y-3">
+          <p className="text-white/60 text-sm uppercase tracking-wide font-semibold">Category Controls</p>
+
+          {loadingApps ? (
+            <div className="flex items-center justify-center py-10">
+              <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+            </div>
+          ) : applications.length === 0 ? (
+            <div className="bg-[#1e1536] rounded-xl p-8 border border-purple-500/20 text-center">
+              <FileText className="w-12 h-12 text-white/40 mx-auto mb-3" />
+              <p className="text-white/60 mb-4">No application categories created yet</p>
+              <button
+                onClick={() => setCurrentView('create_app')}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg transition-all"
+              >
+                Create First Category
+              </button>
+            </div>
+          ) : (
+            applications.map((app) => (
+              <div
+                key={app.id}
+                className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-1">
+                      <h4 className="text-white font-semibold">{app.name}</h4>
+                      {app.pricing?.booth_price != null && (
+                        <span className="text-green-400 font-semibold text-sm">
+                          ${app.pricing.booth_price.toFixed(0)}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-white/60 text-sm">
+                      {app.submissions_count} {app.submissions_count === 1 ? 'application' : 'applications'}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    {/* Pause Button (Coming Soon) */}
+                    <button
+                      disabled
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/20 text-white/40 cursor-not-allowed"
+                      title="Coming soon"
+                    >
+                      <Pause className="w-4 h-4" />
+                    </button>
+
+                    {/* Edit Button */}
+                    <button
+                      onClick={() => {
+                        setSelectedApplication(app);
+                        setCurrentView('edit_app');
+                      }}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+
+                    {/* Status Toggle */}
+                    <div className="flex items-center gap-2">
+                      <span className={`text-sm font-semibold ${app.status === 'active' ? 'text-green-400' : 'text-white/60'}`}>
+                        {app.status === 'active' ? 'Accepting' : 'Closed'}
+                      </span>
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={app.status === 'active'}
+                          onChange={() => {
+                            // TODO: Toggle application status
+                            console.log('Toggle application status:', app.id);
+                          }}
+                          className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-green-600 peer-checked:to-green-500 transition-all"></div>
+                        <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
+
+          {applications.length > 0 && (
+            <button
+              onClick={() => setCurrentView('create_app')}
+              className="w-full px-4 py-3 rounded-lg border-2 border-dashed border-white/20 text-white/60 hover:border-purple-500/40 hover:text-white transition-all"
+            >
+              + Add Category
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Original Settings Sections */}
       <div className="space-y-6">
         {/* Visibility Settings */}
         <div className="bg-white/5 rounded-xl p-6 border border-white/10">
@@ -116,38 +424,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                 </div>
                 <span className="text-white/90 text-sm font-medium">
                   {isPublished ? 'Published' : 'Draft'}
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Registration Settings */}
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-2">Vendor Registration</h3>
-              <p className="text-white/60 text-sm mb-4">
-                {registrationOpen
-                  ? 'Vendors can apply to participate in your event.'
-                  : 'Vendor registration is currently closed.'}
-              </p>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    checked={registrationOpen}
-                    onChange={(e) => setRegistrationOpen(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-blue-500 transition-all"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                </div>
-                <span className="text-white/90 text-sm font-medium">
-                  {registrationOpen ? 'Registration Open' : 'Registration Closed'}
                 </span>
               </label>
             </div>

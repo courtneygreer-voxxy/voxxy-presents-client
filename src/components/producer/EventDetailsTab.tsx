@@ -234,7 +234,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Applicants Card */}
         <div
-          onClick={() => onNavigateToTab?.('applications')}
+          onClick={() => onNavigateToTab?.('applicants')}
           className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all group cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
