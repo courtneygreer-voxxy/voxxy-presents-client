@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Eye, EyeOff, Users, Calendar, Trash2, MapPin, FileText, Edit, Pause } from 'lucide-react';
+import { Settings, Eye, EyeOff, Users, Calendar, Trash2, FileText, Edit, Pause } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 
@@ -127,36 +127,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not set';
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
-  const formatTime = (timeString?: string) => {
-    if (!timeString) return 'Not set';
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    } catch {
-      return timeString;
-    }
-  };
-
   const handleApplicationSuccess = () => {
     fetchApplications();
     setCurrentView('settings');
@@ -185,79 +155,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
-      {/* Event Details Section */}
-      <div>
-        <div className="flex items-center gap-3 mb-6">
-          <div className="p-2 rounded-lg bg-purple-500/20">
-            <MapPin className="w-5 h-5 text-purple-400" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-white">Event Details</h2>
-            <p className="text-white/60 text-sm">Core event information • Changes will notify all applicants</p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column */}
-          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
-            <div>
-              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Event Name</p>
-              <p className="text-white text-lg font-semibold">{event.title}</p>
-            </div>
-
-            <div>
-              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Date & Time</p>
-              <p className="text-white">{formatDate(event.event_date)}</p>
-              <p className="text-white/80 text-sm">
-                {formatTime(event.start_time)} - {formatTime(event.end_time)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Venue</p>
-              <p className="text-white">{event.venue || 'Not set'}</p>
-              {event.location && (
-                <p className="text-white/80 text-sm">{event.location}</p>
-              )}
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
-            <div>
-              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Application Deadline</p>
-              <p className="text-white">{formatDate(event.application_deadline)}</p>
-            </div>
-
-            <div>
-              <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Payment Due Date</p>
-              <p className="text-white">{formatDate(event.payment_due_date)}</p>
-            </div>
-
-            {event.ticket_link && (
-              <div>
-                <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Ticket Link</p>
-                <a
-                  href={event.ticket_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300 text-sm underline break-all"
-                >
-                  {event.ticket_link}
-                </a>
-              </div>
-            )}
-
-            {event.age_restriction && (
-              <div>
-                <p className="text-white/60 text-xs mb-1 uppercase tracking-wide">Age Restriction</p>
-                <p className="text-white">{event.age_restriction}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
       {/* Application Settings Section */}
       <div>
         <div className="flex items-center gap-3 mb-6">

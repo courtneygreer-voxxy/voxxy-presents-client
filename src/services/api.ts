@@ -1362,16 +1362,22 @@ export interface VendorContact {
   job_title?: string
   email: string
   phone?: string
+  location?: string
   contact_type: 'vendor' | 'partner' | 'sponsor' | 'staff'
   status: 'new' | 'contacted' | 'interested' | 'converted' | 'closed'
   tags?: string[]
+  categories?: string[]
   notes?: string
-  source: 'manual' | 'event_application'
+  source: 'manual' | 'event_application' | 'csv_import'
   source_registration_id?: number
   interaction_count: number
   events_participated?: number
   last_contacted_at?: string
   imported_at?: string
+  instagram_handle?: string
+  tiktok_handle?: string
+  website?: string
+  featured?: boolean
   created_at: string
   updated_at: string
 }
@@ -1444,19 +1450,25 @@ export const vendorContactsApi = {
         id: contact.id,
         organization_id: contact.organization_id,
         contact_name: contact.contact_info?.name || '',
-        business_name: contact.contact_info?.company_name || undefined,
+        business_name: contact.contact_info?.business_name || undefined,
         job_title: contact.contact_info?.job_title || undefined,
         email: contact.contact_info?.email || '',
         phone: contact.contact_info?.phone || undefined,
+        location: contact.contact_info?.location || undefined,
         contact_type: contact.crm_data?.contact_type || 'vendor',
         status: contact.crm_data?.status || 'new',
         tags: contact.crm_data?.tags || [],
+        categories: contact.crm_data?.categories || [],
+        featured: contact.crm_data?.featured || false,
         notes: contact.crm_data?.notes || undefined,
         source: contact.metadata?.source || 'manual',
         source_registration_id: contact.registration_id || undefined,
         interaction_count: contact.activity?.interaction_count || 0,
         last_contacted_at: contact.activity?.last_contacted_at || undefined,
         imported_at: contact.metadata?.imported_at || undefined,
+        instagram_handle: contact.social?.instagram_handle || undefined,
+        tiktok_handle: contact.social?.tiktok_handle || undefined,
+        website: contact.social?.website || undefined,
         created_at: contact.metadata?.created_at || '',
         updated_at: contact.metadata?.updated_at || '',
       }
@@ -1502,19 +1514,25 @@ export const vendorContactsApi = {
       id: contact.id,
       organization_id: contact.organization_id,
       contact_name: contact.contact_info?.name || '',
-      business_name: contact.contact_info?.company_name || undefined,
+      business_name: contact.contact_info?.business_name || undefined,
       job_title: contact.contact_info?.job_title || undefined,
       email: contact.contact_info?.email || '',
       phone: contact.contact_info?.phone || undefined,
+      location: contact.contact_info?.location || undefined,
       contact_type: contact.crm_data?.contact_type || 'vendor',
       status: contact.crm_data?.status || 'new',
       tags: contact.crm_data?.tags || [],
+      categories: contact.crm_data?.categories || [],
+      featured: contact.crm_data?.featured || false,
       notes: contact.crm_data?.notes || undefined,
       source: contact.metadata?.source || 'manual',
       source_registration_id: contact.registration_id || undefined,
       interaction_count: contact.activity?.interaction_count || 0,
       last_contacted_at: contact.activity?.last_contacted_at || undefined,
       imported_at: contact.metadata?.imported_at || undefined,
+      instagram_handle: contact.social?.instagram_handle || undefined,
+      tiktok_handle: contact.social?.tiktok_handle || undefined,
+      website: contact.social?.website || undefined,
       created_at: contact.metadata?.created_at || '',
       updated_at: contact.metadata?.updated_at || '',
     }
@@ -1530,12 +1548,18 @@ export const vendorContactsApi = {
     job_title?: string
     email: string
     phone?: string
+    location?: string
     contact_type?: 'vendor' | 'partner' | 'sponsor' | 'staff'
     tags?: string[]
+    categories?: string[]
     notes?: string
-    source?: 'manual' | 'event_application'
+    source?: 'manual' | 'event_application' | 'csv_import'
     vendor_id?: number
     registration_id?: number
+    instagram_handle?: string
+    tiktok_handle?: string
+    website?: string
+    featured?: boolean
   }): Promise<VendorContact> {
     // Backend expects FLAT structure for create (not nested)
     const backendData = {
@@ -1545,12 +1569,18 @@ export const vendorContactsApi = {
       name: data.contact_name,
       email: data.email,
       phone: data.phone,
-      company_name: data.business_name,
+      business_name: data.business_name,
       job_title: data.job_title,
+      location: data.location,
       contact_type: data.contact_type || 'vendor',
       status: 'new',
       notes: data.notes,
       tags: data.tags || [],
+      categories: data.categories || [],
+      instagram_handle: data.instagram_handle,
+      tiktok_handle: data.tiktok_handle,
+      website: data.website,
+      featured: data.featured || false,
       source: data.source || 'manual',
     }
 
@@ -1571,19 +1601,25 @@ export const vendorContactsApi = {
       id: contact.id,
       organization_id: contact.organization_id,
       contact_name: contact.contact_info?.name || '',
-      business_name: contact.contact_info?.company_name || undefined,
+      business_name: contact.contact_info?.business_name || undefined,
       job_title: contact.contact_info?.job_title || undefined,
       email: contact.contact_info?.email || '',
       phone: contact.contact_info?.phone || undefined,
+      location: contact.contact_info?.location || undefined,
       contact_type: contact.crm_data?.contact_type || 'vendor',
       status: contact.crm_data?.status || 'new',
       tags: contact.crm_data?.tags || [],
+      categories: contact.crm_data?.categories || [],
+      featured: contact.crm_data?.featured || false,
       notes: contact.crm_data?.notes || undefined,
       source: contact.metadata?.source || 'manual',
       source_registration_id: contact.registration_id || undefined,
       interaction_count: contact.activity?.interaction_count || 0,
       last_contacted_at: contact.activity?.last_contacted_at || undefined,
       imported_at: contact.metadata?.imported_at || undefined,
+      instagram_handle: contact.social?.instagram_handle || undefined,
+      tiktok_handle: contact.social?.tiktok_handle || undefined,
+      website: contact.social?.website || undefined,
       created_at: contact.metadata?.created_at || '',
       updated_at: contact.metadata?.updated_at || '',
     }
@@ -1601,12 +1637,18 @@ export const vendorContactsApi = {
     if (data.contact_name !== undefined) backendData.name = data.contact_name
     if (data.email !== undefined) backendData.email = data.email
     if (data.phone !== undefined) backendData.phone = data.phone
-    if (data.business_name !== undefined) backendData.company_name = data.business_name
+    if (data.business_name !== undefined) backendData.business_name = data.business_name
     if (data.job_title !== undefined) backendData.job_title = data.job_title
+    if (data.location !== undefined) backendData.location = data.location
     if (data.contact_type !== undefined) backendData.contact_type = data.contact_type
     if (data.status !== undefined) backendData.status = data.status
     if (data.notes !== undefined) backendData.notes = data.notes
     if (data.tags !== undefined) backendData.tags = data.tags
+    if (data.categories !== undefined) backendData.categories = data.categories
+    if (data.instagram_handle !== undefined) backendData.instagram_handle = data.instagram_handle
+    if (data.tiktok_handle !== undefined) backendData.tiktok_handle = data.tiktok_handle
+    if (data.website !== undefined) backendData.website = data.website
+    if (data.featured !== undefined) backendData.featured = data.featured
 
     const response = await fetchApi<any>(
       `/v1/presents/vendor_contacts/${id}`,
@@ -1625,15 +1667,21 @@ export const vendorContactsApi = {
       id: contact.id,
       organization_id: contact.organization_id,
       contact_name: contact.contact_info?.name || '',
-      business_name: contact.contact_info?.company_name || undefined,
+      business_name: contact.contact_info?.business_name || undefined,
       job_title: contact.contact_info?.job_title || undefined,
       email: contact.contact_info?.email || '',
       phone: contact.contact_info?.phone || undefined,
+      location: contact.contact_info?.location || undefined,
       contact_type: contact.crm_data?.contact_type || 'vendor',
       status: contact.crm_data?.status || 'new',
       tags: contact.crm_data?.tags || [],
+      categories: contact.crm_data?.categories || [],
+      featured: contact.crm_data?.featured || false,
       notes: contact.crm_data?.notes || undefined,
       source: contact.metadata?.source || 'manual',
+      instagram_handle: contact.social?.instagram_handle || undefined,
+      tiktok_handle: contact.social?.tiktok_handle || undefined,
+      website: contact.social?.website || undefined,
       source_registration_id: contact.registration_id || undefined,
       interaction_count: contact.activity?.interaction_count || 0,
       last_contacted_at: contact.activity?.last_contacted_at || undefined,

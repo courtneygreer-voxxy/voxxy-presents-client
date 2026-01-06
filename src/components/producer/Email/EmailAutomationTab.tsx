@@ -4,6 +4,7 @@ import { scheduledEmailsApi } from '@/services/api';
 import type { ScheduledEmail } from '@/types/email';
 import ScheduledEmailList from './ScheduledEmailList';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
+import EmailPreviewModal from './EmailPreviewModal';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -15,6 +16,8 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [previewEmail, setPreviewEmail] = useState<ScheduledEmail | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // Load scheduled emails
   useEffect(() => {
@@ -84,6 +87,11 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
   const handleSaveAsTemplate = (templateId: number) => {
     showSuccess('Template saved successfully! You can now reuse it for other events.');
+  };
+
+  const handlePreview = (email: ScheduledEmail) => {
+    setPreviewEmail(email);
+    setIsPreviewOpen(true);
   };
 
   const showSuccess = (message: string) => {
@@ -194,6 +202,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       {/* Scheduled Emails List */}
       <ScheduledEmailList
         emails={emails}
+        onPreview={handlePreview}
         onPause={handlePause}
         onResume={handleResume}
         onSendNow={handleSendNow}
@@ -207,6 +216,14 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         eventSlug={eventSlug}
         emailCount={emails.length}
         onSuccess={handleSaveAsTemplate}
+      />
+
+      {/* Email Preview Modal */}
+      <EmailPreviewModal
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+        email={previewEmail}
+        eventSlug={eventSlug}
       />
     </div>
   );
