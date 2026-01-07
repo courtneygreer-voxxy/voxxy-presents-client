@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 import { scheduledEmailsApi } from '@/services/api';
 import type { ScheduledEmail } from '@/types/email';
 import ScheduledEmailList from './ScheduledEmailList';
@@ -82,6 +82,24 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       showSuccess('Email deleted successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to delete email');
+    }
+  };
+
+  const handleGenerateEmails = async () => {
+    if (!confirm('Generate scheduled emails from the system template? This will create automated emails for your event.')) {
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const result = await scheduledEmailsApi.generate(eventSlug);
+      await loadEmails();
+      showSuccess(`Generated ${result.generated_count} scheduled emails for your event!`);
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate emails');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -200,14 +218,45 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       )}
 
       {/* Scheduled Emails List */}
-      <ScheduledEmailList
-        emails={emails}
-        onPreview={handlePreview}
-        onPause={handlePause}
-        onResume={handleResume}
-        onSendNow={handleSendNow}
-        onDelete={handleDelete}
-      />
+      {emails.length === 0 ? (
+        <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600/30 to-blue-500/30 border border-white/10 mb-4">
+            <Sparkles className="w-8 h-8 text-purple-400" />
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-2">
+            No Scheduled Emails Yet
+          </h3>
+          <p className="text-white/60 mb-6 max-w-md mx-auto">
+            Generate automated emails from the system template to keep your vendors informed throughout the event lifecycle.
+          </p>
+          <button
+            onClick={handleGenerateEmails}
+            disabled={isLoading}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:from-purple-500 hover:to-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-5 h-5 animate-spin" />
+                Generating...
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-5 h-5" />
+                Generate Emails from Template
+              </>
+            )}
+          </button>
+        </div>
+      ) : (
+        <ScheduledEmailList
+          emails={emails}
+          onPreview={handlePreview}
+          onPause={handlePause}
+          onResume={handleResume}
+          onSendNow={handleSendNow}
+          onDelete={handleDelete}
+        />
+      )}
 
       {/* Save as Template Dialog */}
       <SaveAsTemplateDialog

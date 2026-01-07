@@ -261,25 +261,48 @@ export default function Step1EventDetails({
         </div>
 
         {/* Application Deadline */}
-        <div>
-          <label htmlFor="application_deadline" className="block text-white/90 font-medium mb-2">
-            Application Deadline *
-          </label>
-          <p className="text-white/50 text-sm mb-2">
-            Deadline for vendors to submit applications
-          </p>
-          <input
-            id="application_deadline"
-            type="date"
-            value={eventDetails.application_deadline}
-            onChange={(e) => handleChange('application_deadline', e.target.value)}
-            className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-              errors.application_deadline ? 'border-red-500' : 'border-white/10'
-            } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
-          />
-          {errors.application_deadline && (
-            <p className="mt-1 text-sm text-red-400">{errors.application_deadline}</p>
-          )}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="application_deadline" className="block text-white/90 font-medium mb-2">
+              Application Deadline *
+            </label>
+            <p className="text-white/50 text-xs mb-2">
+              Deadline for vendors to submit applications
+            </p>
+            <input
+              id="application_deadline"
+              type="date"
+              value={eventDetails.application_deadline}
+              onChange={(e) => handleChange('application_deadline', e.target.value)}
+              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
+                errors.application_deadline ? 'border-red-500' : 'border-white/10'
+              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+            />
+            {errors.application_deadline && (
+              <p className="mt-1 text-sm text-red-400">{errors.application_deadline}</p>
+            )}
+          </div>
+
+          <div>
+            <label htmlFor="payment_deadline" className="block text-white/90 font-medium mb-2">
+              Payment Deadline
+            </label>
+            <p className="text-white/50 text-xs mb-2">
+              Deadline for approved vendors to pay
+            </p>
+            <input
+              id="payment_deadline"
+              type="date"
+              value={eventDetails.payment_deadline || ''}
+              onChange={(e) => handleChange('payment_deadline', e.target.value)}
+              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
+                errors.payment_deadline ? 'border-red-500' : 'border-white/10'
+              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+            />
+            {errors.payment_deadline && (
+              <p className="mt-1 text-sm text-red-400">{errors.payment_deadline}</p>
+            )}
+          </div>
         </div>
 
         {/* Age Restriction */}

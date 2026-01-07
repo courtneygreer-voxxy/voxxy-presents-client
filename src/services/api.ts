@@ -574,6 +574,7 @@ export const eventsApi = {
     age_restriction?: string
     ticket_link?: string
     application_deadline?: string
+    payment_deadline?: string
     poster_url?: string
     ticket_url?: string
     ticket_price?: number
@@ -603,6 +604,8 @@ export const eventsApi = {
     location: string
     age_restriction: string
     ticket_link: string
+    application_deadline: string
+    payment_deadline: string
     poster_url: string
     ticket_url: string
     ticket_price: number
@@ -1882,6 +1885,7 @@ export interface EventInvitation {
     ticket_url?: string
     ticket_link?: string
     application_deadline: string
+    payment_deadline?: string
     organization?: {
       id: number
       name: string

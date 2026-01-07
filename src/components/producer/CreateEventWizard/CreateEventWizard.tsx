@@ -29,6 +29,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       age_restriction: '',
       ticket_link: '',
       application_deadline: '',
+      payment_deadline: '',
     },
     applicationDetails: {
       applications: [],

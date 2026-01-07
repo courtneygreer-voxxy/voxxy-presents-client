@@ -29,6 +29,7 @@ export interface WizardState {
     age_restriction?: string; // Age restriction (e.g., "18+", "21+", "All Ages")
     ticket_link?: string; // Ticket purchase link
     application_deadline: string; // ISO date string - REQUIRED by backend
+    payment_deadline?: string; // ISO date string - Payment deadline for approved vendors
   };
 
   // Step 2: Application Details

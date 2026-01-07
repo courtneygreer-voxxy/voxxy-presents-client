@@ -40,6 +40,7 @@ interface Event {
   age_restriction?: string;
   ticket_link?: string;
   application_deadline?: string;
+  payment_deadline?: string;
 }
 
 interface EventDetailsTabProps {
@@ -79,6 +80,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
     age_restriction: event.age_restriction || '',
     ticket_link: event.ticket_link || '',
     application_deadline: event.application_deadline || '',
+    payment_deadline: event.payment_deadline || '',
   });
 
   // Update formData when event prop changes
@@ -95,6 +97,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
       age_restriction: event.age_restriction || '',
       ticket_link: event.ticket_link || '',
       application_deadline: event.application_deadline || '',
+      payment_deadline: event.payment_deadline || '',
     });
   }, [event]);
 
@@ -160,6 +163,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
       age_restriction: event.age_restriction || '',
       ticket_link: event.ticket_link || '',
       application_deadline: event.application_deadline || '',
+      payment_deadline: event.payment_deadline || '',
     });
     setIsEditing(false);
     setError(null);
@@ -509,15 +513,28 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
               />
             </div>
 
-            {/* Application Deadline */}
-            <div>
-              <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
-              <input
-                type="date"
-                value={formData.application_deadline}
-                onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-              />
+            {/* Application Deadline & Payment Deadline */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
+                <p className="text-white/50 text-xs mb-2">Deadline for vendors to submit applications</p>
+                <input
+                  type="date"
+                  value={formData.application_deadline}
+                  onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+              <div>
+                <label className="block text-white/90 font-medium mb-2">Payment Deadline</label>
+                <p className="text-white/50 text-xs mb-2">Deadline for approved vendors to pay</p>
+                <input
+                  type="date"
+                  value={formData.payment_deadline}
+                  onChange={(e) => setFormData({ ...formData, payment_deadline: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -643,6 +660,16 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
                   Application Deadline
                 </div>
                 <p className="text-white">{formatDate(event.application_deadline)}</p>
+              </div>
+            )}
+
+            {event.payment_deadline && (
+              <div>
+                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                  <Calendar className="w-4 h-4" />
+                  Payment Deadline
+                </div>
+                <p className="text-white">{formatDate(event.payment_deadline)}</p>
               </div>
             )}
           </div>

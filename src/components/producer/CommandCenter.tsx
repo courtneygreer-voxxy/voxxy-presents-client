@@ -20,6 +20,7 @@ interface Event {
   age_restriction?: string;
   ticket_link?: string;
   application_deadline?: string;
+  payment_deadline?: string;
   status?: {
     published?: boolean;
     registration_open?: boolean;

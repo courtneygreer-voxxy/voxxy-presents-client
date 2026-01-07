@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, scheduledEmailsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -197,6 +197,7 @@ export default function ProducerDashboard() {
         age_restriction: wizardState.eventDetails.age_restriction || undefined,
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
+        payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
         status: 'draft',
         published: false,
       });
@@ -246,7 +247,20 @@ export default function ProducerDashboard() {
         }
       }
 
-      // Step 4: Refresh events list and navigate back
+      // Step 4: Generate scheduled emails from template
+      try {
+        console.log('Generating scheduled emails for event...');
+        const emailResult = await scheduledEmailsApi.generate(newEvent.slug);
+        console.log(`✅ ${emailResult.generated_count} scheduled emails created`);
+        if (emailResult.skipped_count > 0) {
+          console.log(`⚠️ ${emailResult.skipped_count} emails skipped (already exist)`);
+        }
+      } catch (error) {
+        console.error('Failed to generate scheduled emails:', error);
+        // Don't throw - email generation is optional, event creation succeeded
+      }
+
+      // Step 5: Refresh events list and navigate back
       await fetchEvents(organization.slug);
       setEventsView('list');
     } catch (err) {
