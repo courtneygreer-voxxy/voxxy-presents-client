@@ -1,6 +1,5 @@
 import React from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription } from "@/components/ui/card"
 import { Check, Palette } from "lucide-react"
 
 interface BackgroundSelectorProps {
@@ -42,7 +41,7 @@ const backgroundOptions = [
   }
 ]
 
-export function BackgroundSelector({ currentBackground, onBackgroundSelect, isSaving = false }: BackgroundSelectorProps) {
+export function BackgroundSelector({ currentBackground, onBackgroundSelect }: BackgroundSelectorProps) {
   return (
     <div className="space-y-4">
       <div>

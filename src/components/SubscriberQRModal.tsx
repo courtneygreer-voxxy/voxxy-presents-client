@@ -43,7 +43,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
         description: "Share this link to let people subscribe."
       })
       setTimeout(() => setCopied(false), 2000)
-    } catch (err) {
+    } catch {
       toast({
         variant: "destructive",
         title: "Failed to copy",
@@ -60,7 +60,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           text: `Join ${organizationName} to get updates about events!`,
           url: subscribeUrl
         })
-      } catch (err) {
+      } catch {
         // User cancelled share
       }
     } else {

@@ -189,23 +189,19 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   };
 
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
-    try {
-      const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
-      console.log('📧 Updated email received from server:', updated);
-      console.log('   New scheduled_for:', updated.scheduled_for);
+    const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
+    console.log('📧 Updated email received from server:', updated);
+    console.log('   New scheduled_for:', updated.scheduled_for);
 
-      // Close modal first
-      setIsEditOpen(false);
+    // Close modal first
+    setIsEditOpen(false);
 
-      // Force a fresh reload of emails to ensure UI updates
-      setIsLoading(true);
-      await loadEmails();
-      setIsLoading(false);
+    // Force a fresh reload of emails to ensure UI updates
+    setIsLoading(true);
+    await loadEmails();
+    setIsLoading(false);
 
-      showSuccess('Email updated successfully');
-    } catch (err: any) {
-      throw err; // Re-throw so modal can display error
-    }
+    showSuccess('Email updated successfully');
   };
 
   const showSuccess = (message: string) => {

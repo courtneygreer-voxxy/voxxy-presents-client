@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { 
-  Share2, 
-  Link, 
-  Copy, 
+import {
+  Share2,
+  Copy,
   Check,
   Facebook,
   Twitter,

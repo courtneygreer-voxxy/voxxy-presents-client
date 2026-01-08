@@ -106,7 +106,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
       }
       
       onSuccess?.()
-    } catch (err) {
+    } catch {
       // Error is handled by the AuthContext
       setErrors(prev => ({ ...prev, submit: 'Failed to sign in. Please check your credentials and try again.' }))
     } finally {

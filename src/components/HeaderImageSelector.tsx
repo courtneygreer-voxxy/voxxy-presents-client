@@ -48,7 +48,7 @@ const PRESET_IMAGES = [
   }
 ]
 
-export function HeaderImageSelector({ currentImage, onImageSelect, isSaving }: HeaderImageSelectorProps) {
+export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImageSelectorProps) {
   return (
     <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
       <CardHeader>
