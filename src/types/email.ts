@@ -97,6 +97,9 @@ export interface ScheduledEmail {
 
   // Computed field from backend
   delivery_status?: DeliveryStatus;
+
+  // Frontend-only flag for virtual invitation announcement emails
+  isInvitationAnnouncement?: boolean;
 }
 
 // ============================================================================

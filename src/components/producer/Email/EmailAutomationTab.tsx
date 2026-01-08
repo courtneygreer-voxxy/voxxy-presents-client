@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
-import { scheduledEmailsApi } from '@/services/api';
+import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
 import type { ScheduledEmail } from '@/types/email';
 import ScheduledEmailList from './ScheduledEmailList';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
@@ -28,9 +28,63 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     setIsLoading(true);
     setError(null);
     try {
-      const data = await scheduledEmailsApi.getByEvent(eventSlug);
-      setEmails(data);
+      console.log('📧 Loading emails for event:', eventSlug);
+
+      // Fetch scheduled emails
+      const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
+      console.log('✅ Fetched', scheduledEmailsData.length, 'scheduled emails');
+
+      // Fetch invitations (non-blocking)
+      const invitationsData = await eventInvitationsApi.getByEvent(eventSlug).catch((err) => {
+        console.warn('⚠️ Failed to fetch invitations:', err.message);
+        return { invitations: [], meta: { total_count: 0, sent_count: 0, pending_count: 0, accepted_count: 0, declined_count: 0, expired_count: 0 } };
+      });
+      console.log('📨 Fetched', invitationsData.meta.total_count, 'invitations,', invitationsData.meta.sent_count, 'sent');
+
+      // Create virtual "Event Announcement (Invitations Sent)" email if invitations exist
+      const allEmails: ScheduledEmail[] = [...scheduledEmailsData];
+
+      if (invitationsData.meta.sent_count > 0) {
+        // Find the earliest sent invitation to use as the sent date
+        const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
+        const earliestSentDate = sentInvitations.length > 0
+          ? sentInvitations.reduce((earliest: any, inv: any) => {
+              return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
+            }).sent_at
+          : new Date().toISOString();
+
+        // Create virtual invitation announcement email
+        const invitationEmail: ScheduledEmail = {
+          id: -1, // Negative ID to avoid conflicts
+          event_id: -1,
+          email_campaign_template_id: null,
+          email_template_item_id: null,
+          name: 'Event Announcement (Invitations Sent)',
+          subject_template: 'You\'re Invited: {{event_title}} - Apply Now!',
+          body_template: '',
+          trigger_type: 'on_application_open',
+          trigger_value: 0,
+          trigger_time: null,
+          scheduled_for: earliestSentDate,
+          filter_criteria: {},
+          status: 'sent',
+          sent_at: earliestSentDate,
+          recipient_count: invitationsData.meta.sent_count,
+          error_message: null,
+          created_at: earliestSentDate,
+          updated_at: earliestSentDate,
+          isInvitationAnnouncement: true // Flag for special handling
+        };
+
+        // Add invitation email at the beginning
+        allEmails.unshift(invitationEmail);
+        console.log('✅ Added invitation announcement email');
+      }
+
+      console.log('📋 Total emails to display:', allEmails.length);
+      setEmails(allEmails);
     } catch (err: any) {
+      console.error('❌ Failed to load emails:', err);
       setError(err.message || 'Failed to load scheduled emails');
     } finally {
       setIsLoading(false);

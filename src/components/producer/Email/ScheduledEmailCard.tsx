@@ -60,6 +60,7 @@ export default function ScheduledEmailCard({
   const isPaused = email.status === 'paused';
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
+  const isInvitationAnnouncement = email.isInvitationAnnouncement || false;
 
   // Determine status badge
   const statusBadge = isSent ? (
@@ -122,70 +123,72 @@ export default function ScheduledEmailCard({
         </div>
 
         {/* Actions Dropdown */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
-              disabled={isProcessing}
-            >
-              <MoreVertical className="w-4 h-4" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
-            {onPreview && (
-              <DropdownMenuItem onClick={() => onPreview(email)}>
-                <Eye className="w-4 h-4 mr-2" />
-                Preview
-              </DropdownMenuItem>
-            )}
-            {onEdit && !isSent && (
-              <DropdownMenuItem onClick={() => onEdit(email)}>
-                <Edit2 className="w-4 h-4 mr-2" />
-                Edit
-              </DropdownMenuItem>
-            )}
-            {isScheduled && !isPast && onSendNow && (
-              <DropdownMenuItem
-                onClick={() => handleAction(() => onSendNow(email.id))}
+        {!isInvitationAnnouncement && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button
+                className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
                 disabled={isProcessing}
               >
-                <Play className="w-4 h-4 mr-2" />
-                Send Now
-              </DropdownMenuItem>
-            )}
-            {isScheduled && onPause && (
-              <DropdownMenuItem
-                onClick={() => handleAction(() => onPause(email.id))}
-                disabled={isProcessing}
-              >
-                <Pause className="w-4 h-4 mr-2" />
-                Pause
-              </DropdownMenuItem>
-            )}
-            {isPaused && onResume && (
-              <DropdownMenuItem
-                onClick={() => handleAction(() => onResume(email.id))}
-                disabled={isProcessing}
-              >
-                <Play className="w-4 h-4 mr-2" />
-                Resume
-              </DropdownMenuItem>
-            )}
-            {!isSent && onDelete && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  onClick={() => handleAction(() => onDelete(email.id))}
-                  disabled={isProcessing}
-                  className="text-red-400 focus:text-red-400"
-                >
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Delete
+                <MoreVertical className="w-4 h-4" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {onPreview && (
+                <DropdownMenuItem onClick={() => onPreview(email)}>
+                  <Eye className="w-4 h-4 mr-2" />
+                  Preview
                 </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
+              )}
+              {onEdit && !isSent && (
+                <DropdownMenuItem onClick={() => onEdit(email)}>
+                  <Edit2 className="w-4 h-4 mr-2" />
+                  Edit
+                </DropdownMenuItem>
+              )}
+              {isScheduled && !isPast && onSendNow && (
+                <DropdownMenuItem
+                  onClick={() => handleAction(() => onSendNow(email.id))}
+                  disabled={isProcessing}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Send Now
+                </DropdownMenuItem>
+              )}
+              {isScheduled && onPause && (
+                <DropdownMenuItem
+                  onClick={() => handleAction(() => onPause(email.id))}
+                  disabled={isProcessing}
+                >
+                  <Pause className="w-4 h-4 mr-2" />
+                  Pause
+                </DropdownMenuItem>
+              )}
+              {isPaused && onResume && (
+                <DropdownMenuItem
+                  onClick={() => handleAction(() => onResume(email.id))}
+                  disabled={isProcessing}
+                >
+                  <Play className="w-4 h-4 mr-2" />
+                  Resume
+                </DropdownMenuItem>
+              )}
+              {!isSent && onDelete && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => handleAction(() => onDelete(email.id))}
+                    disabled={isProcessing}
+                    className="text-red-400 focus:text-red-400"
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       {/* Error message if failed */}
