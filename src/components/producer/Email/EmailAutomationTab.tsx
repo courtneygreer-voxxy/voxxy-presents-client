@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
 import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
-import type { ScheduledEmail } from '@/types/email';
+import type { ScheduledEmail, UpdateEmailRequest } from '@/types/email';
 import ScheduledEmailList from './ScheduledEmailList';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import EmailPreviewModal from './EmailPreviewModal';
+import EditScheduledEmailModal from './EditScheduledEmailModal';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -18,6 +19,8 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [previewEmail, setPreviewEmail] = useState<ScheduledEmail | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   // Load scheduled emails
   useEffect(() => {
@@ -82,6 +85,14 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       }
 
       console.log('📋 Total emails to display:', allEmails.length);
+
+      // Log each email's scheduled time for debugging
+      allEmails.forEach(email => {
+        if (!email.isInvitationAnnouncement) {
+          console.log(`   ${email.name}: ${email.scheduled_for}`);
+        }
+      });
+
       setEmails(allEmails);
     } catch (err: any) {
       console.error('❌ Failed to load emails:', err);
@@ -164,6 +175,37 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const handlePreview = (email: ScheduledEmail) => {
     setPreviewEmail(email);
     setIsPreviewOpen(true);
+  };
+
+  const handleEdit = (email: ScheduledEmail) => {
+    // Don't allow editing invitation announcements (virtual emails)
+    if (email.isInvitationAnnouncement) {
+      setError('Invitation emails cannot be edited. They are sent immediately when you create invitations.');
+      return;
+    }
+
+    setEditEmail(email);
+    setIsEditOpen(true);
+  };
+
+  const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
+    try {
+      const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
+      console.log('📧 Updated email received from server:', updated);
+      console.log('   New scheduled_for:', updated.scheduled_for);
+
+      // Close modal first
+      setIsEditOpen(false);
+
+      // Force a fresh reload of emails to ensure UI updates
+      setIsLoading(true);
+      await loadEmails();
+      setIsLoading(false);
+
+      showSuccess('Email updated successfully');
+    } catch (err: any) {
+      throw err; // Re-throw so modal can display error
+    }
   };
 
   const showSuccess = (message: string) => {
@@ -304,6 +346,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       ) : (
         <ScheduledEmailList
           emails={emails}
+          onEdit={handleEdit}
           onPreview={handlePreview}
           onPause={handlePause}
           onResume={handleResume}
@@ -327,6 +370,14 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         onClose={() => setIsPreviewOpen(false)}
         email={previewEmail}
         eventSlug={eventSlug}
+      />
+
+      {/* Edit Email Modal */}
+      <EditScheduledEmailModal
+        isOpen={isEditOpen}
+        onClose={() => setIsEditOpen(false)}
+        email={editEmail}
+        onSave={handleSaveEdit}
       />
     </div>
   );

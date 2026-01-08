@@ -62,6 +62,21 @@ export default function ScheduledEmailCard({
   const isFailed = email.status === 'failed';
   const isInvitationAnnouncement = email.isInvitationAnnouncement || false;
 
+  // Debug: Log when component receives new scheduled_for value
+  if (scheduledDate && !isInvitationAnnouncement) {
+    console.log(`🗓️  Card rendering "${email.name}" with date:`, email.scheduled_for, '→', scheduledDate.toLocaleString());
+  }
+
+  // Determine if card should be clickable
+  const isClickable = onEdit && !isSent && !isInvitationAnnouncement;
+
+  const handleCardClick = () => {
+    console.log('Card clicked!', { email: email.name, isClickable, onEdit: !!onEdit, isSent, isInvitationAnnouncement });
+    if (isClickable && onEdit) {
+      onEdit(email);
+    }
+  };
+
   // Determine status badge
   const statusBadge = isSent ? (
     <DeliveryStatusBadge status={email.delivery_status || 'sent'} />
@@ -82,12 +97,24 @@ export default function ScheduledEmailCard({
   );
 
   return (
-    <div className="bg-white/5 rounded-xl border border-white/10 p-5 hover:bg-white/[0.07] transition-all">
+    <div
+      className={`bg-white/5 rounded-xl border border-white/10 p-5 transition-all ${
+        isClickable
+          ? 'hover:bg-white/[0.08] hover:border-purple-500/30 cursor-pointer group'
+          : 'hover:bg-white/[0.07]'
+      }`}
+      onClick={handleCardClick}
+    >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-white font-medium truncate">{email.name}</h3>
+            <h3 className={`text-white font-medium truncate ${isClickable ? 'group-hover:text-purple-300 transition-colors' : ''}`}>
+              {email.name}
+            </h3>
             {statusBadge}
+            {isClickable && (
+              <Edit2 className="w-3.5 h-3.5 text-white/40 group-hover:text-purple-400 transition-colors" />
+            )}
           </div>
 
           <p className="text-white/60 text-sm line-clamp-2 mb-3">
@@ -129,6 +156,7 @@ export default function ScheduledEmailCard({
               <button
                 className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
                 disabled={isProcessing}
+                onClick={(e) => e.stopPropagation()} // Prevent card click when clicking dropdown
               >
                 <MoreVertical className="w-4 h-4" />
               </button>

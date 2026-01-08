@@ -293,7 +293,7 @@ export default function ScheduledEmailList({
                     <div className="p-4 space-y-3">
                       {categoryEmails.map(email => (
                         <ScheduledEmailCard
-                          key={email.id}
+                          key={`${email.id}-${email.scheduled_for}`}
                           email={email}
                           onEdit={onEdit}
                           onPreview={onPreview}
