@@ -47,10 +47,10 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       if (invitationsData.meta.sent_count > 0) {
         // Find the earliest sent invitation to use as the sent date
         const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
-        const earliestSentDate = sentInvitations.length > 0
-          ? sentInvitations.reduce((earliest: any, inv: any) => {
+        const earliestSentDate: string = sentInvitations.length > 0
+          ? (sentInvitations.reduce((earliest: any, inv: any) => {
               return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
-            }).sent_at
+            }).sent_at as string)
           : new Date().toISOString();
 
         // Create virtual invitation announcement email
