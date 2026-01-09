@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { eventsApi, vendorApplicationsApi } from '@/services/api';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
+import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 
 interface Event {
   id: number;
@@ -61,6 +63,9 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  // Email notifications hook
+  const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
   const [stats, setStats] = useState<ApplicationStats>({
     total: 0,
     new: 0,
@@ -174,7 +179,12 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
       setIsSaving(true);
       setError(null);
 
-      await eventsApi.update(event.slug, formData);
+      const response = await eventsApi.update(event.slug, formData);
+
+      // Check if email notification is needed
+      if (response.email_notification) {
+        handleEmailNotification(response.email_notification, event.slug);
+      }
 
       if (onUpdate) {
         await onUpdate(event.slug, formData);
@@ -675,6 +685,19 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
           </div>
         </div>
       )}
+
+      {/* Email Confirmation Dialog */}
+      <EmailConfirmationDialog
+        open={dialogOpen}
+        onOpenChange={closeDialog}
+        onConfirm={handleConfirmSend}
+        title={dialogProps.title}
+        warning={dialogProps.warning}
+        recipientCount={dialogProps.recipientCount}
+        recipientEmail={dialogProps.recipientEmail}
+        type={dialogProps.type}
+        isLoading={dialogProps.isLoading}
+      />
     </div>
   );
 }

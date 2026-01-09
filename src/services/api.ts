@@ -629,6 +629,70 @@ export const eventsApi = {
       method: 'DELETE',
     })
   },
+
+  /**
+   * Check impact of event update email notification
+   * POST /api/v1/presents/events/:slug/email_notifications/check_event_update_impact
+   */
+  async checkEventUpdateImpact(eventSlug: string) {
+    return fetchApi<{
+      action: string
+      recipient_count: number
+      event: any
+      warning: string
+      requires_confirmation: boolean
+    }>(`/v1/presents/events/${eventSlug}/email_notifications/check_event_update_impact`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Send event update emails (requires confirmation)
+   * POST /api/v1/presents/events/:slug/email_notifications/send_event_update
+   */
+  async sendEventUpdateEmails(eventSlug: string) {
+    return fetchApi<{
+      success: boolean
+      message: string
+      sent_count: number
+      failed_count: number
+    }>(`/v1/presents/events/${eventSlug}/email_notifications/send_event_update`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmed: true }),
+    })
+  },
+
+  /**
+   * Check impact of event cancellation email notification
+   * POST /api/v1/presents/events/:slug/email_notifications/check_cancellation_impact
+   */
+  async checkCancellationImpact(eventSlug: string) {
+    return fetchApi<{
+      action: string
+      recipient_count: number
+      event: any
+      warning: string
+      requires_confirmation: boolean
+    }>(`/v1/presents/events/${eventSlug}/email_notifications/check_cancellation_impact`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Send cancellation emails (requires confirmation)
+   * POST /api/v1/presents/events/:slug/email_notifications/send_cancellation
+   */
+  async sendCancellationEmails(eventSlug: string) {
+    return fetchApi<{
+      success: boolean
+      message: string
+      sent_count: number
+      failed_count: number
+    }>(`/v1/presents/events/${eventSlug}/email_notifications/send_cancellation`, {
+      method: 'POST',
+      body: JSON.stringify({ confirmed: true }),
+    })
+  },
 }
 
 // Registrations API
@@ -700,6 +764,50 @@ export const registrationsApi = {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',
       body: JSON.stringify({ registration: { status } }),
+    })
+  },
+
+  /**
+   * Update registration (producer/venue owner only)
+   * PATCH /api/v1/presents/registrations/:id
+   */
+  async update(registrationId: number, data: Partial<{
+    vendor_category: string
+    payment_status: 'pending' | 'paid' | 'confirmed' | 'overdue'
+    status: string
+    name: string
+    phone: string
+  }>) {
+    return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ registration: data }),
+    })
+  },
+
+  /**
+   * Send payment confirmation email
+   * POST /api/v1/presents/registrations/:id/email_notifications/send_payment_confirmation
+   */
+  async sendPaymentConfirmation(registrationId: number) {
+    return fetchApi<{
+      success: boolean
+      message: string
+    }>(`/v1/presents/registrations/${registrationId}/email_notifications/send_payment_confirmation`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Send category change notification email
+   * POST /api/v1/presents/registrations/:id/email_notifications/send_category_change
+   */
+  async sendCategoryChangeNotification(registrationId: number, newPrice?: number) {
+    return fetchApi<{
+      success: boolean
+      message: string
+    }>(`/v1/presents/registrations/${registrationId}/email_notifications/send_category_change`, {
+      method: 'POST',
+      body: newPrice ? JSON.stringify({ new_price: newPrice }) : undefined,
     })
   },
 }
