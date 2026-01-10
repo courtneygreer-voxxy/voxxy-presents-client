@@ -53,7 +53,7 @@ export default function HomePage() {
           <div className="flex items-center justify-between md:grid md:grid-cols-3">
             {/* Logo - Left */}
             <Link to="/" className="md:justify-self-start">
-              <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-16 md:h-20" />
+              <span className="text-2xl md:text-3xl font-bold text-white tracking-wider">VOXXY</span>
             </Link>
 
             {/* Navigation - Center */}
