@@ -139,15 +139,15 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       <div className="max-w-4xl mx-auto p-6 lg:p-8 space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-white/60">Manage your account and preferences 🎨</p>
+          <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
+          <p className="text-sm text-white/60">Manage your account and preferences</p>
         </div>
 
         {/* Profile Information Section */}
         <div className="bg-white/5 rounded-2xl p-6 lg:p-8 space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-white mb-1">Profile Information</h2>
-            <p className="text-white/60 text-sm">Update your account details</p>
+            <h2 className="text-lg font-semibold text-white mb-1">Profile Information</h2>
+            <p className="text-sm text-white/60">Update your account details</p>
           </div>
 
           <div className="space-y-6">
@@ -155,7 +155,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Full Name */}
               <div>
-                <label htmlFor="fullName" className="block text-white/90 font-medium mb-2">
+                <label htmlFor="fullName" className="block text-sm text-white/90 font-medium mb-2">
                   Full Name
                 </label>
                 <input
@@ -170,7 +170,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-white/90 font-medium mb-2">
+                <label htmlFor="email" className="block text-sm text-white/90 font-medium mb-2">
                   Email
                 </label>
                 <input
@@ -186,7 +186,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
             {/* Company Name */}
             <div>
-              <label htmlFor="companyName" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="companyName" className="block text-sm text-white/90 font-medium mb-2">
                 Company Name
               </label>
               <input
@@ -201,7 +201,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
             {/* Bio */}
             <div>
-              <label htmlFor="bio" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="bio" className="block text-sm text-white/90 font-medium mb-2">
                 Bio
               </label>
               <textarea
@@ -228,16 +228,16 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
         {/* Notifications Section */}
         <div className="bg-white/5 rounded-2xl p-6 lg:p-8 space-y-6">
           <div>
-            <h2 className="text-xl font-semibold text-white mb-1">Notifications</h2>
-            <p className="text-white/60 text-sm">Manage how you receive updates</p>
+            <h2 className="text-lg font-semibold text-white mb-1">Notifications</h2>
+            <p className="text-sm text-white/60">Manage how you receive updates</p>
           </div>
 
           <div className="space-y-4">
             {/* New Applications */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-white font-medium mb-1">New Applications</h3>
-                <p className="text-white/60 text-sm">Get notified when vendors apply to your events</p>
+                <h3 className="text-sm text-white font-medium mb-1">New Applications</h3>
+                <p className="text-sm text-white/60">Get notified when vendors apply to your events</p>
               </div>
               <button
                 onClick={() => toggleNotification('newApplications')}
@@ -256,8 +256,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             {/* Event Reminders */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-white font-medium mb-1">Event Reminders</h3>
-                <p className="text-white/60 text-sm">Receive reminders for upcoming events</p>
+                <h3 className="text-sm text-white font-medium mb-1">Event Reminders</h3>
+                <p className="text-sm text-white/60">Receive reminders for upcoming events</p>
               </div>
               <button
                 onClick={() => toggleNotification('eventReminders')}
@@ -276,8 +276,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             {/* Marketing Emails */}
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="text-white font-medium mb-1">Marketing Emails</h3>
-                <p className="text-white/60 text-sm">Updates about new features and tips</p>
+                <h3 className="text-sm text-white font-medium mb-1">Marketing Emails</h3>
+                <p className="text-sm text-white/60">Updates about new features and tips</p>
               </div>
               <button
                 onClick={() => toggleNotification('marketingEmails')}
@@ -300,8 +300,8 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
           <div className="flex items-start gap-3">
             <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-white font-medium mb-1">Danger Zone</h3>
-              <p className="text-white/60 text-sm">
+              <h3 className="text-sm text-white font-medium mb-1">Danger Zone</h3>
+              <p className="text-sm text-white/60">
                 Permanently delete your account and all associated data
               </p>
             </div>
