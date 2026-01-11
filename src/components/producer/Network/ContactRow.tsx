@@ -1,4 +1,5 @@
-import { Star, Instagram, Music2, Globe, Clock, Pencil, Trash2, MapPin } from 'lucide-react';
+import { useState } from 'react';
+import { Star, Instagram, Music2, Globe, Clock, Pencil, Trash2, MapPin, MoreVertical } from 'lucide-react';
 import { VendorContact } from '@/services/api';
 
 interface ContactRowProps {
@@ -18,6 +19,7 @@ export default function ContactRow({
   onEdit,
   onToggleFeatured,
 }: ContactRowProps) {
+  const [showMenu, setShowMenu] = useState(false);
   // Category badge colors
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
@@ -33,7 +35,7 @@ export default function ContactRow({
   const remainingTagsCount = (contact.tags?.length || 0) - 2;
 
   return (
-    <div className="grid grid-cols-[auto,180px,160px,140px,160px,140px,140px,100px,60px,60px,110px] gap-3 px-3 py-2 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
+    <div className="grid grid-cols-[auto,180px,160px,140px,160px,140px,140px,100px,60px,60px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
       {/* Checkbox */}
       <div className="flex items-center justify-center">
         <input
@@ -190,40 +192,56 @@ export default function ContactRow({
         </div>
       </div>
 
-      {/* Voxxy Star (Featured) */}
-      <div className="flex items-center justify-center">
+      {/* Actions */}
+      <div className="flex items-center justify-end">
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onToggleFeatured?.(contact.id);
+            setShowMenu(!showMenu);
           }}
-          className={`transition-all ${
-            contact.featured
-              ? 'text-yellow-400 hover:text-yellow-300'
-              : 'text-white/30 hover:text-white/50'
-          }`}
-          title={contact.featured ? 'Featured' : 'Not featured'}
+          className="p-1.5 hover:bg-white/10 text-white/70 hover:text-white rounded transition-colors relative z-0"
+          title="Actions"
         >
-          <Star className={`w-4 h-4 ${contact.featured ? 'fill-current' : ''}`} />
+          <MoreVertical className="w-4 h-4" />
         </button>
-      </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1 justify-end">
-        <button
-          onClick={onEdit}
-          className="p-1.5 bg-white/10 hover:bg-white/20 text-white/90 rounded transition-colors"
-          title="Edit contact"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
-        <button
-          onClick={onDelete}
-          className="p-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 rounded transition-colors"
-          title="Delete contact"
-        >
-          <Trash2 className="w-3.5 h-3.5" />
-        </button>
+        {showMenu && (
+          <>
+            <div
+              className="fixed inset-0 z-[100]"
+              onClick={() => setShowMenu(false)}
+            />
+            <div className="fixed z-[101] bg-gray-900 border border-white/20 rounded-lg shadow-xl py-1 min-w-[120px]"
+              style={{
+                right: '20px',
+                top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`
+              }}
+            >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMenu(false);
+                  onEdit();
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowMenu(false);
+                  onDelete();
+                }}
+                className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                Delete
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

@@ -83,17 +83,6 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       }
     }
 
-    // Application deadline (required)
-    if (!eventDetails.application_deadline) {
-      newErrors.application_deadline = 'Application deadline is required';
-    } else if (eventDetails.event_date) {
-      const deadline = new Date(eventDetails.application_deadline);
-      const eventDate = new Date(eventDetails.event_date);
-      if (deadline > eventDate) {
-        newErrors.application_deadline = 'Application deadline must be on or before the event date';
-      }
-    }
-
     // Location (required)
     if (!eventDetails.location.trim()) {
       newErrors.location = 'Location is required';
@@ -107,7 +96,18 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
   const validateStep2 = (): boolean => {
     const newErrors: Record<string, string> = {};
-    const { applicationDetails } = wizardState;
+    const { applicationDetails, eventDetails } = wizardState;
+
+    // Application deadline (required)
+    if (!eventDetails.application_deadline) {
+      newErrors.application_deadline = 'Application deadline is required';
+    } else if (eventDetails.event_date) {
+      const deadline = new Date(eventDetails.application_deadline);
+      const eventDate = new Date(eventDetails.event_date);
+      if (deadline > eventDate) {
+        newErrors.application_deadline = 'Application deadline must be on or before the event date';
+      }
+    }
 
     // Validate at least 1 application
     if (applicationDetails.applications.length === 0) {
