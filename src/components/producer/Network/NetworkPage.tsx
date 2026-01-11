@@ -263,8 +263,8 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl lg:text-4xl font-bold text-white mb-2">Network</h2>
-          <p className="text-base text-white/60">
+          <h2 className="text-lg font-bold text-white mb-1">Network</h2>
+          <p className="text-sm text-white/60">
             Manage your professional contacts and relationships
           </p>
         </div>
