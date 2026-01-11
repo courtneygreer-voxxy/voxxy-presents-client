@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Check, Calendar, MapPin, Clock } from 'lucide-react';
+import { Check, Calendar, MapPin, Clock, Share2 } from 'lucide-react';
 import { eventsApi, registrationsApi } from '@/services/api';
 
 interface VendorApplication {
@@ -96,6 +96,25 @@ export default function VendorApplicationForm() {
       setError(err.message || 'Failed to load event');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleShareLink = async () => {
+    const shareUrl = window.location.href;
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: `Apply to ${event?.title}`,
+          text: `Check out this vendor application for ${event?.title}`,
+          url: shareUrl,
+        });
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(shareUrl);
+        alert('Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Failed to share:', err);
     }
   };
 
@@ -213,39 +232,51 @@ export default function VendorApplicationForm() {
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
       {/* Header */}
       <div className="bg-[#1a0d2e]/80 border-b border-white/10">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">
-            Apply to {event?.title}
-          </h1>
-          <p className="text-white/60 text-sm md:text-base">
-            {event?.location && `${event.location} • `}
-            {event?.dates?.start && formatDate(event.dates.start)}
-          </p>
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
+                Apply to {event?.title}
+              </h1>
+              <p className="text-white/60 text-xs md:text-sm">
+                {event?.location && `${event.location} • `}
+                {event?.dates?.start && formatDate(event.dates.start)}
+              </p>
+            </div>
+            <button
+              onClick={handleShareLink}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all text-sm"
+              title="Share this application"
+            >
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Share</span>
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-6">
         {/* Application Details Card */}
-        <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-6 mb-8">
-          <p className="text-white/60 text-sm mb-1">Applying for</p>
-          <h2 className="text-2xl font-bold text-white mb-3">
+        <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-4 mb-6">
+          <p className="text-white/60 text-[10px] mb-0.5">Applying for</p>
+          <h2 className="text-lg font-bold text-white mb-2">
             {application?.name || 'Vendor Application'}
           </h2>
 
           {application?.description && (
-            <p className="text-white/80 text-sm mb-4 whitespace-pre-wrap">
+            <p className="text-white/80 text-xs mb-3 whitespace-pre-wrap">
               {application.description}
             </p>
           )}
 
           {/* Tags */}
           {application?.application_tags && (
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-1.5 mb-3">
               {application.application_tags.split(',').map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-xs"
+                  className="px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[10px]"
                 >
                   {tag.trim()}
                 </span>
@@ -254,16 +285,16 @@ export default function VendorApplicationForm() {
           )}
 
           {/* Install Date & Time */}
-          <div className="flex flex-wrap gap-4 text-sm">
+          <div className="flex flex-wrap gap-3 text-xs">
             {application?.install?.install_date && (
-              <div className="flex items-center gap-2 text-white/80">
-                <Calendar className="w-4 h-4 text-purple-400" />
+              <div className="flex items-center gap-1.5 text-white/80">
+                <Calendar className="w-3.5 h-3.5 text-purple-400" />
                 <span>Install: {formatDate(application.install.install_date)}</span>
               </div>
             )}
             {(application?.install?.install_start_time || application?.install?.install_end_time) && (
-              <div className="flex items-center gap-2 text-white/80">
-                <Clock className="w-4 h-4 text-purple-400" />
+              <div className="flex items-center gap-1.5 text-white/80">
+                <Clock className="w-3.5 h-3.5 text-purple-400" />
                 <span>
                   {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
                   {application.install.install_start_time && application.install.install_end_time && ' - '}
@@ -275,10 +306,10 @@ export default function VendorApplicationForm() {
 
           {/* Price */}
           {application?.booth_price && (
-            <div className="mt-4 pt-4 border-t border-white/10">
+            <div className="mt-3 pt-3 border-t border-white/10">
               <div>
-                <p className="text-white/60 text-sm mb-1">Booth Price</p>
-                <p className="text-3xl font-bold text-purple-400">
+                <p className="text-white/60 text-[10px] mb-0.5">Booth Price</p>
+                <p className="text-2xl font-bold text-purple-400">
                   ${Number(application.booth_price).toFixed(0)}
                 </p>
               </div>
@@ -287,16 +318,16 @@ export default function VendorApplicationForm() {
         </div>
 
         {/* Application Form */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6 md:p-8">
+        <div className="bg-white/5 border border-white/10 rounded-lg p-4 md:p-5">
 
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Your Information */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Your Information</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <h3 className="text-base font-semibold text-white mb-3">Your Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Business/Brand Name */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Business/Brand Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -304,14 +335,14 @@ export default function VendorApplicationForm() {
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Contact Name */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Contact Name <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -319,14 +350,14 @@ export default function VendorApplicationForm() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Your full name"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Email <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -334,14 +365,14 @@ export default function VendorApplicationForm() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="your@email.com"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Phone Number */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Phone Number <span className="text-red-400">*</span>
                   </label>
                   <input
@@ -349,7 +380,7 @@ export default function VendorApplicationForm() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
@@ -358,11 +389,11 @@ export default function VendorApplicationForm() {
 
             {/* Social & Portfolio (Optional) */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Social & Portfolio (Optional)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <h3 className="text-base font-semibold text-white mb-3">Social & Portfolio (Optional)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Instagram */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Instagram
                   </label>
                   <input
@@ -370,13 +401,13 @@ export default function VendorApplicationForm() {
                     value={formData.instagram_handle}
                     onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
                     placeholder="@yourhandle"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
 
                 {/* TikTok */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     TikTok
                   </label>
                   <input
@@ -384,13 +415,13 @@ export default function VendorApplicationForm() {
                     value={formData.tiktok_handle}
                     onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
                     placeholder="@yourhandle"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
 
                 {/* Website/Portfolio */}
                 <div>
-                  <label className="block text-sm font-medium text-white mb-2">
+                  <label className="block text-xs font-medium text-white mb-1.5">
                     Website/Portfolio
                   </label>
                   <input
@@ -398,7 +429,7 @@ export default function VendorApplicationForm() {
                     value={formData.website}
                     onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                     placeholder="https://yoursite.com"
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
               </div>
@@ -406,33 +437,33 @@ export default function VendorApplicationForm() {
 
             {/* Note to Host (Optional) */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs font-medium text-white mb-1.5">
                 Note to Host (Optional)
               </label>
               <textarea
                 value={formData.note_to_host}
                 onChange={(e) => setFormData({ ...formData, note_to_host: e.target.value })}
                 placeholder="Tell the event organizer about your products, experience, or anything else you'd like them to know..."
-                rows={4}
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                rows={3}
+                className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
               />
             </div>
 
             {/* Permissions & Preferences */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Permissions & Preferences</h3>
-              <div className="space-y-3">
+              <h3 className="text-base font-semibold text-white mb-3">Permissions & Preferences</h3>
+              <div className="space-y-2.5">
                 {/* Terms Agreement */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5">
                   <input
                     type="checkbox"
                     id="agreed_to_terms"
                     checked={formData.agreed_to_terms}
                     onChange={(e) => setFormData({ ...formData, agreed_to_terms: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
+                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
                     required
                   />
-                  <label htmlFor="agreed_to_terms" className="text-sm text-white/80">
+                  <label htmlFor="agreed_to_terms" className="text-xs text-white/80">
                     I agree to the{' '}
                     <a
                       href="https://www.voxxypresents.com/privacy"
@@ -443,24 +474,24 @@ export default function VendorApplicationForm() {
                       Privacy Policy
                     </a>{' '}
                     and Terms of Service <span className="text-red-400">*</span>
-                    <p className="text-white/60 text-xs mt-1">
+                    <p className="text-white/60 text-[10px] mt-0.5">
                       Your information will be shared with the event organizer for this application.
                     </p>
                   </label>
                 </div>
 
                 {/* Application Updates */}
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2.5">
                   <input
                     type="checkbox"
                     id="subscribed"
                     checked={formData.subscribed}
                     onChange={(e) => setFormData({ ...formData, subscribed: e.target.checked })}
-                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
+                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
                   />
-                  <label htmlFor="subscribed" className="text-sm text-white/80">
+                  <label htmlFor="subscribed" className="text-xs text-white/80">
                     Receive email updates about my application <span className="text-red-400">*</span>
-                    <p className="text-white/60 text-xs mt-1">
+                    <p className="text-white/60 text-[10px] mt-0.5">
                       Get notified about application status changes and event updates. You can unsubscribe at any time.
                     </p>
                   </label>
@@ -470,8 +501,8 @@ export default function VendorApplicationForm() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4">
-                <p className="text-red-400 text-sm">{error}</p>
+              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
+                <p className="text-red-400 text-xs">{error}</p>
               </div>
             )}
 
@@ -479,11 +510,11 @@ export default function VendorApplicationForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full px-6 py-4 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
+              className="w-full px-5 py-3 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {submitting ? (
                 <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   <span>Submitting...</span>
                 </>
               ) : (

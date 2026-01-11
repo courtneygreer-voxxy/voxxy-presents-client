@@ -27,7 +27,7 @@ export default function Navigation({ activePage }: NavigationProps) {
         <div className="flex items-center justify-between md:grid md:grid-cols-3">
           {/* Logo - Left */}
           <Link to="/" className="md:justify-self-start">
-            <span className="text-2xl md:text-3xl font-bold text-white">Voxxy Presents</span>
+            <span className="text-2xl md:text-3xl font-bold text-white tracking-wider">VOXXY</span>
           </Link>
 
           {/* Navigation - Center */}

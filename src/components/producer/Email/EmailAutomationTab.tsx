@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
-import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter } from 'lucide-react';
 import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
-import type { ScheduledEmail, UpdateEmailRequest } from '@/types/email';
-import ScheduledEmailList from './ScheduledEmailList';
+import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus } from '@/types/email';
+import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import EmailPreviewModal from './EmailPreviewModal';
 import EditScheduledEmailModal from './EditScheduledEmailModal';
@@ -10,6 +10,17 @@ import EditScheduledEmailModal from './EditScheduledEmailModal';
 interface EmailAutomationTabProps {
   eventSlug: string;
 }
+
+type FilterType = 'all' | ScheduledEmailStatus;
+
+const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
+  { value: 'all', label: 'All Emails' },
+  { value: 'scheduled', label: 'Scheduled' },
+  { value: 'paused', label: 'Paused' },
+  { value: 'sent', label: 'Sent' },
+  { value: 'failed', label: 'Failed' },
+  { value: 'cancelled', label: 'Cancelled' },
+];
 
 export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProps) {
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
@@ -21,6 +32,10 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+
+  // Search and filter state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<FilterType>('all');
 
   // Load scheduled emails
   useEffect(() => {
@@ -85,13 +100,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       }
 
       console.log('📋 Total emails to display:', allEmails.length);
-
-      // Log each email's scheduled time for debugging
-      allEmails.forEach(email => {
-        if (!email.isInvitationAnnouncement) {
-          console.log(`   ${email.name}: ${email.scheduled_for}`);
-        }
-      });
 
       setEmails(allEmails);
     } catch (err: any) {
@@ -209,6 +217,32 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     setTimeout(() => setSuccessMessage(null), 5000);
   };
 
+  // Filter and search emails
+  const filteredEmails = useMemo(() => {
+    let result = emails;
+
+    // Filter by status
+    if (statusFilter !== 'all') {
+      result = result.filter(email => email.status === statusFilter);
+    }
+
+    // Search by name or subject
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(email =>
+        email.name.toLowerCase().includes(query) ||
+        email.subject_template.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort by scheduled_for date (ascending)
+    return result.sort((a, b) => {
+      const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
+      const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
+      return dateA - dateB;
+    });
+  }, [emails, searchQuery, statusFilter]);
+
   // Calculate statistics
   const stats = {
     total: emails.length,
@@ -263,26 +297,27 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <p className="text-white/60 text-sm mb-1">Total Emails</p>
-            <p className="text-2xl font-bold text-white">{stats.total}</p>
+        {/* Statistics Cards - Small and Subtle */}
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+          <div className="bg-white/5 rounded-lg p-2 border border-white/10">
+            <p className="text-white/50 text-[10px] mb-0.5">Total</p>
+            <p className="text-base font-semibold text-white">{stats.total}</p>
           </div>
-          <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
-            <p className="text-blue-400/80 text-sm mb-1">Scheduled</p>
-            <p className="text-2xl font-bold text-blue-400">{stats.scheduled}</p>
+          <div className="bg-blue-500/10 rounded-lg p-2 border border-blue-500/20">
+            <p className="text-blue-400/60 text-[10px] mb-0.5">Scheduled</p>
+            <p className="text-base font-semibold text-blue-400">{stats.scheduled}</p>
           </div>
-          <div className="bg-yellow-500/10 rounded-lg p-4 border border-yellow-500/20">
-            <p className="text-yellow-400/80 text-sm mb-1">Paused</p>
-            <p className="text-2xl font-bold text-yellow-400">{stats.paused}</p>
+          <div className="bg-yellow-500/10 rounded-lg p-2 border border-yellow-500/20">
+            <p className="text-yellow-400/60 text-[10px] mb-0.5">Paused</p>
+            <p className="text-base font-semibold text-yellow-400">{stats.paused}</p>
           </div>
-          <div className="bg-green-500/10 rounded-lg p-4 border border-green-500/20">
-            <p className="text-green-400/80 text-sm mb-1">Sent</p>
-            <p className="text-2xl font-bold text-green-400">{stats.sent}</p>
+          <div className="bg-green-500/10 rounded-lg p-2 border border-green-500/20">
+            <p className="text-green-400/60 text-[10px] mb-0.5">Sent</p>
+            <p className="text-base font-semibold text-green-400">{stats.sent}</p>
           </div>
-          <div className="bg-red-500/10 rounded-lg p-4 border border-red-500/20">
-            <p className="text-red-400/80 text-sm mb-1">Failed</p>
-            <p className="text-2xl font-bold text-red-400">{stats.failed}</p>
+          <div className="bg-red-500/10 rounded-lg p-2 border border-red-500/20">
+            <p className="text-red-400/60 text-[10px] mb-0.5">Failed</p>
+            <p className="text-base font-semibold text-red-400">{stats.failed}</p>
           </div>
         </div>
       </div>
@@ -309,7 +344,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         </div>
       )}
 
-      {/* Scheduled Emails List */}
+      {/* Scheduled Emails */}
       {emails.length === 0 ? (
         <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600/30 to-blue-500/30 border border-white/10 mb-4">
@@ -340,15 +375,65 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
           </button>
         </div>
       ) : (
-        <ScheduledEmailList
-          emails={emails}
-          onEdit={handleEdit}
-          onPreview={handlePreview}
-          onPause={handlePause}
-          onResume={handleResume}
-          onSendNow={handleSendNow}
-          onDelete={handleDelete}
-        />
+        <div className="space-y-6">
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <input
+                type="text"
+                placeholder="Search emails..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+              />
+            </div>
+
+            {/* Status Filter */}
+            <div className="flex items-center gap-2">
+              <Filter className="w-4 h-4 text-white/60" />
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as FilterType)}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+              >
+                {FILTER_OPTIONS.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                    {option.value !== 'all' && ` (${stats[option.value as keyof typeof stats] || 0})`}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* Results count */}
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-white/60">
+              Showing {filteredEmails.length} of {emails.length} emails
+            </p>
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="text-sm text-purple-400 hover:text-purple-300"
+              >
+                Clear search
+              </button>
+            )}
+          </div>
+
+          {/* Email Table */}
+          <EmailTable
+            emails={filteredEmails}
+            onEdit={handleEdit}
+            onPreview={handlePreview}
+            onPause={handlePause}
+            onResume={handleResume}
+            onSendNow={handleSendNow}
+            onDelete={handleDelete}
+          />
+        </div>
       )}
 
       {/* Save as Template Dialog */}

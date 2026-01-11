@@ -55,7 +55,7 @@ export default function VendorDashboard() {
         <div className="p-6 border-b border-white/10">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <img src="/PresentsHeader2.svg" alt="Voxxy Presents" className="h-20 mb-2" />
+              <span className="text-3xl font-bold text-white tracking-wider block mb-2">VOXXY</span>
               <p className="text-sm text-white/60">Vendor</p>
             </div>
             {/* Mobile Close Button */}
