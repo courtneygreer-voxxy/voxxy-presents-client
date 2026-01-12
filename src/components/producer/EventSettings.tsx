@@ -55,7 +55,7 @@ interface EventSettingsProps {
   onDelete?: (eventSlug: string) => Promise<void>;
 }
 
-type View = 'settings' | 'create_app' | 'edit_app';
+type View = 'settings' | 'create_app' | 'edit_app' | 'edit_event';
 
 export default function EventSettings({ event, onUpdate, onDelete }: EventSettingsProps) {
   const [currentView, setCurrentView] = useState<View>('settings');
@@ -72,6 +72,23 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [capacity, setCapacity] = useState(event.capacity?.total?.toString() || '');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Event details editing state
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [editedEvent, setEditedEvent] = useState({
+    title: event.title,
+    description: event.description || '',
+    event_date: event.event_date || '',
+    event_end_date: event.event_end_date || '',
+    start_time: event.start_time || '',
+    end_time: event.end_time || '',
+    venue: event.venue || '',
+    location: event.location || '',
+    application_deadline: event.application_deadline || '',
+    payment_due_date: event.payment_due_date || '',
+    ticket_link: event.ticket_link || '',
+    age_restriction: event.age_restriction || '',
+  });
 
   useEffect(() => {
     fetchApplications();
@@ -133,6 +150,44 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     setSelectedApplication(null);
   };
 
+  const handleSaveEventDetails = async () => {
+    if (!onUpdate) {
+      alert('Event details will be saved');
+      setIsEditingDetails(false);
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await onUpdate(event.slug, editedEvent);
+      setIsEditingDetails(false);
+      alert('Event details updated successfully!');
+    } catch (err) {
+      console.error('Failed to save event details:', err);
+      alert('Failed to save event details. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditedEvent({
+      title: event.title,
+      description: event.description || '',
+      event_date: event.event_date || '',
+      event_end_date: event.event_end_date || '',
+      start_time: event.start_time || '',
+      end_time: event.end_time || '',
+      venue: event.venue || '',
+      location: event.location || '',
+      application_deadline: event.application_deadline || '',
+      payment_due_date: event.payment_due_date || '',
+      ticket_link: event.ticket_link || '',
+      age_restriction: event.age_restriction || '',
+    });
+    setIsEditingDetails(false);
+  };
+
   // Show create/edit form
   if (currentView === 'create_app' || currentView === 'edit_app') {
     return (
@@ -167,10 +222,31 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
               <p className="text-white/60 text-sm">Core event information • Changes will notify all applicants</p>
             </div>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all">
-            <Edit className="w-4 h-4" />
-            Edit
-          </button>
+          {!isEditingDetails ? (
+            <button
+              onClick={() => setIsEditingDetails(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+            >
+              <Edit className="w-4 h-4" />
+              Edit
+            </button>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                onClick={handleCancelEdit}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEventDetails}
+                disabled={isSaving}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg transition-all disabled:opacity-50"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-6">
@@ -178,49 +254,126 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-white/70 text-sm mb-2">EVENT NAME</label>
-              <p className="text-white font-medium">{event.title}</p>
+              {isEditingDetails ? (
+                <input
+                  type="text"
+                  value={editedEvent.title}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, title: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              ) : (
+                <p className="text-white font-medium">{event.title}</p>
+              )}
             </div>
             <div>
               <label className="block text-white/70 text-sm mb-2">APPLICATION DEADLINE</label>
-              <p className="text-white font-medium">
-                {event.application_deadline
-                  ? new Date(event.application_deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                  : 'Not set'}
-              </p>
+              {isEditingDetails ? (
+                <input
+                  type="date"
+                  value={editedEvent.application_deadline}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, application_deadline: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              ) : (
+                <p className="text-white font-medium">
+                  {event.application_deadline
+                    ? new Date(event.application_deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    : 'Not set'}
+                </p>
+              )}
             </div>
           </div>
 
           {/* Date & Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-white/70 text-sm mb-2">DATE & TIME</label>
-              <p className="text-white font-medium">
-                {event.event_date
-                  ? `${new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
-                  : 'Not set'}
-              </p>
-              {event.start_time && event.end_time && (
-                <p className="text-white/60 text-sm mt-1">
-                  {event.start_time} - {event.end_time}
-                </p>
+              <label className="block text-white/70 text-sm mb-2">EVENT DATE</label>
+              {isEditingDetails ? (
+                <div className="space-y-2">
+                  <input
+                    type="date"
+                    value={editedEvent.event_date}
+                    onChange={(e) => setEditedEvent({ ...editedEvent, event_date: e.target.value })}
+                    className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="time"
+                      value={editedEvent.start_time}
+                      onChange={(e) => setEditedEvent({ ...editedEvent, start_time: e.target.value })}
+                      placeholder="Start time"
+                      className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <input
+                      type="time"
+                      value={editedEvent.end_time}
+                      onChange={(e) => setEditedEvent({ ...editedEvent, end_time: e.target.value })}
+                      placeholder="End time"
+                      className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-white font-medium">
+                    {event.event_date
+                      ? `${new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+                      : 'Not set'}
+                  </p>
+                  {event.start_time && event.end_time && (
+                    <p className="text-white/60 text-sm mt-1">
+                      {event.start_time} - {event.end_time}
+                    </p>
+                  )}
+                </>
               )}
             </div>
             <div>
               <label className="block text-white/70 text-sm mb-2">PAYMENT DUE DATE</label>
-              <p className="text-white font-medium">
-                {event.payment_due_date
-                  ? new Date(event.payment_due_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-                  : 'Not set'}
-              </p>
+              {isEditingDetails ? (
+                <input
+                  type="date"
+                  value={editedEvent.payment_due_date}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, payment_due_date: e.target.value })}
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              ) : (
+                <p className="text-white font-medium">
+                  {event.payment_due_date
+                    ? new Date(event.payment_due_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    : 'Not set'}
+                </p>
+              )}
             </div>
           </div>
 
           {/* Venue */}
           <div>
             <label className="block text-white/70 text-sm mb-2">VENUE</label>
-            <p className="text-white font-medium">{event.venue || 'Not set'}</p>
-            {event.location && (
-              <p className="text-white/60 text-sm mt-1">{event.location}</p>
+            {isEditingDetails ? (
+              <div className="space-y-2">
+                <input
+                  type="text"
+                  value={editedEvent.venue}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, venue: e.target.value })}
+                  placeholder="Venue name"
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+                <input
+                  type="text"
+                  value={editedEvent.location}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, location: e.target.value })}
+                  placeholder="Full address"
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+            ) : (
+              <>
+                <p className="text-white font-medium">{event.venue || 'Not set'}</p>
+                {event.location && (
+                  <p className="text-white/60 text-sm mt-1">{event.location}</p>
+                )}
+              </>
             )}
           </div>
 
@@ -228,29 +381,61 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-white/70 text-sm mb-2">TICKET LINK</label>
-              {event.ticket_link ? (
-                <a
-                  href={event.ticket_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300 transition-colors break-all"
-                >
-                  {event.ticket_link}
-                </a>
+              {isEditingDetails ? (
+                <input
+                  type="url"
+                  value={editedEvent.ticket_link}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, ticket_link: e.target.value })}
+                  placeholder="https://..."
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               ) : (
-                <p className="text-white/60">Not set</p>
+                <>
+                  {event.ticket_link ? (
+                    <a
+                      href={event.ticket_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-purple-400 hover:text-purple-300 transition-colors break-all"
+                    >
+                      {event.ticket_link}
+                    </a>
+                  ) : (
+                    <p className="text-white/60">Not set</p>
+                  )}
+                </>
               )}
             </div>
             <div>
               <label className="block text-white/70 text-sm mb-2">AGE RESTRICTION</label>
-              <p className="text-white font-medium">{event.age_restriction || 'All Ages'}</p>
+              {isEditingDetails ? (
+                <input
+                  type="text"
+                  value={editedEvent.age_restriction}
+                  onChange={(e) => setEditedEvent({ ...editedEvent, age_restriction: e.target.value })}
+                  placeholder="All Ages, 18+, 21+, etc."
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              ) : (
+                <p className="text-white font-medium">{event.age_restriction || 'All Ages'}</p>
+              )}
             </div>
           </div>
 
           {/* Event Details */}
           <div>
             <label className="block text-white/70 text-sm mb-2">EVENT DETAILS</label>
-            <p className="text-white/80">{event.description || 'No description provided'}</p>
+            {isEditingDetails ? (
+              <textarea
+                value={editedEvent.description}
+                onChange={(e) => setEditedEvent({ ...editedEvent, description: e.target.value })}
+                placeholder="Event description..."
+                rows={4}
+                className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+              />
+            ) : (
+              <p className="text-white/80">{event.description || 'No description provided'}</p>
+            )}
           </div>
         </div>
       </div>
@@ -413,9 +598,22 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                         </span>
                       )}
                     </div>
-                    <p className="text-white/60 text-sm">
+                    <p className="text-white/60 text-sm mb-2">
                       {app.submissions_count} {app.submissions_count === 1 ? 'application' : 'applications'}
                     </p>
+                    {/* Categories Display */}
+                    {app.categories && app.categories.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {app.categories.map((category, idx) => (
+                          <span
+                            key={idx}
+                            className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                          >
+                            {category}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-3">

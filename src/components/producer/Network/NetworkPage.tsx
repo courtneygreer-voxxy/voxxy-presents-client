@@ -44,7 +44,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   ]);
   const [activeListId, setActiveListId] = useState<string>('all');
   const [showSaveListModal, setShowSaveListModal] = useState(false);
-  const [showListsPanel, setShowListsPanel] = useState(false);
+  const [viewMode, setViewMode] = useState<'network' | 'lists'>('network');
   const [newListName, setNewListName] = useState('');
 
   // Load saved lists from localStorage on mount
@@ -388,6 +388,74 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     );
   }
 
+  // Render Lists View
+  if (viewMode === 'lists') {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white mb-1">Saved Lists</h2>
+            <p className="text-sm text-white/60">
+              {savedLists.length} lists
+            </p>
+          </div>
+          <button
+            onClick={() => setViewMode('network')}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
+          >
+            <X className="w-4 h-4" />
+            Close
+          </button>
+        </div>
+
+        {/* Lists */}
+        <div className="space-y-2">
+          {savedLists.map((list) => {
+            const count = getListContactCount(list.id);
+            const isActive = activeListId === list.id;
+
+            return (
+              <div
+                key={list.id}
+                className={`flex items-center justify-between px-6 py-4 rounded-xl border cursor-pointer transition-all ${
+                  isActive
+                    ? 'bg-purple-500/10 border-purple-500/30 border-l-4'
+                    : 'bg-[#1e1536] border-purple-500/20 hover:bg-purple-500/5 border-l-4 border-l-transparent'
+                }`}
+                onClick={() => {
+                  handleApplySavedList(list.id);
+                  setViewMode('network');
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <Bookmark className="w-5 h-5 text-purple-400" />
+                  <div>
+                    <h4 className="text-white font-medium">{list.name}</h4>
+                    <p className="text-sm text-white/60">({count})</p>
+                  </div>
+                </div>
+                {!list.isDefault && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteSavedList(list.id);
+                    }}
+                    className="p-2 hover:bg-red-500/20 rounded-lg transition-all"
+                    title="Delete list"
+                  >
+                    <X className="w-4 h-4 text-red-400" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Render Network View
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -414,7 +482,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             Add Contact
           </button>
           <button
-            onClick={() => setShowListsPanel(!showListsPanel)}
+            onClick={() => setViewMode('lists')}
             className="flex items-center gap-2 px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-white text-sm font-semibold rounded-lg transition-all border border-purple-500/30"
           >
             <Bookmark className="w-4 h-4" />
@@ -609,68 +677,6 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               >
                 Save List
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Lists Panel */}
-      {showListsPanel && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowListsPanel(false)}>
-          <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 w-full max-w-2xl max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/20">
-              <div>
-                <h3 className="text-lg font-bold text-white">Saved Lists</h3>
-                <p className="text-sm text-white/60">{savedLists.length} lists</p>
-              </div>
-              <button
-                onClick={() => setShowListsPanel(false)}
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5 text-white/60" />
-              </button>
-            </div>
-
-            {/* Lists */}
-            <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
-              {savedLists.map((list) => {
-                const count = getListContactCount(list.id);
-                const isActive = activeListId === list.id;
-
-                return (
-                  <div
-                    key={list.id}
-                    className={`flex items-center justify-between px-6 py-4 border-b border-purple-500/10 last:border-b-0 cursor-pointer transition-all ${
-                      isActive ? 'bg-purple-500/10 border-l-4 border-l-purple-500' : 'hover:bg-white/5 border-l-4 border-l-transparent'
-                    }`}
-                    onClick={() => {
-                      handleApplySavedList(list.id);
-                      setShowListsPanel(false);
-                    }}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Bookmark className="w-5 h-5 text-purple-400" />
-                      <div>
-                        <h4 className="text-white font-medium">{list.name}</h4>
-                        <p className="text-sm text-white/60">({count})</p>
-                      </div>
-                    </div>
-                    {!list.isDefault && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeleteSavedList(list.id);
-                        }}
-                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all"
-                        title="Delete list"
-                      >
-                        <X className="w-4 h-4 text-red-400" />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>

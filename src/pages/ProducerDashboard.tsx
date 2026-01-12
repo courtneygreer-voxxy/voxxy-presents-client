@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
+import MailTemplatesPage from './MailTemplatesPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
 import EditEventForm from '@/components/producer/EditEventForm';
@@ -12,7 +13,7 @@ import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
 
-type NavItem = 'events' | 'network' | 'settings';
+type NavItem = 'events' | 'network' | 'mail' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface Organization {
@@ -324,6 +325,7 @@ export default function ProducerDashboard() {
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
+    { id: 'mail' as NavItem, label: 'Mail', icon: Mail },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -561,6 +563,8 @@ export default function ProducerDashboard() {
         <main className="flex-1 overflow-auto">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} />
+          ) : activeNav === 'mail' ? (
+            <MailTemplatesPage />
           ) : activeNav === 'events' ? (
             renderEventsContent()
           ) : activeNav === 'network' ? (

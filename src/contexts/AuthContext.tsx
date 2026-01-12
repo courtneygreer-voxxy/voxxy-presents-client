@@ -236,6 +236,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       console.log('✓ User profile loaded:', { email: user.email, role: user.role, confirmed: !!user.confirmed_at })
     } catch (err) {
+      console.error('❌ Login failed:', err)
+
       if (err instanceof ApiError) {
         // Use the main error message (which is user-friendly)
         setError(err.message)
