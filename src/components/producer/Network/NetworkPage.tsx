@@ -44,6 +44,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   ]);
   const [activeListId, setActiveListId] = useState<string>('all');
   const [showSaveListModal, setShowSaveListModal] = useState(false);
+  const [showListsPanel, setShowListsPanel] = useState(false);
   const [newListName, setNewListName] = useState('');
 
   // Load saved lists from localStorage on mount
@@ -72,6 +73,28 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     );
 
     return !matchesSavedList;
+  };
+
+  // Get contact count for a saved list
+  const getListContactCount = (listId: string) => {
+    const list = savedLists.find(l => l.id === listId);
+    if (!list) return 0;
+
+    // For now, return total contacts for "all" list
+    // In the future, filter by list criteria
+    if (list.id === 'all') return contacts.length;
+    if (list.id === 'unsubscribed') {
+      // Count unsubscribed contacts when that field is available
+      return contacts.filter(c => (c as any).unsubscribed).length;
+    }
+
+    // For custom lists, count contacts matching the filters
+    return contacts.filter(c => {
+      const locationMatch = !list.filters.location || c.location === list.filters.location;
+      const categoryMatch = !list.filters.category || c.categories?.includes(list.filters.category);
+      const featuredMatch = !list.filters.featured || c.featured === (list.filters.featured === 'true');
+      return locationMatch && categoryMatch && featuredMatch;
+    }).length;
   };
 
   useEffect(() => {
@@ -366,80 +389,39 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }
 
   return (
-    <div className="flex gap-6">
-      {/* Saved Lists Sidebar */}
-      <div className="w-64 flex-shrink-0 space-y-4">
-        <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-white">Saved Lists</h3>
-            <button
-              onClick={() => setShowSaveListModal(true)}
-              className="p-1 hover:bg-white/10 rounded transition-colors"
-              title="Save current filters"
-            >
-              <Plus className="w-4 h-4 text-purple-400" />
-            </button>
-          </div>
-
-          <div className="space-y-1">
-            {savedLists.map((list) => (
-              <div
-                key={list.id}
-                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all cursor-pointer group ${
-                  activeListId === list.id
-                    ? 'bg-purple-500/20 border border-purple-500/30'
-                    : 'hover:bg-white/5 border border-transparent'
-                }`}
-                onClick={() => handleApplySavedList(list.id)}
-              >
-                <div className="flex items-center gap-2 flex-1">
-                  <Bookmark className="w-3.5 h-3.5 text-purple-400" />
-                  <span className="text-sm text-white/90">{list.name}</span>
-                </div>
-                {!list.isDefault && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteSavedList(list.id);
-                    }}
-                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-all"
-                  >
-                    <X className="w-3 h-3 text-red-400" />
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-lg font-bold text-white mb-1">Network</h2>
+          <p className="text-sm text-white/60">
+            Manage your professional contacts and relationships
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowCSVUploadModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
+          >
+            <Upload className="w-4 h-4" />
+            <span className="hidden sm:inline">Import CSV</span>
+          </button>
+          <button
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+          >
+            <UserPlus className="w-4 h-4" />
+            Add Contact
+          </button>
+          <button
+            onClick={() => setShowListsPanel(!showListsPanel)}
+            className="flex items-center gap-2 px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-white text-sm font-semibold rounded-lg transition-all border border-purple-500/30"
+          >
+            <Bookmark className="w-4 h-4" />
+            Lists
+          </button>
         </div>
       </div>
-
-      {/* Main Content */}
-      <div className="flex-1 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-bold text-white mb-1">Network</h2>
-            <p className="text-sm text-white/60">
-              Manage your professional contacts and relationships
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowCSVUploadModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
-            >
-              <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">Import CSV</span>
-            </button>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-            >
-              <UserPlus className="w-4 h-4" />
-              Add Contact
-            </button>
-          </div>
-        </div>
 
       {/* Filter dropdowns */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -486,31 +468,32 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
           <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
         </div>
 
-        {/* Clear Filters Button */}
-        {(locationFilter || categoryFilter || featuredFilter) && (
+      </div>
+
+      {/* Save as List and Clear Filters Row */}
+      {(locationFilter || categoryFilter || featuredFilter) && (
+        <div className="flex items-center justify-end gap-3">
           <button
             onClick={() => {
               setLocationFilter('');
               setCategoryFilter('');
               setFeaturedFilter('');
             }}
-            className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
+            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-sm rounded-lg transition-colors border border-white/10"
           >
             Clear Filters
           </button>
-        )}
-
-        {/* Save as List Button */}
-        {hasUnsavedFilters() && (
-          <button
-            onClick={() => setShowSaveListModal(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs rounded-lg transition-colors border border-purple-500/30"
-          >
-            <Bookmark className="w-3.5 h-3.5" />
-            Save as List
-          </button>
-        )}
-      </div>
+          {hasUnsavedFilters() && (
+            <button
+              onClick={() => setShowSaveListModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm rounded-lg transition-colors border border-purple-500/30"
+            >
+              <Bookmark className="w-4 h-4" />
+              Save as List
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Search & Actions bar */}
       <div className="flex items-center gap-2">
@@ -547,17 +530,16 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         </div>
       )}
 
-        {/* Contacts Table */}
-        <ContactsTable
-          contacts={contacts}
-          selectedContacts={selectedContacts}
-          onSelectContact={handleSelectContact}
-          onSelectAll={handleSelectAll}
-          onDeleteContact={handleDeleteContact}
-          onEditContact={(contact) => setEditingContact(contact)}
-          onToggleFeatured={handleToggleFeatured}
-        />
-      </div>
+      {/* Contacts Table */}
+      <ContactsTable
+        contacts={contacts}
+        selectedContacts={selectedContacts}
+        onSelectContact={handleSelectContact}
+        onSelectAll={handleSelectAll}
+        onDeleteContact={handleDeleteContact}
+        onEditContact={(contact) => setEditingContact(contact)}
+        onToggleFeatured={handleToggleFeatured}
+      />
 
       {/* Modals */}
       {showAddModal && (
@@ -627,6 +609,68 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               >
                 Save List
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lists Panel */}
+      {showListsPanel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={() => setShowListsPanel(false)}>
+          <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 w-full max-w-2xl max-h-[80vh] overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-purple-500/20">
+              <div>
+                <h3 className="text-lg font-bold text-white">Saved Lists</h3>
+                <p className="text-sm text-white/60">{savedLists.length} lists</p>
+              </div>
+              <button
+                onClick={() => setShowListsPanel(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-white/60" />
+              </button>
+            </div>
+
+            {/* Lists */}
+            <div className="overflow-y-auto max-h-[calc(80vh-80px)]">
+              {savedLists.map((list) => {
+                const count = getListContactCount(list.id);
+                const isActive = activeListId === list.id;
+
+                return (
+                  <div
+                    key={list.id}
+                    className={`flex items-center justify-between px-6 py-4 border-b border-purple-500/10 last:border-b-0 cursor-pointer transition-all ${
+                      isActive ? 'bg-purple-500/10 border-l-4 border-l-purple-500' : 'hover:bg-white/5 border-l-4 border-l-transparent'
+                    }`}
+                    onClick={() => {
+                      handleApplySavedList(list.id);
+                      setShowListsPanel(false);
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Bookmark className="w-5 h-5 text-purple-400" />
+                      <div>
+                        <h4 className="text-white font-medium">{list.name}</h4>
+                        <p className="text-sm text-white/60">({count})</p>
+                      </div>
+                    </div>
+                    {!list.isDefault && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSavedList(list.id);
+                        }}
+                        className="p-2 hover:bg-red-500/20 rounded-lg transition-all"
+                        title="Delete list"
+                      >
+                        <X className="w-4 h-4 text-red-400" />
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
