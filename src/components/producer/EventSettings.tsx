@@ -155,6 +155,192 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
+      {/* Event Details Section */}
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-purple-500/20">
+              <Settings className="w-5 h-5 text-purple-400" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-white">Event Details</h2>
+              <p className="text-white/60 text-sm">Core event information • Changes will notify all applicants</p>
+            </div>
+          </div>
+          <button className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all">
+            <Edit className="w-4 h-4" />
+            Edit
+          </button>
+        </div>
+
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-6">
+          {/* Event Name */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-white/70 text-sm mb-2">EVENT NAME</label>
+              <p className="text-white font-medium">{event.title}</p>
+            </div>
+            <div>
+              <label className="block text-white/70 text-sm mb-2">APPLICATION DEADLINE</label>
+              <p className="text-white font-medium">
+                {event.application_deadline
+                  ? new Date(event.application_deadline).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                  : 'Not set'}
+              </p>
+            </div>
+          </div>
+
+          {/* Date & Time */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-white/70 text-sm mb-2">DATE & TIME</label>
+              <p className="text-white font-medium">
+                {event.event_date
+                  ? `${new Date(event.event_date).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}`
+                  : 'Not set'}
+              </p>
+              {event.start_time && event.end_time && (
+                <p className="text-white/60 text-sm mt-1">
+                  {event.start_time} - {event.end_time}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-white/70 text-sm mb-2">PAYMENT DUE DATE</label>
+              <p className="text-white font-medium">
+                {event.payment_due_date
+                  ? new Date(event.payment_due_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                  : 'Not set'}
+              </p>
+            </div>
+          </div>
+
+          {/* Venue */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">VENUE</label>
+            <p className="text-white font-medium">{event.venue || 'Not set'}</p>
+            {event.location && (
+              <p className="text-white/60 text-sm mt-1">{event.location}</p>
+            )}
+          </div>
+
+          {/* Ticket Link & Age Restriction */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-white/70 text-sm mb-2">TICKET LINK</label>
+              {event.ticket_link ? (
+                <a
+                  href={event.ticket_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 hover:text-purple-300 transition-colors break-all"
+                >
+                  {event.ticket_link}
+                </a>
+              ) : (
+                <p className="text-white/60">Not set</p>
+              )}
+            </div>
+            <div>
+              <label className="block text-white/70 text-sm mb-2">AGE RESTRICTION</label>
+              <p className="text-white font-medium">{event.age_restriction || 'All Ages'}</p>
+            </div>
+          </div>
+
+          {/* Event Details */}
+          <div>
+            <label className="block text-white/70 text-sm mb-2">EVENT DETAILS</label>
+            <p className="text-white/80">{event.description || 'No description provided'}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Links & Embed Section */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-blue-500/20">
+            <FileText className="w-5 h-5 text-blue-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Links & Embed</h2>
+            <p className="text-white/60 text-sm">Share your application page or embed it on your website</p>
+          </div>
+        </div>
+
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
+          {/* Application Page Link */}
+          <div>
+            <label className="block text-white/70 text-sm mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Application Page Link
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={`${window.location.origin}/apply/${event.slug}`}
+                readOnly
+                className="flex-1 px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white text-sm focus:outline-none"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/apply/${event.slug}`);
+                }}
+                className="p-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                title="Copy link"
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+              <a
+                href={`${window.location.origin}/apply/${event.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                title="Open in new tab"
+              >
+                <Eye className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+
+          {/* Event Portal Link (for accepted vendors) */}
+          <div>
+            <label className="block text-white/70 text-sm mb-3 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Event Portal Link
+            </label>
+            <p className="text-white/60 text-xs mb-2">
+              Accepted vendors use their registration code to access live event details and updates
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={`${window.location.origin}/events/${event.slug}/portal`}
+                readOnly
+                className="flex-1 px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white text-sm focus:outline-none"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/events/${event.slug}/portal`);
+                }}
+                className="p-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                title="Copy link"
+              >
+                <FileText className="w-4 h-4" />
+              </button>
+              <a
+                href={`${window.location.origin}/events/${event.slug}/portal`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                title="Open in new tab"
+              >
+                <Eye className="w-4 h-4" />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Application Settings Section */}
       <div>
         <div className="flex items-center gap-3 mb-6">

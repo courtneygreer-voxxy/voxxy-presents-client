@@ -322,12 +322,12 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#0a0515]">
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <h2 className="text-2xl font-bold text-white">Applicants</h2>
-          <span className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-400 text-sm font-semibold">
+          <h2 className="text-3xl font-bold text-white">Applicants</h2>
+          <span className="px-3 py-1 rounded-full bg-purple-500/30 text-purple-300 text-sm font-semibold">
             {statusCounts.all}
           </span>
         </div>
@@ -335,60 +335,49 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
       </div>
 
       {/* Search and Filters */}
-      <div className="mb-6 space-y-4">
+      <div className="mb-6 flex items-center gap-4">
         {/* Search Bar */}
-        <div className="relative">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
           <input
             type="text"
             placeholder="Search applicants..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="w-full pl-10 pr-4 py-2 bg-[#1a1332] border border-purple-500/20 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
         </div>
 
-        {/* Filter Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
-          <Filter className="w-4 h-4 text-white/40 flex-shrink-0" />
+        {/* Filters Button */}
+        <button className="flex items-center gap-2 px-4 py-2 bg-[#1a1332] border border-purple-500/20 rounded-lg text-white hover:bg-[#211842] transition-colors">
+          <Filter className="w-4 h-4" />
+          <span className="text-sm">Filters</span>
+        </button>
 
-          {/* Category Filter */}
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-3 py-1.5 rounded-lg bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-          >
-            <option value="all">Category: All</option>
-            {categories.filter(c => c !== 'all').map((category) => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+        {/* Category Filter */}
+        <select
+          value={categoryFilter}
+          onChange={(e) => setCategoryFilter(e.target.value)}
+          className="px-4 py-2 bg-[#1a1332] border border-purple-500/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        >
+          <option value="all">Category: All</option>
+          {categories.filter(c => c !== 'all').map((category) => (
+            <option key={category} value={category}>Category: {category}</option>
+          ))}
+        </select>
 
-          {/* Status Filters */}
-          <div className="flex items-center gap-2">
-            {(
-              [
-                { key: 'all', label: 'All' },
-                { key: 'new', label: 'New' },
-                { key: 'approved', label: 'Approved' },
-                { key: 'waitlist', label: 'Waitlist' },
-                { key: 'rejected', label: 'Rejected' },
-              ] as const
-            ).map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setStatusFilter(key)}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                  statusFilter === key
-                    ? 'bg-purple-600 text-white'
-                    : 'bg-white/5 text-white/60 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                {label} ({statusCounts[key]})
-              </button>
-            ))}
-          </div>
-        </div>
+        {/* Status Filter */}
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+          className="px-4 py-2 bg-[#1a1332] border border-purple-500/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+        >
+          <option value="all">Status: All</option>
+          <option value="new">Status: New</option>
+          <option value="approved">Status: Approved</option>
+          <option value="waitlist">Status: Waitlist</option>
+          <option value="rejected">Status: Rejected</option>
+        </select>
       </div>
 
       {/* Applicants Table */}
@@ -405,14 +394,13 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
           </p>
         </div>
       ) : (
-        <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 overflow-hidden">
+        <div className="bg-[#12101f] rounded-xl border border-purple-500/20 overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr] gap-4 px-6 py-4 bg-white/5 border-b border-white/10">
-            <div className="text-sm font-semibold text-white/80">Business Name</div>
-            <div className="text-sm font-semibold text-white/80">Category</div>
-            <div className="text-sm font-semibold text-white/80">Status</div>
-            <div className="text-sm font-semibold text-white/80">Payment</div>
-            <div className="text-sm font-semibold text-white/80">Submitted</div>
+          <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr] gap-4 px-6 py-3 bg-[#1a1332] border-b border-purple-500/10">
+            <div className="text-sm font-semibold text-white/70">Business Name</div>
+            <div className="text-sm font-semibold text-white/70">Category</div>
+            <div className="text-sm font-semibold text-white/70">Status</div>
+            <div className="text-sm font-semibold text-white/70">Submitted</div>
           </div>
 
           {/* Table Body */}
@@ -422,297 +410,204 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               const statusBadge = getStatusBadge(applicant.status);
 
               return (
-                <div key={applicant.id} className="border-b border-white/10 last:border-b-0">
+                <div key={applicant.id} className="border-b border-purple-500/10 last:border-b-0">
                   {/* Row Header */}
-                  <button
-                    onClick={() => setExpandedId(isExpanded ? null : applicant.id)}
-                    className="w-full grid grid-cols-[2fr_1.5fr_1fr_1fr_1fr] gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-left"
+                  <div
+                    className="w-full grid grid-cols-[2fr_1.5fr_1fr_1fr] gap-4 px-6 py-4 hover:bg-[#1a1332]/50 transition-colors"
                   >
-                    <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setExpandedId(isExpanded ? null : applicant.id)}
+                      className="flex items-center gap-2 text-left"
+                    >
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4 text-white/60 flex-shrink-0" />
                       ) : (
                         <ChevronDown className="w-4 h-4 text-white/60 flex-shrink-0" />
                       )}
-                      <div className="flex items-center gap-2">
-                        <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                        <span className="text-white font-medium">{applicant.business_name}</span>
-                        {applicant.website && (
-                          <LinkIcon className="w-3 h-3 text-white/40" />
+                      <span className="text-white font-medium">{applicant.business_name}</span>
+                      {applicant.vendor_application?.booth_price && (
+                        <Music className="w-3 h-3 text-purple-400" />
+                      )}
+                    </button>
+                    <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                      <select
+                        value={applicant.vendor_category}
+                        onChange={(e) => handleUpdateCategory(applicant.id, e.target.value)}
+                        disabled={updatingId === applicant.id}
+                        className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium border border-purple-500/30 hover:bg-purple-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        {allAvailableCategories.length > 0 ? (
+                          allAvailableCategories.map((category) => (
+                            <option key={category} value={category}>
+                              {category}
+                            </option>
+                          ))
+                        ) : (
+                          <option value={applicant.vendor_category}>{applicant.vendor_category}</option>
                         )}
-                      </div>
+                      </select>
                     </div>
-                    <div>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
-                        {applicant.vendor_category}
-                      </span>
-                    </div>
-                    <div>
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${statusBadge.color}`}>
+                    <div className="flex items-center">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusBadge.color}`}>
                         {statusBadge.label}
                       </span>
                     </div>
-                    <div>
-                      {(() => {
-                        const paymentBadge = getPaymentStatusBadge(applicant.payment_status);
-                        return (
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
-                            <span>{paymentBadge.icon}</span>
-                            {paymentBadge.label}
-                          </span>
-                        );
-                      })()}
-                    </div>
-                    <div className="text-white/60 text-sm">
+                    <div className="flex items-center text-white/60 text-sm">
                       {formatDate(applicant.created_at)}
                     </div>
-                  </button>
+                  </div>
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="px-6 pt-6 pb-6 bg-[#14102a]">
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        {/* Left Column - Contact Info */}
-                        <div className="space-y-4">
-                          <h4 className="text-white font-semibold text-sm mb-3">Contact Information</h4>
-
-                          {applicant.contact_name && (
-                            <div>
-                              <p className="text-white/60 text-xs mb-1">Contact Name</p>
-                              <p className="text-white">{applicant.contact_name}</p>
-                            </div>
-                          )}
-
-                          <div>
-                            <p className="text-white/60 text-xs mb-1">Email</p>
+                    <div className="px-6 py-6 bg-[#0f0d1a] border-t border-purple-500/10">
+                      <div className="space-y-6">
+                        {/* Title and Contact */}
+                        <div>
+                          <h3 className="text-xl font-bold text-white mb-1">{applicant.business_name}</h3>
+                          <div className="flex items-center gap-4 text-white/60 text-sm">
                             <a
                               href={`mailto:${applicant.email}`}
-                              className="text-purple-400 hover:text-purple-300 flex items-center gap-2"
+                              className="flex items-center gap-2 hover:text-purple-400 transition-colors"
                             >
                               <Mail className="w-4 h-4" />
                               {applicant.email}
                             </a>
-                          </div>
-
-                          {applicant.phone && (
-                            <div>
-                              <p className="text-white/60 text-xs mb-1">Phone</p>
-                              <a
-                                href={`tel:${applicant.phone}`}
-                                className="text-purple-400 hover:text-purple-300 flex items-center gap-2"
-                              >
-                                <Phone className="w-4 h-4" />
-                                {applicant.phone}
-                              </a>
-                            </div>
-                          )}
-
-                          {/* Social Links */}
-                          <div>
-                            <p className="text-white/60 text-xs mb-2">Social Links</p>
-                            <div className="space-y-2">
-                              {/* Instagram */}
-                              <div className="flex items-center gap-2">
-                                <Instagram className="w-4 h-4 text-white/60" />
-                                {applicant.instagram_handle ? (
-                                  <a
-                                    href={applicant.instagram_handle}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-purple-400 hover:text-purple-300 text-sm"
-                                  >
-                                    {applicant.instagram_handle}
-                                  </a>
-                                ) : (
-                                  <span className="text-white/40 text-sm">N/A</span>
-                                )}
-                              </div>
-
-                              {/* TikTok */}
-                              <div className="flex items-center gap-2">
-                                <Music className="w-4 h-4 text-white/60" />
-                                {applicant.tiktok_handle ? (
-                                  <a
-                                    href={applicant.tiktok_handle}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-purple-400 hover:text-purple-300 text-sm"
-                                  >
-                                    {applicant.tiktok_handle}
-                                  </a>
-                                ) : (
-                                  <span className="text-white/40 text-sm">N/A</span>
-                                )}
-                              </div>
-
-                              {/* Website/Portfolio */}
-                              <div className="flex items-center gap-2">
-                                <Globe className="w-4 h-4 text-white/60" />
-                                {applicant.website ? (
-                                  <a
-                                    href={applicant.website}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-purple-400 hover:text-purple-300 text-sm"
-                                  >
-                                    {applicant.website}
-                                  </a>
-                                ) : (
-                                  <span className="text-white/40 text-sm">N/A</span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div>
-                            <p className="text-white/60 text-xs mb-1">Ticket Code</p>
-                            <code className="text-sm text-purple-300 font-mono bg-black/20 px-2 py-1 rounded">
-                              {applicant.ticket_code}
-                            </code>
+                            {applicant.phone && (
+                              <>
+                                <span>•</span>
+                                <a
+                                  href={`tel:${applicant.phone}`}
+                                  className="flex items-center gap-2 hover:text-purple-400 transition-colors"
+                                >
+                                  <Phone className="w-4 h-4" />
+                                  {applicant.phone}
+                                </a>
+                              </>
+                            )}
                           </div>
                         </div>
 
-                        {/* Right Column - Application Details & Actions */}
-                        <div className="space-y-4">
-                          {applicant.description && (
-                            <div>
-                              <p className="text-white/60 text-xs mb-1">Application Note</p>
-                              <p className="text-white/80 text-sm">{applicant.description}</p>
-                            </div>
-                          )}
-
-                          <div>
-                            <p className="text-white/60 text-xs mb-1">Applied</p>
-                            <p className="text-white text-sm">{formatDate(applicant.created_at)}</p>
+                        {/* Social Links */}
+                        <div>
+                          <p className="text-white/60 text-sm mb-3">Social Links</p>
+                          <div className="flex items-center gap-3">
+                            {applicant.instagram_handle && (
+                              <a
+                                href={applicant.instagram_handle}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg bg-[#1a1332] text-white/70 text-sm hover:bg-[#211842] transition-colors flex items-center gap-2"
+                              >
+                                <Globe className="w-4 h-4" />
+                                @sarahs.ceramics
+                              </a>
+                            )}
+                            {applicant.tiktok_handle && (
+                              <a
+                                href={applicant.tiktok_handle}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg bg-[#1a1332] text-white/70 text-sm hover:bg-[#211842] transition-colors flex items-center gap-2"
+                              >
+                                <Music className="w-4 h-4" />
+                                @sarahs.ceramics
+                              </a>
+                            )}
+                            {applicant.website && (
+                              <a
+                                href={applicant.website}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="px-3 py-1.5 rounded-lg bg-[#1a1332] text-white/70 text-sm hover:bg-[#211842] transition-colors flex items-center gap-2"
+                              >
+                                <Globe className="w-4 h-4" />
+                                Portfolio
+                              </a>
+                            )}
+                            <button className="px-3 py-1.5 rounded-lg bg-pink-500/20 text-pink-400 text-sm border border-pink-500/30 hover:bg-pink-500/30 transition-colors flex items-center gap-2">
+                              <Star className="w-4 h-4" />
+                              Voxxy Card
+                            </button>
                           </div>
+                        </div>
 
-                          {/* Vendor Category */}
-                          <div className="pt-4 border-t border-white/10">
-                            <p className="text-white/60 text-xs mb-3">Vendor Category</p>
-                            <div className="space-y-3">
-                              <div className="flex items-center gap-3">
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-purple-500/20 text-purple-400">
-                                  {applicant.vendor_category}
-                                </span>
+                        {/* Application Note */}
+                        {applicant.description && (
+                          <div>
+                            <p className="text-white/60 text-sm mb-2">Application Note</p>
+                            <p className="text-white/80">{applicant.description}</p>
+                          </div>
+                        )}
+
+                        {/* Meta Info */}
+                        <div className="flex items-center gap-6 text-sm">
+                          <div>
+                            <span className="text-white/60">Applied: </span>
+                            <span className="text-white">{formatDate(applicant.created_at)}</span>
+                            {applicant.vendor_application?.booth_price && (
+                              <span className="text-purple-400 ml-2">
+                                • Returning Vendor
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Category and Actions */}
+                        <div className="border-t border-purple-500/10 pt-6">
+                          <div className="flex items-center justify-between gap-4">
+                            {/* Category Dropdown */}
+                            <div className="flex items-center gap-3">
+                              <p className="text-white/60 text-sm uppercase tracking-wide">Category</p>
+                              <select
+                                value={applicant.vendor_category}
+                                onChange={(e) => handleUpdateCategory(applicant.id, e.target.value)}
+                                disabled={updatingId === applicant.id}
+                                className="px-4 py-2 rounded-lg bg-[#1a1332] text-white text-sm border border-purple-500/30 hover:bg-[#211842] transition-colors disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              >
                                 {allAvailableCategories.length > 0 ? (
-                                  <select
-                                    value={applicant.vendor_category}
-                                    onChange={(e) => handleUpdateCategory(applicant.id, e.target.value)}
-                                    disabled={updatingId === applicant.id}
-                                    className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    {allAvailableCategories.map((category) => (
-                                      <option key={category} value={category}>
-                                        {category === applicant.vendor_category ? `Current: ${category}` : `Change to: ${category}`}
-                                      </option>
-                                    ))}
-                                  </select>
+                                  allAvailableCategories.map((category) => (
+                                    <option key={category} value={category}>
+                                      {category}
+                                    </option>
+                                  ))
                                 ) : (
-                                  <span className="text-white/40 text-xs italic">No categories available - check event settings</span>
+                                  <option value={applicant.vendor_category}>{applicant.vendor_category}</option>
                                 )}
-                              </div>
-                              {(() => {
-                                const boothPrice = applicant.vendor_application?.booth_price || applicant.vendor_application?.pricing?.booth_price;
-                                return boothPrice ? (
-                                  <p className="text-white/40 text-xs">
-                                    Booth Price: ${Number(boothPrice).toFixed(2)}
-                                  </p>
-                                ) : null;
-                              })()}
-                              {/* Debug info - remove after testing */}
-                              {process.env.NODE_ENV === 'development' && (
-                                <p className="text-white/30 text-xs font-mono">
-                                  Debug: {allAvailableCategories.length} total categories from all applications
-                                </p>
+                              </select>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex items-center gap-3">
+                              {updatingId === applicant.id ? (
+                                <div className="flex items-center justify-center py-2">
+                                  <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                                </div>
+                              ) : (
+                                <>
+                                  <button
+                                    onClick={() => handleUpdateStatus(applicant.id, 'approved')}
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors font-medium"
+                                  >
+                                    <ChevronDown className="w-4 h-4" />
+                                    Approve
+                                  </button>
+                                  <button
+                                    onClick={() => handleUpdateStatus(applicant.id, 'waitlist')}
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors font-medium"
+                                  >
+                                    <ChevronDown className="w-4 h-4" />
+                                    Waitlist
+                                  </button>
+                                  <button
+                                    onClick={() => handleUpdateStatus(applicant.id, 'rejected')}
+                                    className="flex items-center gap-2 px-6 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors font-medium"
+                                  >
+                                    <ChevronDown className="w-4 h-4" />
+                                    Reject
+                                  </button>
+                                </>
                               )}
                             </div>
-                          </div>
-
-                          {/* Payment Status */}
-                          <div className="pt-4 border-t border-white/10">
-                            <p className="text-white/60 text-xs mb-3">Payment Status</p>
-                            <div className="flex items-center gap-3">
-                              {(() => {
-                                const paymentBadge = getPaymentStatusBadge(applicant.payment_status);
-                                return (
-                                  <>
-                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-semibold ${paymentBadge.color}`}>
-                                      <span>{paymentBadge.icon}</span>
-                                      {paymentBadge.label}
-                                    </span>
-                                    <select
-                                      value={applicant.payment_status || 'pending'}
-                                      onChange={(e) =>
-                                        handleUpdatePaymentStatus(
-                                          applicant.id,
-                                          e.target.value as 'pending' | 'paid' | 'confirmed' | 'overdue'
-                                        )
-                                      }
-                                      disabled={updatingId === applicant.id}
-                                      className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                    >
-                                      <option value="pending">Mark as Unpaid</option>
-                                      <option value="paid">Mark as Paid</option>
-                                      <option value="confirmed">Mark as Confirmed</option>
-                                      <option value="overdue">Mark as Overdue</option>
-                                    </select>
-                                  </>
-                                );
-                              })()}
-                            </div>
-                            {applicant.payment_confirmed_at && (
-                              <p className="text-white/40 text-xs mt-2">
-                                Confirmed: {formatDate(applicant.payment_confirmed_at)}
-                              </p>
-                            )}
-                          </div>
-
-                          {/* Action Buttons */}
-                          <div className="pt-4 border-t border-white/10">
-                            <p className="text-white/60 text-xs mb-3">Actions</p>
-                            {updatingId === applicant.id ? (
-                              <div className="flex items-center justify-center py-4">
-                                <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                              </div>
-                            ) : applicant.status === 'pending' ? (
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => handleUpdateStatus(applicant.id, 'approved')}
-                                  className="flex-1 px-4 py-2.5 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors text-sm font-semibold"
-                                >
-                                  Approve
-                                </button>
-                                <button
-                                  onClick={() => handleUpdateStatus(applicant.id, 'waitlist')}
-                                  className="flex-1 px-4 py-2.5 rounded-lg bg-yellow-600 text-white hover:bg-yellow-700 transition-colors text-sm font-semibold"
-                                >
-                                  Waitlist
-                                </button>
-                                <button
-                                  onClick={() => handleUpdateStatus(applicant.id, 'rejected')}
-                                  className="flex-1 px-4 py-2.5 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors text-sm font-semibold"
-                                >
-                                  Reject
-                                </button>
-                              </div>
-                            ) : (
-                              <select
-                                value={applicant.status}
-                                onChange={(e) =>
-                                  handleUpdateStatus(
-                                    applicant.id,
-                                    e.target.value as 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
-                                  )
-                                }
-                                className="w-full px-4 py-2.5 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition-colors"
-                              >
-                                <option value="pending">New</option>
-                                <option value="approved">Approved</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="waitlist">Waitlist</option>
-                                <option value="rejected">Rejected</option>
-                              </select>
-                            )}
                           </div>
                         </div>
                       </div>

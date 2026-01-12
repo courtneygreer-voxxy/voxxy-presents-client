@@ -136,26 +136,26 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-6 lg:p-8 space-y-8">
+      <div className="max-w-4xl mx-auto p-6 lg:p-8 space-y-6">
         {/* Header */}
         <div>
-          <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
-          <p className="text-sm text-white/60">Manage your account and preferences</p>
+          <h1 className="text-3xl font-bold text-white mb-1">Settings</h1>
+          <p className="text-white/60">Manage your account and preferences</p>
         </div>
 
         {/* Profile Information Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 space-y-6">
-          <div>
-            <h2 className="text-lg font-semibold text-white mb-1">Profile Information</h2>
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20">
+          <div className="mb-6">
+            <h2 className="text-xl font-bold text-white mb-1">Profile Information</h2>
             <p className="text-sm text-white/60">Update your account details</p>
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-4">
             {/* Full Name and Email Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Full Name */}
               <div>
-                <label htmlFor="fullName" className="block text-sm text-white/70 font-medium mb-2">
+                <label htmlFor="fullName" className="block text-sm text-white/70 mb-2">
                   Full Name
                 </label>
                 <input
@@ -163,14 +163,14 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
                   type="text"
                   value={profileData.fullName}
                   onChange={(e) => handleChange('fullName', e.target.value)}
-                  placeholder="Event Producer"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  placeholder="Sarah Johnson"
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label htmlFor="email" className="block text-sm text-white/70 font-medium mb-2">
+                <label htmlFor="email" className="block text-sm text-white/70 mb-2">
                   Email
                 </label>
                 <input
@@ -178,15 +178,15 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
                   type="email"
                   value={profileData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
-                  placeholder="producer@voxxy.co"
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  placeholder="sarah@portlandevents.co"
+                  className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 />
               </div>
             </div>
 
             {/* Company Name */}
             <div>
-              <label htmlFor="companyName" className="block text-sm text-white/70 font-medium mb-2">
+              <label htmlFor="companyName" className="block text-sm text-white/70 mb-2">
                 Company Name
               </label>
               <input
@@ -194,150 +194,144 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
                 type="text"
                 value={profileData.companyName}
                 onChange={(e) => handleChange('companyName', e.target.value)}
-                placeholder="Voxxy Events Co."
-                className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                placeholder="Portland Events Co."
+                className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             {/* Bio */}
             <div>
-              <label htmlFor="bio" className="block text-sm text-white/70 font-medium mb-2">
+              <label htmlFor="bio" className="block text-sm text-white/70 mb-2">
                 Bio
               </label>
               <textarea
                 id="bio"
                 value={profileData.bio}
                 onChange={(e) => handleChange('bio', e.target.value)}
-                placeholder="Passionate about creating amazing community events"
-                rows={4}
-                className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all resize-none"
+                placeholder="Event producer with 10+ years of experience organizing markets, fairs, and community gatherings in the Pacific Northwest."
+                rows={3}
+                className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
               />
             </div>
 
-            {/* Save Changes Button */}
-            <button
-              onClick={handleSaveChanges}
-              disabled={isSaving}
-              className="px-8 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg hover:shadow-purple-500/25 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-            >
-              {isSaving ? 'Saving...' : 'Save Changes'}
-            </button>
+            {/* Save Changes and Log Out Buttons */}
+            <div className="flex gap-3 pt-2">
+              <button
+                onClick={handleSaveChanges}
+                disabled={isSaving}
+                className="px-6 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                onClick={() => {
+                  // TODO: Implement logout
+                  console.log('Log out clicked');
+                }}
+                className="px-6 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+              >
+                Log Out
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Notifications Section */}
-        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 mt-6">
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20">
           <div className="mb-6">
-            <h2 className="text-lg font-semibold text-white mb-1">Notifications</h2>
+            <h2 className="text-xl font-bold text-white mb-1">Notifications</h2>
             <p className="text-sm text-white/60">Manage how you receive updates</p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* New Applications */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+            <div className="flex items-center justify-between py-3">
               <div>
-                <h3 className="text-sm text-white font-medium mb-1">New Applications</h3>
-                <p className="text-xs text-white/60">Get notified when vendors apply to your events</p>
+                <h3 className="text-white font-medium mb-0.5">New Applications</h3>
+                <p className="text-sm text-white/60">Get notified when vendors apply to your events</p>
               </div>
-              <button
-                onClick={() => toggleNotification('newApplications')}
-                className={`relative w-14 h-7 rounded-full transition-all ${
-                  notifications.newApplications ? 'bg-gradient-to-r from-purple-600 to-blue-500 shadow-lg shadow-purple-500/30' : 'bg-white/20'
-                }`}
-              >
-                <div
-                  className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${
-                    notifications.newApplications ? 'translate-x-7' : 'translate-x-0'
-                  }`}
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.newApplications}
+                  onChange={() => toggleNotification('newApplications')}
+                  className="sr-only peer"
                 />
-              </button>
+                <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-purple-500 transition-all"></div>
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+              </label>
             </div>
 
             {/* Event Reminders */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+            <div className="flex items-center justify-between py-3">
               <div>
-                <h3 className="text-sm text-white font-medium mb-1">Event Reminders</h3>
-                <p className="text-xs text-white/60">Receive reminders for upcoming events</p>
+                <h3 className="text-white font-medium mb-0.5">Event Reminders</h3>
+                <p className="text-sm text-white/60">Receive reminders for upcoming events</p>
               </div>
-              <button
-                onClick={() => toggleNotification('eventReminders')}
-                className={`relative w-14 h-7 rounded-full transition-all ${
-                  notifications.eventReminders ? 'bg-gradient-to-r from-purple-600 to-blue-500 shadow-lg shadow-purple-500/30' : 'bg-white/20'
-                }`}
-              >
-                <div
-                  className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${
-                    notifications.eventReminders ? 'translate-x-7' : 'translate-x-0'
-                  }`}
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.eventReminders}
+                  onChange={() => toggleNotification('eventReminders')}
+                  className="sr-only peer"
                 />
-              </button>
+                <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-purple-500 transition-all"></div>
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+              </label>
             </div>
 
             {/* Marketing Emails */}
-            <div className="flex items-center justify-between p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all">
+            <div className="flex items-center justify-between py-3">
               <div>
-                <h3 className="text-sm text-white font-medium mb-1">Marketing Emails</h3>
-                <p className="text-xs text-white/60">Updates about new features and tips</p>
+                <h3 className="text-white font-medium mb-0.5">Marketing Emails</h3>
+                <p className="text-sm text-white/60">Updates about new features and tips</p>
               </div>
-              <button
-                onClick={() => toggleNotification('marketingEmails')}
-                className={`relative w-14 h-7 rounded-full transition-all ${
-                  notifications.marketingEmails ? 'bg-gradient-to-r from-purple-600 to-blue-500 shadow-lg shadow-purple-500/30' : 'bg-white/20'
-                }`}
-              >
-                <div
-                  className={`absolute top-0.5 left-0.5 w-6 h-6 rounded-full bg-white shadow-md transition-transform ${
-                    notifications.marketingEmails ? 'translate-x-7' : 'translate-x-0'
-                  }`}
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={notifications.marketingEmails}
+                  onChange={() => toggleNotification('marketingEmails')}
+                  className="sr-only peer"
                 />
-              </button>
+                <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-purple-500 transition-all"></div>
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+              </label>
             </div>
           </div>
         </div>
 
-        {/* Danger Zone Section */}
-        <div className="bg-gradient-to-br from-red-600/10 to-red-700/10 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-red-500/30 mt-6">
+        {/* Delete Account Section */}
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-red-500/30">
           <div className="flex items-start gap-3 mb-4">
             <AlertTriangle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <h3 className="text-base text-white font-semibold mb-1">Danger Zone</h3>
-              <p className="text-sm text-white/70">
+              <h3 className="text-xl font-bold text-white mb-1">Delete Account</h3>
+              <p className="text-sm text-white/60">
                 Permanently delete your account and all associated data
               </p>
             </div>
           </div>
 
           {showDeleteWarning && (
-            <div className="bg-red-500/20 border border-red-500/50 rounded-xl p-4 mb-4">
+            <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4">
               <p className="text-red-300 text-sm">
-                <strong className="font-semibold">Warning:</strong> This action cannot be undone. All your events, contacts, and data will be permanently deleted.
+                <span className="font-semibold">Warning:</span> This action cannot be undone. All your events, contacts, and data will be permanently deleted.
               </p>
             </div>
           )}
 
-          <div className="flex gap-3">
-            <button
-              onClick={() => {
-                if (showDeleteWarning) {
-                  handleDeleteAccount();
-                } else {
-                  setShowDeleteWarning(true);
-                }
-              }}
-              className="px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition-all hover:shadow-lg hover:shadow-red-500/25"
-            >
-              Delete My Account
-            </button>
-
-            {showDeleteWarning && (
-              <button
-                onClick={() => setShowDeleteWarning(false)}
-                className="px-6 py-2.5 rounded-xl border border-white/20 text-white hover:bg-white/10 transition-all"
-              >
-                Cancel
-              </button>
-            )}
-          </div>
+          <button
+            onClick={() => {
+              if (showDeleteWarning) {
+                handleDeleteAccount();
+              } else {
+                setShowDeleteWarning(true);
+              }
+            }}
+            className="w-full px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-all"
+          >
+            Delete My Account
+          </button>
         </div>
       </div>
     </div>
