@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Upload } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload, Bookmark, Plus, X } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
@@ -8,6 +8,18 @@ import { CSVUploadModal } from './CSVUploadModal';
 
 interface NetworkPageProps {
   organizationId: number;
+}
+
+interface SavedList {
+  id: string;
+  name: string;
+  filters: {
+    location?: string;
+    category?: string;
+    featured?: string;
+    unsubscribed?: boolean;
+  };
+  isDefault: boolean;
 }
 
 export default function NetworkPage({ organizationId }: NetworkPageProps) {
@@ -24,6 +36,43 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [locationFilter, setLocationFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('');
+
+  // Saved lists
+  const [savedLists, setSavedLists] = useState<SavedList[]>([
+    { id: 'all', name: 'All Contacts', filters: {}, isDefault: true },
+    { id: 'unsubscribed', name: 'Unsubscribed', filters: { unsubscribed: true }, isDefault: true },
+  ]);
+  const [activeListId, setActiveListId] = useState<string>('all');
+  const [showSaveListModal, setShowSaveListModal] = useState(false);
+  const [newListName, setNewListName] = useState('');
+
+  // Load saved lists from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem(`savedLists_${organizationId}`);
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setSavedLists(parsed);
+      } catch (err) {
+        console.error('Failed to parse saved lists:', err);
+      }
+    }
+  }, [organizationId]);
+
+  // Check if current filter state should trigger save prompt
+  const hasUnsavedFilters = () => {
+    const hasFilters = locationFilter || categoryFilter || featuredFilter;
+    if (!hasFilters) return false;
+
+    // Check if current filters match any existing saved list
+    const matchesSavedList = savedLists.some(list =>
+      list.filters.location === (locationFilter || undefined) &&
+      list.filters.category === (categoryFilter || undefined) &&
+      list.filters.featured === (featuredFilter || undefined)
+    );
+
+    return !matchesSavedList;
+  };
 
   useEffect(() => {
     fetchContacts();
@@ -108,6 +157,64 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       );
     } catch (err: any) {
       alert(err.message || 'Failed to update featured status');
+    }
+  };
+
+  // Saved list handlers
+  const handleApplySavedList = (listId: string) => {
+    const list = savedLists.find(l => l.id === listId);
+    if (!list) return;
+
+    setActiveListId(listId);
+    setLocationFilter(list.filters.location || '');
+    setCategoryFilter(list.filters.category || '');
+    setFeaturedFilter(list.filters.featured || '');
+  };
+
+  const handleSaveCurrentFilters = () => {
+    if (!newListName.trim()) {
+      alert('Please enter a name for this list');
+      return;
+    }
+
+    const newList: SavedList = {
+      id: `list_${Date.now()}`,
+      name: newListName.trim(),
+      filters: {
+        location: locationFilter || undefined,
+        category: categoryFilter || undefined,
+        featured: featuredFilter || undefined,
+      },
+      isDefault: false,
+    };
+
+    const updatedLists = [...savedLists, newList];
+    setSavedLists(updatedLists);
+    localStorage.setItem(`savedLists_${organizationId}`, JSON.stringify(updatedLists));
+
+    setNewListName('');
+    setShowSaveListModal(false);
+    setActiveListId(newList.id);
+  };
+
+  const handleDeleteSavedList = (listId: string) => {
+    const list = savedLists.find(l => l.id === listId);
+    if (list?.isDefault) {
+      alert('Cannot delete default lists');
+      return;
+    }
+
+    if (!confirm('Are you sure you want to delete this saved list?')) {
+      return;
+    }
+
+    const updatedLists = savedLists.filter(l => l.id !== listId);
+    setSavedLists(updatedLists);
+    localStorage.setItem(`savedLists_${organizationId}`, JSON.stringify(updatedLists));
+
+    if (activeListId === listId) {
+      setActiveListId('all');
+      handleApplySavedList('all');
     }
   };
 
@@ -259,32 +366,80 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-white mb-1">Network</h2>
-          <p className="text-sm text-white/60">
-            Manage your professional contacts and relationships
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowCSVUploadModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
-          >
-            <Upload className="w-4 h-4" />
-            <span className="hidden sm:inline">Import CSV</span>
-          </button>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-          >
-            <UserPlus className="w-4 h-4" />
-            Add Contact
-          </button>
+    <div className="flex gap-6">
+      {/* Saved Lists Sidebar */}
+      <div className="w-64 flex-shrink-0 space-y-4">
+        <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-white">Saved Lists</h3>
+            <button
+              onClick={() => setShowSaveListModal(true)}
+              className="p-1 hover:bg-white/10 rounded transition-colors"
+              title="Save current filters"
+            >
+              <Plus className="w-4 h-4 text-purple-400" />
+            </button>
+          </div>
+
+          <div className="space-y-1">
+            {savedLists.map((list) => (
+              <div
+                key={list.id}
+                className={`flex items-center justify-between px-3 py-2 rounded-lg transition-all cursor-pointer group ${
+                  activeListId === list.id
+                    ? 'bg-purple-500/20 border border-purple-500/30'
+                    : 'hover:bg-white/5 border border-transparent'
+                }`}
+                onClick={() => handleApplySavedList(list.id)}
+              >
+                <div className="flex items-center gap-2 flex-1">
+                  <Bookmark className="w-3.5 h-3.5 text-purple-400" />
+                  <span className="text-sm text-white/90">{list.name}</span>
+                </div>
+                {!list.isDefault && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteSavedList(list.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-500/20 rounded transition-all"
+                  >
+                    <X className="w-3 h-3 text-red-400" />
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="flex-1 space-y-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold text-white mb-1">Network</h2>
+            <p className="text-sm text-white/60">
+              Manage your professional contacts and relationships
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowCSVUploadModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
+            >
+              <Upload className="w-4 h-4" />
+              <span className="hidden sm:inline">Import CSV</span>
+            </button>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+            >
+              <UserPlus className="w-4 h-4" />
+              Add Contact
+            </button>
+          </div>
+        </div>
 
       {/* Filter dropdowns */}
       <div className="flex items-center gap-3 flex-wrap">
@@ -344,6 +499,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             Clear Filters
           </button>
         )}
+
+        {/* Save as List Button */}
+        {hasUnsavedFilters() && (
+          <button
+            onClick={() => setShowSaveListModal(true)}
+            className="flex items-center gap-2 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-xs rounded-lg transition-colors border border-purple-500/30"
+          >
+            <Bookmark className="w-3.5 h-3.5" />
+            Save as List
+          </button>
+        )}
       </div>
 
       {/* Search & Actions bar */}
@@ -381,16 +547,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         </div>
       )}
 
-      {/* Contacts Table */}
-      <ContactsTable
-        contacts={contacts}
-        selectedContacts={selectedContacts}
-        onSelectContact={handleSelectContact}
-        onSelectAll={handleSelectAll}
-        onDeleteContact={handleDeleteContact}
-        onEditContact={(contact) => setEditingContact(contact)}
-        onToggleFeatured={handleToggleFeatured}
-      />
+        {/* Contacts Table */}
+        <ContactsTable
+          contacts={contacts}
+          selectedContacts={selectedContacts}
+          onSelectContact={handleSelectContact}
+          onSelectAll={handleSelectAll}
+          onDeleteContact={handleDeleteContact}
+          onEditContact={(contact) => setEditingContact(contact)}
+          onToggleFeatured={handleToggleFeatured}
+        />
+      </div>
 
       {/* Modals */}
       {showAddModal && (
@@ -426,6 +593,43 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             fetchContacts();
           }}
         />
+      )}
+
+      {/* Save List Modal */}
+      {showSaveListModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 w-full max-w-md">
+            <h3 className="text-lg font-bold text-white mb-4">Save Filter as List</h3>
+            <p className="text-sm text-white/60 mb-4">
+              Give this filter combination a name to save it for quick access later.
+            </p>
+            <input
+              type="text"
+              value={newListName}
+              onChange={(e) => setNewListName(e.target.value)}
+              placeholder="e.g., Portland Vendors, Summer 2025"
+              className="w-full px-4 py-2 rounded-lg bg-[#0f0a1f] border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all mb-4"
+              onKeyDown={(e) => e.key === 'Enter' && handleSaveCurrentFilters()}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowSaveListModal(false);
+                  setNewListName('');
+                }}
+                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveCurrentFilters}
+                className="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-semibold hover:shadow-lg transition-all"
+              >
+                Save List
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

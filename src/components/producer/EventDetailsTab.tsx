@@ -234,14 +234,14 @@ export default function EventDetailsTab({ event, onNavigateToTab }: EventDetails
 
       {/* Link Sharing Buttons */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Copy Link Button */}
+        {/* Copy Application Link Button */}
         <button
-          onClick={handleCopyUrl}
+          onClick={handleCopyApplicationUrl}
           className="flex items-center justify-between p-5 bg-gradient-to-br from-[#2a1a4a]/40 to-[#1e1536]/40 backdrop-blur-sm rounded-xl border border-purple-500/30 hover:border-purple-500/50 transition-all group"
         >
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-xl bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors border border-purple-400/20">
-              {copied ? (
+              {copiedApplication ? (
                 <Check className="w-5 h-5 text-green-400" />
               ) : (
                 <Copy className="w-5 h-5 text-purple-400" />
@@ -249,17 +249,17 @@ export default function EventDetailsTab({ event, onNavigateToTab }: EventDetails
             </div>
             <div className="text-left">
               <p className="text-sm font-semibold text-white">
-                {copied ? 'Link Copied!' : 'Copy Link'}
+                {copiedApplication ? 'Link Copied!' : 'Copy Application Link'}
               </p>
-              <p className="text-xs text-white/60">Share event URL</p>
+              <p className="text-xs text-white/60">Share event application</p>
             </div>
           </div>
           <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-white/50 transition-colors" />
         </button>
 
-        {/* View Link Button */}
+        {/* View Application Link Button */}
         <a
-          href={publicEventUrl}
+          href={applicationUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center justify-between p-5 bg-gradient-to-br from-[#1a2a4a]/40 to-[#1e1536]/40 backdrop-blur-sm rounded-xl border border-blue-500/30 hover:border-blue-500/50 transition-all group"
@@ -269,8 +269,8 @@ export default function EventDetailsTab({ event, onNavigateToTab }: EventDetails
               <ExternalLink className="w-5 h-5 text-blue-400" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-white">View Link</p>
-              <p className="text-xs text-white/60">Open event page</p>
+              <p className="text-sm font-semibold text-white">View Application</p>
+              <p className="text-xs text-white/60">Open application page</p>
             </div>
           </div>
           <ArrowRight className="w-5 h-5 text-white/30 group-hover:text-white/50 transition-colors" />
