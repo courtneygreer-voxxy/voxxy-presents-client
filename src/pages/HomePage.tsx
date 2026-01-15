@@ -219,7 +219,7 @@ export default function HomePage() {
           </h1>
 
           <p className="text-xl md:text-2xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Event coordination tools that help producers manage vendor relationships, automate logistics, and scale without burning out.
+            Stop spending 15-20 hours per event chasing vendors across texts, emails, and DMs. Voxxy centralizes everything so you can focus on the event, not the inbox.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -265,7 +265,7 @@ export default function HomePage() {
               Event Coordination is Broken
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Event producers managing recurring events face the same operational bottlenecks
+              The bigger your event calendar grows, the more coordination eats your time
             </p>
           </div>
 
@@ -274,9 +274,9 @@ export default function HomePage() {
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
               onClick={() => trackLandingInteraction('click', 'Communication Chaos Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Scattered Communication Chaos</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">5-7 Tools, Zero Visibility</h3>
               <p className="text-gray-300 leading-relaxed">
-                Vendor coordination scattered across texts, emails, Instagram DMs, and spreadsheets - you can't find conversations when you need them most
+                You're managing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical info gets buried. You spend hours just staying on top of messages.
               </p>
             </div>
 
@@ -284,9 +284,9 @@ export default function HomePage() {
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
               onClick={() => trackLandingInteraction('click', 'Manual Work Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Manual Work Eating Your Time</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">15-20 Hours of Unpaid Labor</h3>
               <p className="text-gray-300 leading-relaxed">
-                Spending 15-20 hours per event on vendor logistics instead of creating experiences - coordination becomes unpaid labor that doesn't scale
+                Every event costs you 15-20 hours of coordination work. That time doesn't scale — but your event calendar keeps growing.
               </p>
             </div>
 
@@ -294,9 +294,9 @@ export default function HomePage() {
               className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-8 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 cursor-pointer group"
               onClick={() => trackLandingInteraction('click', 'Application Review Problem Card', 'Problems Section')}
             >
-              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">Application Review Bottleneck</h3>
+              <h3 className="text-xl font-semibold text-purple-400 mb-4 group-hover:text-purple-300 transition-colors">200+ Applications, No Way to Compare</h3>
               <p className="text-gray-300 leading-relaxed">
-                Drowning in 200+ vendor applications across PDFs, emails, and Instagram profiles with no easy way to compare and decide
+                You're scrolling through social profiles one by one with no way to compare. High-quality artists — the ones with followings who drive foot traffic — get lost in the pile.
               </p>
             </div>
           </div>
@@ -308,10 +308,10 @@ export default function HomePage() {
         <div className="container mx-auto max-w-6xl px-4">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Built for Recurring Event Producers
+              Replace 5 Tools With One System
             </h2>
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Voxxy handles vendor coordination so you can focus on creating unforgettable experiences.
+              Everything you need to manage vendors — communication, applications, coordination, relationships — in one place.
             </p>
           </div>
 
@@ -326,7 +326,7 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-indigo-300 transition-colors">Unified Communication Hub</h3>
               <p className="text-gray-300 leading-relaxed">
-                All vendor conversations in one place - no more switching between texts, emails, Instagram DMs, and WhatsApp to find what you need
+                All vendor conversations in one place — so you never lose a thread or miss a deadline. No more digging through five apps to find one message.
               </p>
             </div>
 
@@ -338,9 +338,9 @@ export default function HomePage() {
               <div className="w-14 h-14 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-500/30 transition-all">
                 <MapPin className="h-7 w-7 text-blue-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-300 transition-colors">Vendor CRM That Scales</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-blue-300 transition-colors">Vendor Relationships That Compound</h3>
               <p className="text-gray-300 leading-relaxed">
-                Track vendor relationships across all your events with notes, history, and performance data that travels with them from show to show
+                Stop rebuilding your vendor network from scratch every event. Track history, notes, and performance — so your best vendors keep coming back.
               </p>
             </div>
 
@@ -352,9 +352,9 @@ export default function HomePage() {
               <div className="w-14 h-14 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-green-500/30 transition-all">
                 <Calendar className="h-7 w-7 text-green-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-green-300 transition-colors">Fast Application Review</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-green-300 transition-colors">Review 200 Applications in Hours, Not Days</h3>
               <p className="text-gray-300 leading-relaxed">
-                Side-by-side portfolio comparison with one-click approve, waitlist, or reject - turn 200 applications into decisions in hours, not days
+                Side-by-side portfolio comparison. One-click approve, waitlist, or reject. Spot top talent before review fatigue sets in.
               </p>
             </div>
 
@@ -366,9 +366,9 @@ export default function HomePage() {
               <div className="w-14 h-14 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl flex items-center justify-center mb-6 group-hover:bg-purple-500/30 transition-all">
                 <ArrowRight className="h-7 w-7 text-purple-300" />
               </div>
-              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-purple-300 transition-colors">Email Automation Without the Setup</h3>
+              <h3 className="text-xl font-semibold text-white mb-4 group-hover:text-purple-300 transition-colors">Automated Emails, Zero Setup</h3>
               <p className="text-gray-300 leading-relaxed">
-                Application confirmations, approvals, rejections, payment reminders, and day-of logistics - automated and customizable without needing Mailgun or technical expertise
+                Confirmations, approvals, rejections, payment reminders, day-of logistics — all automated. Stop copying and pasting the same messages.
               </p>
             </div>
           </div>
@@ -379,10 +379,10 @@ export default function HomePage() {
       <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to stop coordinating and start producing?
+            Your next event shouldn't take 20 hours of coordination
           </h2>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Join event producers who are building sustainable recurring events with Voxxy
+            Join producers who've taken back their time
           </p>
           <Link
             to="/contact"
