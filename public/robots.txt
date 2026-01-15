@@ -1,0 +1,5 @@
+# Block all search engines from indexing voxxyai.com
+# Only heyvoxxy.com should appear in search results
+
+User-agent: *
+Disallow: /
