@@ -1126,21 +1126,21 @@ export const scheduledEmailsApi = {
 
   /**
    * Pause scheduled email
-   * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
    */
   async pause(eventSlug: string, id: number) {
     return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/pause`, {
-      method: 'PATCH',
+      method: 'POST',
     })
   },
 
   /**
    * Resume paused scheduled email
-   * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
    */
   async resume(eventSlug: string, id: number) {
     return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/resume`, {
-      method: 'PATCH',
+      method: 'POST',
     })
   },
 
@@ -1369,6 +1369,110 @@ export const adminApi = {
       method: 'PUT',
       body: JSON.stringify({ reason, adminNotes }),
     })
+  },
+
+  // Email testing endpoints
+  async getEmailCategories() {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails.json`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch email categories' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch email categories', response.status)
+    }
+
+    return response.json()
+  },
+
+  async sendAllEmails() {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/send_all.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to send emails' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to send emails', response.status)
+    }
+
+    return response.json()
+  },
+
+  async sendScheduledEmails() {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/send_scheduled.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to send scheduled emails' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to send scheduled emails', response.status)
+    }
+
+    return response.json()
+  },
+
+  async setupTestData() {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/setup_test_data.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to setup test data' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to setup test data', response.status)
+    }
+
+    return response.json()
+  },
+
+  async cleanupTestData() {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/cleanup_test_data.json`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to cleanup test data' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to cleanup test data', response.status)
+    }
+
+    return response.json()
+  },
+
+  async previewEmail(emailType: string) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/preview.json`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+      body: JSON.stringify({ email_type: emailType })
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to preview email' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to preview email', response.status)
+    }
+
+    return response.json()
   }
 }
 
@@ -2053,6 +2157,7 @@ export const eventInvitationsApi = {
         total_count: number
         pending_count: number
         sent_count: number
+        viewed_count: number
         accepted_count: number
         declined_count: number
         expired_count: number

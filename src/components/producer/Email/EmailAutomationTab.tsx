@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter } from 'lucide-react';
-import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
+import { scheduledEmailsApi, eventInvitationsApi, eventsApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus } from '@/types/email';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
@@ -32,6 +32,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [eventData, setEventData] = useState<any | null>(null); // Store event data for preview calculations
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
@@ -48,28 +49,46 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     try {
       console.log('📧 Loading emails for event:', eventSlug);
 
+      // Fetch event data (for preview calculations)
+      const eventDataResponse = await eventsApi.getById(eventSlug);
+      setEventData(eventDataResponse);
+      console.log('📅 Fetched event data:', eventDataResponse.title);
+
       // Fetch scheduled emails
       const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
       console.log('✅ Fetched', scheduledEmailsData.length, 'scheduled emails');
 
       // Fetch invitations (non-blocking)
       const invitationsData = await eventInvitationsApi.getByEvent(eventSlug).catch((err) => {
-        console.warn('⚠️ Failed to fetch invitations:', err.message);
-        return { invitations: [], meta: { total_count: 0, sent_count: 0, pending_count: 0, accepted_count: 0, declined_count: 0, expired_count: 0 } };
+        console.error('❌ Failed to fetch invitations:', err.message);
+        console.error('   Full error:', err);
+        return { invitations: [], meta: { total_count: 0, sent_count: 0, pending_count: 0, viewed_count: 0, accepted_count: 0, declined_count: 0, expired_count: 0 } };
       });
-      console.log('📨 Fetched', invitationsData.meta.total_count, 'invitations,', invitationsData.meta.sent_count, 'sent');
+
+      console.log('📨 Invitations API Response:', {
+        total_count: invitationsData.meta.total_count,
+        sent_count: invitationsData.meta.sent_count,
+        viewed_count: invitationsData.meta.viewed_count,
+        invitations_with_sent_at: invitationsData.invitations.filter((inv: any) => inv.sent_at).length
+      });
 
       // Create virtual "Event Announcement (Invitations Sent)" email if invitations exist
       const allEmails: ScheduledEmail[] = [...scheduledEmailsData];
 
       if (invitationsData.meta.sent_count > 0) {
+        console.log('🎯 Creating virtual invitation email (sent_count:', invitationsData.meta.sent_count, ')');
+
         // Find the earliest sent invitation to use as the sent date
         const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
+        console.log('   Found', sentInvitations.length, 'invitations with sent_at timestamp');
+
         const earliestSentDate: string = sentInvitations.length > 0
           ? (sentInvitations.reduce((earliest: any, inv: any) => {
               return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
             }).sent_at as string)
           : new Date().toISOString();
+
+        console.log('   Using earliest sent date:', earliestSentDate);
 
         // Create virtual invitation announcement email
         const invitationEmail: ScheduledEmail = {
@@ -96,10 +115,21 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
         // Add invitation email at the beginning
         allEmails.unshift(invitationEmail);
-        console.log('✅ Added invitation announcement email');
+        console.log('✅ Added invitation announcement email to position 0');
+        console.log('   Virtual email object:', {
+          name: invitationEmail.name,
+          status: invitationEmail.status,
+          recipient_count: invitationEmail.recipient_count,
+          scheduled_for: invitationEmail.scheduled_for,
+          isInvitationAnnouncement: invitationEmail.isInvitationAnnouncement
+        });
+      } else {
+        console.log('ℹ️  No sent invitations found (sent_count: 0), skipping virtual email creation');
       }
 
       console.log('📋 Total emails to display:', allEmails.length);
+      console.log('   - Scheduled emails from API:', scheduledEmailsData.length);
+      console.log('   - Virtual invitation email:', allEmails.some(e => e.isInvitationAnnouncement) ? 'YES' : 'NO');
 
       setEmails(allEmails);
     } catch (err: any) {
@@ -458,6 +488,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         email={editEmail}
+        eventData={eventData}
         onSave={handleSaveEdit}
       />
     </div>

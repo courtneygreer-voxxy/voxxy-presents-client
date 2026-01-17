@@ -3,6 +3,7 @@ import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
 import { ScheduledEmail, EmailCategory } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
+import { backendToFrontend } from '@/utils/emailVariables';
 
 interface EmailRowProps {
   email: ScheduledEmail;
@@ -140,8 +141,8 @@ export default function EmailRow({
       </div>
 
       {/* Subject */}
-      <div className="text-white/70 truncate" title={email.subject_template}>
-        {email.subject_template}
+      <div className="text-white/70 truncate" title={backendToFrontend(email.subject_template || '')}>
+        {backendToFrontend(email.subject_template || '')}
       </div>
 
       {/* Scheduled Date/Time */}

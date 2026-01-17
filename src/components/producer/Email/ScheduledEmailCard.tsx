@@ -14,6 +14,7 @@ import {
 import { format } from 'date-fns';
 import type { ScheduledEmail } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
+import { backendToFrontend } from '@/utils/emailVariables';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -118,7 +119,7 @@ export default function ScheduledEmailCard({
           </div>
 
           <p className="text-white/60 text-sm line-clamp-2 mb-3">
-            {email.subject_template}
+            {backendToFrontend(email.subject_template || '')}
           </p>
 
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/50">

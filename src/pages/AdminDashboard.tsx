@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Shield, Building2, Store, Menu, X, LogOut } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { adminApi } from "@/services/api";
 import SettingsPage from './SettingsPage';
+import EmailTestingPanel from '@/components/admin/EmailTestingPanel';
 
-type NavItem = 'events' | 'network' | 'settings';
+type NavItem = 'dashboard' | 'emails' | 'settings';
 
 interface User {
   id: number
@@ -20,7 +21,7 @@ interface User {
 }
 
 export default function AdminDashboard() {
-  const [activeNav, setActiveNav] = useState<NavItem>('events');
+  const [activeNav, setActiveNav] = useState<NavItem>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -124,8 +125,8 @@ export default function AdminDashboard() {
   };
 
   const navItems = [
-    { id: 'events' as NavItem, label: 'Events', icon: Calendar },
-    { id: 'network' as NavItem, label: 'Network', icon: Users },
+    { id: 'dashboard' as NavItem, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'emails' as NavItem, label: 'Emails', icon: Mail },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -232,7 +233,9 @@ export default function AdminDashboard() {
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
           {activeNav === 'settings' ? (
-            <SettingsPage onBack={() => setActiveNav('events')} />
+            <SettingsPage onBack={() => setActiveNav('dashboard')} />
+          ) : activeNav === 'emails' ? (
+            <EmailTestingPanel />
           ) : (
             <div className="p-4 lg:p-6">
               <div className="max-w-6xl mx-auto space-y-4 lg:space-y-6">
