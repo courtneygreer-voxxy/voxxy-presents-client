@@ -399,8 +399,9 @@ export function insertVariableAtCursor(
   textareaElement: HTMLTextAreaElement | HTMLInputElement,
   variableToInsert: string
 ): string {
-  const start = textareaElement.selectionStart;
-  const end = textareaElement.selectionEnd;
+  // Handle null selectionStart/selectionEnd (can happen with some input types)
+  const start = textareaElement.selectionStart ?? 0;
+  const end = textareaElement.selectionEnd ?? textareaElement.value.length;
   const text = textareaElement.value;
 
   // Insert variable at cursor position
