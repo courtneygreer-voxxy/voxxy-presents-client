@@ -526,7 +526,8 @@ export default function EditScheduledEmailModal({
               ref={(e) => {
                 // Merge refs: register's ref AND our custom ref
                 register('subject_template').ref(e);
-                subjectRef.current = e;
+                // @ts-ignore - Assigning to ref in callback
+                if (e) subjectRef.current = e;
               }}
               disabled={isSent || isSaving}
               onFocus={() => setActiveField('subject')}
@@ -578,7 +579,8 @@ export default function EditScheduledEmailModal({
               ref={(e) => {
                 // Merge refs: register's ref AND our custom ref
                 register('body_template').ref(e);
-                bodyRef.current = e;
+                // @ts-ignore - Assigning to ref in callback
+                if (e) bodyRef.current = e;
               }}
               disabled={isSent || isSaving}
               onFocus={() => setActiveField('body')}

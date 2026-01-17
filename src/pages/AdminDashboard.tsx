@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail, Users } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";

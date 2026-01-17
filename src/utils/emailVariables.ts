@@ -393,10 +393,10 @@ export function getVariablesByCategory() {
 }
 
 /**
- * Insert variable at cursor position in textarea
+ * Insert variable at cursor position in textarea or input
  */
 export function insertVariableAtCursor(
-  textareaElement: HTMLTextAreaElement,
+  textareaElement: HTMLTextAreaElement | HTMLInputElement,
   variableToInsert: string
 ): string {
   const start = textareaElement.selectionStart;
