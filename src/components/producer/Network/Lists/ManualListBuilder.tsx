@@ -224,7 +224,7 @@ export default function ManualListBuilder({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <p className="text-sm font-medium text-white truncate">
-                          {contact.name}
+                          {contact.contact_name}
                         </p>
                         {contact.featured && (
                           <span className="text-xs px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded">

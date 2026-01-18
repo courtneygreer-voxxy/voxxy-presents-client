@@ -187,7 +187,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
-            onClick={fetchContacts}
+            onClick={() => fetchContacts()}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
           >
             Try Again
