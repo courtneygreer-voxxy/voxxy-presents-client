@@ -335,12 +335,133 @@ export default function MyComponent() {
 
 ---
 
+---
+
+## Email Automation System (Comprehensive Documentation)
+
+### ⭐ Primary Reference
+
+**SCHEDULED_EMAILS_SYSTEM.md** - Complete email automation system documentation
+- **Best for:** Understanding the entire email system
+- **Length:** 47KB, comprehensive
+- **Contains:**
+  - Complete architecture overview
+  - Data models & relationships (ScheduledEmail, EmailDelivery, etc.)
+  - User flows (create, edit, schedule, send)
+  - Frontend components (EmailAutomationTab, EditScheduledEmailModal, etc.)
+  - Backend implementation (controllers, models, workers)
+  - API reference (all endpoints)
+  - Email variables system (28 supported variables)
+  - Trigger system (on_application_open, days_before_event, etc.)
+  - Recipient filtering (by status, category, registration status)
+  - Delivery tracking (SendGrid webhooks)
+  - Debugging guides
+
+### Implementation Session Summaries
+
+**EDIT_MODAL_SESSION_SUMMARY.md** - Session 1: Variable System
+- Variable format conversion ([bracket] ↔ {{mustache}})
+- Email preview with resolved variables
+- Validation system (unknown variables, unclosed brackets, past dates)
+- 28 supported variables across event, vendor, install, and link categories
+- Backend/frontend format conversion with HTML handling
+
+**EDIT_MODAL_IMPROVEMENTS.md** - Session 2: UX Enhancements
+- Clickable variable buttons with color-coded categories
+- Plain text editing (automatic HTML conversion)
+- Timezone-aware scheduling (8:00 AM local time, auto-converts to UTC)
+- Smart cursor insertion for variables
+- Contextual variable panel (shows when editing)
+
+### Planning & Template Reference
+
+**EMAIL_AUTOMATION_PLAN.md** - Original design document
+- Complete planning and architecture
+- Feature specifications
+- Implementation roadmap
+- 71KB of detailed planning (historical reference)
+
+**EMAIL_TEMPLATES.md** - Template library (40 templates)
+- All 40 email templates documented
+- Template categories (pre-event, during event, post-event)
+- Variable usage examples
+- Trigger recommendations
+
+---
+
+## Bug Fixes & Build Resolution (January 17, 2026)
+
+### ⭐ Critical Build Fixes
+
+**FINAL_BUILD_FIX.md** - TypeScript Build Resolution
+- **CRITICAL:** Resolves all 9 TypeScript build errors
+- Null-safe cursor position handling
+- Input/textarea type compatibility
+- Files fixed: emailVariables.ts, AdminDashboard.tsx, EditScheduledEmailModal.tsx
+- **Status:** ✅ ALL BUILD ERRORS RESOLVED - Ready to Deploy
+
+**BUILD_FIXES_SUMMARY.md** - Initial Build Fixes (Round 1)
+- Missing imports (AdminDashboard Users icon)
+- Type signature updates (insertVariableAtCursor)
+- Read-only ref assignment fixes
+- 6 errors resolved
+
+### Feature Bug Fixes
+
+**PAUSE_DELETE_FIX_SUMMARY.md** - Pause Button Fix
+- **Issue:** Pause button not working in production
+- **Root Cause:** HTTP method mismatch (PATCH → POST)
+- Files modified: src/services/api.ts
+- Complete data flow analysis (frontend ↔ backend)
+- **Status:** ✅ Fixed, Ready to Deploy
+
+**INVITATION_EMAIL_FIX.md** - Invitation Display Debugging
+- **Issue:** Invitation emails not showing in scheduled emails list
+- Enhanced debugging with detailed console logs
+- Type definition fixes (added viewed_count)
+- Virtual email creation improvements
+- Complete troubleshooting guide with database queries
+- **Status:** ✅ Fixed with Enhanced Logging
+
+---
+
+## Feature Documentation
+
+### Payment & Deadlines
+- **PAYMENT_DEADLINE_FEATURE.md** - Payment deadline feature specification
+- **FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md** - Frontend integration guide
+
+### Marketing & SEO
+- **LANDING_PAGE_COPY.md** - Landing page copy & SEO optimization
+
+---
+
 ## Document Status
 
-- **Last Updated**: December 27, 2024
-- **Status**: Complete and Ready
-- **Coverage**: 100% of frontend codebase
-- **Accuracy**: High (auto-generated from source analysis)
+- **Last Updated**: January 17, 2026
+- **Status**: Complete and Current
+- **Coverage**: 100% of frontend codebase + email automation system
+- **Accuracy**: High (continuously updated)
+- **New Docs Today**: 7 documents (77KB) covering email system enhancements and bug fixes
+
+---
+
+## Quick Navigation
+
+### Starting Points
+1. **New to Project?** → Start with ARCHITECTURE_SUMMARY.md
+2. **Email System?** → Start with SCHEDULED_EMAILS_SYSTEM.md ⭐
+3. **Need Context?** → Read CLAUDE_CONTEXT.md
+4. **Visual Learner?** → Check FLOW_DIAGRAMS.md
+5. **Bug Fixing?** → Check FINAL_BUILD_FIX.md first
+6. **Deployment?** → Ensure all build fixes are deployed
+
+### By Task
+- **Implementing Features** → ARCHITECTURE_SUMMARY.md → CODEBASE_ANALYSIS.md
+- **Understanding Email System** → SCHEDULED_EMAILS_SYSTEM.md
+- **Fixing Bugs** → Check relevant bug fix docs
+- **Deploying** → Review FINAL_BUILD_FIX.md and build fix docs
+- **API Integration** → CODEBASE_ANALYSIS.md (API section) or CLAUDE_CONTEXT.md
 
 ---
 
@@ -349,7 +470,8 @@ export default function MyComponent() {
 1. Read ARCHITECTURE_SUMMARY.md for overview
 2. Explore FLOW_DIAGRAMS.md for visual understanding
 3. Deep dive into CODEBASE_ANALYSIS.md as needed
-4. Reference this index when you need to find something
-5. Check specific files mentioned in relevant section
+4. For email system work, read SCHEDULED_EMAILS_SYSTEM.md
+5. Reference this index when you need to find something
+6. Check specific files mentioned in relevant section
 
 Happy coding!

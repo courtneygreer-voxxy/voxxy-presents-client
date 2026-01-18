@@ -63,7 +63,7 @@ export default function EmailTestingPanel() {
   };
 
   const handleSendAllEmails = async () => {
-    if (!confirm(`This will send all 21 emails to ${testEmail}. Continue?`)) {
+    if (!confirm(`This will send all 17 emails to ${testEmail}. Continue?`)) {
       return;
     }
 
@@ -73,7 +73,7 @@ export default function EmailTestingPanel() {
       setSuccessMessage(null);
       const result = await adminApi.sendAllEmails();
       console.log('✅ Sent all emails:', result);
-      setSuccessMessage(`Sending all 21 emails to ${testEmail}. Check your inbox in a few minutes.`);
+      setSuccessMessage(`Sending all 17 emails to ${testEmail}. Check your inbox in a few minutes.`);
     } catch (err) {
       console.error('❌ Failed to send all emails:', err);
       setError(err instanceof Error ? err.message : 'Failed to send all emails');
@@ -172,7 +172,7 @@ export default function EmailTestingPanel() {
 
     // Category 2: Event Invitation Emails
     if (categoryIndex === 2) {
-      const types = ['invitation_vendor', 'invitation_accepted_vendor', 'invitation_accepted_producer', 'invitation_declined_vendor', 'invitation_declined_producer'];
+      const types = ['invitation_vendor'];
       return types[emailIndex];
     }
 
@@ -214,7 +214,7 @@ export default function EmailTestingPanel() {
             </div>
             <div>
               <h1 className="text-xl lg:text-2xl font-bold text-white">Email Testing Dashboard</h1>
-              <p className="text-sm lg:text-base text-gray-300">Test all 21 Voxxy Presents emails</p>
+              <p className="text-sm lg:text-base text-gray-300">Test all 17 Voxxy Presents emails</p>
             </div>
           </div>
 
@@ -258,7 +258,7 @@ export default function EmailTestingPanel() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-purple-600/20 to-purple-600/10 backdrop-blur-sm border border-purple-400/30 rounded-lg p-4">
-            <div className="text-3xl font-bold text-white">21</div>
+            <div className="text-3xl font-bold text-white">17</div>
             <div className="text-sm text-purple-200">Total Emails</div>
           </div>
           <div className="bg-gradient-to-br from-pink-600/20 to-pink-600/10 backdrop-blur-sm border border-pink-400/30 rounded-lg p-4">
@@ -266,7 +266,7 @@ export default function EmailTestingPanel() {
             <div className="text-sm text-pink-200">Scheduled Emails</div>
           </div>
           <div className="bg-gradient-to-br from-blue-600/20 to-blue-600/10 backdrop-blur-sm border border-blue-400/30 rounded-lg p-4">
-            <div className="text-3xl font-bold text-white">14</div>
+            <div className="text-3xl font-bold text-white">10</div>
             <div className="text-sm text-blue-200">Transactional Emails</div>
           </div>
         </div>
@@ -288,7 +288,7 @@ export default function EmailTestingPanel() {
               ) : (
                 <>
                   <Send className="mr-2 h-4 w-4" />
-                  Send All 21 Emails
+                  Send All 17 Emails
                 </>
               )}
             </Button>
