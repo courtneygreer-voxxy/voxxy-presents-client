@@ -43,22 +43,23 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
 
   const getTriggerDescription = (item: EmailTemplateItem): string => {
     const { trigger_type, trigger_value, trigger_time } = item;
+    const days = trigger_value ?? 0;
 
     switch (trigger_type) {
       case 'days_before_deadline':
-        return trigger_value === 0
+        return days === 0
           ? `On application deadline at ${trigger_time}`
-          : `${trigger_value} day${trigger_value > 1 ? 's' : ''} before application deadline at ${trigger_time}`;
+          : `${days} day${days > 1 ? 's' : ''} before application deadline at ${trigger_time}`;
       case 'days_before_payment_deadline':
-        return `${trigger_value} day${trigger_value! > 1 ? 's' : ''} before payment deadline at ${trigger_time}`;
+        return `${days} day${days > 1 ? 's' : ''} before payment deadline at ${trigger_time}`;
       case 'on_payment_deadline':
         return `On payment deadline at ${trigger_time}`;
       case 'days_before_event':
-        return `${trigger_value} day${trigger_value! > 1 ? 's' : ''} before event at ${trigger_time}`;
+        return `${days} day${days > 1 ? 's' : ''} before event at ${trigger_time}`;
       case 'on_event_date':
         return `On event date at ${trigger_time}`;
       case 'days_after_event':
-        return `${trigger_value} day${trigger_value! > 1 ? 's' : ''} after event at ${trigger_time}`;
+        return `${days} day${days > 1 ? 's' : ''} after event at ${trigger_time}`;
       case 'on_application_open':
         return `When event is published`;
       case 'on_application_submit':
