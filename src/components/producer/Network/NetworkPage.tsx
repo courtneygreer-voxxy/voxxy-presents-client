@@ -159,12 +159,21 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             <p className="text-white/50 text-sm mb-6">
               Add vendors to your network to easily invite them to future events.
             </p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-            >
-              Add Your First Contact
-            </button>
+            <div className="flex items-center justify-center gap-3">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+              >
+                Add Your First Contact
+              </button>
+              <button
+                onClick={() => setShowCSVUploadModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all border border-white/20"
+              >
+                <Upload className="w-4 h-4" />
+                Import CSV
+              </button>
+            </div>
             <p className="text-white/40 text-xs mt-3">
               You can also add vendors from your event submissions
             </p>
@@ -179,6 +188,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             onSuccess={(newContact) => {
               setContacts(prev => [newContact, ...prev]);
               setShowAddModal(false);
+            }}
+          />
+        )}
+
+        {showCSVUploadModal && (
+          <CSVUploadModal
+            open={showCSVUploadModal}
+            onClose={() => setShowCSVUploadModal(false)}
+            onSuccess={() => {
+              // Refresh contacts list after successful import
+              fetchContacts();
             }}
           />
         )}

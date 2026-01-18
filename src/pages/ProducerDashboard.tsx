@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
@@ -11,8 +11,9 @@ import EventsList from '@/components/producer/EventsList';
 import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
+import EmailTemplatesPage from './EmailTemplatesPage';
 
-type NavItem = 'events' | 'network' | 'settings';
+type NavItem = 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface Organization {
@@ -324,6 +325,7 @@ export default function ProducerDashboard() {
   const navItems = [
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
+    { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -567,6 +569,16 @@ export default function ProducerDashboard() {
             <div className="p-4 lg:p-6">
               {organization ? (
                 <NetworkPage organizationId={organization.id} />
+              ) : (
+                <div className="flex items-center justify-center py-12">
+                  <p className="text-white/60">Loading organization...</p>
+                </div>
+              )}
+            </div>
+          ) : activeNav === 'email-templates' ? (
+            <div className="p-4 lg:p-6">
+              {organization ? (
+                <EmailTemplatesPage organizationId={organization.id} />
               ) : (
                 <div className="flex items-center justify-center py-12">
                   <p className="text-white/60">Loading organization...</p>
