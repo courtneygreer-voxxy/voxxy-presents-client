@@ -99,8 +99,8 @@ export default function CreateListModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-xl border border-white/20 shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
+      <div className="bg-gray-900 rounded-xl border border-white/20 shadow-2xl max-w-3xl w-full my-8 flex flex-col max-h-[calc(100vh-4rem)]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
           <div className="flex items-center gap-3">
@@ -282,7 +282,7 @@ export default function CreateListModal({
 
         {/* Footer */}
         {step === 'configure' && (
-          <div className="flex items-center justify-between p-6 border-t border-white/10 bg-white/5">
+          <div className="flex items-center justify-between p-6 border-t border-white/10 bg-gray-900 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.3)] sticky bottom-0 z-10">
             <button
               onClick={onClose}
               className="px-4 py-2 text-white/60 hover:text-white text-sm font-medium transition-colors"

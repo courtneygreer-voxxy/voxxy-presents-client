@@ -77,42 +77,56 @@ export default function ListsManagement({ organizationId }: ListsManagementProps
   // Empty state
   if (lists.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-            <List className="w-8 h-8 text-white/40" />
-          </div>
-          <h3 className="text-lg font-semibold text-white mb-2">
-            Create Your First Contact List
-          </h3>
-          <p className="text-white/50 text-sm mb-6">
-            Organize your contacts into smart lists or manual collections for easy event invitations.
-          </p>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-          >
-            Create Your First List
-          </button>
-          <div className="mt-6 space-y-2 text-left bg-white/5 rounded-lg p-4 border border-white/10">
-            <p className="text-white/70 text-xs font-medium mb-2">List Types:</p>
-            <div className="flex items-start gap-2">
-              <Filter className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white text-xs font-medium">Smart Lists</p>
-                <p className="text-white/50 text-xs">Auto-update based on filters like category, location, and tags</p>
-              </div>
+      <>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="text-center max-w-md">
+            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+              <List className="w-8 h-8 text-white/40" />
             </div>
-            <div className="flex items-start gap-2">
-              <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-white text-xs font-medium">Manual Lists</p>
-                <p className="text-white/50 text-xs">Hand-pick specific contacts that stay fixed</p>
+            <h3 className="text-lg font-semibold text-white mb-2">
+              Create Your First Contact List
+            </h3>
+            <p className="text-white/50 text-sm mb-6">
+              Organize your contacts into smart lists or manual collections for easy event invitations.
+            </p>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+            >
+              Create Your First List
+            </button>
+            <div className="mt-6 space-y-2 text-left bg-white/5 rounded-lg p-4 border border-white/10">
+              <p className="text-white/70 text-xs font-medium mb-2">List Types:</p>
+              <div className="flex items-start gap-2">
+                <Filter className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-white text-xs font-medium">Smart Lists</p>
+                  <p className="text-white/50 text-xs">Auto-update based on filters like category, location, and tags</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-white text-xs font-medium">Manual Lists</p>
+                  <p className="text-white/50 text-xs">Hand-pick specific contacts that stay fixed</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Modal */}
+        {showCreateModal && (
+          <CreateListModal
+            organizationId={organizationId}
+            onClose={() => setShowCreateModal(false)}
+            onSuccess={(newList) => {
+              setLists(prev => [newList, ...prev]);
+              setShowCreateModal(false);
+            }}
+          />
+        )}
+      </>
     );
   }
 

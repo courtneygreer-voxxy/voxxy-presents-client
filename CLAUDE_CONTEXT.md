@@ -15,9 +15,17 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 
 ---
 
-## ⚡ RECENT UPDATES (January 17, 2026)
+## ⚡ RECENT UPDATES (January 18, 2026)
 
-### Build Fixes & Stability
+### Smart Lists & Contact Organization (NEW)
+- ✅ **Smart Lists** - Dynamic lists that auto-update based on filters (categories, locations, tags)
+- ✅ **Manual Lists** - Static hand-picked contact lists
+- ✅ **List Management UI** - Create, view, edit, delete lists in Network tab
+- ✅ **Pagination** - 100 contacts per page with "Select All" across pages
+- ✅ **Backend API** - Full CRUD endpoints for contact list management
+- **Status:** ✅ Core feature complete | 🚧 Event Wizard integration pending
+
+### Build Fixes & Stability (January 17, 2026)
 - ✅ Resolved all 9 TypeScript build errors
 - ✅ Fixed pause/resume button HTTP method mismatch
 - ✅ Enhanced invitation email display with debugging
@@ -25,7 +33,7 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 - ✅ Added timezone-aware email scheduling
 - **Status:** ✅ Production ready - all build errors resolved
 
-### New Features
+### Other Features
 - ✅ **CSV Bulk Import** - Import vendor contacts via CSV upload with validation
 - ✅ **Email Variable System** - User-friendly `[eventName]` format (converts to `{{event_title}}`)
 - ✅ **Clickable Variable Buttons** - One-click insertion organized by category
@@ -453,11 +461,13 @@ interface EventInvitation {
 **Purpose:** CRM system for managing vendor relationships
 
 **Key Attributes:**
-- Identity: `name`, `email`, `phone`, `company_name`, `job_title`
-- Classification: `contact_type` (lead/vendor/partner/client/other)
+- Identity: `contact_name`, `email`, `phone`, `business_name`, `job_title`
+- Classification: `contact_type` (vendor/partner/sponsor/staff)
 - Status: `status` (new/contacted/interested/converted/closed)
 - Tracking: `interaction_count`, `last_contacted_at`, `source`, `imported_at`
-- Organization: `tags` (JSONB array), `notes`
+- Organization: `tags` (JSONB array), `categories` (JSONB array), `notes`
+- Location: `location` (city/region string)
+- Featured: `featured` (boolean - "Voxxy Card" contacts)
 
 **Relationships:**
 - `belongs_to :organization`
@@ -465,11 +475,49 @@ interface EventInvitation {
 - `belongs_to :registration` (optional - if imported from event submission)
 - `has_many :event_invitations`
 
+**Scopes:**
+- `by_category(category)` - JSONB containment query
+- `by_location(location)` - ILIKE pattern match
+- `featured` - Where featured = true
+
 **Business Logic:**
 - `record_interaction!` - increments counter and updates timestamp
 - Tag management: `add_tag`, `remove_tag`
 - Email normalization (lowercase, trimmed)
 - Can be manually created OR auto-imported from vendor submissions
+- Supports pagination (100 per page) with meta response
+
+### ContactList (`app/models/contact_list.rb`)
+**Purpose:** Organize vendor contacts into reusable lists for event invitations
+
+**Key Attributes:**
+- Identity: `name`, `description`
+- Type: `list_type` ('smart' or 'manual')
+- Smart Lists: `filters` (JSONB - categories, locations, tags)
+- Manual Lists: `contact_ids` (integer array)
+- Cache: `contacts_count`, `last_used_at`
+
+**Relationships:**
+- `belongs_to :organization`
+- Virtual: `contacts` - resolves to VendorContact query based on type
+
+**Validations:**
+- Name unique per organization
+- Filters required for smart lists (must be hash)
+- Contact IDs required for manual lists (must be array)
+
+**Business Logic:**
+- `smart?`, `manual?` - Type checking
+- `contacts` - Resolves list to actual VendorContact records
+- `resolve_smart_list` - Builds query from filters with OR logic
+- `resolve_manual_list` - Finds contacts by ID array
+- `update_contacts_count!` - Updates counter cache
+
+**Filter Resolution:**
+- **Categories:** OR logic (match ANY selected category)
+- **Locations:** OR logic (match ANY selected location)
+- **Tags:** OR logic (match ANY selected tag)
+- **Between filters:** AND logic (must match category filter AND location filter)
 
 ### EventInvitation (`app/models/event_invitation.rb`)
 **Purpose:** Tokenized invitations to vendor contacts for events
@@ -575,11 +623,21 @@ interface EventInvitation {
 - `PATCH /v1/presents/invitations/:token/respond` - Accept/decline invitation (public)
 
 ### Vendor Contacts (Presents)
-- `GET /v1/presents/organizations/:org_id/vendor_contacts` - Get organization's contacts
+- `GET /v1/presents/organizations/:org_id/vendor_contacts` - Get organization's contacts (paginated, 100/page)
+- `GET /v1/presents/organizations/:org_id/vendor_contacts/ids` - Get all contact IDs (for "Select All")
 - `POST /v1/presents/vendor_contacts` - Create contact
 - `GET /v1/presents/vendor_contacts/:id` - Get contact details
 - `PATCH /v1/presents/vendor_contacts/:id` - Update contact
 - `DELETE /v1/presents/vendor_contacts/:id` - Delete contact
+- `POST /v1/presents/vendor_contacts/bulk_import` - CSV bulk import
+
+### Contact Lists (Presents)
+- `GET /v1/presents/organizations/:org_id/contact_lists` - Get organization's lists
+- `POST /v1/presents/organizations/:org_id/contact_lists` - Create new list
+- `GET /v1/presents/contact_lists/:id` - Get list details
+- `GET /v1/presents/contact_lists/:id/contacts` - Get list contacts (paginated)
+- `PATCH /v1/presents/contact_lists/:id` - Update list
+- `DELETE /v1/presents/contact_lists/:id` - Delete list
 
 ### Admin (Protected)
 - `GET /admin/user_breakdown` - Get all users with filters
@@ -1337,15 +1395,19 @@ Event.find_by(slug: 'my-event').vendor_application
 - Email confirmations for invitations
 
 ## Known Limitations
-- No pagination on list endpoints (may cause performance issues with large datasets)
+- ✅ ~~No pagination on vendor contacts~~ (IMPLEMENTED - 100 contacts/page)
+- Event Wizard doesn't yet support saved lists (in progress)
 - No payment processing (Stripe integration planned)
 - Limited vendor dashboard functionality (mostly event browsing)
 - No bulk email campaigns yet (UI exists, backend pending)
 - No QR code scanning for event check-in (QR generation exists)
 - No vendor marketplace public directory
 - No event analytics/reporting dashboard
+- No list usage analytics or statistics
 
 ## Planned Features (Roadmap)
+- **Contact Lists Integration** - Use saved lists in Event Wizard (next priority)
+- **List Analytics** - Track list usage, response rates, popular lists
 - Stripe payment integration for booth fees
 - Bulk email campaigns from Network tab
 - Enhanced vendor dashboard with application history
@@ -1356,6 +1418,7 @@ Event.find_by(slug: 'my-event').vendor_application
 - Budget tracking with vendor integration
 - Calendar integration (Google Calendar, Apple Calendar)
 - Mobile app for on-site event management
+- Advanced list features (CSV export, list sharing, AI suggestions)
 
 ---
 
@@ -1376,8 +1439,8 @@ After pasting this context, ask Claude:
 
 ---
 
-**Last Updated:** 2026-01-18
-**Schema Version:** 2025_12_27_005811
+**Last Updated:** 2026-01-18 (Smart Lists feature added)
+**Schema Version:** 2026_01_18_190827 (contact_lists table)
 **Frontend Version:** React 18.3.1 + Vite 6.3.6
 **Backend Version:** Rails 7.2.2
-**Status:** ✅ Production Ready (Build errors resolved Jan 17, 2026)
+**Status:** ✅ Production Ready | 🚧 Smart Lists: Event Wizard integration pending
