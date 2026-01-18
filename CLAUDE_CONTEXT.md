@@ -15,6 +15,30 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 
 ---
 
+## ⚡ RECENT UPDATES (January 17, 2026)
+
+### Build Fixes & Stability
+- ✅ Resolved all 9 TypeScript build errors
+- ✅ Fixed pause/resume button HTTP method mismatch
+- ✅ Enhanced invitation email display with debugging
+- ✅ Improved edit modal cursor insertion for variables
+- ✅ Added timezone-aware email scheduling
+- **Status:** ✅ Production ready - all build errors resolved
+
+### New Features
+- ✅ **CSV Bulk Import** - Import vendor contacts via CSV upload with validation
+- ✅ **Email Variable System** - User-friendly `[eventName]` format (converts to `{{event_title}}`)
+- ✅ **Clickable Variable Buttons** - One-click insertion organized by category
+- ✅ **Payment Deadline** - Full support for payment tracking and deadline emails
+
+### Documentation
+- 📚 `FINAL_BUILD_FIX.md` - Comprehensive build error resolution guide
+- 📚 `PAUSE_DELETE_FIX_SUMMARY.md` - Email action fixes
+- 📚 `INVITATION_EMAIL_FIX.md` - Invitation debugging enhancements
+- 📚 `SCHEDULED_EMAILS_SYSTEM.md` - Complete email system documentation
+
+---
+
 # 🖥️ FRONTEND: React Web Application
 
 ## Tech Stack
@@ -112,7 +136,12 @@ The platform supports **6 roles** with different capabilities:
 
 ### 4. Vendor Contact Management (Network/CRM)
 - Add/edit vendor contacts
-- Filter by type, status, tags
+- Filter by type, status, tags, categories, location
+- **CSV Bulk Import** - Upload CSV files to import multiple contacts at once
+  - Template download with correct column format
+  - Validation and error reporting
+  - Duplicate detection
+  - Source tracking (`csv_import`)
 - Import contacts from event submissions
 - Integration with event invitations
 - Bulk email campaigns (planned)
@@ -1347,7 +1376,8 @@ After pasting this context, ask Claude:
 
 ---
 
-**Last Updated:** 2025-12-28
+**Last Updated:** 2026-01-18
 **Schema Version:** 2025_12_27_005811
 **Frontend Version:** React 18.3.1 + Vite 6.3.6
-**Backend Version:** Rails 7.2.2.1
+**Backend Version:** Rails 7.2.2
+**Status:** ✅ Production Ready (Build errors resolved Jan 17, 2026)

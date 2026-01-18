@@ -127,9 +127,21 @@ export default function EmailRow({
     );
   };
 
-  // Calculate undelivered and unsubscribed counts (placeholder for now, will be populated from SendGrid data)
-  const undeliveredCount = 0; // TODO: Get from email.email_deliveries when SendGrid integration is added
-  const unsubscribedCount = 0; // TODO: Get from email.email_deliveries when SendGrid integration is added
+  // Get delivery counts from backend (populated via SendGrid webhooks)
+  const undeliveredCount = email.undelivered_count || 0;
+  const unsubscribedCount = email.unsubscribed_count || 0;
+
+  // Build tooltip with detailed delivery breakdown (for sent emails)
+  const deliveryCounts = email.delivery_counts;
+  const deliveryTooltip = deliveryCounts
+    ? `Delivery Status:\n` +
+      `✓ Delivered: ${deliveryCounts.delivered}\n` +
+      `✕ Bounced: ${deliveryCounts.bounced}\n` +
+      `⊘ Dropped: ${deliveryCounts.dropped}\n` +
+      `⊗ Unsubscribed: ${deliveryCounts.unsubscribed}\n` +
+      `⋯ Pending: ${deliveryCounts.pending}\n` +
+      `Total Sent: ${deliveryCounts.total_sent}`
+    : undefined;
 
   return (
     <div className="grid grid-cols-[200px,240px,130px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
@@ -172,13 +184,23 @@ export default function EmailRow({
       </div>
 
       {/* Undelivered Count */}
-      <div className="text-center text-white/60">
-        <span>{undeliveredCount}</span>
+      <div
+        className="text-center text-white/60 cursor-help"
+        title={deliveryTooltip}
+      >
+        <span className={undeliveredCount > 0 ? 'text-red-400 font-medium' : ''}>
+          {undeliveredCount}
+        </span>
       </div>
 
       {/* Unsubscribed Count */}
-      <div className="text-center text-white/60">
-        <span>{unsubscribedCount}</span>
+      <div
+        className="text-center text-white/60 cursor-help"
+        title={deliveryTooltip}
+      >
+        <span className={unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''}>
+          {unsubscribedCount}
+        </span>
       </div>
 
       {/* Status */}

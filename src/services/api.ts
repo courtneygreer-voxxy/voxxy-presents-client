@@ -1629,6 +1629,34 @@ export interface BulkImportOptions {
   tags?: string[]
 }
 
+export interface ContactList {
+  id: number
+  organization_id: number
+  name: string
+  description?: string
+  list_type: 'smart' | 'manual'
+
+  // For smart lists
+  filters?: {
+    categories?: string[]
+    locations?: string[]
+    tags?: string[]
+  }
+
+  // For manual lists
+  contact_ids?: number[]
+
+  // Metadata
+  contacts_count: number
+  last_used_at?: string
+  created_at: string
+  updated_at: string
+}
+
+export interface ContactListsResponse {
+  contact_lists: ContactList[]
+}
+
 export const vendorContactsApi = {
   /**
    * Get all vendor contacts for an organization
@@ -1757,6 +1785,33 @@ export const vendorContactsApi = {
       created_at: contact.metadata?.created_at || '',
       updated_at: contact.metadata?.updated_at || '',
     }
+  },
+
+  /**
+   * Get all vendor contact IDs for bulk selection
+   * GET /api/v1/presents/organizations/:organization_id/vendor_contacts/ids
+   */
+  async getAllIds(organizationId: number, params?: {
+    search?: string
+    contact_type?: string
+    status?: string
+    location?: string
+    category?: string
+    featured?: string
+  }): Promise<{ ids: number[], count: number }> {
+    const queryParams = new URLSearchParams()
+
+    if (params?.search) queryParams.append('search', params.search)
+    if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
+    if (params?.status) queryParams.append('status', params.status)
+    if (params?.location) queryParams.append('location', params.location)
+    if (params?.category) queryParams.append('category', params.category)
+    if (params?.featured) queryParams.append('featured', params.featured)
+
+    const queryString = queryParams.toString()
+    const endpoint = `/v1/presents/organizations/${organizationId}/vendor_contacts/ids${queryString ? `?${queryString}` : ''}`
+
+    return fetchApi<{ ids: number[], count: number }>(endpoint)
   },
 
   /**
@@ -2121,6 +2176,80 @@ export interface EventInvitation {
   updated_at: string
   can_respond?: boolean
   is_expired?: boolean
+}
+
+export const contactListsApi = {
+  /**
+   * Get all contact lists for an organization
+   * GET /api/v1/presents/organizations/:organization_id/contact_lists
+   */
+  async getAll(organizationId: number): Promise<ContactListsResponse> {
+    return fetchApi<ContactListsResponse>(
+      `/v1/presents/organizations/${organizationId}/contact_lists`
+    )
+  },
+
+  /**
+   * Get single contact list by ID
+   * GET /api/v1/presents/contact_lists/:id
+   */
+  async getById(listId: number): Promise<ContactList> {
+    return fetchApi<ContactList>(`/v1/presents/contact_lists/${listId}`)
+  },
+
+  /**
+   * Get contacts for a list (with pagination)
+   * GET /api/v1/presents/contact_lists/:id/contacts
+   */
+  async getContacts(listId: number, page = 1, perPage = 100): Promise<VendorContactsListResponse> {
+    return fetchApi<VendorContactsListResponse>(
+      `/v1/presents/contact_lists/${listId}/contacts?page=${page}&per_page=${perPage}`
+    )
+  },
+
+  /**
+   * Create new contact list
+   * POST /api/v1/presents/organizations/:organization_id/contact_lists
+   */
+  async create(organizationId: number, listData: {
+    name: string
+    description?: string
+    list_type: 'smart' | 'manual'
+    filters?: ContactList['filters']
+    contact_ids?: number[]
+  }): Promise<ContactList> {
+    return fetchApi<ContactList>(
+      `/v1/presents/organizations/${organizationId}/contact_lists`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ contact_list: listData })
+      }
+    )
+  },
+
+  /**
+   * Update contact list
+   * PATCH /api/v1/presents/contact_lists/:id
+   */
+  async update(listId: number, listData: Partial<ContactList>): Promise<ContactList> {
+    return fetchApi<ContactList>(
+      `/v1/presents/contact_lists/${listId}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ contact_list: listData })
+      }
+    )
+  },
+
+  /**
+   * Delete contact list
+   * DELETE /api/v1/presents/contact_lists/:id
+   */
+  async delete(listId: number): Promise<void> {
+    return fetchApi<void>(`/v1/presents/contact_lists/${listId}`, {
+      method: 'DELETE'
+    })
+  }
 }
 
 export const eventInvitationsApi = {

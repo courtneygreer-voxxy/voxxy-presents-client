@@ -1,5 +1,6 @@
 import { VendorContact } from '@/services/api';
 import ContactRow from './ContactRow';
+import Pagination from './Pagination';
 
 interface ContactsTableProps {
   contacts: VendorContact[];
@@ -9,6 +10,13 @@ interface ContactsTableProps {
   onDeleteContact: (contactId: number) => void;
   onEditContact: (contact: VendorContact) => void;
   onToggleFeatured: (contactId: number) => void;
+  paginationMeta: {
+    current_page: number;
+    per_page: number;
+    total_count: number;
+    total_pages: number;
+  };
+  onPageChange: (page: number) => void;
 }
 
 export default function ContactsTable({
@@ -19,6 +27,8 @@ export default function ContactsTable({
   onDeleteContact,
   onEditContact,
   onToggleFeatured,
+  paginationMeta,
+  onPageChange,
 }: ContactsTableProps) {
   const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
 
@@ -70,21 +80,14 @@ export default function ContactsTable({
         )}
       </div>
 
-      {/* Footer with count */}
-      {contacts.length > 0 && (
-        <div className="bg-white/5 border-t border-white/10 px-4 py-2">
-          <div className="flex items-center justify-between text-xs text-white/50">
-            <span>
-              Showing {contacts.length} {contacts.length === 1 ? 'contact' : 'contacts'}
-            </span>
-            {selectedContacts.length > 0 && (
-              <span className="text-purple-400">
-                {selectedContacts.length} selected
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Pagination Footer */}
+      <Pagination
+        currentPage={paginationMeta.current_page}
+        totalPages={paginationMeta.total_pages}
+        totalCount={paginationMeta.total_count}
+        perPage={paginationMeta.per_page}
+        onPageChange={onPageChange}
+      />
     </div>
   );
 }

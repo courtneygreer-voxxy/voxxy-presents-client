@@ -98,6 +98,22 @@ export interface ScheduledEmail {
   // Computed field from backend
   delivery_status?: DeliveryStatus;
 
+  // Aggregated delivery counts (for sent emails)
+  delivery_counts?: {
+    total_sent: number;
+    delivered: number;
+    bounced: number;
+    dropped: number;
+    unsubscribed: number;
+    pending: number;
+  };
+
+  // Individual delivery metrics
+  undelivered_count?: number;
+  unsubscribed_count?: number;
+  delivered_count?: number;
+  delivery_rate?: number; // Percentage (0-100)
+
   // Frontend-only flag for virtual invitation announcement emails
   isInvitationAnnouncement?: boolean;
 }

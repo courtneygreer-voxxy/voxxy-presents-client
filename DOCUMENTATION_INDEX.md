@@ -2,9 +2,79 @@
 
 Complete analysis and documentation of the Voxxy Presents frontend codebase.
 
-## Overview Documents
+**Last Updated:** January 18, 2026
+**Status:** ✅ Reorganized - All documentation now in organized folders
 
-### 1. **ARCHITECTURE_SUMMARY.md** - Start Here
+---
+
+## 📖 Quick Start
+
+### New to the Project?
+1. **[README.md](README.md)** - Project overview and quick start guide
+2. **[CLAUDE_CONTEXT.md](CLAUDE_CONTEXT.md)** - Complete platform context (frontend + backend)
+3. **[docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md)** - Architecture overview
+
+### Working on Email System?
+1. **[docs/email-system/SCHEDULED_EMAILS_SYSTEM.md](docs/email-system/SCHEDULED_EMAILS_SYSTEM.md)** ⭐ - Complete email system guide
+2. **[docs/email-system/EDIT_MODAL_IMPROVEMENTS.md](docs/email-system/EDIT_MODAL_IMPROVEMENTS.md)** - UI enhancements
+3. **[docs/email-system/EMAIL_TEMPLATES.md](docs/email-system/EMAIL_TEMPLATES.md)** - 40 email templates
+
+### Fixing Bugs?
+1. **[docs/fixes/FINAL_BUILD_FIX.md](docs/fixes/FINAL_BUILD_FIX.md)** - TypeScript build fixes
+2. **[docs/fixes/PAUSE_DELETE_FIX_SUMMARY.md](docs/fixes/PAUSE_DELETE_FIX_SUMMARY.md)** - Pause button fix
+3. **[docs/fixes/INVITATION_EMAIL_FIX.md](docs/fixes/INVITATION_EMAIL_FIX.md)** - Invitation debugging
+
+---
+
+## 📚 Documentation Structure
+
+```
+/
+├── README.md                          # Project overview ⭐
+├── CLAUDE_CONTEXT.md                  # Complete platform context ⭐
+├── DOCUMENTATION_INDEX.md (this file) # Navigation hub
+│
+└── docs/
+    ├── architecture/                  # Architecture & analysis
+    │   ├── ARCHITECTURE_SUMMARY.md ⭐
+    │   ├── CODEBASE_ANALYSIS.md
+    │   └── FLOW_DIAGRAMS.md
+    │
+    ├── email-system/                  # Email automation docs (7 files)
+    │   ├── SCHEDULED_EMAILS_SYSTEM.md ⭐
+    │   ├── EDIT_MODAL_IMPROVEMENTS.md
+    │   ├── EDIT_MODAL_SESSION_SUMMARY.md
+    │   ├── EMAIL_TEMPLATES.md
+    │   ├── EMAIL_DEBUG_SUMMARY.md
+    │   ├── EMAIL_AUTOMATION_PLAN.md (planning doc)
+    │   └── EMAIL_AUTOMATION_PROGRESS.md
+    │
+    ├── fixes/                         # Bug fixes & build issues (6 files)
+    │   ├── FINAL_BUILD_FIX.md ⭐
+    │   ├── BUILD_FIXES_SUMMARY.md
+    │   ├── PAUSE_DELETE_FIX_SUMMARY.md
+    │   ├── INVITATION_EMAIL_FIX.md
+    │   ├── DOCUMENTATION_AUDIT_2026-01-17.md
+    │   └── DOCUMENTATION_REVIEW_COMPLETE.md
+    │
+    ├── features/                      # Feature documentation (3 files)
+    │   ├── PAYMENT_DEADLINE_FEATURE.md
+    │   ├── FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md
+    │   └── LANDING_PAGE_COPY.md
+    │
+    ├── deployment/                    # Deployment guides
+    ├── design/                        # Design system & UI docs
+    ├── development/                   # Development guides
+    ├── releases/                      # Release notes
+    ├── phase-reports/                 # Project phase reports
+    └── v3-migration/                  # Historical migration docs
+```
+
+---
+
+## 🎯 Architecture & Core Docs
+
+### **[docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md)** ⭐ START HERE
 - **Best for:** Quick overview, onboarding, executive summary
 - **Length:** 5 minutes read
 - **Contains:**
@@ -16,7 +86,7 @@ Complete analysis and documentation of the Voxxy Presents frontend codebase.
   - Important files to know
   - Development quick start
 
-### 2. **CODEBASE_ANALYSIS.md** - Deep Dive
+### **[docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md)** - Deep Dive
 - **Best for:** Understanding implementation details, development
 - **Length:** 30 minute read
 - **Contains:**
@@ -28,10 +98,8 @@ Complete analysis and documentation of the Voxxy Presents frontend codebase.
   - API integration patterns and all endpoints
   - Error handling strategies
   - Request/response formats
-  - Existing invitation and onboarding flows
-  - Frontend-ready but backend-pending features
 
-### 3. **FLOW_DIAGRAMS.md** - Visual Reference
+### **[docs/architecture/FLOW_DIAGRAMS.md](docs/architecture/FLOW_DIAGRAMS.md)** - Visual Reference
 - **Best for:** Visual learners, understanding data flows
 - **Length:** 10 minute read
 - **Contains:**
@@ -44,101 +112,222 @@ Complete analysis and documentation of the Voxxy Presents frontend codebase.
   - API service organization
   - Component hierarchy
 
-### 4. **docs/BACKEND_INVITATION_REQUIREMENTS.md** - Feature Spec
-- **Best for:** Backend developers, understanding invitation feature
-- **Length:** 15 minute read
-- **Contains:**
-  - Frontend implementation status
-  - Required backend API endpoints
-  - Database schema suggestions
-  - Request/response examples
-  - Email notification requirements
-  - Testing recommendations
-  - Security considerations
+---
 
-## Quick Reference Guide
+## 📧 Email Automation System
+
+The email system is a comprehensive automation platform with 40+ templates, smart scheduling, and delivery tracking.
+
+### **[docs/email-system/SCHEDULED_EMAILS_SYSTEM.md](docs/email-system/SCHEDULED_EMAILS_SYSTEM.md)** ⭐ COMPLETE GUIDE
+- **Length:** 47KB, comprehensive documentation
+- **Contains:**
+  - Complete architecture overview
+  - Data models & relationships (ScheduledEmail, EmailDelivery, etc.)
+  - User flows (create, edit, schedule, send)
+  - Frontend components (EmailAutomationTab, EditScheduledEmailModal, etc.)
+  - Backend implementation (controllers, models, workers)
+  - API reference (all endpoints)
+  - Email variables system (28 supported variables)
+  - Trigger system (on_application_open, days_before_event, etc.)
+  - Recipient filtering (by status, category, payment status)
+  - Delivery tracking (SendGrid webhooks)
+  - Current limitations and future enhancements
+
+### Implementation Details
+
+**[docs/email-system/EDIT_MODAL_IMPROVEMENTS.md](docs/email-system/EDIT_MODAL_IMPROVEMENTS.md)** - UX Enhancements
+- Clickable variable buttons with color-coded categories
+- Plain text editing (automatic HTML conversion)
+- Timezone-aware scheduling (8:00 AM local time, auto-converts to UTC)
+- Smart cursor insertion for variables
+- Contextual variable panel (shows when editing)
+
+**[docs/email-system/EDIT_MODAL_SESSION_SUMMARY.md](docs/email-system/EDIT_MODAL_SESSION_SUMMARY.md)** - Variable System
+- Variable format conversion ([bracket] ↔ {{mustache}})
+- Email preview with resolved variables
+- Validation system (unknown variables, unclosed brackets, past dates)
+- 28 supported variables across event, vendor, install, and link categories
+- Backend/frontend format conversion with HTML handling
+
+**[docs/email-system/EMAIL_DEBUG_SUMMARY.md](docs/email-system/EMAIL_DEBUG_SUMMARY.md)** - Debugging Guide
+- Common issues and solutions
+- Console logging and debugging techniques
+
+### Reference Materials
+
+**[docs/email-system/EMAIL_TEMPLATES.md](docs/email-system/EMAIL_TEMPLATES.md)** - Template Library
+- All 40 email templates documented
+- Template categories (pre-event, during event, post-event)
+- Variable usage examples
+- Trigger recommendations
+
+**[docs/email-system/EMAIL_AUTOMATION_PLAN.md](docs/email-system/EMAIL_AUTOMATION_PLAN.md)** - Original Design
+- Complete planning and architecture (71KB)
+- Feature specifications
+- Implementation roadmap
+- Historical reference
+
+**[docs/email-system/EMAIL_AUTOMATION_PROGRESS.md](docs/email-system/EMAIL_AUTOMATION_PROGRESS.md)** - Progress Tracking
+- Implementation milestones
+- Feature completion status
+
+---
+
+## 🐛 Bug Fixes & Build Resolution
+
+### **[docs/fixes/FINAL_BUILD_FIX.md](docs/fixes/FINAL_BUILD_FIX.md)** ⭐ CRITICAL
+- **Status:** ✅ ALL 9 BUILD ERRORS RESOLVED - Ready to Deploy
+- **Issue:** TypeScript build errors preventing deployment
+- **Solution:** Null-safe cursor position handling, input/textarea type compatibility
+- **Files Fixed:** emailVariables.ts, AdminDashboard.tsx, EditScheduledEmailModal.tsx
+- **Date:** January 17, 2026
+
+### **[docs/fixes/BUILD_FIXES_SUMMARY.md](docs/fixes/BUILD_FIXES_SUMMARY.md)** - Initial Round
+- Missing imports (AdminDashboard Users icon)
+- Type signature updates (insertVariableAtCursor)
+- Read-only ref assignment fixes
+- 6 errors resolved
+
+### **[docs/fixes/PAUSE_DELETE_FIX_SUMMARY.md](docs/fixes/PAUSE_DELETE_FIX_SUMMARY.md)** - Feature Fix
+- **Issue:** Pause button not working in production
+- **Root Cause:** HTTP method mismatch (PATCH vs POST)
+- **Files Modified:** src/services/api.ts
+- Complete data flow analysis (frontend ↔ backend)
+- **Status:** ✅ Fixed, Ready to Deploy
+
+### **[docs/fixes/INVITATION_EMAIL_FIX.md](docs/fixes/INVITATION_EMAIL_FIX.md)** - Debugging Enhancement
+- **Issue:** Invitation emails not showing in scheduled emails list
+- Enhanced debugging with detailed console logs
+- Type definition fixes (added viewed_count)
+- Virtual email creation improvements
+- Complete troubleshooting guide with database queries
+- **Status:** ✅ Fixed with Enhanced Logging
+
+### Documentation Audits
+
+**[docs/fixes/DOCUMENTATION_AUDIT_2026-01-17.md](docs/fixes/DOCUMENTATION_AUDIT_2026-01-17.md)** - Documentation Review
+- Comprehensive audit of all documentation
+- Accuracy assessment
+- Recommendations for updates
+
+**[docs/fixes/DOCUMENTATION_REVIEW_COMPLETE.md](docs/fixes/DOCUMENTATION_REVIEW_COMPLETE.md)** - Review Summary
+- Documentation review completion status
+
+---
+
+## ⚙️ Feature Documentation
+
+### Payment & Deadlines
+
+**[docs/features/PAYMENT_DEADLINE_FEATURE.md](docs/features/PAYMENT_DEADLINE_FEATURE.md)** - Feature Specification
+- Payment deadline functionality
+- Business rules and validation
+- Backend integration requirements
+
+**[docs/features/FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md](docs/features/FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md)** - Frontend Guide
+- UI components
+- Form validation
+- API integration
+- Testing procedures
+
+### Marketing & SEO
+
+**[docs/features/LANDING_PAGE_COPY.md](docs/features/LANDING_PAGE_COPY.md)** - Marketing Content
+- Landing page copy
+- SEO optimization
+- Messaging strategy
+
+---
+
+## 🚀 Deployment & Infrastructure
+
+See **[docs/deployment/](docs/deployment/)** folder for:
+- Render.com deployment guides
+- Platform integration
+- Environment configuration
+- CI/CD workflows
+
+---
+
+## 🎨 Design System
+
+See **[docs/design/](docs/design/)** folder for:
+- Glass morphism design system
+- Component styling guides
+- UI patterns
+- Radix UI integration
+
+---
+
+## 🔧 Development Guides
+
+See **[docs/development/](docs/development/)** folder for:
+- Git workflow
+- Branching strategy
+- Code review guidelines
+- Contributing guide
+
+---
+
+## 📦 Historical Documentation
+
+### V3 Migration
+**[docs/v3-migration/](docs/v3-migration/)** - Historical migration docs from previous architecture
+
+### Release Notes
+**[docs/releases/](docs/releases/)** - Release history and changelogs
+
+### Phase Reports
+**[docs/phase-reports/](docs/phase-reports/)** - Project phase completion reports
+
+---
+
+## 🎯 Quick Navigation by Task
 
 ### For Different Audiences
 
 **Product Manager / Designer**
-1. Read: ARCHITECTURE_SUMMARY.md
-2. Skim: FLOW_DIAGRAMS.md (look at flow diagrams)
-3. Reference: CODEBASE_ANALYSIS.md section 4 (User Flows)
+1. [docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md)
+2. [docs/architecture/FLOW_DIAGRAMS.md](docs/architecture/FLOW_DIAGRAMS.md) (look at flow diagrams)
+3. [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md) (User Flows section)
 
 **Frontend Developer (New to Project)**
-1. Read: ARCHITECTURE_SUMMARY.md (full)
-2. Read: CODEBASE_ANALYSIS.md (sections 1-3)
-3. Study: FLOW_DIAGRAMS.md (all diagrams)
-4. Reference: CODEBASE_ANALYSIS.md sections 5-6
+1. [docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md) (full)
+2. [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md) (sections 1-3)
+3. [docs/architecture/FLOW_DIAGRAMS.md](docs/architecture/FLOW_DIAGRAMS.md) (all diagrams)
 
 **Backend Developer**
-1. Skim: ARCHITECTURE_SUMMARY.md
-2. Read: CODEBASE_ANALYSIS.md section 5 (API Integration)
-3. Read: docs/BACKEND_INVITATION_REQUIREMENTS.md (full)
-4. Reference: CODEBASE_ANALYSIS.md section 6 (Onboarding Flows)
+1. [CLAUDE_CONTEXT.md](CLAUDE_CONTEXT.md) (backend section)
+2. [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md) (API Integration section)
 
 **DevOps / Infrastructure**
-1. Skim: ARCHITECTURE_SUMMARY.md (tech stack section)
-2. Check: config/environments.ts (environment config)
-3. Reference: package.json (scripts and dependencies)
-4. Check: render.yaml (.github/ folder for deployment)
+1. [docs/deployment/](docs/deployment/) (deployment guides)
+2. [docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md) (tech stack section)
 
 **QA / Testing**
-1. Read: FLOW_DIAGRAMS.md (all user flows)
-2. Read: CODEBASE_ANALYSIS.md section 6 (User flows)
-3. Reference: docs/BACKEND_INVITATION_REQUIREMENTS.md (testing section)
+1. [docs/architecture/FLOW_DIAGRAMS.md](docs/architecture/FLOW_DIAGRAMS.md) (all user flows)
+2. [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md) (User Flows section)
 
-## Key Concepts Explained
+### By Task
 
-### Authentication
-- **JWT Token Flow**: Login → Get token → Save to localStorage → Include in API requests
-- **Role-Based Access**: Producer, Vendor, Consumer, Admin roles determine dashboard access
-- **Auto-Organization Creation**: First login auto-creates organization for producers
+**Implementing Features**
+→ [docs/architecture/ARCHITECTURE_SUMMARY.md](docs/architecture/ARCHITECTURE_SUMMARY.md) → [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md)
 
-**Key Files:**
-- `src/contexts/AuthContext.tsx` - Auth state and methods
-- `src/services/api.ts` (authApi section) - Auth endpoints
+**Understanding Email System**
+→ [docs/email-system/SCHEDULED_EMAILS_SYSTEM.md](docs/email-system/SCHEDULED_EMAILS_SYSTEM.md)
 
-### State Management
-- **Global**: AuthContext for user state and auth methods
-- **Local**: useState in components for UI state
-- **Cache**: LocalStorage for JWT token and user profile
+**Fixing Bugs**
+→ Check [docs/fixes/](docs/fixes/) for relevant fix documentation
 
-**Key Files:**
-- `src/contexts/AuthContext.tsx` - Global auth state
-- `src/utils/cache.ts` - Caching utilities
+**Deploying**
+→ Review [docs/fixes/FINAL_BUILD_FIX.md](docs/fixes/FINAL_BUILD_FIX.md) and [docs/deployment/](docs/deployment/)
 
-### API Integration
-- **Custom Fetch Wrapper**: `fetchApi<T>()` for all requests
-- **Bearer Token Auth**: JWT automatically added to all requests
-- **Error Handling**: ApiError class with user-friendly messages
-- **Organization**: API endpoints organized by domain (auth, events, etc.)
+**API Integration**
+→ [CLAUDE_CONTEXT.md](CLAUDE_CONTEXT.md) (API section) or [docs/architecture/CODEBASE_ANALYSIS.md](docs/architecture/CODEBASE_ANALYSIS.md)
 
-**Key Files:**
-- `src/services/api.ts` - All API endpoints (40KB)
-- Lines 1-114: Base fetch wrapper and error handling
-- Lines 117-416: authApi endpoints
-- Lines 418+: Other domain APIs
+---
 
-### Event Creation
-- **4-Step Wizard**: Basic info → Settings → Invitations → Review
-- **Invitation System**: Frontend captures contact IDs, backend pending
-- **Auto-Creation**: Event created immediately on step 4 confirmation
-
-**Key Files:**
-- `src/components/producer/CreateEventWizard/` - Wizard components
-- `src/pages/ProducerDashboard.tsx` - Dashboard integration
-
-### Vendor Applications
-- **Public Form**: No auth required to apply for vendor spot
-- **Ticket Code**: Instant tracking code provided after submission
-- **Status Tracking**: Public tracking endpoint using ticket code
-
-**Key Files:**
-- `src/pages/VendorApplicationForm.tsx` - Application form
-- `src/pages/ApplicationTrackingPage.tsx` - Track status page
-
-## Common Tasks
+## 🔍 Common Tasks Reference
 
 ### Adding a New Route
 1. Create page component in `src/pages/`
@@ -146,56 +335,25 @@ Complete analysis and documentation of the Voxxy Presents frontend codebase.
 3. Import component in App.tsx
 4. Consider if lazy-loaded or eager-loaded
 
-**Example:**
-```typescript
-// In App.tsx
-const NewPage = lazy(() => import('./pages/NewPage'))
-
-// In Routes
-<Route path="/new-route" element={<NewPage />} />
-```
-
 ### Adding a New API Endpoint
 1. Add to appropriate API object in `src/services/api.ts`
 2. Use `fetchApi<T>()` for requests
 3. Handle errors with ApiError
 4. Document with JSDoc comments
 
-**Example:**
-```typescript
-export const eventsApi = {
-  async newMethod() {
-    return fetchApi<any>('/v1/presents/events/new-endpoint', {
-      method: 'POST',
-      body: JSON.stringify({ data }),
-    })
-  }
-}
-```
-
 ### Using Auth State in Components
-1. Import `useAuth` from `src/contexts/AuthContext`
-2. Check `isAuthenticated`, `isProducer`, etc.
-3. Use `signIn`, `signOut`, `signUp` methods
-
-**Example:**
 ```typescript
 import { useAuth } from '@/contexts/AuthContext'
 
 export function MyComponent() {
   const { userProfile, isProducer, signOut } = useAuth()
-  
+
   if (!isProducer) return <div>Not a producer</div>
   return <div>Hello {userProfile?.name}</div>
 }
 ```
 
 ### Creating a Protected Route
-1. Use `AdminRoute` wrapper for admin-only routes
-2. Use `ProtectedRouteV2` for redirecting authenticated users
-3. Or check `useAuth()` inside component
-
-**Example:**
 ```typescript
 <Route path="/admin/dashboard" element={
   <AdminRoute>
@@ -204,67 +362,55 @@ export function MyComponent() {
 } />
 ```
 
-## Feature Status & Roadmap
+---
 
-### Implemented (MVP)
-- [x] User authentication system
-- [x] Role-based access control
-- [x] Producer event creation (4-step wizard)
-- [x] Vendor network/contacts management
-- [x] Public vendor application form
-- [x] Application tracking by ticket code
-- [x] Producer application management dashboard
-- [x] Admin dashboard
-- [x] Email contact form
-- [x] Responsive design
+## 📊 Project Status
+
+### Build Status
+- ✅ **Production Ready** - All TypeScript errors resolved (Jan 17, 2026)
+- ✅ All critical bugs fixed
+- ✅ Email system fully functional
+- ✅ Documentation comprehensive and current
+
+### Feature Completion
+- ✅ User authentication system
+- ✅ Role-based access control
+- ✅ Producer event creation (4-step wizard)
+- ✅ Vendor network/contacts management
+- ✅ Public vendor application form
+- ✅ Application tracking by ticket code
+- ✅ Producer application management dashboard
+- ✅ Admin dashboard
+- ✅ **Email automation system** (40+ templates)
+- ✅ **CSV bulk import** for vendor contacts
+- ✅ Responsive design
 
 ### In Progress
-- [ ] Event invitation system (frontend complete, backend needed)
-  - See: `docs/BACKEND_INVITATION_REQUIREMENTS.md`
-  - Frontend files: `src/components/producer/CreateEventWizard/steps/Step3InviteList.tsx`
+- 🔄 Event invitation system (frontend complete, backend needed)
+- 🔄 Mobile app integration planning
 
-### Planned
-- [ ] Email notifications for invitations
-- [ ] Public invitation view page
-- [ ] Invitation accept/decline interface
-- [ ] Invitation analytics and tracking
-- [ ] Automated reminder emails
-- [ ] Advanced vendor analytics dashboard
-- [ ] Mobile app optimization
-- [ ] Bulk vendor operations
+---
 
-## Important Notes
+## 💡 Important Notes
 
-1. **Beta Access Gate**: Users can't directly sign up - they must request beta access via contact form
+1. **Beta Access Gate**: Users can't directly sign up - they must request beta access
 2. **Organization Auto-Creation**: First producer login auto-creates an organization
-3. **Invitation System**: Frontend is ready, waiting for backend API implementation
-4. **Multi-Environment**: Config in `src/config/environments.ts` for dev/staging/production
-5. **No Redux**: Project uses Context API + useState for simplicity
-6. **Component Library**: Radix UI for headless, accessible components
-7. **Type Safety**: Full TypeScript coverage, Zod for validation
+3. **Multi-Environment**: Config in `src/config/environments.ts` for dev/staging/production
+4. **No Redux**: Project uses Context API + useState for simplicity
+5. **Component Library**: Radix UI for headless, accessible components
+6. **Type Safety**: Full TypeScript coverage, Zod for validation
+7. **Email System**: Complete automation with 40+ templates, smart scheduling
 
-## Files That Should Never Change
+---
 
-- `src/App.tsx` - Main router, be careful with routes
-- `src/contexts/AuthContext.tsx` - Auth is critical
-- `src/services/api.ts` - API contract with backend
-- `package.json` - Dependency management
-- `tsconfig.json` - TypeScript configuration
-
-## Files That Change Often
-
-- `src/pages/*` - New features added here
-- `src/components/*` - New components for features
-- `.env.*` - Environment variables change per environment
-
-## Getting Help
+## 🆘 Getting Help
 
 ### Understanding a Feature
 1. Find the route in `src/App.tsx`
 2. Check the page component in `src/pages/`
 3. Look at child components in `src/components/`
 4. Search for API calls in `src/services/api.ts`
-5. Check FLOW_DIAGRAMS.md for visual explanation
+5. Check [docs/architecture/FLOW_DIAGRAMS.md](docs/architecture/FLOW_DIAGRAMS.md) for visual explanation
 
 ### Debugging Auth Issues
 1. Check `src/contexts/AuthContext.tsx` - Auth logic
@@ -278,13 +424,14 @@ export function MyComponent() {
 3. Check API error response - Backend validation errors
 4. Check `fetchApi` error handling - Error message
 
-### Debugging Routing Issues
-1. Check `src/App.tsx` - Route definition
-2. Check page component - Correct export?
-3. Check browser URL - Matches route?
-4. Check redirect logic - `RoleBasedDashboardRedirect`
+### Debugging Email System
+1. Check [docs/email-system/SCHEDULED_EMAILS_SYSTEM.md](docs/email-system/SCHEDULED_EMAILS_SYSTEM.md)
+2. Review [docs/email-system/EMAIL_DEBUG_SUMMARY.md](docs/email-system/EMAIL_DEBUG_SUMMARY.md)
+3. Check SendGrid dashboard for delivery status
 
-## Standards & Conventions
+---
+
+## 📋 Standards & Conventions
 
 ### Naming
 - **Components**: PascalCase (HomePage, VendorApplicationForm)
@@ -300,178 +447,50 @@ import { useAuth } from '@/contexts/AuthContext'
 
 // Types (if needed)
 interface Props { ... }
-interface State { ... }
 
 // Component
 export default function MyComponent() {
   // Hooks
   const { userProfile } = useAuth()
   const [state, setState] = useState()
-  
+
   // Effects
   useEffect(() => { ... }, [])
-  
+
   // Handlers
   const handleClick = () => { ... }
-  
+
   // Render
   return <div>...</div>
 }
 ```
 
-### API Integration
-- Always use `fetchApi<T>()` for requests
-- Wrap API calls in try/catch
-- Use ApiError for error handling
-- Document endpoints with JSDoc
+---
 
-## Version Information
+## 🔗 External Resources
+
+- **Rails API Docs**: `/Users/beaulazear/Desktop/voxxy-rails/docs/README.md`
+- **Repository**: (add GitHub link)
+- **Production**: voxxypresents.com
+- **Staging**: (add staging URL)
+
+---
+
+## 📦 Version Information
 
 - **Node.js**: ^18+ (per .nvmrc)
 - **React**: 18.3.1
 - **TypeScript**: 5.0+
 - **Vite**: 6.3.6
-- **Latest Update**: December 26, 2024
+- **Latest Update**: January 18, 2026
 
 ---
 
----
-
-## Email Automation System (Comprehensive Documentation)
-
-### ⭐ Primary Reference
-
-**SCHEDULED_EMAILS_SYSTEM.md** - Complete email automation system documentation
-- **Best for:** Understanding the entire email system
-- **Length:** 47KB, comprehensive
-- **Contains:**
-  - Complete architecture overview
-  - Data models & relationships (ScheduledEmail, EmailDelivery, etc.)
-  - User flows (create, edit, schedule, send)
-  - Frontend components (EmailAutomationTab, EditScheduledEmailModal, etc.)
-  - Backend implementation (controllers, models, workers)
-  - API reference (all endpoints)
-  - Email variables system (28 supported variables)
-  - Trigger system (on_application_open, days_before_event, etc.)
-  - Recipient filtering (by status, category, registration status)
-  - Delivery tracking (SendGrid webhooks)
-  - Debugging guides
-
-### Implementation Session Summaries
-
-**EDIT_MODAL_SESSION_SUMMARY.md** - Session 1: Variable System
-- Variable format conversion ([bracket] ↔ {{mustache}})
-- Email preview with resolved variables
-- Validation system (unknown variables, unclosed brackets, past dates)
-- 28 supported variables across event, vendor, install, and link categories
-- Backend/frontend format conversion with HTML handling
-
-**EDIT_MODAL_IMPROVEMENTS.md** - Session 2: UX Enhancements
-- Clickable variable buttons with color-coded categories
-- Plain text editing (automatic HTML conversion)
-- Timezone-aware scheduling (8:00 AM local time, auto-converts to UTC)
-- Smart cursor insertion for variables
-- Contextual variable panel (shows when editing)
-
-### Planning & Template Reference
-
-**EMAIL_AUTOMATION_PLAN.md** - Original design document
-- Complete planning and architecture
-- Feature specifications
-- Implementation roadmap
-- 71KB of detailed planning (historical reference)
-
-**EMAIL_TEMPLATES.md** - Template library (40 templates)
-- All 40 email templates documented
-- Template categories (pre-event, during event, post-event)
-- Variable usage examples
-- Trigger recommendations
+**Last Updated:** January 18, 2026
+**Documentation Status:** ✅ Complete and Reorganized
+**Coverage:** 100% of frontend codebase
+**Accuracy:** High (continuously updated)
 
 ---
 
-## Bug Fixes & Build Resolution (January 17, 2026)
-
-### ⭐ Critical Build Fixes
-
-**FINAL_BUILD_FIX.md** - TypeScript Build Resolution
-- **CRITICAL:** Resolves all 9 TypeScript build errors
-- Null-safe cursor position handling
-- Input/textarea type compatibility
-- Files fixed: emailVariables.ts, AdminDashboard.tsx, EditScheduledEmailModal.tsx
-- **Status:** ✅ ALL BUILD ERRORS RESOLVED - Ready to Deploy
-
-**BUILD_FIXES_SUMMARY.md** - Initial Build Fixes (Round 1)
-- Missing imports (AdminDashboard Users icon)
-- Type signature updates (insertVariableAtCursor)
-- Read-only ref assignment fixes
-- 6 errors resolved
-
-### Feature Bug Fixes
-
-**PAUSE_DELETE_FIX_SUMMARY.md** - Pause Button Fix
-- **Issue:** Pause button not working in production
-- **Root Cause:** HTTP method mismatch (PATCH → POST)
-- Files modified: src/services/api.ts
-- Complete data flow analysis (frontend ↔ backend)
-- **Status:** ✅ Fixed, Ready to Deploy
-
-**INVITATION_EMAIL_FIX.md** - Invitation Display Debugging
-- **Issue:** Invitation emails not showing in scheduled emails list
-- Enhanced debugging with detailed console logs
-- Type definition fixes (added viewed_count)
-- Virtual email creation improvements
-- Complete troubleshooting guide with database queries
-- **Status:** ✅ Fixed with Enhanced Logging
-
----
-
-## Feature Documentation
-
-### Payment & Deadlines
-- **PAYMENT_DEADLINE_FEATURE.md** - Payment deadline feature specification
-- **FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md** - Frontend integration guide
-
-### Marketing & SEO
-- **LANDING_PAGE_COPY.md** - Landing page copy & SEO optimization
-
----
-
-## Document Status
-
-- **Last Updated**: January 17, 2026
-- **Status**: Complete and Current
-- **Coverage**: 100% of frontend codebase + email automation system
-- **Accuracy**: High (continuously updated)
-- **New Docs Today**: 7 documents (77KB) covering email system enhancements and bug fixes
-
----
-
-## Quick Navigation
-
-### Starting Points
-1. **New to Project?** → Start with ARCHITECTURE_SUMMARY.md
-2. **Email System?** → Start with SCHEDULED_EMAILS_SYSTEM.md ⭐
-3. **Need Context?** → Read CLAUDE_CONTEXT.md
-4. **Visual Learner?** → Check FLOW_DIAGRAMS.md
-5. **Bug Fixing?** → Check FINAL_BUILD_FIX.md first
-6. **Deployment?** → Ensure all build fixes are deployed
-
-### By Task
-- **Implementing Features** → ARCHITECTURE_SUMMARY.md → CODEBASE_ANALYSIS.md
-- **Understanding Email System** → SCHEDULED_EMAILS_SYSTEM.md
-- **Fixing Bugs** → Check relevant bug fix docs
-- **Deploying** → Review FINAL_BUILD_FIX.md and build fix docs
-- **API Integration** → CODEBASE_ANALYSIS.md (API section) or CLAUDE_CONTEXT.md
-
----
-
-## Next Steps
-
-1. Read ARCHITECTURE_SUMMARY.md for overview
-2. Explore FLOW_DIAGRAMS.md for visual understanding
-3. Deep dive into CODEBASE_ANALYSIS.md as needed
-4. For email system work, read SCHEDULED_EMAILS_SYSTEM.md
-5. Reference this index when you need to find something
-6. Check specific files mentioned in relevant section
-
-Happy coding!
+Happy coding! 🚀

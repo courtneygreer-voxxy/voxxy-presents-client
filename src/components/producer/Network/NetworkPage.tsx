@@ -1,16 +1,20 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Upload } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload, List } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
+import ListsManagement from './Lists/ListsManagement';
+
+type NetworkTab = 'contacts' | 'lists';
 
 interface NetworkPageProps {
   organizationId: number;
 }
 
 export default function NetworkPage({ organizationId }: NetworkPageProps) {
+  const [activeTab, setActiveTab] = useState<NetworkTab>('contacts');
   const [contacts, setContacts] = useState<VendorContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -25,11 +29,23 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [categoryFilter, setCategoryFilter] = useState('');
   const [featuredFilter, setFeaturedFilter] = useState('');
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage] = useState(100);
+  const [paginationMeta, setPaginationMeta] = useState({
+    current_page: 1,
+    per_page: 100,
+    total_count: 0,
+    total_pages: 1,
+  });
+
   useEffect(() => {
-    fetchContacts();
+    // Reset to page 1 when filters change
+    setCurrentPage(1);
+    fetchContacts(1);
   }, [organizationId, locationFilter, categoryFilter, featuredFilter]);
 
-  const fetchContacts = async () => {
+  const fetchContacts = async (page: number = currentPage) => {
     try {
       setLoading(true);
       setError(null);
@@ -39,12 +55,22 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         location: locationFilter || undefined,
         category: categoryFilter || undefined,
         featured: featuredFilter || undefined,
+        page: page,
+        per_page: perPage,
       });
 
       // Handle different response formats
       const contactsData = response?.vendor_contacts || [];
+      const meta = response?.meta || {
+        current_page: page,
+        per_page: perPage,
+        total_count: contactsData.length,
+        total_pages: 1,
+      };
 
       setContacts(contactsData);
+      setPaginationMeta(meta);
+      setCurrentPage(page);
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
       setContacts([]); // Set to empty array on error to prevent crashes
@@ -53,12 +79,21 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchContacts(page);
+    // Clear selections when changing pages
+    setSelectedContacts([]);
+  };
+
   const handleSearch = (value: string) => {
     setSearchTerm(value);
   };
 
   const handleSearchSubmit = () => {
-    fetchContacts();
+    // Reset to page 1 when searching
+    setCurrentPage(1);
+    fetchContacts(1);
   };
 
   const handleSelectContact = (contactId: number) => {
@@ -71,11 +106,29 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     });
   };
 
-  const handleSelectAll = () => {
-    if (selectedContacts.length === contacts.length) {
+  const handleSelectAll = async () => {
+    // If some or all contacts on current page are selected, deselect all
+    const currentPageIds = contacts.map(c => c.id);
+    const allCurrentPageSelected = currentPageIds.every(id => selectedContacts.includes(id));
+
+    if (allCurrentPageSelected && selectedContacts.length > 0) {
+      // Deselect all
       setSelectedContacts([]);
     } else {
-      setSelectedContacts(contacts.map(c => c.id));
+      // Select all contacts across all pages (fetch all IDs)
+      try {
+        const result = await vendorContactsApi.getAllIds(organizationId, {
+          search: searchTerm || undefined,
+          location: locationFilter || undefined,
+          category: categoryFilter || undefined,
+          featured: featuredFilter || undefined,
+        });
+        setSelectedContacts(result.ids);
+      } catch (err) {
+        console.error('Failed to fetch all contact IDs:', err);
+        // Fallback to selecting just current page
+        setSelectedContacts(currentPageIds);
+      }
     }
   };
 
@@ -306,8 +359,46 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         </div>
       </div>
 
-      {/* Filter dropdowns */}
-      <div className="flex items-center gap-3 flex-wrap">
+      {/* Tabs */}
+      <div className="flex items-center gap-2 border-b border-white/10">
+        <button
+          onClick={() => setActiveTab('contacts')}
+          className={`
+            px-4 py-2.5 text-sm font-medium transition-all relative
+            ${activeTab === 'contacts'
+              ? 'text-white'
+              : 'text-white/60 hover:text-white'
+            }
+          `}
+        >
+          All Contacts
+          {activeTab === 'contacts' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
+          )}
+        </button>
+        <button
+          onClick={() => setActiveTab('lists')}
+          className={`
+            flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative
+            ${activeTab === 'lists'
+              ? 'text-white'
+              : 'text-white/60 hover:text-white'
+            }
+          `}
+        >
+          <List className="w-4 h-4" />
+          Lists
+          {activeTab === 'lists' && (
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
+          )}
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'contacts' && (
+        <>
+          {/* Filter dropdowns */}
+          <div className="flex items-center gap-3 flex-wrap">
         {/* Location Filter */}
         <div className="relative">
           <select
@@ -410,6 +501,8 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         onDeleteContact={handleDeleteContact}
         onEditContact={(contact) => setEditingContact(contact)}
         onToggleFeatured={handleToggleFeatured}
+        paginationMeta={paginationMeta}
+        onPageChange={handlePageChange}
       />
 
       {/* Modals */}
@@ -446,6 +539,13 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             fetchContacts();
           }}
         />
+      )}
+        </>
+      )}
+
+      {/* Lists Tab Content */}
+      {activeTab === 'lists' && (
+        <ListsManagement organizationId={organizationId} />
       )}
     </div>
   );
