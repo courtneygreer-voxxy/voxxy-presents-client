@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Users, Search, UserPlus, X, Building2, Mail } from 'lucide-react';
+import { Users, Search, UserPlus, X, Building2, Mail, XCircle, Filter } from 'lucide-react';
 import { WizardStepProps } from '../types';
-import { vendorContactsApi, VendorContact } from '@/services/api';
+import { vendorContactsApi, contactListsApi, VendorContact } from '@/services/api';
+import ListSelector from '../ListSelector';
 
 interface Step3InviteListProps extends WizardStepProps {
   organizationId: number;
@@ -14,7 +15,9 @@ export default function Step3InviteList({
 }: Step3InviteListProps) {
   const [contacts, setContacts] = useState<VendorContact[]>([]);
   const [filteredContacts, setFilteredContacts] = useState<VendorContact[]>([]);
+  const [listContacts, setListContacts] = useState<VendorContact[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingListContacts, setLoadingListContacts] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
@@ -24,6 +27,15 @@ export default function Step3InviteList({
   useEffect(() => {
     fetchContacts();
   }, [organizationId]);
+
+  // Fetch contacts from selected lists
+  useEffect(() => {
+    if (inviteList.selectedListIds.length > 0) {
+      fetchListContacts();
+    } else {
+      setListContacts([]);
+    }
+  }, [inviteList.selectedListIds, organizationId]);
 
   useEffect(() => {
     // Filter contacts based on search and type
@@ -68,43 +80,118 @@ export default function Step3InviteList({
     }
   };
 
-  const handleToggleContact = (contactId: number) => {
-    const currentIds = inviteList.invitedContactIds;
-    const newIds = currentIds.includes(contactId)
-      ? currentIds.filter((id) => id !== contactId)
-      : [...currentIds, contactId];
+  const fetchListContacts = async () => {
+    try {
+      setLoadingListContacts(true);
 
-    updateWizardState({
-      inviteList: {
-        invitedContactIds: newIds,
-      },
-    });
+      // Fetch contacts from all selected lists
+      const listContactPromises = inviteList.selectedListIds.map(async (listId) => {
+        console.log(`Fetching contacts for list ${listId}...`);
+        const response = await contactListsApi.getContacts(listId, 1, 1000); // Get first 1000 contacts
+        console.log(`List ${listId} returned ${response.vendor_contacts?.length || 0} contacts`);
+        return response.vendor_contacts || [];
+      });
+
+      const listContactArrays = await Promise.all(listContactPromises);
+
+      // Flatten and de-duplicate by contact ID
+      const allListContacts = listContactArrays.flat();
+      const uniqueContacts = Array.from(
+        new Map(allListContacts.map(contact => [contact.id, contact])).values()
+      );
+
+      console.log(`Total unique contacts from lists: ${uniqueContacts.length}`);
+      if (uniqueContacts.length > 0) {
+        console.log('Sample contact:', uniqueContacts[0]);
+      }
+
+      setListContacts(uniqueContacts);
+    } catch (err: any) {
+      console.error('Failed to fetch list contacts:', err);
+      setListContacts([]);
+    } finally {
+      setLoadingListContacts(false);
+    }
+  };
+
+  const handleToggleContact = (contactId: number) => {
+    // Check if this contact is from a selected list
+    const isFromList = listContacts.some((c) => c.id === contactId);
+
+    if (isFromList) {
+      // If contact is from a list, toggle their exclusion status
+      const isExcluded = (inviteList.excludedContactIds || []).includes(contactId);
+      const newExcluded = isExcluded
+        ? (inviteList.excludedContactIds || []).filter((id) => id !== contactId)
+        : [...(inviteList.excludedContactIds || []), contactId];
+
+      updateWizardState({
+        inviteList: {
+          ...inviteList,
+          excludedContactIds: newExcluded,
+        },
+      });
+    } else {
+      // If contact is NOT from a list, toggle manual selection
+      const currentIds = inviteList.invitedContactIds || [];
+      const newIds = currentIds.includes(contactId)
+        ? currentIds.filter((id) => id !== contactId)
+        : [...currentIds, contactId];
+
+      updateWizardState({
+        inviteList: {
+          ...inviteList,
+          invitedContactIds: newIds,
+        },
+      });
+    }
   };
 
   const handleSelectAll = () => {
     const allFilteredIds = filteredContacts.map((c) => c.id);
-    const allSelected = allFilteredIds.every((id) =>
-      inviteList.invitedContactIds.includes(id)
-    );
+    // Check if all filtered contacts are in the final merged list
+    const allSelected = allFilteredIds.every((id) => finalContactIds.includes(id));
 
     if (allSelected) {
       // Deselect all filtered contacts
+      // For contacts from lists: add to excluded
+      // For manually selected contacts: remove from invitedContactIds
+      const listContactIds = listContacts.map((c) => c.id);
+      const toExclude = allFilteredIds.filter((id) => listContactIds.includes(id));
+      const toRemoveFromManual = allFilteredIds.filter((id) => !listContactIds.includes(id));
+
       updateWizardState({
         inviteList: {
-          invitedContactIds: inviteList.invitedContactIds.filter(
-            (id) => !allFilteredIds.includes(id)
+          ...inviteList,
+          excludedContactIds: [
+            ...(inviteList.excludedContactIds || []),
+            ...toExclude.filter((id) => !(inviteList.excludedContactIds || []).includes(id)),
+          ],
+          invitedContactIds: (inviteList.invitedContactIds || []).filter(
+            (id) => !toRemoveFromManual.includes(id)
           ),
         },
       });
     } else {
       // Select all filtered contacts
-      const combinedIds = [
-        ...inviteList.invitedContactIds,
-        ...allFilteredIds.filter((id) => !inviteList.invitedContactIds.includes(id)),
-      ];
+      // For contacts from lists: remove from excluded
+      // For other contacts: add to invitedContactIds
+      const listContactIds = listContacts.map((c) => c.id);
+      const toUnexclude = allFilteredIds.filter((id) => listContactIds.includes(id));
+      const toAddToManual = allFilteredIds.filter(
+        (id) => !listContactIds.includes(id) && !finalContactIds.includes(id)
+      );
+
       updateWizardState({
         inviteList: {
-          invitedContactIds: combinedIds,
+          ...inviteList,
+          excludedContactIds: (inviteList.excludedContactIds || []).filter(
+            (id) => !toUnexclude.includes(id)
+          ),
+          invitedContactIds: [
+            ...(inviteList.invitedContactIds || []),
+            ...toAddToManual,
+          ],
         },
       });
     }
@@ -113,14 +200,64 @@ export default function Step3InviteList({
   const handleClearAll = () => {
     updateWizardState({
       inviteList: {
+        selectedListIds: inviteList.selectedListIds,
         invitedContactIds: [],
+        excludedContactIds: [],
       },
     });
   };
 
+  const handleListsChange = (listIds: number[]) => {
+    updateWizardState({
+      inviteList: {
+        ...inviteList,
+        selectedListIds: listIds,
+      },
+    });
+  };
+
+  const handleToggleExclusion = (contactId: number) => {
+    const currentExcluded = inviteList.excludedContactIds;
+    const newExcluded = currentExcluded.includes(contactId)
+      ? currentExcluded.filter((id) => id !== contactId)
+      : [...currentExcluded, contactId];
+
+    updateWizardState({
+      inviteList: {
+        ...inviteList,
+        excludedContactIds: newExcluded,
+      },
+    });
+  };
+
+  // Calculate final merged contacts: (list contacts + manually selected) - excluded
+  const getMergedContactIds = (): number[] => {
+    const listContactIds = listContacts.map((c) => c.id);
+    const manualContactIds = inviteList.invitedContactIds || [];
+    const excludedContactIds = inviteList.excludedContactIds || [];
+
+    // Merge and de-duplicate
+    const merged = Array.from(new Set([...listContactIds, ...manualContactIds]));
+
+    // Remove excluded contacts
+    return merged.filter((id) => !excludedContactIds.includes(id));
+  };
+
+  const finalContactIds = getMergedContactIds();
+
+  // Get all contacts (list + manual) for display
+  const allAvailableContacts = Array.from(
+    new Map([...listContacts, ...contacts].map(c => [c.id, c])).values()
+  );
+
   // Get selected contacts for display
-  const selectedContacts = contacts.filter((c) =>
-    inviteList.invitedContactIds.includes(c.id)
+  const selectedContacts = allAvailableContacts.filter((c) =>
+    finalContactIds.includes(c.id)
+  );
+
+  // Get contacts from lists that can be excluded
+  const listOnlyContacts = listContacts.filter((c) =>
+    !(inviteList.invitedContactIds || []).includes(c.id)
   );
 
   // Loading state
@@ -173,11 +310,10 @@ export default function Step3InviteList({
               No Contacts in Your Network
             </h3>
             <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
-              You don't have any vendor contacts yet. You can skip this step and add
-              contacts to your network later from the Network page.
+              You don't have any vendor contacts yet. Add contacts to your network from the Network page, then return to create events with invitations.
             </p>
             <p className="text-white/40 text-xs">
-              This step is optional - click Next to continue
+              You can skip this step and send invitations manually outside the platform
             </p>
           </div>
         </div>
@@ -187,7 +323,7 @@ export default function Step3InviteList({
 
   const allFilteredSelected =
     filteredContacts.length > 0 &&
-    filteredContacts.every((c) => inviteList.invitedContactIds.includes(c.id));
+    filteredContacts.every((c) => finalContactIds.includes(c.id));
 
   return (
     <div className="space-y-6">
@@ -196,9 +332,82 @@ export default function Step3InviteList({
         <div>
           <h2 className="text-xl font-semibold text-white">Invite Vendors</h2>
           <p className="text-white/60 text-sm mt-1">
-            Select contacts from your network to invite to this event
+            Use saved lists or select individual contacts to invite to this event
           </p>
         </div>
+
+        {/* List Selector */}
+        <ListSelector
+          organizationId={organizationId}
+          selectedListIds={inviteList.selectedListIds}
+          onListsChange={handleListsChange}
+        />
+
+        {/* Exclusion UI - Show when lists are selected */}
+        {(inviteList.selectedListIds || []).length > 0 && listOnlyContacts.length > 0 && (
+          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h4 className="text-sm font-semibold text-white">Exclude Contacts (Optional)</h4>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Uncheck contacts from your selected lists that you don't want to invite
+                </p>
+              </div>
+              {(inviteList.excludedContactIds || []).length > 0 && (
+                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded">
+                  {(inviteList.excludedContactIds || []).length} excluded
+                </span>
+              )}
+            </div>
+
+            <div className="max-h-48 overflow-y-auto space-y-1">
+              {listOnlyContacts.map((contact) => {
+                const isExcluded = (inviteList.excludedContactIds || []).includes(contact.id);
+                return (
+                  <label
+                    key={contact.id}
+                    className={`flex items-center gap-3 p-2 rounded hover:bg-white/5 cursor-pointer transition-colors ${
+                      isExcluded ? 'opacity-50' : ''
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={!isExcluded}
+                      onChange={() => handleToggleExclusion(contact.id)}
+                      className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white truncate">{contact.contact_name}</span>
+                        {contact.business_name && (
+                          <>
+                            <span className="text-white/30">•</span>
+                            <span className="text-xs text-white/50 truncate">{contact.business_name}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    {isExcluded && (
+                      <XCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                    )}
+                  </label>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Divider when lists are selected */}
+        {(inviteList.selectedListIds || []).length > 0 && (
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-white/10"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-gray-900 px-2 text-white/40">Or select individual contacts</span>
+            </div>
+          </div>
+        )}
 
         {/* Search and Filter Bar */}
         <div className="flex flex-col sm:flex-row gap-3">
@@ -234,15 +443,20 @@ export default function Step3InviteList({
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-white/60" />
               <span className="text-sm text-white/90">
-                {inviteList.invitedContactIds.length} of {contacts.length} selected
+                <strong>{finalContactIds.length}</strong> total contacts to invite
+                {(inviteList.selectedListIds || []).length > 0 && (
+                  <span className="text-white/50 text-xs ml-2">
+                    ({listContacts.length} from lists, {(inviteList.invitedContactIds || []).length} manual{(inviteList.excludedContactIds || []).length > 0 && `, ${(inviteList.excludedContactIds || []).length} excluded`})
+                  </span>
+                )}
               </span>
             </div>
-            {inviteList.invitedContactIds.length > 0 && (
+            {((inviteList.invitedContactIds || []).length > 0 || (inviteList.selectedListIds || []).length > 0) && (
               <button
                 onClick={handleClearAll}
                 className="text-xs text-purple-400 hover:text-purple-300 underline"
               >
-                Clear All
+                Clear Manual Selections
               </button>
             )}
           </div>
@@ -276,7 +490,10 @@ export default function Step3InviteList({
         ) : (
           <div className="bg-white/5 rounded-lg border border-white/10 divide-y divide-white/5 max-h-[400px] overflow-y-auto">
             {filteredContacts.map((contact) => {
-              const isSelected = inviteList.invitedContactIds.includes(contact.id);
+              // Show as selected if contact is in final merged list (includes list contacts + manual - excluded)
+              const isSelected = finalContactIds.includes(contact.id);
+              // Check if this contact is from a list (so we know it's auto-selected, not manually selected)
+              const isFromList = listContacts.some((c) => c.id === contact.id);
 
               return (
                 <div
@@ -301,7 +518,7 @@ export default function Step3InviteList({
                     {/* Contact Info */}
                     <div className="flex-1 min-w-0">
                       {/* Name & Business */}
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
                         <h4 className="text-sm font-semibold text-white">
                           {contact.contact_name}
                         </h4>
@@ -315,6 +532,12 @@ export default function Step3InviteList({
                               </span>
                             </div>
                           </>
+                        )}
+                        {isFromList && (
+                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs">
+                            <Filter className="w-3 h-3" />
+                            From List
+                          </span>
                         )}
                       </div>
 
@@ -383,15 +606,6 @@ export default function Step3InviteList({
             </div>
           </div>
         )}
-
-        {/* Optional Step Notice */}
-        <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-          <p className="text-sm text-blue-200/80">
-            <strong>Optional:</strong> You can skip this step and invite vendors later.
-            Selected contacts will receive invitation notifications once the event is
-            created.
-          </p>
-        </div>
       </div>
     </div>
   );

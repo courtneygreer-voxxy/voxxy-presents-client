@@ -127,3 +127,9 @@ export function getApiUrl(): string {
   const config = getEnvironmentConfig()
   return config.apiBaseUrl
 }
+
+// Check if we're in development or staging (for dev tools)
+export function isDevOrStaging(): boolean {
+  const env = getCurrentEnvironment()
+  return env === 'development' || env === 'staging'
+}

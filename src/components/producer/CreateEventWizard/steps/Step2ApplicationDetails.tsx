@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Plus, X, Tag } from 'lucide-react';
+import { Plus, X, Tag, Zap } from 'lucide-react';
 import { WizardStepProps, ApplicationRow } from '../types';
+import { isDevOrStaging } from '@/config/environments';
 
 const MAX_APPLICATIONS = 20;
 
@@ -150,8 +151,105 @@ export default function Step2ApplicationDetails({
     }
   };
 
+  // DEV ONLY: Prefill form with test data
+  const handlePrefill = () => {
+    // Calculate dates relative to event date (if set) or today
+    const eventDate = wizardState.eventDetails.event_date
+      ? new Date(wizardState.eventDetails.event_date)
+      : new Date();
+
+    const today = new Date();
+    const applicationDeadline = new Date(eventDate);
+    applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
+
+    // Don't set deadline in the past
+    if (applicationDeadline < today) {
+      applicationDeadline.setDate(today.getDate() + 7); // 1 week from today
+    }
+
+    const paymentDeadline = new Date(eventDate);
+    paymentDeadline.setDate(eventDate.getDate() - 7); // 1 week before event
+
+    // Don't set deadline in the past
+    if (paymentDeadline < today) {
+      paymentDeadline.setDate(today.getDate() + 3); // 3 days from today
+    }
+
+    const installDate = new Date(eventDate);
+    installDate.setDate(eventDate.getDate() - 1); // Day before event
+
+    // Create sample applications
+    const sampleApplications: ApplicationRow[] = [
+      {
+        id: crypto.randomUUID(),
+        name: 'Food Vendor',
+        booth_price: 350,
+        description: 'Full food service booth with electrical hookup',
+        install_date: installDate.toISOString().split('T')[0],
+        install_start_time: '07:00',
+        install_end_time: '09:00',
+        payment_link: 'https://www.example.com/payment/food',
+        application_tags: ['food', 'cooking', 'catering'],
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Art & Craft Vendor',
+        booth_price: 200,
+        description: 'Standard 10x10 booth space for handmade goods',
+        install_date: installDate.toISOString().split('T')[0],
+        install_start_time: '08:00',
+        install_end_time: '10:00',
+        payment_link: 'https://www.example.com/payment/art',
+        application_tags: ['art', 'handmade', 'crafts'],
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Premium Corner Booth',
+        booth_price: 500,
+        description: 'Large corner booth with extra visibility',
+        install_date: installDate.toISOString().split('T')[0],
+        install_start_time: '07:00',
+        install_end_time: '09:00',
+        payment_link: 'https://www.example.com/payment/premium',
+        application_tags: ['premium', 'featured'],
+      },
+    ];
+
+    updateWizardState({
+      eventDetails: {
+        ...wizardState.eventDetails,
+        application_deadline: applicationDeadline.toISOString().split('T')[0],
+        payment_deadline: paymentDeadline.toISOString().split('T')[0],
+      },
+      applicationDetails: {
+        applications: sampleApplications,
+      },
+    });
+
+    // Clear any errors
+    setErrors({});
+  };
+
   return (
     <div className="space-y-4">
+      {/* DEV ONLY: Prefill Button */}
+      {isDevOrStaging() && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs text-yellow-200/90 font-medium">Dev Mode</span>
+            </div>
+            <button
+              onClick={handlePrefill}
+              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30 hover:border-yellow-500/50"
+            >
+              Prefill Test Data
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 space-y-4">
         <div className="mb-3">
           <h2 className="text-base font-semibold text-white">Application Details</h2>

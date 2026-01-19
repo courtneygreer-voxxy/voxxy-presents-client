@@ -35,7 +35,9 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       applications: [],
     },
     inviteList: {
+      selectedListIds: [],
       invitedContactIds: [],
+      excludedContactIds: [],
     },
     automaticMessages: {
       messages: [],

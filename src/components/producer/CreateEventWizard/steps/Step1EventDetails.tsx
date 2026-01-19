@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Lock, X } from 'lucide-react';
+import { Lock, X, Zap } from 'lucide-react';
 import { WizardStepProps } from '../types';
 import VenueAutocomplete from '../VenueAutocomplete';
 import LocationAutocomplete from '../LocationAutocomplete';
 import googlePlacesService, { LocationData } from '@/services/googlePlacesService';
+import { isDevOrStaging } from '@/config/environments';
 
 export default function Step1EventDetails({
   wizardState,
@@ -77,8 +78,67 @@ export default function Step1EventDetails({
     setErrors(newErrors);
   };
 
+  // DEV ONLY: Prefill form with test data
+  const handlePrefill = () => {
+    // Calculate dates relative to today
+    const today = new Date();
+    const eventDate = new Date(today);
+    eventDate.setDate(today.getDate() + 30); // Event in 30 days
+
+    const eventEndDate = new Date(eventDate);
+    eventEndDate.setDate(eventDate.getDate() + 2); // 3-day event
+
+    const applicationDeadline = new Date(eventDate);
+    applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
+
+    const paymentDeadline = new Date(eventDate);
+    paymentDeadline.setDate(eventDate.getDate() - 7); // 1 week before event
+
+    updateWizardState({
+      eventDetails: {
+        ...eventDetails,
+        title: 'Brooklyn Art & Vendor Market',
+        description: 'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
+        venue: 'Prospect Park Bandshell',
+        location: 'Brooklyn, NY',
+        event_date: eventDate.toISOString().split('T')[0],
+        event_end_date: eventEndDate.toISOString().split('T')[0],
+        start_time: '10:00',
+        end_time: '18:00',
+        age_restriction: 'All Ages',
+        ticket_link: 'https://www.example.com/tickets/brooklyn-market',
+        application_deadline: applicationDeadline.toISOString().split('T')[0],
+        payment_deadline: paymentDeadline.toISOString().split('T')[0],
+      },
+    });
+
+    // Mark venue as selected (since we're setting it programmatically)
+    setIsVenueSelected(true);
+
+    // Clear any errors
+    setErrors({});
+  };
+
   return (
     <div className="space-y-4">
+      {/* DEV ONLY: Prefill Button */}
+      {isDevOrStaging() && (
+        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Zap className="w-4 h-4 text-yellow-400" />
+              <span className="text-xs text-yellow-200/90 font-medium">Dev Mode</span>
+            </div>
+            <button
+              onClick={handlePrefill}
+              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30 hover:border-yellow-500/50"
+            >
+              Prefill Test Data
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 space-y-4">
         <div className="mb-3">
           <h2 className="text-base font-semibold text-white">Event Details</h2>

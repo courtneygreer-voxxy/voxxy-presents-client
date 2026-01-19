@@ -39,7 +39,9 @@ export interface WizardState {
 
   // Step 3: Invite List
   inviteList: {
-    invitedContactIds: number[]; // Vendor contact IDs to invite
+    selectedListIds: number[]; // Contact list IDs to use
+    invitedContactIds: number[]; // Manually selected vendor contact IDs
+    excludedContactIds: number[]; // Contact IDs to exclude from lists
   };
 
   // Step 4: Automatic Messages (placeholder for future)

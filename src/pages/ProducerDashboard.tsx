@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -230,17 +230,58 @@ export default function ProducerDashboard() {
         }
       }
 
-      // Step 3: Handle invited contacts (if any)
-      if (wizardState.inviteList.invitedContactIds.length > 0) {
-        console.log(`Inviting ${wizardState.inviteList.invitedContactIds.length} contacts to event`);
+      // Step 3: Handle invited contacts (from lists + manual selection)
+      // Calculate final merged contact IDs
+      let finalContactIds: number[] = [];
+
+      // Fetch contacts from selected lists if any
+      if (wizardState.inviteList.selectedListIds.length > 0) {
+        try {
+          console.log(`Fetching contacts from ${wizardState.inviteList.selectedListIds.length} selected lists`);
+
+          const listContactPromises = wizardState.inviteList.selectedListIds.map(async (listId) => {
+            const response = await contactListsApi.getContacts(listId, 1, 1000);
+            return response.vendor_contacts.map(c => c.id);
+          });
+
+          const listContactArrays = await Promise.all(listContactPromises);
+          const listContactIds = listContactArrays.flat();
+
+          // Merge list contacts with manual selections and de-duplicate
+          const merged = Array.from(new Set([...listContactIds, ...wizardState.inviteList.invitedContactIds]));
+
+          // Remove excluded contacts
+          finalContactIds = merged.filter(id => !wizardState.inviteList.excludedContactIds.includes(id));
+
+          console.log(`Merged: ${listContactIds.length} from lists + ${wizardState.inviteList.invitedContactIds.length} manual - ${wizardState.inviteList.excludedContactIds.length} excluded = ${finalContactIds.length} total`);
+        } catch (error) {
+          console.error('Failed to fetch list contacts, falling back to manual selections only:', error);
+          finalContactIds = wizardState.inviteList.invitedContactIds.filter(
+            id => !wizardState.inviteList.excludedContactIds.includes(id)
+          );
+        }
+      } else {
+        // No lists selected, just use manual selections
+        finalContactIds = wizardState.inviteList.invitedContactIds;
+      }
+
+      // Send invitations if we have any contacts
+      if (finalContactIds.length > 0) {
+        console.log(`Inviting ${finalContactIds.length} contacts to event`);
         try {
           const result = await eventInvitationsApi.createBatch(
             newEvent.slug,
-            wizardState.inviteList.invitedContactIds
+            finalContactIds
           );
           console.log(`✅ ${result.created_count} invitations sent successfully`);
           if (result.errors.length > 0) {
             console.warn('Some invitations failed:', result.errors);
+          }
+
+          // Update last_used_at for selected lists
+          if (wizardState.inviteList.selectedListIds.length > 0) {
+            // Note: Backend should handle this automatically when lists are used
+            // We could add an API call here if needed: contactListsApi.markAsUsed(listId)
           }
         } catch (error) {
           console.error('Failed to send invitations:', error);

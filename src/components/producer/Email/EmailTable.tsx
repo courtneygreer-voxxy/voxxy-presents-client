@@ -38,8 +38,12 @@ export default function EmailTable({
           <div>Scheduled</div>
           <div>Category</div>
           <div className="text-center">Recipients</div>
-          <div className="text-center">Undelivered</div>
-          <div className="text-center">Unsub</div>
+          <div className="text-center cursor-help" title="Emails that bounced or were dropped by SendGrid">
+            Undelivered
+          </div>
+          <div className="text-center cursor-help" title="Recipients who unsubscribed from emails">
+            Unsub
+          </div>
           <div className="text-center">Status</div>
           <div className="text-right">Actions</div>
         </div>

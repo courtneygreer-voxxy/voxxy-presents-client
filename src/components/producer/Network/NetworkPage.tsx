@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Upload, List } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload, List, Save } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
+import SaveSmartListModal from './Lists/SaveSmartListModal';
 
 type NetworkTab = 'contacts' | 'lists';
 
@@ -22,6 +23,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showCSVUploadModal, setShowCSVUploadModal] = useState(false);
+  const [showSaveSmartListModal, setShowSaveSmartListModal] = useState(false);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
 
   // Filter states
@@ -444,16 +446,27 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
         {/* Clear Filters Button */}
         {(locationFilter || categoryFilter || featuredFilter) && (
-          <button
-            onClick={() => {
-              setLocationFilter('');
-              setCategoryFilter('');
-              setFeaturedFilter('');
-            }}
-            className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
-          >
-            Clear Filters
-          </button>
+          <>
+            <button
+              onClick={() => {
+                setLocationFilter('');
+                setCategoryFilter('');
+                setFeaturedFilter('');
+              }}
+              className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
+            >
+              Clear Filters
+            </button>
+
+            {/* Save as Smart List Button */}
+            <button
+              onClick={() => setShowSaveSmartListModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/30"
+            >
+              <Save className="w-3.5 h-3.5" />
+              Save as Smart List
+            </button>
+          </>
         )}
       </div>
 
@@ -537,6 +550,24 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
           onSuccess={() => {
             // Refresh contacts list after successful import
             fetchContacts();
+          }}
+        />
+      )}
+
+      {showSaveSmartListModal && (
+        <SaveSmartListModal
+          organizationId={organizationId}
+          filters={{
+            locations: locationFilter ? [locationFilter] : [],
+            categories: categoryFilter ? [categoryFilter] : [],
+            tags: [],
+            featured: featuredFilter === 'true' ? true : undefined,
+          }}
+          onClose={() => setShowSaveSmartListModal(false)}
+          onSuccess={() => {
+            setShowSaveSmartListModal(false);
+            // Optionally switch to lists tab
+            setActiveTab('lists');
           }}
         />
       )}
