@@ -21,9 +21,7 @@ export function BulletinsList({
       <div className="text-center py-12">
         <div className="text-gray-400 mb-2">No bulletins yet</div>
         <p className="text-gray-500 text-sm">
-          {isProducer
-            ? 'Create your first bulletin to share updates with vendors'
-            : 'Check back later for updates from the event producer'}
+          Create your first bulletin to share updates with vendors
         </p>
       </div>
     );

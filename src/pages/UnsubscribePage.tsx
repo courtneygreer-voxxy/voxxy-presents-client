@@ -227,7 +227,7 @@ export default function UnsubscribePage() {
               <RadioGroup value={selectedScope} onValueChange={(value) => setSelectedScope(value as any)}>
                 {context.available_scopes.includes('event') && context.event && (
                   <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="event" id="event" className="mt-1" />
+                    <RadioGroupItem value="event" id="event" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
                     <Label htmlFor="event" className="flex-1 cursor-pointer">
                       <div className="text-white font-medium">This event only</div>
                       <div className="text-white/60 text-sm mt-1">
@@ -239,7 +239,7 @@ export default function UnsubscribePage() {
 
                 {context.available_scopes.includes('organization') && context.organization && (
                   <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="organization" id="organization" className="mt-1" />
+                    <RadioGroupItem value="organization" id="organization" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
                     <Label htmlFor="organization" className="flex-1 cursor-pointer">
                       <div className="text-white font-medium">All emails from this producer</div>
                       <div className="text-white/60 text-sm mt-1">
@@ -251,7 +251,7 @@ export default function UnsubscribePage() {
 
                 {context.available_scopes.includes('global') && (
                   <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="global" id="global" className="mt-1" />
+                    <RadioGroupItem value="global" id="global" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
                     <Label htmlFor="global" className="flex-1 cursor-pointer">
                       <div className="text-white font-medium">All Voxxy Presents emails</div>
                       <div className="text-white/60 text-sm mt-1">

@@ -6,7 +6,6 @@ import { CreateBulletinModal } from './CreateBulletinModal';
 import { BulletinsList } from './BulletinsList';
 import { Button } from '../../ui/button';
 import { Plus, Megaphone } from 'lucide-react';
-import { useAuth } from '../../../contexts/AuthContext';
 
 interface BulletinsTabProps {
   eventSlug?: string;
@@ -15,14 +14,11 @@ interface BulletinsTabProps {
 export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {}) {
   const { eventSlug: eventSlugParam } = useParams<{ eventSlug: string }>();
   const eventSlug = eventSlugProp || eventSlugParam;
-  const { currentUser } = useAuth();
   const [bulletins, setBulletins] = useState<Bulletin[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingBulletin, setEditingBulletin] = useState<Bulletin | undefined>(undefined);
-
-  const isProducer = currentUser?.role === 'venue_owner' || currentUser?.role === 'producer';
 
   useEffect(() => {
     if (eventSlug) {
@@ -133,22 +129,18 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
           <div>
             <h2 className="text-2xl font-bold text-white">Bulletins</h2>
             <p className="text-gray-400 text-sm">
-              {isProducer
-                ? 'Share important updates and announcements with vendors'
-                : 'Stay updated with announcements from the event producer'}
+              Share important updates and announcements with vendors
             </p>
           </div>
         </div>
 
-        {isProducer && (
-          <Button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="bg-purple-600 hover:bg-purple-700"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Create Bulletin
-          </Button>
-        )}
+        <Button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="bg-purple-600 hover:bg-purple-700"
+        >
+          <Plus className="w-4 h-4 mr-2" />
+          Create Bulletin
+        </Button>
       </div>
 
       {/* Bulletins List */}
@@ -157,7 +149,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
         onEdit={handleEdit}
         onDelete={handleDelete}
         onTogglePin={handleTogglePin}
-        isProducer={isProducer}
+        isProducer={true}
       />
 
       {/* Create/Edit Modal */}
