@@ -2367,7 +2367,7 @@ export const eventInvitationsApi = {
 export const unsubscribeApi = {
   /**
    * Get unsubscribe context by token
-   * GET /api/v1/unsubscribe/:token
+   * GET /api/v1/presents/unsubscribe/:token
    */
   async getByToken(token: string) {
     return fetchApi<{
@@ -2389,12 +2389,12 @@ export const unsubscribeApi = {
         globally_unsubscribed: boolean
       }
       available_scopes: string[]
-    }>(`/v1/unsubscribe/${token}`)
+    }>(`/v1/presents/unsubscribe/${token}`)
   },
 
   /**
    * Process unsubscribe with specified scope
-   * POST /api/v1/unsubscribe/:token
+   * POST /api/v1/presents/unsubscribe/:token
    */
   async confirm(token: string, scope: 'event' | 'organization' | 'global') {
     return fetchApi<{
@@ -2412,9 +2412,84 @@ export const unsubscribeApi = {
           name: string
         }
       }
-    }>(`/v1/unsubscribe/${token}`, {
+    }>(`/v1/presents/unsubscribe/${token}`, {
       method: 'POST',
       body: JSON.stringify({ scope }),
+    })
+  },
+}
+
+/**
+ * Bulletins API
+ * Producer announcements/messages for vendors
+ */
+export const bulletinsApi = {
+  /**
+   * Get all bulletins for an event
+   * GET /api/v1/presents/events/:eventSlug/bulletins
+   */
+  async getByEvent(eventSlug: string) {
+    return fetchApi<import('@/types/bulletin').BulletinsResponse>(`/v1/presents/events/${eventSlug}/bulletins`)
+  },
+
+  /**
+   * Get a single bulletin
+   * GET /api/v1/presents/bulletins/:id
+   */
+  async getById(id: number) {
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/bulletins/${id}`)
+  },
+
+  /**
+   * Create a new bulletin
+   * POST /api/v1/presents/events/:eventSlug/bulletins
+   */
+  async create(eventSlug: string, data: import('@/types/bulletin').CreateBulletinRequest) {
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/events/${eventSlug}/bulletins`, {
+      method: 'POST',
+      body: JSON.stringify({ bulletin: data }),
+    })
+  },
+
+  /**
+   * Update a bulletin
+   * PATCH /api/v1/presents/bulletins/:id
+   */
+  async update(id: number, data: import('@/types/bulletin').UpdateBulletinRequest) {
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/bulletins/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ bulletin: data }),
+    })
+  },
+
+  /**
+   * Delete a bulletin
+   * DELETE /api/v1/presents/bulletins/:id
+   */
+  async delete(id: number) {
+    return fetchApi<void>(`/v1/presents/bulletins/${id}`, {
+      method: 'DELETE',
+    })
+  },
+
+  /**
+   * Toggle pin status of a bulletin
+   * POST /api/v1/presents/bulletins/:id/toggle_pin
+   */
+  async togglePin(id: number) {
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/bulletins/${id}/toggle_pin`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Mark a bulletin as read
+   * POST /api/v1/presents/bulletins/:id/mark_read
+   */
+  async markRead(id: number, email?: string) {
+    return fetchApi<{ success: boolean }>(`/v1/presents/bulletins/${id}/mark_read`, {
+      method: 'POST',
+      body: JSON.stringify({ email }),
     })
   },
 }

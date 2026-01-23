@@ -1,4 +1,5 @@
 // Types for Vendor Event Portal feature
+import type { Bulletin } from './bulletin';
 
 export interface EventPortalData {
   id: number;
@@ -6,7 +7,7 @@ export interface EventPortalData {
   last_viewed_at: string | null;
   event: EventDetails;
   vendor_categories: VendorCategory[];
-  producer_updates: ProducerUpdate[];
+  producer_updates: Bulletin[];
 }
 
 export interface EventDetails {

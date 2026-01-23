@@ -10,6 +10,8 @@ import {
   AlertCircle,
   Users,
   Building2,
+  Megaphone,
+  Pin,
 } from 'lucide-react';
 import {
   verifyPortalAccess,
@@ -19,6 +21,9 @@ import {
   hasActiveSession,
 } from '@/services/eventPortalService';
 import type { EventPortalData } from '@/types/eventPortal';
+import type { Bulletin } from '@/types/bulletin';
+import { bulletinsApi } from '@/services/api';
+import { formatDistanceToNow } from 'date-fns';
 
 export default function VendorEventPortalPage() {
   const { eventSlug } = useParams<{ eventSlug: string }>();
@@ -500,12 +505,67 @@ export default function VendorEventPortalPage() {
           </div>
         )}
 
-        {/* Producer Updates Section (Placeholder for Phase 2) */}
+        {/* Producer Updates Section */}
         <div className="bg-gray-800 rounded-lg p-6 shadow-xl">
-          <h2 className="text-2xl font-bold mb-4">Producer Updates</h2>
-          <p className="text-gray-400 text-center py-8">
-            No updates at this time. Check back later for announcements from the event producer.
-          </p>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
+              <Megaphone className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold">Producer Updates</h2>
+          </div>
+
+          {portalData.producer_updates && portalData.producer_updates.length > 0 ? (
+            <div className="space-y-4">
+              {portalData.producer_updates.map((bulletin: Bulletin) => {
+                const getInitials = (name: string) => {
+                  return name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                };
+
+                return (
+                  <div
+                    key={bulletin.id}
+                    className={`bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] rounded-lg p-6 border ${
+                      bulletin.pinned ? 'border-purple-500' : 'border-gray-700'
+                    }`}
+                  >
+                    {/* Header */}
+                    <div className="flex items-start gap-3 mb-4">
+                      {/* Author Avatar */}
+                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium flex-shrink-0">
+                        {getInitials(bulletin.author.name)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-white font-semibold">{bulletin.subject}</h3>
+                          {bulletin.pinned && (
+                            <Pin className="w-4 h-4 text-purple-400 fill-purple-400 flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-gray-400 text-sm">
+                          {bulletin.author.name} · {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="text-gray-300 whitespace-pre-wrap">
+                      {bulletin.body}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-8">
+              No updates at this time. Check back later for announcements from the event producer.
+            </p>
+          )}
         </div>
       </div>
     </div>

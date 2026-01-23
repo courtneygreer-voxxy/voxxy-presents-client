@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, EmailCategory } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import { backendToFrontend } from '@/utils/emailVariables';
@@ -131,17 +132,44 @@ export default function EmailRow({
   const undeliveredCount = email.undelivered_count || 0;
   const unsubscribedCount = email.unsubscribed_count || 0;
 
-  // Build tooltip with detailed delivery breakdown (for sent emails)
+  // Check if we have delivery data to show in tooltip
   const deliveryCounts = email.delivery_counts;
-  const deliveryTooltip = deliveryCounts
-    ? `Delivery Status:\n` +
-      `✓ Delivered: ${deliveryCounts.delivered}\n` +
-      `✕ Bounced: ${deliveryCounts.bounced}\n` +
-      `⊘ Dropped: ${deliveryCounts.dropped}\n` +
-      `⊗ Unsubscribed: ${deliveryCounts.unsubscribed}\n` +
-      `⋯ Pending: ${deliveryCounts.pending}\n` +
-      `Total Sent: ${deliveryCounts.total_sent}`
-    : undefined;
+  const hasDeliveryData = deliveryCounts && deliveryCounts.total_sent > 0;
+
+  // Render delivery stats tooltip content
+  const DeliveryTooltipContent = () => {
+    if (!deliveryCounts) return null;
+
+    return (
+      <div className="space-y-1">
+        <div className="font-semibold text-xs mb-2 border-b border-white/20 pb-1">Delivery Status</div>
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-green-400">✓ Delivered:</span>
+          <span className="font-medium">{deliveryCounts.delivered}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-red-400">✕ Bounced:</span>
+          <span className="font-medium">{deliveryCounts.bounced}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-orange-400">⊘ Dropped:</span>
+          <span className="font-medium">{deliveryCounts.dropped}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-yellow-400">⊗ Unsubscribed:</span>
+          <span className="font-medium">{deliveryCounts.unsubscribed}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs">
+          <span className="text-blue-400">⋯ Pending:</span>
+          <span className="font-medium">{deliveryCounts.pending}</span>
+        </div>
+        <div className="flex items-center justify-between gap-3 text-xs pt-1 mt-1 border-t border-white/20">
+          <span className="font-semibold">Total Sent:</span>
+          <span className="font-bold">{deliveryCounts.total_sent}</span>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="grid grid-cols-[200px,240px,130px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
@@ -184,23 +212,59 @@ export default function EmailRow({
       </div>
 
       {/* Undelivered Count */}
-      <div
-        className="text-center text-white/60 cursor-help"
-        title={deliveryTooltip}
-      >
-        <span className={undeliveredCount > 0 ? 'text-red-400 font-medium' : ''}>
-          {undeliveredCount}
-        </span>
+      <div className="text-center text-white/60">
+        {hasDeliveryData ? (
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span className={`cursor-help ${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''}`}>
+                  {undeliveredCount}
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl border border-white/10 max-w-xs"
+                  sideOffset={5}
+                >
+                  <DeliveryTooltipContent />
+                  <Tooltip.Arrow className="fill-gray-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        ) : (
+          <span className={undeliveredCount > 0 ? 'text-red-400 font-medium' : ''}>
+            {undeliveredCount}
+          </span>
+        )}
       </div>
 
       {/* Unsubscribed Count */}
-      <div
-        className="text-center text-white/60 cursor-help"
-        title={deliveryTooltip}
-      >
-        <span className={unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''}>
-          {unsubscribedCount}
-        </span>
+      <div className="text-center text-white/60">
+        {hasDeliveryData ? (
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <span className={`cursor-help ${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''}`}>
+                  {unsubscribedCount}
+                </span>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl border border-white/10 max-w-xs"
+                  sideOffset={5}
+                >
+                  <DeliveryTooltipContent />
+                  <Tooltip.Arrow className="fill-gray-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        ) : (
+          <span className={unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''}>
+            {unsubscribedCount}
+          </span>
+        )}
       </div>
 
       {/* Status */}
