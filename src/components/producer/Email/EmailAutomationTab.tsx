@@ -91,7 +91,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         console.log('   Using earliest sent date:', earliestSentDate);
 
         // Create virtual invitation announcement email with delivery stats
-        const deliveryStats = invitationsData.meta.delivery_stats || {};
+        const deliveryStats = (invitationsData.meta as any).delivery_stats || {};
         const invitationEmail: ScheduledEmail = {
           id: -1, // Negative ID to avoid conflicts
           event_id: -1,

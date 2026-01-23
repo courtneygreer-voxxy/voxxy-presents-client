@@ -16,7 +16,7 @@ import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
 import EmailTemplatesPage from './EmailTemplatesPage';
 
-type NavItem = 'admin' | 'analytics' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
+type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface User {
@@ -528,16 +528,15 @@ export default function AdminDashboard() {
     }
   };
 
-  // Load analytics when switching to analytics tab
+  // Load analytics when admin tab is active
   useEffect(() => {
-    if (activeNav === 'analytics' && !analytics) {
+    if (activeNav === 'admin' && !analytics) {
       loadAnalytics();
     }
   }, [activeNav]);
 
   const navItems = [
     { id: 'admin' as NavItem, label: 'Admin', icon: Shield },
-    { id: 'analytics' as NavItem, label: 'Analytics', icon: BarChart3 },
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
@@ -779,33 +778,61 @@ export default function AdminDashboard() {
         <main className="flex-1 overflow-auto">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('admin')} />
-          ) : activeNav === 'analytics' ? (
+          ) : activeNav === 'events' ? (
+            renderEventsContent()
+          ) : activeNav === 'network' ? (
+            <div className="p-4 lg:p-6">
+              {organization ? (
+                <NetworkPage organizationId={organization.id} />
+              ) : (
+                <div className="flex items-center justify-center py-12">
+                  <p className="text-white/60">Loading organization...</p>
+                </div>
+              )}
+            </div>
+          ) : activeNav === 'email-templates' ? (
+            <div className="p-4 lg:p-6">
+              {organization ? (
+                <EmailTemplatesPage organizationId={organization.id} />
+              ) : (
+                <div className="flex items-center justify-center py-12">
+                  <p className="text-white/60">Loading organization...</p>
+                </div>
+              )}
+            </div>
+          ) : activeNav === 'email-testing' ? (
+            <EmailTestingPanel />
+          ) : activeNav === 'admin' ? (
             <div className="p-4 lg:p-6">
               <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
-                {/* Header */}
+                {/* Header Section */}
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
                   <div className="flex items-center gap-3 lg:gap-4">
                     <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <BarChart3 className="h-5 w-5 lg:h-6 lg:w-6 text-purple-300" />
+                      <Shield className="h-5 w-5 lg:h-6 lg:w-6 text-purple-300" />
                     </div>
                     <div className="flex-1">
-                      <h1 className="text-xl lg:text-2xl font-bold text-white">Voxxy Presents Analytics</h1>
-                      <p className="text-sm lg:text-base text-gray-300">Platform statistics and insights</p>
+                      <h1 className="text-xl lg:text-2xl font-bold text-white">Admin Dashboard</h1>
+                      <p className="text-sm lg:text-base text-gray-300">Platform analytics and user management</p>
                     </div>
                     <Button
-                      onClick={loadAnalytics}
+                      onClick={() => {
+                        loadUsers();
+                        loadAnalytics();
+                      }}
                       variant="outline"
                       size="sm"
                       className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15"
-                      disabled={loadingAnalytics}
+                      disabled={loading || loadingAnalytics}
                     >
-                      {loadingAnalytics ? 'Loading...' : 'Refresh'}
+                      {loading || loadingAnalytics ? 'Loading...' : 'Refresh All'}
                     </Button>
                   </div>
                 </div>
 
+                {/* Analytics Stats Overview */}
                 {loadingAnalytics ? (
-                  <div className="flex items-center justify-center min-h-[400px]">
+                  <div className="flex items-center justify-center min-h-[200px]">
                     <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
                   </div>
                 ) : analyticsError ? (
@@ -815,7 +842,7 @@ export default function AdminDashboard() {
                       onClick={loadAnalytics}
                       className="mt-4 bg-purple-600 hover:bg-purple-700"
                     >
-                      Retry
+                      Retry Analytics
                     </Button>
                   </div>
                 ) : analytics ? (
@@ -842,7 +869,7 @@ export default function AdminDashboard() {
                         </div>
                         <p className="text-3xl font-bold text-white">{analytics.events.active}</p>
                         <p className="text-xs text-gray-400 mt-1">
-                          {analytics.events.upcoming} upcoming, {analytics.events.today} today
+                          {analytics.events.upcoming} upcoming
                         </p>
                       </div>
 
@@ -853,7 +880,7 @@ export default function AdminDashboard() {
                           <Clock className="h-5 w-5 text-gray-400" />
                         </div>
                         <p className="text-3xl font-bold text-white">{analytics.events.past}</p>
-                        <p className="text-xs text-gray-400 mt-1">Completed events</p>
+                        <p className="text-xs text-gray-400 mt-1">Completed</p>
                       </div>
 
                       {/* Total Users */}
@@ -919,134 +946,16 @@ export default function AdminDashboard() {
                         ))}
                       </div>
                     </div>
-
-                    {/* All Users with Event Counts */}
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
-                      <h3 className="text-lg font-semibold text-white mb-4">
-                        All Users ({analytics.users_with_events.length})
-                      </h3>
-                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
-                        <div className="overflow-x-auto">
-                          <table className="w-full min-w-[600px]">
-                            <thead>
-                              <tr className="border-b border-white/10">
-                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Name</th>
-                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Email</th>
-                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Role</th>
-                                <th className="text-right px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Events Created</th>
-                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Status</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {analytics.users_with_events.map((user) => (
-                                <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                                  <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-200">
-                                    {user.name || 'No name'}
-                                  </td>
-                                  <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-200">
-                                    {user.email}
-                                  </td>
-                                  <td className="px-3 lg:px-4 py-3">
-                                    <Badge className={`${getRoleBadgeColor(user.role)} text-xs flex items-center gap-1 w-fit`}>
-                                      {getRoleIcon(user.role)}
-                                      {getDisplayRole(user.role)}
-                                    </Badge>
-                                  </td>
-                                  <td className="px-3 lg:px-4 py-3 text-right">
-                                    <span className="text-lg font-bold text-purple-400">{user.events_count || 0}</span>
-                                  </td>
-                                  <td className="px-3 lg:px-4 py-3">
-                                    <Badge
-                                      variant={user.confirmed_at ? "default" : "outline"}
-                                      className={
-                                        user.confirmed_at
-                                          ? "bg-green-500/20 border-green-400/30 text-green-300 text-xs"
-                                          : "bg-yellow-500/20 border-yellow-400/30 text-yellow-300 text-xs"
-                                      }
-                                    >
-                                      {user.confirmed_at ? 'Verified' : 'Unverified'}
-                                    </Badge>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
                   </>
                 ) : null}
-              </div>
-            </div>
-          ) : activeNav === 'events' ? (
-            renderEventsContent()
-          ) : activeNav === 'network' ? (
-            <div className="p-4 lg:p-6">
-              {organization ? (
-                <NetworkPage organizationId={organization.id} />
-              ) : (
-                <div className="flex items-center justify-center py-12">
-                  <p className="text-white/60">Loading organization...</p>
-                </div>
-              )}
-            </div>
-          ) : activeNav === 'email-templates' ? (
-            <div className="p-4 lg:p-6">
-              {organization ? (
-                <EmailTemplatesPage organizationId={organization.id} />
-              ) : (
-                <div className="flex items-center justify-center py-12">
-                  <p className="text-white/60">Loading organization...</p>
-                </div>
-              )}
-            </div>
-          ) : activeNav === 'email-testing' ? (
-            <EmailTestingPanel />
-          ) : activeNav === 'admin' ? (
-            <div className="p-4 lg:p-6">
-              <div className="max-w-6xl mx-auto space-y-4 lg:space-y-6">
-                {/* Header Section */}
+
+                {/* All Users with Event Counts Table */}
                 <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
-                  <div className="flex items-center gap-3 lg:gap-4 mb-4">
-                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Shield className="h-5 w-5 lg:h-6 lg:w-6 text-purple-300" />
-                    </div>
-                    <div>
-                      <h1 className="text-xl lg:text-2xl font-bold text-white">Voxxy Presents Users</h1>
-                      <p className="text-sm lg:text-base text-gray-300">Manage vendors and producers</p>
-                    </div>
-                  </div>
+                  <h3 className="text-lg lg:text-xl font-semibold text-white mb-4">
+                    All Users {analytics ? `(${analytics.users_with_events.length})` : `(${users.length})`}
+                  </h3>
 
-                  {userProfile?.email && (
-                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
-                      <p className="text-sm text-gray-300">
-                        <strong className="text-white">Logged in as:</strong> {userProfile.email}
-                      </p>
-                      <p className="text-sm text-gray-300 mt-1">
-                        <strong className="text-white">Role:</strong> Admin
-                      </p>
-                    </div>
-                  )}
-                </div>
-
-                {/* Users Table Section */}
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 lg:mb-6">
-                    <h3 className="text-lg lg:text-xl font-semibold text-white">
-                      All Users ({users.length})
-                    </h3>
-                    <Button
-                      onClick={loadUsers}
-                      variant="outline"
-                      size="sm"
-                      className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15"
-                      disabled={loading}
-                    >
-                      {loading ? 'Loading...' : 'Refresh'}
-                    </Button>
-                  </div>
-
-                  {error && activeNav === 'admin' && (
+                  {error && (
                     <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4 mb-6">
                       <p className="text-red-300 text-sm">{error}</p>
                     </div>
@@ -1056,12 +965,7 @@ export default function AdminDashboard() {
                     <div className="text-center py-12">
                       <p className="text-gray-300">Loading users...</p>
                     </div>
-                  ) : users.length === 0 ? (
-                    <div className="text-center py-12">
-                      <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <p className="text-gray-300">No Voxxy Presents users found</p>
-                    </div>
-                  ) : (
+                  ) : analytics?.users_with_events ? (
                     <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
                       <div className="overflow-x-auto">
                         <table className="w-full min-w-[600px]">
@@ -1070,11 +974,12 @@ export default function AdminDashboard() {
                               <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Name</th>
                               <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Email</th>
                               <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Role</th>
+                              <th className="text-right px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Events</th>
                               <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Status</th>
                             </tr>
                           </thead>
                           <tbody>
-                            {users.map((user) => (
+                            {analytics.users_with_events.map((user) => (
                               <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
                                 <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-200">
                                   {user.name || 'No name'}
@@ -1087,6 +992,9 @@ export default function AdminDashboard() {
                                     {getRoleIcon(user.role)}
                                     {getDisplayRole(user.role)}
                                   </Badge>
+                                </td>
+                                <td className="px-3 lg:px-4 py-3 text-right">
+                                  <span className="text-lg font-bold text-purple-400">{user.events_count || 0}</span>
                                 </td>
                                 <td className="px-3 lg:px-4 py-3">
                                   <Badge
@@ -1106,7 +1014,7 @@ export default function AdminDashboard() {
                         </table>
                       </div>
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </div>

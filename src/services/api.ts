@@ -2317,6 +2317,15 @@ export const eventInvitationsApi = {
         accepted_count: number
         declined_count: number
         expired_count: number
+        delivery_stats: {
+          total_sent: number
+          delivered: number
+          bounced: number
+          dropped: number
+          undelivered: number
+          unsubscribed: number
+          pending: number
+        }
       }
     }>(
       `/v1/presents/events/${eventSlug}/invitations${query ? `?${query}` : ''}`
