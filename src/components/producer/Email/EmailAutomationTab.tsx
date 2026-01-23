@@ -90,7 +90,8 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
         console.log('   Using earliest sent date:', earliestSentDate);
 
-        // Create virtual invitation announcement email
+        // Create virtual invitation announcement email with delivery stats
+        const deliveryStats = invitationsData.meta.delivery_stats || {};
         const invitationEmail: ScheduledEmail = {
           id: -1, // Negative ID to avoid conflicts
           event_id: -1,
@@ -107,6 +108,18 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
           status: 'sent',
           sent_at: earliestSentDate,
           recipient_count: invitationsData.meta.sent_count,
+          // Add delivery tracking stats from API
+          undelivered_count: deliveryStats.undelivered || 0,
+          unsubscribed_count: deliveryStats.unsubscribed || 0,
+          delivered_count: deliveryStats.delivered || 0,
+          delivery_counts: {
+            total_sent: deliveryStats.total_sent || invitationsData.meta.sent_count,
+            delivered: deliveryStats.delivered || 0,
+            bounced: deliveryStats.bounced || 0,
+            dropped: deliveryStats.dropped || 0,
+            unsubscribed: deliveryStats.unsubscribed || 0,
+            pending: deliveryStats.pending || 0
+          },
           error_message: null,
           created_at: earliestSentDate,
           updated_at: earliestSentDate,
