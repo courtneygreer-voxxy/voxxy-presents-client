@@ -8,8 +8,13 @@ import { Button } from '../../ui/button';
 import { Plus, Megaphone } from 'lucide-react';
 import { useAuth } from '../../../contexts/AuthContext';
 
-export function BulletinsTab() {
-  const { eventSlug } = useParams<{ eventSlug: string }>();
+interface BulletinsTabProps {
+  eventSlug?: string;
+}
+
+export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {}) {
+  const { eventSlug: eventSlugParam } = useParams<{ eventSlug: string }>();
+  const eventSlug = eventSlugProp || eventSlugParam;
   const { currentUser } = useAuth();
   const [bulletins, setBulletins] = useState<Bulletin[]>([]);
   const [isLoading, setIsLoading] = useState(true);

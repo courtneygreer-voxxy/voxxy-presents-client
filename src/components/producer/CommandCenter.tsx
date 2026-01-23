@@ -76,7 +76,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
       case 'vendors':
         return <VendorsTab eventSlug={event.slug} />;
       case 'bulletins':
-        return <BulletinsTab />;
+        return <BulletinsTab eventSlug={event.slug} />;
       case 'emails':
         return <EmailAutomationTab eventSlug={event.slug} />;
       case 'settings':
