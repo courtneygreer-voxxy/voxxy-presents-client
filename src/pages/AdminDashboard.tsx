@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail, Users, Calendar } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail, Users, Calendar, BarChart3, TrendingUp, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,7 +16,7 @@ import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
 import EmailTemplatesPage from './EmailTemplatesPage';
 
-type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
+type NavItem = 'admin' | 'analytics' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface User {
@@ -27,6 +27,52 @@ interface User {
   status?: 'active' | 'suspended' | 'banned'
   confirmed_at: string | null
   created_at?: string
+  events_count?: number
+}
+
+interface PresentsAnalytics {
+  users: {
+    total: number
+    producers: number
+    vendors: number
+  }
+  events: {
+    total: number
+    active: number
+    past: number
+    upcoming: number
+    today: number
+    draft: number
+    published: number
+  }
+  organizations: {
+    total: number
+    verified: number
+  }
+  registrations: {
+    total: number
+    pending: number
+    approved: number
+    rejected: number
+  }
+  top_creators: Array<{
+    id: number
+    name: string
+    email: string
+    role: string
+    events_count: number
+  }>
+  users_with_events: Array<User>
+  recent_events: Array<{
+    id: number
+    title: string
+    slug: string
+    event_date: string
+    published: boolean
+    registered_count: number
+    created_at: string
+    organization_name: string
+  }>
 }
 
 interface Organization {
@@ -74,6 +120,11 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Analytics tab state
+  const [analytics, setAnalytics] = useState<PresentsAnalytics | null>(null);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
 
   // Producer functionality state
   const [organization, setOrganization] = useState<Organization | null>(null);
@@ -180,6 +231,22 @@ export default function AdminDashboard() {
       navigate('/');
     } catch (err) {
       console.error('Logout failed:', err);
+    }
+  };
+
+  // Analytics tab: Load analytics data
+  const loadAnalytics = async () => {
+    try {
+      setLoadingAnalytics(true);
+      setAnalyticsError(null);
+      const data = await adminApi.getPresentsAnalytics();
+      setAnalytics(data);
+      console.log('✅ Analytics loaded:', data);
+    } catch (err) {
+      console.error('❌ Failed to load analytics:', err);
+      setAnalyticsError(err instanceof Error ? err.message : 'Failed to load analytics');
+    } finally {
+      setLoadingAnalytics(false);
     }
   };
 
@@ -461,8 +528,16 @@ export default function AdminDashboard() {
     }
   };
 
+  // Load analytics when switching to analytics tab
+  useEffect(() => {
+    if (activeNav === 'analytics' && !analytics) {
+      loadAnalytics();
+    }
+  }, [activeNav]);
+
   const navItems = [
     { id: 'admin' as NavItem, label: 'Admin', icon: Shield },
+    { id: 'analytics' as NavItem, label: 'Analytics', icon: BarChart3 },
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
@@ -704,6 +779,205 @@ export default function AdminDashboard() {
         <main className="flex-1 overflow-auto">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('admin')} />
+          ) : activeNav === 'analytics' ? (
+            <div className="p-4 lg:p-6">
+              <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
+                {/* Header */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
+                  <div className="flex items-center gap-3 lg:gap-4">
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BarChart3 className="h-5 w-5 lg:h-6 lg:w-6 text-purple-300" />
+                    </div>
+                    <div className="flex-1">
+                      <h1 className="text-xl lg:text-2xl font-bold text-white">Voxxy Presents Analytics</h1>
+                      <p className="text-sm lg:text-base text-gray-300">Platform statistics and insights</p>
+                    </div>
+                    <Button
+                      onClick={loadAnalytics}
+                      variant="outline"
+                      size="sm"
+                      className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15"
+                      disabled={loadingAnalytics}
+                    >
+                      {loadingAnalytics ? 'Loading...' : 'Refresh'}
+                    </Button>
+                  </div>
+                </div>
+
+                {loadingAnalytics ? (
+                  <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                  </div>
+                ) : analyticsError ? (
+                  <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-6 text-center">
+                    <p className="text-red-300">{analyticsError}</p>
+                    <Button
+                      onClick={loadAnalytics}
+                      className="mt-4 bg-purple-600 hover:bg-purple-700"
+                    >
+                      Retry
+                    </Button>
+                  </div>
+                ) : analytics ? (
+                  <>
+                    {/* Stats Overview Cards */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      {/* Total Events */}
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Total Events</p>
+                          <Calendar className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <p className="text-3xl font-bold text-white">{analytics.events.total}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {analytics.events.published} published, {analytics.events.draft} draft
+                        </p>
+                      </div>
+
+                      {/* Active Events */}
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Active Events</p>
+                          <TrendingUp className="h-5 w-5 text-green-400" />
+                        </div>
+                        <p className="text-3xl font-bold text-white">{analytics.events.active}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {analytics.events.upcoming} upcoming, {analytics.events.today} today
+                        </p>
+                      </div>
+
+                      {/* Past Events */}
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Past Events</p>
+                          <Clock className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <p className="text-3xl font-bold text-white">{analytics.events.past}</p>
+                        <p className="text-xs text-gray-400 mt-1">Completed events</p>
+                      </div>
+
+                      {/* Total Users */}
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Total Users</p>
+                          <Users className="h-5 w-5 text-purple-400" />
+                        </div>
+                        <p className="text-3xl font-bold text-white">{analytics.users.total}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {analytics.users.producers} producers, {analytics.users.vendors} vendors
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Registrations Stats */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Total Applications</p>
+                          <Mail className="h-5 w-5 text-blue-400" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">{analytics.registrations.total}</p>
+                      </div>
+
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Approved</p>
+                          <CheckCircle2 className="h-5 w-5 text-green-400" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">{analytics.registrations.approved}</p>
+                      </div>
+
+                      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="text-sm text-gray-400">Pending</p>
+                          <Clock className="h-5 w-5 text-yellow-400" />
+                        </div>
+                        <p className="text-2xl font-bold text-white">{analytics.registrations.pending}</p>
+                      </div>
+                    </div>
+
+                    {/* Top Event Creators */}
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">Top Event Creators</h3>
+                      <div className="space-y-3">
+                        {analytics.top_creators.slice(0, 5).map((creator, index) => (
+                          <div key={creator.id} className="flex items-center justify-between bg-white/5 rounded-lg p-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-300 font-bold">
+                                {index + 1}
+                              </div>
+                              <div>
+                                <p className="text-sm font-medium text-white">{creator.name}</p>
+                                <p className="text-xs text-gray-400">{creator.email}</p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-lg font-bold text-purple-400">{creator.events_count}</p>
+                              <p className="text-xs text-gray-400">events</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* All Users with Event Counts */}
+                    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
+                      <h3 className="text-lg font-semibold text-white mb-4">
+                        All Users ({analytics.users_with_events.length})
+                      </h3>
+                      <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
+                        <div className="overflow-x-auto">
+                          <table className="w-full min-w-[600px]">
+                            <thead>
+                              <tr className="border-b border-white/10">
+                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Name</th>
+                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Email</th>
+                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Role</th>
+                                <th className="text-right px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Events Created</th>
+                                <th className="text-left px-3 lg:px-4 py-3 text-xs lg:text-sm font-semibold text-white">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {analytics.users_with_events.map((user) => (
+                                <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
+                                  <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-200">
+                                    {user.name || 'No name'}
+                                  </td>
+                                  <td className="px-3 lg:px-4 py-3 text-xs lg:text-sm text-gray-200">
+                                    {user.email}
+                                  </td>
+                                  <td className="px-3 lg:px-4 py-3">
+                                    <Badge className={`${getRoleBadgeColor(user.role)} text-xs flex items-center gap-1 w-fit`}>
+                                      {getRoleIcon(user.role)}
+                                      {getDisplayRole(user.role)}
+                                    </Badge>
+                                  </td>
+                                  <td className="px-3 lg:px-4 py-3 text-right">
+                                    <span className="text-lg font-bold text-purple-400">{user.events_count || 0}</span>
+                                  </td>
+                                  <td className="px-3 lg:px-4 py-3">
+                                    <Badge
+                                      variant={user.confirmed_at ? "default" : "outline"}
+                                      className={
+                                        user.confirmed_at
+                                          ? "bg-green-500/20 border-green-400/30 text-green-300 text-xs"
+                                          : "bg-yellow-500/20 border-yellow-400/30 text-yellow-300 text-xs"
+                                      }
+                                    >
+                                      {user.confirmed_at ? 'Verified' : 'Unverified'}
+                                    </Badge>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            </div>
           ) : activeNav === 'events' ? (
             renderEventsContent()
           ) : activeNav === 'network' ? (

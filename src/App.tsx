@@ -27,6 +27,7 @@ const ApplicationTrackingPage = lazy(() => import('./pages/ApplicationTrackingPa
 const ShortLinkRedirectPage = lazy(() => import('./pages/ShortLinkRedirectPage'))
 const InvitationViewPage = lazy(() => import('./pages/InvitationViewPage'))
 const VendorEventPortalPage = lazy(() => import('./pages/VendorEventPortalPage'))
+const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'))
 
 // Lazy load: Auth Pages (load on-demand)
 const LoginPage = lazy(() => import('./pages/LoginPage'))
@@ -139,6 +140,9 @@ export default function App() {
 
           {/* Vendor Event Portal Route */}
           <Route path="/portal/:eventSlug" element={<VendorEventPortalPage />} />
+
+          {/* Unsubscribe Route (public - token-based) */}
+          <Route path="/unsubscribe/:token" element={<UnsubscribePage />} />
 
           {/* ==========================================
               AUTH ROUTES - Redirect if already logged in

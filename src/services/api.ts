@@ -1343,6 +1343,24 @@ export const adminApi = {
     return data.users || data
   },
 
+  async getPresentsAnalytics() {
+    // Admin endpoints are at root level (not /api prefix)
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/presents_analytics`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch analytics' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch analytics', response.status)
+    }
+
+    return await response.json()
+  },
+
   async updateUserBetaStatus(userId: string, status: 'approved' | 'denied', notes?: string) {
     return fetchApi<any>(`/admin/users/${userId}/beta-status`, {
       method: 'PUT',
@@ -2330,6 +2348,65 @@ export const eventInvitationsApi = {
         }),
       }
     )
+  },
+}
+
+/**
+ * Unsubscribe API
+ * Public endpoints (no authentication required - token-based security)
+ */
+export const unsubscribeApi = {
+  /**
+   * Get unsubscribe context by token
+   * GET /api/v1/unsubscribe/:token
+   */
+  async getByToken(token: string) {
+    return fetchApi<{
+      email: string
+      event: {
+        id: number
+        title: string
+        slug: string
+        event_date: string
+      } | null
+      organization: {
+        id: number
+        name: string
+        slug: string
+      } | null
+      subscription_status: {
+        event_unsubscribed: boolean
+        organization_unsubscribed: boolean
+        globally_unsubscribed: boolean
+      }
+      available_scopes: string[]
+    }>(`/v1/unsubscribe/${token}`)
+  },
+
+  /**
+   * Process unsubscribe with specified scope
+   * POST /api/v1/unsubscribe/:token
+   */
+  async confirm(token: string, scope: 'event' | 'organization' | 'global') {
+    return fetchApi<{
+      success: boolean
+      message: string
+      unsubscribe: {
+        scope: string
+        email: string
+        event?: {
+          id: number
+          title: string
+        }
+        organization?: {
+          id: number
+          name: string
+        }
+      }
+    }>(`/v1/unsubscribe/${token}`, {
+      method: 'POST',
+      body: JSON.stringify({ scope }),
+    })
   },
 }
 
