@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authApi, organizationsApi } from '@/services/api';
 import { AlertTriangle } from 'lucide-react';
+import { EventbriteConnection } from '@/components/producer/PaymentIntegrations';
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -224,6 +225,23 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             </button>
           </div>
         </div>
+
+        {/* Integrations Section */}
+        {organization && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 mt-6">
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-white mb-1">Integrations</h2>
+              <p className="text-sm text-white/60">Connect external services to sync data</p>
+            </div>
+
+            <EventbriteConnection
+              organizationId={organization.id}
+              onConnectionChange={(connected) => {
+                console.log('Eventbrite connection changed:', connected);
+              }}
+            />
+          </div>
+        )}
 
         {/* Notifications Section */}
         <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 mt-6">

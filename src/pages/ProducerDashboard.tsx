@@ -433,6 +433,7 @@ export default function ProducerDashboard() {
         return (
           <CommandCenter
             event={selectedEvent}
+            organizationId={organization?.id}
             onBack={() => {
               setEventsView('list');
               setSelectedEvent(null);

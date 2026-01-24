@@ -33,7 +33,9 @@ export default function EventbriteConnection({
       setConnectedAt(status.connected_at || null);
     } catch (err: any) {
       console.error('Failed to fetch Eventbrite status:', err);
-      setError('Failed to check connection status');
+      const errorMessage = err.data?.error || err.message || 'Failed to check connection status';
+      console.error('Backend error details:', err.data);
+      setError(`Failed to check status: ${errorMessage}`);
     } finally {
       setIsFetching(false);
     }
@@ -61,7 +63,9 @@ export default function EventbriteConnection({
       onConnectionChange?.(true);
     } catch (err: any) {
       console.error('Failed to connect Eventbrite:', err);
-      setError(err.message || 'Failed to connect to Eventbrite. Please check your API token.');
+      const errorMessage = err.data?.error || err.message || 'Failed to connect to Eventbrite';
+      console.error('Backend error details:', err.data);
+      setError(`Connection failed: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -92,18 +96,18 @@ export default function EventbriteConnection({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6 space-y-4">
+    <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-6 space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${isConnected ? 'bg-green-100' : 'bg-gray-100'}`}>
-            <Link2 className={`w-5 h-5 ${isConnected ? 'text-green-600' : 'text-gray-600'}`} />
+          <div className={`p-2 rounded-lg ${isConnected ? 'bg-green-500/20' : 'bg-white/10'}`}>
+            <Link2 className={`w-5 h-5 ${isConnected ? 'text-green-400' : 'text-white/60'}`} />
           </div>
           <div>
-            <h3 className="font-semibold text-lg">Eventbrite Integration</h3>
-            <p className="text-sm text-gray-600">
+            <h3 className="font-semibold text-lg text-white">Eventbrite Integration</h3>
+            <p className="text-sm text-white/60">
               {isConnected ? 'Connected' : 'Not connected'}
               {connectedAt && (
-                <span className="ml-2 text-gray-500">
+                <span className="ml-2 text-white/50">
                   since {new Date(connectedAt).toLocaleDateString()}
                 </span>
               )}
@@ -114,7 +118,7 @@ export default function EventbriteConnection({
         <button
           onClick={fetchStatus}
           disabled={isFetching}
-          className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+          className="p-2 text-white/60 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
           title="Refresh status"
         >
           <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
@@ -122,23 +126,23 @@ export default function EventbriteConnection({
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-300">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-800">{success}</p>
+        <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+          <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-green-300">{success}</p>
         </div>
       )}
 
       {!isConnected ? (
         <div className="space-y-4">
           <div>
-            <label htmlFor="eventbrite-token" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="eventbrite-token" className="block text-sm font-medium text-white/70 mb-2">
               Eventbrite Private Token
             </label>
             <input
@@ -147,16 +151,16 @@ export default function EventbriteConnection({
               value={apiToken}
               onChange={(e) => setApiToken(e.target.value)}
               placeholder="Enter your Eventbrite private token"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
               disabled={isLoading}
             />
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-2 text-sm text-white/60">
               Get your API token from{' '}
               <a
                 href="https://www.eventbrite.com/account-settings/apps"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
+                className="text-purple-400 hover:text-purple-300 hover:underline"
               >
                 Eventbrite Account Settings
               </a>
@@ -166,19 +170,19 @@ export default function EventbriteConnection({
           <button
             onClick={handleConnect}
             disabled={isLoading || !apiToken.trim()}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            className="w-full px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-xl hover:shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
           >
             {isLoading ? 'Connecting...' : 'Connect Eventbrite'}
           </button>
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+          <div className="p-4 bg-green-500/10 border border-green-500/30 rounded-xl">
             <div className="flex items-center gap-2 mb-2">
-              <Check className="w-5 h-5 text-green-600" />
-              <h4 className="font-medium text-green-900">Connection Active</h4>
+              <Check className="w-5 h-5 text-green-400" />
+              <h4 className="font-medium text-green-300">Connection Active</h4>
             </div>
-            <p className="text-sm text-green-800">
+            <p className="text-sm text-green-200/80">
               Your Eventbrite account is connected. You can now enable payment syncing for individual events.
             </p>
           </div>
@@ -186,7 +190,7 @@ export default function EventbriteConnection({
           <button
             onClick={handleDisconnect}
             disabled={isLoading}
-            className="w-full px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all font-medium flex items-center justify-center gap-2"
           >
             <Unlink className="w-4 h-4" />
             {isLoading ? 'Disconnecting...' : 'Disconnect Eventbrite'}

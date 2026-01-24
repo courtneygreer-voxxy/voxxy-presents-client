@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, Building2, Settings, Info, Mail, Megaphone } from 'lucide-react';
+import { ArrowLeft, Users, Building2, Settings, Info, Mail, Megaphone, DollarSign } from 'lucide-react';
 import EventSettings from './EventSettings';
 import ApplicantsTab from './ApplicantsTab';
 import VendorsTab from './VendorsTab';
 import EventDetailsTab from './EventDetailsTab';
 import { EmailAutomationTab } from './Email';
 import { BulletinsTab } from './Bulletins';
+import { PaymentSettingsTab } from './PaymentIntegrations';
 
 interface Event {
   id: number;
@@ -41,11 +42,12 @@ interface CommandCenterProps {
   onBack: () => void;
   onUpdateEvent?: (eventSlug: string, updates: any) => Promise<void>;
   onDeleteEvent?: (eventSlug: string) => Promise<void>;
+  organizationId?: number;
 }
 
-type Tab = 'details' | 'applicants' | 'vendors' | 'bulletins' | 'emails' | 'settings';
+type Tab = 'details' | 'applicants' | 'vendors' | 'bulletins' | 'emails' | 'payments' | 'settings';
 
-export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent }: CommandCenterProps) {
+export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
 
   const tabs = [
@@ -54,6 +56,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
     { id: 'vendors' as Tab, label: 'Vendors', icon: Building2 },
     { id: 'bulletins' as Tab, label: 'Bulletins', icon: Megaphone },
     { id: 'emails' as Tab, label: 'Mail', icon: Mail },
+    { id: 'payments' as Tab, label: 'Payments', icon: DollarSign },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ];
 
@@ -79,6 +82,8 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
         return <BulletinsTab eventSlug={event.slug} />;
       case 'emails':
         return <EmailAutomationTab eventSlug={event.slug} />;
+      case 'payments':
+        return <PaymentSettingsTab eventSlug={event.slug} organizationId={organizationId || 1} />;
       case 'settings':
         return (
           <EventSettings
