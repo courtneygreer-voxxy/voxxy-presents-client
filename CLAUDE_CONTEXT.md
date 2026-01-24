@@ -15,9 +15,21 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 
 ---
 
-## ⚡ RECENT UPDATES (January 18, 2026)
+## ⚡ RECENT UPDATES (January 24, 2026)
 
-### Smart Lists & Contact Organization (NEW)
+### Email Unsubscribe System (NEW - January 24, 2026)
+- ✅ **Three-Tier Unsubscribe** - Event-specific, organization-wide, or global unsubscribe
+- ✅ **Token-Based Security** - 90-day secure tokens, no auth required
+- ✅ **Branded Unsubscribe Page** - Full React page with context display and scope selection
+- ✅ **Email Integration** - All 7 scheduled templates + invitation emails include unsubscribe links
+- ✅ **Recipient Filtering** - Automatic filtering of unsubscribed users before sending
+- ✅ **Resubscribe Functionality** - Users can resubscribe with one click
+- ✅ **Admin Analytics** - Dashboard showing unsubscribe stats, trends, and top events/organizations
+- ✅ **UNSUB Count** - Email Automation tab shows count of unsubscribed recipients per scheduled email
+- **Status:** ✅ Production ready - full system deployed and tested
+- **Documentation:** See `/Users/beaulazear/Desktop/voxxy-rails/docs/UNSUBSCRIBE_SYSTEM.md`
+
+### Smart Lists & Contact Organization (January 18, 2026)
 - ✅ **Smart Lists** - Dynamic lists that auto-update based on filters (categories, locations, tags)
 - ✅ **Manual Lists** - Static hand-picked contact lists
 - ✅ **List Management UI** - Create, view, edit, delete lists in Network tab
@@ -40,6 +52,7 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 - ✅ **Payment Deadline** - Full support for payment tracking and deadline emails
 
 ### Documentation
+- 📚 `UNSUBSCRIBE_SYSTEM.md` - Complete unsubscribe system documentation (NEW)
 - 📚 `FINAL_BUILD_FIX.md` - Comprehensive build error resolution guide
 - 📚 `PAUSE_DELETE_FIX_SUMMARY.md` - Email action fixes
 - 📚 `INVITATION_EMAIL_FIX.md` - Invitation debugging enhancements

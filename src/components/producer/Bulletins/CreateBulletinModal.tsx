@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -72,9 +72,9 @@ export function CreateBulletinModal({
       <DialogContent className="max-w-2xl bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] border-purple-500/20 p-0">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-white/10">
-          <h2 className="text-2xl font-bold text-white">
+          <DialogTitle className="text-2xl font-bold text-white">
             {editBulletin ? 'Edit Bulletin Message' : 'Create Bulletin Message'}
-          </h2>
+          </DialogTitle>
           <button
             onClick={handleClose}
             className="text-white/60 hover:text-white transition-colors"

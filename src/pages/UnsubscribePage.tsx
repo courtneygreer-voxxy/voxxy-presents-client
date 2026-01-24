@@ -39,6 +39,7 @@ export default function UnsubscribePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>('');
+  const [isResubscribing, setIsResubscribing] = useState(false);
 
   useEffect(() => {
     if (token) {
@@ -83,6 +84,26 @@ export default function UnsubscribePage() {
       setError(err.message || 'Failed to process unsubscribe request');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleResubscribe = async () => {
+    if (!token) return;
+
+    try {
+      setIsResubscribing(true);
+      setError(null);
+      const response = await unsubscribeApi.resubscribe(token);
+      // Reset success state and show resubscribe message
+      setSuccess(false);
+      setSuccessMessage('');
+      // Reload the page to show updated subscription status
+      window.location.reload();
+    } catch (err: any) {
+      console.error('Failed to resubscribe:', err);
+      setError(err.message || 'Failed to resubscribe');
+    } finally {
+      setIsResubscribing(false);
     }
   };
 
@@ -144,14 +165,41 @@ export default function UnsubscribePage() {
                 You will no longer receive the emails you selected to unsubscribe from.
               </p>
             </div>
-            <div className="flex justify-center pt-2">
-              <Button
-                onClick={() => navigate('/')}
-                variant="outline"
-                className="border-white/20 text-white hover:bg-white/10"
-              >
-                Go Home
-              </Button>
+
+            {error && (
+              <Alert className="bg-red-500/10 border-red-500/20">
+                <AlertCircle className="h-4 w-4 text-red-500" />
+                <AlertDescription className="text-red-500/90">{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-3">
+              <div className="flex justify-center">
+                <Button
+                  onClick={handleResubscribe}
+                  disabled={isResubscribing}
+                  variant="outline"
+                  className="border-white/20 text-white hover:bg-white/10"
+                >
+                  {isResubscribing ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      Processing...
+                    </>
+                  ) : (
+                    'Changed Your Mind? Resubscribe'
+                  )}
+                </Button>
+              </div>
+              <div className="flex justify-center">
+                <Button
+                  onClick={() => navigate('/')}
+                  variant="ghost"
+                  className="text-white/60 hover:text-white hover:bg-white/5"
+                >
+                  Go Home
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

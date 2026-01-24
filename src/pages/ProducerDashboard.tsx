@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Send } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
@@ -12,8 +12,11 @@ import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
 import EmailTemplatesPage from './EmailTemplatesPage';
+import EmailTestingPage from './EmailTestingPage';
+import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmationDialog';
+import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
-type NavItem = 'events' | 'network' | 'email-templates' | 'settings';
+type NavItem = 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface Organization {
@@ -64,6 +67,7 @@ export default function ProducerDashboard() {
 
   const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -302,12 +306,7 @@ export default function ProducerDashboard() {
   };
 
   // Handle update event
-  const handleUpdateEvent = async (eventSlug: string, eventData: {
-    title: string;
-    description: string;
-    event_date: string;
-    location: string;
-  }) => {
+  const handleUpdateEvent = async (eventSlug: string, eventData: any) => {
     if (!organization) {
       console.error('No organization found');
       return;
@@ -315,8 +314,14 @@ export default function ProducerDashboard() {
 
     try {
       console.log('Updating event:', eventSlug);
-      await eventsApi.update(eventSlug, eventData);
-      console.log('Event updated successfully');
+      const response = await eventsApi.update(eventSlug, eventData);
+      console.log('Event updated successfully', response);
+
+      // Check if backend is requesting email notification confirmation
+      if (response?.email_notification) {
+        console.log('Email notification required:', response.email_notification);
+        handleEmailNotification(response.email_notification, eventSlug);
+      }
 
       // Refresh events list
       await fetchEvents(organization.slug);
@@ -367,6 +372,7 @@ export default function ProducerDashboard() {
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
+    { id: 'email-testing' as NavItem, label: 'Test Emails', icon: Send },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -627,6 +633,8 @@ export default function ProducerDashboard() {
                 </div>
               )}
             </div>
+          ) : activeNav === 'email-testing' ? (
+            <EmailTestingPage onBack={() => setActiveNav('events')} />
           ) : (
             <div className="p-4 lg:p-6">
               <div className="text-white/40 text-center mt-20">
@@ -636,6 +644,19 @@ export default function ProducerDashboard() {
           )}
         </main>
       </div>
+
+      {/* Email Notification Dialog */}
+      <EmailConfirmationDialog
+        open={dialogOpen}
+        onOpenChange={closeDialog}
+        onConfirm={handleConfirmSend}
+        title={dialogProps.title}
+        warning={dialogProps.warning}
+        recipientCount={dialogProps.recipientCount}
+        recipientEmail={dialogProps.recipientEmail}
+        type={dialogProps.type}
+        isLoading={dialogProps.isLoading}
+      />
     </div>
   );
 }

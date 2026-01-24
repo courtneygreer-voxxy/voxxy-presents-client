@@ -2417,6 +2417,20 @@ export const unsubscribeApi = {
       body: JSON.stringify({ scope }),
     })
   },
+
+  /**
+   * Resubscribe - delete the unsubscribe record to receive emails again
+   * POST /api/v1/presents/unsubscribe/:token/resubscribe
+   */
+  async resubscribe(token: string) {
+    return fetchApi<{
+      success: boolean
+      message: string
+      scope: string
+    }>(`/v1/presents/unsubscribe/${token}/resubscribe`, {
+      method: 'POST',
+    })
+  },
 }
 
 /**
