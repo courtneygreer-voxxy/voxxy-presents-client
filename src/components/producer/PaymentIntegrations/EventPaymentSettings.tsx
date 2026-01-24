@@ -1,0 +1,493 @@
+import { useState, useEffect } from 'react';
+import {
+  DollarSign,
+  Plus,
+  RefreshCw,
+  AlertCircle,
+  Check,
+  Pause,
+  Play,
+  Link2,
+  Calendar,
+  ExternalLink,
+} from 'lucide-react';
+import {
+  organizationIntegrationsApi,
+  paymentIntegrationsApi,
+  PaymentApiError,
+} from '@/services/paymentApi';
+import type {
+  PaymentIntegration,
+  EventbriteEvent,
+  CreatePaymentIntegrationRequest,
+} from '@/types/payment';
+
+interface EventPaymentSettingsProps {
+  eventSlug: string;
+  organizationId: number;
+  onIntegrationChange?: (integration: PaymentIntegration | null) => void;
+}
+
+export default function EventPaymentSettings({
+  eventSlug,
+  organizationId,
+  onIntegrationChange,
+}: EventPaymentSettingsProps) {
+  const [integration, setIntegration] = useState<PaymentIntegration | null>(null);
+  const [eventbriteEvents, setEventbriteEvents] = useState<EventbriteEvent[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  // Form state
+  const [inputMethod, setInputMethod] = useState<'url' | 'dropdown'>('url');
+  const [eventbriteUrl, setEventbriteUrl] = useState('');
+  const [selectedEventId, setSelectedEventId] = useState('');
+  const [autoSync, setAutoSync] = useState(true);
+  const [autoUpdate, setAutoUpdate] = useState(true);
+
+  useEffect(() => {
+    fetchIntegration();
+    checkEventbriteConnection();
+  }, [eventSlug, organizationId]);
+
+  const checkEventbriteConnection = async () => {
+    try {
+      const status = await organizationIntegrationsApi.getEventbriteStatus(organizationId);
+      setIsConnected(status.connected);
+
+      if (status.connected) {
+        fetchEventbriteEvents();
+      }
+    } catch (err) {
+      console.error('Failed to check Eventbrite connection:', err);
+    }
+  };
+
+  const fetchEventbriteEvents = async () => {
+    try {
+      const response = await organizationIntegrationsApi.getEventbriteEvents(organizationId);
+      setEventbriteEvents(response.events || []);
+    } catch (err) {
+      console.error('Failed to fetch Eventbrite events:', err);
+    }
+  };
+
+  const fetchIntegration = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const integrations = await paymentIntegrationsApi.getByEvent(eventSlug);
+      const eventbriteIntegration = integrations.find((i) => i.provider === 'eventbrite');
+      setIntegration(eventbriteIntegration || null);
+
+      if (eventbriteIntegration) {
+        setAutoSync(eventbriteIntegration.auto_sync_enabled);
+        setAutoUpdate(eventbriteIntegration.auto_update_payment_status);
+      }
+    } catch (err: any) {
+      console.error('Failed to fetch payment integration:', err);
+      setError('Failed to load payment integration');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCreateIntegration = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(null);
+
+      let providerEventId: string | undefined;
+      let providerUrl: string | undefined;
+
+      if (inputMethod === 'url') {
+        if (!eventbriteUrl.trim()) {
+          setError('Please enter an Eventbrite event URL');
+          return;
+        }
+        providerUrl = eventbriteUrl.trim();
+      } else {
+        if (!selectedEventId) {
+          setError('Please select an Eventbrite event');
+          return;
+        }
+        providerEventId = selectedEventId;
+        const selectedEvent = eventbriteEvents.find((e) => e.id === selectedEventId);
+        if (selectedEvent) {
+          providerUrl = selectedEvent.url;
+        }
+      }
+
+      const data: CreatePaymentIntegrationRequest = {
+        provider: 'eventbrite',
+        provider_event_id: providerEventId,
+        provider_url: providerUrl,
+        auto_sync_enabled: autoSync,
+        auto_update_payment_status: autoUpdate,
+        auto_send_confirmations: false,
+      };
+
+      const newIntegration = await paymentIntegrationsApi.create(eventSlug, data);
+      setIntegration(newIntegration);
+      setSuccess('Payment integration created successfully!');
+      setEventbriteUrl('');
+      setSelectedEventId('');
+      onIntegrationChange?.(newIntegration);
+    } catch (err: any) {
+      console.error('Failed to create integration:', err);
+      setError(err.message || 'Failed to create payment integration');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleToggleAutoSync = async () => {
+    if (!integration) return;
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const updated = await paymentIntegrationsApi.update(eventSlug, integration.id, {
+        auto_sync_enabled: !integration.auto_sync_enabled,
+      });
+
+      setIntegration(updated);
+      setAutoSync(updated.auto_sync_enabled);
+      setSuccess(`Auto-sync ${updated.auto_sync_enabled ? 'enabled' : 'disabled'}`);
+      onIntegrationChange?.(updated);
+    } catch (err: any) {
+      console.error('Failed to toggle auto-sync:', err);
+      setError(err.message || 'Failed to update settings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleManualSync = async () => {
+    if (!integration) return;
+
+    try {
+      setIsSyncing(true);
+      setError(null);
+      setSuccess(null);
+
+      const response = await paymentIntegrationsApi.sync(eventSlug, integration.id);
+      setSuccess(
+        `Sync completed! Fetched ${response.sync_log.transactions_fetched} transactions, matched ${response.sync_log.contacts_matched} vendors`
+      );
+
+      await fetchIntegration();
+    } catch (err: any) {
+      console.error('Failed to sync payments:', err);
+      setError(err.message || 'Failed to sync payments');
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  const handleDeleteIntegration = async () => {
+    if (!integration) return;
+
+    if (
+      !confirm(
+        'Are you sure you want to delete this payment integration? This will not delete existing payment records.'
+      )
+    ) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await paymentIntegrationsApi.delete(eventSlug, integration.id);
+      setIntegration(null);
+      setSuccess('Payment integration deleted');
+      onIntegrationChange?.(null);
+    } catch (err: any) {
+      console.error('Failed to delete integration:', err);
+      setError(err.message || 'Failed to delete integration');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (!isConnected) {
+    return (
+      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="font-medium text-yellow-900 mb-1">Eventbrite Not Connected</h3>
+            <p className="text-sm text-yellow-800">
+              Please connect your Eventbrite account in Organization Settings before enabling payment
+              syncing for events.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-800">{error}</p>
+        </div>
+      )}
+
+      {success && (
+        <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-green-800">{success}</p>
+        </div>
+      )}
+
+      {!integration ? (
+        <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-blue-100">
+              <DollarSign className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">Enable Payment Syncing</h3>
+              <p className="text-sm text-gray-600">
+                Connect this event to an Eventbrite event to automatically sync vendor payments
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-3">
+              How would you like to connect?
+            </label>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setInputMethod('url')}
+                className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                  inputMethod === 'url'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <Link2 className="w-5 h-5 mb-2 mx-auto" />
+                <p className="font-medium text-sm">Paste Event URL</p>
+              </button>
+              <button
+                onClick={() => setInputMethod('dropdown')}
+                className={`flex-1 p-4 border-2 rounded-lg transition-all ${
+                  inputMethod === 'dropdown'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <Calendar className="w-5 h-5 mb-2 mx-auto" />
+                <p className="font-medium text-sm">Select from List</p>
+              </button>
+            </div>
+          </div>
+
+          {inputMethod === 'url' ? (
+            <div>
+              <label htmlFor="eventbrite-url" className="block text-sm font-medium text-gray-700 mb-2">
+                Eventbrite Event URL
+              </label>
+              <input
+                id="eventbrite-url"
+                type="text"
+                value={eventbriteUrl}
+                onChange={(e) => setEventbriteUrl(e.target.value)}
+                placeholder="https://www.eventbrite.com/e/your-event-name-123456789"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isLoading}
+              />
+              <p className="mt-2 text-sm text-gray-600">
+                Paste the URL of your Eventbrite event (e.g., from the event dashboard)
+              </p>
+            </div>
+          ) : (
+            <div>
+              <label htmlFor="eventbrite-event" className="block text-sm font-medium text-gray-700 mb-2">
+                Select Eventbrite Event
+              </label>
+              <select
+                id="eventbrite-event"
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                disabled={isLoading}
+              >
+                <option value="">Choose an event...</option>
+                {eventbriteEvents.map((event) => (
+                  <option key={event.id} value={event.id}>
+                    {event.name.text} ({event.status})
+                  </option>
+                ))}
+              </select>
+              {eventbriteEvents.length === 0 && (
+                <p className="mt-2 text-sm text-gray-600">No Eventbrite events found</p>
+              )}
+            </div>
+          )}
+
+          <div className="space-y-3">
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={autoSync}
+                onChange={(e) => setAutoSync(e.target.checked)}
+                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <div>
+                <span className="font-medium text-sm text-gray-900">Auto-sync every 15 minutes</span>
+                <p className="text-sm text-gray-600">
+                  Automatically check for new payments and update vendor statuses
+                </p>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={autoUpdate}
+                onChange={(e) => setAutoUpdate(e.target.checked)}
+                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <div>
+                <span className="font-medium text-sm text-gray-900">
+                  Auto-update payment status
+                </span>
+                <p className="text-sm text-gray-600">
+                  Automatically mark vendors as paid and trigger confirmation emails
+                </p>
+              </div>
+            </label>
+          </div>
+
+          <button
+            onClick={handleCreateIntegration}
+            disabled={isLoading}
+            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            {isLoading ? 'Creating...' : 'Enable Payment Syncing'}
+          </button>
+        </div>
+      ) : (
+        <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-green-100">
+                <Check className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-lg">Payment Syncing Enabled</h3>
+                <p className="text-sm text-gray-600">
+                  Status: <span className="capitalize">{integration.sync_status}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleToggleAutoSync}
+                disabled={isLoading}
+                className={`p-2 rounded-lg transition-colors ${
+                  integration.auto_sync_enabled
+                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title={integration.auto_sync_enabled ? 'Disable auto-sync' : 'Enable auto-sync'}
+              >
+                {integration.auto_sync_enabled ? (
+                  <Play className="w-4 h-4" />
+                ) : (
+                  <Pause className="w-4 h-4" />
+                )}
+              </button>
+
+              <button
+                onClick={handleManualSync}
+                disabled={isSyncing}
+                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
+                title="Sync now"
+              >
+                <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Eventbrite Event</p>
+              <p className="font-medium text-sm truncate">{integration.provider_event_id || 'Connected'}</p>
+              {integration.provider_url && (
+                <a
+                  href={integration.provider_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
+                >
+                  View on Eventbrite
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              )}
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600 mb-1">Last Synced</p>
+              <p className="font-medium text-sm">
+                {integration.last_synced_at
+                  ? new Date(integration.last_synced_at).toLocaleString()
+                  : 'Never'}
+              </p>
+            </div>
+          </div>
+
+          {integration.latest_sync_log && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h4 className="font-medium text-sm text-blue-900 mb-2">Latest Sync Results</h4>
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-blue-700">Transactions: {integration.latest_sync_log.transactions_fetched}</p>
+                </div>
+                <div>
+                  <p className="text-blue-700">Matched: {integration.latest_sync_log.contacts_matched}</p>
+                </div>
+                <div>
+                  <p className="text-blue-700">Updated: {integration.latest_sync_log.registrations_updated}</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="flex gap-3">
+            <button
+              onClick={handleManualSync}
+              disabled={isSyncing || isLoading}
+              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              {isSyncing ? 'Syncing...' : 'Sync Now'}
+            </button>
+
+            <button
+              onClick={handleDeleteIntegration}
+              disabled={isLoading}
+              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+            >
+              Disable
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
