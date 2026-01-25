@@ -373,7 +373,7 @@ export default function VendorApplicationForm() {
                 {/* Phone Number */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
-                    Phone Number <span className="text-red-400">*</span>
+                    Phone Number
                   </label>
                   <input
                     type="tel"
@@ -381,7 +381,6 @@ export default function VendorApplicationForm() {
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                    required
                   />
                 </div>
               </div>

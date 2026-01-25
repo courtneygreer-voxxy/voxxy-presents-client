@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Settings, Eye, EyeOff, Users, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check } from 'lucide-react';
+import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 
@@ -69,7 +69,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [eventStatus, setEventStatus] = useState<'draft' | 'published' | 'cancelled' | 'completed'>(
     event.status?.status || 'draft'
   );
-  const [capacity, setCapacity] = useState(event.capacity?.total?.toString() || '');
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -105,7 +104,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
         published: isPublished,
         status: eventStatus,
         registration_open: registrationOpen,
-        capacity: capacity ? parseInt(capacity) : null,
       });
       alert('Settings saved successfully!');
     } catch (err) {
@@ -448,37 +446,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                   {isPublished ? 'Published' : 'Draft'}
                 </span>
               </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Capacity Settings */}
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-2">Vendor Capacity</h3>
-              <p className="text-white/60 text-sm mb-4">
-                Set the maximum number of vendors that can participate in this event.
-              </p>
-              <div className="max-w-xs">
-                <label className="block text-white/90 text-sm mb-2">Maximum Vendors</label>
-                <input
-                  type="number"
-                  value={capacity}
-                  onChange={(e) => setCapacity(e.target.value)}
-                  placeholder="Unlimited"
-                  min="0"
-                  className="w-full px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                />
-                {event.capacity?.registered !== undefined && (
-                  <p className="text-white/60 text-xs mt-2">
-                    Currently registered: {event.capacity.registered} vendors
-                  </p>
-                )}
-              </div>
             </div>
           </div>
         </div>

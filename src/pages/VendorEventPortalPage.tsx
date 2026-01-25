@@ -327,23 +327,23 @@ export default function VendorEventPortalPage() {
   // Portal Dashboard
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-4xl font-bold">{event.title}</h1>
+        <div className="mb-6 md:mb-8">
+          <div className="flex items-center justify-between mb-3 md:mb-4">
+            <h1 className="text-2xl md:text-4xl font-bold">{event.title}</h1>
             <button
               onClick={() => {
                 clearPortalSession();
                 setIsAuthenticated(false);
               }}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors"
             >
               Sign Out
             </button>
           </div>
           {event.organization && (
-            <div className="flex items-center gap-2 text-gray-400">
+            <div className="flex items-center gap-2 text-gray-400 text-sm">
               <Building2 className="h-4 w-4" />
               <span>Presented by {event.organization.name}</span>
             </div>
@@ -351,14 +351,14 @@ export default function VendorEventPortalPage() {
         </div>
 
         {/* Event Details Section */}
-        <div className="bg-gray-800 rounded-lg p-6 mb-6 shadow-xl">
-          <h2 className="text-2xl font-bold mb-4">Event Details</h2>
+        <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-6 shadow-xl">
+          <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Event Details</h2>
 
           {event.description && (
-            <p className="text-gray-300 mb-6 leading-relaxed">{event.description}</p>
+            <p className="text-sm md:text-base text-gray-300 mb-4 md:mb-6 leading-relaxed">{event.description}</p>
           )}
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             <div className="flex items-start gap-3">
               <Calendar className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
               <div>
@@ -436,23 +436,86 @@ export default function VendorEventPortalPage() {
           </div>
         </div>
 
+        {/* Producer Updates Section */}
+        <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-6 shadow-xl">
+          <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-purple-600 flex items-center justify-center">
+              <Megaphone className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold">Producer Updates</h2>
+          </div>
+
+          {portalData.producer_updates && portalData.producer_updates.length > 0 ? (
+            <div className="space-y-3 md:space-y-4">
+              {portalData.producer_updates.map((bulletin: Bulletin) => {
+                const getInitials = (name: string) => {
+                  return name
+                    .split(' ')
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2);
+                };
+
+                return (
+                  <div
+                    key={bulletin.id}
+                    className={`bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] rounded-lg p-4 md:p-6 border ${
+                      bulletin.pinned ? 'border-purple-500' : 'border-gray-700'
+                    }`}
+                  >
+                    {/* Header */}
+                    <div className="flex items-start gap-2 md:gap-3 mb-3 md:mb-4">
+                      {/* Author Avatar */}
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs md:text-sm font-medium flex-shrink-0">
+                        {getInitials(bulletin.author.name)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm md:text-base text-white font-semibold">{bulletin.subject}</h3>
+                          {bulletin.pinned && (
+                            <Pin className="w-3 h-3 md:w-4 md:h-4 text-purple-400 fill-purple-400 flex-shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-gray-400 text-xs md:text-sm">
+                          {bulletin.author.name} · {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Body */}
+                    <div className="text-sm md:text-base text-gray-300 whitespace-pre-wrap">
+                      {bulletin.body}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="text-gray-400 text-center py-6 md:py-8 text-sm md:text-base">
+              No updates at this time. Check back later for announcements from the event producer.
+            </p>
+          )}
+        </div>
+
         {/* Vendor Categories Section */}
         {vendor_categories.length > 0 && (
-          <div className="bg-gray-800 rounded-lg p-6 mb-6 shadow-xl">
-            <h2 className="text-2xl font-bold mb-4">Vendor Categories & Pricing</h2>
+          <div className="bg-gray-800 rounded-lg p-4 md:p-6 shadow-xl">
+            <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Vendor Categories & Pricing</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {vendor_categories.map((category) => (
-                <div key={category.id} className="bg-gray-700 rounded-lg p-4 border border-gray-600">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-semibold">{category.name}</h3>
+                <div key={category.id} className="bg-gray-700 rounded-lg p-3 md:p-4 border border-gray-600">
+                  <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3 gap-3">
+                    <div className="flex-1">
+                      <h3 className="text-lg md:text-xl font-semibold">{category.name}</h3>
                       {category.categories.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mt-2">
+                        <div className="flex flex-wrap gap-1.5 md:gap-2 mt-2">
                           {category.categories.map((cat, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-1 bg-gray-600 text-xs rounded-full text-gray-300"
+                              className="px-2 py-0.5 md:py-1 bg-gray-600 text-xs rounded-full text-gray-300"
                             >
                               {cat}
                             </span>
@@ -461,8 +524,8 @@ export default function VendorEventPortalPage() {
                       )}
                     </div>
                     {category.booth_price && (
-                      <div className="text-right">
-                        <p className="text-2xl font-bold text-purple-400">
+                      <div className="flex items-center justify-between md:block md:text-right">
+                        <p className="text-xl md:text-2xl font-bold text-purple-400">
                           {formatPrice(category.booth_price)}
                         </p>
                         {category.payment_link && (
@@ -470,7 +533,7 @@ export default function VendorEventPortalPage() {
                             href={category.payment_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-2 text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded transition-colors"
+                            className="inline-flex items-center gap-1 mt-0 md:mt-2 text-xs md:text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded transition-colors"
                           >
                             Pay Now
                             <ExternalLink className="h-3 w-3" />
@@ -481,14 +544,14 @@ export default function VendorEventPortalPage() {
                   </div>
 
                   {category.description && (
-                    <p className="text-gray-300 text-sm mb-3">{category.description}</p>
+                    <p className="text-gray-300 text-xs md:text-sm mb-3">{category.description}</p>
                   )}
 
                   {(category.install.install_date ||
                     category.install.install_start_time ||
                     category.install.install_end_time) && (
-                    <div className="flex items-start gap-2 text-sm">
-                      <Clock className="h-4 w-4 text-gray-400 mt-0.5" />
+                    <div className="flex items-start gap-2 text-xs md:text-sm">
+                      <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mt-0.5" />
                       <div className="text-gray-400">
                         <span className="font-semibold">Install Time: </span>
                         {category.install.install_date && formatDate(category.install.install_date)}
@@ -504,69 +567,6 @@ export default function VendorEventPortalPage() {
             </div>
           </div>
         )}
-
-        {/* Producer Updates Section */}
-        <div className="bg-gray-800 rounded-lg p-6 shadow-xl">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
-              <Megaphone className="w-5 h-5 text-white" />
-            </div>
-            <h2 className="text-2xl font-bold">Producer Updates</h2>
-          </div>
-
-          {portalData.producer_updates && portalData.producer_updates.length > 0 ? (
-            <div className="space-y-4">
-              {portalData.producer_updates.map((bulletin: Bulletin) => {
-                const getInitials = (name: string) => {
-                  return name
-                    .split(' ')
-                    .map(n => n[0])
-                    .join('')
-                    .toUpperCase()
-                    .slice(0, 2);
-                };
-
-                return (
-                  <div
-                    key={bulletin.id}
-                    className={`bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] rounded-lg p-6 border ${
-                      bulletin.pinned ? 'border-purple-500' : 'border-gray-700'
-                    }`}
-                  >
-                    {/* Header */}
-                    <div className="flex items-start gap-3 mb-4">
-                      {/* Author Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium flex-shrink-0">
-                        {getInitials(bulletin.author.name)}
-                      </div>
-
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="text-white font-semibold">{bulletin.subject}</h3>
-                          {bulletin.pinned && (
-                            <Pin className="w-4 h-4 text-purple-400 fill-purple-400 flex-shrink-0" />
-                          )}
-                        </div>
-                        <p className="text-gray-400 text-sm">
-                          {bulletin.author.name} · {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Body */}
-                    <div className="text-gray-300 whitespace-pre-wrap">
-                      {bulletin.body}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="text-gray-400 text-center py-8">
-              No updates at this time. Check back later for announcements from the event producer.
-            </p>
-          )}
-        </div>
       </div>
     </div>
   );
