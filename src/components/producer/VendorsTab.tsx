@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Building2, Mail, Phone, Globe, Instagram, Music, Link as LinkIcon, Star, Search, ArrowUpDown } from 'lucide-react';
+import { Building2, Mail, Phone, Globe, Instagram, Music, Link as LinkIcon, Star, Search, ArrowUpDown, ChevronDown, ChevronRight } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 
 interface VendorSubmission {
@@ -39,6 +39,10 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
   const [paymentFilter, setPaymentFilter] = useState<string>('all');
   const [sortField, setSortField] = useState<SortField>('business_name');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  // Multi-select state
+  const [selectedVendors, setSelectedVendors] = useState<Set<number>>(new Set());
+  const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     fetchVendors();
@@ -265,7 +269,21 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
       ) : (
         <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr_1.5fr_2fr_1.5fr_1fr_1fr] gap-4 px-6 py-4 bg-white/5 border-b border-white/10">
+          <div className="grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 bg-white/5 border-b border-white/10">
+            <div className="flex items-center justify-center">
+              <input
+                type="checkbox"
+                checked={selectedVendors.size === filteredAndSortedVendors.length && filteredAndSortedVendors.length > 0}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedVendors(new Set(filteredAndSortedVendors.map(v => v.id)));
+                  } else {
+                    setSelectedVendors(new Set());
+                  }
+                }}
+                className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+              />
+            </div>
             <button
               onClick={() => handleSort('business_name')}
               className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
@@ -301,122 +319,255 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
               Payment
               <ArrowUpDown className="w-3 h-3" />
             </button>
-            <div className="text-sm font-semibold text-white/80">Links</div>
+            <div className="text-sm font-semibold text-white/80"></div>
           </div>
 
           {/* Table Body */}
           <div>
             {filteredAndSortedVendors.map((vendor) => {
               const paymentBadge = getPaymentBadge(vendor.payment_status);
+              const isExpanded = expandedRows.has(vendor.id);
+              const isSelected = selectedVendors.has(vendor.id);
 
               return (
-                <div
-                  key={vendor.id}
-                  className="grid grid-cols-[2fr_1.5fr_2fr_1.5fr_1fr_1fr] gap-4 px-6 py-4 border-b border-white/10 last:border-b-0 hover:bg-white/5 transition-colors"
-                >
-                  {/* Business Name */}
-                  <div className="flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-white font-medium truncate">{vendor.business_name}</p>
-                      {vendor.contact_name && (
-                        <p className="text-white/60 text-xs truncate">{vendor.contact_name}</p>
+                <div key={vendor.id}>
+                  {/* Main Row */}
+                  <div
+                    className={`grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors ${isSelected ? 'bg-purple-500/10' : ''}`}
+                  >
+                    {/* Checkbox */}
+                    <div className="flex items-center justify-center">
+                      <input
+                        type="checkbox"
+                        checked={isSelected}
+                        onChange={(e) => {
+                          const newSelected = new Set(selectedVendors);
+                          if (e.target.checked) {
+                            newSelected.add(vendor.id);
+                          } else {
+                            newSelected.delete(vendor.id);
+                          }
+                          setSelectedVendors(newSelected);
+                        }}
+                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                      />
+                    </div>
+
+                    {/* Business Name */}
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-white font-medium truncate">{vendor.business_name}</p>
+                        {vendor.contact_name && (
+                          <p className="text-white/60 text-xs truncate">{vendor.contact_name}</p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Category */}
+                    <div>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
+                        {vendor.vendor_category}
+                      </span>
+                    </div>
+
+                    {/* Email */}
+                    <div className="flex items-center gap-2 min-w-0">
+                      <Mail className="w-4 h-4 text-white/40 flex-shrink-0" />
+                      <a
+                        href={`mailto:${vendor.email}`}
+                        className="text-purple-400 hover:text-purple-300 text-sm truncate"
+                      >
+                        {vendor.email}
+                      </a>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="flex items-center gap-2 min-w-0">
+                      {vendor.phone ? (
+                        <>
+                          <Phone className="w-4 h-4 text-white/40 flex-shrink-0" />
+                          <a
+                            href={`tel:${vendor.phone}`}
+                            className="text-purple-400 hover:text-purple-300 text-sm truncate"
+                          >
+                            {vendor.phone}
+                          </a>
+                        </>
+                      ) : (
+                        <span className="text-white/40 text-sm">—</span>
                       )}
+                    </div>
+
+                    {/* Payment Status */}
+                    <div>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
+                        {paymentBadge.label}
+                      </span>
+                    </div>
+
+                    {/* Expand Button */}
+                    <div className="flex items-center justify-center">
+                      <button
+                        onClick={() => {
+                          const newExpanded = new Set(expandedRows);
+                          if (isExpanded) {
+                            newExpanded.delete(vendor.id);
+                          } else {
+                            newExpanded.add(vendor.id);
+                          }
+                          setExpandedRows(newExpanded);
+                        }}
+                        className="text-white/60 hover:text-purple-400 transition-colors p-1 hover:bg-white/5 rounded"
+                      >
+                        {isExpanded ? (
+                          <ChevronDown className="w-4 h-4" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" />
+                        )}
+                      </button>
                     </div>
                   </div>
 
-                  {/* Category */}
-                  <div>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
-                      {vendor.vendor_category}
-                    </span>
-                  </div>
+                  {/* Expanded Details */}
+                  {isExpanded && (
+                    <div className="px-6 py-4 bg-white/5 border-b border-white/10">
+                      <div className="grid grid-cols-2 gap-6 pl-14">
+                        {/* Left Column */}
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Contact Name
+                            </p>
+                            <p className="text-sm text-white">
+                              {vendor.contact_name || '—'}
+                            </p>
+                          </div>
 
-                  {/* Email */}
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Mail className="w-4 h-4 text-white/40 flex-shrink-0" />
-                    <a
-                      href={`mailto:${vendor.email}`}
-                      className="text-purple-400 hover:text-purple-300 text-sm truncate"
-                    >
-                      {vendor.email}
-                    </a>
-                  </div>
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Email
+                            </p>
+                            <a
+                              href={`mailto:${vendor.email}`}
+                              className="text-sm text-purple-400 hover:text-purple-300"
+                            >
+                              {vendor.email}
+                            </a>
+                          </div>
 
-                  {/* Phone */}
-                  <div className="flex items-center gap-2 min-w-0">
-                    {vendor.phone ? (
-                      <>
-                        <Phone className="w-4 h-4 text-white/40 flex-shrink-0" />
-                        <a
-                          href={`tel:${vendor.phone}`}
-                          className="text-purple-400 hover:text-purple-300 text-sm truncate"
-                        >
-                          {vendor.phone}
-                        </a>
-                      </>
-                    ) : (
-                      <span className="text-white/40 text-sm">—</span>
-                    )}
-                  </div>
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Phone
+                            </p>
+                            {vendor.phone ? (
+                              <a
+                                href={`tel:${vendor.phone}`}
+                                className="text-sm text-purple-400 hover:text-purple-300"
+                              >
+                                {vendor.phone}
+                              </a>
+                            ) : (
+                              <p className="text-sm text-white/40">—</p>
+                            )}
+                          </div>
 
-                  {/* Payment Status */}
-                  <div>
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
-                      {paymentBadge.label}
-                    </span>
-                  </div>
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Category
+                            </p>
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
+                              {vendor.vendor_category}
+                            </span>
+                          </div>
+                        </div>
 
-                  {/* Links */}
-                  <div className="flex items-center gap-2">
-                    {vendor.instagram_handle && (
-                      <a
-                        href={vendor.instagram_handle}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-white/60 hover:text-purple-400 transition-colors"
-                        title="Instagram"
-                      >
-                        <Instagram className="w-4 h-4" />
-                      </a>
-                    )}
-                    {vendor.tiktok_handle && (
-                      <a
-                        href={vendor.tiktok_handle}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-white/60 hover:text-purple-400 transition-colors"
-                        title="TikTok"
-                      >
-                        <Music className="w-4 h-4" />
-                      </a>
-                    )}
-                    {vendor.website && (
-                      <a
-                        href={vendor.website}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-white/60 hover:text-purple-400 transition-colors"
-                        title="Website"
-                      >
-                        <Globe className="w-4 h-4" />
-                      </a>
-                    )}
-                    {vendor.portfolio && (
-                      <a
-                        href={vendor.portfolio}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-white/60 hover:text-purple-400 transition-colors"
-                        title="Portfolio"
-                      >
-                        <Star className="w-4 h-4" />
-                      </a>
-                    )}
-                    {!vendor.instagram_handle && !vendor.tiktok_handle && !vendor.website && !vendor.portfolio && (
-                      <span className="text-white/40 text-sm">—</span>
-                    )}
-                  </div>
+                        {/* Right Column */}
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Payment Status
+                            </p>
+                            <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
+                              {paymentBadge.label}
+                            </span>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                              Accepted Date
+                            </p>
+                            <p className="text-sm text-white">
+                              {new Date(vendor.created_at).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'long',
+                                day: 'numeric',
+                              })}
+                            </p>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">
+                              Social Links
+                            </p>
+                            <div className="flex flex-wrap gap-3">
+                              {vendor.instagram_handle && (
+                                <a
+                                  href={vendor.instagram_handle}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  title="Instagram"
+                                >
+                                  <Instagram className="w-4 h-4" />
+                                  <span className="text-sm">Instagram</span>
+                                </a>
+                              )}
+                              {vendor.tiktok_handle && (
+                                <a
+                                  href={vendor.tiktok_handle}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  title="TikTok"
+                                >
+                                  <Music className="w-4 h-4" />
+                                  <span className="text-sm">TikTok</span>
+                                </a>
+                              )}
+                              {vendor.website && (
+                                <a
+                                  href={vendor.website}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  title="Website"
+                                >
+                                  <Globe className="w-4 h-4" />
+                                  <span className="text-sm">Website</span>
+                                </a>
+                              )}
+                              {vendor.portfolio && (
+                                <a
+                                  href={vendor.portfolio}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  title="Portfolio"
+                                >
+                                  <Star className="w-4 h-4" />
+                                  <span className="text-sm">Portfolio</span>
+                                </a>
+                              )}
+                              {!vendor.instagram_handle && !vendor.tiktok_handle && !vendor.website && !vendor.portfolio && (
+                                <span className="text-sm text-white/40">No links available</span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               );
             })}
