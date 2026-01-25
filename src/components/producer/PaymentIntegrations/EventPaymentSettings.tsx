@@ -219,12 +219,12 @@ export default function EventPaymentSettings({
 
   if (!isConnected) {
     return (
-      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+      <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-6">
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-medium text-yellow-900 mb-1">Eventbrite Not Connected</h3>
-            <p className="text-sm text-yellow-800">
+            <h3 className="font-medium text-yellow-200 mb-1">Eventbrite Not Connected</h3>
+            <p className="text-sm text-yellow-300/80">
               Please connect your Eventbrite account in Organization Settings before enabling payment
               syncing for events.
             </p>
@@ -237,35 +237,35 @@ export default function EventPaymentSettings({
   return (
     <div className="space-y-6">
       {error && (
-        <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-red-800">{error}</p>
+        <div className="flex items-start gap-2 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
+          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-red-200">{error}</p>
         </div>
       )}
 
       {success && (
-        <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-          <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-800">{success}</p>
+        <div className="flex items-start gap-2 p-3 bg-green-500/10 border border-green-500/20 rounded-lg">
+          <Check className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-green-200">{success}</p>
         </div>
       )}
 
       {!integration ? (
-        <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+        <div className="bg-white/5 rounded-lg border border-white/10 p-6 space-y-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-blue-100">
-              <DollarSign className="w-5 h-5 text-blue-600" />
+            <div className="p-2 rounded-lg bg-purple-500/20">
+              <DollarSign className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg">Enable Payment Syncing</h3>
-              <p className="text-sm text-gray-600">
+              <h3 className="font-semibold text-lg text-white">Enable Payment Syncing</h3>
+              <p className="text-sm text-white/60">
                 Connect this event to an Eventbrite event to automatically sync vendor payments
               </p>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium text-white/90 mb-3">
               How would you like to connect?
             </label>
             <div className="flex gap-4">
@@ -273,8 +273,8 @@ export default function EventPaymentSettings({
                 onClick={() => setInputMethod('url')}
                 className={`flex-1 p-4 border-2 rounded-lg transition-all ${
                   inputMethod === 'url'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-purple-500/20 text-white'
+                    : 'border-white/20 hover:border-white/30 text-white/70'
                 }`}
               >
                 <Link2 className="w-5 h-5 mb-2 mx-auto" />
@@ -284,8 +284,8 @@ export default function EventPaymentSettings({
                 onClick={() => setInputMethod('dropdown')}
                 className={`flex-1 p-4 border-2 rounded-lg transition-all ${
                   inputMethod === 'dropdown'
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-purple-500 bg-purple-500/20 text-white'
+                    : 'border-white/20 hover:border-white/30 text-white/70'
                 }`}
               >
                 <Calendar className="w-5 h-5 mb-2 mx-auto" />
@@ -296,7 +296,7 @@ export default function EventPaymentSettings({
 
           {inputMethod === 'url' ? (
             <div>
-              <label htmlFor="eventbrite-url" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="eventbrite-url" className="block text-sm font-medium text-white/90 mb-2">
                 Eventbrite Event URL
               </label>
               <input
@@ -305,23 +305,23 @@ export default function EventPaymentSettings({
                 value={eventbriteUrl}
                 onChange={(e) => setEventbriteUrl(e.target.value)}
                 placeholder="https://www.eventbrite.com/e/your-event-name-123456789"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isLoading}
               />
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-white/60">
                 Paste the URL of your Eventbrite event (e.g., from the event dashboard)
               </p>
             </div>
           ) : (
             <div>
-              <label htmlFor="eventbrite-event" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="eventbrite-event" className="block text-sm font-medium text-white/90 mb-2">
                 Select Eventbrite Event
               </label>
               <select
                 id="eventbrite-event"
                 value={selectedEventId}
                 onChange={(e) => setSelectedEventId(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 disabled={isLoading}
               >
                 <option value="">Choose an event...</option>
@@ -332,7 +332,7 @@ export default function EventPaymentSettings({
                 ))}
               </select>
               {eventbriteEvents.length === 0 && (
-                <p className="mt-2 text-sm text-gray-600">No Eventbrite events found</p>
+                <p className="mt-2 text-sm text-white/60">No Eventbrite events found</p>
               )}
             </div>
           )}
@@ -343,11 +343,11 @@ export default function EventPaymentSettings({
                 type="checkbox"
                 checked={autoSync}
                 onChange={(e) => setAutoSync(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-purple-600 border-white/20 rounded focus:ring-purple-500"
               />
               <div>
-                <span className="font-medium text-sm text-gray-900">Auto-sync every 15 minutes</span>
-                <p className="text-sm text-gray-600">
+                <span className="font-medium text-sm text-white">Auto-sync every 15 minutes</span>
+                <p className="text-sm text-white/60">
                   Automatically check for new payments and update vendor statuses
                 </p>
               </div>
@@ -358,13 +358,13 @@ export default function EventPaymentSettings({
                 type="checkbox"
                 checked={autoUpdate}
                 onChange={(e) => setAutoUpdate(e.target.checked)}
-                className="mt-1 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 w-4 h-4 text-purple-600 border-white/20 rounded focus:ring-purple-500"
               />
               <div>
-                <span className="font-medium text-sm text-gray-900">
+                <span className="font-medium text-sm text-white">
                   Auto-update payment status
                 </span>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-white/60">
                   Automatically mark vendors as paid and trigger confirmation emails
                 </p>
               </div>
@@ -374,22 +374,22 @@ export default function EventPaymentSettings({
           <button
             onClick={handleCreateIntegration}
             disabled={isLoading}
-            className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
           >
             <Plus className="w-4 h-4" />
             {isLoading ? 'Creating...' : 'Enable Payment Syncing'}
           </button>
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border p-6 space-y-6">
+        <div className="bg-white/5 rounded-lg border border-white/10 p-6 space-y-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-100">
-                <Check className="w-5 h-5 text-green-600" />
+              <div className="p-2 rounded-lg bg-green-500/20">
+                <Check className="w-5 h-5 text-green-400" />
               </div>
               <div>
-                <h3 className="font-semibold text-lg">Payment Syncing Enabled</h3>
-                <p className="text-sm text-gray-600">
+                <h3 className="font-semibold text-lg text-white">Payment Syncing Enabled</h3>
+                <p className="text-sm text-white/60">
                   Status: <span className="capitalize">{integration.sync_status}</span>
                 </p>
               </div>
@@ -401,8 +401,8 @@ export default function EventPaymentSettings({
                 disabled={isLoading}
                 className={`p-2 rounded-lg transition-colors ${
                   integration.auto_sync_enabled
-                    ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30'
+                    : 'bg-white/10 text-white/60 hover:bg-white/20'
                 }`}
                 title={integration.auto_sync_enabled ? 'Disable auto-sync' : 'Enable auto-sync'}
               >
@@ -416,7 +416,7 @@ export default function EventPaymentSettings({
               <button
                 onClick={handleManualSync}
                 disabled={isSyncing}
-                className="p-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors disabled:opacity-50"
+                className="p-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
                 title="Sync now"
               >
                 <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -425,15 +425,15 @@ export default function EventPaymentSettings({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Eventbrite Event</p>
-              <p className="font-medium text-sm truncate">{integration.provider_event_id || 'Connected'}</p>
+            <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+              <p className="text-sm text-white/60 mb-1">Eventbrite Event</p>
+              <p className="font-medium text-sm text-white truncate">{integration.provider_event_id || 'Connected'}</p>
               {integration.provider_url && (
                 <a
                   href={integration.provider_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs text-blue-600 hover:underline flex items-center gap-1 mt-1"
+                  className="text-xs text-purple-400 hover:underline flex items-center gap-1 mt-1"
                 >
                   View on Eventbrite
                   <ExternalLink className="w-3 h-3" />
@@ -441,9 +441,9 @@ export default function EventPaymentSettings({
               )}
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600 mb-1">Last Synced</p>
-              <p className="font-medium text-sm">
+            <div className="p-4 bg-white/5 rounded-lg border border-white/10">
+              <p className="text-sm text-white/60 mb-1">Last Synced</p>
+              <p className="font-medium text-sm text-white">
                 {integration.last_synced_at
                   ? new Date(integration.last_synced_at).toLocaleString()
                   : 'Never'}
@@ -452,17 +452,17 @@ export default function EventPaymentSettings({
           </div>
 
           {integration.latest_sync_log && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h4 className="font-medium text-sm text-blue-900 mb-2">Latest Sync Results</h4>
+            <div className="p-4 bg-purple-500/10 border border-purple-500/20 rounded-lg">
+              <h4 className="font-medium text-sm text-purple-200 mb-2">Latest Sync Results</h4>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
-                  <p className="text-blue-700">Transactions: {integration.latest_sync_log.transactions_fetched}</p>
+                  <p className="text-purple-300">Transactions: {integration.latest_sync_log.transactions_fetched}</p>
                 </div>
                 <div>
-                  <p className="text-blue-700">Matched: {integration.latest_sync_log.contacts_matched}</p>
+                  <p className="text-purple-300">Matched: {integration.latest_sync_log.contacts_matched}</p>
                 </div>
                 <div>
-                  <p className="text-blue-700">Updated: {integration.latest_sync_log.registrations_updated}</p>
+                  <p className="text-purple-300">Updated: {integration.latest_sync_log.registrations_updated}</p>
                 </div>
               </div>
             </div>
@@ -472,7 +472,7 @@ export default function EventPaymentSettings({
             <button
               onClick={handleManualSync}
               disabled={isSyncing || isLoading}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium flex items-center justify-center gap-2"
             >
               <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
               {isSyncing ? 'Syncing...' : 'Sync Now'}
