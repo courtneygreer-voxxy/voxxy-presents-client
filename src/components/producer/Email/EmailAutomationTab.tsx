@@ -338,31 +338,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             </button>
           </div>
         </div>
-
-        {/* Statistics Cards */}
-        {/* Statistics Cards - Small and Subtle */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
-          <div className="bg-white/5 rounded-lg p-2 border border-white/10">
-            <p className="text-white/50 text-[10px] mb-0.5">Total</p>
-            <p className="text-base font-semibold text-white">{stats.total}</p>
-          </div>
-          <div className="bg-blue-500/10 rounded-lg p-2 border border-blue-500/20">
-            <p className="text-blue-400/60 text-[10px] mb-0.5">Scheduled</p>
-            <p className="text-base font-semibold text-blue-400">{stats.scheduled}</p>
-          </div>
-          <div className="bg-yellow-500/10 rounded-lg p-2 border border-yellow-500/20">
-            <p className="text-yellow-400/60 text-[10px] mb-0.5">Paused</p>
-            <p className="text-base font-semibold text-yellow-400">{stats.paused}</p>
-          </div>
-          <div className="bg-green-500/10 rounded-lg p-2 border border-green-500/20">
-            <p className="text-green-400/60 text-[10px] mb-0.5">Sent</p>
-            <p className="text-base font-semibold text-green-400">{stats.sent}</p>
-          </div>
-          <div className="bg-red-500/10 rounded-lg p-2 border border-red-500/20">
-            <p className="text-red-400/60 text-[10px] mb-0.5">Failed</p>
-            <p className="text-base font-semibold text-red-400">{stats.failed}</p>
-          </div>
-        </div>
       </div>
 
       {/* Success Message */}
