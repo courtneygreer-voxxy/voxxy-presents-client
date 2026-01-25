@@ -414,42 +414,6 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
 
       {/* Original Settings Sections */}
       <div className="space-y-6">
-        {/* Visibility Settings */}
-        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              {isPublished ? (
-                <Eye className="w-5 h-5 text-purple-400" />
-              ) : (
-                <EyeOff className="w-5 h-5 text-purple-400" />
-              )}
-            </div>
-            <div className="flex-1">
-              <h3 className="text-white font-semibold mb-2">Event Visibility</h3>
-              <p className="text-white/60 text-sm mb-4">
-                {isPublished
-                  ? 'Your event is visible to the public and can receive applications.'
-                  : 'Your event is hidden from the public. Only you can see it.'}
-              </p>
-              <label className="flex items-center gap-3 cursor-pointer">
-                <div className="relative">
-                  <input
-                    type="checkbox"
-                    checked={isPublished}
-                    onChange={(e) => setIsPublished(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-blue-500 transition-all"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                </div>
-                <span className="text-white/90 text-sm font-medium">
-                  {isPublished ? 'Published' : 'Draft'}
-                </span>
-              </label>
-            </div>
-          </div>
-        </div>
-
         {/* Event Status */}
         <div className="bg-white/5 rounded-xl p-6 border border-white/10">
           <div className="flex items-start gap-4">

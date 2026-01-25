@@ -171,7 +171,9 @@ export const paymentTransactionsApi = {
     const response = await fetchWithAuth(
       `${API_BASE_URL}/v1/presents/events/${eventSlug}/payment_transactions`
     );
-    return response.json();
+    const data = await response.json();
+    // Backend returns { transactions: [...] }, extract the array
+    return data.transactions || data;
   },
 
   // Get single transaction
