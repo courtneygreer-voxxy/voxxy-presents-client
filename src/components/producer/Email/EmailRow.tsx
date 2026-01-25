@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, EmailCategory } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
@@ -13,6 +13,7 @@ interface EmailRowProps {
   onPause?: (emailId: number) => Promise<void>;
   onResume?: (emailId: number) => Promise<void>;
   onSendNow?: (emailId: number) => Promise<void>;
+  onRetryFailed?: (emailId: number) => Promise<void>;
   onDelete?: (emailId: number) => Promise<void>;
 }
 
@@ -62,6 +63,7 @@ export default function EmailRow({
   onPause,
   onResume,
   onSendNow,
+  onRetryFailed,
   onDelete,
 }: EmailRowProps) {
   const [showMenu, setShowMenu] = useState(false);
@@ -361,6 +363,19 @@ export default function EmailRow({
                     >
                       <Play className="w-3.5 h-3.5" />
                       Resume
+                    </button>
+                  )}
+                  {isSent && undeliveredCount > 0 && onRetryFailed && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAction(() => onRetryFailed(email.id));
+                      }}
+                      className="w-full px-4 py-2 text-left text-sm text-orange-400 hover:bg-orange-500/10 flex items-center gap-2 transition-colors"
+                      title="Retry failed email deliveries (soft bounces only)"
+                    >
+                      <RefreshCcw className="w-3.5 h-3.5" />
+                      Retry Failed
                     </button>
                   )}
                   {!isSent && onDelete && (

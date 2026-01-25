@@ -187,6 +187,26 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     }
   };
 
+  const handleRetryFailed = async (emailId: number) => {
+    if (!confirm('Retry all failed deliveries? Only soft bounces (temporary failures like "mailbox full") will be retried. Hard bounces (invalid emails) will be skipped.')) {
+      return;
+    }
+
+    try {
+      const result = await scheduledEmailsApi.retryFailed(eventSlug, emailId);
+      await loadEmails(); // Reload to get updated counts
+
+      // Build success message
+      let message = `Retried ${result.retried_count} failed ${result.retried_count === 1 ? 'delivery' : 'deliveries'}`;
+      if (result.skipped_count > 0) {
+        message += ` (${result.skipped_count} hard ${result.skipped_count === 1 ? 'bounce' : 'bounces'} skipped)`;
+      }
+      showSuccess(message);
+    } catch (err: any) {
+      setError(err.message || 'Failed to retry failed deliveries');
+    }
+  };
+
   const handleDelete = async (emailId: number) => {
     if (!confirm('Are you sure you want to delete this scheduled email? This cannot be undone.')) {
       return;
@@ -449,6 +469,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             onPause={handlePause}
             onResume={handleResume}
             onSendNow={handleSendNow}
+            onRetryFailed={handleRetryFailed}
             onDelete={handleDelete}
           />
         </div>

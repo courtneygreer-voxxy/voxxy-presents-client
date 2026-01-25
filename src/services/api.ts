@@ -1169,6 +1169,22 @@ export const scheduledEmailsApi = {
   },
 
   /**
+   * Retry all failed deliveries for a scheduled email (soft bounces only)
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/retry_failed
+   */
+  async retryFailed(eventSlug: string, id: number) {
+    return fetchApi<{
+      message: string
+      retried_count: number
+      retry_failed_count: number
+      skipped_count: number
+      total_failed: number
+    }>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/retry_failed`, {
+      method: 'POST',
+    })
+  },
+
+  /**
    * Delete/cancel scheduled email
    * DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */

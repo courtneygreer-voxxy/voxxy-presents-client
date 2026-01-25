@@ -8,6 +8,7 @@ interface EmailTableProps {
   onPause?: (emailId: number) => Promise<void>;
   onResume?: (emailId: number) => Promise<void>;
   onSendNow?: (emailId: number) => Promise<void>;
+  onRetryFailed?: (emailId: number) => Promise<void>;
   onDelete?: (emailId: number) => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ export default function EmailTable({
   onPause,
   onResume,
   onSendNow,
+  onRetryFailed,
   onDelete,
 }: EmailTableProps) {
   if (emails.length === 0) {
@@ -60,6 +62,7 @@ export default function EmailTable({
             onPause={onPause}
             onResume={onResume}
             onSendNow={onSendNow}
+            onRetryFailed={onRetryFailed}
             onDelete={onDelete}
           />
         ))}
