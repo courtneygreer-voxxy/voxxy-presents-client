@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { format } from 'date-fns';
-import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
+import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2, AlertTriangle } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, EmailCategory } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
@@ -177,8 +177,28 @@ export default function EmailRow({
     <div className="grid grid-cols-[200px,240px,130px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
+        {email.overdue && email.overdue_message && (
+          <Tooltip.Provider delayDuration={200}>
+            <Tooltip.Root>
+              <Tooltip.Trigger asChild>
+                <div className="flex-shrink-0">
+                  <AlertTriangle className="w-4 h-4 text-red-400" />
+                </div>
+              </Tooltip.Trigger>
+              <Tooltip.Portal>
+                <Tooltip.Content
+                  className="z-50 bg-red-900/90 text-white px-3 py-2 rounded-lg shadow-xl border border-red-500/30"
+                  sideOffset={5}
+                >
+                  <div className="text-xs font-semibold">Overdue: {email.overdue_message}</div>
+                  <Tooltip.Arrow className="fill-red-900" />
+                </Tooltip.Content>
+              </Tooltip.Portal>
+            </Tooltip.Root>
+          </Tooltip.Provider>
+        )}
         <div className="flex-1 min-w-0">
-          <div className="font-medium text-white truncate">{email.name}</div>
+          <div className={`font-medium truncate ${email.overdue ? 'text-red-400' : 'text-white'}`}>{email.name}</div>
         </div>
       </div>
 

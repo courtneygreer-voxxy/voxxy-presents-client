@@ -1,4 +1,4 @@
-import { X, Mail, Calendar, Users, Loader2 } from 'lucide-react';
+import { X, Mail, Calendar, Users, Loader2, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { scheduledEmailsApi } from '@/services/api';
@@ -82,6 +82,17 @@ export default function EmailPreviewModal({
           {/* Email Info */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
             <h3 className="text-white font-medium mb-3">{email.name}</h3>
+
+            {/* Overdue Warning */}
+            {email.overdue && email.overdue_message && (
+              <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                <span className="text-sm font-semibold text-red-400">
+                  Overdue: {email.overdue_message}
+                </span>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-4 text-sm">
               {email.scheduled_for && (
                 <div className="flex items-center gap-2 text-white/60">

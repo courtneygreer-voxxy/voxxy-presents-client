@@ -114,6 +114,11 @@ export interface ScheduledEmail {
   delivered_count?: number;
   delivery_rate?: number; // Percentage (0-100)
 
+  // Overdue detection (for scheduled emails that are late)
+  overdue?: boolean;
+  minutes_overdue?: number;
+  overdue_message?: string | null; // e.g., "45 minutes late"
+
   // Frontend-only flag for virtual invitation announcement emails
   isInvitationAnnouncement?: boolean;
 }

@@ -9,7 +9,8 @@ import {
   Pause,
   Trash2,
   Eye,
-  MoreVertical
+  MoreVertical,
+  AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { ScheduledEmail } from '@/types/email';
@@ -117,6 +118,16 @@ export default function ScheduledEmailCard({
               <Edit2 className="w-3.5 h-3.5 text-white/40 group-hover:text-purple-400 transition-colors" />
             )}
           </div>
+
+          {/* Overdue Warning */}
+          {email.overdue && email.overdue_message && (
+            <div className="flex items-center gap-2 px-3 py-2 mb-3 rounded-lg bg-red-500/10 border border-red-500/30">
+              <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+              <span className="text-sm font-semibold text-red-400">
+                {email.overdue_message}
+              </span>
+            </div>
+          )}
 
           <p className="text-white/60 text-sm line-clamp-2 mb-3">
             {backendToFrontend(email.subject_template || '')}
