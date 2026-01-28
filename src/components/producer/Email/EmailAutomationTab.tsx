@@ -464,6 +464,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
           {/* Email Table */}
           <EmailTable
             emails={filteredEmails}
+            eventSlug={eventSlug}
             onEdit={handleEdit}
             onPreview={handlePreview}
             onPause={handlePause}

@@ -3,6 +3,7 @@ import EmailRow from './EmailRow';
 
 interface EmailTableProps {
   emails: ScheduledEmail[];
+  eventSlug: string;
   onEdit?: (email: ScheduledEmail) => void;
   onPreview?: (email: ScheduledEmail) => void;
   onPause?: (emailId: number) => Promise<void>;
@@ -14,6 +15,7 @@ interface EmailTableProps {
 
 export default function EmailTable({
   emails,
+  eventSlug,
   onEdit,
   onPreview,
   onPause,
@@ -57,6 +59,7 @@ export default function EmailTable({
           <EmailRow
             key={`${email.id}-${email.scheduled_for}`}
             email={email}
+            eventSlug={eventSlug}
             onEdit={onEdit}
             onPreview={onPreview}
             onPause={onPause}

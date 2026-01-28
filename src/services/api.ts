@@ -1185,6 +1185,23 @@ export const scheduledEmailsApi = {
   },
 
   /**
+   * Get list of recipients for a scheduled email
+   * GET /api/v1/presents/events/:event_slug/scheduled_emails/:id/recipients
+   */
+  async getRecipients(eventSlug: string, id: number) {
+    return fetchApi<{
+      count: number
+      category: string
+      email_type: 'invitation_reminders' | 'registration_emails'
+      recipients: Array<{
+        email: string
+        name: string
+        organization: string
+      }>
+    }>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/recipients`)
+  },
+
+  /**
    * Delete/cancel scheduled email
    * DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */

@@ -4,10 +4,12 @@ import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megap
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, EmailCategory } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
+import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
 
 interface EmailRowProps {
   email: ScheduledEmail;
+  eventSlug: string;
   onEdit?: (email: ScheduledEmail) => void;
   onPreview?: (email: ScheduledEmail) => void;
   onPause?: (emailId: number) => Promise<void>;
@@ -58,6 +60,7 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: 
 
 export default function EmailRow({
   email,
+  eventSlug,
   onEdit,
   onPreview,
   onPause,
@@ -68,6 +71,7 @@ export default function EmailRow({
 }: EmailRowProps) {
   const [showMenu, setShowMenu] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showRecipientsModal, setShowRecipientsModal] = useState(false);
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsProcessing(true);
@@ -228,9 +232,18 @@ export default function EmailRow({
       </div>
 
       {/* Recipients Count */}
-      <div className="flex items-center justify-center gap-1 text-white/60">
-        <Users className="w-3 h-3" />
-        <span>{email.recipient_count || 0}</span>
+      <div className="flex items-center justify-center">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowRecipientsModal(true);
+          }}
+          className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
+          title="Click to view recipients list"
+        >
+          <Users className="w-3 h-3" />
+          <span>{email.recipient_count || 0}</span>
+        </button>
       </div>
 
       {/* Undelivered Count */}
@@ -423,6 +436,16 @@ export default function EmailRow({
           <p className="text-red-400 text-xs">{email.error_message}</p>
         </div>
       )}
+
+      {/* Recipients Modal */}
+      <RecipientsModal
+        isOpen={showRecipientsModal}
+        onClose={() => setShowRecipientsModal(false)}
+        eventSlug={eventSlug}
+        emailId={email.id}
+        emailName={email.name}
+        isInvitationAnnouncement={isInvitationAnnouncement}
+      />
     </div>
   );
 }
