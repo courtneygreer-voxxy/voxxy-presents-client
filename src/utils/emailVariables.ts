@@ -136,6 +136,14 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
 
   // Vendor Variables
   {
+    label: 'Greeting Name',
+    frontendVar: '[greetingName]',
+    backendVar: '{{greeting_name}}',
+    category: 'vendor',
+    description: 'Smart greeting (business name or first name)',
+    example: "John's Tacos (or John)"
+  },
+  {
     label: 'First Name',
     frontendVar: '[firstName]',
     backendVar: '{{first_name}}',
