@@ -304,7 +304,7 @@ export function EmailEditorPage({
                 })}
                 ref={(e) => {
                   register('subject_template').ref(e);
-                  if (e) subjectRef.current = e;
+                  if (e) (subjectRef as React.MutableRefObject<HTMLInputElement | null>).current = e;
                 }}
                 onFocus={() => setActiveField('subject')}
                 onBlur={() => setTimeout(() => setActiveField(null), 200)}
@@ -328,7 +328,7 @@ export function EmailEditorPage({
                 })}
                 ref={(e) => {
                   register('body_template').ref(e);
-                  if (e) bodyRef.current = e;
+                  if (e) (bodyRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = e;
                 }}
                 onFocus={() => setActiveField('body')}
                 onBlur={() => setTimeout(() => setActiveField(null), 200)}
