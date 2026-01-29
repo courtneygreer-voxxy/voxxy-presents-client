@@ -5,7 +5,7 @@ import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus } from '@
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import EmailPreviewModal from './EmailPreviewModal';
-import EditScheduledEmailModal from './EditScheduledEmailModal';
+import { EmailEditorPage } from './EmailEditorPage';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -259,13 +259,15 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     setIsEditOpen(true);
   };
 
+  const handleCloseEditor = () => {
+    setIsEditOpen(false);
+    setEditEmail(null);
+  };
+
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
     const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
     console.log('📧 Updated email received from server:', updated);
     console.log('   New scheduled_for:', updated.scheduled_for);
-
-    // Close modal first
-    setIsEditOpen(false);
 
     // Force a fresh reload of emails to ensure UI updates
     setIsLoading(true);
@@ -314,6 +316,22 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     sent: emails.filter(e => e.status === 'sent').length,
     failed: emails.filter(e => e.status === 'failed').length,
   };
+
+  // Show full-screen editor if editing
+  if (isEditOpen && editEmail) {
+    return (
+      <EmailEditorPage
+        email={editEmail}
+        eventData={eventData}
+        onBack={handleCloseEditor}
+        onSave={handleSaveEdit}
+        onPreview={() => {
+          handleCloseEditor();
+          handlePreview(editEmail);
+        }}
+      />
+    );
+  }
 
   if (isLoading) {
     return (
@@ -491,15 +509,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         onClose={() => setIsPreviewOpen(false)}
         email={previewEmail}
         eventSlug={eventSlug}
-      />
-
-      {/* Edit Email Modal */}
-      <EditScheduledEmailModal
-        isOpen={isEditOpen}
-        onClose={() => setIsEditOpen(false)}
-        email={editEmail}
-        eventData={eventData}
-        onSave={handleSaveEdit}
       />
     </div>
   );
