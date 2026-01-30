@@ -2316,8 +2316,28 @@ export const eventInvitationsApi = {
   /**
    * Create batch invitations for an event
    * POST /api/v1/presents/events/:event_slug/invitations/batch
+   *
+   * Supports two signatures:
+   * 1. Legacy: createBatch(eventSlug, contactIds: number[])
+   * 2. New: createBatch(eventSlug, { list_ids, vendor_contact_ids, excluded_contact_ids })
    */
-  async createBatch(eventSlug: string, vendorContactIds: number[]) {
+  async createBatch(
+    eventSlug: string,
+    params: number[] | {
+      list_ids?: number[]
+      vendor_contact_ids?: number[]
+      excluded_contact_ids?: number[]
+    }
+  ) {
+    // Support legacy array signature for backward compatibility
+    const body = Array.isArray(params)
+      ? { vendor_contact_ids: params }
+      : {
+          list_ids: params.list_ids || [],
+          vendor_contact_ids: params.vendor_contact_ids || [],
+          excluded_contact_ids: params.excluded_contact_ids || [],
+        }
+
     return fetchApi<{
       invitations: EventInvitation[]
       created_count: number
@@ -2326,7 +2346,7 @@ export const eventInvitationsApi = {
       `/v1/presents/events/${eventSlug}/invitations/batch`,
       {
         method: 'POST',
-        body: JSON.stringify({ vendor_contact_ids: vendorContactIds }),
+        body: JSON.stringify(body),
       }
     )
   },

@@ -357,47 +357,26 @@ export default function AdminDashboard() {
       }
 
       // Step 3: Handle invited contacts (from lists + manual selection)
-      // Calculate final merged contact IDs
-      let finalContactIds: number[] = [];
+      // Instead of fetching contacts client-side, send list IDs to backend
+      // Backend will resolve all contacts from lists (no pagination limits!)
+      const hasInvites =
+        wizardState.inviteList.selectedListIds.length > 0 ||
+        wizardState.inviteList.invitedContactIds.length > 0;
 
-      // Fetch contacts from selected lists if any
-      if (wizardState.inviteList.selectedListIds.length > 0) {
-        try {
-          console.log(`Fetching contacts from ${wizardState.inviteList.selectedListIds.length} selected lists`);
+      if (hasInvites) {
+        console.log(`Sending invitation batch with:`);
+        console.log(`  - ${wizardState.inviteList.selectedListIds.length} lists`);
+        console.log(`  - ${wizardState.inviteList.invitedContactIds.length} manual contacts`);
+        console.log(`  - ${wizardState.inviteList.excludedContactIds.length} excluded contacts`);
 
-          const listContactPromises = wizardState.inviteList.selectedListIds.map(async (listId) => {
-            const response = await contactListsApi.getContacts(listId, 1, 1000);
-            return response.vendor_contacts.map(c => c.id);
-          });
-
-          const listContactArrays = await Promise.all(listContactPromises);
-          const listContactIds = listContactArrays.flat();
-
-          // Merge list contacts with manual selections and de-duplicate
-          const merged = Array.from(new Set([...listContactIds, ...wizardState.inviteList.invitedContactIds]));
-
-          // Remove excluded contacts
-          finalContactIds = merged.filter(id => !wizardState.inviteList.excludedContactIds.includes(id));
-
-          console.log(`Merged: ${listContactIds.length} from lists + ${wizardState.inviteList.invitedContactIds.length} manual - ${wizardState.inviteList.excludedContactIds.length} excluded = ${finalContactIds.length} total`);
-        } catch (error) {
-          console.error('Failed to fetch list contacts, falling back to manual selections only:', error);
-          finalContactIds = wizardState.inviteList.invitedContactIds.filter(
-            id => !wizardState.inviteList.excludedContactIds.includes(id)
-          );
-        }
-      } else {
-        // No lists selected, just use manual selections
-        finalContactIds = wizardState.inviteList.invitedContactIds;
-      }
-
-      // Send invitations if we have any contacts
-      if (finalContactIds.length > 0) {
-        console.log(`Inviting ${finalContactIds.length} contacts to event`);
         try {
           const result = await eventInvitationsApi.createBatch(
             newEvent.slug,
-            finalContactIds
+            {
+              list_ids: wizardState.inviteList.selectedListIds,
+              vendor_contact_ids: wizardState.inviteList.invitedContactIds,
+              excluded_contact_ids: wizardState.inviteList.excludedContactIds,
+            }
           );
           console.log(`✅ ${result.created_count} invitations sent successfully`);
           if (result.errors.length > 0) {
