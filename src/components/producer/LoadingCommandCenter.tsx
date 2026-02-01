@@ -2,9 +2,10 @@ import { LayoutGrid } from 'lucide-react';
 
 interface LoadingCommandCenterProps {
   eventName: string;
+  progress?: string; // Optional progress message
 }
 
-export default function LoadingCommandCenter({ eventName }: LoadingCommandCenterProps) {
+export default function LoadingCommandCenter({ eventName, progress }: LoadingCommandCenterProps) {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#1a0d2e] via-[#2d1b4e] to-[#1a0d2e]">
       <div className="text-center">
@@ -28,7 +29,7 @@ export default function LoadingCommandCenter({ eventName }: LoadingCommandCenter
 
         {/* Loading Text */}
         <h2 className="text-2xl font-semibold text-white mb-2">
-          Loading Command Center
+          {progress || 'Loading Command Center'}
         </h2>
         <p className="text-white/60 mb-4">{eventName}</p>
 

@@ -18,9 +18,11 @@ export default function Step3InviteList({
   const [listContacts, setListContacts] = useState<VendorContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingListContacts, setLoadingListContacts] = useState(false);
+  const [loadingAllIds, setLoadingAllIds] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
+  const [totalContactsCount, setTotalContactsCount] = useState(0);
 
   const { inviteList } = wizardState;
 
@@ -66,15 +68,18 @@ export default function Step3InviteList({
       setLoading(true);
       setError(null);
 
-      const response = await vendorContactsApi.getAll(organizationId);
+      const response = await vendorContactsApi.getAll(organizationId, { page: 1, per_page: 100 });
       const contactsData = response?.vendor_contacts || [];
+      const total = response?.meta?.total_count || contactsData.length;
 
       setContacts(contactsData);
       setFilteredContacts(contactsData);
+      setTotalContactsCount(total);
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
       setContacts([]);
       setFilteredContacts([]);
+      setTotalContactsCount(0);
     } finally {
       setLoading(false);
     }
@@ -194,6 +199,33 @@ export default function Step3InviteList({
           ],
         },
       });
+    }
+  };
+
+  const handleSelectAllContacts = async () => {
+    try {
+      setLoadingAllIds(true);
+      console.log('Fetching all contact IDs for organization...');
+
+      const result = await vendorContactsApi.getAllIds(organizationId, {
+        search: searchTerm || undefined,
+        contact_type: filterType !== 'all' ? filterType : undefined,
+      });
+
+      console.log(`Fetched ${result.ids.length} contact IDs`);
+
+      // Set all IDs as manually selected
+      updateWizardState({
+        inviteList: {
+          ...inviteList,
+          invitedContactIds: result.ids,
+        },
+      });
+    } catch (err: any) {
+      console.error('Failed to fetch all contact IDs:', err);
+      setError(err.message || 'Failed to select all contacts');
+    } finally {
+      setLoadingAllIds(false);
     }
   };
 
@@ -438,36 +470,82 @@ export default function Step3InviteList({
         </div>
 
         {/* Selection Summary */}
-        <div className="flex items-center justify-between bg-white/5 rounded-lg px-4 py-3 border border-white/10">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-white/60" />
-              <span className="text-sm text-white/90">
-                <strong>{finalContactIds.length}</strong> total contacts to invite
-                {(inviteList.selectedListIds || []).length > 0 && (
-                  <span className="text-white/50 text-xs ml-2">
-                    ({listContacts.length} from lists, {(inviteList.invitedContactIds || []).length} manual{(inviteList.excludedContactIds || []).length > 0 && `, ${(inviteList.excludedContactIds || []).length} excluded`})
-                  </span>
-                )}
-              </span>
+        <div className="bg-white/5 rounded-lg px-4 py-3 border border-white/10 space-y-3">
+          {/* Top Row: Contact Count + Actions */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-white/60" />
+                <span className="text-sm text-white/90">
+                  <strong>{finalContactIds.length}</strong> total contacts to invite
+                  {totalContactsCount > 0 && (
+                    <span className="text-white/40 text-xs ml-2">
+                      (of {totalContactsCount} total contacts)
+                    </span>
+                  )}
+                </span>
+              </div>
+              {((inviteList.invitedContactIds || []).length > 0 || (inviteList.selectedListIds || []).length > 0) && (
+                <button
+                  onClick={handleClearAll}
+                  className="text-xs text-purple-400 hover:text-purple-300 underline"
+                >
+                  Clear Manual Selections
+                </button>
+              )}
             </div>
-            {((inviteList.invitedContactIds || []).length > 0 || (inviteList.selectedListIds || []).length > 0) && (
+
+            {filteredContacts.length > 0 && (
               <button
-                onClick={handleClearAll}
-                className="text-xs text-purple-400 hover:text-purple-300 underline"
+                onClick={handleSelectAll}
+                className="text-sm text-white/70 hover:text-white transition-colors"
               >
-                Clear Manual Selections
+                {allFilteredSelected ? 'Deselect' : 'Select'} All Filtered
               </button>
             )}
           </div>
 
-          {filteredContacts.length > 0 && (
-            <button
-              onClick={handleSelectAll}
-              className="text-sm text-white/70 hover:text-white transition-colors"
-            >
-              {allFilteredSelected ? 'Deselect' : 'Select'} All Filtered
-            </button>
+          {/* Bottom Row: Breakdown + Select All Button */}
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-white/50">
+              {(inviteList.selectedListIds || []).length > 0 && (
+                <span>
+                  {listContacts.length} from lists, {(inviteList.invitedContactIds || []).length} manual
+                  {(inviteList.excludedContactIds || []).length > 0 && `, ${(inviteList.excludedContactIds || []).length} excluded`}
+                </span>
+              )}
+            </div>
+
+            {/* Select All Contacts Button */}
+            {totalContactsCount > 0 && (
+              <button
+                onClick={handleSelectAllContacts}
+                disabled={loadingAllIds}
+                className="flex items-center gap-2 px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 text-white text-xs font-medium rounded-lg transition-colors"
+              >
+                {loadingAllIds ? (
+                  <>
+                    <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Loading...
+                  </>
+                ) : (
+                  <>
+                    <Users className="w-3 h-3" />
+                    Select All {totalContactsCount} Contacts
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+
+          {/* All Contacts Selected Indicator */}
+          {(inviteList.invitedContactIds || []).length === totalContactsCount && totalContactsCount > 0 && (inviteList.selectedListIds || []).length === 0 && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-green-500/20 border border-green-500/30 rounded-lg">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+              <span className="text-xs text-green-300 font-medium">
+                All {totalContactsCount} contacts selected
+              </span>
+            </div>
           )}
         </div>
 
