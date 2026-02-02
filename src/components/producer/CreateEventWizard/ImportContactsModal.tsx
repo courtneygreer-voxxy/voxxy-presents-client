@@ -39,7 +39,7 @@ export default function ImportContactsModal({
     } else if (selectedListIds.length > 0) {
       const count = lists
         .filter((list) => selectedListIds.includes(list.id))
-        .reduce((sum, list) => sum + (list.contact_count || 0), 0);
+        .reduce((sum, list) => sum + (list.contacts_count || 0), 0);
       setEstimatedCount(count);
     } else {
       setEstimatedCount(0);
@@ -192,7 +192,7 @@ export default function ImportContactsModal({
                     <div className="text-sm font-medium text-white">{list.name}</div>
                   </div>
                   <div className="text-xs text-white/60">
-                    ({list.contact_count || 0})
+                    ({list.contacts_count || 0})
                   </div>
                 </label>
               ))}
