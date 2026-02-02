@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, ChevronDown, ChevronUp, Eye, Users } from 'lucide-react';
+import { Mail, ChevronDown, ChevronUp, Eye, Users, Plus } from 'lucide-react';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import ImportTemplateModal from '../ImportTemplateModal';
@@ -157,24 +157,16 @@ export default function Step4AutoMessages({
             Review automated emails for your event
           </p>
 
-          {/* Template Selector Buttons */}
-          <div className="flex items-center gap-3">
+          {/* Template Selector Button */}
+          {selectedTemplate && (
             <button
               onClick={() => setIsImportModalOpen(true)}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2"
             >
-              <Mail className="w-4 h-4" />
-              {selectedTemplate ? 'Default Template' : 'Select Template'}
+              <Plus className="w-4 h-4" />
+              Import Template
             </button>
-            {selectedTemplate && (
-              <button
-                onClick={() => setIsImportModalOpen(true)}
-                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-              >
-                + Import Template
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Loading State */}
