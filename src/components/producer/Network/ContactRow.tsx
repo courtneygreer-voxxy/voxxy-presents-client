@@ -35,25 +35,25 @@ export default function ContactRow({
   const remainingTagsCount = (contact.tags?.length || 0) - 2;
 
   return (
-    <div className="grid grid-cols-[auto,180px,160px,140px,160px,140px,140px,100px,60px,60px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
+    <div className="grid grid-cols-[28px,180px,160px,120px,140px,200px,130px,140px,70px,50px,70px] gap-2 px-2 py-1 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-[11px]">
       {/* Checkbox */}
       <div className="flex items-center justify-center">
         <input
           type="checkbox"
           checked={isSelected}
           onChange={onSelect}
-          className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+          className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
         />
       </div>
 
       {/* Name */}
       <div className="min-w-0">
-        <div className="font-semibold text-white truncate text-xs">{contact.contact_name}</div>
+        <div className="font-semibold text-white truncate">{contact.contact_name}</div>
       </div>
 
       {/* Business */}
       <div className="min-w-0">
-        <div className="text-white/70 truncate text-xs">
+        <div className="text-white/70 truncate">
           {contact.business_name || '—'}
         </div>
       </div>
@@ -65,16 +65,16 @@ export default function ContactRow({
             contact.categories.slice(0, 1).map((category) => (
               <span
                 key={category}
-                className={`px-1.5 py-0.5 text-[10px] rounded border truncate ${getCategoryColor(category)}`}
+                className={`px-1 py-0.5 text-[9px] rounded border truncate ${getCategoryColor(category)}`}
               >
                 {category}
               </span>
             ))
           ) : (
-            <span className="text-white/40 text-xs">—</span>
+            <span className="text-white/40">—</span>
           )}
           {contact.categories && contact.categories.length > 1 && (
-            <span className="px-1.5 py-0.5 text-[10px] bg-white/10 text-white/50 rounded border border-white/20">
+            <span className="px-1 py-0.5 text-[9px] bg-white/10 text-white/50 rounded border border-white/20">
               +{contact.categories.length - 1}
             </span>
           )}
@@ -87,18 +87,18 @@ export default function ContactRow({
           {displayTags.map((tag) => (
             <span
               key={tag}
-              className="px-1.5 py-0.5 text-[10px] bg-purple-500/10 text-purple-300 rounded border border-purple-500/20 truncate"
+              className="px-1 py-0.5 text-[9px] bg-purple-500/10 text-purple-300 rounded border border-purple-500/20 truncate"
             >
               #{tag}
             </span>
           ))}
           {remainingTagsCount > 0 && (
-            <span className="px-1.5 py-0.5 text-[10px] bg-white/10 text-white/50 rounded border border-white/20">
+            <span className="px-1 py-0.5 text-[9px] bg-white/10 text-white/50 rounded border border-white/20">
               +{remainingTagsCount}
             </span>
           )}
           {(!contact.tags || contact.tags.length === 0) && (
-            <span className="text-white/40 text-xs">—</span>
+            <span className="text-white/40">—</span>
           )}
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function ContactRow({
       <div className="min-w-0">
         <a
           href={`mailto:${contact.email}`}
-          className="text-white/70 hover:text-purple-400 transition-colors truncate block text-xs"
+          className="text-white/70 hover:text-purple-400 transition-colors truncate block"
           onClick={(e) => e.stopPropagation()}
         >
           {contact.email}
@@ -119,30 +119,30 @@ export default function ContactRow({
         {contact.phone ? (
           <a
             href={`tel:${contact.phone}`}
-            className="text-white/70 hover:text-purple-400 transition-colors truncate block text-xs"
+            className="text-white/70 hover:text-purple-400 transition-colors truncate block"
             onClick={(e) => e.stopPropagation()}
           >
             {contact.phone}
           </a>
         ) : (
-          <span className="text-white/40 text-xs">—</span>
+          <span className="text-white/40">—</span>
         )}
       </div>
 
       {/* Location */}
       <div className="min-w-0">
         {contact.location ? (
-          <div className="flex items-center gap-1 text-white/70 text-xs">
+          <div className="flex items-center gap-0.5 text-white/70">
             <MapPin className="w-3 h-3 flex-shrink-0 text-white/50" />
             <span className="truncate">{contact.location}</span>
           </div>
         ) : (
-          <span className="text-white/40 text-xs">—</span>
+          <span className="text-white/40">—</span>
         )}
       </div>
 
       {/* Social */}
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1">
         {contact.instagram_handle && (
           <a
             href={`https://instagram.com/${contact.instagram_handle.replace('@', '')}`}
@@ -180,15 +180,15 @@ export default function ContactRow({
           </a>
         )}
         {!contact.instagram_handle && !contact.tiktok_handle && !contact.website && (
-          <span className="text-white/40 text-xs">—</span>
+          <span className="text-white/40">—</span>
         )}
       </div>
 
       {/* Hist (Interaction History) */}
       <div className="flex items-center justify-center">
-        <div className="flex items-center gap-1 text-white/60" title={`${contact.interaction_count || 0} interactions`}>
+        <div className="flex items-center gap-0.5 text-white/60" title={`${contact.interaction_count || 0} interactions`}>
           <Clock className="w-3 h-3" />
-          <span className="text-[10px]">{contact.interaction_count || 0}</span>
+          <span className="text-[9px]">{contact.interaction_count || 0}</span>
         </div>
       </div>
 

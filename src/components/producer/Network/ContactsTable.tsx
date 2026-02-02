@@ -36,13 +36,13 @@ export default function ContactsTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[auto,180px,160px,140px,160px,140px,140px,100px,60px,60px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
+        <div className="grid grid-cols-[28px,180px,160px,120px,140px,200px,130px,140px,70px,50px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
               checked={allSelected}
               onChange={onSelectAll}
-              className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+              className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
               title={allSelected ? 'Deselect all' : 'Select all'}
             />
           </div>
