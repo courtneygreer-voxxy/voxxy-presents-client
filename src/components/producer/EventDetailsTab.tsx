@@ -21,6 +21,7 @@ import {
 import { eventsApi, vendorApplicationsApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
+import GoLiveCard from './GoLiveCard';
 
 interface Event {
   id: number;
@@ -49,6 +50,7 @@ interface EventDetailsTabProps {
   event: Event;
   onUpdate?: (eventSlug: string, updates: any) => Promise<void>;
   onNavigateToTab?: (tab: string) => void;
+  organizationId?: number;
 }
 
 interface ApplicationStats {
@@ -58,7 +60,7 @@ interface ApplicationStats {
   waitlisted: number;
 }
 
-export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: EventDetailsTabProps) {
+export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, organizationId }: EventDetailsTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -292,20 +294,12 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab }: Ev
           <p className="text-xs text-white/50">Approved & paid vendors ready for event</p>
         </div>
 
-        {/* Next Scheduled Email Card */}
-        <div className="bg-[#1e1536] rounded-xl p-5 border border-blue-500/20 hover:border-blue-500/40 transition-all group cursor-pointer opacity-60">
-          <div className="flex items-start justify-between mb-3">
-            <div className="p-3 rounded-lg bg-blue-500/20">
-              <Mail className="w-6 h-6 text-blue-400" />
-            </div>
-            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
-          </div>
-          <div className="mb-2">
-            <p className="text-white/60 text-sm mb-1">Next Scheduled Email</p>
-            <p className="text-lg font-semibold text-white">Coming Soon</p>
-          </div>
-          <p className="text-xs text-white/50">Email automation features coming soon</p>
-        </div>
+        {/* Go Live Card - only show if event is not live yet */}
+        <GoLiveCard
+          event={event}
+          onGoLive={() => window.location.reload()}
+          organizationId={organizationId}
+        />
 
         {/* Event Settings Card */}
         <div

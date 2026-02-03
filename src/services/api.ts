@@ -613,6 +613,9 @@ export const eventsApi = {
     published: boolean
     registration_open: boolean
     status: 'draft' | 'published' | 'cancelled' | 'completed'
+    invitation_list_ids: number[]
+    invitation_contact_ids: number[]
+    invitation_excluded_ids: number[]
   }>) {
     return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
       method: 'PATCH',
@@ -627,6 +630,21 @@ export const eventsApi = {
   async delete(eventSlug: string) {
     return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
       method: 'DELETE',
+    })
+  },
+
+  /**
+   * Go live - sends invitations and activates scheduled emails
+   * POST /api/v1/presents/events/:slug/go_live
+   */
+  async goLive(eventSlug: string) {
+    return fetchApi<{
+      message: string
+      invitations_sent: number
+      emails_activated: number
+      is_live: boolean
+    }>(`/v1/presents/events/${eventSlug}/go_live`, {
+      method: 'POST',
     })
   },
 

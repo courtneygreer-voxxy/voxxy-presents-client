@@ -68,6 +68,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
             event={event}
             onUpdate={onUpdateEvent}
             onNavigateToTab={(tab) => setActiveTab(tab as Tab)}
+            organizationId={organizationId}
           />
         );
       case 'applicants':
