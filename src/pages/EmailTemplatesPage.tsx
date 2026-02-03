@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Clock, Users, ChevronDown, ChevronUp, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
+import { Mail, ChevronDown, ChevronUp, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
 import { emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import EmailPreviewModal from '@/components/admin/EmailPreviewModal';
@@ -121,14 +121,11 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   };
 
   const getTemplateTypeBadge = (template: EmailCampaignTemplate) => {
-    if (template.template_type === 'system' && template.is_default) {
-      return { label: 'Default', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
-    }
-    if (template.template_type === 'quick') {
-      return { label: 'Quick', color: 'bg-green-500/20 text-green-300 border-green-500/30' };
-    }
-    if (template.template_type === 'standard') {
-      return { label: 'Standard', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+    if (template.template_type === 'system') {
+      if (template.is_default) {
+        return { label: 'Default', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
+      }
+      return { label: 'System', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
     }
     return { label: 'Custom', color: 'bg-white/10 text-white/70 border-white/20' };
   };
