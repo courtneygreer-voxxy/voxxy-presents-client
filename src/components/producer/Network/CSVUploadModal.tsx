@@ -57,7 +57,10 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const allExpectedHeaders = [...requiredHeaders, ...optionalHeaders];
 
   const handleFileSelect = (file: File) => {
+    console.log('📁 File selected:', { name: file.name, size: file.size, type: file.type });
+
     if (!file.name.endsWith('.csv')) {
+      console.error('❌ Invalid file type:', file.name);
       setErrorMessage('Please select a CSV file');
       setState('error');
       return;
@@ -73,11 +76,18 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       skipEmptyLines: true,
       preview: 10, // Only parse first 10 rows for preview
       complete: (results) => {
+        console.log('📊 CSV preview parsed:', {
+          headers: results.meta.fields,
+          previewRows: results.data.length,
+          errors: results.errors
+        });
+
         const headers = results.meta.fields || [];
 
         // Check for required headers
         const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
         if (missingHeaders.length > 0) {
+          console.error('❌ Missing required headers:', missingHeaders);
           setErrorMessage(`Missing required columns: ${missingHeaders.join(', ')}`);
           setState('error');
           return;
@@ -88,6 +98,11 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
           header: true,
           skipEmptyLines: true,
           complete: (fullResults) => {
+            console.log('✅ Full CSV parsed:', {
+              totalRows: fullResults.data.length,
+              errors: fullResults.errors
+            });
+
             setPreviewData({
               headers,
               rows: results.data as Record<string, string>[],
@@ -95,9 +110,15 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             });
             setState('file_selected');
           },
+          error: (fullError) => {
+            console.error('❌ Failed to parse full CSV:', fullError);
+            setErrorMessage(`Failed to parse CSV: ${fullError.message}`);
+            setState('error');
+          },
         });
       },
       error: (error) => {
+        console.error('❌ Failed to parse CSV preview:', error);
         setErrorMessage(`Failed to parse CSV: ${error.message}`);
         setState('error');
       },
@@ -128,6 +149,13 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     setErrorMessage('');
 
     try {
+      console.log('🔄 Starting CSV import:', {
+        fileName: selectedFile.name,
+        fileSize: selectedFile.size,
+        totalRows: previewData?.totalRows,
+        options: { skipDuplicates, updateExisting, tags: bulkTags }
+      });
+
       const tags = bulkTags
         .split(',')
         .map(t => t.trim())
@@ -139,13 +167,23 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
         tags,
       });
 
+      console.log('✅ Import successful:', result);
+
       setImportResult(result);
       setState('success');
 
       // Refresh parent list after successful import
       onSuccess();
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Upload failed');
+      console.error('❌ Import failed:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : undefined,
+        error
+      });
+
+      const errorMsg = error instanceof Error ? error.message : 'Upload failed. Please check your file and try again.';
+      setErrorMessage(errorMsg);
       setState('error');
     }
   };
@@ -412,7 +450,20 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     <div className="space-y-4">
       <Alert variant="destructive">
         <XCircle className="h-4 w-4" />
-        <AlertDescription>{errorMessage}</AlertDescription>
+        <AlertDescription>
+          <div className="space-y-2">
+            <p className="font-medium">Import Failed</p>
+            <p>{errorMessage}</p>
+            {selectedFile && (
+              <p className="text-sm opacity-75">
+                File: {selectedFile.name} ({previewData?.totalRows || 0} rows)
+              </p>
+            )}
+            <p className="text-xs opacity-75 mt-2">
+              💡 Tip: Check the browser console (F12) for detailed error logs
+            </p>
+          </div>
+        </AlertDescription>
       </Alert>
       <div className="flex justify-end">
         <Button onClick={handleReset}>Try Again</Button>
