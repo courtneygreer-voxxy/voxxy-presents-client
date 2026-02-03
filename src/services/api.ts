@@ -2160,24 +2160,59 @@ export const vendorContactsApi = {
       formData.append('tags', JSON.stringify(options.tags))
     }
 
-    const response = await fetch(
-      `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`,
-      {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${getAuthToken()}`,
-          // Don't set Content-Type - browser will set it with boundary for multipart
-        },
-        body: formData,
+    console.log('📤 Sending bulk import request to:', `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`)
+    console.log('📤 File size:', file.size, 'bytes')
+
+    // Create abort controller for timeout (5 minutes for large files)
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 min timeout
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${getAuthToken()}`,
+            // Don't set Content-Type - browser will set it with boundary for multipart
+          },
+          body: formData,
+          signal: controller.signal,
+        }
+      )
+
+      clearTimeout(timeoutId)
+
+      console.log('📥 Response status:', response.status, response.statusText)
+
+      if (!response.ok) {
+        let errorMessage = 'Import failed'
+        try {
+          const error = await response.json()
+          errorMessage = error.error || error.message || errorMessage
+          console.error('❌ Server error response:', error)
+        } catch (e) {
+          const text = await response.text()
+          console.error('❌ Server error text:', text)
+          errorMessage = text || errorMessage
+        }
+        throw new Error(errorMessage)
       }
-    )
 
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Import failed')
+      const result = await response.json()
+      console.log('✅ Import result:', result)
+      return result
+    } catch (error) {
+      clearTimeout(timeoutId)
+
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.error('❌ Request timeout after 5 minutes')
+        throw new Error('Import timeout - file may be too large or server is slow. Please try with a smaller batch.')
+      }
+
+      console.error('❌ Bulk import error:', error)
+      throw error
     }
-
-    return response.json()
   },
 }
 
