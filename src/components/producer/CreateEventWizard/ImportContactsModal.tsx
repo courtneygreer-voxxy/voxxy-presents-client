@@ -104,36 +104,55 @@ export default function ImportContactsModal({
         onImport(result.ids, 'all');
       } else if (selectedListIds.length > 0) {
         // Fetch ALL contacts from selected lists (handling pagination)
+        console.log('🔍 Starting to fetch contacts from', selectedListIds.length, 'lists');
+
         const listContactPromises = selectedListIds.map(async (listId) => {
           let allContacts: any[] = [];
           let currentPage = 1;
           let hasMore = true;
 
+          console.log(`📋 Fetching list ${listId}...`);
+
           // Fetch all pages for this list
           while (hasMore) {
+            console.log(`  📄 Fetching page ${currentPage} for list ${listId}...`);
             const response = await contactListsApi.getContacts(listId, currentPage, 100);
+            console.log(`  ✅ Got response:`, {
+              listId,
+              page: currentPage,
+              contactsInPage: response.vendor_contacts?.length || 0,
+              meta: response.meta
+            });
+
             const pageContacts = response.vendor_contacts || [];
             allContacts = [...allContacts, ...pageContacts];
 
             // Check if there are more pages
             const meta = response.meta;
             if (meta && currentPage < meta.total_pages) {
+              console.log(`  ➡️  More pages available (${currentPage}/${meta.total_pages}), fetching next...`);
               currentPage++;
             } else {
+              console.log(`  ✋ No more pages (${currentPage}/${meta?.total_pages || 'unknown'})`);
               hasMore = false;
             }
           }
 
+          console.log(`📋 List ${listId} complete: ${allContacts.length} total contacts`);
           return allContacts;
         });
 
         const listContactArrays = await Promise.all(listContactPromises);
         const allListContacts = listContactArrays.flat();
 
+        console.log(`📊 Total contacts from all lists: ${allListContacts.length}`);
+
         // De-duplicate by contact ID
         const uniqueContactIds = Array.from(
           new Set(allListContacts.map(contact => contact.id))
         );
+
+        console.log(`✨ Unique contact IDs: ${uniqueContactIds.length}`);
 
         onImport(uniqueContactIds, 'lists');
       }
