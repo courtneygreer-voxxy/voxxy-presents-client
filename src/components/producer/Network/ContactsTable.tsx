@@ -9,7 +9,6 @@ interface ContactsTableProps {
   onSelectAll: () => void;
   onDeleteContact: (contactId: number) => void;
   onEditContact: (contact: VendorContact) => void;
-  onToggleFeatured: (contactId: number) => void;
   paginationMeta: {
     current_page: number;
     per_page: number;
@@ -26,7 +25,6 @@ export default function ContactsTable({
   onSelectAll,
   onDeleteContact,
   onEditContact,
-  onToggleFeatured,
   paginationMeta,
   onPageChange,
 }: ContactsTableProps) {
@@ -74,7 +72,6 @@ export default function ContactsTable({
               onSelect={() => onSelectContact(contact.id)}
               onDelete={() => onDeleteContact(contact.id)}
               onEdit={() => onEditContact(contact)}
-              onToggleFeatured={onToggleFeatured}
             />
           ))
         )}

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Star, Instagram, Music2, Globe, Clock, Pencil, Trash2, MapPin, MoreVertical } from 'lucide-react';
+import { Instagram, Music2, Globe, Clock, Pencil, Trash2, MapPin, MoreVertical } from 'lucide-react';
 import { VendorContact } from '@/services/api';
 
 interface ContactRowProps {
@@ -8,7 +8,6 @@ interface ContactRowProps {
   onSelect: () => void;
   onDelete: () => void;
   onEdit: () => void;
-  onToggleFeatured?: (contactId: number) => void;
 }
 
 export default function ContactRow({
@@ -17,7 +16,6 @@ export default function ContactRow({
   onSelect,
   onDelete,
   onEdit,
-  onToggleFeatured,
 }: ContactRowProps) {
   const [showMenu, setShowMenu] = useState(false);
   // Category badge colors

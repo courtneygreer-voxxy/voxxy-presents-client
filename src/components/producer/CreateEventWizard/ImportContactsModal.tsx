@@ -103,10 +103,28 @@ export default function ImportContactsModal({
         const result = await vendorContactsApi.getAllIds(organizationId, {});
         onImport(result.ids, 'all');
       } else if (selectedListIds.length > 0) {
-        // Fetch contacts from selected lists
+        // Fetch ALL contacts from selected lists (handling pagination)
         const listContactPromises = selectedListIds.map(async (listId) => {
-          const response = await contactListsApi.getContacts(listId, 1, 1000);
-          return response.vendor_contacts || [];
+          let allContacts: any[] = [];
+          let currentPage = 1;
+          let hasMore = true;
+
+          // Fetch all pages for this list
+          while (hasMore) {
+            const response = await contactListsApi.getContacts(listId, currentPage, 100);
+            const pageContacts = response.vendor_contacts || [];
+            allContacts = [...allContacts, ...pageContacts];
+
+            // Check if there are more pages
+            const meta = response.meta;
+            if (meta && currentPage < meta.total_pages) {
+              currentPage++;
+            } else {
+              hasMore = false;
+            }
+          }
+
+          return allContacts;
         });
 
         const listContactArrays = await Promise.all(listContactPromises);

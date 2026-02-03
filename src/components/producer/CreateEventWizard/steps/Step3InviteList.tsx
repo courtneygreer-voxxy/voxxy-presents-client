@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Star, Edit, Trash2 } from 'lucide-react';
+import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2 } from 'lucide-react';
 import { WizardStepProps } from '../types';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ImportContactsModal from '../ImportContactsModal';
@@ -271,9 +271,6 @@ export default function Step3InviteList({
 
                         {/* Name */}
                         <div className="flex items-center gap-1">
-                          {contact.featured && (
-                            <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
-                          )}
                           <span className="text-white truncate">{contact.contact_name}</span>
                         </div>
 
