@@ -37,13 +37,28 @@ export default function Step3InviteList({
     try {
       setLoading(true);
 
-      // Fetch all contacts in one go (we'll paginate on the frontend)
-      const response = await vendorContactsApi.getAll(organizationId, {
-        page: 1,
-        per_page: 1000, // Get all at once
-      });
+      // Fetch ALL contacts with pagination (backend may cap per_page)
+      let allContacts: VendorContact[] = [];
+      let currentPage = 1;
+      let hasMore = true;
 
-      const allContacts = response?.vendor_contacts || [];
+      while (hasMore) {
+        const response = await vendorContactsApi.getAll(organizationId, {
+          page: currentPage,
+          per_page: 100,
+        });
+
+        const pageContacts = response?.vendor_contacts || [];
+        allContacts = [...allContacts, ...pageContacts];
+
+        // Check if there are more pages
+        const meta = response?.meta;
+        if (meta && currentPage < meta.total_pages) {
+          currentPage++;
+        } else {
+          hasMore = false;
+        }
+      }
 
       // Filter to only invited contacts
       const invitedContacts = allContacts.filter((c) => invitedContactIds.includes(c.id));
