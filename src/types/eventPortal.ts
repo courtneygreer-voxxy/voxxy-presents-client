@@ -61,7 +61,8 @@ export interface ProducerUpdate {
 
 // API Request/Response types
 export interface VerifyAccessRequest {
-  event_slug: string;
+  event_slug?: string;  // Optional for legacy slug-based access
+  access_token?: string; // Optional for new token-based access
   email: string;
 }
 
@@ -69,6 +70,7 @@ export interface VerifyAccessResponse {
   access_granted: boolean;
   portal_token?: string;
   event_slug?: string;
+  access_token?: string;  // New: returns portal access token
   error?: string;
 }
 

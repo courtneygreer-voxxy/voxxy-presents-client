@@ -138,8 +138,8 @@ export default function App() {
           {/* Public Invitation View Route */}
           <Route path="/invitations/:token" element={<InvitationViewPage />} />
 
-          {/* Vendor Event Portal Route */}
-          <Route path="/portal/:eventSlug" element={<VendorEventPortalPage />} />
+          {/* Vendor Event Portal Routes - Token-based (primary) and slug-based (legacy) */}
+          <Route path="/portal/:portalIdentifier" element={<VendorEventPortalPage />} />
 
           {/* Unsubscribe Route (public - token-based) */}
           <Route path="/unsubscribe/:token" element={<UnsubscribePage />} />

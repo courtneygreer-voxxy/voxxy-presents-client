@@ -112,7 +112,59 @@ export async function verifyPortalAccess(
 }
 
 /**
- * Fetch event portal data
+ * Fetch event portal data by access token (primary method)
+ * GET /api/v1/presents/portals/token/:access_token
+ */
+export async function fetchPortalDataByToken(accessToken: string): Promise<EventPortalData> {
+  const session = getPortalSession()
+
+  if (!session) {
+    throw new PortalApiError('No active portal session. Please log in again.', 401)
+  }
+
+  const url = `${API_BASE_URL}/v1/presents/portals/token/${accessToken}`
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Portal-Token': session.token,
+      },
+    })
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        clearPortalSession()
+        throw new PortalApiError('Session expired. Please log in again.', 401)
+      }
+
+      const errorData = await response.json().catch(() => ({
+        error: 'Failed to fetch portal data',
+      }))
+
+      throw new PortalApiError(
+        errorData.error || 'Failed to fetch portal data',
+        response.status
+      )
+    }
+
+    const result: PortalApiResponse = await response.json()
+    return result.data
+  } catch (error) {
+    if (error instanceof PortalApiError) {
+      throw error
+    }
+    console.error('Portal data fetch error:', error)
+    throw new PortalApiError(
+      'Network error. Please check your connection and try again.',
+      0
+    )
+  }
+}
+
+/**
+ * Fetch event portal data by event slug (legacy method for backward compatibility)
  * GET /api/v1/presents/portals/:event_slug
  */
 export async function fetchPortalData(eventSlug: string): Promise<EventPortalData> {
