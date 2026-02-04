@@ -16,6 +16,7 @@ import {
 import {
   verifyPortalAccess,
   fetchPortalData,
+  fetchPortalDataByToken,
   getPortalSession,
   clearPortalSession,
   hasActiveSession,
@@ -26,8 +27,14 @@ import { bulletinsApi } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function VendorEventPortalPage() {
-  const { eventSlug } = useParams<{ eventSlug: string }>();
+  const { portalIdentifier } = useParams<{ portalIdentifier: string }>();
   const [searchParams] = useSearchParams();
+
+  // Detect if portalIdentifier is a token (long base64) or slug (short kebab-case)
+  // Tokens are 43 chars (urlsafe_base64(32)), slugs are typically < 100 chars with hyphens
+  const isToken = portalIdentifier && portalIdentifier.length > 40 && !/[^A-Za-z0-9_-]/.test(portalIdentifier);
+  const eventSlug = !isToken ? portalIdentifier : undefined;
+  const accessToken = isToken ? portalIdentifier : undefined;
 
   // Authentication state
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,12 +66,12 @@ export default function VendorEventPortalPage() {
       setIsAuthenticated(true);
       loadPortalData();
     }
-  }, [eventSlug, searchParams]);
+  }, [portalIdentifier, eventSlug, searchParams]);
 
   const handleAccessPortal = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!eventSlug || !email) {
+    if (!portalIdentifier || !email) {
       setAuthError('Please provide your email address');
       return;
     }
@@ -73,10 +80,12 @@ export default function VendorEventPortalPage() {
       setVerifying(true);
       setAuthError(null);
 
-      const response = await verifyPortalAccess({
-        event_slug: eventSlug,
-        email: email.toLowerCase().trim(),
-      });
+      // Build request with either access_token or event_slug
+      const request = isToken
+        ? { access_token: accessToken, email: email.toLowerCase().trim() }
+        : { event_slug: eventSlug, email: email.toLowerCase().trim() };
+
+      const response = await verifyPortalAccess(request);
 
       if (response.access_granted) {
         setIsAuthenticated(true);
@@ -93,13 +102,16 @@ export default function VendorEventPortalPage() {
   };
 
   const loadPortalData = async () => {
-    if (!eventSlug) return;
+    if (!portalIdentifier) return;
 
     try {
       setLoading(true);
       setDataError(null);
 
-      const data = await fetchPortalData(eventSlug);
+      // Use token-based fetch if we have a token, otherwise use slug-based fetch
+      const data = isToken && accessToken
+        ? await fetchPortalDataByToken(accessToken)
+        : await fetchPortalData(eventSlug!);
       setPortalData(data);
     } catch (error: any) {
       console.error('Portal data error:', error);

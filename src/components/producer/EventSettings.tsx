@@ -30,6 +30,10 @@ interface Event {
     remaining?: number;
     is_full?: boolean;
   };
+  event_portal?: {
+    access_token: string;
+    view_count: number;
+  };
 }
 
 interface VendorApplication {
@@ -156,7 +160,10 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const applicationLink = firstApplication
     ? `${window.location.origin}/apply/${firstApplication.shareable_code}`
     : '';
-  const portalLink = `${window.location.origin}/portal/${event.slug}`;
+  // Use token-based portal URL (primary) or fallback to slug-based (legacy)
+  const portalLink = event.event_portal?.access_token
+    ? `${window.location.origin}/portal/${event.event_portal.access_token}`
+    : `${window.location.origin}/portal/${event.slug}`;
 
   // Show create/edit form
   if (currentView === 'create_app' || currentView === 'edit_app') {
