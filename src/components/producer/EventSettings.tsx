@@ -77,7 +77,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [isSaving, setIsSaving] = useState(false);
 
   // Copy link states
-  const [copiedApplicationLink, setCopiedApplicationLink] = useState(false);
+  const [copiedEventPageLink, setCopiedEventPageLink] = useState(false);
   const [copiedPortalLink, setCopiedPortalLink] = useState(false);
 
   useEffect(() => {
@@ -139,12 +139,12 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     setSelectedApplication(null);
   };
 
-  const copyToClipboard = async (text: string, type: 'application' | 'portal') => {
+  const copyToClipboard = async (text: string, type: 'eventpage' | 'portal') => {
     try {
       await navigator.clipboard.writeText(text);
-      if (type === 'application') {
-        setCopiedApplicationLink(true);
-        setTimeout(() => setCopiedApplicationLink(false), 2000);
+      if (type === 'eventpage') {
+        setCopiedEventPageLink(true);
+        setTimeout(() => setCopiedEventPageLink(false), 2000);
       } else {
         setCopiedPortalLink(true);
         setTimeout(() => setCopiedPortalLink(false), 2000);
@@ -155,11 +155,9 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     }
   };
 
-  // Get the first application's shareable code for links
-  const firstApplication = applications.length > 0 ? applications[0] : null;
-  const applicationLink = firstApplication
-    ? `${window.location.origin}/apply/${firstApplication.shareable_code}`
-    : '';
+  // Generate public event page URL
+  const eventPageLink = `${window.location.origin}/events/${event.slug}`;
+
   // Use token-based portal URL (primary) or fallback to slug-based (legacy)
   const portalLink = event.event_portal?.access_token
     ? `${window.location.origin}/portal/${event.event_portal.access_token}`
@@ -334,52 +332,50 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
         </div>
 
         <div className="space-y-4">
-          {/* Application Link */}
-          {applicationLink && (
-            <div className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-white font-semibold mb-1">Application Page</h3>
-                  <p className="text-white/60 text-sm mb-3">
-                    Share this link for vendors to apply to your event
-                  </p>
-                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
-                    <code className="text-purple-400 text-sm flex-1 overflow-x-auto">
-                      {applicationLink}
-                    </code>
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyToClipboard(applicationLink, 'application')}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-all"
-                    title="Copy link"
-                  >
-                    {copiedApplicationLink ? (
-                      <Check className="w-4 h-4" />
-                    ) : (
-                      <Copy className="w-4 h-4" />
-                    )}
-                  </button>
-                  <a
-                    href={applicationLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
-                    title="Open in new tab"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </a>
+          {/* Event Page Link */}
+          <div className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <h3 className="text-white font-semibold mb-1">Event Page</h3>
+                <p className="text-white/60 text-sm mb-3">
+                  Share this link to the public event landing page
+                </p>
+                <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
+                  <code className="text-purple-400 text-sm flex-1 overflow-x-auto">
+                    {eventPageLink}
+                  </code>
                 </div>
               </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => copyToClipboard(eventPageLink, 'eventpage')}
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-all"
+                  title="Copy link"
+                >
+                  {copiedEventPageLink ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
+                </button>
+                <a
+                  href={eventPageLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+                  title="Open in new tab"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
             </div>
-          )}
+          </div>
 
           {/* Portal Link */}
           <div className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Event Portal</h3>
+                <h3 className="text-white font-semibold mb-1">Vendor Portal</h3>
                 <p className="text-white/60 text-sm mb-3">
                   Share this link with accepted vendors to view event details, payment info, and updates
                 </p>
