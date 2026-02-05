@@ -1,7 +1,7 @@
 import { X, Mail, Calendar, Users, Loader2, AlertTriangle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
-import { scheduledEmailsApi } from '@/services/api';
+import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
 import type { ScheduledEmail } from '@/types/email';
 import {
   Dialog,
@@ -49,9 +49,15 @@ export default function EmailPreviewModal({
     setIsLoading(true);
     setError(null);
     try {
-      // Pass empty object - backend should use sample registration for preview
-      const data = await scheduledEmailsApi.preview(eventSlug, email.id, {} as any);
-      setPreviewData(data);
+      // Special handling for invitation emails
+      if (email.isInvitationAnnouncement) {
+        const data = await eventInvitationsApi.previewEmail(eventSlug);
+        setPreviewData(data);
+      } else {
+        // Pass empty object - backend should use sample registration for preview
+        const data = await scheduledEmailsApi.preview(eventSlug, email.id, {} as any);
+        setPreviewData(data);
+      }
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load email preview';
 

@@ -72,71 +72,76 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         invitations_with_sent_at: invitationsData.invitations.filter((inv: any) => inv.sent_at).length
       });
 
-      // Create virtual "Event Announcement (Invitations Sent)" email if invitations exist
+      // Create virtual invitation email (always show, even if not sent yet)
       const allEmails: ScheduledEmail[] = [...scheduledEmailsData];
 
-      if (invitationsData.meta.sent_count > 0) {
-        console.log('🎯 Creating virtual invitation email (sent_count:', invitationsData.meta.sent_count, ')');
+      // Always create virtual invitation email for preview/tracking
+      const hasSentInvitations = invitationsData.meta.sent_count > 0;
+      console.log('🎯 Creating virtual invitation email (sent_count:', invitationsData.meta.sent_count, ')');
 
-        // Find the earliest sent invitation to use as the sent date
-        const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
-        console.log('   Found', sentInvitations.length, 'invitations with sent_at timestamp');
+      // Find the earliest sent invitation to use as the sent date
+      const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
+      console.log('   Found', sentInvitations.length, 'invitations with sent_at timestamp');
 
-        const earliestSentDate: string = sentInvitations.length > 0
-          ? (sentInvitations.reduce((earliest: any, inv: any) => {
-              return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
-            }).sent_at as string)
-          : new Date().toISOString();
+      const earliestSentDate: string = sentInvitations.length > 0
+        ? (sentInvitations.reduce((earliest: any, inv: any) => {
+            return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
+          }).sent_at as string)
+        : new Date().toISOString();
 
-        console.log('   Using earliest sent date:', earliestSentDate);
+      console.log('   Using earliest sent date:', earliestSentDate);
 
-        // Create virtual invitation announcement email with delivery stats
-        const deliveryStats = (invitationsData.meta as any).delivery_stats || {};
-        const invitationEmail: ScheduledEmail = {
-          id: -1, // Negative ID to avoid conflicts
-          event_id: -1,
-          email_campaign_template_id: null,
-          email_template_item_id: null,
-          name: 'Event Announcement (Invitations Sent)',
-          subject_template: 'You\'re Invited: {{event_title}} - Apply Now!',
-          body_template: '',
-          trigger_type: 'on_application_open',
-          trigger_value: 0,
-          trigger_time: null,
-          scheduled_for: earliestSentDate,
-          filter_criteria: {},
-          status: 'sent',
-          sent_at: earliestSentDate,
-          recipient_count: invitationsData.meta.sent_count,
-          // Add delivery tracking stats from API
-          undelivered_count: deliveryStats.undelivered || 0,
-          unsubscribed_count: deliveryStats.unsubscribed || 0,
-          delivered_count: deliveryStats.delivered || 0,
-          delivery_counts: {
-            total_sent: deliveryStats.total_sent || invitationsData.meta.sent_count,
-            delivered: deliveryStats.delivered || 0,
-            bounced: deliveryStats.bounced || 0,
-            dropped: deliveryStats.dropped || 0,
-            unsubscribed: deliveryStats.unsubscribed || 0,
-            pending: deliveryStats.pending || 0
-          },
-          error_message: null,
-          created_at: earliestSentDate,
-          updated_at: earliestSentDate,
-          isInvitationAnnouncement: true // Flag for special handling
-        };
+      // Create virtual invitation announcement email with delivery stats
+      const deliveryStats = (invitationsData.meta as any).delivery_stats || {};
+      const invitationEmail: ScheduledEmail = {
+        id: -1, // Negative ID to avoid conflicts
+        event_id: -1,
+        email_campaign_template_id: null,
+        email_template_item_id: null,
+        name: hasSentInvitations ? 'Event Announcement (Invitations Sent)' : 'Event Announcement (Invitation Preview)',
+        subject_template: 'Submissions Open for {{event_title}}',
+        body_template: '',
+        trigger_type: 'on_application_open',
+        trigger_value: 0,
+        trigger_time: null,
+        scheduled_for: hasSentInvitations ? earliestSentDate : new Date().toISOString(),
+        filter_criteria: {},
+        status: hasSentInvitations ? 'sent' : 'pending',
+        sent_at: hasSentInvitations ? earliestSentDate : null,
+        recipient_count: hasSentInvitations ? invitationsData.meta.sent_count : (invitationsData.meta.total_count || 0),
+        // Add delivery tracking stats from API (only if sent)
+        undelivered_count: hasSentInvitations ? (deliveryStats.undelivered || 0) : 0,
+        unsubscribed_count: hasSentInvitations ? (deliveryStats.unsubscribed || 0) : 0,
+        delivered_count: hasSentInvitations ? (deliveryStats.delivered || 0) : 0,
+        delivery_counts: hasSentInvitations ? {
+          total_sent: deliveryStats.total_sent || invitationsData.meta.sent_count,
+          delivered: deliveryStats.delivered || 0,
+          bounced: deliveryStats.bounced || 0,
+          dropped: deliveryStats.dropped || 0,
+          unsubscribed: deliveryStats.unsubscribed || 0,
+          pending: deliveryStats.pending || 0
+        } : undefined,
+        error_message: null,
+        created_at: earliestSentDate,
+        updated_at: earliestSentDate,
+        isInvitationAnnouncement: true, // Flag for special handling
+        isPreviewOnly: !hasSentInvitations // Flag to indicate this is preview mode
+      };
 
-        // Add invitation email at the beginning
-        allEmails.unshift(invitationEmail);
-        console.log('✅ Added invitation announcement email to position 0');
-        console.log('   Virtual email object:', {
-          name: invitationEmail.name,
-          status: invitationEmail.status,
-          recipient_count: invitationEmail.recipient_count,
-          scheduled_for: invitationEmail.scheduled_for,
-          isInvitationAnnouncement: invitationEmail.isInvitationAnnouncement
-        });
-      } else {
+      // Add invitation email at the beginning
+      allEmails.unshift(invitationEmail);
+      console.log('✅ Added invitation announcement email to position 0');
+      console.log('   Virtual email object:', {
+        name: invitationEmail.name,
+        status: invitationEmail.status,
+        recipient_count: invitationEmail.recipient_count,
+        scheduled_for: invitationEmail.scheduled_for,
+        isInvitationAnnouncement: invitationEmail.isInvitationAnnouncement,
+        isPreviewOnly: invitationEmail.isPreviewOnly
+      });
+
+      // Remove the else block since we always show the invitation now
+      if (false) {
         console.log('ℹ️  No sent invitations found (sent_count: 0), skipping virtual email creation');
       }
 
