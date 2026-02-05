@@ -140,11 +140,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         isPreviewOnly: invitationEmail.isPreviewOnly
       });
 
-      // Remove the else block since we always show the invitation now
-      if (false) {
-        console.log('ℹ️  No sent invitations found (sent_count: 0), skipping virtual email creation');
-      }
-
       console.log('📋 Total emails to display:', allEmails.length);
       console.log('   - Scheduled emails from API:', scheduledEmailsData.length);
       console.log('   - Virtual invitation email:', allEmails.some(e => e.isInvitationAnnouncement) ? 'YES' : 'NO');
