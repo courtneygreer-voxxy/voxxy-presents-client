@@ -204,8 +204,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[categoryList]',
     backendVar: '{{category_list}}',
     category: 'vendor',
-    description: 'Bulleted list of all vendor categories',
-    example: '• Artist\n• Food Vendor\n• Craft Vendor'
+    description: 'Bulleted list of all vendor application names',
+    example: '• Art Vendor Application\n• Music Vendor Application\n• Food Vendor Application'
   },
   {
     label: 'Booth Number',
