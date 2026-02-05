@@ -121,6 +121,8 @@ export interface ScheduledEmail {
 
   // Frontend-only flag for virtual invitation announcement emails
   isInvitationAnnouncement?: boolean;
+  // Frontend-only flag to indicate invitation is in preview mode (not sent yet)
+  isPreviewOnly?: boolean;
 }
 
 // ============================================================================

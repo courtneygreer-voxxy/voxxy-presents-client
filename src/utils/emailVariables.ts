@@ -115,6 +115,14 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     description: 'Payment deadline',
     example: 'June 1, 2025'
   },
+  {
+    label: 'Age Restriction',
+    frontendVar: '[ageRestriction]',
+    backendVar: '{{age_restriction}}',
+    category: 'event',
+    description: 'Age policy for the event',
+    example: '21+'
+  },
 
   // Organization Variables
   {
@@ -192,6 +200,14 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     example: 'Food'
   },
   {
+    label: 'Category List',
+    frontendVar: '[categoryList]',
+    backendVar: '{{category_list}}',
+    category: 'vendor',
+    description: 'Bulleted list of all vendor application names',
+    example: '• Art Vendor Application\n• Music Vendor Application\n• Food Vendor Application'
+  },
+  {
     label: 'Booth Number',
     frontendVar: '[boothNumber]',
     backendVar: '{{booth_number}}',
@@ -255,6 +271,14 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_link}}',
     category: 'computed',
     description: 'Public event page URL',
+    example: 'https://voxxy.io/events/summer-market'
+  },
+  {
+    label: 'Invitation Link',
+    frontendVar: '[invitationLink]',
+    backendVar: '{{invitation_link}}',
+    category: 'computed',
+    description: 'Event invitation URL (same as event link)',
     example: 'https://voxxy.io/events/summer-market'
   },
   {

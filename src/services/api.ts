@@ -2464,6 +2464,22 @@ export const eventInvitationsApi = {
       }
     )
   },
+
+  /**
+   * Preview invitation email content
+   * GET /api/v1/presents/events/:event_slug/invitations/preview_email
+   */
+  async previewEmail(eventSlug: string) {
+    return fetchApi<{
+      subject: string
+      body: string
+      recipient_name: string
+      recipient_email: string
+      is_sample: boolean
+    }>(
+      `/v1/presents/events/${eventSlug}/invitations/preview_email`
+    )
+  },
 }
 
 /**
