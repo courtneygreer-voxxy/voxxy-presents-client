@@ -106,7 +106,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         trigger_time: null,
         scheduled_for: hasSentInvitations ? earliestSentDate : new Date().toISOString(),
         filter_criteria: {},
-        status: hasSentInvitations ? 'sent' : 'pending',
+        status: (hasSentInvitations ? 'sent' : 'scheduled') as ScheduledEmailStatus,
         sent_at: hasSentInvitations ? earliestSentDate : null,
         recipient_count: hasSentInvitations ? invitationsData.meta.sent_count : (invitationsData.meta.total_count || 0),
         // Add delivery tracking stats from API (only if sent)
