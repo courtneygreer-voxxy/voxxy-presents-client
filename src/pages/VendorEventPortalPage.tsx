@@ -531,20 +531,6 @@ export default function VendorEventPortalPage() {
                   {category.description && (
                     <p className="text-gray-300 text-xs md:text-sm mb-3">{category.description}</p>
                   )}
-
-                  {(category.install.install_start_time ||
-                    category.install.install_end_time) && (
-                    <div className="flex items-start gap-2 text-xs md:text-sm">
-                      <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mt-0.5" />
-                      <div className="text-gray-400">
-                        <span className="font-semibold">Install Time: </span>
-                        {category.install.install_start_time &&
-                          `${formatTime(category.install.install_start_time)}`}
-                        {category.install.install_end_time &&
-                          ` - ${formatTime(category.install.install_end_time)}`}
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))}
             </div>
