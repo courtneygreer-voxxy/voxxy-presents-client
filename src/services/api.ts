@@ -2480,6 +2480,21 @@ export const eventInvitationsApi = {
       `/v1/presents/events/${eventSlug}/invitations/preview_email`
     )
   },
+
+  /**
+   * Get vendor contact data for form pre-fill (public)
+   * GET /api/v1/presents/invitations/prefill/:token
+   */
+  async getPrefillData(token: string) {
+    return fetchApi<{
+      email: string
+      first_name: string
+      last_name: string
+      business_name: string
+    }>(
+      `/v1/presents/invitations/prefill/${token}`
+    )
+  },
 }
 
 /**
