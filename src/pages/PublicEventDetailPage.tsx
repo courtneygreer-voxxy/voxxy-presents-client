@@ -301,26 +301,6 @@ export default function PublicEventDetailPage() {
                     </div>
                   )}
 
-                  {/* Install Date & Time */}
-                  {application.install?.install_date && (
-                    <div className="flex items-center gap-3 text-white/80 text-xs mb-3">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                        <span>Install: {new Date(application.install.install_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                      </div>
-                      {(application.install.install_start_time || application.install.install_end_time) && (
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-purple-400" />
-                          <span>
-                            {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
-                            {application.install.install_start_time && application.install.install_end_time && ' - '}
-                            {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
                   {/* Apply Now Button */}
                   <a
                     href={`/events/${event.slug}/apply/${application.id}`}
