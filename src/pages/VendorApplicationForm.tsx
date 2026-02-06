@@ -314,14 +314,8 @@ export default function VendorApplicationForm() {
             </div>
           )}
 
-          {/* Install Date & Time */}
+          {/* Install Time */}
           <div className="flex flex-wrap gap-3 text-xs">
-            {application?.install?.install_date && (
-              <div className="flex items-center gap-1.5 text-white/80">
-                <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                <span>Install: {formatDate(application.install.install_date)}</span>
-              </div>
-            )}
             {(application?.install?.install_start_time || application?.install?.install_end_time) && (
               <div className="flex items-center gap-1.5 text-white/80">
                 <Clock className="w-3.5 h-3.5 text-purple-400" />
