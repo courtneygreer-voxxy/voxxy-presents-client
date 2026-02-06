@@ -287,12 +287,13 @@ export default function PublicEventDetailPage() {
             <div className="space-y-3">
               {event.vendor_applications.map((application) => (
                 <div key={application.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
-                  {/* Title and Price Row */}
+                  {/* Title Row - Price hidden for Pancakes & Booze pilot */}
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-base font-bold text-white">
                       {application.name}
                     </h3>
-                    <div className="text-right">
+                    {/* Price display commented out for pilot - payment handled via external integration */}
+                    {/* <div className="text-right">
                       {application.booth_price && (
                         <>
                           <p className="text-xl font-bold text-purple-400">
@@ -305,7 +306,7 @@ export default function PublicEventDetailPage() {
                           )}
                         </>
                       )}
-                    </div>
+                    </div> */}
                   </div>
 
                   {/* Description */}
