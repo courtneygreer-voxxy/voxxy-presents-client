@@ -184,35 +184,6 @@ export default function PublicEventDetailPage() {
           {/* Event Details Grid */}
           <div className="py-4 border-t border-b border-white/10 mb-6">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {/* Event Date */}
-              {event.dates.start && (
-                <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Event Date</p>
-                    <p className="text-white text-xs">
-                      {new Date(event.dates.start).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      {event.dates.end && ` - ${new Date(event.dates.end).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Time */}
-              {(event.dates.start_time || event.dates.end_time) && (
-                <div className="flex items-start gap-2">
-                  <Clock className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Time</p>
-                    <p className="text-white text-xs">
-                      {event.dates.start_time && formatTimeString(event.dates.start_time)}
-                      {event.dates.start_time && event.dates.end_time && ' - '}
-                      {event.dates.end_time && formatTimeString(event.dates.end_time)}
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {/* Venue */}
               {event.venue && (
                 <div className="flex items-start gap-2">
