@@ -213,8 +213,22 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
     setIsSubmitting(true);
     try {
       await onSubmit(wizardState);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create event:', error);
+
+      // Display error message to user
+      const errorMessage = error?.response?.data?.errors?.[0]
+        || error?.message
+        || 'Failed to create event. Please try again.';
+
+      setErrors({
+        submit: errorMessage.includes('taken') || errorMessage.includes('duplicate')
+          ? 'An event with this name already exists. Please choose a different name.'
+          : errorMessage
+      });
+
+      // Go back to step 1 so user can fix the title
+      setWizardState((prev) => ({ ...prev, currentStep: 1 }));
     } finally {
       setIsSubmitting(false);
     }
@@ -267,6 +281,13 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
         completedSteps={completedSteps}
         onStepClick={handleStepClick}
       />
+
+      {/* Submit Error Display */}
+      {errors.submit && (
+        <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
+          <p className="text-red-400 text-sm">{errors.submit}</p>
+        </div>
+      )}
 
       {/* Current Step Content */}
       {renderCurrentStep()}
