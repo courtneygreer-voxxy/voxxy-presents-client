@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Calendar, MapPin, Clock, Share2 } from 'lucide-react';
-import { eventsApi, registrationsApi } from '@/services/api';
+import { eventsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 
 interface VendorApplication {
   id: number;
@@ -40,6 +40,7 @@ interface Event {
 export default function VendorApplicationForm() {
   const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [application, setApplication] = useState<VendorApplication | null>(null);
   const [loading, setLoading] = useState(true);
@@ -65,6 +66,14 @@ export default function VendorApplicationForm() {
       fetchEvent(slug, applicationId);
     }
   }, [slug, applicationId]);
+
+  // Pre-fill form from invitation token (Pancakes & Booze pilot feature)
+  useEffect(() => {
+    const token = searchParams.get('token');
+    if (token) {
+      fetchPrefillData(token);
+    }
+  }, [searchParams]);
 
   // Auto-set vendor_category to application name when application loads
   useEffect(() => {
@@ -96,6 +105,29 @@ export default function VendorApplicationForm() {
       setError(err.message || 'Failed to load event');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPrefillData = async (token: string) => {
+    try {
+      console.log('Fetching prefill data for token:', token);
+      const data = await eventInvitationsApi.getPrefillData(token);
+
+      // Pre-fill form fields with vendor contact data
+      setFormData(prev => ({
+        ...prev,
+        email: data.email || prev.email,
+        name: data.first_name && data.last_name
+          ? `${data.first_name} ${data.last_name}`.trim()
+          : prev.name,
+        business_name: data.business_name || prev.business_name,
+      }));
+
+      console.log('Form pre-filled with invitation data');
+    } catch (err: any) {
+      console.error('Failed to fetch prefill data:', err);
+      // Don't show error to user - just silently fail prefill
+      // User can still fill out form manually
     }
   };
 
@@ -304,8 +336,8 @@ export default function VendorApplicationForm() {
             )}
           </div>
 
-          {/* Price */}
-          {application?.booth_price && (
+          {/* Price - Hidden for Pancakes & Booze pilot (payment handled via external integration) */}
+          {/* {application?.booth_price && (
             <div className="mt-3 pt-3 border-t border-white/10">
               <div>
                 <p className="text-white/60 text-[10px] mb-0.5">Booth Price</p>
@@ -314,7 +346,7 @@ export default function VendorApplicationForm() {
                 </p>
               </div>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Application Form */}
