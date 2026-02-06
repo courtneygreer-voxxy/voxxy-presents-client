@@ -371,33 +371,6 @@ export default function VendorEventPortalPage() {
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-            <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
-              <div>
-                <p className="font-semibold">Date</p>
-                <p className="text-gray-300">{formatDate(event.dates.event_date)}</p>
-                {event.dates.event_end_date &&
-                  event.dates.event_end_date !== event.dates.event_date && (
-                    <p className="text-sm text-gray-400">
-                      to {formatDate(event.dates.event_end_date)}
-                    </p>
-                  )}
-              </div>
-            </div>
-
-            {(event.dates.start_time || event.dates.end_time) && (
-              <div className="flex items-start gap-3">
-                <Clock className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
-                <div>
-                  <p className="font-semibold">Time</p>
-                  <p className="text-gray-300">
-                    {formatTime(event.dates.start_time)}
-                    {event.dates.end_time && ` - ${formatTime(event.dates.end_time)}`}
-                  </p>
-                </div>
-              </div>
-            )}
-
             {event.location && (
               <div className="flex items-start gap-3">
                 <MapPin className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
@@ -557,22 +530,6 @@ export default function VendorEventPortalPage() {
 
                   {category.description && (
                     <p className="text-gray-300 text-xs md:text-sm mb-3">{category.description}</p>
-                  )}
-
-                  {(category.install.install_date ||
-                    category.install.install_start_time ||
-                    category.install.install_end_time) && (
-                    <div className="flex items-start gap-2 text-xs md:text-sm">
-                      <Clock className="h-3.5 w-3.5 md:h-4 md:w-4 text-gray-400 mt-0.5" />
-                      <div className="text-gray-400">
-                        <span className="font-semibold">Install Time: </span>
-                        {category.install.install_date && formatDate(category.install.install_date)}
-                        {category.install.install_start_time &&
-                          `, ${formatTime(category.install.install_start_time)}`}
-                        {category.install.install_end_time &&
-                          ` - ${formatTime(category.install.install_end_time)}`}
-                      </div>
-                    </div>
                   )}
                 </div>
               ))}

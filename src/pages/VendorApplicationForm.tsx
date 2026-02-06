@@ -271,10 +271,8 @@ export default function VendorApplicationForm() {
                 Apply to {event?.title}
               </h1>
               <p className="text-white/60 text-xs md:text-sm">
-                {event?.location && `${event.location} • `}
-                {event?.dates?.start && formatDate(event.dates.start)}
-              </p>
-            </div>
+                {event?.location}
+              </p>            </div>
             <button
               onClick={handleShareLink}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all text-sm"
