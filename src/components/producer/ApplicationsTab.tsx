@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, Edit, Eye, Calendar, Link2, Check, Clock, DollarSign, Tag } from 'lucide-react';
+import { Plus, Edit, Eye, Calendar, Link2, Check, DollarSign, Tag } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import ViewApplicationSubmissions from './ViewApplicationSubmissions';
@@ -74,22 +74,6 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
       month: 'short',
       day: 'numeric',
     });
-  };
-
-  const formatTime = (timeString?: string) => {
-    if (!timeString) return '';
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    } catch {
-      return timeString;
-    }
   };
 
   const handleSuccess = () => {
@@ -239,12 +223,6 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                           <div className="flex-1">
                             <span className="text-white/60">Install Date:</span>{' '}
                             <span className="text-white">{formatDate(application.install.install_date)}</span>
-                            {(application.install?.install_start_time || application.install?.install_end_time) && (
-                              <span className="text-white/80">
-                                {' '}({formatTime(application.install.install_start_time)}
-                                {application.install.install_end_time && ` - ${formatTime(application.install.install_end_time)}`})
-                              </span>
-                            )}
                           </div>
                         </div>
                       )}

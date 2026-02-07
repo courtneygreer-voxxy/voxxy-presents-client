@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Calendar, MapPin, Clock, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { eventsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 
 interface VendorApplication {
@@ -173,6 +173,58 @@ export default function VendorApplicationForm() {
       setSubmitting(true);
       setError(null);
 
+      // Construct full URLs from user input with defensive handling
+      const buildInstagramUrl = (handle: string): string | undefined => {
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, instagram.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?instagram\.com\//i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://instagram.com/${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
+      };
+
+      const buildTikTokUrl = (handle: string): string | undefined => {
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, tiktok.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?tiktok\.com\/@?/i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://tiktok.com/@${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
+      };
+
+      const buildWebsiteUrl = (site: string): string | undefined => {
+        try {
+          if (!site || !site.trim()) return undefined;
+          let cleanSite = site.trim();
+
+          // If already a complete URL, validate and return
+          if (cleanSite.startsWith('http://') || cleanSite.startsWith('https://')) {
+            return cleanSite;
+          }
+
+          // Otherwise add https:// prefix
+          return cleanSite.length > 0 ? `https://${cleanSite}` : undefined;
+        } catch {
+          return undefined;
+        }
+      };
+
       const response = await registrationsApi.submitVendorApplication(event.slug, {
         name: formData.name,
         email: formData.email,
@@ -181,9 +233,9 @@ export default function VendorApplicationForm() {
         vendor_category: formData.vendor_category,
         vendor_application_id: application.id,
         subscribed: formData.subscribed,
-        instagram_handle: formData.instagram_handle || undefined,
-        tiktok_handle: formData.tiktok_handle || undefined,
-        website: formData.website || undefined,
+        instagram_handle: buildInstagramUrl(formData.instagram_handle),
+        tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
+        website: buildWebsiteUrl(formData.website),
         note_to_host: formData.note_to_host || undefined,
       });
 
@@ -223,42 +275,6 @@ export default function VendorApplicationForm() {
       </div>
     );
   }
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'TBA';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
-  const formatTimeString = (timeString?: string) => {
-    if (!timeString) return '';
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    } catch {
-      return timeString;
-    }
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
@@ -313,20 +329,6 @@ export default function VendorApplicationForm() {
               ))}
             </div>
           )}
-
-          {/* Install Time */}
-          <div className="flex flex-wrap gap-3 text-xs">
-            {(application?.install?.install_start_time || application?.install?.install_end_time) && (
-              <div className="flex items-center gap-1.5 text-white/80">
-                <Clock className="w-3.5 h-3.5 text-purple-400" />
-                <span>
-                  {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
-                  {application.install.install_start_time && application.install.install_end_time && ' - '}
-                  {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
-                </span>
-              </div>
-            )}
-          </div>
 
           {/* Price - Hidden for Pancakes & Booze pilot (payment handled via external integration) */}
           {/* {application?.booth_price && (
@@ -412,20 +414,28 @@ export default function VendorApplicationForm() {
 
             {/* Social & Portfolio (One Link Required) */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">Social & Portfolio (One Link Required)</h3>
+              <h3 className="text-base font-semibold text-white mb-3">
+                Social & Portfolio <span className="text-red-400">*</span>
+                <span className="text-xs font-normal text-white/60 ml-2">(One Link Required)</span>
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Instagram */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
                     Instagram
                   </label>
-                  <input
-                    type="text"
-                    value={formData.instagram_handle}
-                    onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
-                    placeholder="@yourhandle"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.instagram_handle}
+                      onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
+                      placeholder="yourhandle"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
 
                 {/* TikTok */}
@@ -433,13 +443,18 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-white mb-1.5">
                     TikTok
                   </label>
-                  <input
-                    type="text"
-                    value={formData.tiktok_handle}
-                    onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
-                    placeholder="@yourhandle"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.tiktok_handle}
+                      onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
+                      placeholder="yourhandle"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
 
                 {/* Website/Portfolio */}
@@ -447,13 +462,18 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-white mb-1.5">
                     Website/Portfolio
                   </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                    placeholder="https://yoursite.com"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">https://</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      placeholder="yoursite.com"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
