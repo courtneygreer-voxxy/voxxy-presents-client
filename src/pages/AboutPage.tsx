@@ -1,100 +1,117 @@
 import React, { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import Footer from '@/components/Footer'
+import { ArrowRight } from 'lucide-react'
 import { usePageTracking } from '@/hooks/usePageTracking'
-import { analytics } from '@/lib/analytics'
+import { TrackedLink } from '@/components/analytics/TrackedLink'
+import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
 
 export default function AboutPage() {
-  // Track page views
   usePageTracking('About')
 
-  // Scroll to top on page load
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    window.scrollTo(0, 0)
   }, [])
 
-  const handleEmailClick = () => {
-    // Analytics tracking for email click
-    console.log('Email link clicked on About Page')
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
-      {/* Navigation */}
-      <nav className="relative z-50 px-4 py-6 bg-gray-800/50 backdrop-blur-sm border-b border-white/10">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="text-2xl font-bold text-white">
-              Voxxy Presents
-            </Link>
-            <Link
-              to="/"
-              className="text-gray-300 hover:text-purple-400 transition-colors"
-            >
-              Back to Home
-            </Link>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-50">
+      <Navigation activePage="about" />
+
+      {/* Hero Section */}
+      <section className="relative pt-[140px] pb-16 px-6 md:px-12 bg-gradient-to-br from-voxxy-purple-deep to-voxxy-purple-mid overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent"></div>
+
+        <div className="container mx-auto max-w-[1000px] relative z-10">
+          <div className="text-center">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-light mb-4">About</div>
+            <h1 className="text-[48px] font-display font-bold text-white mb-4 leading-tight">Community is built in person</h1>
+            <p className="text-[18px] text-white/60 max-w-[600px] mx-auto">
+              Voxxy exists because we believe the best communities are formed face-to-face — at art markets, pop-ups, and the events that give neighborhoods their identity.
+            </p>
           </div>
         </div>
-      </nav>
+      </section>
 
       {/* Main Content */}
-      <main className="relative py-16 px-6 md:py-24">
-        <div className="container mx-auto max-w-4xl">
-          {/* Hero Section */}
-          <section className="mb-12 md:mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 leading-tight">
-              Making connection effortless
-            </h1>
-            <p className="text-lg md:text-xl text-gray-300 leading-relaxed">
-              Voxxy started as a way to fix messy group chats. We're building the operating system for gatherings so hosts and attendees can focus on what matters: time together.
-            </p>
-          </section>
-
-          {/* Founders Section */}
-          <section className="mb-12 md:mb-16">
-            <div className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
-              <div className="order-2 md:order-1">
-                <img
-                  src="/courtandbeau.png"
-                  alt="Courtney Greer and Beau Lazear"
-                  className="w-full h-auto rounded-3xl object-cover shadow-2xl"
-                  loading="lazy"
-                />
-              </div>
-              <div className="order-1 md:order-2 space-y-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-                  Meet the founders
-                </h2>
-                <p className="text-lg text-gray-300 leading-relaxed">
-                  <strong className="text-white">Courtney Greer</strong> and <strong className="text-white">Beau Lazear</strong> are building Voxxy to bridge the gap between spontaneous hangouts and sustainable community.
-                </p>
-                <p className="text-lg text-gray-300 leading-relaxed">
-                  We believe software should amplify human warmth, not replace it.
-                </p>
-              </div>
-            </div>
-          </section>
-
-          {/* Contact Card */}
-          <section>
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 md:p-10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300">
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Let's work together
-              </h3>
-              <p className="text-lg text-gray-300 leading-relaxed">
-                Interested in collaborating, partnering, or investing? Reach out at{' '}
-                <a
-                  href="mailto:team@voxxyai.com"
-                  onClick={handleEmailClick}
-                  className="text-purple-400 hover:text-purple-300 underline transition-colors"
-                >
-                  team@voxxyai.com
-                </a>
+      <section className="py-[100px] px-6 md:px-12">
+        <div className="container mx-auto max-w-[1200px]">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
+            <div>
+              <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
+                We're a small team based in Brooklyn, building tools for the people who bring communities together. The event producers running art shows at local venues. The market organizers coordinating 100 vendors across a weekend. The people who believe that gathering in real life matters.
+              </p>
+              <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
+                We started Voxxy because we saw these organizers drowning in coordination work — juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools — instead of doing what they do best: curating experiences that bring people together.
+              </p>
+              <p className="text-[17px] leading-relaxed text-gray-600">
+                Our background is in community organizing, tech, and events. We've been on both sides — producing events and building the tools that power them. Voxxy is the platform we wished we had.
               </p>
             </div>
-          </section>
+
+            <img
+              src="/screenshots/team-photo.png"
+              alt="Voxxy team in Brooklyn"
+              className="rounded-2xl shadow-xl border border-gray-200 w-full"
+              loading="lazy"
+            />
+          </div>
+
+          {/* Values Grid */}
+          <div className="grid md:grid-cols-2 gap-5 max-w-[900px] mt-10">
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-[16px] font-display font-bold mb-1.5">🤝 Community First</h4>
+              <p className="text-[14px] text-gray-600 leading-relaxed">
+                Everything we build starts with the question: does this help people connect in real life?
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-[16px] font-display font-bold mb-1.5">⚡ Simplicity Over Features</h4>
+              <p className="text-[14px] text-gray-600 leading-relaxed">
+                We'd rather do 5 things perfectly than 50 things poorly. Our competitors have feature bloat. We have focus.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-[16px] font-display font-bold mb-1.5">🌍 Representation Matters</h4>
+              <p className="text-[14px] text-gray-600 leading-relaxed">
+                We're committed to supporting underrepresented communities in events and tech. That's not a talking point — it's our founding story.
+              </p>
+            </div>
+
+            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+              <h4 className="text-[16px] font-display font-bold mb-1.5">🛠️ Built by Producers</h4>
+              <p className="text-[14px] text-gray-600 leading-relaxed">
+                We produce events alongside our customers. We don't just build tools — we use them every week.
+              </p>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-24 px-6 md:px-12 bg-gradient-to-r from-purple-600/20 to-indigo-600/20">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-[42px] md:text-[48px] font-display font-bold text-gray-900 mb-6">
+            Want to learn more?
+          </h2>
+          <p className="text-[18px] text-gray-700 mb-10">
+            We'd love to hear about your events.
+          </p>
+          <TrackedLink
+            to="/contact"
+            className="inline-flex items-center px-8 py-4 bg-voxxy-purple-brand text-white hover:bg-purple-700 transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+            trackingData={{
+              link_text: 'Get in Touch',
+              destination_page: 'Contact',
+              current_page: 'About',
+              link_position: 'cta_section'
+            }}
+          >
+            Get in Touch <ArrowRight className="ml-2 h-5 w-5" />
+          </TrackedLink>
+        </div>
+      </section>
 
       <Footer />
     </div>
