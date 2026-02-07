@@ -410,9 +410,9 @@ export default function VendorApplicationForm() {
               </div>
             </div>
 
-            {/* Social & Portfolio (Optional) */}
+            {/* Social & Portfolio (One Link Required) */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">Social & Portfolio (Optional)</h3>
+              <h3 className="text-base font-semibold text-white mb-3">Social & Portfolio (One Link Required)</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Instagram */}
                 <div>
