@@ -33,31 +33,51 @@ export default function AboutPage() {
       </section>
 
       {/* Main Content */}
-      <section className="py-[100px] px-6 md:px-12">
+      <section className="py-[100px] px-6 md:px-12 bg-gradient-to-br from-purple-50/40 via-white to-purple-50/40">
         <div className="container mx-auto max-w-[1200px]">
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-20">
-            <div>
-              <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
-                We're a small team based in Brooklyn, building tools for the people who bring communities together. The event producers running art shows at local venues. The market organizers coordinating 100 vendors across a weekend. The people who believe that gathering in real life matters.
-              </p>
-              <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
-                We started Voxxy because we saw these organizers drowning in coordination work — juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools — instead of doing what they do best: curating experiences that bring people together.
-              </p>
-              <p className="text-[17px] leading-relaxed text-gray-600">
-                Our background is in community organizing, tech, and events. We've been on both sides — producing events and building the tools that power them. Voxxy is the platform we wished we had.
-              </p>
-            </div>
+          {/* Story Text */}
+          <div className="max-w-[800px] mx-auto text-center mb-16">
+            <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
+              We're a small team based in Brooklyn, building tools for the people who bring communities together. The event producers running art shows at local venues. The market organizers coordinating 100 vendors across a weekend. The people who believe that gathering in real life matters.
+            </p>
+            <p className="text-[17px] leading-relaxed text-gray-600 mb-6">
+              We started Voxxy because we saw these organizers drowning in coordination work — juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools — instead of doing what they do best: curating experiences that bring people together.
+            </p>
+            <p className="text-[17px] leading-relaxed text-gray-600">
+              Our background is in community organizing, tech, and events. We've been on both sides — producing events and building the tools that power them. Voxxy is the platform we wished we had.
+            </p>
+          </div>
 
+          {/* 4-Image Grid */}
+          <div className="grid grid-cols-2 gap-4 max-w-[900px] mx-auto mb-20">
             <img
               src="/screenshots/team-photo.png"
               alt="Voxxy team in Brooklyn"
-              className="rounded-2xl shadow-xl border border-gray-200 w-full"
+              className="rounded-xl shadow-lg border border-gray-200 w-full h-full object-cover"
+              loading="lazy"
+            />
+            <img
+              src="/screenshots/event-photo-1.png"
+              alt="Brooklyn art market with vendors and visitors"
+              className="rounded-xl shadow-lg border border-gray-200 w-full h-full object-cover"
+              loading="lazy"
+            />
+            <img
+              src="/screenshots/event-photo-2.png"
+              alt="Vibrant outdoor market event"
+              className="rounded-xl shadow-lg border border-gray-200 w-full h-full object-cover"
+              loading="lazy"
+            />
+            <img
+              src="/screenshots/event-photo-3.png"
+              alt="Community gathering at local art show"
+              className="rounded-xl shadow-lg border border-gray-200 w-full h-full object-cover"
               loading="lazy"
             />
           </div>
 
           {/* Values Grid */}
-          <div className="grid md:grid-cols-2 gap-5 max-w-[900px] mt-10">
+          <div className="grid md:grid-cols-2 gap-5 max-w-[900px] mx-auto">
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
               <h4 className="text-[16px] font-display font-bold mb-1.5">🤝 Community First</h4>
               <p className="text-[14px] text-gray-600 leading-relaxed">

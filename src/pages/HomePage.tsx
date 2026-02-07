@@ -401,13 +401,13 @@ export default function HomePage() {
           <div className="bg-white/10 border border-white/20 rounded-2xl p-10 grid md:grid-cols-2 gap-12 items-center backdrop-blur-sm">
             <div>
               <p className="text-[20px] italic leading-relaxed text-white/85 mb-6">
-                "We run shows in cities across the country. Voxxy replaced the spreadsheets, the manual emails, the endless coordination work. It's the first tool that actually gets how recurring events work."
+                "We've grown from one market every other month to two markets a month with Voxxy. The automation freed us up to focus on bringing more vendors and revenue to Brooklyn. Game changer."
               </p>
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center text-[10px] text-white/40 font-semibold">P&B</div>
+                <div className="w-14 h-14 bg-white/10 rounded-xl flex items-center justify-center text-[32px]">❤️</div>
                 <div>
-                  <div className="font-bold text-white">Pancakes & Booze Art Show</div>
-                  <div className="text-[13px] text-white/50">Touring nationally · First Voxxy customer</div>
+                  <div className="font-bold text-white">Brooklyn Hearts Club</div>
+                  <div className="text-[13px] text-white/50">Brooklyn art market series</div>
                 </div>
               </div>
             </div>
