@@ -173,26 +173,56 @@ export default function VendorApplicationForm() {
       setSubmitting(true);
       setError(null);
 
-      // Construct full URLs from user input
-      const buildInstagramUrl = (handle: string) => {
-        if (!handle) return undefined;
-        // Remove @ if user added it
-        const cleanHandle = handle.replace(/^@/, '').trim();
-        return cleanHandle ? `https://instagram.com/${cleanHandle}` : undefined;
+      // Construct full URLs from user input with defensive handling
+      const buildInstagramUrl = (handle: string): string | undefined => {
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, instagram.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?instagram\.com\//i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://instagram.com/${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
       };
 
-      const buildTikTokUrl = (handle: string) => {
-        if (!handle) return undefined;
-        // Remove @ if user added it
-        const cleanHandle = handle.replace(/^@/, '').trim();
-        return cleanHandle ? `https://tiktok.com/@${cleanHandle}` : undefined;
+      const buildTikTokUrl = (handle: string): string | undefined => {
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, tiktok.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?tiktok\.com\/@?/i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://tiktok.com/@${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
       };
 
-      const buildWebsiteUrl = (site: string) => {
-        if (!site) return undefined;
-        const cleanSite = site.trim();
-        // If user already included https://, use as-is, otherwise add it
-        return cleanSite ? (cleanSite.startsWith('http') ? cleanSite : `https://${cleanSite}`) : undefined;
+      const buildWebsiteUrl = (site: string): string | undefined => {
+        try {
+          if (!site || !site.trim()) return undefined;
+          let cleanSite = site.trim();
+
+          // If already a complete URL, validate and return
+          if (cleanSite.startsWith('http://') || cleanSite.startsWith('https://')) {
+            return cleanSite;
+          }
+
+          // Otherwise add https:// prefix
+          return cleanSite.length > 0 ? `https://${cleanSite}` : undefined;
+        } catch {
+          return undefined;
+        }
       };
 
       const response = await registrationsApi.submitVendorApplication(event.slug, {
@@ -395,8 +425,8 @@ export default function VendorApplicationForm() {
                     Instagram
                   </label>
                   <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
-                      <span className="text-white/60 text-sm whitespace-nowrap">instagram.com/</span>
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
                     </div>
                     <input
                       type="text"
@@ -414,8 +444,8 @@ export default function VendorApplicationForm() {
                     TikTok
                   </label>
                   <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
-                      <span className="text-white/60 text-sm whitespace-nowrap">tiktok.com/@</span>
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
                     </div>
                     <input
                       type="text"
@@ -433,8 +463,8 @@ export default function VendorApplicationForm() {
                     Website/Portfolio
                   </label>
                   <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
-                      <span className="text-white/60 text-sm whitespace-nowrap">https://</span>
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">https://</span>
                     </div>
                     <input
                       type="text"
