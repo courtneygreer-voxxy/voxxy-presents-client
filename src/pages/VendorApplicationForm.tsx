@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Calendar, MapPin, Clock, Share2 } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 import { eventsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 
 interface VendorApplication {
@@ -224,42 +224,6 @@ export default function VendorApplicationForm() {
     );
   }
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'TBA';
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const formatDateTime = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: 'numeric',
-      minute: '2-digit',
-    });
-  };
-
-  const formatTimeString = (timeString?: string) => {
-    if (!timeString) return '';
-    try {
-      const [hours, minutes] = timeString.split(':');
-      const date = new Date();
-      date.setHours(parseInt(hours), parseInt(minutes));
-      return date.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      });
-    } catch {
-      return timeString;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
       {/* Header */}
@@ -313,20 +277,6 @@ export default function VendorApplicationForm() {
               ))}
             </div>
           )}
-
-          {/* Install Time */}
-          <div className="flex flex-wrap gap-3 text-xs">
-            {(application?.install?.install_start_time || application?.install?.install_end_time) && (
-              <div className="flex items-center gap-1.5 text-white/80">
-                <Clock className="w-3.5 h-3.5 text-purple-400" />
-                <span>
-                  {application.install.install_start_time && formatTimeString(application.install.install_start_time)}
-                  {application.install.install_start_time && application.install.install_end_time && ' - '}
-                  {application.install.install_end_time && formatTimeString(application.install.install_end_time)}
-                </span>
-              </div>
-            )}
-          </div>
 
           {/* Price - Hidden for Pancakes & Booze pilot (payment handled via external integration) */}
           {/* {application?.booth_price && (
