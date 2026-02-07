@@ -412,7 +412,10 @@ export default function VendorApplicationForm() {
 
             {/* Social & Portfolio (One Link Required) */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">Social & Portfolio (One Link Required)</h3>
+              <h3 className="text-base font-semibold text-white mb-3">
+                Social & Portfolio <span className="text-red-400">*</span>
+                <span className="text-xs font-normal text-white/60 ml-2">(One Link Required)</span>
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {/* Instagram */}
                 <div>
@@ -420,10 +423,10 @@ export default function VendorApplicationForm() {
                     Instagram
                   </label>
                   <input
-                    type="text"
+                    type="url"
                     value={formData.instagram_handle}
                     onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
-                    placeholder="@yourhandle"
+                    placeholder="https://instagram.com/yourhandle"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
@@ -434,10 +437,10 @@ export default function VendorApplicationForm() {
                     TikTok
                   </label>
                   <input
-                    type="text"
+                    type="url"
                     value={formData.tiktok_handle}
                     onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
-                    placeholder="@yourhandle"
+                    placeholder="https://tiktok.com/@yourhandle"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
