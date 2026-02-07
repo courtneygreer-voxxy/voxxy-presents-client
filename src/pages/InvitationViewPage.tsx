@@ -279,6 +279,16 @@ export default function InvitationViewPage() {
                       </div>
                     )}
 
+                    {/* Install Date */}
+                    {application.install?.install_date && (
+                      <div className="flex items-center gap-4 text-white/80 text-sm mb-4">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="w-4 h-4 text-purple-400" />
+                          <span>Install: {new Date(application.install.install_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Apply Now Button */}
                     <a
                       href={`/events/${invitation.event!.slug}/apply/${application.id}`}
