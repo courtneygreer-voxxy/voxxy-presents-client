@@ -55,6 +55,8 @@ export default function VendorApplicationForm() {
     vendor_category: '',
     instagram_handle: '',
     tiktok_handle: '',
+    facebook_handle: '',
+    twitter_handle: '',
     website: '',
     note_to_host: '',
     agreed_to_terms: false,
@@ -418,7 +420,28 @@ export default function VendorApplicationForm() {
                 Social & Portfolio <span className="text-red-400">*</span>
                 <span className="text-xs font-normal text-white/60 ml-2">(One Link Required)</span>
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+
+              {/* Row 1: Website and Instagram */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                {/* Link to your work */}
+                <div>
+                  <label className="block text-xs font-medium text-white mb-1.5">
+                    Link to your work <span className="text-red-400">*</span>
+                  </label>
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">https://</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      placeholder="yoursite.com"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
+                </div>
+
                 {/* Instagram */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
@@ -437,7 +460,10 @@ export default function VendorApplicationForm() {
                     />
                   </div>
                 </div>
+              </div>
 
+              {/* Row 2: TikTok and Facebook */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* TikTok */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
@@ -457,20 +483,20 @@ export default function VendorApplicationForm() {
                   </div>
                 </div>
 
-                {/* Website/Portfolio */}
+                {/* Facebook */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
-                    Website/Portfolio
+                    Facebook
                   </label>
                   <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
                     <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
-                      <span className="text-white/50 text-sm whitespace-nowrap select-none">https://</span>
+                      <span className="text-white/50 text-sm whitespace-nowrap select-none">facebook.com/</span>
                     </div>
                     <input
                       type="text"
-                      value={formData.website}
-                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                      placeholder="yoursite.com"
+                      value={formData.facebook_handle}
+                      onChange={(e) => setFormData({ ...formData, facebook_handle: e.target.value })}
+                      placeholder="yourpage"
                       className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
                     />
                   </div>
