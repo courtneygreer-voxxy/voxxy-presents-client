@@ -173,6 +173,28 @@ export default function VendorApplicationForm() {
       setSubmitting(true);
       setError(null);
 
+      // Construct full URLs from user input
+      const buildInstagramUrl = (handle: string) => {
+        if (!handle) return undefined;
+        // Remove @ if user added it
+        const cleanHandle = handle.replace(/^@/, '').trim();
+        return cleanHandle ? `https://instagram.com/${cleanHandle}` : undefined;
+      };
+
+      const buildTikTokUrl = (handle: string) => {
+        if (!handle) return undefined;
+        // Remove @ if user added it
+        const cleanHandle = handle.replace(/^@/, '').trim();
+        return cleanHandle ? `https://tiktok.com/@${cleanHandle}` : undefined;
+      };
+
+      const buildWebsiteUrl = (site: string) => {
+        if (!site) return undefined;
+        const cleanSite = site.trim();
+        // If user already included https://, use as-is, otherwise add it
+        return cleanSite ? (cleanSite.startsWith('http') ? cleanSite : `https://${cleanSite}`) : undefined;
+      };
+
       const response = await registrationsApi.submitVendorApplication(event.slug, {
         name: formData.name,
         email: formData.email,
@@ -181,9 +203,9 @@ export default function VendorApplicationForm() {
         vendor_category: formData.vendor_category,
         vendor_application_id: application.id,
         subscribed: formData.subscribed,
-        instagram_handle: formData.instagram_handle || undefined,
-        tiktok_handle: formData.tiktok_handle || undefined,
-        website: formData.website || undefined,
+        instagram_handle: buildInstagramUrl(formData.instagram_handle),
+        tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
+        website: buildWebsiteUrl(formData.website),
         note_to_host: formData.note_to_host || undefined,
       });
 
@@ -372,13 +394,18 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-white mb-1.5">
                     Instagram
                   </label>
-                  <input
-                    type="url"
-                    value={formData.instagram_handle}
-                    onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
-                    placeholder="https://instagram.com/yourhandle"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
+                      <span className="text-white/60 text-sm whitespace-nowrap">instagram.com/</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.instagram_handle}
+                      onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
+                      placeholder="yourhandle"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
 
                 {/* TikTok */}
@@ -386,13 +413,18 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-white mb-1.5">
                     TikTok
                   </label>
-                  <input
-                    type="url"
-                    value={formData.tiktok_handle}
-                    onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
-                    placeholder="https://tiktok.com/@yourhandle"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
+                      <span className="text-white/60 text-sm whitespace-nowrap">tiktok.com/@</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.tiktok_handle}
+                      onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
+                      placeholder="yourhandle"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
 
                 {/* Website/Portfolio */}
@@ -400,13 +432,18 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-white mb-1.5">
                     Website/Portfolio
                   </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                    placeholder="https://yoursite.com"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
+                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-3 bg-white/5 border-r border-white/10">
+                      <span className="text-white/60 text-sm whitespace-nowrap">https://</span>
+                    </div>
+                    <input
+                      type="text"
+                      value={formData.website}
+                      onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                      placeholder="yoursite.com"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
