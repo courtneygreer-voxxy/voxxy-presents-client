@@ -1,5 +1,7 @@
-# Block all search engines from indexing voxxyai.com
-# Only heyvoxxy.com should appear in search results
+# Voxxy Presents - Ready for SEO indexing
+# Note: index.html still has noindex tag - remove when ready to launch
 
 User-agent: *
-Disallow: /
+Allow: /
+
+Sitemap: https://www.voxxypresents.com/sitemap.xml
