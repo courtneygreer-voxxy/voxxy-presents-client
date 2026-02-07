@@ -290,28 +290,41 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                   )}
 
                   {/* Shareable Link */}
-                  <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                    <p className="text-xs text-white/60 mb-1">Shareable Link:</p>
-                    <div className="flex items-center gap-2">
-                      <code className="flex-1 text-sm text-purple-300 font-mono bg-black/20 px-2 py-1 rounded overflow-x-auto">
-                        {application.shareable_url}
-                      </code>
-                      <button
-                        onClick={() => handleCopyLink(application)}
-                        className="px-3 py-1.5 rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 whitespace-nowrap"
-                      >
-                        {copiedId === application.id ? (
-                          <>
-                            <Check className="w-4 h-4" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Link2 className="w-4 h-4" />
-                            Copy Link
-                          </>
-                        )}
-                      </button>
+                  <div className="bg-white/5 border border-white/10 rounded-lg p-4 space-y-3">
+                    <div>
+                      <p className="text-sm font-medium text-white mb-2">Application Link</p>
+                      <p className="text-xs text-white/60 mb-3">Share this link with vendors to apply for this category:</p>
+                      
+                      {/* Preview Message */}
+                      <div className="bg-black/20 rounded-lg p-3 mb-3 border border-white/5">
+                        <p className="text-xs text-white/50 mb-1">Preview:</p>
+                        <p className="text-sm text-purple-300">
+                          Apply to {application.name} - {event.title}
+                        </p>
+                      </div>
+                      
+                      {/* URL */}
+                      <div className="flex items-center gap-2">
+                        <code className="flex-1 text-sm text-purple-300 font-mono bg-black/30 px-3 py-2 rounded overflow-x-auto">
+                          {application.shareable_url}
+                        </code>
+                        <button
+                          onClick={() => handleCopyLink(application)}
+                          className="px-4 py-2 rounded bg-purple-600 text-white hover:bg-purple-700 transition-colors text-sm flex items-center gap-2 whitespace-nowrap font-medium"
+                        >
+                          {copiedId === application.id ? (
+                            <>
+                              <Check className="w-4 h-4" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Link2 className="w-4 h-4" />
+                              Copy Link
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
