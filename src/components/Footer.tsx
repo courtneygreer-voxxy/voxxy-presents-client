@@ -27,7 +27,7 @@ export default function Footer() {
                   </Link>
                 </li>
                 <li>
-                  <a href="https://voxxymobile.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
                     Voxxy Mobile
                   </a>
                 </li>

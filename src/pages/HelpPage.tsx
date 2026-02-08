@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mail, ArrowRight, MessageCircle, Sparkles } from "lucide-react"
+import { Mail, ArrowRight, MessageCircle, Book, ChevronDown } from "lucide-react"
 import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 
 export default function HelpPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   // Scroll to top on page load
   useEffect(() => {
@@ -16,129 +17,160 @@ export default function HelpPage() {
 
   usePageTracking('Help')
 
+  const toggleFaq = (index: number) => {
+    setOpenFaq(openFaq === index ? null : index)
+  }
+
+  const faqs = [
+    {
+      question: "How do I get started?",
+      answer: "Request beta access through our contact form. Once approved, you'll receive an onboarding email with your login credentials and a link to our step-by-step setup guide."
+    },
+    {
+      question: "What's included in each pricing tier?",
+      answer: "Our Starter plan ($80/month) includes up to 10 events per year and 10k vendor contacts. Growth ($160/month) includes 50 events and 50k contacts with advanced features. Enterprise ($400/month) offers unlimited events and contacts with dedicated support."
+    },
+    {
+      question: "Is there a contract or commitment?",
+      answer: "No long-term contracts required. All plans are month-to-month and you can cancel anytime."
+    },
+    {
+      question: "What payment methods do you accept?",
+      answer: "We accept all major credit cards (Visa, Mastercard, American Express) and ACH bank transfers for annual plans."
+    },
+    {
+      question: "Can I import my existing vendor lists?",
+      answer: "Yes! You can import vendor contacts via CSV upload. Our system will automatically map fields and detect duplicates."
+    },
+    {
+      question: "Does Voxxy work with Eventbrite, Luma, or other event tools?",
+      answer: "Voxxy is designed to replace disconnected event tools with one unified platform. We're building integrations with popular ticketing platforms - reach out to discuss your specific needs."
+    },
+    {
+      question: "I'm an artist/vendor — is Voxxy free for me?",
+      answer: "Yes! Voxxy is completely free for artists and vendors. You'll receive a vendor portal to manage applications, view event details, and communicate with producers."
+    }
+  ]
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-50">
       <Navigation activePage="help" />
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-medium rounded-full">
-              <Sparkles className="h-4 w-4 mr-2" />
-              We're Here to Help
-            </div>
+      <section className="relative pt-32 pb-16 px-6 md:px-12 bg-gradient-to-br from-voxxy-purple-deep to-voxxy-purple-mid">
+        <div className="container mx-auto max-w-4xl">
+          <div className="mb-4">
+            <p className="text-sm font-semibold uppercase tracking-wider text-purple-300">HELP CENTER</p>
           </div>
-
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
-            How Can We{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Help You?
-            </span>
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+            We're here to help
           </h1>
-
-          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Have questions about Voxxy? We're here to help
+          <p className="text-xl text-gray-300 max-w-2xl leading-relaxed">
+            Real humans, fast responses. Whether you need onboarding support or have a quick question, we've got you.
           </p>
         </div>
       </section>
 
-      {/* Contact Options */}
-      <section className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="grid md:grid-cols-2 gap-6">
+      {/* Support Options */}
+      <section className="py-20 px-6 md:px-12 bg-white">
+        <div className="container mx-auto max-w-5xl">
+          <div className="grid md:grid-cols-3 gap-6">
             {/* Email Support */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mb-4">
-                  <Mail className="h-8 w-8 text-purple-300" />
+            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Mail className="h-8 w-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-2xl text-white">Email Support</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-200 mb-4">
-                  Questions about Voxxy? Want to learn more? Reach out directly.
+                <CardTitle className="text-xl font-bold mb-4">Email Support</CardTitle>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Reach our team directly for questions about your account, event setup, or anything else. We respond within 1–2 business days.
                 </p>
                 <a
                   href="mailto:team@voxxypresents.com"
-                  className="inline-flex items-center text-purple-400 hover:text-purple-300 transition-colors font-medium mb-4"
+                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
                 >
-                  team@voxxypresents.com
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  team@voxxypresents.com →
                 </a>
-                <p className="text-gray-300 text-sm">
-                  Response time: Within 24-48 hours
-                </p>
               </CardContent>
             </Card>
 
-            {/* Request Access */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mb-4">
-                  <MessageCircle className="h-8 w-8 text-purple-300" />
+            {/* Onboarding Guide */}
+            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Book className="h-8 w-8 text-purple-600" />
                 </div>
-                <CardTitle className="text-2xl text-white">Request Beta Access</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-200 mb-6">
-                  Interested in Voxxy? Request early access to our platform.
+                <CardTitle className="text-xl font-bold mb-4">Onboarding Guide</CardTitle>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Step-by-step walkthrough for setting up your first event, importing vendors, configuring email flows, and going live.
                 </p>
-                <Button className="bg-purple-600 hover:bg-purple-700 text-white" asChild>
-                  <Link to="/contact">
-                    Request Access
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                <a
+                  href="https://docs.voxxypresents.com/onboarding"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+                >
+                  Read the Guide →
+                </a>
+              </CardContent>
+            </Card>
+
+            {/* Community Discord */}
+            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <CardContent className="pt-8 pb-8 text-center">
+                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MessageCircle className="h-8 w-8 text-purple-600" />
+                </div>
+                <CardTitle className="text-xl font-bold mb-4">Community Discord</CardTitle>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Connect with other event producers, share tips, and get quick answers from the Voxxy team and community.
+                </p>
+                <a
+                  href="https://discord.gg/voxxy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+                >
+                  Join Discord →
+                </a>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
 
-      {/* Quick Links */}
-      <section className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-4xl px-4">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-12 text-center">Quick Links</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-white mb-2">Features</h3>
-                <p className="text-gray-200 mb-4">
-                  Learn about what Voxxy Presents can do for your recurring events
-                </p>
-                <Link to="/features" className="text-purple-400 hover:text-purple-300 inline-flex items-center">
-                  View Features
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
+      {/* FAQ Section */}
+      <section className="py-20 px-6 md:px-12 bg-gray-50">
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-wider text-purple-600 mb-4">FAQ</p>
+            <h2 className="text-4xl font-bold text-gray-900">Common questions</h2>
+          </div>
 
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-white mb-2">Pricing</h3>
-                <p className="text-gray-300 mb-4 leading-relaxed">
-                  Simple, transparent pricing starting at $80/month
-                </p>
-                <Link to="/pricing" className="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
-                  View Pricing
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardContent className="pt-6">
-                <h3 className="text-xl font-semibold text-white mb-2">Contact Us</h3>
-                <p className="text-gray-200 mb-4">
-                  Have questions? Reach out to our team
-                </p>
-                <Link to="/contact" className="text-purple-400 hover:text-purple-300 inline-flex items-center">
-                  Get in Touch
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+              >
+                <button
+                  onClick={() => toggleFaq(index)}
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                >
+                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+                  <ChevronDown
+                    className={`h-5 w-5 text-purple-600 flex-shrink-0 transition-transform ${
+                      openFaq === index ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+                {openFaq === index && (
+                  <div className="px-6 pb-5 pt-2">
+                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         </div>
       </section>
