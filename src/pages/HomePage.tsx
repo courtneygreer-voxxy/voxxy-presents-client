@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
@@ -6,9 +6,54 @@ import { useSectionTracking } from "@/hooks/useSectionTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
 import { analytics } from "@/lib/analytics"
+import { useFormTracking } from "@/hooks/useFormTracking"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
-import { ArrowRight, Check } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { ArrowRight, CheckCircle } from "lucide-react"
+
+// Inline types and API for contact form
+interface CreateContactSubmissionData {
+  type: string
+  name: string
+  email: string
+  organizationName?: string
+  eventFrequency?: string
+  typicalAttendance?: string
+  biggestChallenge?: string
+  description?: string
+  source?: string
+}
+
+class EmailServiceError extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'EmailServiceError'
+  }
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
+
+const contactFormApi = {
+  async submitForm(data: CreateContactSubmissionData) {
+    const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contact_submission: data })
+    })
+    if (!response.ok) {
+      throw new EmailServiceError('Failed to submit contact form')
+    }
+    return response.json()
+  }
+}
+
+interface ContactFormData {
+  name: string
+  email: string
+  message: string
+}
 
 export default function HomePage() {
   const { isAuthenticated, isProducer } = useAuth()
@@ -34,6 +79,69 @@ export default function HomePage() {
     sectionName: 'Features',
   })
 
+  // Contact form state
+  const contactFormTracking = useFormTracking('contact', 'Home')
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    email: '',
+    message: ''
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
+  const [formStarted, setFormStarted] = useState(false)
+
+  const handleInputChange = (field: keyof ContactFormData, value: string) => {
+    if (!formStarted) {
+      setFormStarted(true)
+      contactFormTracking.trackFormStart('cta_form')
+    }
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (isSubmitting || isSubmitted) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmissionError(null)
+
+    contactFormTracking.trackFormSubmit({})
+
+    try {
+      const submissionData: CreateContactSubmissionData = {
+        type: 'contact',
+        name: formData.name,
+        email: formData.email,
+        description: formData.message,
+        source: 'home_page_cta'
+      }
+
+      await contactFormApi.submitForm(submissionData)
+      setIsSubmitted(true)
+
+      analytics.trackConversionStep('Contact Form Submitted', 'Home')
+      analytics.setUserProperties({
+        conversion_stage: 'submitted',
+        profile_confidence: 'high',
+      })
+
+    } catch (error) {
+      console.error('Contact form submission failed:', error)
+      contactFormTracking.trackFormError('submission', error instanceof Error ? error.message : 'Unknown error')
+      if (error instanceof EmailServiceError) {
+        setSubmissionError(`Failed to submit: ${error.message}`)
+      } else {
+        setSubmissionError('An unexpected error occurred. Please try again or email us at team@voxxypresents.com')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       <Navigation activePage="home" />
@@ -52,7 +160,7 @@ export default function HomePage() {
               </div>
 
               <h1 className="text-[52px] md:text-[56px] font-display font-bold leading-[1.1] text-white mb-5 tracking-tight">
-                The Operating System for <em className="not-italic bg-gradient-to-r from-voxxy-purple-light to-voxxy-coral bg-clip-text text-transparent">Recurring Event Producers</em>
+                The Operating System for <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Recurring Event Producers</em>
               </h1>
 
               <p className="text-[18px] leading-relaxed text-white/65 mb-9 max-w-[500px]">
@@ -324,27 +432,77 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA Section with Contact Form */}
       <section className="py-24 px-6 md:px-12 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 border-y border-white/10">
-        <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-6">
-            Your next event starts here
-          </h2>
-          <p className="text-[18px] text-white/70 mb-10 max-w-2xl mx-auto">
-            Tell us about your events and we'll get you set up. Real humans, fast responses, no sales funnel.
-          </p>
-          <TrackedLink
-            to="/contact"
-            className="inline-flex items-center px-8 py-4 bg-white text-voxxy-purple-brand hover:bg-gray-100 transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl"
-            trackingData={{
-              link_text: 'Get Started',
-              destination_page: 'Contact',
-              current_page: 'Home',
-              link_position: 'cta_section'
-            }}
-          >
-            Get Started <ArrowRight className="ml-2 h-5 w-5" />
-          </TrackedLink>
+        <div className="container mx-auto max-w-3xl">
+          <div className="text-center mb-12">
+            <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-6">
+              Your next event starts here
+            </h2>
+            <p className="text-[18px] text-white/70 max-w-2xl mx-auto">
+              Tell us about your events and we'll get you set up. Real humans, fast responses, no sales funnel.
+            </p>
+          </div>
+
+          {isSubmitted ? (
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-10 text-center">
+              <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="h-8 w-8 text-green-300" />
+              </div>
+              <h3 className="text-[24px] font-bold text-white mb-4">Thanks for reaching out!</h3>
+              <p className="text-white/80 mb-6">
+                We'll review your message and get back to you within 2-3 business days.
+              </p>
+            </div>
+          ) : (
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-10">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <Input
+                  id="name"
+                  placeholder="Your Name *"
+                  value={formData.name}
+                  onChange={(e) => handleInputChange('name', e.target.value)}
+                  required
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
+                />
+
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email Address *"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  required
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
+                />
+
+                <Textarea
+                  id="message"
+                  placeholder="Tell us about yourself and your events *"
+                  value={formData.message}
+                  onChange={(e) => handleInputChange('message', e.target.value)}
+                  required
+                  rows={5}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all resize-none"
+                />
+
+                {submissionError && (
+                  <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4 animate-in fade-in duration-300">
+                    <p className="text-red-300 text-sm">{submissionError}</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full inline-flex items-center justify-center px-8 py-4 bg-white text-voxxy-purple-brand hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl"
+                >
+                  {isSubmitting ? 'Sending...' : 'Get Started'}
+                  {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </section>
 

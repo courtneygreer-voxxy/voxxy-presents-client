@@ -1,265 +1,265 @@
-import React, { useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { useEffect } from 'react'
 import {
-  Calendar,
-  Users,
-  DollarSign,
-  MapPin,
   Shield,
   ArrowRight,
   CheckCircle,
-  Sparkles,
-  Copy
+  Mail,
+  Users,
+  Search,
+  Zap
 } from "lucide-react"
-import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { useSectionTracking } from "@/hooks/useSectionTracking"
-import { TrackedButton } from "@/components/analytics/TrackedButton"
-import { analytics } from "@/lib/analytics"
+import { TrackedLink } from "@/components/analytics/TrackedLink"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 
 export default function FeaturesPage() {
-
-  // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
 
   usePageTracking('Features')
 
-  // Section tracking for key features
-  const { sectionRef: rsvpRef } = useSectionTracking({
+  const { sectionRef: featuresRef } = useSectionTracking({
     pageName: 'Features',
-    sectionName: 'RSVP Management',
+    sectionName: 'Core Features',
   })
 
-  const { sectionRef: venueRef } = useSectionTracking({
+  const { sectionRef: trustRef } = useSectionTracking({
     pageName: 'Features',
-    sectionName: 'Venue Coordination',
-  })
-
-  const { sectionRef: marketingRef } = useSectionTracking({
-    pageName: 'Features',
-    sectionName: 'Marketing Tools',
+    sectionName: 'Trust & Safety',
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       <Navigation activePage="features" />
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4">
-        <div className="container mx-auto max-w-4xl text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-medium rounded-full">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Built for Recurring Event Producers
+      <section className="relative pt-[140px] pb-20 px-6 md:px-12 min-h-[70vh] flex items-center">
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
+
+        <div className="container mx-auto max-w-[1200px] relative z-10">
+          <div className="text-center max-w-[800px] mx-auto">
+            <div className="inline-flex items-center gap-2 bg-voxxy-purple-brand/20 border border-voxxy-purple-brand/30 px-4 py-1.5 rounded-full mb-6">
+              <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
+              <span className="text-[13px] font-semibold text-purple-200">Built for Recurring Event Producers</span>
             </div>
-          </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
-            Voxxy Presents{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
-              Features
-            </span>
-          </h1>
+            <h1 className="text-[52px] md:text-[56px] font-display font-bold leading-[1.1] text-white mb-5 tracking-tight">
+              Everything you need to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">run better events</em>
+            </h1>
 
-          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Everything you need to coordinate vendors, automate logistics, and scale your recurring events—all in one platform.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg hover:shadow-xl font-semibold" asChild>
-              <Link to="/contact">
-                Request Beta Access
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
+            <p className="text-[18px] leading-relaxed text-white/65 mb-9 max-w-[600px] mx-auto">
+              Vendor coordination, automated communications, and relationship management — all in one platform designed for how you actually work.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Core Features */}
-      <section ref={rsvpRef} className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Core Voxxy Presents Features
-            </h2>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Purpose-built tools for producers managing recurring events with the same vendor pool
+      {/* Core Features Section */}
+      <section ref={featuresRef} className="py-[100px] px-6 md:px-12 bg-white">
+        <div className="container mx-auto max-w-[1200px]">
+          <div className="mb-14">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Core Features</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Built for your workflow</h2>
+            <p className="text-[18px] text-gray-600 max-w-[600px]">
+              Every feature designed to save you time and help you run more events with less stress.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Automated Vendor Communication */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-indigo-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/30 transition-all">
-                  <Users className="h-7 w-7 text-indigo-300" />
+          {/* Feature Block 1 - Automated Communication */}
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
+            <div>
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Mail className="h-6 w-6 text-voxxy-purple-brand" />
+              </div>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Automated vendor communication</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+                Stop writing the same emails over and over. Application confirmations, approval notices, payment reminders, waitlist updates, and event-day details — all sent automatically from one branded email thread. Vendors always know where they stand.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Automated email sequences for every event stage</span>
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Automated Vendor Communication</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Stop writing the same update emails for every event. Voxxy sends application confirmations, approval notices, waitlist updates, payment reminders, and logistics details automatically — all from one consistent email thread so vendors can easily follow along and stay updated.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Automated email sequences
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Branded email threads
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Zero manual follow-up
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Branded emails that feel personal</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Zero manual follow-up required</span>
+                </div>
+              </div>
+            </div>
+            <img
+              src="/screenshots/email-automation.png"
+              alt="Automated email sequences showing vendor communication workflows"
+              className="rounded-2xl shadow-xl border border-gray-200"
+              loading="lazy"
+            />
+          </div>
 
-            {/* Vendor CRM */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-purple-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-500/30 transition-all">
-                  <MapPin className="h-7 w-7 text-purple-300" />
+          {/* Feature Block 2 - Vendor CRM - Reversed */}
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
+            <div className="md:order-2">
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Users className="h-6 w-6 text-voxxy-purple-brand" />
+              </div>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Vendor relationships that compound</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+                Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. CSV import for existing lists. Your best vendors are always one search away.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Unified vendor profiles across all events</span>
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Vendor CRM Across All Events</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Track vendor relationships across all your events with unified profiles, notes, tags, and performance history. CSV import for existing vendor lists, searchable and filterable database.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    Unified vendor profiles
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    Notes and performance tracking
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0" />
-                    CSV import capability
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Performance tracking and ratings</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">CSV import for existing vendor lists</span>
+                </div>
+              </div>
+            </div>
+            <div className="md:order-1">
+              <img
+                src="/screenshots/vendor-crm.png"
+                alt="Vendor CRM showing contact management and performance tracking"
+                className="rounded-2xl shadow-xl border border-gray-200"
+                loading="lazy"
+              />
+            </div>
+          </div>
 
-            {/* Fast Application Review */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-green-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-green-500/30 transition-all">
-                  <Calendar className="h-7 w-7 text-green-300" />
+          {/* Feature Block 3 - Fast Application Review */}
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
+            <div>
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Search className="h-6 w-6 text-voxxy-purple-brand" />
+              </div>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Fast application review</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+                Stop scrolling through 200 Instagram profiles one by one. Side-by-side portfolio comparison with integrated social profiles. One-click approve, waitlist, or reject. Bulk actions for faster decisions.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Side-by-side application comparison</span>
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Fast Application Review</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Side-by-side portfolio comparison with one-click approve, waitlist, or reject. Integrated social profiles and portfolios with bulk actions for faster decisions.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    Side-by-side comparison
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    One-click decisions
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-green-400 mr-3 flex-shrink-0" />
-                    Bulk actions
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Integrated social profiles and portfolios</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Bulk actions for efficiency</span>
+                </div>
+              </div>
+            </div>
+            <img
+              src="/screenshots/hero-dashboard.png"
+              alt="Application review interface with side-by-side comparison"
+              className="rounded-2xl shadow-xl border border-gray-200"
+              loading="lazy"
+            />
+          </div>
 
-            {/* Email Automation */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 group">
-              <CardHeader>
-                <div className="w-14 h-14 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-500/30 transition-all">
-                  <DollarSign className="h-7 w-7 text-blue-300" />
+          {/* Feature Block 4 - No-Code Automation */}
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="md:order-2">
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Zap className="h-6 w-6 text-voxxy-purple-brand" />
+              </div>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Email automation without technical setup</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+                No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics — all automated and customizable.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Automated email triggers for every action</span>
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Email Automation Without Technical Setup</CardTitle>
-                <CardDescription className="text-gray-300 leading-relaxed">
-                  Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics - all automated and customizable without needing Mailgun or SendGrid.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    Automated email triggers
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    Event-specific customization
-                  </li>
-                  <li className="flex items-center text-gray-300">
-                    <CheckCircle className="h-5 w-5 text-blue-400 mr-3 flex-shrink-0" />
-                    No technical setup required
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Event-specific customization</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Zero technical setup required</span>
+                </div>
+              </div>
+            </div>
+            <div className="md:order-1">
+              <img
+                src="/screenshots/email-automation.png"
+                alt="Email automation dashboard showing customizable templates"
+                className="rounded-2xl shadow-xl border border-gray-200"
+                loading="lazy"
+              />
+            </div>
           </div>
         </div>
       </section>
 
       {/* Trust & Safety Section */}
-      <section className="py-24 relative z-10">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-10 md:p-14">
+      <section ref={trustRef} className="py-[100px] px-6 md:px-12 bg-gray-50">
+        <div className="container mx-auto max-w-[1200px]">
+          <div className="max-w-[800px] mx-auto">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center">
-                <Shield className="h-8 w-8 text-purple-300" />
+              <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center">
+                <Shield className="h-8 w-8 text-voxxy-purple-brand" />
               </div>
             </div>
 
-            <h2 className="text-3xl font-bold text-white mb-6 text-center">
-              Trust & Safety Commitment
-            </h2>
+            <div className="text-center mb-10">
+              <h2 className="text-[36px] font-display font-bold text-gray-900 mb-4">Trust & Safety Commitment</h2>
+              <p className="text-[18px] text-gray-600">
+                We found that our users — especially those focused on art and community — really care about their data. They want privacy and a commitment that their data won't be sold to third parties.
+              </p>
+            </div>
 
-            <div className="space-y-4 text-gray-200 text-lg">
-              <p>
-                We found that our users—especially those focused on art and community—really care about their data.
-                They want privacy and a commitment that their data won't be sold to third parties unless discussed upfront
-                and agreed upon by users.
+            <div className="bg-white border border-gray-200 rounded-2xl p-10">
+              <p className="text-[16px] text-gray-700 mb-6 leading-relaxed">
+                <strong className="text-gray-900">Trust is a huge part of community</strong>, and we want our users to feel safe. That's why we:
               </p>
 
-              <p>
-                <strong className="text-white">Trust is a huge part of community</strong>, and we want our users to feel safe.
-                That's why we:
-              </p>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-voxxy-purple-brand flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900">Never sell your data</strong>
+                    <span className="text-gray-700"> to third parties without explicit consent</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-voxxy-purple-brand flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900">Generate immediate safety reviews</strong>
+                    <span className="text-gray-700"> for all applications</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-voxxy-purple-brand flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900">Always have human support</strong>
+                    <span className="text-gray-700"> available for any safety concerns</span>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-6 w-6 text-voxxy-purple-brand flex-shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-gray-900">Transparent about data usage</strong>
+                    <span className="text-gray-700"> — you always know what we do with your information</span>
+                  </div>
+                </div>
+              </div>
 
-              <ul className="space-y-3 mt-4">
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Never sell your data</strong> to third parties without explicit consent</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Generate immediate safety reviews</strong> for all applications</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Always have human support</strong> available for any safety concerns</span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                  <span><strong className="text-white">Transparent about data usage</strong>—you always know what we do with your information</span>
-                </li>
-              </ul>
-
-              <p className="mt-6 text-center text-gray-300 italic">
+              <p className="mt-8 text-center text-gray-600 italic">
                 Your community's safety and privacy are foundational to everything we build.
               </p>
             </div>
@@ -268,20 +268,26 @@ export default function FeaturesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Build Your Next Event?
+      <section className="py-24 px-6 md:px-12 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 border-y border-white/10">
+        <div className="container mx-auto max-w-4xl text-center">
+          <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-6">
+            Ready to build your next event?
           </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Join event producers everywhere who are scaling their recurring events with Voxxy
+          <p className="text-[18px] text-white/70 mb-10 max-w-2xl mx-auto">
+            Join event producers everywhere who are scaling their recurring events with Voxxy.
           </p>
-          <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
-            <Link to="/contact">
-              Request Beta Access
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          <TrackedLink
+            to="/contact"
+            className="inline-flex items-center px-8 py-4 bg-white text-voxxy-purple-brand hover:bg-gray-100 transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl"
+            trackingData={{
+              link_text: 'Get Started',
+              destination_page: 'Contact',
+              current_page: 'Features',
+              link_position: 'cta_section'
+            }}
+          >
+            Get Started <ArrowRight className="ml-2 h-5 w-5" />
+          </TrackedLink>
         </div>
       </section>
 

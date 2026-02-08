@@ -53,41 +53,48 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-purple-50/30 to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
       <Navigation activePage="help" />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-16 px-6 md:px-12 bg-gradient-to-br from-voxxy-purple-deep to-voxxy-purple-mid">
-        <div className="container mx-auto max-w-4xl">
+      <section className="relative pt-[140px] pb-20 px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
+
+        <div className="container mx-auto max-w-[900px] relative z-10">
           <div className="mb-4">
-            <p className="text-sm font-semibold uppercase tracking-wider text-purple-300">HELP CENTER</p>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-purple-300 mb-4">HELP CENTER</div>
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-6 leading-tight">
+          <h1 className="text-[52px] md:text-[56px] font-display font-bold text-white mb-5 leading-[1.1] tracking-tight">
             We're here to help
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl leading-relaxed">
+          <p className="text-[18px] text-white/65 max-w-[700px] leading-relaxed">
             Real humans, fast responses. Whether you need onboarding support or have a quick question, we've got you.
           </p>
         </div>
       </section>
 
       {/* Support Options */}
-      <section className="py-20 px-6 md:px-12 bg-white">
-        <div className="container mx-auto max-w-5xl">
-          <div className="grid md:grid-cols-3 gap-6">
+      <section className="py-[100px] px-6 md:px-12 bg-white">
+        <div className="container mx-auto max-w-[1200px]">
+          <div className="mb-14">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Support Options</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Get the help you need</h2>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
             {/* Email Support */}
-            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Mail className="h-8 w-8 text-purple-600" />
+                <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Mail className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-xl font-bold mb-4">Email Support</CardTitle>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Email Support</CardTitle>
+                <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Reach our team directly for questions about your account, event setup, or anything else. We respond within 1–2 business days.
                 </p>
                 <a
                   href="mailto:team@voxxypresents.com"
-                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+                  className="inline-flex items-center text-voxxy-purple-brand hover:text-purple-700 font-semibold text-[15px]"
                 >
                   team@voxxypresents.com →
                 </a>
@@ -95,20 +102,20 @@ export default function HelpPage() {
             </Card>
 
             {/* Onboarding Guide */}
-            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Book className="h-8 w-8 text-purple-600" />
+                <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Book className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-xl font-bold mb-4">Onboarding Guide</CardTitle>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Onboarding Guide</CardTitle>
+                <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Step-by-step walkthrough for setting up your first event, importing vendors, configuring email flows, and going live.
                 </p>
                 <a
                   href="https://docs.voxxypresents.com/onboarding"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+                  className="inline-flex items-center text-voxxy-purple-brand hover:text-purple-700 font-semibold text-[15px]"
                 >
                   Read the Guide →
                 </a>
@@ -116,20 +123,20 @@ export default function HelpPage() {
             </Card>
 
             {/* Community Discord */}
-            <Card className="bg-white border border-gray-200 hover:shadow-lg transition-all duration-300">
+            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
-                <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <MessageCircle className="h-8 w-8 text-purple-600" />
+                <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <MessageCircle className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-xl font-bold mb-4">Community Discord</CardTitle>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Community Discord</CardTitle>
+                <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Connect with other event producers, share tips, and get quick answers from the Voxxy team and community.
                 </p>
                 <a
                   href="https://discord.gg/voxxy"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-purple-600 hover:text-purple-700 font-semibold"
+                  className="inline-flex items-center text-voxxy-purple-brand hover:text-purple-700 font-semibold text-[15px]"
                 >
                   Join Discord →
                 </a>
@@ -140,33 +147,33 @@ export default function HelpPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 px-6 md:px-12 bg-gray-50">
-        <div className="container mx-auto max-w-3xl">
-          <div className="text-center mb-12">
-            <p className="text-sm font-semibold uppercase tracking-wider text-purple-600 mb-4">FAQ</p>
-            <h2 className="text-4xl font-bold text-gray-900">Common questions</h2>
+      <section className="py-[100px] px-6 md:px-12 bg-gray-50">
+        <div className="container mx-auto max-w-[900px]">
+          <div className="mb-14">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">FAQ</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900">Common questions</h2>
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all"
               >
                 <button
                   onClick={() => toggleFaq(index)}
                   className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
                 >
-                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+                  <span className="font-semibold text-gray-900 pr-4 text-[16px]">{faq.question}</span>
                   <ChevronDown
-                    className={`h-5 w-5 text-purple-600 flex-shrink-0 transition-transform ${
+                    className={`h-5 w-5 text-voxxy-purple-brand flex-shrink-0 transition-transform ${
                       openFaq === index ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
                 {openFaq === index && (
                   <div className="px-6 pb-5 pt-2">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                    <p className="text-[15px] text-gray-600 leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>

@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-800/50 backdrop-blur-sm border-t border-white/10 text-white py-12 relative z-10">
-      <div className="container mx-auto max-w-6xl px-4">
+    <footer className="bg-[#0f0a1a] border-t border-white/20 text-white py-12 relative z-10">
+      <div className="container mx-auto max-w-6xl px-6">
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-12 gap-8 md:gap-12">
           {/* Brand Column - Takes more space like header logo */}
           <div className="md:col-span-5">
             <span className="text-2xl md:text-3xl font-bold text-white tracking-wider block mb-4">VOXXY</span>
-            <p className="text-gray-300 leading-relaxed">
+            <p className="text-white/70 leading-relaxed">
               Event infrastructure for recurring event producers.
               Focus on creating experiences, we'll handle the vendor coordination.
             </p>
@@ -19,15 +19,15 @@ export default function Footer() {
           <div className="md:col-span-7 grid grid-cols-3 gap-6">
             {/* Product Column */}
             <div>
-              <h4 className="font-semibold mb-3 text-white">Product</h4>
+              <h4 className="font-semibold mb-3 text-white text-[15px]">Product</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/features" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/features" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     For Artists
                   </Link>
                 </li>
                 <li>
-                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     Voxxy Mobile
                   </a>
                 </li>
@@ -36,20 +36,20 @@ export default function Footer() {
 
             {/* Company Column */}
             <div>
-              <h4 className="font-semibold mb-3 text-white">Company</h4>
+              <h4 className="font-semibold mb-3 text-white text-[15px]">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/about" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/about" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/help" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/help" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/contact" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     Contact
                   </Link>
                 </li>
@@ -58,15 +58,15 @@ export default function Footer() {
 
             {/* Legal Column */}
             <div>
-              <h4 className="font-semibold mb-3 text-white">Legal</h4>
+              <h4 className="font-semibold mb-3 text-white text-[15px]">Legal</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/terms" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/terms" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     Terms
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                  <Link to="/privacy" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
                     Privacy
                   </Link>
                 </li>
@@ -76,8 +76,8 @@ export default function Footer() {
         </div>
 
         {/* Copyright Section */}
-        <div className="border-t border-white/10 mt-10 pt-6 text-center">
-          <p className="text-gray-400 text-sm">&copy; 2025 Voxxy, Inc. All rights reserved.</p>
+        <div className="border-t border-white/20 mt-10 pt-6 text-center">
+          <p className="text-white/60 text-sm">&copy; 2025 Voxxy, Inc. All rights reserved.</p>
         </div>
       </div>
     </footer>
