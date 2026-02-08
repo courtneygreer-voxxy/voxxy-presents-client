@@ -81,7 +81,7 @@ export default function ReportBug({
       }, 2000);
     } catch (err: any) {
       console.error('Failed to submit bug report:', err);
-      setError('Failed to submit report. Please try again or contact support@voxxy.com');
+      setError('Failed to submit report. Please try again or contact team@voxxypresents.com');
     } finally {
       setSubmitting(false);
     }
@@ -231,10 +231,10 @@ export default function ReportBug({
           <p className="text-center text-xs text-white/50">
             Or email us directly at{' '}
             <a
-              href="mailto:support@voxxy.com"
+              href="mailto:team@voxxypresents.com"
               className="text-purple-400 hover:text-purple-300 underline"
             >
-              support@voxxy.com
+              team@voxxypresents.com
             </a>
           </p>
         </form>

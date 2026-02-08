@@ -145,10 +145,10 @@ class ErrorBoundary extends Component<Props, State> {
               <p className="text-center text-xs text-white/50 mt-6">
                 If this problem persists, contact us at{' '}
                 <a
-                  href="mailto:support@voxxy.com"
+                  href="mailto:team@voxxypresents.com"
                   className="text-purple-400 hover:text-purple-300 underline"
                 >
-                  support@voxxy.com
+                  team@voxxypresents.com
                 </a>
               </p>
             </div>
