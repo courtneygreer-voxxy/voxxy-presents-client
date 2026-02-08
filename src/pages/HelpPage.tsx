@@ -38,7 +38,7 @@ export default function HelpPage() {
           </h1>
 
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            We're here to support you during the pilot program and beyond
+            Have questions about Voxxy? We're here to help
           </p>
         </div>
       </section>
@@ -57,7 +57,7 @@ export default function HelpPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-200 mb-4">
-                  Questions about the pilot program? Want to learn more? Reach out directly.
+                  Questions about Voxxy? Want to learn more? Reach out directly.
                 </p>
                 <a
                   href="mailto:team@voxxypresents.com"
@@ -78,11 +78,11 @@ export default function HelpPage() {
                 <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mb-4">
                   <MessageCircle className="h-8 w-8 text-purple-300" />
                 </div>
-                <CardTitle className="text-2xl text-white">Request Pilot Access</CardTitle>
+                <CardTitle className="text-2xl text-white">Request Beta Access</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-200 mb-6">
-                  Ready to join? We're accepting 5 producers into our pilot program.
+                  Interested in Voxxy? Request early access to our platform.
                 </p>
                 <Button className="bg-purple-600 hover:bg-purple-700 text-white" asChild>
                   <Link to="/contact">
@@ -118,10 +118,10 @@ export default function HelpPage() {
               <CardContent className="pt-6">
                 <h3 className="text-xl font-semibold text-white mb-2">Pricing</h3>
                 <p className="text-gray-300 mb-4 leading-relaxed">
-                  Simple, transparent pricing at $15/month for pilot program members
+                  Simple, transparent pricing starting at $80/month
                 </p>
-                <Link to="/contact" className="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
-                  Learn More
+                <Link to="/pricing" className="text-purple-400 hover:text-purple-300 inline-flex items-center font-medium">
+                  View Pricing
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </CardContent>

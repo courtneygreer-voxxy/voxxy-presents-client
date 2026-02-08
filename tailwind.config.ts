@@ -11,6 +11,12 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
+  			'voxxy-purple': {
+  				deep: '#1a0b2e',
+  				mid: '#2d1b4e',
+  				brand: '#a855f7',
+  				light: '#c084fc',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

@@ -23,13 +23,13 @@ export default function Footer() {
               <ul className="space-y-2">
                 <li>
                   <Link to="/features" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
-                    Features
+                    For Artists
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
-                    For Vendors
-                  </Link>
+                  <a href="https://voxxymobile.com" target="_blank" rel="noopener noreferrer" className="text-gray-300 hover:text-purple-400 transition-colors text-sm">
+                    Voxxy Mobile
+                  </a>
                 </li>
               </ul>
             </div>
