@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail, Users, Calendar, BarChart3, TrendingUp, CheckCircle2, XCircle, Clock } from 'lucide-react';
+import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, Mail, Users, Calendar, BarChart3, TrendingUp, CheckCircle2, XCircle, Clock, Bug } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,8 +15,9 @@ import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
 import EmailTemplatesPage from './EmailTemplatesPage';
+import BugReportsTab from '@/components/admin/BugReportsTab';
 
-type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
+type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'bug-reports' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface User {
@@ -547,6 +548,7 @@ export default function AdminDashboard() {
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
     { id: 'email-testing' as NavItem, label: 'Email Testing', icon: Mail },
+    { id: 'bug-reports' as NavItem, label: 'Bug Reports', icon: Bug },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -808,6 +810,8 @@ export default function AdminDashboard() {
             </div>
           ) : activeNav === 'email-testing' ? (
             <EmailTestingPanel />
+          ) : activeNav === 'bug-reports' ? (
+            <BugReportsTab />
           ) : activeNav === 'admin' ? (
             <div className="p-4 lg:p-6">
               <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">

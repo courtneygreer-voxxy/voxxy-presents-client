@@ -2645,4 +2645,65 @@ export const bulletinsApi = {
   },
 }
 
+/**
+ * Bug Reports API
+ * For reporting bugs and issues from users
+ */
+export const bugReportsApi = {
+  /**
+   * Submit a bug report
+   * POST /v1/shared/bug_reports
+   */
+  async create(data: {
+    name: string
+    email: string
+    description: string
+    error_context?: any
+  }) {
+    // Note: Bug reports endpoint is public (no auth required)
+    return fetchApi<{ id: number; message?: string }>('/v1/shared/bug_reports', {
+      method: 'POST',
+      body: JSON.stringify({
+        bug_report: {
+          name: data.name,
+          email: data.email,
+          bug_description: data.description, // Backend uses 'bug_description'
+          description: data.description, // Also send 'description' for compatibility
+          error_context: data.error_context,
+        },
+      }),
+    })
+  },
+
+  /**
+   * Get all bug reports (admin only)
+   * GET /v1/shared/bug_reports
+   */
+  async getAll() {
+    return fetchApi<Array<{
+      id: number
+      name: string
+      email: string
+      bug_description: string
+      error_context?: any
+      created_at: string
+    }>>('/v1/shared/bug_reports')
+  },
+
+  /**
+   * Get single bug report (admin only)
+   * GET /v1/shared/bug_reports/:id
+   */
+  async getById(id: number) {
+    return fetchApi<{
+      id: number
+      name: string
+      email: string
+      bug_description: string
+      error_context?: any
+      created_at: string
+    }>(`/v1/shared/bug_reports/${id}`)
+  },
+}
+
 export { ApiError }

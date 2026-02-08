@@ -1,7 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
-import { Share2 } from 'lucide-react';
+import { Share2, AlertCircle } from 'lucide-react';
 import { eventsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
+import {
+  saveFormData,
+  loadFormData,
+  clearFormData,
+  hasSavedData,
+  getSavedDataTimestamp,
+  retryWithBackoff,
+  isRetryableError,
+} from '@/utils/formPersistence';
+import ReportBug from '@/components/ReportBug';
+import FloatingBugButton from '@/components/FloatingBugButton';
 
 interface VendorApplication {
   id: number;
@@ -46,6 +57,12 @@ export default function VendorApplicationForm() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [retryAttempt, setRetryAttempt] = useState(0);
+  const [showRestorePrompt, setShowRestorePrompt] = useState(false);
+  const [showBugReport, setShowBugReport] = useState(false);
+  const [bugReportContext, setBugReportContext] = useState<any>(null);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const failedAttemptsRef = useRef(0);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -83,6 +100,44 @@ export default function VendorApplicationForm() {
       setFormData(prev => ({ ...prev, vendor_category: application.name }));
     }
   }, [application]);
+
+  // Check for saved form data on mount
+  useEffect(() => {
+    if (slug && applicationId) {
+      const formId = `vendor-app-${slug}-${applicationId}`;
+      if (hasSavedData(formId)) {
+        setShowRestorePrompt(true);
+      }
+    }
+  }, [slug, applicationId]);
+
+  // Auto-save form data every 30 seconds
+  useEffect(() => {
+    if (!slug || !applicationId) return;
+
+    const formId = `vendor-app-${slug}-${applicationId}`;
+
+    // Schedule auto-save
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      // Only save if form has been touched (not all defaults)
+      const hasData = formData.name || formData.email || formData.business_name;
+      if (hasData) {
+        saveFormData(formId, formData);
+        console.log('[AutoSave] Form data saved');
+      }
+    }, 30000); // 30 seconds
+
+    // Cleanup on unmount
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [formData, slug, applicationId]);
 
   const fetchEvent = async (eventSlug: string, appId: string) => {
     try {
@@ -133,6 +188,34 @@ export default function VendorApplicationForm() {
     }
   };
 
+  const restoreSavedData = () => {
+    if (!slug || !applicationId) return;
+
+    const formId = `vendor-app-${slug}-${applicationId}`;
+    const saved = loadFormData(formId);
+
+    if (saved) {
+      // Restore all fields except internal metadata
+      const { _timestamp, _formId, ...savedFormData } = saved;
+      setFormData(prev => ({
+        ...prev,
+        ...savedFormData,
+      }));
+      console.log('[Restore] Form data restored from', getSavedDataTimestamp(formId));
+    }
+
+    setShowRestorePrompt(false);
+  };
+
+  const discardSavedData = () => {
+    if (!slug || !applicationId) return;
+
+    const formId = `vendor-app-${slug}-${applicationId}`;
+    clearFormData(formId);
+    setShowRestorePrompt(false);
+    console.log('[Restore] Saved data discarded');
+  };
+
   const handleShareLink = async () => {
     const shareUrl = window.location.href;
     try {
@@ -174,6 +257,7 @@ export default function VendorApplicationForm() {
     try {
       setSubmitting(true);
       setError(null);
+      setRetryAttempt(0);
 
       // Construct full URLs from user input with defensive handling
       const buildInstagramUrl = (handle: string): string | undefined => {
@@ -227,27 +311,81 @@ export default function VendorApplicationForm() {
         }
       };
 
-      const response = await registrationsApi.submitVendorApplication(event.slug, {
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone || undefined,
-        business_name: formData.business_name,
-        vendor_category: formData.vendor_category,
-        vendor_application_id: application.id,
-        subscribed: formData.subscribed,
-        instagram_handle: buildInstagramUrl(formData.instagram_handle),
-        tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
-        website: buildWebsiteUrl(formData.website),
-        note_to_host: formData.note_to_host || undefined,
-      });
+      // Submit with retry logic for network/server errors
+      const response = await retryWithBackoff(
+        async () => {
+          return await registrationsApi.submitVendorApplication(event.slug, {
+            name: formData.name,
+            email: formData.email,
+            phone: formData.phone || undefined,
+            business_name: formData.business_name,
+            vendor_category: formData.vendor_category,
+            vendor_application_id: application.id,
+            subscribed: formData.subscribed,
+            instagram_handle: buildInstagramUrl(formData.instagram_handle),
+            tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
+            website: buildWebsiteUrl(formData.website),
+            note_to_host: formData.note_to_host || undefined,
+          });
+        },
+        {
+          maxAttempts: 3,
+          baseDelay: 2000,
+          maxDelay: 8000,
+          onRetry: (attempt, error) => {
+            setRetryAttempt(attempt);
+            console.log(`[Retry] Attempt ${attempt}/3 failed:`, error);
+
+            // Only retry if it's a retryable error
+            if (!isRetryableError(error)) {
+              throw error; // Stop retrying for non-retryable errors
+            }
+          },
+        }
+      );
+
+      // Clear saved form data on successful submission
+      if (slug && applicationId) {
+        const formId = `vendor-app-${slug}-${applicationId}`;
+        clearFormData(formId);
+      }
 
       // Redirect to confirmation page with ticket code
       navigate(`/applications/success?ticket_code=${response.ticket_code}&event=${event.slug}`);
     } catch (err: any) {
       console.log('Failed to submit application:', err);
+
       // Check for errors array first (Rails validation errors), then fallback to message
-      const errorMessage = err.errors?.[0] || err.message || 'Failed to submit application. Please try again.';
+      let errorMessage = err.errors?.[0] || err.message || 'Failed to submit application.';
+
+      // Add context based on error type
+      if (isRetryableError(err)) {
+        errorMessage += ' We tried 3 times but couldn\'t connect to the server. Please check your internet connection and try again.';
+      } else if (err.status === 422) {
+        errorMessage = 'Please check your form entries. ' + errorMessage;
+      } else if (err.status === 409) {
+        errorMessage = 'You may have already applied. ' + errorMessage;
+      }
+
       setError(errorMessage);
+      setRetryAttempt(0);
+
+      // Track failed attempts and auto-show bug report after 3 failures
+      failedAttemptsRef.current += 1;
+      if (failedAttemptsRef.current >= 3) {
+        // Auto-show bug report modal
+        setBugReportContext({
+          errorMessage,
+          componentName: 'VendorApplicationForm',
+          formData: {
+            ...formData,
+            // Don't include sensitive data in bug report
+            agreed_to_terms: undefined,
+          },
+        });
+        setShowBugReport(true);
+        failedAttemptsRef.current = 0; // Reset counter
+      }
     } finally {
       setSubmitting(false);
     }
@@ -305,6 +443,38 @@ export default function VendorApplicationForm() {
 
       {/* Content */}
       <div className="max-w-3xl mx-auto px-4 py-6">
+        {/* Restore Saved Data Prompt */}
+        {showRestorePrompt && (
+          <div className="mb-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <h3 className="text-sm font-semibold text-white mb-1">
+                  Resume Your Application?
+                </h3>
+                <p className="text-xs text-white/70 mb-3">
+                  We found a previously saved version of your application from{' '}
+                  {getSavedDataTimestamp(`vendor-app-${slug}-${applicationId}`)}. Would you like to continue where you left off?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={restoreSavedData}
+                    className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-300 text-xs font-medium transition-all"
+                  >
+                    Restore My Data
+                  </button>
+                  <button
+                    onClick={discardSavedData}
+                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-all"
+                  >
+                    Start Fresh
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Application Details Card */}
         <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-4 mb-6">
           <p className="text-white/60 text-[10px] mb-0.5">Applying for</p>
@@ -584,7 +754,9 @@ export default function VendorApplicationForm() {
               {submitting ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  <span>Submitting...</span>
+                  <span>
+                    {retryAttempt > 0 ? `Retrying (${retryAttempt}/3)...` : 'Submitting...'}
+                  </span>
                 </>
               ) : (
                 <>
@@ -592,6 +764,11 @@ export default function VendorApplicationForm() {
                 </>
               )}
             </button>
+
+            {/* Auto-save Indicator */}
+            <p className="text-center text-xs text-white/40">
+              Your progress is automatically saved every 30 seconds
+            </p>
           </form>
         </div>
 
@@ -608,6 +785,20 @@ export default function VendorApplicationForm() {
           </div>
         </div>
       </div>
+
+      {/* Floating Bug Report Button */}
+      <FloatingBugButton onClick={() => setShowBugReport(true)} />
+
+      {/* Bug Report Modal */}
+      <ReportBug
+        isOpen={showBugReport}
+        onClose={() => {
+          setShowBugReport(false);
+          setBugReportContext(null);
+        }}
+        errorContext={bugReportContext}
+        autoShow={!!bugReportContext}
+      />
     </div>
   );
 }
