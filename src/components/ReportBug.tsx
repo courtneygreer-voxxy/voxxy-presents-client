@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, Bug, Send } from 'lucide-react';
+import { bugReportsApi } from '@/services/api';
 
 interface ReportBugProps {
   isOpen: boolean;
@@ -58,16 +59,12 @@ export default function ReportBug({
         },
       };
 
-      // TODO: Replace with actual API endpoint when backend is ready
-      console.log('[Bug Report] Would submit:', bugReport);
+      console.log('[Bug Report] Submitting:', bugReport);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Submit to backend API
+      await bugReportsApi.create(bugReport);
 
-      // For now, store locally
-      const existingReports = JSON.parse(localStorage.getItem('bug_reports') || '[]');
-      existingReports.push(bugReport);
-      localStorage.setItem('bug_reports', JSON.stringify(existingReports));
+      console.log('[Bug Report] Successfully submitted');
 
       setSubmitted(true);
 
