@@ -181,7 +181,7 @@ export default function ContactPage() {
               <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="text-lg font-semibold text-white mb-1">Vendor Coordination Tools</h3>
-                <p className="text-gray-200">Unified communication hub and vendor CRM</p>
+                <p className="text-gray-200">Vendor CRM & automated email workflows</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">

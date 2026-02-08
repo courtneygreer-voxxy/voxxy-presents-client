@@ -95,30 +95,30 @@ export default function FeaturesPage() {
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Unified Communication Hub */}
+            {/* Automated Vendor Communication */}
             <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-indigo-400/30 transition-all duration-300 group">
               <CardHeader>
                 <div className="w-14 h-14 bg-indigo-500/20 backdrop-blur-sm border border-indigo-400/30 rounded-xl flex items-center justify-center mb-4 group-hover:bg-indigo-500/30 transition-all">
                   <Users className="h-7 w-7 text-indigo-300" />
                 </div>
-                <CardTitle className="text-white text-xl mb-2">Unified Communication Hub</CardTitle>
+                <CardTitle className="text-white text-xl mb-2">Automated Vendor Communication</CardTitle>
                 <CardDescription className="text-gray-300 leading-relaxed">
-                  All vendor coordination in one place - no more texts, emails, Instagram DMs, and WhatsApp chaos. Conversation history that persists across events so your team can see full vendor context instantly.
+                  Stop writing the same update emails for every event. Voxxy sends application confirmations, approval notices, waitlist updates, payment reminders, and logistics details automatically — all from one consistent email thread so vendors can easily follow along and stay updated.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    All communication in one platform
+                    Automated email sequences
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Conversation history across events
+                    Branded email threads
                   </li>
                   <li className="flex items-center text-gray-300">
                     <CheckCircle className="h-5 w-5 text-indigo-400 mr-3 flex-shrink-0" />
-                    Team collaboration tools
+                    Zero manual follow-up
                   </li>
                 </ul>
               </CardContent>

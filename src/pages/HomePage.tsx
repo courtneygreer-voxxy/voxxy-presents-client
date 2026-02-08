@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
@@ -6,12 +6,12 @@ import { useSectionTracking } from "@/hooks/useSectionTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
 import { analytics } from "@/lib/analytics"
+import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
-import { Menu, X, ArrowRight, Check } from "lucide-react"
+import { ArrowRight, Check } from "lucide-react"
 
 export default function HomePage() {
   const { isAuthenticated, isProducer } = useAuth()
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -36,104 +36,7 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-4 bg-gradient-to-r from-voxxy-purple-deep/95 to-voxxy-purple-mid/95 backdrop-blur-xl border-b border-white/10">
-        <div className="container mx-auto max-w-[1200px]">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center">
-              <span className="text-[22px] font-display font-bold text-white tracking-tight">
-                VOXXY
-              </span>
-              <span className="text-[14px] text-voxxy-purple-brand ml-1.5 font-normal">presents</span>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center gap-7">
-              <TrackedLink
-                to="/features"
-                className="text-[14px] font-medium text-gray-300 hover:text-voxxy-purple-brand transition-colors"
-                trackingData={{
-                  link_text: 'Features',
-                  destination_page: 'Features',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                Features
-              </TrackedLink>
-              <TrackedLink
-                to="/pricing"
-                className="text-[14px] font-medium text-gray-300 hover:text-voxxy-purple-brand transition-colors"
-                trackingData={{
-                  link_text: 'Pricing',
-                  destination_page: 'Pricing',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                Pricing
-              </TrackedLink>
-              <TrackedLink
-                to="/about"
-                className="text-[14px] font-medium text-gray-300 hover:text-voxxy-purple-brand transition-colors"
-                trackingData={{
-                  link_text: 'About',
-                  destination_page: 'About',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                About
-              </TrackedLink>
-              <TrackedLink
-                to="/help"
-                className="text-[14px] font-medium text-gray-300 hover:text-voxxy-purple-brand transition-colors"
-                trackingData={{
-                  link_text: 'Help',
-                  destination_page: 'Help',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                Help
-              </TrackedLink>
-              <TrackedLink
-                to="/contact"
-                className="bg-voxxy-purple-brand text-white px-6 py-2.5 rounded-lg text-[14px] font-semibold hover:bg-purple-700 transition-all hover:-translate-y-0.5"
-                trackingData={{
-                  link_text: 'Get Started',
-                  destination_page: 'Contact',
-                  current_page: 'Home',
-                  link_position: 'header'
-                }}
-              >
-                Get Started →
-              </TrackedLink>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button
-              className="md:hidden p-2 text-white"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="absolute top-full left-0 right-0 bg-gradient-to-r from-voxxy-purple-deep/95 to-voxxy-purple-mid/95 backdrop-blur-xl border-b border-white/10 md:hidden">
-            <div className="container mx-auto px-6 py-4 space-y-4">
-              <Link to="/features" className="block text-gray-300 py-2" onClick={() => setMobileMenuOpen(false)}>Features</Link>
-              <Link to="/pricing" className="block text-gray-300 py-2" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
-              <Link to="/about" className="block text-gray-300 py-2" onClick={() => setMobileMenuOpen(false)}>About</Link>
-              <Link to="/help" className="block text-gray-300 py-2" onClick={() => setMobileMenuOpen(false)}>Help</Link>
-              <Link to="/contact" className="block bg-voxxy-purple-brand text-white px-6 py-2.5 rounded-lg text-center" onClick={() => setMobileMenuOpen(false)}>Get Started</Link>
-            </div>
-          </div>
-        )}
-      </nav>
+      <Navigation activePage="home" />
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative pt-[140px] pb-20 px-6 md:px-12 min-h-[90vh] flex items-center">
