@@ -162,8 +162,8 @@ class ErrorBoundary extends Component<Props, State> {
               errorMessage: this.state.error?.message || 'Unknown error',
               componentName: 'ErrorBoundary',
               timestamp: new Date().toISOString(),
-              stack: this.state.error?.stack,
-              componentStack: this.state.errorInfo?.componentStack,
+              stack: this.state.error?.stack || undefined,
+              componentStack: this.state.errorInfo?.componentStack || undefined,
             }}
             autoShow={false}
           />
