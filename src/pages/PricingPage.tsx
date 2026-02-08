@@ -28,14 +28,9 @@ export default function PricingPage() {
   usePageTracking('Pricing')
 
   // Section tracking
-  const { sectionRef: pricingCardRef, trackInteraction: trackPricingInteraction } = useSectionTracking({
+  const { sectionRef: pricingCardRef } = useSectionTracking({
     pageName: 'Pricing',
-    sectionName: 'Pricing Card',
-  })
-
-  const { sectionRef: whyPilotRef } = useSectionTracking({
-    pageName: 'Pricing',
-    sectionName: 'Why Pilot',
+    sectionName: 'Pricing Cards',
   })
 
   return (
@@ -45,13 +40,6 @@ export default function PricingPage() {
       {/* Hero Section */}
       <section className="relative py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center">
-          <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-medium rounded-full">
-              <Sparkles className="h-4 w-4 mr-2" />
-              Limited Pilot Program Spots Available
-            </div>
-          </div>
-
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
             Simple,{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
@@ -60,156 +48,142 @@ export default function PricingPage() {
           </h1>
 
           <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Join our pilot program and help shape the future of Voxxy Presents
+            Choose the plan that fits your event schedule
           </p>
         </div>
       </section>
 
-      {/* Pricing Card */}
+      {/* Pricing Cards */}
       <section ref={pricingCardRef} className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-2xl px-4">
-          <Card className="bg-white/5 backdrop-blur-sm border-2 border-purple-400/30 hover:border-purple-400/50 transition-all duration-300 shadow-2xl">
-            <CardHeader className="text-center pb-8">
-              <div className="flex justify-center mb-4">
-                <Badge className="bg-purple-500/20 border border-purple-400/30 text-purple-300 px-4 py-2">
-                  Pilot Program
-                </Badge>
-              </div>
-              <CardTitle className="text-4xl font-bold text-white mb-2">$15/month</CardTitle>
-              <CardDescription className="text-gray-200 text-lg">
-                Everything you need to build your recurring event community
-              </CardDescription>
-            </CardHeader>
-
-            <CardContent className="space-y-8">
-              {/* What's Included */}
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">What's Included:</h3>
-                <ul className="space-y-3">
-                  <li className="flex items-start text-gray-200">
-                    <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Full platform access</strong> - All Voxxy Presents features</span>
-                  </li>
-                  <li className="flex items-start text-gray-200">
-                    <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Venue network</strong> - Access to our growing venue marketplace</span>
-                  </li>
-                  <li className="flex items-start text-gray-200">
-                    <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Locked-in pricing</strong> - Your rate stays at $15/month forever</span>
-                  </li>
-                  <li className="flex items-start text-gray-200">
-                    <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Priority support</strong> - Direct access to our team</span>
-                  </li>
-                  <li className="flex items-start text-gray-200">
-                    <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Shape the product</strong> - Help us build features you need</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Pilot Benefits */}
-              <div className="bg-purple-500/10 border border-purple-400/20 rounded-lg p-6">
-                <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
-                  <Zap className="h-5 w-5 text-purple-400 mr-2" />
-                  Pilot Program Benefits
-                </h3>
-                <ul className="space-y-2 text-gray-200">
-                  <li className="flex items-start">
-                    <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0 mt-1" />
-                    <span>Be part of building the future of Voxxy Presents</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0 mt-1" />
-                    <span>Direct influence on feature roadmap</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0 mt-1" />
-                    <span>Early access to new features</span>
-                  </li>
-                  <li className="flex items-start">
-                    <Check className="h-4 w-4 text-purple-400 mr-2 flex-shrink-0 mt-1" />
-                    <span>Community of early adopters</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* CTA Button */}
-              <div className="pt-4">
-                <TrackedButton
-                  size="lg"
-                  className="w-full bg-purple-600 hover:bg-purple-700 text-white text-lg py-6"
-                  trackingData={{
-                    button_text: 'Request Pilot Access',
-                    button_location: 'pricing_card',
-                    page_name: 'Pricing',
-                    is_primary_cta: true,
-                    destination_page: 'Contact',
-                  }}
-                  onClick={() => {
-                    trackPricingInteraction('cta_click', 'Request Pilot Access');
-                    analytics.trackConversionStep('Pricing CTA Clicked', 'Pricing');
-                  }}
-                  asChild
-                >
-                  <Link to="/contact">
-                    Request Pilot Access
-                    <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
-                </TrackedButton>
-                <p className="text-center text-gray-300 text-sm mt-4">
-                  <Users className="h-4 w-4 inline mr-1" />
-                  Limited spots available - join the waitlist today
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Why Pilot Section */}
-      <section ref={whyPilotRef} className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-4xl px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Why Join the Pilot Program?
-            </h2>
-            <p className="text-xl text-gray-300 leading-relaxed">
-              We're in the pilot phase, taking limited spots to ensure quality and gather feedback
-            </p>
-          </div>
-
+        <div className="container mx-auto max-w-6xl px-4">
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-purple-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Locked-In Price</h3>
-              <p className="text-gray-200">
-                Your $15/month rate is guaranteed forever, even as we add more features and value
-              </p>
-            </div>
+            {/* Starter Plan */}
+            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-400/30 transition-all duration-300">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-2xl font-bold text-white mb-2">Starter</CardTitle>
+                <div className="text-4xl font-bold text-white mb-2">$80</div>
+                <CardDescription className="text-gray-300">per month</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <p className="text-gray-300 mb-4">Perfect for new producers</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Up to 10 events per year</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>10,000 vendor contacts</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Automated email workflows</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Vendor CRM</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Email support</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
+                  <Link to="/contact">Get Started</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Zap className="h-8 w-8 text-purple-300" />
+            {/* Growth Plan */}
+            <Card className="bg-white/5 backdrop-blur-sm border-2 border-purple-400/50 hover:border-purple-400/70 transition-all duration-300 shadow-2xl relative">
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                <Badge className="bg-purple-500 text-white px-4 py-1 text-sm">Most Popular</Badge>
               </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Build With Us</h3>
-              <p className="text-gray-200">
-                Direct input on features and roadmap—we're building this for you
-              </p>
-            </div>
+              <CardHeader className="text-center pb-6 pt-8">
+                <CardTitle className="text-2xl font-bold text-white mb-2">Growth</CardTitle>
+                <div className="text-4xl font-bold text-white mb-2">$160</div>
+                <CardDescription className="text-gray-300">per month</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <p className="text-gray-300 mb-4">For established producers</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Up to 50 events per year</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>50,000 vendor contacts</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Advanced email automation</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Vendor CRM with tagging</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Priority email support</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Custom branding</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
+                  <Link to="/contact">Get Started</Link>
+                </Button>
+              </CardContent>
+            </Card>
 
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="h-8 w-8 text-purple-300" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-2">Priority Access</h3>
-              <p className="text-gray-200">
-                Join a curated community of recurring event organizers and get priority support
-              </p>
-            </div>
+            {/* Enterprise Plan */}
+            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-400/30 transition-all duration-300">
+              <CardHeader className="text-center pb-6">
+                <CardTitle className="text-2xl font-bold text-white mb-2">Enterprise</CardTitle>
+                <div className="text-4xl font-bold text-white mb-2">$400</div>
+                <CardDescription className="text-gray-300">per month</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div>
+                  <p className="text-gray-300 mb-4">For large-scale operations</p>
+                  <ul className="space-y-3">
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Unlimited events</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Unlimited vendor contacts</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>White-label email automation</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Advanced CRM & analytics</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>Dedicated account manager</span>
+                    </li>
+                    <li className="flex items-start text-gray-200">
+                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                      <span>API access</span>
+                    </li>
+                  </ul>
+                </div>
+                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
+                  <Link to="/contact">Contact Sales</Link>
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </section>
@@ -218,14 +192,14 @@ export default function PricingPage() {
       <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Join?
+            Ready to Get Started?
           </h2>
           <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
-            Request access to our pilot program today - limited spots available
+            Join event producers who are scaling their recurring events with Voxxy
           </p>
           <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
             <Link to="/contact">
-              Request Pilot Access
+              Request Beta Access
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
