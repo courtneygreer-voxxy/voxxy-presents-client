@@ -12,6 +12,8 @@ interface ReportBugProps {
     userAgent?: string;
     url?: string;
     formData?: any;
+    stack?: string;
+    componentStack?: string;
   };
   autoShow?: boolean; // Whether this was triggered automatically (after failures)
 }
