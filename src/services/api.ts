@@ -2652,7 +2652,7 @@ export const bulletinsApi = {
 export const bugReportsApi = {
   /**
    * Submit a bug report
-   * POST /v1/presents/bug_reports
+   * POST /v1/shared/bug_reports
    */
   async create(data: {
     name: string
@@ -2661,7 +2661,7 @@ export const bugReportsApi = {
     error_context?: any
   }) {
     // Note: Bug reports endpoint is public (no auth required)
-    return fetchApi<{ id: number; message?: string }>('/v1/presents/bug_reports', {
+    return fetchApi<{ id: number; message?: string }>('/v1/shared/bug_reports', {
       method: 'POST',
       body: JSON.stringify({
         bug_report: {
@@ -2677,7 +2677,7 @@ export const bugReportsApi = {
 
   /**
    * Get all bug reports (admin only)
-   * GET /v1/presents/bug_reports
+   * GET /v1/shared/bug_reports
    */
   async getAll() {
     return fetchApi<Array<{
@@ -2687,12 +2687,12 @@ export const bugReportsApi = {
       bug_description: string
       error_context?: any
       created_at: string
-    }>>('/v1/presents/bug_reports')
+    }>>('/v1/shared/bug_reports')
   },
 
   /**
    * Get single bug report (admin only)
-   * GET /v1/presents/bug_reports/:id
+   * GET /v1/shared/bug_reports/:id
    */
   async getById(id: number) {
     return fetchApi<{
@@ -2702,7 +2702,7 @@ export const bugReportsApi = {
       bug_description: string
       error_context?: any
       created_at: string
-    }>(`/v1/presents/bug_reports/${id}`)
+    }>(`/v1/shared/bug_reports/${id}`)
   },
 }
 
