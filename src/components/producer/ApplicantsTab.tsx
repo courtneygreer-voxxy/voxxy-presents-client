@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Building2,
   Mail,
@@ -13,6 +13,9 @@ import {
   Clock,
   XCircle,
   AlertCircle,
+  MapPin,
+  Calendar,
+  CreditCard,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
@@ -32,6 +35,8 @@ interface Applicant {
   tiktok_handle?: string;
   created_at: string;
   reviewed_at?: string;
+  location?: string;
+  portfolio_images?: string[];
 }
 
 interface ApplicantsTabProps {
@@ -47,6 +52,7 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
@@ -80,6 +86,10 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
       }
 
       setApplicants(allSubmissions);
+      // Auto-select first applicant if available
+      if (allSubmissions.length > 0 && !selectedApplicant) {
+        setSelectedApplicant(allSubmissions[0]);
+      }
     } catch (err: any) {
       console.error('Failed to fetch applicants:', err);
       setError(err.message || 'Failed to load applicants');
@@ -104,12 +114,25 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
 
       // Remove from list if approved or rejected
       if (newStatus === 'approved' || newStatus === 'rejected') {
-        setApplicants((prev) => prev.filter((a) => a.id !== applicant.id));
+        setApplicants((prev) => {
+          const updated = prev.filter((a) => a.id !== applicant.id);
+          // Select next applicant if current one was selected
+          if (selectedApplicant?.id === applicant.id && updated.length > 0) {
+            setSelectedApplicant(updated[0]);
+          } else if (updated.length === 0) {
+            setSelectedApplicant(null);
+          }
+          return updated;
+        });
       } else {
         // Update status for waitlist
         setApplicants((prev) =>
           prev.map((a) => (a.id === applicant.id ? { ...a, status: newStatus } : a))
         );
+        // Update selected applicant if it's the one being modified
+        if (selectedApplicant?.id === applicant.id) {
+          setSelectedApplicant({ ...selectedApplicant, status: newStatus });
+        }
       }
     } catch (err: any) {
       console.error('Failed to update status:', err);
@@ -168,6 +191,20 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
     setSearchQuery('');
   };
 
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Not set';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return 'Invalid date';
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -193,220 +230,322 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   }
 
   return (
-    <div className="p-3 md:p-4">
-      {/* Header */}
-      <div className="mb-3">
-        <h2 className="text-lg font-bold text-white mb-0.5">Applicants</h2>
-        <p className="text-[10px] text-white/60">
-          {filteredApplicants.length} applications pending review
-        </p>
-      </div>
+    <div className="h-full flex flex-col">
+      {/* Two-Panel Layout */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Left Panel - Applicant List */}
+        <div className="w-80 border-r border-white/10 flex flex-col bg-[#0f0820]/50">
+          {/* List Header */}
+          <div className="p-3 border-b border-white/10">
+            <div className="mb-2">
+              <h2 className="text-sm font-bold text-white">Applicants</h2>
+              <p className="text-[10px] text-white/60">
+                {filteredApplicants.length} pending review
+              </p>
+            </div>
 
-      {/* Search Bar */}
-      <div className="relative mb-3">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-        <input
-          type="text"
-          placeholder="Search applicants..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-        />
-      </div>
+            {/* Search Bar */}
+            <div className="relative mb-2">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-7 pr-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+              />
+            </div>
 
-      {/* Filters */}
-      <div className="flex flex-wrap items-center gap-2 mb-3">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-        >
-          <option value="all">All Status</option>
-          <option value="pending">Pending Review</option>
-          <option value="waitlist">Waitlisted</option>
-        </select>
-
-        {hasActiveFilters && (
-          <button
-            onClick={clearFilters}
-            className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
-          >
-            Clear Filters
-          </button>
-        )}
-      </div>
-
-      {/* Applicants Grid */}
-      {filteredApplicants.length === 0 ? (
-        <div className="glass-card p-8 text-center">
-          <Building2 className="w-12 h-12 text-white/20 mx-auto mb-3" />
-          <h3 className="text-sm font-semibold text-white mb-1">No Pending Applications</h3>
-          <p className="text-xs text-white/60">
-            {hasActiveFilters
-              ? 'Try adjusting your filters or search query.'
-              : 'All applications have been reviewed!'}
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {filteredApplicants.map((applicant) => {
-            const statusBadge = getStatusBadge(applicant.status);
-            const StatusIcon = statusBadge.icon;
-            const isUpdating = updatingId === applicant.id;
-
-            return (
-              <div
-                key={applicant.id}
-                className="glass-card p-3 hover:bg-white/8 hover:border-white/20 transition-smooth"
+            {/* Status Filter */}
+            <div className="flex items-center gap-2">
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
               >
-                {/* Card Header */}
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-sm font-semibold text-white truncate mb-0.5">
-                      {applicant.business_name}
-                    </h3>
-                    {applicant.contact_name && (
-                      <p className="text-[11px] text-white/60 truncate">{applicant.contact_name}</p>
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="waitlist">Waitlist</option>
+              </select>
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="px-2 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Applicant List */}
+          <div className="flex-1 overflow-y-auto">
+            {filteredApplicants.length === 0 ? (
+              <div className="p-4 text-center">
+                <Building2 className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                <p className="text-xs text-white/60">
+                  {hasActiveFilters ? 'No matches found' : 'No pending applications'}
+                </p>
+              </div>
+            ) : (
+              <div className="p-2 space-y-1">
+                {filteredApplicants.map((applicant) => {
+                  const statusBadge = getStatusBadge(applicant.status);
+                  const StatusIcon = statusBadge.icon;
+                  const isSelected = selectedApplicant?.id === applicant.id;
+
+                  return (
+                    <button
+                      key={applicant.id}
+                      onClick={() => setSelectedApplicant(applicant)}
+                      className={`w-full p-2 rounded-lg text-left transition-smooth ${
+                        isSelected
+                          ? 'bg-purple-600/20 border border-purple-500/50'
+                          : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between mb-1">
+                        <h3 className="text-xs font-semibold text-white truncate flex-1">
+                          {applicant.business_name}
+                        </h3>
+                        <span
+                          className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${statusBadge.color} flex-shrink-0 ml-2`}
+                        >
+                          <StatusIcon className="w-2 h-2" />
+                          {statusBadge.label === 'Pending Review' ? 'Pending' : statusBadge.label}
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-white/60 truncate mb-1">
+                        {applicant.contact_name || applicant.email}
+                      </p>
+                      <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-500/20 text-purple-400">
+                        {applicant.vendor_category}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Panel - Detail View */}
+        <div className="flex-1 overflow-y-auto">
+          {!selectedApplicant ? (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <Building2 className="w-16 h-16 text-white/20 mx-auto mb-3" />
+                <h3 className="text-sm font-semibold text-white mb-1">No Applicant Selected</h3>
+                <p className="text-xs text-white/60">Select an applicant from the list to view details</p>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4">
+              {/* Detail Header */}
+              <div className="glass-card p-4 mb-3">
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex-1">
+                    <h2 className="text-lg font-bold text-white mb-1">{selectedApplicant.business_name}</h2>
+                    {selectedApplicant.contact_name && (
+                      <p className="text-sm text-white/80 mb-2">{selectedApplicant.contact_name}</p>
                     )}
+                    <span
+                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
+                        getStatusBadge(selectedApplicant.status).color
+                      }`}
+                    >
+                      {React.createElement(getStatusBadge(selectedApplicant.status).icon, {
+                        className: 'w-3 h-3',
+                      })}
+                      {getStatusBadge(selectedApplicant.status).label}
+                    </span>
                   </div>
-                  <span
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusBadge.color} flex-shrink-0 ml-2`}
-                  >
-                    <StatusIcon className="w-2.5 h-2.5" />
-                    {statusBadge.label}
-                  </span>
+                </div>
+
+                {/* Contact Info Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-3">
+                  <div>
+                    <p className="text-[10px] text-white/60 mb-1">Email</p>
+                    <a
+                      href={`mailto:${selectedApplicant.email}`}
+                      className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                    >
+                      <Mail className="w-3.5 h-3.5 flex-shrink-0" />
+                      <span className="truncate">{selectedApplicant.email}</span>
+                    </a>
+                  </div>
+                  {selectedApplicant.phone && (
+                    <div>
+                      <p className="text-[10px] text-white/60 mb-1">Phone</p>
+                      <a
+                        href={`tel:${selectedApplicant.phone}`}
+                        className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                      >
+                        <Phone className="w-3.5 h-3.5 flex-shrink-0" />
+                        <span>{selectedApplicant.phone}</span>
+                      </a>
+                    </div>
+                  )}
+                  {selectedApplicant.location && (
+                    <div>
+                      <p className="text-[10px] text-white/60 mb-1">Location</p>
+                      <div className="flex items-center gap-1.5 text-xs text-white/80">
+                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
+                        <span>{selectedApplicant.location}</span>
+                      </div>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-[10px] text-white/60 mb-1">Applied</p>
+                    <div className="flex items-center gap-1.5 text-xs text-white/80">
+                      <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
+                      <span>{formatDate(selectedApplicant.created_at)}</span>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Category */}
-                <div className="mb-2">
-                  <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 text-purple-400">
-                    {applicant.vendor_category}
+                <div className="mb-3">
+                  <p className="text-[10px] text-white/60 mb-1">Category</p>
+                  <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-500/20 text-purple-400">
+                    {selectedApplicant.vendor_category}
                   </span>
                 </div>
+              </div>
 
-                {/* Contact Info */}
-                <div className="space-y-1.5 mb-3">
-                  <a
-                    href={`mailto:${applicant.email}`}
-                    className="flex items-center gap-1.5 text-[11px] text-purple-400 hover:text-purple-300 transition-smooth"
-                  >
-                    <Mail className="w-3 h-3 flex-shrink-0" />
-                    <span className="truncate">{applicant.email}</span>
-                  </a>
-
-                  {applicant.phone && (
-                    <a
-                      href={`tel:${applicant.phone}`}
-                      className="flex items-center gap-1.5 text-[11px] text-purple-400 hover:text-purple-300 transition-smooth"
-                    >
-                      <Phone className="w-3 h-3 flex-shrink-0" />
-                      <span>{applicant.phone}</span>
-                    </a>
-                  )}
-                </div>
-
-                {/* Social Links */}
-                <div className="flex flex-wrap gap-1.5 mb-3">
-                  {applicant.portfolio && (
+              {/* Social & Links */}
+              <div className="glass-card p-4 mb-3">
+                <h3 className="text-sm font-semibold text-white mb-3">Social & Links</h3>
+                <div className="flex flex-wrap gap-2">
+                  {selectedApplicant.instagram_handle && (
                     <a
                       href={
-                        applicant.portfolio.startsWith('http')
-                          ? applicant.portfolio
-                          : `https://${applicant.portfolio}`
+                        selectedApplicant.instagram_handle.startsWith('http')
+                          ? selectedApplicant.instagram_handle
+                          : `https://instagram.com/${selectedApplicant.instagram_handle.replace('@', '')}`
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/80 hover:text-white transition-smooth"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
                     >
-                      <Star className="w-3 h-3 text-yellow-400" />
+                      <Instagram className="w-4 h-4" />
+                      <span>Instagram</span>
+                      <ExternalLink className="w-3 h-3 ml-auto" />
+                    </a>
+                  )}
+                  {selectedApplicant.tiktok_handle && (
+                    <a
+                      href={
+                        selectedApplicant.tiktok_handle.startsWith('http')
+                          ? selectedApplicant.tiktok_handle
+                          : `https://tiktok.com/@${selectedApplicant.tiktok_handle.replace('@', '')}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                    >
+                      <Music className="w-4 h-4" />
+                      <span>TikTok</span>
+                      <ExternalLink className="w-3 h-3 ml-auto" />
+                    </a>
+                  )}
+                  {selectedApplicant.portfolio && (
+                    <a
+                      href={
+                        selectedApplicant.portfolio.startsWith('http')
+                          ? selectedApplicant.portfolio
+                          : `https://${selectedApplicant.portfolio}`
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                    >
+                      <Star className="w-4 h-4 text-yellow-400" />
                       <span>Portfolio</span>
-                      <ExternalLink className="w-2.5 h-2.5" />
+                      <ExternalLink className="w-3 h-3 ml-auto" />
                     </a>
                   )}
-                  {applicant.instagram_handle && (
+                  {selectedApplicant.website && (
                     <a
                       href={
-                        applicant.instagram_handle.startsWith('http')
-                          ? applicant.instagram_handle
-                          : `https://instagram.com/${applicant.instagram_handle.replace('@', '')}`
+                        selectedApplicant.website.startsWith('http')
+                          ? selectedApplicant.website
+                          : `https://${selectedApplicant.website}`
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/80 hover:text-white transition-smooth"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
                     >
-                      <Instagram className="w-3 h-3" />
-                      <ExternalLink className="w-2.5 h-2.5" />
+                      <Globe className="w-4 h-4" />
+                      <span>Website</span>
+                      <ExternalLink className="w-3 h-3 ml-auto" />
                     </a>
                   )}
-                  {applicant.tiktok_handle && (
-                    <a
-                      href={
-                        applicant.tiktok_handle.startsWith('http')
-                          ? applicant.tiktok_handle
-                          : `https://tiktok.com/@${applicant.tiktok_handle.replace('@', '')}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/80 hover:text-white transition-smooth"
-                    >
-                      <Music className="w-3 h-3" />
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                  )}
-                  {applicant.website && (
-                    <a
-                      href={
-                        applicant.website.startsWith('http')
-                          ? applicant.website
-                          : `https://${applicant.website}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[11px] text-white/80 hover:text-white transition-smooth"
-                    >
-                      <Globe className="w-3 h-3" />
-                      <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
-                  )}
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 pt-2 border-t border-white/10">
-                  {isUpdating ? (
-                    <div className="flex items-center justify-center w-full py-2">
-                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                    </div>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => handleUpdateStatus(applicant, 'approved')}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-xs font-medium transition-smooth"
-                      >
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(applicant, 'waitlist')}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-xs font-medium transition-smooth"
-                      >
-                        <AlertCircle className="w-3.5 h-3.5" />
-                        Waitlist
-                      </button>
-                      <button
-                        onClick={() => handleUpdateStatus(applicant, 'rejected')}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-xs font-medium transition-smooth"
-                      >
-                        <XCircle className="w-3.5 h-3.5" />
-                        Decline
-                      </button>
-                    </>
-                  )}
+                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10">
+                    <CreditCard className="w-4 h-4 text-purple-400" />
+                    <span>Voxxy Card</span>
+                    <ExternalLink className="w-3 h-3 ml-auto" />
+                  </button>
                 </div>
               </div>
-            );
-          })}
+
+              {/* Portfolio Images */}
+              {selectedApplicant.portfolio_images && selectedApplicant.portfolio_images.length > 0 && (
+                <div className="glass-card p-4 mb-3">
+                  <h3 className="text-sm font-semibold text-white mb-3">Images</h3>
+                  <div className="grid grid-cols-3 gap-2">
+                    {selectedApplicant.portfolio_images.map((image, idx) => (
+                      <div
+                        key={idx}
+                        className="aspect-square rounded-lg bg-white/5 border border-white/10 overflow-hidden"
+                      >
+                        <img
+                          src={image}
+                          alt={`Portfolio ${idx + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="glass-card p-4">
+                {updatingId === selectedApplicant.id ? (
+                  <div className="flex items-center justify-center py-3">
+                    <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleUpdateStatus(selectedApplicant, 'approved')}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-smooth"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Approve
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedApplicant, 'waitlist')}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium transition-smooth"
+                    >
+                      <AlertCircle className="w-4 h-4" />
+                      Waitlist
+                    </button>
+                    <button
+                      onClick={() => handleUpdateStatus(selectedApplicant, 'rejected')}
+                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-smooth"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Decline
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
 
       {/* Email Notification Dialog */}
       <EmailConfirmationDialog
