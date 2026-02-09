@@ -749,7 +749,8 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                                 className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {availableCategories.length > 0 ? (
-                                  availableCategories.map((category) => (
+                                  // Show all available categories, ensuring current category is included
+                                  [...new Set([row.category, ...availableCategories])].filter(Boolean).sort().map((category) => (
                                     <option key={category} value={category}>
                                       {category}
                                     </option>
