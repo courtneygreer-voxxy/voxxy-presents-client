@@ -72,6 +72,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
   const [notesEditValue, setNotesEditValue] = useState('');
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
@@ -91,6 +92,16 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
       // Fetch vendor applications and their submissions
       const vendorApps = await vendorApplicationsApi.getByEvent(eventSlug);
+
+      // Extract unique categories from all applications
+      const categoriesSet = new Set<string>();
+      vendorApps.forEach((app: any) => {
+        if (app.categories && Array.isArray(app.categories)) {
+          app.categories.forEach((cat: string) => categoriesSet.add(cat));
+        }
+      });
+      setAvailableCategories(Array.from(categoriesSet).sort());
+
       const allSubmissions: any[] = [];
 
       for (const app of vendorApps) {
@@ -640,15 +651,15 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                                 disabled={isUpdatingCategory}
                                 className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
-                                <option value="Artist">Artist</option>
-                                <option value="Artisan">Artisan</option>
-                                <option value="Crafts">Crafts</option>
-                                <option value="Food & Beverage">Food & Beverage</option>
-                                <option value="Jewelry">Jewelry</option>
-                                <option value="Clothing">Clothing</option>
-                                <option value="Home Goods">Home Goods</option>
-                                <option value="Entertainment">Entertainment</option>
-                                <option value="Other">Other</option>
+                                {availableCategories.length > 0 ? (
+                                  availableCategories.map((category) => (
+                                    <option key={category} value={category}>
+                                      {category}
+                                    </option>
+                                  ))
+                                ) : (
+                                  <option value={row.category}>{row.category}</option>
+                                )}
                               </select>
                             </div>
                           )}
