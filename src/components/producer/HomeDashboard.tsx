@@ -23,11 +23,13 @@ import {
   scheduledEmailsApi,
   bulletinsApi,
 } from '@/services/api';
+import GoLiveCard from './GoLiveCard';
 
 interface HomeDashboardProps {
   eventSlug: string;
   event: any;
   onNavigateToTab?: (tab: string) => void;
+  organizationId?: number;
 }
 
 interface DashboardStats {
@@ -53,7 +55,7 @@ interface Bulletin {
   created_at: string;
 }
 
-export default function HomeDashboard({ eventSlug, event, onNavigateToTab }: HomeDashboardProps) {
+export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organizationId }: HomeDashboardProps) {
   const [stats, setStats] = useState<DashboardStats>({
     totalInvited: 0,
     applied: 0,
@@ -245,6 +247,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab }: Hom
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column - Upcoming Emails & Bulletins */}
         <div className="lg:col-span-2 space-y-4">
+          {/* Go Live Card */}
+          <GoLiveCard
+            event={event}
+            onGoLive={fetchDashboardData}
+            organizationId={organizationId}
+          />
           {/* Upcoming Emails */}
           <div className="glass-card p-3">
             <div className="flex items-center justify-between mb-3">

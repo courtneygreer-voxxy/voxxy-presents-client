@@ -247,7 +247,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
 
   return (
     <>
-      <HomeDashboard eventSlug={event.slug} event={event} onNavigateToTab={onNavigateToTab} />
+      <HomeDashboard eventSlug={event.slug} event={event} onNavigateToTab={onNavigateToTab} organizationId={organizationId} />
       {/* Original detailed view below - can be accessed via Edit button */}
       <div className="hidden p-6 space-y-6">
       {/* Dashboard Cards */}
