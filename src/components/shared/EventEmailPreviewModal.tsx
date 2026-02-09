@@ -42,6 +42,8 @@ type EmailPreviewData = {
   overdue?: boolean;
   overdue_message?: string;
   isInvitationAnnouncement?: boolean;
+  trigger_type?: string;
+  trigger_value?: number | null;
 };
 
 interface EventEmailPreviewModalProps {
@@ -70,6 +72,32 @@ const DEFAULT_CATEGORIES = [
   { value: 'table_vendor', label: 'Table Vendor' },
   { value: 'sponsor', label: 'Sponsor' },
 ];
+
+// Format trigger type for display
+const formatTrigger = (triggerType?: string, triggerValue?: number | null): string => {
+  if (!triggerType) return '';
+
+  switch (triggerType) {
+    case 'days_before_event':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`;
+    case 'days_after_event':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
+    case 'days_before_deadline':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
+    case 'on_application_open':
+      return 'When applications open';
+    case 'on_application_submit':
+      return 'On application submission';
+    case 'on_approval':
+      return 'On application approval';
+    case 'on_payment_deadline':
+      return 'On payment deadline';
+    case 'on_event_date':
+      return 'On event day';
+    default:
+      return triggerType.replace(/_/g, ' ');
+  }
+};
 
 export default function EventEmailPreviewModal({
   isOpen,
@@ -176,6 +204,14 @@ export default function EventEmailPreviewModal({
           {/* Email Metadata */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
             <div className="flex flex-wrap items-center gap-3 mb-3">
+              {/* Trigger */}
+              {email.trigger_type && (
+                <div className="flex items-center gap-2 text-sm text-white/80">
+                  <Mail className="w-4 h-4 text-purple-400" />
+                  <span>{formatTrigger(email.trigger_type, email.trigger_value)}</span>
+                </div>
+              )}
+
               {/* Date */}
               {email.scheduled_for && (
                 <div className="flex items-center gap-2 text-sm text-white/80">
@@ -311,10 +347,11 @@ export default function EventEmailPreviewModal({
                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
                   Message Body
                 </label>
-                <div
-                  className="bg-white rounded-lg p-6 border border-white/10 prose prose-sm max-w-none"
-                  dangerouslySetInnerHTML={{ __html: previewData.body }}
-                />
+                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+                  <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                    {previewData.body.replace(/<[^>]*>/g, '')}
+                  </pre>
+                </div>
               </div>
 
               {/* Info Note */}
