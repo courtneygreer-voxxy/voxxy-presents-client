@@ -22,6 +22,7 @@ import { eventsApi, vendorApplicationsApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import GoLiveCard from './GoLiveCard';
+import HomeDashboard from './HomeDashboard';
 
 interface Event {
   id: number;
@@ -245,7 +246,10 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <>
+      <HomeDashboard eventSlug={event.slug} event={event} onNavigateToTab={onNavigateToTab} />
+      {/* Original detailed view below - can be accessed via Edit button */}
+      <div className="hidden p-6 space-y-6">
       {/* Dashboard Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Applicants Card */}
@@ -692,6 +696,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
         type={dialogProps.type}
         isLoading={dialogProps.isLoading}
       />
-    </div>
+      </div>
+    </>
   );
 }
