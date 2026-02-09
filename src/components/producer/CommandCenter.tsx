@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Users, Building2, Settings, Info, Mail, Megaphone, DollarSign } from 'lucide-react';
 import EventSettings from './EventSettings';
-import ApplicantsTab from './ApplicantsTab';
+import InvitesTab from './InvitesTab';
 import VendorsTab from './VendorsTab';
 import EventDetailsTab from './EventDetailsTab';
 import { EmailAutomationTab } from './Email';
@@ -45,14 +45,14 @@ interface CommandCenterProps {
   organizationId?: number;
 }
 
-type Tab = 'details' | 'applicants' | 'vendors' | 'bulletins' | 'emails' | 'payments' | 'settings';
+type Tab = 'details' | 'invites' | 'vendors' | 'bulletins' | 'emails' | 'payments' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
 
   const tabs = [
     { id: 'details' as Tab, label: 'Home', icon: Info },
-    { id: 'applicants' as Tab, label: 'Applicants', icon: Users },
+    { id: 'invites' as Tab, label: 'Invites', icon: Users },
     { id: 'vendors' as Tab, label: 'Vendors', icon: Building2 },
     { id: 'bulletins' as Tab, label: 'Bulletins', icon: Megaphone },
     { id: 'emails' as Tab, label: 'Mail', icon: Mail },
@@ -71,10 +71,11 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
             organizationId={organizationId}
           />
         );
-      case 'applicants':
+      case 'invites':
         return (
-          <ApplicantsTab
+          <InvitesTab
             eventSlug={event.slug}
+            organizationId={organizationId}
           />
         );
       case 'vendors':
