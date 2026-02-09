@@ -99,27 +99,27 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0a0515]">
+    <div className="h-full flex flex-col">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0f0820] px-6 py-5">
-        <div className="flex items-center justify-between mb-6">
+      <div className="border-b border-white/10 bg-[#0f0820] px-4 py-3">
+        <div className="flex items-center justify-between mb-3">
           <div>
-            <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+            <h1 className="text-lg font-bold gradient-text mb-1">
               Command Center
             </h1>
-            <p className="text-base text-white/70">{event.title}</p>
+            <p className="text-sm text-white/70">{event.title}</p>
           </div>
           <button
             onClick={onBack}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/30 text-white hover:bg-white/5 hover:border-white/50 transition-all"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 hover:border-white/50 transition-smooth text-xs"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Back to Events</span>
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-1">
+        <div className="flex gap-1 overflow-x-auto pb-1">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -128,13 +128,13 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-smooth whitespace-nowrap ${
                   isActive
-                    ? 'bg-purple-600 text-white border-b-2 border-purple-400'
+                    ? 'bg-purple-600 text-white'
                     : 'text-white/60 hover:text-white hover:bg-white/5'
                 }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
                 {tab.label}
               </button>
             );
