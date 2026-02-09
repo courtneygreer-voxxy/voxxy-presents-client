@@ -349,19 +349,32 @@ export default function EventEmailPreviewModal({
                 </label>
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                    {previewData.body.replace(/<[^>]*>/g, '')}
+                    {(() => {
+                      const strippedBody = previewData.body.replace(/<[^>]*>/g, '');
+                      const footerMatch = strippedBody.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
+                      return footerMatch ? strippedBody.substring(0, footerMatch.index) : strippedBody;
+                    })()}
                   </pre>
                 </div>
               </div>
 
-              {/* Info Note */}
-              <div className="bg-blue-500/10 rounded-lg p-4 border border-blue-500/20">
-                <p className="text-blue-300 text-sm">
-                  <strong>Note:</strong> This preview shows the email with variables
-                  resolved using a sample recipient. Actual emails sent to other recipients
-                  may vary based on their specific information.
-                </p>
-              </div>
+              {/* Footer */}
+              {(() => {
+                const strippedBody = previewData.body.replace(/<[^>]*>/g, '');
+                const footerMatch = strippedBody.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
+                return footerMatch ? (
+                  <div>
+                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                      Email Footer
+                    </label>
+                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                      <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
+                        {footerMatch[0].trim()}
+                      </pre>
+                    </div>
+                  </div>
+                ) : null;
+              })()}
             </div>
           )}
         </div>

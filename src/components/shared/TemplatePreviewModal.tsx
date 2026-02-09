@@ -46,8 +46,29 @@ export default function TemplatePreviewModal({
     return tmp.textContent || tmp.innerText || '';
   };
 
+  // Extract footer from body
+  const extractFooter = (body: string): { body: string; footer: string | null } => {
+    const footerPatterns = [
+      /\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?\n\[organizationName\]$/i,
+      /\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?\n.*$/i,
+    ];
+
+    for (const pattern of footerPatterns) {
+      const match = body.match(pattern);
+      if (match) {
+        return {
+          body: body.substring(0, match.index),
+          footer: match[0].trim(),
+        };
+      }
+    }
+
+    return { body, footer: null };
+  };
+
   const displaySubject = stripHtml(template.subject_template);
-  const displayBody = stripHtml(template.body_template);
+  const strippedBody = stripHtml(template.body_template);
+  const { body: displayBody, footer: displayFooter } = extractFooter(strippedBody);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -66,17 +87,6 @@ export default function TemplatePreviewModal({
             {template.description && (
               <p className="text-white/60 text-sm mt-1">{template.description}</p>
             )}
-          </div>
-
-          {/* Info Banner */}
-          <div className="flex items-start gap-3 px-4 py-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
-            <Info className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-blue-300 text-sm font-medium">Template Preview</p>
-              <p className="text-blue-300/80 text-xs mt-1">
-                Variables shown in [brackets] will be replaced with actual data when sent to recipients.
-              </p>
-            </div>
           </div>
 
           {/* Subject */}
@@ -101,27 +111,19 @@ export default function TemplatePreviewModal({
             </div>
           </div>
 
-          {/* Variable Reference */}
-          <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-            <p className="text-purple-300 text-xs font-semibold mb-2">Common Variables:</p>
-            <div className="flex flex-wrap gap-2">
-              <code className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                [firstName]
-              </code>
-              <code className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                [eventName]
-              </code>
-              <code className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                [eventDate]
-              </code>
-              <code className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                [eventLocation]
-              </code>
-              <code className="text-xs px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                [categoryPrice]
-              </code>
+          {/* Footer */}
+          {displayFooter && (
+            <div>
+              <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                Email Footer
+              </label>
+              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
+                  {displayFooter}
+                </pre>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Footer Actions */}

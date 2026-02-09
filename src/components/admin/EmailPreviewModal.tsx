@@ -2,7 +2,7 @@
  * EmailPreviewModal - Admin Panel
  *
  * Displays email preview from admin testing panel.
- * Shows the full rendered HTML email in an iframe.
+ * Shows the email content with glassmorphism styling.
  */
 
 import { X, Mail, Loader2 } from 'lucide-react';
@@ -29,6 +29,28 @@ export default function EmailPreviewModal({
   emailHtml,
   loading,
 }: EmailPreviewModalProps) {
+  // Strip HTML tags for clean display
+  const stripHtml = (html: string) => {
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
+  // Extract footer from body
+  const extractFooter = (text: string): { body: string; footer: string | null } => {
+    const footerMatch = text.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
+    if (footerMatch) {
+      return {
+        body: text.substring(0, footerMatch.index),
+        footer: footerMatch[0].trim(),
+      };
+    }
+    return { body: text, footer: null };
+  };
+
+  const displayText = stripHtml(emailHtml);
+  const { body: displayBody, footer: displayFooter } = extractFooter(displayText);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
@@ -52,15 +74,33 @@ export default function EmailPreviewModal({
               <p className="text-white/60">Loading preview...</p>
             </div>
           ) : emailHtml ? (
-            /* Email HTML */
-            <div className="bg-white rounded-lg overflow-hidden">
-              <iframe
-                srcDoc={emailHtml}
-                title="Email Preview"
-                className="w-full h-[600px] border-0"
-                sandbox="allow-same-origin"
-              />
-            </div>
+            <>
+              {/* Message Body */}
+              <div>
+                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                  Message Body
+                </label>
+                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+                  <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                    {displayBody}
+                  </pre>
+                </div>
+              </div>
+
+              {/* Footer */}
+              {displayFooter && (
+                <div>
+                  <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                    Email Footer
+                  </label>
+                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+                    <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
+                      {displayFooter}
+                    </pre>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex items-center justify-center py-12">
               <p className="text-white/60">No preview available</p>

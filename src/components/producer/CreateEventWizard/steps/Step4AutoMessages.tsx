@@ -195,11 +195,10 @@ export default function Step4AutoMessages({
           /* Email List - Table View */
           <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
             {/* Table Header */}
-            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-12 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
-              <div className="col-span-4">Email</div>
-              <div className="col-span-3">Trigger</div>
+            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-10 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
               <div className="col-span-2">Send Date</div>
-              <div className="col-span-2">Recipients</div>
+              <div className="col-span-3">Trigger</div>
+              <div className="col-span-4">Email</div>
               <div className="col-span-1 text-right">Actions</div>
             </div>
 
@@ -217,26 +216,8 @@ export default function Step4AutoMessages({
                 return (
                   <div
                     key={email.id}
-                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-12 gap-4 items-center"
+                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-10 gap-4 items-center"
                   >
-                    {/* Email Name & Subject */}
-                    <div className="col-span-4 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
-                        {!email.enabled_by_default && (
-                          <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
-                            Auto
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
-                    </div>
-
-                    {/* Trigger */}
-                    <div className="col-span-3 text-sm text-white/80">
-                      {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
-                    </div>
-
                     {/* Send Date */}
                     <div className="col-span-2">
                       {sendDate ? (
@@ -249,12 +230,22 @@ export default function Step4AutoMessages({
                       )}
                     </div>
 
-                    {/* Recipients */}
-                    <div className="col-span-2">
-                      <div className="flex items-center gap-1.5 text-xs text-white/60">
-                        <Users className="w-3.5 h-3.5" />
-                        <span>All Vendors</span>
+                    {/* Trigger */}
+                    <div className="col-span-3 text-sm text-white/80">
+                      {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
+                    </div>
+
+                    {/* Email Name & Subject */}
+                    <div className="col-span-4 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
+                        {!email.enabled_by_default && (
+                          <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
+                            Auto
+                          </span>
+                        )}
                       </div>
+                      <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
                     </div>
 
                     {/* Actions */}
