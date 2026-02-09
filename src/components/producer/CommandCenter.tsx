@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, Building2, Settings, Info, Mail, Megaphone, DollarSign } from 'lucide-react';
+import { ArrowLeft, Users, ClipboardList, Settings, Info, Mail, Megaphone, DollarSign } from 'lucide-react';
 import EventSettings from './EventSettings';
 import InvitesTab from './InvitesTab';
-import VendorsTab from './VendorsTab';
+import ApplicantsTab from './ApplicantsTab';
 import EventDetailsTab from './EventDetailsTab';
 import { EmailAutomationTab } from './Email';
 import { BulletinsTab } from './Bulletins';
@@ -45,7 +45,7 @@ interface CommandCenterProps {
   organizationId?: number;
 }
 
-type Tab = 'details' | 'invites' | 'vendors' | 'bulletins' | 'emails' | 'payments' | 'settings';
+type Tab = 'details' | 'invites' | 'applicants' | 'bulletins' | 'emails' | 'payments' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
@@ -53,7 +53,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
   const tabs = [
     { id: 'details' as Tab, label: 'Home', icon: Info },
     { id: 'invites' as Tab, label: 'Invites', icon: Users },
-    { id: 'vendors' as Tab, label: 'Vendors', icon: Building2 },
+    { id: 'applicants' as Tab, label: 'Applicants', icon: ClipboardList },
     { id: 'bulletins' as Tab, label: 'Bulletins', icon: Megaphone },
     { id: 'emails' as Tab, label: 'Mail', icon: Mail },
     { id: 'payments' as Tab, label: 'Payments', icon: DollarSign },
@@ -78,8 +78,8 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
             organizationId={organizationId}
           />
         );
-      case 'vendors':
-        return <VendorsTab eventSlug={event.slug} />;
+      case 'applicants':
+        return <ApplicantsTab eventSlug={event.slug} />;
       case 'bulletins':
         return <BulletinsTab eventSlug={event.slug} />;
       case 'emails':

@@ -141,13 +141,18 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         if (!email) return;
 
         if (emailMap.has(email)) {
-          // Contact applied - update source and add invite data
+          // Contact applied - update source and merge contact data
           const existing = emailMap.get(email)!;
           existing.source = 'contact';
           existing.isReturning = contact.source === 'returning' || contact.source === 'past_event';
           existing.producerNotes = contact.notes;
           existing.tags = contact.tags || [];
-          existing.location = contact.location;
+          existing.location = contact.location || existing.location;
+          // Merge social media - prefer application data but fall back to contact data
+          existing.instagram = existing.instagram || contact.instagram_handle;
+          existing.tiktok = existing.tiktok || contact.tiktok_handle;
+          existing.website = existing.website || contact.website;
+          existing.phone = existing.phone || contact.phone;
         } else {
           // Contact was invited but hasn't applied yet
           emailMap.set(email, {
