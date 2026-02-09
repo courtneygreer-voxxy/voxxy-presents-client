@@ -111,6 +111,7 @@ export default function EventEmailPreviewModal({
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showingTemplate, setShowingTemplate] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(
     availableCategories[0]?.value || 'artist'
   );
@@ -129,6 +130,7 @@ export default function EventEmailPreviewModal({
 
     setIsLoading(true);
     setError(null);
+    setShowingTemplate(false);
     try {
       // Special handling for invitation emails
       if (email.isInvitationAnnouncement) {
@@ -150,11 +152,23 @@ export default function EventEmailPreviewModal({
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load email preview';
 
-      // Provide helpful message when no registrations exist
+      // When no registrations exist, show template with [brackets]
       if (errorMessage.includes('No registration found')) {
-        setError(
-          'No vendor applications found for this event yet. The preview will be available once vendors start applying.'
-        );
+        setShowingTemplate(true);
+
+        // Strip HTML from templates for clean display
+        const stripHtml = (html: string) => {
+          const tmp = document.createElement('div');
+          tmp.innerHTML = html;
+          return tmp.textContent || tmp.innerText || '';
+        };
+
+        setPreviewData({
+          subject: stripHtml(email.subject_template || ''),
+          body: stripHtml(email.body_template || ''),
+          recipient_email: '[vendorEmail]',
+          recipient_name: '[vendorName]',
+        });
       } else {
         setError(errorMessage);
       }
@@ -295,34 +309,29 @@ export default function EventEmailPreviewModal({
             </div>
           )}
 
+          {/* Template Fallback Notice */}
+          {showingTemplate && !isLoading && (
+            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
+              <p className="text-yellow-400 text-sm">
+                No vendor applications found yet. Showing template with [variables] unresolved.
+              </p>
+            </div>
+          )}
+
           {/* Error State */}
           {error && !isLoading && (
-            <div
-              className={`p-4 rounded-lg ${
-                error.includes('No vendor applications')
-                  ? 'bg-yellow-500/10 border border-yellow-500/20'
-                  : 'bg-red-500/10 border border-red-500/20'
-              }`}
-            >
-              <p
-                className={
-                  error.includes('No vendor applications')
-                    ? 'text-yellow-400'
-                    : 'text-red-400'
-                }
-              >
-                {error}
-              </p>
+            <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+              <p className="text-red-400">{error}</p>
             </div>
           )}
 
           {/* Preview Content */}
           {previewData && !isLoading && (
             <div className="space-y-4">
-              {/* Sample Recipient */}
+              {/* Category View */}
               <div>
                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
-                  Preview Recipient
+                  Category View
                 </label>
                 <div className="bg-white/5 rounded-lg p-3 border border-white/10">
                   <p className="text-white font-medium text-sm">

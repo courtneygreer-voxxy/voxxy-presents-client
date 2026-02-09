@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, ChevronDown, ChevronUp, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
+import { Mail, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
 import { emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
@@ -27,9 +27,6 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [expandedCategories, setExpandedCategories] = useState<Set<EmailCategory>>(
-    new Set(['pre_application', 'application', 'payment', 'pre_event'])
-  );
 
   // Email preview modal state
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -68,18 +65,6 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   const handleBackToLibrary = () => {
     setViewMode('library');
     setSelectedTemplate(null);
-  };
-
-  const toggleCategory = (category: EmailCategory) => {
-    setExpandedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
   };
 
   const handlePreviewEmail = (email: EmailTemplateItem) => {
@@ -317,22 +302,6 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   if (viewMode === 'detail' && selectedTemplate) {
     const emailItems = selectedTemplate.email_template_items || [];
 
-    // Group emails by category
-    const emailsByCategory = emailItems.reduce((acc, email) => {
-      if (!acc[email.category]) {
-        acc[email.category] = [];
-      }
-      acc[email.category].push(email);
-      return acc;
-    }, {} as Record<EmailCategory, EmailTemplateItem[]>);
-
-    // Sort categories by order
-    const sortedCategories = Object.keys(emailsByCategory).sort((a, b) => {
-      const orderA = CATEGORY_CONFIG[a as EmailCategory]?.order || 999;
-      const orderB = CATEGORY_CONFIG[b as EmailCategory]?.order || 999;
-      return orderA - orderB;
-    }) as EmailCategory[];
-
     const enabledCount = emailItems.filter(e => e.enabled_by_default).length;
     const totalCount = emailItems.length;
 
@@ -378,140 +347,63 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
           </div>
         </div>
 
-        {/* Email Categories */}
-        <div className="space-y-4">
-          {sortedCategories.map((category) => {
-            const categoryEmails = emailsByCategory[category] || [];
-            const enabledInCategory = categoryEmails.filter(e => e.enabled_by_default).length;
-            const isExpanded = expandedCategories.has(category);
+        {/* Email Table */}
+        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+          {/* Table Header */}
+          <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-10 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
+            <div className="col-span-2">Send Date</div>
+            <div className="col-span-3">Trigger</div>
+            <div className="col-span-4">Email</div>
+            <div className="col-span-1 text-right">Actions</div>
+          </div>
 
-            return (
-              <div key={category} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-                {/* Category Header */}
-                <button
-                  onClick={() => toggleCategory(category)}
-                  className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
-                  type="button"
+          {/* Table Body */}
+          <div className="divide-y divide-white/10">
+            {emailItems.map((email: EmailTemplateItem) => {
+              const triggerBadge = getTriggerBadge(email);
+
+              return (
+                <div
+                  key={email.id}
+                  className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-10 gap-4 items-center"
                 >
-                  <div className="flex items-center gap-3">
-                    <Mail className="w-5 h-5 text-purple-400" />
-                    <div className="text-left">
-                      <h3 className="text-base font-semibold text-white">
-                        {CATEGORY_CONFIG[category]?.label || category}
-                      </h3>
-                      <p className="text-xs text-white/60">
-                        {CATEGORY_CONFIG[category]?.label === 'Event Announcements'
-                          ? 'Promote your event and drive applications'
-                          : CATEGORY_CONFIG[category]?.label === 'Application Updates'
-                          ? 'Notify applicants of their status'
-                          : CATEGORY_CONFIG[category]?.label === 'Payment Reminders'
-                          ? 'Payment deadline countdown and follow-ups'
-                          : 'Automated email notifications'}
-                      </p>
+                  {/* Send Date - Not available for templates */}
+                  <div className="col-span-2">
+                    <span className="text-xs text-white/40">Event specific</span>
+                  </div>
+
+                  {/* Trigger */}
+                  <div className="col-span-3 text-sm text-white/80">
+                    {triggerBadge.text}
+                  </div>
+
+                  {/* Email Name & Subject */}
+                  <div className="col-span-4 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
+                      {!email.enabled_by_default && (
+                        <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
+                          Auto
+                        </span>
+                      )}
                     </div>
+                    <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                      {enabledInCategory}/{categoryEmails.length} enabled
-                    </span>
-                    {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-white/60" />
-                    ) : (
-                      <ChevronDown className="w-5 h-5 text-white/60" />
-                    )}
-                  </div>
-                </button>
 
-                {/* Email Items */}
-                {isExpanded && (
-                  <div className="border-t border-white/10">
-                    {categoryEmails.map((email, index) => {
-                      const triggerBadge = getTriggerBadge(email);
-
-                      return (
-                        <div
-                          key={email.id}
-                          className={`px-4 py-3 hover:bg-white/5 transition-colors ${
-                            index < categoryEmails.length - 1 ? 'border-b border-white/5' : ''
-                          }`}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 mb-2">
-                                <h4 className="text-sm font-medium text-white">{email.name}</h4>
-                                {!email.enabled_by_default && (
-                                  <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded">
-                                    Auto
-                                  </span>
-                                )}
-                              </div>
-                              <div className="mb-2">
-                                <span className={`text-xs px-2 py-1 rounded border ${triggerBadge.color}`}>
-                                  {triggerBadge.text}
-                                </span>
-                              </div>
-                              <p className="text-xs text-white/60 flex items-center gap-1">
-                                <Mail className="w-3 h-3" />
-                                {email.subject_template}
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => handlePreviewEmail(email)}
-                                className="p-1.5 hover:bg-purple-500/20 text-purple-400 hover:text-purple-300 rounded transition-colors"
-                                title="Preview email"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              <button
-                                className="p-1.5 hover:bg-red-500/20 text-red-400 hover:text-red-300 rounded transition-colors opacity-50 cursor-not-allowed"
-                                disabled
-                                title="Coming soon"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    {/* Add Email Button */}
+                  {/* Actions */}
+                  <div className="col-span-1 flex justify-end">
                     <button
-                      className="w-full px-4 py-3 text-white/60 hover:text-white hover:bg-white/5 transition-colors flex items-center justify-center gap-2 text-sm opacity-50 cursor-not-allowed"
-                      disabled
-                      title="Coming soon"
+                      onClick={() => handlePreviewEmail(email)}
+                      className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
+                      title="Preview email"
                     >
-                      <Plus className="w-4 h-4" />
-                      Add Email to {CATEGORY_CONFIG[category]?.label}
+                      <Eye className="w-4 h-4" />
                     </button>
                   </div>
-                )}
-
-                {/* Category Actions */}
-                {isExpanded && (
-                  <div className="border-t border-white/10 px-4 py-2 bg-white/5 flex items-center gap-2">
-                    <button
-                      className="px-3 py-1.5 text-xs text-white/60 hover:text-white hover:bg-white/10 rounded transition-colors flex items-center gap-1.5 opacity-50 cursor-not-allowed"
-                      disabled
-                      title="Coming soon"
-                    >
-                      <Eye className="w-3 h-3" />
-                      Rename
-                    </button>
-                    <button
-                      className="px-3 py-1.5 text-xs text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded transition-colors flex items-center gap-1.5 opacity-50 cursor-not-allowed"
-                      disabled
-                      title="Coming soon"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                      Remove
-                    </button>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         {/* Email Preview Modal */}
