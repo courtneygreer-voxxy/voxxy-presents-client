@@ -207,7 +207,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                     className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
-                    View
+                    See More
                   </button>
                 </div>
               </div>
@@ -284,9 +284,10 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                     } as EmailTemplateItem);
                     setPreviewModalOpen(true);
                   }}
-                  className="text-white/40 hover:text-white transition-colors"
+                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
                 >
-                  <Eye className="w-4 h-4" />
+                  <Eye className="w-3.5 h-3.5" />
+                  View
                 </button>
               </div>
             ))}

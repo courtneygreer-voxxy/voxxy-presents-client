@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, ChevronDown, ChevronUp, Eye, Users, Plus, Calendar, Clock } from 'lucide-react';
+import { Mail, ChevronDown, ChevronUp, Eye, Edit, Users, Plus, Calendar, Clock } from 'lucide-react';
 import { format, addDays, subDays } from 'date-fns';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
@@ -195,11 +195,11 @@ export default function Step4AutoMessages({
           /* Email List - Table View */
           <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
             {/* Table Header */}
-            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-10 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
-              <div className="col-span-2">Send Date</div>
-              <div className="col-span-3">Trigger</div>
+            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-12 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
+              <div className="col-span-3">Trigger Type</div>
               <div className="col-span-4">Email</div>
-              <div className="col-span-1 text-right">Actions</div>
+              <div className="col-span-3">Send Date</div>
+              <div className="col-span-2 text-right">Actions</div>
             </div>
 
             {/* Table Body */}
@@ -216,21 +216,9 @@ export default function Step4AutoMessages({
                 return (
                   <div
                     key={email.id}
-                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-10 gap-4 items-center"
+                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-12 gap-4 items-center"
                   >
-                    {/* Send Date */}
-                    <div className="col-span-2">
-                      {sendDate ? (
-                        <div className="flex items-center gap-1.5 text-sm text-white/80">
-                          <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                          <span>{sendDate}</span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-white/40">Not calculated</span>
-                      )}
-                    </div>
-
-                    {/* Trigger */}
+                    {/* Trigger Type */}
                     <div className="col-span-3 text-sm text-white/80">
                       {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
                     </div>
@@ -248,14 +236,33 @@ export default function Step4AutoMessages({
                       <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
                     </div>
 
+                    {/* Send Date */}
+                    <div className="col-span-3">
+                      {sendDate ? (
+                        <div className="flex items-center gap-1.5 text-sm text-white/80">
+                          <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                          <span>{sendDate}</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-white/40">Not calculated</span>
+                      )}
+                    </div>
+
                     {/* Actions */}
-                    <div className="col-span-1 flex justify-end">
+                    <div className="col-span-2 flex justify-end gap-2">
                       <button
                         onClick={() => handlePreviewEmail(email)}
                         className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
                         title="Preview email"
                       >
                         <Eye className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => alert('Edit features coming soon')}
+                        className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
+                        title="Edit email"
+                      >
+                        <Edit className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

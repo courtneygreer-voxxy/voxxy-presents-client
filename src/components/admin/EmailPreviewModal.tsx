@@ -13,6 +13,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import EmailFooterCard from '@/components/shared/EmailFooterCard';
 
 interface EmailPreviewModalProps {
   isOpen: boolean;
@@ -36,20 +37,7 @@ export default function EmailPreviewModal({
     return tmp.textContent || tmp.innerText || '';
   };
 
-  // Extract footer from body
-  const extractFooter = (text: string): { body: string; footer: string | null } => {
-    const footerMatch = text.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
-    if (footerMatch) {
-      return {
-        body: text.substring(0, footerMatch.index),
-        footer: footerMatch[0].trim(),
-      };
-    }
-    return { body: text, footer: null };
-  };
-
   const displayText = stripHtml(emailHtml);
-  const { body: displayBody, footer: displayFooter } = extractFooter(displayText);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -62,11 +50,6 @@ export default function EmailPreviewModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* Email Name */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <h3 className="text-white font-medium">{emailName}</h3>
-          </div>
-
           {/* Loading State */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
@@ -75,6 +58,26 @@ export default function EmailPreviewModal({
             </div>
           ) : emailHtml ? (
             <>
+              {/* Trigger Type */}
+              <div>
+                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                  Trigger Type
+                </label>
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                  <p className="text-white/80 text-sm">Test Email</p>
+                </div>
+              </div>
+
+              {/* Subject Line */}
+              <div>
+                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                  Subject Line
+                </label>
+                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+                  <p className="text-white font-medium text-sm">{emailName}</p>
+                </div>
+              </div>
+
               {/* Message Body */}
               <div>
                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
@@ -82,24 +85,13 @@ export default function EmailPreviewModal({
                 </label>
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                    {displayBody}
+                    {displayText}
                   </pre>
                 </div>
               </div>
 
-              {/* Footer */}
-              {displayFooter && (
-                <div>
-                  <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
-                    Email Footer
-                  </label>
-                  <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                    <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
-                      {displayFooter}
-                    </pre>
-                  </div>
-                </div>
-              )}
+              {/* Hard-coded Footer Card */}
+              <EmailFooterCard />
             </>
           ) : (
             <div className="flex items-center justify-center py-12">

@@ -18,6 +18,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import EmailFooterCard from '@/components/shared/EmailFooterCard';
 
 interface TemplatePreviewModalProps {
   isOpen: boolean;
@@ -46,29 +47,8 @@ export default function TemplatePreviewModal({
     return tmp.textContent || tmp.innerText || '';
   };
 
-  // Extract footer from body
-  const extractFooter = (body: string): { body: string; footer: string | null } => {
-    const footerPatterns = [
-      /\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?\n\[organizationName\]$/i,
-      /\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?\n.*$/i,
-    ];
-
-    for (const pattern of footerPatterns) {
-      const match = body.match(pattern);
-      if (match) {
-        return {
-          body: body.substring(0, match.index),
-          footer: match[0].trim(),
-        };
-      }
-    }
-
-    return { body, footer: null };
-  };
-
   const displaySubject = stripHtml(template.subject_template);
-  const strippedBody = stripHtml(template.body_template);
-  const { body: displayBody, footer: displayFooter } = extractFooter(strippedBody);
+  const displayBody = stripHtml(template.body_template);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -111,19 +91,8 @@ export default function TemplatePreviewModal({
             </div>
           </div>
 
-          {/* Footer */}
-          {displayFooter && (
-            <div>
-              <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
-                Email Footer
-              </label>
-              <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
-                  {displayFooter}
-                </pre>
-              </div>
-            </div>
-          )}
+          {/* Hard-coded Footer Card */}
+          <EmailFooterCard />
         </div>
 
         {/* Footer Actions */}

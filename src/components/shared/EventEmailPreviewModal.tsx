@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import EmailFooterCard from '@/components/shared/EmailFooterCard';
 
 // Flexible email type that works with both ScheduledEmail and EmailTemplateItem
 type EmailPreviewData = {
@@ -215,41 +216,39 @@ export default function EventEmailPreviewModal({
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Email Metadata */}
+          {/* Top Section: Trigger Type & Scheduled Send Date */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <div className="flex flex-wrap items-center gap-3 mb-3">
+            <div className="flex flex-wrap items-center gap-4">
               {/* Trigger */}
               {email.trigger_type && (
-                <div className="flex items-center gap-2 text-sm text-white/80">
+                <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-purple-400" />
-                  <span>{formatTrigger(email.trigger_type, email.trigger_value)}</span>
+                  <div>
+                    <p className="text-xs text-white/60">Trigger Type</p>
+                    <p className="text-sm font-medium text-white">
+                      {formatTrigger(email.trigger_type, email.trigger_value)}
+                    </p>
+                  </div>
                 </div>
               )}
 
-              {/* Date */}
+              {/* Scheduled Send Date */}
               {email.scheduled_for && (
-                <div className="flex items-center gap-2 text-sm text-white/80">
+                <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-purple-400" />
-                  <span>
-                    {format(new Date(email.scheduled_for), 'MMM d, yyyy h:mm a')}
-                  </span>
+                  <div>
+                    <p className="text-xs text-white/60">Scheduled For</p>
+                    <p className="text-sm font-medium text-white">
+                      {format(new Date(email.scheduled_for), 'MMM d, yyyy h:mm a')}
+                    </p>
+                  </div>
                 </div>
               )}
-
-              {/* Recipients */}
-              <div className="flex items-center gap-2 text-sm text-white/80">
-                <Users className="w-4 h-4 text-purple-400" />
-                <span>
-                  {email.recipient_count
-                    ? `${email.recipient_count} recipients`
-                    : 'All Applicants'}
-                </span>
-              </div>
 
               {/* Status Badge */}
               {email.status && (
                 <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ${
+                  className={`px-3 py-1 rounded-full text-xs font-medium border ml-auto ${
                     statusColor[email.status as keyof typeof statusColor] ||
                     'bg-gray-500/20 border-gray-500/30 text-gray-400'
                   }`}
@@ -258,8 +257,6 @@ export default function EventEmailPreviewModal({
                 </span>
               )}
             </div>
-
-            <h3 className="text-white font-medium">{email.name}</h3>
 
             {/* Overdue Warning */}
             {email.overdue && email.overdue_message && (
@@ -271,35 +268,6 @@ export default function EventEmailPreviewModal({
               </div>
             )}
           </div>
-
-          {/* Category Selector */}
-          {hasCategorySpecificContent && !isLoading && !error && (
-            <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-              <label className="block text-sm font-medium text-purple-300 mb-2">
-                Preview for Category
-              </label>
-              <Select value={selectedCategory} onValueChange={handleCategoryChange}>
-                <SelectTrigger className="bg-white/5 border-white/20 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                  {availableCategories.map((cat) => (
-                    <SelectItem
-                      key={cat.value}
-                      value={cat.value}
-                      className="text-white"
-                    >
-                      {cat.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-purple-300/60 mt-2">
-                This email contains category-specific content. Switch categories to see
-                different values (e.g., prices, install times).
-              </p>
-            </div>
-          )}
 
           {/* Loading State */}
           {isLoading && (
@@ -325,22 +293,9 @@ export default function EventEmailPreviewModal({
             </div>
           )}
 
-          {/* Preview Content */}
+          {/* Middle Section: Subject, Body, Footer */}
           {previewData && !isLoading && (
             <div className="space-y-4">
-              {/* Category View */}
-              <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
-                  Category View
-                </label>
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-white font-medium text-sm">
-                    {previewData.recipient_name}
-                  </p>
-                  <p className="text-white/60 text-xs">{previewData.recipient_email}</p>
-                </div>
-              </div>
-
               {/* Subject */}
               <div>
                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
@@ -351,39 +306,37 @@ export default function EventEmailPreviewModal({
                 </div>
               </div>
 
-              {/* Body */}
+              {/* Message Body */}
               <div>
                 <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
                   Message Body
                 </label>
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                    {(() => {
-                      const strippedBody = previewData.body.replace(/<[^>]*>/g, '');
-                      const footerMatch = strippedBody.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
-                      return footerMatch ? strippedBody.substring(0, footerMatch.index) : strippedBody;
-                    })()}
+                    {previewData.body.replace(/<[^>]*>/g, '')}
                   </pre>
                 </div>
               </div>
 
-              {/* Footer */}
-              {(() => {
-                const strippedBody = previewData.body.replace(/<[^>]*>/g, '');
-                const footerMatch = strippedBody.match(/\n\n(Best regards|Sincerely|Thank you|Thanks|Cheers|Warm regards),?[\s\S]*$/i);
-                return footerMatch ? (
-                  <div>
-                    <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
-                      Email Footer
-                    </label>
-                    <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                      <pre className="text-white/70 text-sm whitespace-pre-wrap font-sans">
-                        {footerMatch[0].trim()}
-                      </pre>
-                    </div>
-                  </div>
-                ) : null;
-              })()}
+              {/* Hard-coded Footer Card */}
+              <EmailFooterCard />
+            </div>
+          )}
+
+          {/* Bottom Section: Recipients */}
+          {previewData && !isLoading && (
+            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-purple-400" />
+                <div>
+                  <p className="text-xs text-white/60">Recipients</p>
+                  <p className="text-sm font-medium text-white">
+                    {email.recipient_count
+                      ? `${email.recipient_count} recipients`
+                      : 'All Applicants'}
+                  </p>
+                </div>
+              </div>
             </div>
           )}
         </div>
