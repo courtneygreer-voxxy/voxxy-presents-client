@@ -53,6 +53,7 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [updatingId, setUpdatingId] = useState<number | null>(null);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
@@ -95,6 +96,30 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
       setError(err.message || 'Failed to load applicants');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateCategory = async (applicant: Applicant, newCategory: string) => {
+    try {
+      setIsUpdatingCategory(true);
+      await registrationsApi.update(applicant.id, { vendor_category: newCategory });
+
+      // Update local state
+      setApplicants((prev) =>
+        prev.map((a) =>
+          a.id === applicant.id ? { ...a, vendor_category: newCategory } : a
+        )
+      );
+
+      // Update selected applicant if it's the one being modified
+      if (selectedApplicant?.id === applicant.id) {
+        setSelectedApplicant({ ...selectedApplicant, vendor_category: newCategory });
+      }
+    } catch (err: any) {
+      console.error('Failed to update category:', err);
+      alert(`Failed to update category: ${err.message}`);
+    } finally {
+      setIsUpdatingCategory(false);
     }
   };
 
@@ -407,9 +432,22 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                 {/* Category */}
                 <div className="mb-3">
                   <p className="text-[10px] text-white/60 mb-1">Category</p>
-                  <span className="inline-flex px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-500/20 text-purple-400">
-                    {selectedApplicant.vendor_category}
-                  </span>
+                  <select
+                    value={selectedApplicant.vendor_category}
+                    onChange={(e) => handleUpdateCategory(selectedApplicant, e.target.value)}
+                    disabled={isUpdatingCategory}
+                    className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <option value="Artist">Artist</option>
+                    <option value="Artisan">Artisan</option>
+                    <option value="Crafts">Crafts</option>
+                    <option value="Food & Beverage">Food & Beverage</option>
+                    <option value="Jewelry">Jewelry</option>
+                    <option value="Clothing">Clothing</option>
+                    <option value="Home Goods">Home Goods</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
 

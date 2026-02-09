@@ -71,6 +71,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [editingNotesId, setEditingNotesId] = useState<string | null>(null);
   const [notesEditValue, setNotesEditValue] = useState('');
+  const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
@@ -219,6 +220,29 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
           r.id === id ? { ...r, reviewedAt: new Date().toISOString() } : r
         )
       );
+    }
+  };
+
+  // Handle category update
+  const handleUpdateCategory = async (row: InviteRow, newCategory: string) => {
+    if (!row.registrationId) {
+      alert('Cannot update category: No application found');
+      return;
+    }
+
+    try {
+      setIsUpdatingCategory(true);
+      await registrationsApi.update(row.registrationId, { vendor_category: newCategory });
+
+      // Update local state
+      setInviteRows((prev) =>
+        prev.map((r) => (r.id === row.id ? { ...r, category: newCategory } : r))
+      );
+    } catch (err: any) {
+      console.error('Failed to update category:', err);
+      alert(`Failed to update category: ${err.message}`);
+    } finally {
+      setIsUpdatingCategory(false);
     }
   };
 
@@ -603,6 +627,29 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                             <div>
                               <p className="text-[10px] text-white/60 mb-0.5">Location</p>
                               <p className="text-sm text-white/80">{row.location}</p>
+                            </div>
+                          )}
+
+                          {/* Category Dropdown (only for applied/approved/waitlist) */}
+                          {row.status !== 'invited' && row.registrationId && (
+                            <div>
+                              <p className="text-[10px] text-white/60 mb-0.5">Category</p>
+                              <select
+                                value={row.category}
+                                onChange={(e) => handleUpdateCategory(row, e.target.value)}
+                                disabled={isUpdatingCategory}
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                              >
+                                <option value="Artist">Artist</option>
+                                <option value="Artisan">Artisan</option>
+                                <option value="Crafts">Crafts</option>
+                                <option value="Food & Beverage">Food & Beverage</option>
+                                <option value="Jewelry">Jewelry</option>
+                                <option value="Clothing">Clothing</option>
+                                <option value="Home Goods">Home Goods</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Other">Other</option>
+                              </select>
                             </div>
                           )}
 
