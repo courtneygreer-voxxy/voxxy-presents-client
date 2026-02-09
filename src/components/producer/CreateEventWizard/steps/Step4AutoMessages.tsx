@@ -3,7 +3,7 @@ import { Mail, ChevronDown, ChevronUp, Eye, Users, Plus } from 'lucide-react';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import ImportTemplateModal from '../ImportTemplateModal';
-import EmailPreviewModal from '../EmailPreviewModal';
+import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 
 interface Step4AutoMessagesProps {
   selectedTemplateId?: number | null;
@@ -272,11 +272,21 @@ export default function Step4AutoMessages({
       />
 
       {/* Email Preview Modal */}
-      <EmailPreviewModal
-        isOpen={isPreviewModalOpen}
-        onClose={() => setIsPreviewModalOpen(false)}
-        email={previewEmail}
-      />
+      {previewEmail && (
+        <TemplatePreviewModal
+          isOpen={isPreviewModalOpen}
+          onClose={() => {
+            setIsPreviewModalOpen(false);
+            setPreviewEmail(null);
+          }}
+          template={{
+            name: previewEmail.name,
+            subject_template: previewEmail.subject_template,
+            body_template: previewEmail.body_template,
+            description: previewEmail.description || undefined,
+          }}
+        />
+      )}
     </div>
   );
 }
