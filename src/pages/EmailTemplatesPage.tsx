@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Mail, ChevronDown, ChevronUp, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
 import { emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
-import EmailPreviewModal from '@/components/admin/EmailPreviewModal';
+import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 
 interface EmailTemplatesPageProps {
   organizationId: number;
@@ -33,9 +33,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
 
   // Email preview modal state
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [previewEmailName, setPreviewEmailName] = useState('');
-  const [previewEmailHtml, setPreviewEmailHtml] = useState('');
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null);
 
   useEffect(() => {
     fetchTemplates();
@@ -84,40 +82,9 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
     });
   };
 
-  const handlePreviewEmail = async (email: EmailTemplateItem) => {
-    try {
-      setPreviewLoading(true);
-      setPreviewEmailName(email.name);
-      setPreviewModalOpen(true);
-      setError(null);
-
-      // Map email template item to backend email_type
-      const emailType = getEmailTypeFromTemplate(email);
-      const result = await adminApi.previewEmail(emailType);
-      setPreviewEmailHtml(result.html);
-    } catch (err) {
-      console.error('❌ Failed to preview email:', err);
-      setError(err instanceof Error ? err.message : 'Failed to preview email');
-      setPreviewModalOpen(false);
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const getEmailTypeFromTemplate = (email: EmailTemplateItem): string => {
-    // Map template email names/triggers to backend email types
-    // This is a simplified mapping - adjust based on your backend
-    if (email.name.includes('Immediate Announcement')) return 'scheduled_1';
-    if (email.name.includes('1 Day Before Deadline')) return 'scheduled_2';
-    if (email.name.includes('Day of Deadline')) return 'scheduled_3';
-    if (email.name.includes('Application Accepted')) return 'application_approved';
-    if (email.name.includes('Payment Details')) return 'scheduled_4';
-    if (email.name.includes('1 Day Before Payment Due')) return 'scheduled_5';
-    if (email.name.includes('7 Days Before Event')) return 'scheduled_6';
-    if (email.name.includes('Day of Event')) return 'scheduled_7';
-
-    // Default fallback
-    return 'scheduled_1';
+  const handlePreviewEmail = (email: EmailTemplateItem) => {
+    setPreviewEmail(email);
+    setPreviewModalOpen(true);
   };
 
   const getTemplateTypeBadge = (template: EmailCampaignTemplate) => {
@@ -277,11 +244,36 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
 
           <div className="divide-y divide-white/10">
             {[
-              { name: 'Application Received', description: 'Automatically sent when an application is submitted' },
-              { name: 'Payment Confirmed', description: 'Automatically sent when payment is received' },
-              { name: 'Moved to Waitlist (Non-Payment)', description: 'Automatically sent when vendor is moved to waitlist due to missed payment' },
-              { name: 'Category Changed', description: "Automatically sent when vendor's category is changed" },
-              { name: 'Event Details Changed', description: 'Sent when event date, venue, or time changes' },
+              {
+                name: 'Application Received',
+                description: 'Automatically sent when an application is submitted',
+                subject: 'Application Received for [eventName]',
+                body: 'Hi [firstName],\n\nThank you for submitting your application for [eventName]!\n\nWe have received your application and will review it shortly. You will receive a confirmation email once your application has been processed.\n\nEvent Details:\n- Event: [eventName]\n- Date: [eventDate]\n- Location: [eventLocation]\n\nIf you have any questions, please contact us at [organizationEmail].\n\nBest regards,\n[organizationName]'
+              },
+              {
+                name: 'Payment Confirmed',
+                description: 'Automatically sent when payment is received',
+                subject: 'Payment Confirmed - [eventName]',
+                body: 'Hi [firstName],\n\nYour payment of [categoryPrice] for [eventName] has been confirmed!\n\nPayment Details:\n- Amount: [categoryPrice]\n- Event: [eventName]\n- Category: [vendorCategory]\n\nYou are all set! We will send you additional details as the event approaches.\n\nThank you,\n[organizationName]'
+              },
+              {
+                name: 'Moved to Waitlist (Non-Payment)',
+                description: 'Automatically sent when vendor is moved to waitlist due to missed payment',
+                subject: 'Moved to Waitlist - [eventName]',
+                body: 'Hi [firstName],\n\nWe noticed that the payment deadline of [paymentDueDate] for [eventName] has passed without payment.\n\nYour application has been moved to the waitlist. If a spot becomes available and you are still interested, we will reach out to you.\n\nIf this was a mistake, please contact us immediately at [organizationEmail].\n\nBest regards,\n[organizationName]'
+              },
+              {
+                name: 'Category Changed',
+                description: "Automatically sent when vendor's category is changed",
+                subject: 'Category Updated - [eventName]',
+                body: 'Hi [firstName],\n\nYour vendor category for [eventName] has been updated to [vendorCategory].\n\nIf you did not request this change or have any questions, please contact us at [organizationEmail].\n\nThank you,\n[organizationName]'
+              },
+              {
+                name: 'Event Details Changed',
+                description: 'Sent when event date, venue, or time changes',
+                subject: 'Important: Event Details Updated - [eventName]',
+                body: 'Hi [firstName],\n\nImportant update: The details for [eventName] have been changed.\n\nUpdated Event Details:\n- Date: [eventDate]\n- Time: [eventTime]\n- Location: [eventLocation]\n\nPlease make note of these changes. If you have any concerns, contact us at [organizationEmail].\n\nThank you for your understanding,\n[organizationName]'
+              },
             ].map((notification) => (
               <div
                 key={notification.name}
@@ -296,7 +288,19 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                   </div>
                   <div className="text-xs text-white/60">{notification.description}</div>
                 </div>
-                <button className="text-white/40 hover:text-white transition-colors">
+                <button
+                  onClick={() => {
+                    setPreviewEmail({
+                      id: 0,
+                      name: notification.name,
+                      subject_template: notification.subject,
+                      body_template: notification.body,
+                      description: notification.description,
+                    } as EmailTemplateItem);
+                    setPreviewModalOpen(true);
+                  }}
+                  className="text-white/40 hover:text-white transition-colors"
+                >
                   <Eye className="w-4 h-4" />
                 </button>
               </div>
@@ -511,13 +515,21 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
         </div>
 
         {/* Email Preview Modal */}
-        <EmailPreviewModal
-          isOpen={previewModalOpen}
-          onClose={() => setPreviewModalOpen(false)}
-          emailName={previewEmailName}
-          emailHtml={previewEmailHtml}
-          loading={previewLoading}
-        />
+        {previewEmail && (
+          <TemplatePreviewModal
+            isOpen={previewModalOpen}
+            onClose={() => {
+              setPreviewModalOpen(false);
+              setPreviewEmail(null);
+            }}
+            template={{
+              name: previewEmail.name,
+              subject_template: previewEmail.subject_template,
+              body_template: previewEmail.body_template,
+              description: previewEmail.description || undefined,
+            }}
+          />
+        )}
       </div>
     );
   }
