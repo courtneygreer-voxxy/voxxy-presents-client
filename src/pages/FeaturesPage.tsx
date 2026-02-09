@@ -74,7 +74,7 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Mail className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Automated vendor communication</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Automated vendor communication</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop writing the same emails over and over. Application confirmations, approval notices, payment reminders, waitlist updates, and event-day details — all sent automatically from one branded email thread. Vendors always know where they stand.
               </p>
@@ -107,7 +107,7 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Users className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Vendor relationships that compound</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Vendor relationships that compound</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. CSV import for existing lists. Your best vendors are always one search away.
               </p>
@@ -142,7 +142,7 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Search className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Fast application review</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Fast application review</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop scrolling through 200 Instagram profiles one by one. Side-by-side portfolio comparison with integrated social profiles. One-click approve, waitlist, or reject. Bulk actions for faster decisions.
               </p>
@@ -175,7 +175,7 @@ export default function FeaturesPage() {
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
                 <Zap className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Email automation without technical setup</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Email automation without technical setup</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics — all automated and customizable.
               </p>

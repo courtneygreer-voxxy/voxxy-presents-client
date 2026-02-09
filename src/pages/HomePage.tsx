@@ -265,7 +265,7 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
-              <h3 className="text-[20px] font-display font-bold mb-3">5–7 Tools, Zero Visibility</h3>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">5–7 Tools, Zero Visibility</h3>
               <p className="text-[15px] leading-relaxed text-gray-600">
                 You're chasing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical details get buried. Deadlines slip.
               </p>
@@ -273,7 +273,7 @@ export default function HomePage() {
 
             <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
-              <h3 className="text-[20px] font-display font-bold mb-3">Hours of Unpaid Coordination</h3>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">Hours of Unpaid Coordination</h3>
               <p className="text-[15px] leading-relaxed text-gray-600">
                 Every event eats hours of back-and-forth that doesn't scale. Your calendar grows, but your coordination workflow stays manual.
               </p>
@@ -281,7 +281,7 @@ export default function HomePage() {
 
             <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
               <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
-              <h3 className="text-[20px] font-display font-bold mb-3">200+ Applications, No Way to Compare</h3>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">200+ Applications, No Way to Compare</h3>
               <p className="text-[15px] leading-relaxed text-gray-600">
                 You're scrolling social profiles one by one. Great vendors get lost in the pile. By application 80, you're approving on fatigue.
               </p>
@@ -304,7 +304,7 @@ export default function HomePage() {
           {/* Feature Block 1 */}
           <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
             <div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Automated emails that keep vendors in the loop</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Automated emails that keep vendors in the loop</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Application confirmations, approval notices, payment reminders, event-day details — all sent automatically from one branded email thread. Vendors always know where they stand. You never have to write the same email twice.
               </p>
@@ -325,7 +325,7 @@ export default function HomePage() {
           {/* Feature Block 2 - Reversed */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="md:order-2">
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4">Vendor relationships that compound</h3>
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Vendor relationships that compound</h3>
               <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. Your best vendors are always one search away.
               </p>
