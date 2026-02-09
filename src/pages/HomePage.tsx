@@ -11,7 +11,7 @@ import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { ArrowRight, CheckCircle } from "lucide-react"
+import { ArrowRight, CheckCircle, Mail, MessageCircle, Instagram } from "lucide-react"
 
 // Inline types and API for contact form
 interface CreateContactSubmissionData {
@@ -52,6 +52,7 @@ const contactFormApi = {
 interface ContactFormData {
   name: string
   email: string
+  eventName: string
   message: string
 }
 
@@ -84,6 +85,7 @@ export default function HomePage() {
   const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
+    eventName: '',
     message: ''
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -116,6 +118,7 @@ export default function HomePage() {
         type: 'contact',
         name: formData.name,
         email: formData.email,
+        organizationName: formData.eventName || undefined,
         description: formData.message,
         source: 'home_page_cta'
       }
@@ -229,20 +232,20 @@ export default function HomePage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="flex justify-center gap-16 flex-wrap">
             <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">3,000+</div>
-              <div className="text-[14px] text-gray-600">Artist Invites Sent This Week</div>
+              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">3,000</div>
+              <div className="text-[14px] text-gray-600">Artists Invited</div>
             </div>
             <div className="text-center">
               <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">5</div>
               <div className="text-[14px] text-gray-600">Art Shows This Month</div>
             </div>
             <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">2%</div>
-              <div className="text-[14px] text-gray-600">Transaction Fee</div>
+              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">~5 min</div>
+              <div className="text-[14px] text-gray-600">Event Setup Time</div>
             </div>
             <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">~5 min</div>
-              <div className="text-[14px] text-gray-600">Setup Time</div>
+              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">3</div>
+              <div className="text-[14px] text-gray-600">Simple Pricing Tiers</div>
             </div>
           </div>
         </div>
@@ -253,7 +256,7 @@ export default function HomePage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Problem</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Event coordination is broken</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">Event coordination is broken</h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
               The bigger your event calendar grows, the more coordination eats your time — and your margins.
             </p>
@@ -292,7 +295,7 @@ export default function HomePage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Platform</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">One place for everything</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">One place for everything</h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
               Replace disconnected tools with a single platform built for how you actually run events.
             </p>
@@ -312,7 +315,7 @@ export default function HomePage() {
               </div>
             </div>
             <img
-              src="/screenshots/email-automation.png"
+              src="/screenshots/email-flows.png"
               alt="Automated email sequences for vendor communication showing approval notices and payment reminders"
               className="rounded-2xl shadow-xl border border-gray-200"
               loading="lazy"
@@ -364,7 +367,7 @@ export default function HomePage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14 text-center">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">How It Works</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Live in minutes, not months</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">Live in minutes, not months</h2>
             <p className="text-[18px] text-gray-600 max-w-[600px] mx-auto">
               No enterprise onboarding. No implementation timeline. You can be running your next event through Voxxy today.
             </p>
@@ -433,76 +436,154 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section with Contact Form */}
-      <section className="py-24 px-6 md:px-12 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 border-y border-white/10">
-        <div className="container mx-auto max-w-3xl">
-          <div className="text-center mb-12">
-            <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-6">
+      <section id="contact" className="py-24 px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
+        <div className="container mx-auto max-w-[1200px]">
+          {/* Header */}
+          <div className="mb-12">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-white/60 mb-4">TALK TO OUR TEAM</div>
+            <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-4">
               Your next event starts here
             </h2>
-            <p className="text-[18px] text-white/70 max-w-2xl mx-auto">
+            <p className="text-[16px] text-white/60 max-w-[600px]">
               Tell us about your events and we'll get you set up. Real humans, fast responses, no sales funnel.
             </p>
           </div>
 
-          {isSubmitted ? (
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-10 text-center">
-              <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-8 w-8 text-green-300" />
+          {/* Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Column - Contact Info */}
+            <div className="space-y-8">
+              <div>
+                <h3 className="text-[24px] font-display font-bold text-white mb-4">Let's talk about your events</h3>
+                <p className="text-[15px] text-white/60 leading-relaxed">
+                  Whether you're running 5 art markets a year or 50 pop-ups across the country, we'd love to hear what you're building. We respond to every message within 1–2 business days.
+                </p>
               </div>
-              <h3 className="text-[24px] font-bold text-white mb-4">Thanks for reaching out!</h3>
-              <p className="text-white/80 mb-6">
-                We'll review your message and get back to you within 2-3 business days.
-              </p>
-            </div>
-          ) : (
-            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-10">
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <Input
-                  id="name"
-                  placeholder="Your Name *"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange('name', e.target.value)}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
-                />
 
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Email Address *"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 h-12 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all"
-                />
-
-                <Textarea
-                  id="message"
-                  placeholder="Tell us about yourself and your events *"
-                  value={formData.message}
-                  onChange={(e) => handleInputChange('message', e.target.value)}
-                  required
-                  rows={5}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50 text-base focus:bg-white/15 focus:border-purple-400/50 transition-all resize-none"
-                />
-
-                {submissionError && (
-                  <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4 animate-in fade-in duration-300">
-                    <p className="text-red-300 text-sm">{submissionError}</p>
+              {/* Contact Methods */}
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-purple-400" />
                   </div>
-                )}
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">EMAIL</div>
+                    <a href="mailto:team@voxxypresents.com" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                      team@voxxypresents.com
+                    </a>
+                  </div>
+                </div>
 
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full inline-flex items-center justify-center px-8 py-4 bg-white text-voxxy-purple-brand hover:bg-gray-100 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl"
-                >
-                  {isSubmitting ? 'Sending...' : 'Get Started'}
-                  {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
-                </button>
-              </form>
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">COMMUNITY</div>
+                    <a href="https://discord.gg/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                      Join our Discord
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
+                    <Instagram className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">SOCIAL</div>
+                    <a href="https://instagram.com/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                      @voxxypresents on Instagram
+                    </a>
+                  </div>
+                </div>
+              </div>
             </div>
-          )}
+
+            {/* Right Column - Form */}
+            <div>
+              {isSubmitted ? (
+                <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-white/10 rounded-2xl p-10 text-center">
+                  <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <CheckCircle className="h-8 w-8 text-green-300" />
+                  </div>
+                  <h3 className="text-[24px] font-bold text-white mb-4">Thanks for reaching out!</h3>
+                  <p className="text-white/70 mb-6">
+                    We'll review your message and get back to you within 1-2 business days.
+                  </p>
+                </div>
+              ) : (
+                <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    {/* Name and Email Row */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <Input
+                        id="name"
+                        placeholder="Your name"
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        required
+                        className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
+                      />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Email address"
+                        value={formData.email}
+                        onChange={(e) => handleInputChange('email', e.target.value)}
+                        required
+                        className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
+                      />
+                    </div>
+
+                    {/* Event Name */}
+                    <Input
+                      id="eventName"
+                      placeholder="Event name (if you have one)"
+                      value={formData.eventName}
+                      onChange={(e) => handleInputChange('eventName', e.target.value)}
+                      className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
+                    />
+
+                    {/* Message */}
+                    <Textarea
+                      id="message"
+                      placeholder="Tell us about your events — what do you produce, how often, and what's your biggest headache right now?"
+                      value={formData.message}
+                      onChange={(e) => handleInputChange('message', e.target.value)}
+                      required
+                      rows={5}
+                      className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all resize-none rounded-lg"
+                    />
+
+                    {submissionError && (
+                      <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4">
+                        <p className="text-red-300 text-sm">{submissionError}</p>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg hover:shadow-xl"
+                    >
+                      {isSubmitting ? 'Sending...' : 'Send Message'}
+                      {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                    </button>
+
+                    {/* Bottom Email Link */}
+                    <p className="text-center text-[13px] text-white/50">
+                      Or email us directly at{' '}
+                      <a href="mailto:team@voxxypresents.com" className="text-white/70 hover:text-purple-400 transition-colors underline">
+                        team@voxxypresents.com
+                      </a>
+                    </p>
+                  </form>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 

@@ -62,7 +62,7 @@ export default function FeaturesPage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Core Features</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Built for your workflow</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">Built for your workflow</h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
               Every feature designed to save you time and help you run more events with less stress.
             </p>
@@ -162,7 +162,7 @@ export default function FeaturesPage() {
               </div>
             </div>
             <img
-              src="/screenshots/hero-dashboard.png"
+              src="/screenshots/application-review.png"
               alt="Application review interface with side-by-side comparison"
               className="rounded-2xl shadow-xl border border-gray-200"
               loading="lazy"
@@ -196,7 +196,7 @@ export default function FeaturesPage() {
             </div>
             <div className="md:order-1">
               <img
-                src="/screenshots/email-automation.png"
+                src="/screenshots/email-flows.png"
                 alt="Email automation dashboard showing customizable templates"
                 className="rounded-2xl shadow-xl border border-gray-200"
                 loading="lazy"
@@ -217,7 +217,7 @@ export default function FeaturesPage() {
             </div>
 
             <div className="text-center mb-10">
-              <h2 className="text-[36px] font-display font-bold text-gray-900 mb-4">Trust & Safety Commitment</h2>
+              <h2 className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-4">Trust & Safety Commitment</h2>
               <p className="text-[18px] text-gray-600">
                 We found that our users — especially those focused on art and community — really care about their data. They want privacy and a commitment that their data won't be sold to third parties.
               </p>
