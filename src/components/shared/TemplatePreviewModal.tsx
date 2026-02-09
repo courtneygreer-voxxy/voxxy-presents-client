@@ -47,8 +47,30 @@ export default function TemplatePreviewModal({
     return tmp.textContent || tmp.innerText || '';
   };
 
+  // Remove footer text from body since we have hard-coded footer card
+  const removeFooter = (text: string): string => {
+    // Remove common footer patterns
+    const footerPatterns = [
+      /Best regards,?\s*\n?\[?organizationName\]?/gi,
+      /Thank you,?\s*\n?\[?organizationName\]?/gi,
+      /Sincerely,?\s*\n?\[?organizationName\]?/gi,
+      /For questions,?\s*contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /Please do not reply to this email\.?/gi,
+      /Powered by Voxxy\.?/gi,
+    ];
+
+    let cleanedText = text;
+    footerPatterns.forEach(pattern => {
+      cleanedText = cleanedText.replace(pattern, '');
+    });
+
+    // Trim excessive whitespace at the end
+    return cleanedText.trim();
+  };
+
   const displaySubject = stripHtml(template.subject_template);
-  const displayBody = stripHtml(template.body_template);
+  const displayBody = removeFooter(stripHtml(template.body_template));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

@@ -335,13 +335,20 @@ export function EmailEditorPage({
                 className="bg-white/5 border-white/20 text-white placeholder:text-white/40 min-h-[400px] font-mono text-sm leading-relaxed resize-none"
                 placeholder="Write your email message here... Click variables on the right to insert."
               />
-              <div className="mt-2 p-2.5 bg-gradient-to-br from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-lg">
-                <p className="text-[10px] text-purple-400 font-semibold mb-0.5 uppercase tracking-wide">Email Footer (auto-included)</p>
-                <p className="text-[10px] text-white/60 font-mono leading-relaxed">
-                  ---<br />
-                  You're receiving this email because you registered for [eventName].<br />
-                  If you have questions, contact us at [organizationEmail].<br />
-                  <span className="text-purple-400">[unsubscribeLink]</span>
+              <div className="mt-2 p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
+                <p className="text-[10px] text-purple-400 font-semibold mb-2 uppercase tracking-wide">Email Footer (auto-included)</p>
+                <p className="text-[10px] text-white/60 leading-relaxed">
+                  <span className="block mb-1.5">Please do not reply to this email.</span>
+                  <span className="block mb-1.5">
+                    For questions, contact{' '}
+                    <span className="text-purple-300 font-medium">[organizationEmail]</span>
+                  </span>
+                  <span className="block mb-1.5">
+                    <span className="text-purple-300 underline">Unsubscribe from these emails</span>
+                  </span>
+                  <span className="block text-white/40 text-[9px] mt-2">
+                    Powered by Voxxy
+                  </span>
                 </p>
               </div>
             </div>

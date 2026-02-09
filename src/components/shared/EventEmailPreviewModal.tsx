@@ -117,6 +117,28 @@ export default function EventEmailPreviewModal({
     availableCategories[0]?.value || 'artist'
   );
 
+  // Remove footer text from body since we have hard-coded footer card
+  const removeFooter = (text: string): string => {
+    // Remove common footer patterns
+    const footerPatterns = [
+      /Best regards,?\s*\n?\[?organizationName\]?/gi,
+      /Thank you,?\s*\n?\[?organizationName\]?/gi,
+      /Sincerely,?\s*\n?\[?organizationName\]?/gi,
+      /For questions,?\s*contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /Please do not reply to this email\.?/gi,
+      /Powered by Voxxy\.?/gi,
+    ];
+
+    let cleanedText = text;
+    footerPatterns.forEach(pattern => {
+      cleanedText = cleanedText.replace(pattern, '');
+    });
+
+    // Trim excessive whitespace at the end
+    return cleanedText.trim();
+  };
+
   useEffect(() => {
     if (isOpen && email) {
       loadPreview();
@@ -166,7 +188,7 @@ export default function EventEmailPreviewModal({
 
         setPreviewData({
           subject: stripHtml(email.subject_template || ''),
-          body: stripHtml(email.body_template || ''),
+          body: removeFooter(stripHtml(email.body_template || '')),
           recipient_email: '[vendorEmail]',
           recipient_name: '[vendorName]',
         });
@@ -313,7 +335,7 @@ export default function EventEmailPreviewModal({
                 </label>
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
                   <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                    {previewData.body.replace(/<[^>]*>/g, '')}
+                    {removeFooter(previewData.body.replace(/<[^>]*>/g, ''))}
                   </pre>
                 </div>
               </div>

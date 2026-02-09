@@ -37,7 +37,29 @@ export default function EmailPreviewModal({
     return tmp.textContent || tmp.innerText || '';
   };
 
-  const displayText = stripHtml(emailHtml);
+  // Remove footer text from body since we have hard-coded footer card
+  const removeFooter = (text: string): string => {
+    // Remove common footer patterns
+    const footerPatterns = [
+      /Best regards,?\s*\n?\[?organizationName\]?/gi,
+      /Thank you,?\s*\n?\[?organizationName\]?/gi,
+      /Sincerely,?\s*\n?\[?organizationName\]?/gi,
+      /For questions,?\s*contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
+      /Please do not reply to this email\.?/gi,
+      /Powered by Voxxy\.?/gi,
+    ];
+
+    let cleanedText = text;
+    footerPatterns.forEach(pattern => {
+      cleanedText = cleanedText.replace(pattern, '');
+    });
+
+    // Trim excessive whitespace at the end
+    return cleanedText.trim();
+  };
+
+  const displayText = removeFooter(stripHtml(emailHtml));
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

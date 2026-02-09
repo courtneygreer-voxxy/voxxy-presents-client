@@ -147,24 +147,25 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   // ==========================================
   if (viewMode === 'library') {
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-white mb-1">Mail Sequences</h2>
-            <p className="text-sm text-white/60">
-              Create and manage your email automation sequences
-            </p>
+      <>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Mail Sequences</h2>
+              <p className="text-sm text-white/60">
+                Create and manage your email automation sequences
+              </p>
+            </div>
+            <button
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
+              disabled
+              title="Coming soon"
+            >
+              <Plus className="w-4 h-4" />
+              Create New Sequence
+            </button>
           </div>
-          <button
-            className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
-            disabled
-            title="Coming soon"
-          >
-            <Plus className="w-4 h-4" />
-            Create New Sequence
-          </button>
-        </div>
 
         {/* Sequences Section */}
         <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
@@ -293,7 +294,25 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             ))}
           </div>
         </div>
-      </div>
+        </div>
+
+        {/* Email Preview Modal */}
+        {previewEmail && (
+          <TemplatePreviewModal
+            isOpen={previewModalOpen}
+            onClose={() => {
+              setPreviewModalOpen(false);
+              setPreviewEmail(null);
+            }}
+            template={{
+              name: previewEmail.name,
+              subject_template: previewEmail.subject_template,
+              body_template: previewEmail.body_template,
+              description: previewEmail.description || undefined,
+            }}
+          />
+        )}
+      </>
     );
   }
 
@@ -307,27 +326,28 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
     const totalCount = emailItems.length;
 
     return (
-      <div className="space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-4">
-            <button
-              onClick={handleBackToLibrary}
-              className="p-2 hover:bg-white/10 text-white rounded-lg transition-colors mt-1"
-              title="Back to library"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </button>
-            <div>
-              <h2 className="text-xl font-bold text-white mb-1">{selectedTemplate.name}</h2>
-              <p className="text-sm text-white/60">
-                {selectedTemplate.description || 'Email automation sequence'}
-              </p>
-              <p className="text-xs text-white/40 mt-2">
-                {enabledCount}/{totalCount} emails (excludes system notifications)
-              </p>
+      <>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-start justify-between">
+            <div className="flex items-start gap-4">
+              <button
+                onClick={handleBackToLibrary}
+                className="p-2 hover:bg-white/10 text-white rounded-lg transition-colors mt-1"
+                title="Back to library"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">{selectedTemplate.name}</h2>
+                <p className="text-sm text-white/60">
+                  {selectedTemplate.description || 'Email automation sequence'}
+                </p>
+                <p className="text-xs text-white/40 mt-2">
+                  {enabledCount}/{totalCount} emails (excludes system notifications)
+                </p>
+              </div>
             </div>
-          </div>
           <div className="flex items-center gap-2">
             <button
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed"
@@ -406,6 +426,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             })}
           </div>
         </div>
+        </div>
 
         {/* Email Preview Modal */}
         {previewEmail && (
@@ -423,7 +444,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             }}
           />
         )}
-      </div>
+      </>
     );
   }
 
