@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Mail, ChevronDown, ChevronUp, Eye, Users, Plus } from 'lucide-react';
+import { Mail, ChevronDown, ChevronUp, Eye, Users, Plus, Calendar, Clock } from 'lucide-react';
+import { format, addDays, subDays } from 'date-fns';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import ImportTemplateModal from '../ImportTemplateModal';
@@ -8,6 +9,9 @@ import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 interface Step4AutoMessagesProps {
   selectedTemplateId?: number | null;
   onTemplateSelect?: (templateId: number | null) => void;
+  eventDate?: string;
+  applicationDeadline?: string;
+  paymentDeadline?: string;
 }
 
 // Category display names and order
@@ -25,29 +29,69 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; order: number }> =
 const getTriggerLabel = (triggerType: string, triggerValue: number | null): string => {
   switch (triggerType) {
     case 'days_before_event':
-      return `${triggerValue} Days Before Event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`;
     case 'days_after_event':
-      return `${triggerValue} Days After Event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
     case 'days_before_deadline':
-      return `${triggerValue} Days Before Deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
     case 'on_application_open':
-      return 'Immediate Announcement';
+      return 'When applications open';
     case 'on_application_submit':
-      return 'Application Received';
+      return 'On application submission';
     case 'on_approval':
-      return 'Application Accepted';
+      return 'On application approval';
     case 'on_payment_deadline':
-      return 'Payment Confirmed';
+      return 'On payment deadline';
     case 'on_event_date':
-      return 'Day of Event';
+      return 'On event day';
     default:
       return 'Auto';
   }
 };
 
+// Calculate when an email will be sent based on trigger
+const calculateSendDate = (
+  triggerType: string,
+  triggerValue: number | null,
+  eventDate?: string,
+  applicationDeadline?: string,
+  paymentDeadline?: string
+): string | null => {
+  if (!eventDate) return null;
+
+  try {
+    const eventDateObj = new Date(eventDate);
+
+    switch (triggerType) {
+      case 'days_before_event':
+        if (triggerValue === null) return null;
+        return format(subDays(eventDateObj, triggerValue), 'MMM d, yyyy');
+      case 'days_after_event':
+        if (triggerValue === null) return null;
+        return format(addDays(eventDateObj, triggerValue), 'MMM d, yyyy');
+      case 'days_before_deadline':
+        if (triggerValue === null || !paymentDeadline) return null;
+        return format(subDays(new Date(paymentDeadline), triggerValue), 'MMM d, yyyy');
+      case 'on_application_open':
+        return applicationDeadline ? format(new Date(applicationDeadline), 'MMM d, yyyy') : null;
+      case 'on_event_date':
+        return format(eventDateObj, 'MMM d, yyyy');
+      case 'on_payment_deadline':
+        return paymentDeadline ? format(new Date(paymentDeadline), 'MMM d, yyyy') : null;
+      default:
+        return null;
+    }
+  } catch {
+    return null;
+  }
+};
+
 export default function Step4AutoMessages({
   selectedTemplateId = null,
-  onTemplateSelect
+  onTemplateSelect,
+  eventDate,
+  applicationDeadline,
+  paymentDeadline
 }: Step4AutoMessagesProps) {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -55,9 +99,6 @@ export default function Step4AutoMessages({
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [expandedCategories, setExpandedCategories] = useState<Set<EmailCategory>>(
-    new Set(['pre_application', 'application', 'payment', 'pre_event'])
-  );
 
   useEffect(() => {
     fetchDefaultTemplate();
@@ -103,39 +144,10 @@ export default function Step4AutoMessages({
     }
   };
 
-  const toggleCategory = (category: EmailCategory) => {
-    setExpandedCategories((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(category)) {
-        newSet.delete(category);
-      } else {
-        newSet.add(category);
-      }
-      return newSet;
-    });
-  };
-
   const handlePreviewEmail = (email: EmailTemplateItem) => {
     setPreviewEmail(email);
     setIsPreviewModalOpen(true);
   };
-
-  // Group emails by category
-  const emailsByCategory = emailItems.reduce((acc, email) => {
-    if (!acc[email.category]) {
-      acc[email.category] = [];
-    }
-    acc[email.category].push(email);
-    return acc;
-  }, {} as Record<EmailCategory, EmailTemplateItem[]>);
-
-  // Sort categories by order
-  const sortedCategories = Object.keys(emailsByCategory)
-    .sort((a, b) => {
-      const orderA = CATEGORY_CONFIG[a as EmailCategory]?.order || 999;
-      const orderB = CATEGORY_CONFIG[b as EmailCategory]?.order || 999;
-      return orderA - orderB;
-    }) as EmailCategory[];
 
   return (
     <div className="space-y-6">
@@ -180,85 +192,85 @@ export default function Step4AutoMessages({
             <p className="text-white/50 text-sm">No template selected. Click "Select Template" to choose one.</p>
           </div>
         ) : (
-          /* Email List by Category */
-          <div className="space-y-4">
-            {sortedCategories.map((category: EmailCategory) => {
-              const categoryEmails = emailsByCategory[category] || [];
-              const enabledCount = categoryEmails.filter((e: EmailTemplateItem) => e.enabled_by_default).length;
-              const isExpanded = expandedCategories.has(category);
+          /* Email List - Table View */
+          <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+            {/* Table Header */}
+            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-12 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
+              <div className="col-span-4">Email</div>
+              <div className="col-span-3">Trigger</div>
+              <div className="col-span-2">Send Date</div>
+              <div className="col-span-2">Recipients</div>
+              <div className="col-span-1 text-right">Actions</div>
+            </div>
 
-              return (
-                <div key={category} className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-                  {/* Category Header */}
-                  <button
-                    onClick={() => toggleCategory(category)}
-                    className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors"
-                    type="button"
+            {/* Table Body */}
+            <div className="divide-y divide-white/10">
+              {emailItems.map((email: EmailTemplateItem) => {
+                const sendDate = calculateSendDate(
+                  email.trigger_type,
+                  email.trigger_value ?? null,
+                  eventDate,
+                  applicationDeadline,
+                  paymentDeadline
+                );
+
+                return (
+                  <div
+                    key={email.id}
+                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-12 gap-4 items-center"
                   >
-                    <div className="flex items-center gap-3">
-                      <Mail className="w-5 h-5 text-purple-400" />
-                      <div className="text-left">
-                        <h3 className="text-base font-semibold text-white">
-                          {CATEGORY_CONFIG[category]?.label || category}
-                        </h3>
+                    {/* Email Name & Subject */}
+                    <div className="col-span-4 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
+                        {!email.enabled_by_default && (
+                          <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
+                            Auto
+                          </span>
+                        )}
                       </div>
+                      <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-medium px-2 py-1 bg-purple-500/20 text-purple-300 rounded">
-                        {enabledCount}/{categoryEmails.length} enabled
-                      </span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-5 h-5 text-white/60" />
+
+                    {/* Trigger */}
+                    <div className="col-span-3 text-sm text-white/80">
+                      {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
+                    </div>
+
+                    {/* Send Date */}
+                    <div className="col-span-2">
+                      {sendDate ? (
+                        <div className="flex items-center gap-1.5 text-sm text-white/80">
+                          <Calendar className="w-3.5 h-3.5 text-purple-400" />
+                          <span>{sendDate}</span>
+                        </div>
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-white/60" />
+                        <span className="text-xs text-white/40">Not calculated</span>
                       )}
                     </div>
-                  </button>
 
-                  {/* Email Items */}
-                  {isExpanded && (
-                    <div className="border-t border-white/10">
-                      {categoryEmails.map((email: EmailTemplateItem, index: number) => (
-                        <div
-                          key={email.id}
-                          className={`px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors ${
-                            index < categoryEmails.length - 1 ? 'border-b border-white/5' : ''
-                          }`}
-                        >
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className="text-sm font-medium text-white">{email.name}</h4>
-                              {!email.enabled_by_default && (
-                                <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded">
-                                  Auto
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
-                          </div>
-                          <div className="flex items-center gap-2 ml-4">
-                            {/* Recipient Filter */}
-                            <button className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-xs text-white rounded border border-white/10 flex items-center gap-1.5 transition-colors">
-                              <Users className="w-3.5 h-3.5" />
-                              <span>All Vendors</span>
-                              <ChevronDown className="w-3 h-3" />
-                            </button>
-                            {/* Preview Button */}
-                            <button
-                              onClick={() => handlePreviewEmail(email)}
-                              className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
-                              title="Preview email"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
+                    {/* Recipients */}
+                    <div className="col-span-2">
+                      <div className="flex items-center gap-1.5 text-xs text-white/60">
+                        <Users className="w-3.5 h-3.5" />
+                        <span>All Vendors</span>
+                      </div>
                     </div>
-                  )}
-                </div>
-              );
-            })}
+
+                    {/* Actions */}
+                    <div className="col-span-1 flex justify-end">
+                      <button
+                        onClick={() => handlePreviewEmail(email)}
+                        className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
+                        title="Preview email"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>

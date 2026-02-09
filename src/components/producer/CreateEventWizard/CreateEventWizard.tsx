@@ -250,7 +250,13 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       case 3:
         return <Step3InviteList {...stepProps} organizationId={organizationId} />;
       case 4:
-        return <Step4AutoMessages />;
+        return (
+          <Step4AutoMessages
+            eventDate={wizardState.eventDetails.event_date}
+            applicationDeadline={wizardState.eventDetails.application_deadline}
+            paymentDeadline={wizardState.eventDetails.payment_deadline}
+          />
+        );
       default:
         return null;
     }
