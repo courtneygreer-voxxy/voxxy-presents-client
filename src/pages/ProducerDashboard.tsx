@@ -501,30 +501,30 @@ export default function ProducerDashboard() {
 
       {/* Left Sidebar */}
       <aside className={`
-        w-[200px]
+        w-[180px]
         bg-[#0f0820] flex flex-col transition-all duration-300
         fixed lg:relative inset-y-0 left-0 z-50
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="p-4 border-b border-white/10">
+        <div className="p-3 border-b border-white/10">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <span className="text-xl font-bold text-white tracking-wider block mb-1">VOXXY</span>
-              <p className="text-xs text-white/60">Event Producer</p>
+              <span className="text-lg font-bold text-white tracking-wider block mb-0.5">VOXXY</span>
+              <p className="text-[10px] text-white/60">Event Producer</p>
             </div>
             {/* Mobile Close Button */}
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden text-white/70 hover:text-white p-1"
+              className="lg:hidden text-white/70 hover:text-white p-0.5"
             >
-              <X className="w-4 h-4" />
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 p-3 space-y-1">
+        <nav className="flex-1 p-2 space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeNav === item.id;
@@ -541,15 +541,15 @@ export default function ProducerDashboard() {
                   }
                 }}
                 className={`
-                  w-full flex items-center gap-2 px-3 py-2 rounded-lg
-                  text-sm font-medium transition-smooth
+                  w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
+                  text-xs font-medium transition-smooth
                   ${isActive
                     ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
                     : 'text-white/70 hover:text-white hover:bg-white/5'
                   }
                 `}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-3.5 h-3.5" />
                 {item.label}
               </button>
             );
@@ -560,36 +560,36 @@ export default function ProducerDashboard() {
         <div className="border-t border-white/10">
           {/* Organization Info */}
           {organization && (
-            <div className="p-3 border-b border-white/10">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-4 h-4 text-white" />
+            <div className="p-2 border-b border-white/10">
+              <div className="flex items-center gap-1.5">
+                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-3 h-3 text-white" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-white truncate">
+                  <p className="text-xs font-medium text-white truncate">
                     {organization.name}
                   </p>
-                  <p className="text-[11px] text-white/60">Organization</p>
+                  <p className="text-[10px] text-white/60">Organization</p>
                 </div>
               </div>
             </div>
           )}
 
           {/* User Profile & Sign Out */}
-          <div className="p-3">
+          <div className="p-2">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-white truncate">
+                <p className="text-xs font-medium text-white truncate">
                   {userProfile?.name || userProfile?.email}
                 </p>
-                <p className="text-[11px] text-white/60">Producer</p>
+                <p className="text-[10px] text-white/60">Producer</p>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-smooth"
+                className="p-1 rounded-md text-white/60 hover:text-white hover:bg-white/5 transition-smooth"
                 title="Sign Out"
               >
-                <LogOut className="w-3.5 h-3.5" />
+                <LogOut className="w-3 h-3" />
               </button>
             </div>
           </div>
@@ -599,16 +599,16 @@ export default function ProducerDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="h-12 bg-[#0f0820] border-b border-white/10 flex items-center px-4">
+        <header className="h-10 bg-[#0f0820] border-b border-white/10 flex items-center px-3">
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden text-white/70 hover:text-white mr-3"
+            className="lg:hidden text-white/70 hover:text-white mr-2"
           >
-            <Menu className="w-5 h-5" />
+            <Menu className="w-4 h-4" />
           </button>
 
-          <h2 className="text-sm text-white font-medium">
+          <h2 className="text-xs text-white font-medium">
             {userProfile?.name || 'Producer Dashboard'}
           </h2>
         </header>
@@ -620,31 +620,31 @@ export default function ProducerDashboard() {
           ) : activeNav === 'events' ? (
             renderEventsContent()
           ) : activeNav === 'network' ? (
-            <div className="p-4 md:p-6">
+            <div className="p-3 md:p-4">
               {organization ? (
                 <NetworkPage organizationId={organization.id} />
               ) : (
-                <div className="flex items-center justify-center py-12">
-                  <p className="text-sm text-white/60">Loading organization...</p>
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-xs text-white/60">Loading organization...</p>
                 </div>
               )}
             </div>
           ) : activeNav === 'email-templates' ? (
-            <div className="p-4 md:p-6">
+            <div className="p-3 md:p-4">
               {organization ? (
                 <EmailTemplatesPage organizationId={organization.id} />
               ) : (
-                <div className="flex items-center justify-center py-12">
-                  <p className="text-sm text-white/60">Loading organization...</p>
+                <div className="flex items-center justify-center py-8">
+                  <p className="text-xs text-white/60">Loading organization...</p>
                 </div>
               )}
             </div>
           ) : activeNav === 'email-testing' ? (
             <EmailTestingPage onBack={() => setActiveNav('events')} />
           ) : (
-            <div className="p-4 md:p-6">
-              <div className="text-white/40 text-center mt-20">
-                <p className="text-sm">{activeNav} content coming soon...</p>
+            <div className="p-3 md:p-4">
+              <div className="text-white/40 text-center mt-12">
+                <p className="text-xs">{activeNav} content coming soon...</p>
               </div>
             </div>
           )}

@@ -130,6 +130,6 @@
     background: linear-gradient(to bottom right, #1a0b2e, #2d1b4e, #0f172a);
     background-attachment: fixed;
     /* Reduced base font size for more compact UI */
-    font-size: 14px;
+    font-size: 13px;
   }
 }

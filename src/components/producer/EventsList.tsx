@@ -84,28 +84,28 @@ export default function EventsList({
   }
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="p-3 md:p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h1 className="text-xl font-bold text-white mb-0.5">Events</h1>
-          <p className="text-xs text-white/60">Manage your event postings and applications</p>
+          <h1 className="text-lg font-bold text-white mb-0.5">Events</h1>
+          <p className="text-[10px] text-white/60">Manage your event postings and applications</p>
         </div>
         <button
           onClick={onCreateEvent}
-          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm"
+          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-3.5 h-3.5" />
           <span className="hidden sm:inline">Create New Event</span>
           <span className="sm:hidden">New</span>
         </button>
       </div>
 
       {/* Events List */}
-      <div className="space-y-2">
+      <div className="space-y-1.5">
         {events.length === 0 ? (
-          <div className="text-center py-12 text-white/40">
-            <p className="text-sm">No events found</p>
+          <div className="text-center py-8 text-white/40">
+            <p className="text-xs">No events found</p>
           </div>
         ) : (
           events.map((event) => {
@@ -116,32 +116,32 @@ export default function EventsList({
             return (
               <div
                 key={event.id}
-                className="glass-card p-4 hover:bg-white/8 hover:border-white/20 transition-smooth"
+                className="glass-card p-3 hover:bg-white/8 hover:border-white/20 transition-smooth"
               >
-                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
+                <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-2">
                   {/* Event Info */}
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-white">
+                    <div className="flex items-center gap-1.5 mb-0.5">
+                      <h3 className="text-sm font-semibold text-white">
                         {event.title}
                       </h3>
                       <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide ${badge.color}`}
+                        className={`px-1.5 py-0.5 rounded-full text-[9px] font-medium uppercase tracking-wide ${badge.color}`}
                       >
                         {badge.label}
                       </span>
                     </div>
 
                     {event.description && (
-                      <p className="text-white/70 text-xs mb-1.5 line-clamp-1">
+                      <p className="text-white/70 text-[11px] mb-1 line-clamp-1">
                         {event.description}
                       </p>
                     )}
 
                     {/* Event Meta */}
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-purple-400" />
+                    <div className="flex flex-wrap items-center gap-1.5 text-[10px] text-white/60">
+                      <div className="flex items-center gap-0.5">
+                        <Calendar className="w-2.5 h-2.5 text-purple-400" />
                         <span>{formatEventDate(event)}</span>
                       </div>
                       {event.location && (
@@ -161,7 +161,7 @@ export default function EventsList({
                   <div className="flex">
                     <button
                       onClick={() => onCommandCenter(event.slug)}
-                      className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm whitespace-nowrap"
+                      className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs whitespace-nowrap"
                     >
                       Command Center
                     </button>
