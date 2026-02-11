@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check } from 'lucide-react';
+import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check, X } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 

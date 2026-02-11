@@ -8,8 +8,6 @@ export function generateCSVTemplate(): string {
     'tiktok_handle',
     'website',
     'location',
-    'job_title',
-    'contact_type',
     'tags',
     'notes'
   ];
@@ -24,8 +22,6 @@ export function generateCSVTemplate(): string {
       tiktok_handle: '@sarahceramics',
       website: 'https://sarahceramics.com',
       location: 'San Francisco, CA',
-      job_title: 'Owner',
-      contact_type: 'vendor',
       tags: 'art,local',
       notes: 'Met at Spring Market 2024'
     },
@@ -38,8 +34,6 @@ export function generateCSVTemplate(): string {
       tiktok_handle: '',
       website: 'https://johnstacos.com',
       location: 'Oakland, CA',
-      job_title: 'Manager',
-      contact_type: 'vendor',
       tags: 'food,catering',
       notes: 'Interested in summer events'
     }
