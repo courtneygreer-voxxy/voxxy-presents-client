@@ -110,6 +110,25 @@ export default function LoginPage() {
     }
   }
 
+  // Development-only bypass login
+  const handleDevLogin = async () => {
+    setIsSubmitting(true)
+    setErrors({})
+
+    try {
+      const { authApi } = await import('@/services/api')
+      const data = await authApi.devLogin()
+
+      // Manually trigger sign in flow
+      await signIn({ email: data.email, password: 'test123' })
+    } catch (err) {
+      console.error('Dev login error:', err)
+      setErrors({ submit: 'Dev login failed' })
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Branding */}
@@ -257,6 +276,24 @@ export default function LoginPage() {
                     )}
                   </Button>
                 </form>
+
+                {/* Development Login Bypass */}
+                {import.meta.env.DEV && (
+                  <div className="mt-4">
+                    <Button
+                      type="button"
+                      onClick={handleDevLogin}
+                      disabled={isSubmitting}
+                      variant="outline"
+                      className="w-full border-yellow-500/50 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 font-medium"
+                    >
+                      🔧 Dev Login (Bypass Auth)
+                    </Button>
+                    <p className="text-yellow-400/70 text-xs text-center mt-2">
+                      Development only - creates test user automatically
+                    </p>
+                  </div>
+                )}
 
                 {/* Request Beta Access */}
                 <div className="mt-6">

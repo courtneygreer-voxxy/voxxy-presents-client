@@ -57,7 +57,13 @@ type SourceFilter = 'all' | 'contact' | 'net_new';
 export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProps) {
   const [inviteRows, setInviteRows] = useState<InviteRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasNextPage, setHasNextPage] = useState(false);
+  const PER_PAGE = 50;
 
   // Filters
   const [searchQuery, setSearchQuery] = useState('');
@@ -78,17 +84,29 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
 
   useEffect(() => {
-    fetchInviteRows();
+    fetchInviteRows(1);
   }, [eventSlug]);
 
-  const fetchInviteRows = async () => {
+  const fetchInviteRows = async (page: number = 1, append: boolean = false) => {
     try {
-      setLoading(true);
+      if (append) {
+        setLoadingMore(true);
+      } else {
+        setLoading(true);
+      }
       setError(null);
 
-      // Fetch invitations (people who were invited)
-      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug);
+      // Fetch invitations (people who were invited) with pagination
+      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, page, PER_PAGE);
       const invitations = invitationsResponse.invitations || [];
+
+      // Store pagination metadata
+      if (invitationsResponse.meta?.pagination) {
+        setCurrentPage(invitationsResponse.meta.pagination.current_page);
+        setTotalPages(invitationsResponse.meta.pagination.total_pages);
+        setTotalCount(invitationsResponse.meta.pagination.total_count);
+        setHasNextPage(invitationsResponse.meta.pagination.has_next_page);
+      }
 
       // Fetch vendor applications and their submissions
       const vendorApps = await vendorApplicationsApi.getByEvent(eventSlug);
@@ -188,12 +206,23 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         }
       });
 
-      setInviteRows(Array.from(emailMap.values()));
+      if (append) {
+        setInviteRows((prev) => [...prev, ...Array.from(emailMap.values())]);
+      } else {
+        setInviteRows(Array.from(emailMap.values()));
+      }
     } catch (err: any) {
       console.error('Failed to fetch invite rows:', err);
       setError(err.message || 'Failed to load invite data');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const handleLoadMore = () => {
+    if (hasNextPage && !loadingMore) {
+      fetchInviteRows(currentPage + 1, true);
     }
   };
 
@@ -420,7 +449,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         <div className="text-center py-12">
           <p className="text-sm text-red-400 mb-3">{error}</p>
           <button
-            onClick={fetchInviteRows}
+            onClick={() => fetchInviteRows(1)}
             className="px-3 py-1.5 text-xs rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth"
           >
             Retry
@@ -849,6 +878,26 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
               );
             })}
           </div>
+
+          {/* Load More Button */}
+          {hasNextPage && (
+            <div className="px-3 py-4 border-t border-white/10 text-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                {loadingMore ? (
+                  <>
+                    <div className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Loading...
+                  </>
+                ) : (
+                  `Load More (${filteredRows.length} of ${totalCount})`
+                )}
+              </button>
+            </div>
+          )}
         </div>
       )}
 
