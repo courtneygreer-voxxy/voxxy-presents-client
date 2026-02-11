@@ -4,8 +4,10 @@ export function generateCSVTemplate(): string {
     'email',
     'phone',
     'business_name',
-    'job_title',
-    'contact_type',
+    'instagram_handle',
+    'tiktok_handle',
+    'website',
+    'location',
     'tags',
     'notes'
   ];
@@ -16,8 +18,10 @@ export function generateCSVTemplate(): string {
       email: 'sarah@ceramics.com',
       phone: '555-1234',
       business_name: "Sarah's Ceramics",
-      job_title: 'Owner',
-      contact_type: 'vendor',
+      instagram_handle: '@sarahceramics',
+      tiktok_handle: '@sarahceramics',
+      website: 'https://sarahceramics.com',
+      location: 'San Francisco, CA',
       tags: 'art,local',
       notes: 'Met at Spring Market 2024'
     },
@@ -26,8 +30,10 @@ export function generateCSVTemplate(): string {
       email: 'john@foodtruck.com',
       phone: '555-5678',
       business_name: "John's Tacos",
-      job_title: 'Manager',
-      contact_type: 'vendor',
+      instagram_handle: '@johnstacos',
+      tiktok_handle: '',
+      website: 'https://johnstacos.com',
+      location: 'Oakland, CA',
       tags: 'food,catering',
       notes: 'Interested in summer events'
     }

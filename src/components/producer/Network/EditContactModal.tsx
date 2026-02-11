@@ -128,12 +128,12 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-4">
+        <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-white">Edit Contact</h2>
+              <h2 className="text-lg font-bold text-white">Edit Contact</h2>
               <p className="text-white/50 text-xs mt-0.5">{contact.contact_name}</p>
             </div>
             <button
@@ -146,9 +146,9 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-w-5xl mx-auto">
           {/* Row 1: Full Name, Business Name, Email */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label htmlFor="contact_name" className="block text-white/90 text-sm font-medium mb-1.5">
                 Full Name <span className="text-red-400">*</span>
@@ -200,7 +200,7 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
           </div>
 
           {/* Row 2: Phone, Location */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="phone" className="block text-white/90 text-sm font-medium mb-1.5">
                 Phone
@@ -230,7 +230,7 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
           </div>
 
           {/* Row 3: Social Media */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label htmlFor="instagram_handle" className="block text-white/90 text-sm font-medium mb-1.5 flex items-center gap-2">
                 <span className="text-pink-400">@</span> Instagram

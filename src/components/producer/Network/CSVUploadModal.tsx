@@ -53,7 +53,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const requiredHeaders = ['name', 'email'];
-  const optionalHeaders = ['phone', 'business_name', 'job_title', 'contact_type', 'tags', 'notes'];
+  const optionalHeaders = ['phone', 'business_name', 'instagram_handle', 'tiktok_handle', 'website', 'location', 'tags', 'notes'];
   const allExpectedHeaders = [...requiredHeaders, ...optionalHeaders];
 
   const handleFileSelect = (file: File) => {
@@ -172,8 +172,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       setImportResult(result);
       setState('success');
 
-      // Refresh parent list after successful import
-      onSuccess();
+      // Don't call onSuccess() here - let user see success screen first
+      // onSuccess() will be called when they click "Done" button
     } catch (error) {
       console.error('❌ Import failed:', error);
       console.error('Error details:', {
@@ -226,14 +226,14 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       <div
         onDrop={handleFileDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-primary transition-colors cursor-pointer"
+        className="border-2 border-dashed border-purple-500/40 bg-white/5 rounded-lg p-12 text-center hover:border-purple-500 hover:bg-white/10 transition-all cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Upload className="mx-auto h-12 w-12 text-gray-400" />
-        <p className="mt-2 text-sm text-gray-600">
+        <Upload className="mx-auto h-12 w-12 text-purple-400" />
+        <p className="mt-2 text-sm text-white/80">
           Drag and drop your CSV file here, or click to browse
         </p>
-        <p className="mt-1 text-xs text-gray-500">CSV files only</p>
+        <p className="mt-1 text-xs text-white/60">CSV files only</p>
       </div>
 
       <input
@@ -257,33 +257,39 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       </Alert>
 
       {/* Preview Table */}
-      <div className="border rounded-lg overflow-hidden">
-        <div className="bg-gray-50 px-4 py-2 border-b">
-          <h4 className="text-sm font-medium">Preview (first 10 rows)</h4>
+      <div className="border border-purple-500/20 rounded-lg overflow-hidden bg-white/5">
+        <div className="bg-purple-500/10 px-3 py-2 border-b border-purple-500/20">
+          <h4 className="text-sm font-medium text-white">Preview (first 10 rows)</h4>
         </div>
         <div className="overflow-x-auto max-h-64">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-100 sticky top-0">
+          <table className="w-full text-xs">
+            <thead className="bg-white/5 sticky top-0">
               <tr>
                 {previewData?.headers.map((header) => (
                   <th
                     key={header}
-                    className="px-4 py-2 text-left font-medium text-gray-700 border-b"
+                    className="px-2 py-1.5 text-left font-medium text-white/90 border-b border-purple-500/20 whitespace-nowrap"
                   >
-                    {header}
-                    {requiredHeaders.includes(header) && (
-                      <span className="text-red-500 ml-1">*</span>
-                    )}
+                    <div className="flex items-center gap-1">
+                      <span className="truncate max-w-[100px]" title={header}>
+                        {header}
+                      </span>
+                      {requiredHeaders.includes(header) && (
+                        <span className="text-red-400">*</span>
+                      )}
+                    </div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
               {previewData?.rows.map((row, idx) => (
-                <tr key={idx} className="border-b hover:bg-gray-50">
+                <tr key={idx} className="border-b border-purple-500/10 hover:bg-white/5">
                   {previewData.headers.map((header) => (
-                    <td key={header} className="px-4 py-2 text-gray-600">
-                      {row[header] || <span className="text-gray-400">—</span>}
+                    <td key={header} className="px-2 py-1.5 text-white/70">
+                      <div className="truncate max-w-[120px]" title={row[header] || ''}>
+                        {row[header] || <span className="text-white/40">—</span>}
+                      </div>
                     </td>
                   ))}
                 </tr>
@@ -294,8 +300,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       </div>
 
       {/* Import Options */}
-      <div className="space-y-3 border rounded-lg p-4 bg-gray-50">
-        <h4 className="text-sm font-medium">Import Options</h4>
+      <div className="space-y-3 border border-purple-500/20 rounded-lg p-3 bg-white/5">
+        <h4 className="text-xs font-medium text-white">Import Options</h4>
 
         <div className="flex items-center space-x-2">
           <Checkbox
@@ -303,7 +309,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             checked={skipDuplicates}
             onCheckedChange={(checked) => setSkipDuplicates(checked as boolean)}
           />
-          <Label htmlFor="skip-duplicates" className="text-sm cursor-pointer">
+          <Label htmlFor="skip-duplicates" className="text-xs cursor-pointer text-white/90">
             Skip duplicates (based on email)
           </Label>
         </div>
@@ -314,13 +320,13 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             checked={updateExisting}
             onCheckedChange={(checked) => setUpdateExisting(checked as boolean)}
           />
-          <Label htmlFor="update-existing" className="text-sm cursor-pointer">
+          <Label htmlFor="update-existing" className="text-xs cursor-pointer text-white/90">
             Update existing contacts (if email matches)
           </Label>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="bulk-tags" className="text-sm">
+        <div className="space-y-1.5">
+          <Label htmlFor="bulk-tags" className="text-xs text-white/90">
             Add tags to all imported contacts (comma-separated)
           </Label>
           <Input
@@ -333,11 +339,11 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       </div>
 
       {/* Actions */}
-      <div className="flex justify-between">
-        <Button variant="outline" onClick={handleReset}>
+      <div className="flex justify-between gap-3">
+        <Button variant="outline" onClick={handleReset} size="sm">
           Choose Different File
         </Button>
-        <Button onClick={handleUpload}>
+        <Button onClick={handleUpload} size="sm">
           Import {previewData?.totalRows} Contacts
         </Button>
       </div>
@@ -360,43 +366,43 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     <div className="space-y-4">
       {/* Success Header */}
       <div className="flex items-center justify-center py-4">
-        <CheckCircle2 className="h-12 w-12 text-green-500" />
+        <CheckCircle2 className="h-12 w-12 text-green-400" />
       </div>
-      <h3 className="text-lg font-medium text-center">Import Complete!</h3>
+      <h3 className="text-lg font-medium text-center text-white">Import Complete!</h3>
 
       {/* Summary Stats */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="border rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-600">
+        <div className="border border-green-500/30 bg-green-500/10 rounded-lg p-4 text-center">
+          <div className="text-2xl font-bold text-green-400">
             {importResult?.summary.created}
           </div>
-          <div className="text-sm text-gray-600">Created</div>
+          <div className="text-sm text-white/70">Created</div>
         </div>
 
         {importResult && importResult.summary.updated > 0 && (
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-blue-600">
+          <div className="border border-blue-500/30 bg-blue-500/10 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-blue-400">
               {importResult.summary.updated}
             </div>
-            <div className="text-sm text-gray-600">Updated</div>
+            <div className="text-sm text-white/70">Updated</div>
           </div>
         )}
 
         {importResult && importResult.summary.skipped > 0 && (
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-yellow-600">
+          <div className="border border-yellow-500/30 bg-yellow-500/10 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-yellow-400">
               {importResult.summary.skipped}
             </div>
-            <div className="text-sm text-gray-600">Skipped</div>
+            <div className="text-sm text-white/70">Skipped</div>
           </div>
         )}
 
         {importResult && importResult.summary.failed > 0 && (
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-red-600">
+          <div className="border border-red-500/30 bg-red-500/10 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-red-400">
               {importResult.summary.failed}
             </div>
-            <div className="text-sm text-gray-600">Failed</div>
+            <div className="text-sm text-white/70">Failed</div>
           </div>
         )}
       </div>
@@ -441,7 +447,10 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
         <Button variant="outline" onClick={handleReset}>
           Import Another File
         </Button>
-        <Button onClick={handleClose}>Done</Button>
+        <Button onClick={() => {
+          onSuccess(); // Refresh parent list
+          handleClose(); // Then close modal
+        }}>Done</Button>
       </div>
     </div>
   );
@@ -473,10 +482,10 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Import Contacts from CSV</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto bg-[#1a0f2e]/95 backdrop-blur-xl border border-purple-500/30 shadow-2xl p-6">
+        <DialogHeader className="mb-4">
+          <DialogTitle className="text-xl text-white mb-2">Import Contacts from CSV</DialogTitle>
+          <DialogDescription className="text-white/70 text-sm">
             Upload a CSV file to bulk import vendor contacts
           </DialogDescription>
         </DialogHeader>
