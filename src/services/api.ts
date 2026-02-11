@@ -655,6 +655,7 @@ export const eventsApi = {
     published?: boolean
     registration_open?: boolean
     status?: 'draft' | 'published' | 'cancelled' | 'completed'
+    email_campaign_template_id?: number
   }) {
     return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',

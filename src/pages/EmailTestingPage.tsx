@@ -3,6 +3,7 @@ import { Mail, Send, CheckCircle2, XCircle, AlertCircle, Loader2, ArrowLeft } fr
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import EmailSequenceManager from '@/components/admin/EmailSequenceManager';
 
 interface EmailCategory {
   name: string;
@@ -128,6 +129,9 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
             </Button>
           )}
         </div>
+
+        {/* Email Sequence Manager */}
+        <EmailSequenceManager />
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

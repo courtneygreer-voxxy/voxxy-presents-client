@@ -166,19 +166,30 @@ export default function Step4AutoMessages({
           </h2>
 
           <p className="text-white/60 text-base max-w-2xl leading-relaxed mb-6">
-            Review automated emails for your event
+            Review and select automated email sequence for your event
           </p>
 
-          {/* Template Selector Button */}
-          {selectedTemplate && (
+          {/* Current Template Display & Change Button */}
+          <div className="flex items-center justify-between bg-white/10 rounded-lg p-4 border border-white/20">
+            <div>
+              <p className="text-xs text-white/50 mb-1">Email Sequence</p>
+              <p className="text-white font-medium">
+                {selectedTemplate ? selectedTemplate.name : 'No template selected'}
+              </p>
+              {selectedTemplate && (
+                <p className="text-xs text-white/50 mt-1">
+                  {emailItems.length} {emailItems.length === 1 ? 'email' : 'emails'}
+                </p>
+              )}
+            </div>
             <button
               onClick={() => setIsImportModalOpen(true)}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-colors flex items-center gap-2 font-medium shadow-lg"
             >
               <Plus className="w-4 h-4" />
-              Import Template
+              {selectedTemplate ? 'Change Sequence' : 'Select Sequence'}
             </button>
-          )}
+          </div>
         </div>
 
         {/* Loading State */}

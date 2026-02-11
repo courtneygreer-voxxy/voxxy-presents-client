@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check, X } from 'lucide-react';
-import { vendorApplicationsApi } from '@/services/api';
+import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check, X, Download, Database } from 'lucide-react';
+import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 
 interface Event {
@@ -202,6 +202,88 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     } catch (err) {
       console.error('Failed to copy:', err);
       alert('Failed to copy link to clipboard');
+    }
+  };
+
+  const handleExportInvitesCSV = async () => {
+    try {
+      // Fetch all invitations and registrations
+      const [invitations, registrations] = await Promise.all([
+        eventInvitationsApi.getAll(event.slug),
+        registrationsApi.getByEvent(event.slug)
+      ]);
+
+      // Combine and format data for CSV
+      const csvData: any[] = [];
+
+      // Add invitations
+      invitations.invitations?.forEach((inv: any) => {
+        csvData.push({
+          name: inv.contact_name || inv.name || '',
+          email: inv.contact_email || inv.email || '',
+          business_name: inv.business_name || '',
+          category: inv.vendor_category || '',
+          status: 'Invited',
+          invited_at: inv.created_at ? new Date(inv.created_at).toLocaleDateString() : '',
+          applied: 'No',
+          application_date: '',
+          application_status: '',
+          payment_status: ''
+        });
+      });
+
+      // Add registrations (applications)
+      registrations.vendor_registrations?.forEach((reg: any) => {
+        csvData.push({
+          name: reg.name || '',
+          email: reg.email || '',
+          business_name: reg.business_name || '',
+          category: reg.vendor_category || '',
+          status: 'Applied',
+          invited_at: '',
+          applied: 'Yes',
+          application_date: reg.created_at ? new Date(reg.created_at).toLocaleDateString() : '',
+          application_status: reg.status || '',
+          payment_status: reg.payment_status || ''
+        });
+      });
+
+      // Convert to CSV
+      if (csvData.length === 0) {
+        alert('No data to export');
+        return;
+      }
+
+      const headers = ['Name', 'Email', 'Business Name', 'Category', 'Status', 'Invited At', 'Applied', 'Application Date', 'Application Status', 'Payment Status'];
+      const csvContent = [
+        headers.join(','),
+        ...csvData.map(row => [
+          `"${row.name}"`,
+          `"${row.email}"`,
+          `"${row.business_name}"`,
+          `"${row.category}"`,
+          `"${row.status}"`,
+          `"${row.invited_at}"`,
+          `"${row.applied}"`,
+          `"${row.application_date}"`,
+          `"${row.application_status}"`,
+          `"${row.payment_status}"`
+        ].join(','))
+      ].join('\n');
+
+      // Download CSV
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${event.slug}-invites-and-applications-${new Date().toISOString().split('T')[0]}.csv`);
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err: any) {
+      console.error('Failed to export CSV:', err);
+      alert('Failed to export CSV: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -692,6 +774,38 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           >
             {isSaving ? 'Saving...' : 'Save Settings'}
           </button>
+        </div>
+
+        {/* Data Export Section */}
+        <div className="bg-white/5 rounded-xl p-6 border border-white/10">
+          <div className="flex items-start gap-4">
+            <div className="flex-shrink-0 w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <Database className="w-5 h-5 text-blue-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-white font-semibold mb-2">Data Export</h3>
+              <p className="text-white/60 text-sm mb-4">
+                Export your event data for offline use or integration with other tools.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-4 bg-white/5 rounded-lg border border-white/10 hover:border-blue-500/30 transition-all">
+                  <div>
+                    <h4 className="text-white text-sm font-medium mb-1">Invites & Applications CSV</h4>
+                    <p className="text-white/50 text-xs">
+                      Download all invited contacts and submitted applications with their current status
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleExportInvitesCSV}
+                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-all"
+                  >
+                    <Download className="w-4 h-4" />
+                    Export
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Danger Zone */}

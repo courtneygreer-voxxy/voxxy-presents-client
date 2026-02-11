@@ -541,7 +541,19 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
       {/* Lists Tab Content */}
       {activeTab === 'lists' && (
-        <ListsManagement organizationId={organizationId} />
+        <ListsManagement
+          organizationId={organizationId}
+          onViewList={(filters) => {
+            // Apply filters and switch to contacts tab
+            if (filters.locations && filters.locations.length > 0) {
+              setLocationFilter(filters.locations[0]);
+            }
+            if (filters.categories && filters.categories.length > 0) {
+              setCategoryFilter(filters.categories[0]);
+            }
+            setActiveTab('contacts');
+          }}
+        />
       )}
     </div>
   );
