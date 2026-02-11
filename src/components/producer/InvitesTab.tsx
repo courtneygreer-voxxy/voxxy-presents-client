@@ -449,7 +449,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         <div className="text-center py-12">
           <p className="text-sm text-red-400 mb-3">{error}</p>
           <button
-            onClick={fetchInviteRows}
+            onClick={() => fetchInviteRows(1)}
             className="px-3 py-1.5 text-xs rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth"
           >
             Retry
