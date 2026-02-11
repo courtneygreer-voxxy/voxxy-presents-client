@@ -160,6 +160,42 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 // Authentication API (Rails JWT)
 export const authApi = {
   /**
+   * Development-only login bypass (no password required)
+   * POST /dev_login
+   */
+  async devLogin() {
+    console.log('🔧 [DEV] Using development login bypass...')
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/dev_login`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Mobile-App': 'true',
+      },
+    })
+
+    const data = await response.json()
+
+    if (!response.ok) {
+      throw new ApiError(
+        data.error || 'Dev login failed',
+        response.status,
+        data.errors
+      )
+    }
+
+    // Validate response
+    if (!data.token || !data.id) {
+      throw new ApiError('Invalid response from server', 500)
+    }
+
+    // Save token
+    saveAuthToken(data.token)
+
+    console.log('✅ [DEV] Dev login successful, token saved')
+    return data
+  },
+
+  /**
    * Login with email and password
    * POST /login (legacy endpoint)
    */
