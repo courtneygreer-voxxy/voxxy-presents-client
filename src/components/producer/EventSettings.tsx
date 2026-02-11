@@ -76,6 +76,21 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
+  // Event details edit state
+  const [isEditingDetails, setIsEditingDetails] = useState(false);
+  const [eventFormData, setEventFormData] = useState({
+    title: event.title || '',
+    description: event.description || '',
+    event_date: event.event_date || '',
+    event_end_date: event.event_end_date || '',
+    start_time: event.start_time || '',
+    end_time: event.end_time || '',
+    venue: event.venue || '',
+    location: event.location || '',
+    application_deadline: event.application_deadline || '',
+    payment_due_date: event.payment_due_date || '',
+  });
+
   // Copy link states
   const [copiedEventPageLink, setCopiedEventPageLink] = useState(false);
   const [copiedPortalLink, setCopiedPortalLink] = useState(false);
@@ -116,6 +131,41 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const handleSaveEventDetails = async () => {
+    if (!onUpdate) {
+      alert('Event details will be saved');
+      return;
+    }
+
+    try {
+      setIsSaving(true);
+      await onUpdate(event.slug, eventFormData);
+      setIsEditingDetails(false);
+      alert('Event details saved successfully!');
+    } catch (err) {
+      console.error('Failed to save event details:', err);
+      alert('Failed to save event details. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleCancelEditDetails = () => {
+    setEventFormData({
+      title: event.title || '',
+      description: event.description || '',
+      event_date: event.event_date || '',
+      event_end_date: event.event_end_date || '',
+      start_time: event.start_time || '',
+      end_time: event.end_time || '',
+      venue: event.venue || '',
+      location: event.location || '',
+      application_deadline: event.application_deadline || '',
+      payment_due_date: event.payment_due_date || '',
+    });
+    setIsEditingDetails(false);
   };
 
   const handleDeleteEvent = async () => {
@@ -412,6 +462,195 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Event Details Section */}
+      <div>
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-lg bg-purple-500/20">
+            <Edit className="w-5 h-5 text-purple-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-white">Event Details</h2>
+            <p className="text-white/60 text-sm">Manage basic event information</p>
+          </div>
+        </div>
+
+        <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20">
+          {!isEditingDetails ? (
+            <>
+              {/* View Mode */}
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Event Title</p>
+                    <p className="text-white">{event.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Venue</p>
+                    <p className="text-white">{event.venue || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Location</p>
+                    <p className="text-white">{event.location || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Event Date</p>
+                    <p className="text-white">{event.event_date ? new Date(event.event_date).toLocaleDateString() : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Application Deadline</p>
+                    <p className="text-white">{event.application_deadline ? new Date(event.application_deadline).toLocaleDateString() : '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Payment Deadline</p>
+                    <p className="text-white">{event.payment_due_date ? new Date(event.payment_due_date).toLocaleDateString() : '—'}</p>
+                  </div>
+                </div>
+                {event.description && (
+                  <div>
+                    <p className="text-xs text-white/60 mb-1">Description</p>
+                    <p className="text-white text-sm">{event.description}</p>
+                  </div>
+                )}
+              </div>
+              <div className="mt-6">
+                <button
+                  onClick={() => setIsEditingDetails(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-all"
+                >
+                  <Edit className="w-4 h-4" />
+                  Edit Details
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Edit Mode */}
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Event Title *</label>
+                  <input
+                    type="text"
+                    value={eventFormData.title}
+                    onChange={(e) => setEventFormData({ ...eventFormData, title: e.target.value })}
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs text-white/60 mb-1">Description</label>
+                  <textarea
+                    value={eventFormData.description}
+                    onChange={(e) => setEventFormData({ ...eventFormData, description: e.target.value })}
+                    rows={3}
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Venue</label>
+                    <input
+                      type="text"
+                      value={eventFormData.venue}
+                      onChange={(e) => setEventFormData({ ...eventFormData, venue: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Location</label>
+                    <input
+                      type="text"
+                      value={eventFormData.location}
+                      onChange={(e) => setEventFormData({ ...eventFormData, location: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Event Date</label>
+                    <input
+                      type="date"
+                      value={eventFormData.event_date}
+                      onChange={(e) => setEventFormData({ ...eventFormData, event_date: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">End Date</label>
+                    <input
+                      type="date"
+                      value={eventFormData.event_end_date}
+                      onChange={(e) => setEventFormData({ ...eventFormData, event_end_date: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Start Time</label>
+                    <input
+                      type="time"
+                      value={eventFormData.start_time}
+                      onChange={(e) => setEventFormData({ ...eventFormData, start_time: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">End Time</label>
+                    <input
+                      type="time"
+                      value={eventFormData.end_time}
+                      onChange={(e) => setEventFormData({ ...eventFormData, end_time: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Application Deadline</label>
+                    <input
+                      type="date"
+                      value={eventFormData.application_deadline}
+                      onChange={(e) => setEventFormData({ ...eventFormData, application_deadline: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-white/60 mb-1">Payment Deadline</label>
+                    <input
+                      type="date"
+                      value={eventFormData.payment_due_date}
+                      onChange={(e) => setEventFormData({ ...eventFormData, payment_due_date: e.target.value })}
+                      className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={handleSaveEventDetails}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSaving ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={handleCancelEditDetails}
+                  disabled={isSaving}
+                  className="px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <X className="w-4 h-4 inline mr-2" />
+                  Cancel
+                </button>
+              </div>
+            </>
+          )}
         </div>
       </div>
 

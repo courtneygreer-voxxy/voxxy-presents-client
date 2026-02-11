@@ -53,7 +53,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const requiredHeaders = ['name', 'email'];
-  const optionalHeaders = ['phone', 'business_name', 'job_title', 'contact_type', 'tags', 'notes'];
+  const optionalHeaders = ['phone', 'business_name', 'instagram_handle', 'tiktok_handle', 'website', 'location', 'job_title', 'contact_type', 'tags', 'notes'];
   const allExpectedHeaders = [...requiredHeaders, ...optionalHeaders];
 
   const handleFileSelect = (file: File) => {

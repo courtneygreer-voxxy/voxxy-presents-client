@@ -2408,9 +2408,11 @@ export const eventInvitationsApi = {
    * Get all invitations for an event
    * GET /api/v1/presents/events/:event_slug/invitations
    */
-  async getByEvent(eventSlug: string, params?: { status?: string }) {
+  async getByEvent(eventSlug: string, page?: number, perPage?: number, params?: { status?: string }) {
     const queryParams = new URLSearchParams()
     if (params?.status) queryParams.append('status', params.status)
+    if (page) queryParams.append('page', page.toString())
+    if (perPage) queryParams.append('per_page', perPage.toString())
 
     const query = queryParams.toString()
     return fetchApi<{
@@ -2431,6 +2433,14 @@ export const eventInvitationsApi = {
           undelivered: number
           unsubscribed: number
           pending: number
+        }
+        pagination?: {
+          current_page: number
+          per_page: number
+          total_pages: number
+          total_count: number
+          has_next_page: boolean
+          has_prev_page: boolean
         }
       }
     }>(
