@@ -219,6 +219,7 @@ export default function ProducerDashboard() {
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
         payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
+        email_campaign_template_id: wizardState.automaticMessages.email_campaign_template_id || undefined,
         status: 'draft',
         published: false,
       });
