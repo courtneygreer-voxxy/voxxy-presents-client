@@ -208,8 +208,8 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const handleExportInvitesCSV = async () => {
     try {
       // Fetch all invitations and registrations
-      const [invitations, registrations] = await Promise.all([
-        eventInvitationsApi.getAll(event.slug),
+      const [invitationsResponse, registrations] = await Promise.all([
+        eventInvitationsApi.getByEvent(event.slug, 1, 1000), // Fetch up to 1000 invitations
         registrationsApi.getByEvent(event.slug)
       ]);
 
@@ -217,7 +217,8 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       const csvData: any[] = [];
 
       // Add invitations
-      invitations.invitations?.forEach((inv: any) => {
+      const invitations = invitationsResponse?.invitations || [];
+      invitations.forEach((inv: any) => {
         csvData.push({
           name: inv.contact_name || inv.name || '',
           email: inv.contact_email || inv.email || '',
@@ -233,7 +234,8 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       });
 
       // Add registrations (applications)
-      registrations.vendor_registrations?.forEach((reg: any) => {
+      const registrationList = registrations?.vendor_registrations || [];
+      registrationList.forEach((reg: any) => {
         csvData.push({
           name: reg.name || '',
           email: reg.email || '',
