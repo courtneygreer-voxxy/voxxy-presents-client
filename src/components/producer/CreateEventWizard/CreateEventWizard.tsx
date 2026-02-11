@@ -252,6 +252,15 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       case 4:
         return (
           <Step4AutoMessages
+            selectedTemplateId={wizardState.automaticMessages.email_campaign_template_id}
+            onTemplateSelect={(templateId) => {
+              updateWizardState({
+                automaticMessages: {
+                  ...wizardState.automaticMessages,
+                  email_campaign_template_id: templateId || undefined,
+                },
+              });
+            }}
             eventDate={wizardState.eventDetails.event_date}
             applicationDeadline={wizardState.eventDetails.application_deadline}
             paymentDeadline={wizardState.eventDetails.payment_deadline}
