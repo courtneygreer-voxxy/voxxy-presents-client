@@ -25,16 +25,28 @@ const TOKEN_KEY = 'railsAuthToken'
 export function saveAuthToken(token: string): void {
   try {
     localStorage.setItem(TOKEN_KEY, token)
+    console.log('🔐 [AUTH DEBUG] Token saved to localStorage:', {
+      key: TOKEN_KEY,
+      tokenLength: token.length,
+      tokenPreview: token.substring(0, 20) + '...'
+    })
   } catch (error) {
-    console.error('Failed to save auth token:', error)
+    console.error('❌ [AUTH DEBUG] Failed to save auth token:', error)
   }
 }
 
 export function getAuthToken(): string | null {
   try {
-    return localStorage.getItem(TOKEN_KEY)
+    const token = localStorage.getItem(TOKEN_KEY)
+    console.log('🔍 [AUTH DEBUG] Token retrieved from localStorage:', {
+      key: TOKEN_KEY,
+      hasToken: !!token,
+      tokenLength: token?.length || 0,
+      tokenPreview: token ? token.substring(0, 20) + '...' : 'null'
+    })
+    return token
   } catch (error) {
-    console.error('Failed to get auth token:', error)
+    console.error('❌ [AUTH DEBUG] Failed to get auth token:', error)
     return null
   }
 }
@@ -75,12 +87,28 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
     (endpoint.startsWith('/v1/shared/users') && options?.method === 'POST') ||
     endpoint.startsWith('/v1/shared/password_reset')
 
+  console.log('🌐 [AUTH DEBUG] Making API request:', {
+    method: options?.method || 'GET',
+    endpoint,
+    isPublicAuthEndpoint
+  })
+
   if (!isPublicAuthEndpoint) {
     const token = getAuthToken()
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
+      console.log('✅ [AUTH DEBUG] Authorization header added to request')
+    } else {
+      console.warn('⚠️ [AUTH DEBUG] No token found - request will be unauthenticated')
     }
+  } else {
+    console.log('ℹ️ [AUTH DEBUG] Public endpoint - skipping auth header')
   }
+
+  console.log('📤 [AUTH DEBUG] Request headers:', {
+    hasAuthorization: !!headers['Authorization'],
+    headers: Object.keys(headers)
+  })
 
   try {
     const response = await fetch(url, {
