@@ -1,4 +1,5 @@
-import { Calendar, Edit2, Plus } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { Calendar, Edit2, Plus, Search, SlidersHorizontal, Eye, EyeOff } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Event {
@@ -42,11 +43,16 @@ export default function EventsList({
   onCommandCenter,
   loading = false,
 }: EventsListProps) {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'draft' | 'past'>('all');
+  const [showPastEvents, setShowPastEvents] = useState(false);
+  const [sortBy, setSortBy] = useState<'date' | 'status' | 'name'>('date');
+
   const getStatusBadge = (event: Event) => {
     // Determine badge based on event date and status
     const eventDate = event.dates?.start || event.event_date;
     if (!eventDate) {
-      return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300' };
+      return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
     }
 
     const date = new Date(eventDate);
@@ -54,13 +60,11 @@ export default function EventsList({
     const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysUntil < 0) {
-      return { label: 'Past', color: 'bg-gray-500/20 text-gray-300' };
-    } else if (daysUntil <= 7) {
-      return { label: 'Upcoming', color: 'bg-blue-500/20 text-blue-300' };
-    } else if (daysUntil <= 30) {
-      return { label: 'Brewing', color: 'bg-yellow-500/20 text-yellow-300' };
+      return { label: 'Past', color: 'bg-gray-500/20 text-gray-300', value: 'past' };
+    } else if (event.published || event.status?.published) {
+      return { label: 'Live', color: 'bg-green-500/20 text-green-300', value: 'live' };
     } else {
-      return { label: 'New', color: 'bg-green-500/20 text-green-300' };
+      return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
     }
   };
 
@@ -74,6 +78,51 @@ export default function EventsList({
       return 'Invalid date';
     }
   };
+
+  // Filter and sort events
+  const filteredAndSortedEvents = useMemo(() => {
+    let filtered = events.filter(event => {
+      // Search filter
+      if (searchTerm) {
+        const searchLower = searchTerm.toLowerCase();
+        const matchesSearch =
+          event.title?.toLowerCase().includes(searchLower) ||
+          event.description?.toLowerCase().includes(searchLower) ||
+          event.location?.toLowerCase().includes(searchLower);
+        if (!matchesSearch) return false;
+      }
+
+      // Status filter
+      const badge = getStatusBadge(event);
+
+      // Hide past events by default unless showPastEvents is true
+      if (!showPastEvents && badge.value === 'past') {
+        return false;
+      }
+
+      if (statusFilter !== 'all' && badge.value !== statusFilter) {
+        return false;
+      }
+
+      return true;
+    });
+
+    // Sort events
+    filtered.sort((a, b) => {
+      if (sortBy === 'date') {
+        const dateA = new Date(a.dates?.start || a.event_date || 0).getTime();
+        const dateB = new Date(b.dates?.start || b.event_date || 0).getTime();
+        return dateB - dateA; // Newest first
+      } else if (sortBy === 'name') {
+        return (a.title || '').localeCompare(b.title || '');
+      } else if (sortBy === 'status') {
+        return getStatusBadge(a).label.localeCompare(getStatusBadge(b).label);
+      }
+      return 0;
+    });
+
+    return filtered;
+  }, [events, searchTerm, statusFilter, showPastEvents, sortBy]);
 
   if (loading) {
     return (
@@ -89,7 +138,10 @@ export default function EventsList({
       <div className="flex items-center justify-between mb-3">
         <div>
           <h1 className="text-lg font-bold text-white mb-0.5">Events</h1>
-          <p className="text-[10px] text-white/60">Manage your event postings and applications</p>
+          <p className="text-[10px] text-white/60">
+            {filteredAndSortedEvents.length} {filteredAndSortedEvents.length === 1 ? 'event' : 'events'}
+            {!showPastEvents && ' (past events hidden)'}
+          </p>
         </div>
         <button
           onClick={onCreateEvent}
@@ -101,14 +153,111 @@ export default function EventsList({
         </button>
       </div>
 
+      {/* Search and Filters */}
+      <div className="mb-4 space-y-2">
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search events by name, location, or description..."
+            className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          />
+        </div>
+
+        {/* Filters Row */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Status Filter */}
+          <div className="flex items-center gap-1 bg-white/5 rounded-lg border border-white/10 p-1">
+            <button
+              onClick={() => setStatusFilter('all')}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                statusFilter === 'all'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setStatusFilter('live')}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                statusFilter === 'live'
+                  ? 'bg-green-600 text-white'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Live
+            </button>
+            <button
+              onClick={() => setStatusFilter('draft')}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                statusFilter === 'draft'
+                  ? 'bg-purple-600 text-white'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Draft
+            </button>
+            <button
+              onClick={() => setStatusFilter('past')}
+              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
+                statusFilter === 'past'
+                  ? 'bg-gray-600 text-white'
+                  : 'text-white/60 hover:text-white'
+              }`}
+            >
+              Past
+            </button>
+          </div>
+
+          {/* Sort Dropdown */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as any)}
+            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="date">Sort by Date</option>
+            <option value="name">Sort by Name</option>
+            <option value="status">Sort by Status</option>
+          </select>
+
+          {/* Toggle Past Events */}
+          <button
+            onClick={() => setShowPastEvents(!showPastEvents)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              showPastEvents
+                ? 'bg-blue-600 text-white'
+                : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+            }`}
+          >
+            {showPastEvents ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+            {showPastEvents ? 'Hide Past' : 'Show Past'}
+          </button>
+        </div>
+      </div>
+
       {/* Events List */}
       <div className="space-y-2.5">
-        {events.length === 0 ? (
+        {filteredAndSortedEvents.length === 0 ? (
           <div className="text-center py-8 text-white/40">
             <p className="text-xs">No events found</p>
+            {(searchTerm || statusFilter !== 'all') && (
+              <button
+                onClick={() => {
+                  setSearchTerm('');
+                  setStatusFilter('all');
+                }}
+                className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
+              >
+                Clear filters
+              </button>
+            )}
           </div>
         ) : (
-          events.map((event) => {
+          filteredAndSortedEvents.map((event) => {
             const badge = getStatusBadge(event);
             const applicantCount = event.capacity?.registered || event.registered_count || 0;
             const acceptedCount = Math.floor(applicantCount * 0.6); // Mock calculation

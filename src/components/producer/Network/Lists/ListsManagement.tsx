@@ -4,11 +4,13 @@ import { contactListsApi, ContactList } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 import CreateListModal from './CreateListModal';
 
+
 interface ListsManagementProps {
   organizationId: number;
+  onViewList?: (filters: { locations?: string[]; categories?: string[]; tags?: string[] }) => void;
 }
 
-export default function ListsManagement({ organizationId }: ListsManagementProps) {
+export default function ListsManagement({ organizationId, onViewList }: ListsManagementProps) {
   const [lists, setLists] = useState<ContactList[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -150,111 +152,156 @@ export default function ListsManagement({ organizationId }: ListsManagementProps
         </button>
       </div>
 
-      {/* Lists Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {lists.map(list => (
-          <div
-            key={list.id}
-            className="bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-all p-5 group"
-          >
-            {/* Header */}
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-start gap-2 flex-1 min-w-0">
-                {list.list_type === 'smart' ? (
-                  <Filter className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                ) : (
-                  <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                )}
-                <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold text-white truncate mb-0.5">
-                    {list.name}
-                  </h4>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${
+      {/* Lists Table */}
+      <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-white/10 bg-white/5">
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Name</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Type</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Filters</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Contacts</span>
+              </th>
+              <th className="px-4 py-3 text-left">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Last Used</span>
+              </th>
+              <th className="px-4 py-3 text-right">
+                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Actions</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {lists.map(list => (
+              <tr
+                key={list.id}
+                className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+              >
+                {/* Name */}
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    {list.list_type === 'smart' ? (
+                      <Filter className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    ) : (
+                      <Users className="w-4 h-4 text-blue-400 flex-shrink-0" />
+                    )}
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-white truncate">
+                        {list.name}
+                      </p>
+                      {list.description && (
+                        <p className="text-xs text-white/50 truncate">
+                          {list.description}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </td>
+
+                {/* Type */}
+                <td className="px-4 py-3">
+                  <span className={`inline-flex items-center text-xs px-2 py-1 rounded-full ${
                     list.list_type === 'smart'
                       ? 'bg-purple-500/20 text-purple-300'
                       : 'bg-blue-500/20 text-blue-300'
                   }`}>
                     {list.list_type === 'smart' ? 'Smart' : 'Manual'}
                   </span>
-                </div>
-              </div>
+                </td>
 
-              {/* Actions */}
-              <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button
-                  onClick={() => setViewingList(list)}
-                  className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
-                  title="View list"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => {
-                    // TODO: Open edit modal
-                    alert('Edit functionality coming soon');
-                  }}
-                  className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
-                  title="Edit list"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => handleDeleteList(list.id, list.name)}
-                  className="p-1.5 hover:bg-red-500/20 rounded text-white/60 hover:text-red-400 transition-colors"
-                  title="Delete list"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
+                {/* Filters */}
+                <td className="px-4 py-3">
+                  {list.list_type === 'smart' && list.filters ? (
+                    <div className="space-y-0.5 max-w-xs">
+                      {list.filters.categories && list.filters.categories.length > 0 && (
+                        <p className="text-xs text-white/60 truncate">
+                          <span className="text-white/40">Cat:</span> {list.filters.categories.join(', ')}
+                        </p>
+                      )}
+                      {list.filters.locations && list.filters.locations.length > 0 && (
+                        <p className="text-xs text-white/60 truncate">
+                          <span className="text-white/40">Loc:</span> {list.filters.locations.join(', ')}
+                        </p>
+                      )}
+                      {list.filters.tags && list.filters.tags.length > 0 && (
+                        <p className="text-xs text-white/60 truncate">
+                          <span className="text-white/40">Tags:</span> {list.filters.tags.join(', ')}
+                        </p>
+                      )}
+                      {!list.filters.categories?.length && !list.filters.locations?.length && !list.filters.tags?.length && (
+                        <span className="text-xs text-white/40">No filters</span>
+                      )}
+                    </div>
+                  ) : (
+                    <span className="text-xs text-white/40">—</span>
+                  )}
+                </td>
 
-            {/* Description */}
-            {list.description && (
-              <p className="text-xs text-white/50 mb-3 line-clamp-2">
-                {list.description}
-              </p>
-            )}
-
-            {/* Smart List Filters Preview */}
-            {list.list_type === 'smart' && list.filters && (
-              <div className="mb-3 space-y-1">
-                {list.filters.categories && list.filters.categories.length > 0 && (
-                  <div className="text-xs text-white/60">
-                    <span className="text-white/40">Categories:</span> {list.filters.categories.join(', ')}
+                {/* Contacts Count */}
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1.5 text-white/70">
+                    <Users className="w-3.5 h-3.5" />
+                    <span className="text-sm font-medium">{list.contacts_count}</span>
                   </div>
-                )}
-                {list.filters.locations && list.filters.locations.length > 0 && (
-                  <div className="text-xs text-white/60">
-                    <span className="text-white/40">Locations:</span> {list.filters.locations.join(', ')}
-                  </div>
-                )}
-                {list.filters.tags && list.filters.tags.length > 0 && (
-                  <div className="text-xs text-white/60">
-                    <span className="text-white/40">Tags:</span> {list.filters.tags.join(', ')}
-                  </div>
-                )}
-              </div>
-            )}
+                </td>
 
-            {/* Footer Stats */}
-            <div className="flex items-center justify-between pt-3 border-t border-white/10">
-              <div className="flex items-center gap-1 text-white/60">
-                <Users className="w-3.5 h-3.5" />
-                <span className="text-xs">
-                  {list.contacts_count} {list.contacts_count === 1 ? 'contact' : 'contacts'}
-                </span>
-              </div>
-              {list.last_used_at && (
-                <div className="flex items-center gap-1 text-white/40">
-                  <Calendar className="w-3.5 h-3.5" />
-                  <span className="text-xs">
-                    {formatDistanceToNow(new Date(list.last_used_at), { addSuffix: true })}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+                {/* Last Used */}
+                <td className="px-4 py-3">
+                  {list.last_used_at ? (
+                    <div className="flex items-center gap-1.5 text-white/50">
+                      <Calendar className="w-3.5 h-3.5" />
+                      <span className="text-xs">
+                        {formatDistanceToNow(new Date(list.last_used_at), { addSuffix: true })}
+                      </span>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-white/30">Never</span>
+                  )}
+                </td>
+
+                {/* Actions */}
+                <td className="px-4 py-3">
+                  <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() => {
+                        if (list.list_type === 'smart' && list.filters && onViewList) {
+                          onViewList(list.filters);
+                        }
+                      }}
+                      className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
+                      title={list.list_type === 'smart' ? 'View filtered contacts' : 'Manual list view coming soon'}
+                      disabled={list.list_type !== 'smart'}
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => {
+                        alert('Edit functionality coming soon');
+                      }}
+                      className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
+                      title="Edit list"
+                    >
+                      <Edit3 className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteList(list.id, list.name)}
+                      className="p-1.5 hover:bg-red-500/20 rounded text-white/60 hover:text-red-400 transition-colors"
+                      title="Delete list"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Modals */}
