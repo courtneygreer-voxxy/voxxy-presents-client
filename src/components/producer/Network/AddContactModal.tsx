@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { X, Plus } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
+import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
+import SuccessMessage from '@/components/ui/SuccessMessage';
 
 interface AddContactModalProps {
   organizationId: number;
@@ -17,6 +19,7 @@ const CATEGORY_OPTIONS = [
 
 export default function AddContactModal({ organizationId, onClose, onSuccess }: AddContactModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
 
@@ -120,8 +123,14 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
         source: 'manual',
       });
 
-      onSuccess(newContact);
-      onClose();
+      // Show success screen
+      setShowSuccess(true);
+
+      // Auto-close after 2 seconds
+      setTimeout(() => {
+        onSuccess(newContact);
+        onClose();
+      }, 2000);
     } catch (error: any) {
       setErrors({ submit: error.message || 'Failed to create contact' });
     } finally {
@@ -131,10 +140,10 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-white">Add New Contact</h2>
+        <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+          <h2 className="text-lg font-bold text-white">Add New Contact</h2>
           <button
             onClick={onClose}
             className="text-white/60 hover:text-white transition-colors"
@@ -143,10 +152,24 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
           </button>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        {/* Loading Screen */}
+        {isSubmitting && !showSuccess && (
+          <SimsLoadingScreen message="Creating your contact..." />
+        )}
+
+        {/* Success Screen */}
+        {showSuccess && (
+          <SuccessMessage
+            title="Contact Added!"
+            message="Your new contact has been successfully added to your network."
+          />
+        )}
+
+        {/* Form - only show when not submitting or showing success */}
+        {!isSubmitting && !showSuccess && (
+        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-w-5xl mx-auto">
           {/* Row 1: Full Name, Business Name, Email */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label htmlFor="contact_name" className="block text-white/90 text-sm font-medium mb-1.5">
                 Full Name <span className="text-red-400">*</span>
@@ -201,7 +224,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
           </div>
 
           {/* Row 2: Phone, Location */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label htmlFor="phone" className="block text-white/90 text-sm font-medium mb-1.5">
                 Phone
@@ -232,7 +255,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
           </div>
 
           {/* Row 3: Social Media - Instagram, TikTok, Portfolio URL */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
               <label htmlFor="instagram_handle" className="block text-white/90 text-sm font-medium mb-1.5 flex items-center gap-2">
                 <span className="text-pink-400">@</span> Instagram
@@ -419,6 +442,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );
