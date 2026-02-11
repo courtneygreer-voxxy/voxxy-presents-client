@@ -291,13 +291,22 @@ export const authApi = {
     // Note: Using legacy /me endpoint since /v1/shared/me controller doesn't exist yet
     console.log('🔍 Fetching current user from /me endpoint...')
 
+    const token = getAuthToken()
+    console.log('🔑 [AUTH DEBUG] Token for /me request:', {
+      hasToken: !!token,
+      tokenLength: token?.length || 0
+    })
+
     const response = await fetch(`${API_BASE_URL.replace('/api', '')}/me`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        'X-Mobile-App': 'true', // CRITICAL: Required for JWT auth on backend
+        'Authorization': `Bearer ${token}`
       },
     })
+
+    console.log('📡 [AUTH DEBUG] /me response status:', response.status)
 
     if (!response.ok) {
       throw new ApiError(`Failed to get current user: ${response.statusText}`, response.status)
