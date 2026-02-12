@@ -42,6 +42,7 @@ interface InviteRow {
   location?: string;
   tags?: string[];
   registrationId?: number;
+  invitationId?: number;
 }
 
 interface InvitesTabProps {
@@ -207,6 +208,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
             producerNotes: contact.notes,
             tags: contact.tags || [],
             location: contact.location,
+            invitationId: invitation.id,
           });
         }
       });
@@ -361,7 +363,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   };
 
   // Handle email history toggle
-  const handleToggleEmailHistory = async (rowId: string, registrationId: number) => {
+  const handleToggleEmailHistory = async (rowId: string, registrationId?: number, invitationId?: number) => {
     // If clicking the same row, collapse it
     if (emailHistoryExpanded === rowId) {
       setEmailHistoryExpanded(null);
@@ -371,7 +373,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
     // Expand this row
     setEmailHistoryExpanded(rowId);
 
-    // If we already have data for this registration, don't fetch again
+    // If we already have data for this row, don't fetch again
     if (emailHistoryData[rowId]) {
       return;
     }
@@ -379,7 +381,16 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
     // Fetch email history
     try {
       setLoadingEmailHistory(rowId);
-      const history = await emailDeliveriesApi.getByRegistration(registrationId);
+      let history;
+
+      if (registrationId) {
+        history = await emailDeliveriesApi.getByRegistration(registrationId);
+      } else if (invitationId) {
+        history = await emailDeliveriesApi.getByInvitation(eventSlug, invitationId);
+      } else {
+        throw new Error('No registration or invitation ID provided');
+      }
+
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
     } catch (err: any) {
       console.error('Failed to load email history:', err);
@@ -745,14 +756,17 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                                   <ExternalLink className="w-2.5 h-2.5" />
                                 </a>
                               )}
+                              {!row.instagram && !row.tiktok && !row.website && (
+                                <span className="text-xs text-white/40 italic">N/A</span>
+                              )}
                             </div>
                           </div>
 
                           {/* Email History Section */}
-                          {row.registrationId && (
+                          {(row.registrationId || row.invitationId) && (
                             <div className="pt-3 border-t border-white/10">
                               <button
-                                onClick={() => handleToggleEmailHistory(row.id, row.registrationId!)}
+                                onClick={() => handleToggleEmailHistory(row.id, row.registrationId, row.invitationId)}
                                 className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth"
                               >
                                 <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">

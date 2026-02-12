@@ -1375,6 +1375,14 @@ export const emailDeliveriesApi = {
   async getByRegistration(registrationId: number) {
     return fetchApi<EmailDelivery[]>(`/v1/presents/registrations/${registrationId}/email_history`)
   },
+
+  /**
+   * Get email history for an event invitation
+   * GET /api/v1/presents/events/:event_slug/invitations/:invitation_id/email_history
+   */
+  async getByInvitation(eventSlug: string, invitationId: number) {
+    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${eventSlug}/invitations/${invitationId}/email_history`)
+  },
 }
 
 // Venues API
