@@ -1367,6 +1367,14 @@ export const emailDeliveriesApi = {
       method: 'POST',
     })
   },
+
+  /**
+   * Get email history for a registration
+   * GET /api/v1/presents/registrations/:registration_id/email_history
+   */
+  async getByRegistration(registrationId: number) {
+    return fetchApi<EmailDelivery[]>(`/v1/presents/registrations/${registrationId}/email_history`)
+  },
 }
 
 // Venues API

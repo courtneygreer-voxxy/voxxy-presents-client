@@ -14,7 +14,7 @@ import {
   ExternalLink,
   Edit2
 } from 'lucide-react';
-import { eventInvitationsApi, vendorApplicationsApi, registrationsApi } from '@/services/api';
+import { eventInvitationsApi, vendorApplicationsApi, registrationsApi, emailDeliveriesApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 
@@ -667,6 +667,28 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                             <div>
                               <p className="text-[10px] text-white/60 mb-0.5">Location</p>
                               <p className="text-sm text-white/80">{row.location}</p>
+                            </div>
+                          )}
+
+                          {/* Email History Button (Testing) */}
+                          {row.registrationId && (
+                            <div className="pt-3 border-t border-white/10">
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    const history = await emailDeliveriesApi.getByRegistration(row.registrationId!);
+                                    console.log('Email history for', row.businessName, ':', history);
+                                    alert(`Email history loaded! Check console for ${history.length} deliveries.`);
+                                  } catch (err) {
+                                    console.error('Failed to load email history:', err);
+                                    alert('Failed to load email history. Check console.');
+                                  }
+                                }}
+                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 hover:text-purple-300 transition-smooth text-xs font-medium"
+                              >
+                                <Mail className="w-3.5 h-3.5" />
+                                <span>+ Email History</span>
+                              </button>
                             </div>
                           )}
 
