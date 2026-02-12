@@ -384,17 +384,23 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
       setLoadingEmailHistory(rowId);
       let history;
 
+      console.log('[Email History] Fetching for:', { rowId, registrationId, invitationId, eventSlug });
+
       if (registrationId) {
+        console.log('[Email History] Using registration endpoint');
         history = await emailDeliveriesApi.getByRegistration(registrationId);
       } else if (invitationId) {
+        console.log('[Email History] Using invitation endpoint');
         history = await emailDeliveriesApi.getByInvitation(eventSlug, invitationId);
       } else {
         throw new Error('No registration or invitation ID provided');
       }
 
+      console.log('[Email History] Received:', history);
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
     } catch (err: any) {
-      // Silently fail and show empty state instead of alerting
+      console.error('[Email History] Error:', err);
+      // Show empty state instead of alerting
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: [] }));
     } finally {
       setLoadingEmailHistory(null);
