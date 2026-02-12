@@ -340,11 +340,11 @@ export default function ClubOwnerSignUpPage() {
                     />
                     <Label htmlFor="acceptTerms" className="text-gray-200 text-sm leading-relaxed">
                       I agree to the{' '}
-                      <a href="https://www.heyvoxxy.com/#/terms" target="_blank" rel="noopener noreferrer" className="text-pink-300 hover:text-pink-200 underline">
+                      <a href="/legal/terms" className="text-pink-300 hover:text-pink-200 underline">
                         Terms of Service
                       </a>{' '}
                       and{' '}
-                      <a href="https://www.heyvoxxy.com/#/privacy" target="_blank" rel="noopener noreferrer" className="text-pink-300 hover:text-pink-200 underline">
+                      <a href="/legal/privacy" className="text-pink-300 hover:text-pink-200 underline">
                         Privacy Policy
                       </a>
                     </Label>

@@ -705,14 +705,19 @@ export default function VendorApplicationForm() {
                   <label htmlFor="agreed_to_terms" className="text-xs text-white/80">
                     I agree to the{' '}
                     <a
-                      href="https://www.voxxypresents.com/privacy"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/legal/privacy"
                       className="text-purple-400 hover:text-purple-300 underline"
                     >
                       Privacy Policy
                     </a>{' '}
-                    and Terms of Service <span className="text-red-400">*</span>
+                    and{' '}
+                    <a
+                      href="/legal/acceptable-use"
+                      className="text-purple-400 hover:text-purple-300 underline"
+                    >
+                      Acceptable Use Policy
+                    </a>{' '}
+                    <span className="text-red-400">*</span>
                     <p className="text-white/60 text-[10px] mt-0.5">
                       Your information will be shared with the event organizer for this application.
                     </p>

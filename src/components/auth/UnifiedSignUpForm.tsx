@@ -302,11 +302,11 @@ export function UnifiedSignUpForm({
               />
               <Label htmlFor="acceptTerms" className="text-gray-300 text-sm leading-relaxed">
                 I agree to the{' '}
-                <a href="/terms" className="text-purple-400 hover:text-purple-300 underline">
+                <a href="/legal/terms" className="text-purple-400 hover:text-purple-300 underline">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/privacy" className="text-purple-400 hover:text-purple-300 underline">
+                <a href="/legal/privacy" className="text-purple-400 hover:text-purple-300 underline">
                   Privacy Policy
                 </a>
               </Label>

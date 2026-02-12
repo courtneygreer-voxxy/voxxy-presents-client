@@ -321,11 +321,11 @@ export default function VenueOwnerSignUpPage() {
                     />
                     <Label htmlFor="acceptTerms" className="text-gray-200 text-sm leading-relaxed">
                       I agree to the{' '}
-                      <a href="https://www.heyvoxxy.com/#/terms" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 underline">
+                      <a href="/legal/terms" className="text-blue-300 hover:text-blue-200 underline">
                         Terms of Service
                       </a>{' '}
                       and{' '}
-                      <a href="https://www.heyvoxxy.com/#/privacy" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-blue-200 underline">
+                      <a href="/legal/privacy" className="text-blue-300 hover:text-blue-200 underline">
                         Privacy Policy
                       </a>
                     </Label>

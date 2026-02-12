@@ -15,8 +15,16 @@ const FeaturesPage = lazy(() => import('./pages/FeaturesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const HelpPage = lazy(() => import('./pages/HelpPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
-const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
-const TermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
+// Old legal pages (deprecated, kept for potential legacy references)
+const OldPrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
+const OldTermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
+
+// New legal hub pages
+const TermsOfServicePage = lazy(() => import('./pages/legal/TermsOfServicePage'))
+const PrivacyPolicyPage = lazy(() => import('./pages/legal/PrivacyPolicyPage'))
+const AcceptableUsePage = lazy(() => import('./pages/legal/AcceptableUsePage'))
+const CookiePolicyPage = lazy(() => import('./pages/legal/CookiePolicyPage'))
+const MobileEULAPage = lazy(() => import('./pages/legal/MobileEULAPage'))
 
 // Lazy load: Public Event & Vendor Application Pages (load on-demand)
 const PublicEventDetailPage = lazy(() => import('./pages/PublicEventDetailPage'))
@@ -124,8 +132,17 @@ export default function App() {
           <Route path="/help" element={<HelpPage />} />
           <Route path="/contact" element={<Navigate to="/#contact" replace />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/terms" element={<TermsOfServicePage />} />
+
+          {/* New Legal Hub Routes */}
+          <Route path="/legal/terms" element={<TermsOfServicePage />} />
+          <Route path="/legal/privacy" element={<PrivacyPolicyPage />} />
+          <Route path="/legal/acceptable-use" element={<AcceptableUsePage />} />
+          <Route path="/legal/cookies" element={<CookiePolicyPage />} />
+          <Route path="/legal/mobile" element={<MobileEULAPage />} />
+
+          {/* Legacy redirects to new legal pages */}
+          <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
+          <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
 
           {/* Public Event & Vendor Application Routes */}
           <Route path="/events/:slug" element={<PublicEventDetailPage />} />
