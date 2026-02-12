@@ -365,8 +365,16 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
   // Handle email history toggle
   const handleToggleEmailHistory = async (rowId: string, registrationId?: number, invitationId?: number) => {
+    console.log('[EMAIL HISTORY DEBUG] Toggle called with:', {
+      rowId,
+      registrationId,
+      invitationId,
+      eventSlug
+    });
+
     // If clicking the same row, collapse it
     if (emailHistoryExpanded === rowId) {
+      console.log('[EMAIL HISTORY DEBUG] Collapsing row');
       setEmailHistoryExpanded(null);
       return;
     }
@@ -376,6 +384,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
     // If we already have data for this row, don't fetch again
     if (emailHistoryData[rowId]) {
+      console.log('[EMAIL HISTORY DEBUG] Using cached data:', emailHistoryData[rowId]);
       return;
     }
 
@@ -385,16 +394,27 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
       let history;
 
       if (registrationId) {
+        console.log('[EMAIL HISTORY DEBUG] Fetching from registration endpoint:', registrationId);
         history = await emailDeliveriesApi.getByRegistration(registrationId);
+        console.log('[EMAIL HISTORY DEBUG] Registration response:', history);
       } else if (invitationId) {
+        console.log('[EMAIL HISTORY DEBUG] Fetching from invitation endpoint:', { eventSlug, invitationId });
         history = await emailDeliveriesApi.getByInvitation(eventSlug, invitationId);
+        console.log('[EMAIL HISTORY DEBUG] Invitation response:', history);
       } else {
+        console.error('[EMAIL HISTORY DEBUG] No ID provided!');
         throw new Error('No registration or invitation ID provided');
       }
 
+      console.log('[EMAIL HISTORY DEBUG] Setting history data, length:', history?.length || 0);
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
     } catch (err: any) {
-      console.error('Failed to fetch email history:', err);
+      console.error('[EMAIL HISTORY DEBUG] Error caught:', {
+        message: err.message,
+        status: err.status,
+        response: err.response,
+        fullError: err
+      });
       // Show empty state instead of alerting
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: [] }));
     } finally {

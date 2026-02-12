@@ -1373,7 +1373,12 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/registrations/:registration_id/email_history
    */
   async getByRegistration(registrationId: number) {
-    return fetchApi<EmailDelivery[]>(`/v1/presents/registrations/${registrationId}/email_history`)
+    console.log('[API DEBUG] getByRegistration called with:', registrationId);
+    const url = `/v1/presents/registrations/${registrationId}/email_history`;
+    console.log('[API DEBUG] Full URL:', url);
+    const result = await fetchApi<EmailDelivery[]>(url);
+    console.log('[API DEBUG] getByRegistration result:', result);
+    return result;
   },
 
   /**
@@ -1381,7 +1386,12 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/events/:event_slug/invitations/:invitation_id/email_history
    */
   async getByInvitation(eventSlug: string, invitationId: number) {
-    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${eventSlug}/invitations/${invitationId}/email_history`)
+    console.log('[API DEBUG] getByInvitation called with:', { eventSlug, invitationId });
+    const url = `/v1/presents/events/${eventSlug}/invitations/${invitationId}/email_history`;
+    console.log('[API DEBUG] Full URL:', url);
+    const result = await fetchApi<EmailDelivery[]>(url);
+    console.log('[API DEBUG] getByInvitation result:', result);
+    return result;
   },
 }
 
