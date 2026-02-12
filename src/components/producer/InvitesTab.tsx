@@ -184,6 +184,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
           existing.producerNotes = contact.notes;
           existing.tags = contact.tags || [];
           existing.location = contact.location || existing.location;
+          existing.invitationId = invitation.id; // Track invitation for email history
           // Merge social media - prefer application data but fall back to contact data
           existing.instagram = existing.instagram || contact.instagram_handle;
           existing.tiktok = existing.tiktok || contact.tiktok_handle;
@@ -393,9 +394,8 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
       setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
     } catch (err: any) {
-      console.error('Failed to load email history:', err);
-      alert(`Failed to load email history: ${err.message}`);
-      setEmailHistoryExpanded(null);
+      // Silently fail and show empty state instead of alerting
+      setEmailHistoryData((prev) => ({ ...prev, [rowId]: [] }));
     } finally {
       setLoadingEmailHistory(null);
     }
