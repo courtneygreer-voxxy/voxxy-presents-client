@@ -80,6 +80,11 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
+  // Email history state
+  const [emailHistoryExpanded, setEmailHistoryExpanded] = useState<string | null>(null);
+  const [emailHistoryData, setEmailHistoryData] = useState<Record<string, any[]>>({});
+  const [loadingEmailHistory, setLoadingEmailHistory] = useState<string | null>(null);
+
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
 
@@ -353,6 +358,36 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
     );
     setEditingNotesId(null);
     setNotesEditValue('');
+  };
+
+  // Handle email history toggle
+  const handleToggleEmailHistory = async (rowId: string, registrationId: number) => {
+    // If clicking the same row, collapse it
+    if (emailHistoryExpanded === rowId) {
+      setEmailHistoryExpanded(null);
+      return;
+    }
+
+    // Expand this row
+    setEmailHistoryExpanded(rowId);
+
+    // If we already have data for this registration, don't fetch again
+    if (emailHistoryData[rowId]) {
+      return;
+    }
+
+    // Fetch email history
+    try {
+      setLoadingEmailHistory(rowId);
+      const history = await emailDeliveriesApi.getByRegistration(registrationId);
+      setEmailHistoryData((prev) => ({ ...prev, [rowId]: history }));
+    } catch (err: any) {
+      console.error('Failed to load email history:', err);
+      alert(`Failed to load email history: ${err.message}`);
+      setEmailHistoryExpanded(null);
+    } finally {
+      setLoadingEmailHistory(null);
+    }
   };
 
   const getStatusBadge = (status: InviteRow['status']) => {
@@ -670,28 +705,6 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                             </div>
                           )}
 
-                          {/* Email History Button (Testing) */}
-                          {row.registrationId && (
-                            <div className="pt-3 border-t border-white/10">
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    const history = await emailDeliveriesApi.getByRegistration(row.registrationId!);
-                                    console.log('Email history for', row.businessName, ':', history);
-                                    alert(`Email history loaded! Check console for ${history.length} deliveries.`);
-                                  } catch (err) {
-                                    console.error('Failed to load email history:', err);
-                                    alert('Failed to load email history. Check console.');
-                                  }
-                                }}
-                                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-purple-600/20 hover:bg-purple-600/30 text-purple-400 hover:text-purple-300 transition-smooth text-xs font-medium"
-                              >
-                                <Mail className="w-3.5 h-3.5" />
-                                <span>+ Email History</span>
-                              </button>
-                            </div>
-                          )}
-
                           {/* Social Links */}
                           <div>
                             <p className="text-[10px] text-white/60 mb-1.5">Social Links</p>
@@ -734,6 +747,108 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                               )}
                             </div>
                           </div>
+
+                          {/* Email History Section */}
+                          {row.registrationId && (
+                            <div className="pt-3 border-t border-white/10">
+                              <button
+                                onClick={() => handleToggleEmailHistory(row.id, row.registrationId!)}
+                                className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth"
+                              >
+                                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                                  Email History
+                                </span>
+                                {emailHistoryExpanded === row.id ? (
+                                  <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                                ) : (
+                                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                                )}
+                              </button>
+
+                              {/* Email History List */}
+                              {emailHistoryExpanded === row.id && (
+                                <div className="mt-2 space-y-2">
+                                  {loadingEmailHistory === row.id ? (
+                                    <div className="flex items-center justify-center py-4">
+                                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                                    </div>
+                                  ) : emailHistoryData[row.id]?.length > 0 ? (
+                                    emailHistoryData[row.id].map((delivery: any) => {
+                                      const deliveryStatus = delivery.status;
+                                      const emailSubject = delivery.scheduled_email?.subject || 'Unknown Email';
+                                      const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
+
+                                      // Status badge colors
+                                      let statusColor = 'bg-gray-500/20 text-gray-400';
+                                      if (deliveryStatus === 'delivered') statusColor = 'bg-green-500/20 text-green-400';
+                                      else if (deliveryStatus === 'bounced') statusColor = 'bg-red-500/20 text-red-400';
+                                      else if (deliveryStatus === 'dropped') statusColor = 'bg-orange-500/20 text-orange-400';
+                                      else if (deliveryStatus === 'unsubscribed') statusColor = 'bg-yellow-500/20 text-yellow-400';
+
+                                      return (
+                                        <div
+                                          key={delivery.id}
+                                          className="bg-white/5 border border-white/10 rounded-lg p-2.5 space-y-1.5"
+                                        >
+                                          <div className="flex items-start justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                              <p className="text-xs text-white font-medium truncate">
+                                                {emailSubject}
+                                              </p>
+                                              <p className="text-[10px] text-white/60 mt-0.5">
+                                                {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
+                                                  month: 'short',
+                                                  day: 'numeric',
+                                                  year: 'numeric',
+                                                  hour: 'numeric',
+                                                  minute: '2-digit'
+                                                }) : 'Date unknown'}
+                                              </p>
+                                            </div>
+                                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor} whitespace-nowrap`}>
+                                              {deliveryStatus}
+                                            </span>
+                                          </div>
+
+                                          {/* Bounce/Drop reason */}
+                                          {(delivery.bounce_reason || delivery.drop_reason) && (
+                                            <p className="text-[10px] text-red-400/80 mt-1">
+                                              {delivery.bounce_type && `${delivery.bounce_type}: `}
+                                              {delivery.bounce_reason || delivery.drop_reason}
+                                            </p>
+                                          )}
+
+                                          {/* Action buttons */}
+                                          <div className="flex gap-2 mt-2">
+                                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                                              <button
+                                                onClick={async () => {
+                                                  try {
+                                                    await emailDeliveriesApi.retry(delivery.id);
+                                                    alert('Email queued for retry');
+                                                    // Refresh email history
+                                                    const updated = await emailDeliveriesApi.getByRegistration(row.registrationId!);
+                                                    setEmailHistoryData((prev) => ({ ...prev, [row.id]: updated }));
+                                                  } catch (err: any) {
+                                                    alert(`Failed to retry: ${err.message}`);
+                                                  }
+                                                }}
+                                                className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 transition-smooth"
+                                              >
+                                                Retry
+                                              </button>
+                                            )}
+                                          </div>
+                                        </div>
+                                      );
+                                    })
+                                  ) : (
+                                    <p className="text-xs text-white/40 italic py-2">No email history found</p>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {/* Right Column - Actions & Notes */}
