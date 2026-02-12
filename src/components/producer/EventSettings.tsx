@@ -208,10 +208,20 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const handleExportInvitesCSV = async () => {
     try {
       // Fetch all invitations and registrations
-      const [invitationsResponse, registrations] = await Promise.all([
-        eventInvitationsApi.getByEvent(event.slug, 1, 1000), // Fetch up to 1000 invitations
-        registrationsApi.getByEvent(event.slug)
-      ]);
+      let invitationsResponse: any = { invitations: [] };
+      let registrations: any = { vendor_registrations: [] };
+
+      try {
+        invitationsResponse = await eventInvitationsApi.getByEvent(event.slug, 1, 1000);
+      } catch (err) {
+        console.warn('No invitations found or error fetching invitations:', err);
+      }
+
+      try {
+        registrations = await registrationsApi.getByEvent(event.slug);
+      } catch (err) {
+        console.warn('No registrations found or error fetching registrations:', err);
+      }
 
       // Combine and format data for CSV
       const csvData: any[] = [];
