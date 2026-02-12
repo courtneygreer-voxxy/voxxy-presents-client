@@ -37,6 +37,7 @@ interface Applicant {
   reviewed_at?: string;
   location?: string;
   portfolio_images?: string[];
+  producer_notes?: string;
 }
 
 interface ApplicantsTabProps {
@@ -560,6 +561,22 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                   </div>
                 </div>
               )}
+
+              {/* Producer Notes */}
+              <div className="glass-card p-3 mb-3">
+                <h3 className="text-sm font-semibold text-white mb-2">Producer Notes</h3>
+                {selectedApplicant.producer_notes ? (
+                  <p className="text-xs text-white/80">{selectedApplicant.producer_notes}</p>
+                ) : (
+                  <p className="text-xs text-white/40 italic">No notes yet</p>
+                )}
+              </div>
+
+              {/* Event History */}
+              <div className="glass-card p-3 mb-3">
+                <h3 className="text-sm font-semibold text-white mb-2">Event History</h3>
+                <p className="text-xs text-white/40 italic">Coming soon - past events attended</p>
+              </div>
 
               {/* Action Buttons */}
               <div className="glass-card p-3">
