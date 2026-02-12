@@ -375,9 +375,9 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               </div>
             </div>
           ) : (
-            <div className="p-4">
+            <div className="p-4 max-w-3xl mx-auto">
               {/* Detail Header */}
-              <div className="glass-card p-4 mb-3">
+              <div className="glass-card p-3 mb-3">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h2 className="text-lg font-bold text-white mb-1">{selectedApplicant.business_name}</h2>
@@ -465,7 +465,7 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               </div>
 
               {/* Social & Links */}
-              <div className="glass-card p-4 mb-3">
+              <div className="glass-card p-3 mb-3">
                 <h3 className="text-sm font-semibold text-white mb-3">Social & Links</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedApplicant.instagram_handle && (
@@ -542,7 +542,7 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
 
               {/* Portfolio Images */}
               {selectedApplicant.portfolio_images && selectedApplicant.portfolio_images.length > 0 && (
-                <div className="glass-card p-4 mb-3">
+                <div className="glass-card p-3 mb-3">
                   <h3 className="text-sm font-semibold text-white mb-3">Images</h3>
                   <div className="grid grid-cols-3 gap-2">
                     {selectedApplicant.portfolio_images.map((image, idx) => (
@@ -562,32 +562,32 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               )}
 
               {/* Action Buttons */}
-              <div className="glass-card p-4">
+              <div className="glass-card p-3">
                 {updatingId === selectedApplicant.id ? (
-                  <div className="flex items-center justify-center py-3">
-                    <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                  <div className="flex items-center justify-end py-2">
+                    <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
                   </div>
                 ) : (
-                  <div className="flex gap-2">
+                  <div className="flex justify-end gap-2">
                     <button
                       onClick={() => handleUpdateStatus(selectedApplicant, 'approved')}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-green-600 hover:bg-green-700 text-white text-sm font-medium transition-smooth"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs font-medium transition-smooth"
                     >
-                      <CheckCircle className="w-4 h-4" />
+                      <CheckCircle className="w-3.5 h-3.5" />
                       Approve
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(selectedApplicant, 'waitlist')}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium transition-smooth"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
                     >
-                      <AlertCircle className="w-4 h-4" />
+                      <AlertCircle className="w-3.5 h-3.5" />
                       Waitlist
                     </button>
                     <button
                       onClick={() => handleUpdateStatus(selectedApplicant, 'rejected')}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-red-600 hover:bg-red-700 text-white text-sm font-medium transition-smooth"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
                     >
-                      <XCircle className="w-4 h-4" />
+                      <XCircle className="w-3.5 h-3.5" />
                       Decline
                     </button>
                   </div>
