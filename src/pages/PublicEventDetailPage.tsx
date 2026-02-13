@@ -282,7 +282,7 @@ export default function PublicEventDetailPage() {
 
                   {/* Description */}
                   {application.description && (
-                    <p className="text-white/80 text-xs mb-3">
+                    <p className="text-white/80 text-xs mb-3 whitespace-pre-wrap">
                       {application.description}
                     </p>
                   )}

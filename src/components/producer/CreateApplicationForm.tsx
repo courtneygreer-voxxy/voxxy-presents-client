@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ArrowLeft, Plus, X } from 'lucide-react';
 import { vendorApplicationsApi } from '@/services/api';
+import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 
 interface Event {
   slug: string;
@@ -22,11 +23,9 @@ interface CreateApplicationFormProps {
       currency: string;
     };
     categories: string[];
-    install?: {
-      install_date?: string;
-      install_start_time?: string;
-      install_end_time?: string;
-    };
+    install_date?: string;
+    install_start_time?: string;
+    install_end_time?: string;
     payment_link?: string;
     application_tags?: string;
     status: 'active' | 'inactive';
@@ -43,18 +42,13 @@ export default function CreateApplicationForm({
     name: existingApplication?.name || '',
     description: existingApplication?.description || '',
     booth_price: existingApplication?.pricing?.booth_price || 0,
-    install_date: existingApplication?.install?.install_date || '',
-    install_start_time: existingApplication?.install?.install_start_time || '',
-    install_end_time: existingApplication?.install?.install_end_time || '',
+    install_date: formatDateForInput(existingApplication?.install_date) || '',
+    install_start_time: existingApplication?.install_start_time || '',
+    install_end_time: existingApplication?.install_end_time || '',
     payment_link: existingApplication?.payment_link || '',
     status: existingApplication?.status || 'active' as 'active' | 'inactive',
   });
 
-  // Initialize categories
-  const [categories, setCategories] = useState<string[]>(
-    existingApplication?.categories || []
-  );
-  const [newCategory, setNewCategory] = useState('');
 
   // Initialize tags from application_tags (comma-separated string)
   const [tags, setTags] = useState<string[]>(
@@ -66,17 +60,6 @@ export default function CreateApplicationForm({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleAddCategory = () => {
-    const trimmed = newCategory.trim();
-    if (trimmed && !categories.includes(trimmed)) {
-      setCategories([...categories, trimmed]);
-      setNewCategory('');
-    }
-  };
-
-  const handleRemoveCategory = (category: string) => {
-    setCategories(categories.filter(c => c !== category));
-  };
 
   const handleAddTag = () => {
     const trimmed = newTag.trim();
@@ -103,11 +86,6 @@ export default function CreateApplicationForm({
       return;
     }
 
-    if (categories.length === 0) {
-      setError('At least one vendor category is required');
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
@@ -117,7 +95,6 @@ export default function CreateApplicationForm({
         description: formData.description.trim() || undefined,
         booth_price: formData.booth_price,
         status: formData.status,
-        categories: categories,
         install_date: formData.install_date || undefined,
         install_start_time: formData.install_start_time || undefined,
         install_end_time: formData.install_end_time || undefined,
@@ -301,11 +278,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               </label>
               <div className="px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white/80">
                 {event.event_date
-                  ? new Date(event.event_date).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })
+                  ? formatEventDate(event.event_date, 'MMMM d, yyyy')
                   : 'Not set'}
               </div>
             </div>
@@ -319,69 +292,6 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Vendor Categories */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-semibold text-white">Vendor Categories *</h2>
-          </div>
-          <p className="text-sm text-white/60 mb-4">
-            Add categories that vendors can choose from (e.g., Food Trucks, Artists, Crafts)
-          </p>
-
-          {/* Add Category Input */}
-          <div className="flex gap-2 mb-4">
-            <input
-              type="text"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  handleAddCategory();
-                }
-              }}
-              placeholder="e.g., Food Trucks, Artists, Crafts"
-              className="flex-1 px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-            />
-            <button
-              type="button"
-              onClick={handleAddCategory}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Plus className="w-4 h-4" />
-              Add
-            </button>
-          </div>
-
-          {/* Categories List */}
-          {categories.length === 0 ? (
-            <div className="text-center py-8 border-2 border-dashed border-yellow-500/20 rounded-lg bg-yellow-500/5">
-              <p className="text-yellow-400/80 text-sm font-medium">⚠️ At least one category is required</p>
-              <p className="text-white/30 text-xs mt-1">
-                Categories help vendors choose the right application
-              </p>
-            </div>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {categories.map((category, index) => (
-                <div
-                  key={index}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-green-500/20 border border-green-500/30 text-white text-sm"
-                >
-                  <span>{category}</span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveCategory(category)}
-                    className="text-white/70 hover:text-white transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
 
         {/* Application Tags */}

@@ -3,6 +3,7 @@ import { Plus, Edit, Eye, Calendar, Link2, Check, DollarSign, Tag } from 'lucide
 import { vendorApplicationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import ViewApplicationSubmissions from './ViewApplicationSubmissions';
+import { formatEventDate } from '@/utils/dateHelpers';
 
 interface VendorApplication {
   id: number;
@@ -19,11 +20,9 @@ interface VendorApplication {
     booth_price: number;
     currency: string;
   };
-  install?: {
-    install_date?: string;
-    install_start_time?: string;
-    install_end_time?: string;
-  };
+  install_date?: string;
+  install_start_time?: string;
+  install_end_time?: string;
   payment_link?: string;
   application_tags?: string;
 }
@@ -66,14 +65,6 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
     } finally {
       setLoading(false);
     }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
   };
 
   const handleSuccess = () => {
@@ -210,19 +201,19 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                       </>
                     )}
                     <span>•</span>
-                    <span>Created {formatDate(application.created_at)}</span>
+                    <span>Created {formatEventDate(application.created_at, 'MMM d, yyyy')}</span>
                   </div>
 
                   {/* Application Details */}
-                  {(application.install?.install_date || application.payment_link || application.application_tags) && (
+                  {(application.install_date || application.payment_link || application.application_tags) && (
                     <div className="bg-white/5 border border-white/10 rounded-lg p-3 mb-3 space-y-2">
                       {/* Install Info */}
-                      {application.install?.install_date && (
+                      {application.install_date && (
                         <div className="flex items-start gap-2 text-sm">
                           <Calendar className="w-4 h-4 text-white/60 mt-0.5 flex-shrink-0" />
                           <div className="flex-1">
                             <span className="text-white/60">Install Date:</span>{' '}
-                            <span className="text-white">{formatDate(application.install.install_date)}</span>
+                            <span className="text-white">{formatEventDate(application.install_date, 'MMM d, yyyy')}</span>
                           </div>
                         </div>
                       )}

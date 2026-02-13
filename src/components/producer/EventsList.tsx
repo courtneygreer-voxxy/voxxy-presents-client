@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Calendar, Edit2, Plus, Search, SlidersHorizontal, Eye, EyeOff } from 'lucide-react';
-import { format } from 'date-fns';
+import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers';
 
 interface Event {
   id: number;
@@ -17,6 +17,7 @@ interface Event {
     published?: boolean;
     registration_open?: boolean;
     status?: 'draft' | 'published' | 'cancelled' | 'completed';
+    is_live?: boolean;
   };
   published?: boolean;
   registered_count?: number;
@@ -49,34 +50,32 @@ export default function EventsList({
   const [sortBy, setSortBy] = useState<'date' | 'status' | 'name'>('date');
 
   const getStatusBadge = (event: Event) => {
-    // Determine badge based on event date and status
+    // Determine badge based on event date and is_live status
     const eventDate = event.dates?.start || event.event_date;
     if (!eventDate) {
       return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
     }
 
-    const date = new Date(eventDate);
-    const now = new Date();
-    const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysUntil < 0) {
+    // Check if event date has passed
+    if (isDatePast(eventDate)) {
       return { label: 'Past', color: 'bg-gray-500/20 text-gray-300', value: 'past' };
-    } else if (event.published || event.status?.published) {
-      return { label: 'Live', color: 'bg-green-500/20 text-green-300', value: 'live' };
-    } else {
-      return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
     }
+
+    // Check if event is live (invitation email has been sent)
+    if (event.status?.is_live) {
+      return { label: 'Live', color: 'bg-green-500/20 text-green-300', value: 'live' };
+    }
+
+    // Otherwise it's still a draft
+    return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
   };
 
-  const formatEventDate = (event: Event) => {
+  const formatEventDateDisplay = (event: Event) => {
     const dateString = event.dates?.start || event.event_date;
     if (!dateString) return 'Date TBD';
-    try {
-      const date = new Date(dateString);
-      return format(date, 'MMMM d, yyyy');
-    } catch {
-      return 'Invalid date';
-    }
+
+    const formatted = formatDate(dateString, 'MMMM d, yyyy');
+    return formatted || 'Invalid date';
   };
 
   // Filter and sort events
@@ -291,7 +290,7 @@ export default function EventsList({
                     <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
                       <div className="flex items-center gap-1">
                         <Calendar className="w-3 h-3 text-purple-400" />
-                        <span>{formatEventDate(event)}</span>
+                        <span>{formatEventDateDisplay(event)}</span>
                       </div>
                       {event.location && (
                         <>

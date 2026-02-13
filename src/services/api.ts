@@ -578,6 +578,7 @@ export const organizationsApi = {
     zip_code: string
     latitude: number
     longitude: number
+    timezone: string
   }>) {
     return fetchApi<any>(`/v1/presents/organizations/${slug}`, {
       method: 'PATCH',
@@ -1849,6 +1850,9 @@ export const vendorContactsApi = {
     if (params?.search) queryParams.append('search', params.search)
     if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
     if (params?.status) queryParams.append('status', params.status)
+    if (params?.tags && params.tags.length > 0) {
+      params.tags.forEach(tag => queryParams.append('tags[]', tag))
+    }
     if (params?.location) queryParams.append('location', params.location)
     if (params?.category) queryParams.append('category', params.category)
     if (params?.featured) queryParams.append('featured', params.featured)
@@ -1969,6 +1973,7 @@ export const vendorContactsApi = {
     search?: string
     contact_type?: string
     status?: string
+    tags?: string[]
     location?: string
     category?: string
     featured?: string
@@ -1978,6 +1983,9 @@ export const vendorContactsApi = {
     if (params?.search) queryParams.append('search', params.search)
     if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
     if (params?.status) queryParams.append('status', params.status)
+    if (params?.tags && params.tags.length > 0) {
+      params.tags.forEach(tag => queryParams.append('tags[]', tag))
+    }
     if (params?.location) queryParams.append('location', params.location)
     if (params?.category) queryParams.append('category', params.category)
     if (params?.featured) queryParams.append('featured', params.featured)

@@ -29,6 +29,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   // Filter states
   const [locationFilter, setLocationFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [tagFilter, setTagFilter] = useState('');
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +45,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     // Reset to page 1 when filters change
     setCurrentPage(1);
     fetchContacts(1);
-  }, [organizationId, locationFilter, categoryFilter]);
+  }, [organizationId, locationFilter, categoryFilter, tagFilter]);
 
   const fetchContacts = async (page: number = currentPage) => {
     try {
@@ -55,6 +56,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
         search: searchTerm || undefined,
         location: locationFilter || undefined,
         category: categoryFilter || undefined,
+        tags: tagFilter ? [tagFilter] : undefined,
         page: page,
         per_page: perPage,
       });
@@ -147,9 +149,10 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   };
 
 
-  // Get unique locations and categories for filter dropdowns
+  // Get unique locations, categories, and tags for filter dropdowns
   const uniqueLocations = Array.from(new Set(contacts.map(c => c.location).filter(Boolean))) as string[];
   const uniqueCategories = Array.from(new Set(contacts.flatMap(c => c.categories || []))).sort();
+  const uniqueTags = Array.from(new Set(contacts.flatMap(c => c.tags || []))).sort();
 
   // Loading state
   if (loading) {
@@ -412,13 +415,29 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
           <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
         </div>
 
+        {/* Tag Filter */}
+        <div className="relative">
+          <select
+            value={tagFilter}
+            onChange={(e) => setTagFilter(e.target.value)}
+            className="pl-3 pr-8 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white appearance-none cursor-pointer hover:bg-white/10 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500"
+          >
+            <option value="" className="bg-gray-900">All Tags</option>
+            {uniqueTags.map(tag => (
+              <option key={tag} value={tag} className="bg-gray-900">{tag}</option>
+            ))}
+          </select>
+          <Filter className="absolute right-2 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
+        </div>
+
         {/* Clear Filters Button */}
-        {(locationFilter || categoryFilter) && (
+        {(locationFilter || categoryFilter || tagFilter) && (
           <>
             <button
               onClick={() => {
                 setLocationFilter('');
                 setCategoryFilter('');
+                setTagFilter('');
               }}
               className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
             >

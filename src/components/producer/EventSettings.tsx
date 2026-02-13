@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check, X, Download, Database } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
+import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 
 interface Event {
   id: number;
@@ -51,6 +52,11 @@ interface VendorApplication {
     booth_price: number;
     currency: string;
   };
+  install_date?: string;
+  install_start_time?: string;
+  install_end_time?: string;
+  payment_link?: string;
+  application_tags?: string;
 }
 
 interface EventSettingsProps {
@@ -81,14 +87,14 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   const [eventFormData, setEventFormData] = useState({
     title: event.title || '',
     description: event.description || '',
-    event_date: event.event_date || '',
-    event_end_date: event.event_end_date || '',
+    event_date: formatDateForInput(event.event_date) || '',
+    event_end_date: formatDateForInput(event.event_end_date) || '',
     start_time: event.start_time || '',
     end_time: event.end_time || '',
     venue: event.venue || '',
     location: event.location || '',
-    application_deadline: event.application_deadline || '',
-    payment_due_date: event.payment_due_date || '',
+    application_deadline: formatDateForInput(event.application_deadline) || '',
+    payment_due_date: formatDateForInput(event.payment_due_date) || '',
   });
 
   // Copy link states
@@ -156,14 +162,14 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     setEventFormData({
       title: event.title || '',
       description: event.description || '',
-      event_date: event.event_date || '',
-      event_end_date: event.event_end_date || '',
+      event_date: formatDateForInput(event.event_date) || '',
+      event_end_date: formatDateForInput(event.event_end_date) || '',
       start_time: event.start_time || '',
       end_time: event.end_time || '',
       venue: event.venue || '',
       location: event.location || '',
-      application_deadline: event.application_deadline || '',
-      payment_due_date: event.payment_due_date || '',
+      application_deadline: formatDateForInput(event.application_deadline) || '',
+      payment_due_date: formatDateForInput(event.payment_due_date) || '',
     });
     setIsEditingDetails(false);
   };
@@ -361,11 +367,11 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                   </div>
                   <div>
                     <p className="text-xs text-white/60 mb-1">Event Date</p>
-                    <p className="text-white">{event.event_date ? new Date(event.event_date).toLocaleDateString() : '—'}</p>
+                    <p className="text-white">{event.event_date ? formatEventDate(event.event_date, 'MMM d, yyyy') : '—'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-white/60 mb-1">Application Deadline</p>
-                    <p className="text-white">{event.application_deadline ? new Date(event.application_deadline).toLocaleDateString() : '—'}</p>
+                    <p className="text-white">{event.application_deadline ? formatEventDate(event.application_deadline, 'MMM d, yyyy') : '—'}</p>
                   </div>
                   <div>
                     <p className="text-xs text-white/60 mb-1">Payment Deadline</p>

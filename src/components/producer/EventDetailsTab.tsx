@@ -23,6 +23,7 @@ import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import GoLiveCard from './GoLiveCard';
 import HomeDashboard from './HomeDashboard';
+import { formatEventDate } from '@/utils/dateHelpers';
 
 interface Event {
   id: number;
@@ -217,16 +218,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Not set';
-    try {
-      return new Date(dateString).toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      });
-    } catch {
-      return dateString;
-    }
+    return formatEventDate(dateString, 'EEEE, MMMM d, yyyy') || dateString;
   };
 
   const formatTime = (timeString?: string) => {
@@ -298,13 +290,6 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
           <p className="text-xs text-white/50">Approved & paid vendors ready for event</p>
         </div>
 
-        {/* Go Live Card - only show if event is not live yet */}
-        <GoLiveCard
-          event={event}
-          onGoLive={() => window.location.reload()}
-          organizationId={organizationId}
-        />
-
         {/* Event Settings Card */}
         <div
           onClick={handleEdit}
@@ -368,6 +353,13 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
           <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
         </a>
       </div>
+
+      {/* Go Live Card - moved here from above */}
+      <GoLiveCard
+        event={event}
+        onGoLive={() => window.location.reload()}
+        organizationId={organizationId}
+      />
 
       {/* Edit Form (Hidden by default) */}
       {isEditing && (
@@ -619,68 +611,8 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
             )}
           </div>
 
-          {/* Date & Time Card */}
-          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Date & Time</h3>
-
-            <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                <Calendar className="w-4 h-4" />
-                Event Date
-              </div>
-              <p className="text-white">{formatDate(event.event_date || event.dates?.start)}</p>
-            </div>
-
-            {(event.event_end_date || event.dates?.end) && (
-              <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                  <Calendar className="w-4 h-4" />
-                  Event End Date
-                </div>
-                <p className="text-white">{formatDate(event.event_end_date || event.dates?.end)}</p>
-              </div>
-            )}
-
-            {(event.start_time || event.dates?.start_time) && (
-              <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                  <Clock className="w-4 h-4" />
-                  Start Time
-                </div>
-                <p className="text-white">{formatTime(event.start_time || event.dates?.start_time)}</p>
-              </div>
-            )}
-
-            {(event.end_time || event.dates?.end_time) && (
-              <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                  <Clock className="w-4 h-4" />
-                  End Time
-                </div>
-                <p className="text-white">{formatTime(event.end_time || event.dates?.end_time)}</p>
-              </div>
-            )}
-
-            {event.application_deadline && (
-              <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                  <Calendar className="w-4 h-4" />
-                  Application Deadline
-                </div>
-                <p className="text-white">{formatDate(event.application_deadline)}</p>
-              </div>
-            )}
-
-            {event.payment_deadline && (
-              <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-                  <Calendar className="w-4 h-4" />
-                  Payment Deadline
-                </div>
-                <p className="text-white">{formatDate(event.payment_deadline)}</p>
-              </div>
-            )}
-          </div>
+          {/* Date & Time Card - Hidden to avoid timezone display issues */}
+          {/* Users can view/edit dates in the Settings tab */}
         </div>
       )}
 

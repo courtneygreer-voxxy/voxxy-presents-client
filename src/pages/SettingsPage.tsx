@@ -13,6 +13,7 @@ interface Organization {
   slug: string;
   name: string;
   user_id: number;
+  timezone?: string;
 }
 
 export default function SettingsPage({ onBack }: SettingsPageProps) {
@@ -25,6 +26,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
     fullName: userProfile?.name || '',
     email: userProfile?.email || '',
     companyName: '',
+    timezone: 'America/Los_Angeles',
     bio: '',
   });
 
@@ -40,10 +42,11 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
         if (userOrg) {
           setOrganization(userOrg);
-          // Update companyName with organization name
+          // Update companyName and timezone with organization data
           setProfileData(prev => ({
             ...prev,
             companyName: userOrg.name || '',
+            timezone: userOrg.timezone || 'America/Los_Angeles',
           }));
         }
       } catch (err) {
@@ -86,11 +89,15 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       console.log('🔵 [Settings] Updating user with:', userPayload);
       await authApi.updateUser(userProfile.id, userPayload);
 
-      // Update organization if exists and name changed
-      if (organization && profileData.companyName && profileData.companyName !== organization.name) {
-        console.log('🔵 [Settings] Updating organization name to:', profileData.companyName);
+      // Update organization if exists and name or timezone changed
+      if (organization && (profileData.companyName !== organization.name || profileData.timezone !== organization.timezone)) {
+        console.log('🔵 [Settings] Updating organization:', {
+          name: profileData.companyName,
+          timezone: profileData.timezone
+        });
         await organizationsApi.update(organization.slug, {
           name: profileData.companyName,
+          timezone: profileData.timezone,
         });
         console.log('✅ [Settings] Organization updated');
       }
@@ -185,19 +192,44 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               </div>
             </div>
 
-            {/* Company Name */}
-            <div>
-              <label htmlFor="companyName" className="block text-sm text-white/70 font-medium mb-2">
-                Company Name
-              </label>
-              <input
-                id="companyName"
-                type="text"
-                value={profileData.companyName}
-                onChange={(e) => handleChange('companyName', e.target.value)}
-                placeholder="Voxxy Events Co."
-                className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
-              />
+            {/* Company Name and Timezone Row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {/* Company Name */}
+              <div>
+                <label htmlFor="companyName" className="block text-sm text-white/70 font-medium mb-2">
+                  Company Name
+                </label>
+                <input
+                  id="companyName"
+                  type="text"
+                  value={profileData.companyName}
+                  onChange={(e) => handleChange('companyName', e.target.value)}
+                  placeholder="Voxxy Events Co."
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                />
+              </div>
+
+              {/* Timezone */}
+              <div>
+                <label htmlFor="timezone" className="block text-sm text-white/70 font-medium mb-2">
+                  Timezone
+                </label>
+                <select
+                  id="timezone"
+                  value={profileData.timezone}
+                  onChange={(e) => handleChange('timezone', e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all appearance-none cursor-pointer"
+                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' fill-opacity='0.6' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+                >
+                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                  <option value="America/Denver">Mountain Time (MT)</option>
+                  <option value="America/Chicago">Central Time (CT)</option>
+                  <option value="America/New_York">Eastern Time (ET)</option>
+                  <option value="America/Phoenix">Arizona (MST)</option>
+                  <option value="America/Anchorage">Alaska Time (AKT)</option>
+                  <option value="Pacific/Honolulu">Hawaii Time (HST)</option>
+                </select>
+              </div>
             </div>
 
             {/* Bio */}

@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import { ArrowLeft, Trash2 } from 'lucide-react';
+import { formatDateForInput } from '@/utils/dateHelpers';
 
 interface Event {
   id: number;
   slug: string;
   title: string;
   description?: string;
+  event_date?: string;
+  event_end_date?: string;
+  start_time?: string;
+  end_time?: string;
   dates?: {
     start?: string;
     end?: string;
@@ -49,15 +54,15 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
   const [formData, setFormData] = useState({
     title: event.title || '',
     description: event.description || '',
-    event_date: event.dates?.start ? event.dates.start.split('T')[0] : '',
-    event_end_date: event.dates?.end ? event.dates.end.split('T')[0] : '',
-    start_time: event.dates?.start_time || '',
-    end_time: event.dates?.end_time || '',
+    event_date: formatDateForInput(event.event_date || event.dates?.start) || '',
+    event_end_date: formatDateForInput(event.event_end_date || event.dates?.end) || '',
+    start_time: event.start_time || event.dates?.start_time || '',
+    end_time: event.end_time || event.dates?.end_time || '',
     venue: event.venue || '',
     location: event.location || '',
     age_restriction: event.age_restriction || '',
     ticket_link: event.ticket_link || '',
-    application_deadline: event.application_deadline ? event.application_deadline.split('T')[0] : '',
+    application_deadline: formatDateForInput(event.application_deadline) || '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 

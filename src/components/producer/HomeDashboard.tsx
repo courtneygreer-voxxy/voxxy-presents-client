@@ -24,6 +24,7 @@ import {
   bulletinsApi,
 } from '@/services/api';
 import GoLiveCard from './GoLiveCard';
+import { formatEventDate } from '@/utils/dateHelpers';
 
 interface HomeDashboardProps {
   eventSlug: string;
@@ -131,16 +132,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
 
   const formatDate = (dateString?: string) => {
     if (!dateString) return 'Not set';
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric',
-      });
-    } catch {
-      return 'Invalid date';
-    }
+    return formatEventDate(dateString, 'MMM d, yyyy') || 'Invalid date';
   };
 
   const formatTime = (timeString?: string) => {
