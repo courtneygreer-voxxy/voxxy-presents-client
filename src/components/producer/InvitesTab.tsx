@@ -365,11 +365,12 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
   // Handle email history toggle
   const handleToggleEmailHistory = async (rowId: string, registrationId?: number, invitationId?: number) => {
-    console.log('[EMAIL HISTORY DEBUG] Toggle called with:', {
+    console.log('[EMAIL HISTORY DEBUG v2.12.2025] Toggle called with:', {
       rowId,
       registrationId,
       invitationId,
-      eventSlug
+      eventSlug,
+      timestamp: new Date().toISOString()
     });
 
     // If clicking the same row, collapse it
