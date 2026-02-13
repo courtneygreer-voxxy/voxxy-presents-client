@@ -50,32 +50,14 @@ export default function SmartListBuilder({
 
   const fetchFilterOptions = async () => {
     try {
-      // Fetch all contacts to extract unique values
-      const response = await vendorContactsApi.getAll(organizationId, {
-        per_page: 1000, // Get a large number to extract all unique values
-      });
-
-      const contacts = response.vendor_contacts || [];
-
-      // Extract unique categories
-      const categories = Array.from(
-        new Set(contacts.flatMap((c) => c.categories || []))
-      ).sort();
-
-      // Extract unique locations
-      const locations = Array.from(
-        new Set(contacts.map((c) => c.location).filter(Boolean))
-      ).sort() as string[];
-
-      // Extract unique tags
-      const tags = Array.from(
-        new Set(contacts.flatMap((c) => c.tags || []))
-      ).sort();
+      // Use dedicated filter_options endpoint to get ALL unique values
+      // This avoids pagination limits and ensures all filter options are available
+      const filterOptions = await vendorContactsApi.getFilterOptions(organizationId);
 
       setAvailableFilters({
-        categories,
-        locations,
-        tags,
+        categories: filterOptions.categories,
+        locations: filterOptions.locations,
+        tags: filterOptions.tags,
       });
     } catch (err) {
       console.error('Failed to fetch filter options:', err);

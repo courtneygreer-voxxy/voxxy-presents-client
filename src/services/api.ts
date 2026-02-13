@@ -1997,6 +1997,20 @@ export const vendorContactsApi = {
   },
 
   /**
+   * Get all unique filter options (locations, tags, categories) for an organization
+   * GET /api/v1/presents/organizations/:organization_id/vendor_contacts/filter_options
+   */
+  async getFilterOptions(organizationId: number): Promise<{
+    locations: string[]
+    tags: string[]
+    categories: string[]
+  }> {
+    return fetchApi<{ locations: string[], tags: string[], categories: string[] }>(
+      `/v1/presents/organizations/${organizationId}/vendor_contacts/filter_options`
+    )
+  },
+
+  /**
    * Create new vendor contact
    * POST /api/v1/presents/vendor_contacts
    */
