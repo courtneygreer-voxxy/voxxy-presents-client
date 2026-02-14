@@ -16,7 +16,7 @@ interface Event {
   venue?: string;
   location?: string;
   application_deadline?: string;
-  payment_due_date?: string;
+  payment_deadline?: string;
   ticket_link?: string;
   age_restriction?: string;
   status?: {
@@ -94,7 +94,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     venue: event.venue || '',
     location: event.location || '',
     application_deadline: formatDateForInput(event.application_deadline) || '',
-    payment_due_date: formatDateForInput(event.payment_due_date) || '',
+    payment_deadline: formatDateForInput(event.payment_deadline) || '',
   });
 
   // Copy link states
@@ -169,7 +169,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       venue: event.venue || '',
       location: event.location || '',
       application_deadline: formatDateForInput(event.application_deadline) || '',
-      payment_due_date: formatDateForInput(event.payment_due_date) || '',
+      payment_deadline: formatDateForInput(event.payment_deadline) || '',
     });
     setIsEditingDetails(false);
   };
@@ -213,18 +213,31 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
 
   const handleExportInvitesCSV = async () => {
     try {
+      console.log('🔍 === CSV Export Debug ===');
+      console.log('Event slug:', event.slug);
+
       // Fetch all invitations and registrations
       let invitationsResponse: any = { invitations: [] };
       let registrations: any = { vendor_registrations: [] };
 
       try {
         invitationsResponse = await eventInvitationsApi.getByEvent(event.slug, 1, 1000);
+        console.log('📨 Invitations API Response:', {
+          count: invitationsResponse?.invitations?.length || 0,
+          sampleInvitation: invitationsResponse?.invitations?.[0] || 'none',
+          allFieldsInSample: invitationsResponse?.invitations?.[0] ? Object.keys(invitationsResponse.invitations[0]) : []
+        });
       } catch (err) {
         console.warn('No invitations found or error fetching invitations:', err);
       }
 
       try {
         registrations = await registrationsApi.getByEvent(event.slug);
+        console.log('📝 Registrations API Response:', {
+          count: registrations?.vendor_registrations?.length || 0,
+          sampleRegistration: registrations?.vendor_registrations?.[0] || 'none',
+          allFieldsInSample: registrations?.vendor_registrations?.[0] ? Object.keys(registrations.vendor_registrations[0]) : []
+        });
       } catch (err) {
         console.warn('No registrations found or error fetching registrations:', err);
       }
@@ -235,7 +248,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       // Add invitations
       const invitations = invitationsResponse?.invitations || [];
       invitations.forEach((inv: any) => {
-        csvData.push({
+        const csvRow = {
           name: inv.contact_name || inv.name || '',
           email: inv.contact_email || inv.email || '',
           business_name: inv.business_name || '',
@@ -246,13 +259,15 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           application_date: '',
           application_status: '',
           payment_status: ''
-        });
+        };
+        csvData.push(csvRow);
       });
+      console.log(`✅ Processed ${invitations.length} invitations`);
 
       // Add registrations (applications)
       const registrationList = registrations?.vendor_registrations || [];
       registrationList.forEach((reg: any) => {
-        csvData.push({
+        const csvRow = {
           name: reg.name || '',
           email: reg.email || '',
           business_name: reg.business_name || '',
@@ -263,7 +278,20 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           application_date: reg.created_at ? new Date(reg.created_at).toLocaleDateString() : '',
           application_status: reg.status || '',
           payment_status: reg.payment_status || ''
-        });
+        };
+        csvData.push(csvRow);
+      });
+      console.log(`✅ Processed ${registrationList.length} registrations`);
+
+      console.log('📊 CSV Data Summary:', {
+        totalRows: csvData.length,
+        sampleRows: csvData.slice(0, 3),
+        emptyFields: csvData.map(row => ({
+          name: !row.name,
+          email: !row.email,
+          business_name: !row.business_name,
+          category: !row.category
+        })).filter(row => row.name || row.email || row.business_name || row.category).length
       });
 
       // Convert to CSV
@@ -375,7 +403,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                   </div>
                   <div>
                     <p className="text-xs text-white/60 mb-1">Payment Deadline</p>
-                    <p className="text-white">{event.payment_due_date ? new Date(event.payment_due_date).toLocaleDateString() : '—'}</p>
+                    <p className="text-white">{event.payment_deadline ? formatEventDate(event.payment_deadline, 'MMM d, yyyy') : '—'}</p>
                   </div>
                 </div>
                 {event.description && (
@@ -485,8 +513,8 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                     <label className="block text-xs text-white/60 mb-1">Payment Deadline</label>
                     <input
                       type="date"
-                      value={eventFormData.payment_due_date}
-                      onChange={(e) => setEventFormData({ ...eventFormData, payment_due_date: e.target.value })}
+                      value={eventFormData.payment_deadline}
+                      onChange={(e) => setEventFormData({ ...eventFormData, payment_deadline: e.target.value })}
                       className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
