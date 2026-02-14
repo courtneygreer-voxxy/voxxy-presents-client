@@ -99,6 +99,24 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
         (sub) => sub.payment_status !== 'paid'
       ).length;
 
+      // Debug logging to investigate count discrepancies
+      console.log('📊 Dashboard Stats Debug:', {
+        totalSubmissions: allSubmissions.length,
+        applied,
+        newUnreviewed,
+        approvedCount: approved.length,
+        approvedPaid,
+        missingPayments,
+        statusBreakdown: allSubmissions.reduce((acc: any, sub) => {
+          acc[sub.status] = (acc[sub.status] || 0) + 1;
+          return acc;
+        }, {}),
+        paymentStatusBreakdown: approved.reduce((acc: any, sub) => {
+          acc[sub.payment_status || 'null'] = (acc[sub.payment_status || 'null'] || 0) + 1;
+          return acc;
+        }, {}),
+      });
+
       setStats({
         applied,
         newUnreviewed,
