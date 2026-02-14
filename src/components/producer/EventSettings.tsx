@@ -213,18 +213,31 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
 
   const handleExportInvitesCSV = async () => {
     try {
+      console.log('🔍 === CSV Export Debug ===');
+      console.log('Event slug:', event.slug);
+
       // Fetch all invitations and registrations
       let invitationsResponse: any = { invitations: [] };
       let registrations: any = { vendor_registrations: [] };
 
       try {
         invitationsResponse = await eventInvitationsApi.getByEvent(event.slug, 1, 1000);
+        console.log('📨 Invitations API Response:', {
+          count: invitationsResponse?.invitations?.length || 0,
+          sampleInvitation: invitationsResponse?.invitations?.[0] || 'none',
+          allFieldsInSample: invitationsResponse?.invitations?.[0] ? Object.keys(invitationsResponse.invitations[0]) : []
+        });
       } catch (err) {
         console.warn('No invitations found or error fetching invitations:', err);
       }
 
       try {
         registrations = await registrationsApi.getByEvent(event.slug);
+        console.log('📝 Registrations API Response:', {
+          count: registrations?.vendor_registrations?.length || 0,
+          sampleRegistration: registrations?.vendor_registrations?.[0] || 'none',
+          allFieldsInSample: registrations?.vendor_registrations?.[0] ? Object.keys(registrations.vendor_registrations[0]) : []
+        });
       } catch (err) {
         console.warn('No registrations found or error fetching registrations:', err);
       }
@@ -235,7 +248,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       // Add invitations
       const invitations = invitationsResponse?.invitations || [];
       invitations.forEach((inv: any) => {
-        csvData.push({
+        const csvRow = {
           name: inv.contact_name || inv.name || '',
           email: inv.contact_email || inv.email || '',
           business_name: inv.business_name || '',
@@ -246,13 +259,15 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           application_date: '',
           application_status: '',
           payment_status: ''
-        });
+        };
+        csvData.push(csvRow);
       });
+      console.log(`✅ Processed ${invitations.length} invitations`);
 
       // Add registrations (applications)
       const registrationList = registrations?.vendor_registrations || [];
       registrationList.forEach((reg: any) => {
-        csvData.push({
+        const csvRow = {
           name: reg.name || '',
           email: reg.email || '',
           business_name: reg.business_name || '',
@@ -263,7 +278,20 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           application_date: reg.created_at ? new Date(reg.created_at).toLocaleDateString() : '',
           application_status: reg.status || '',
           payment_status: reg.payment_status || ''
-        });
+        };
+        csvData.push(csvRow);
+      });
+      console.log(`✅ Processed ${registrationList.length} registrations`);
+
+      console.log('📊 CSV Data Summary:', {
+        totalRows: csvData.length,
+        sampleRows: csvData.slice(0, 3),
+        emptyFields: csvData.map(row => ({
+          name: !row.name,
+          email: !row.email,
+          business_name: !row.business_name,
+          category: !row.category
+        })).filter(row => row.name || row.email || row.business_name || row.category).length
       });
 
       // Convert to CSV
