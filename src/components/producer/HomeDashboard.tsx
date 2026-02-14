@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import {
-  Users,
   ClipboardList,
   Eye,
   CheckCircle,
@@ -17,9 +16,7 @@ import {
   MessageSquare,
 } from 'lucide-react';
 import {
-  eventInvitationsApi,
   vendorApplicationsApi,
-  registrationsApi,
   scheduledEmailsApi,
   bulletinsApi,
 } from '@/services/api';
@@ -34,7 +31,6 @@ interface HomeDashboardProps {
 }
 
 interface DashboardStats {
-  totalInvited: number;
   applied: number;
   newUnreviewed: number;
   approvedPaid: number;
@@ -58,7 +54,6 @@ interface Bulletin {
 
 export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organizationId }: HomeDashboardProps) {
   const [stats, setStats] = useState<DashboardStats>({
-    totalInvited: 0,
     applied: 0,
     newUnreviewed: 0,
     approvedPaid: 0,
@@ -76,16 +71,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
     try {
       setLoading(true);
 
-      // Fetch stats in parallel
-      const [invitationsRes, applications, emails, bulletinsRes] = await Promise.all([
-        eventInvitationsApi.getByEvent(eventSlug).catch(() => ({ invitations: [], meta: {} })),
+      // Fetch stats in parallel (removed invitations fetch for performance)
+      const [applications, emails, bulletinsRes] = await Promise.all([
         vendorApplicationsApi.getByEvent(eventSlug).catch(() => []),
         scheduledEmailsApi.getByEvent(eventSlug).catch(() => []),
         bulletinsApi.getByEvent(eventSlug).catch(() => []),
       ]);
-
-      // Calculate stats
-      const totalInvited = (invitationsRes && 'meta' in invitationsRes && invitationsRes.meta && 'total_count' in invitationsRes.meta) ? invitationsRes.meta.total_count : 0;
 
       // Fetch all submissions
       let allSubmissions: any[] = [];
@@ -109,7 +100,6 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
       ).length;
 
       setStats({
-        totalInvited,
         applied,
         newUnreviewed,
         approvedPaid,
@@ -168,20 +158,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
   return (
     <div className="p-3 md:p-4">
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-        {/* Total Invited */}
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="p-2 rounded-lg bg-blue-500/20">
-              <Users className="w-4 h-4 text-blue-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl font-bold text-white">{stats.totalInvited}</p>
-              <p className="text-[10px] text-white/60">Total Invited</p>
-            </div>
-          </div>
-        </div>
-
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
         {/* Applied */}
         <div className="glass-card p-3">
           <div className="flex items-center gap-2 mb-2">
