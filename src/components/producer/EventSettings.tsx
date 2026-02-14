@@ -16,7 +16,7 @@ interface Event {
   venue?: string;
   location?: string;
   application_deadline?: string;
-  payment_due_date?: string;
+  payment_deadline?: string;
   ticket_link?: string;
   age_restriction?: string;
   status?: {
@@ -94,7 +94,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
     venue: event.venue || '',
     location: event.location || '',
     application_deadline: formatDateForInput(event.application_deadline) || '',
-    payment_due_date: formatDateForInput(event.payment_due_date) || '',
+    payment_deadline: formatDateForInput(event.payment_deadline) || '',
   });
 
   // Copy link states
@@ -169,7 +169,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
       venue: event.venue || '',
       location: event.location || '',
       application_deadline: formatDateForInput(event.application_deadline) || '',
-      payment_due_date: formatDateForInput(event.payment_due_date) || '',
+      payment_deadline: formatDateForInput(event.payment_deadline) || '',
     });
     setIsEditingDetails(false);
   };
@@ -403,7 +403,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                   </div>
                   <div>
                     <p className="text-xs text-white/60 mb-1">Payment Deadline</p>
-                    <p className="text-white">{event.payment_due_date ? new Date(event.payment_due_date).toLocaleDateString() : '—'}</p>
+                    <p className="text-white">{event.payment_deadline ? formatEventDate(event.payment_deadline, 'MMM d, yyyy') : '—'}</p>
                   </div>
                 </div>
                 {event.description && (
@@ -513,8 +513,8 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
                     <label className="block text-xs text-white/60 mb-1">Payment Deadline</label>
                     <input
                       type="date"
-                      value={eventFormData.payment_due_date}
-                      onChange={(e) => setEventFormData({ ...eventFormData, payment_due_date: e.target.value })}
+                      value={eventFormData.payment_deadline}
+                      onChange={(e) => setEventFormData({ ...eventFormData, payment_deadline: e.target.value })}
                       className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
