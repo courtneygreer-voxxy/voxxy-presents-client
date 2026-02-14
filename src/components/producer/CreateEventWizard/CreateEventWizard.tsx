@@ -215,21 +215,11 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       await onSubmit(wizardState);
     } catch (error: any) {
       console.error('Failed to create event:', error);
-      console.error('Error details:', {
-        status: error?.status,
-        message: error?.message,
-        errors: error?.errors,
-        response: error?.response,
-        fullError: JSON.stringify(error, null, 2)
-      });
 
       // Display error message to user
-      const errorMessage = error?.errors?.[0]
-        || error?.response?.data?.errors?.[0]
+      const errorMessage = error?.response?.data?.errors?.[0]
         || error?.message
         || 'Failed to create event. Please try again.';
-
-      console.error('Displaying error message:', errorMessage);
 
       setErrors({
         submit: errorMessage.includes('taken') || errorMessage.includes('duplicate')
