@@ -362,7 +362,7 @@ export default function EmailRow({
                       Edit
                     </button>
                   )}
-                  {isScheduled && !isPast && onSendNow && (
+                  {(isScheduled || isPaused) && !isSent && onSendNow && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
