@@ -811,7 +811,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
                                   ) : emailHistoryData[row.id]?.length > 0 ? (
                                     emailHistoryData[row.id].map((delivery: any) => {
                                       const deliveryStatus = delivery.status;
-                                      const emailSubject = delivery.scheduled_email?.subject || 'Unknown Email';
+                                      const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
                                       const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
                                       // Status badge colors
