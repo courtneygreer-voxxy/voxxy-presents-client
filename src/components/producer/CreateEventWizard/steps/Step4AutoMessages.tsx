@@ -215,7 +215,7 @@ export default function Step4AutoMessages({
 
             {/* Table Body */}
             <div className="divide-y divide-white/10">
-              {emailItems.map((email: EmailTemplateItem) => {
+              {[...emailItems].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)).map((email: EmailTemplateItem) => {
                 const sendDate = calculateSendDate(
                   email.trigger_type,
                   email.trigger_value ?? null,
