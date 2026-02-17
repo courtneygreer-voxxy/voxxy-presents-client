@@ -40,37 +40,8 @@ export default function TemplatePreviewModal({
 }: TemplatePreviewModalProps) {
   if (!template) return null;
 
-  // Strip HTML tags for display (templates stored as HTML in backend)
-  const stripHtml = (html: string) => {
-    const tmp = document.createElement('div');
-    tmp.innerHTML = html;
-    return tmp.textContent || tmp.innerText || '';
-  };
-
-  // Remove footer text from body since we have hard-coded footer card
-  const removeFooter = (text: string): string => {
-    // Remove common footer patterns
-    const footerPatterns = [
-      /Best regards,?\s*\n?\[?organizationName\]?/gi,
-      /Thank you,?\s*\n?\[?organizationName\]?/gi,
-      /Sincerely,?\s*\n?\[?organizationName\]?/gi,
-      /For questions,?\s*contact us at\s*\[?organizationEmail\]?\.?/gi,
-      /If you have any questions,?\s*please contact us at\s*\[?organizationEmail\]?\.?/gi,
-      /Please do not reply to this email\.?/gi,
-      /Powered by Voxxy\.?/gi,
-    ];
-
-    let cleanedText = text;
-    footerPatterns.forEach(pattern => {
-      cleanedText = cleanedText.replace(pattern, '');
-    });
-
-    // Trim excessive whitespace at the end
-    return cleanedText.trim();
-  };
-
-  const displaySubject = stripHtml(template.subject_template);
-  const displayBody = removeFooter(stripHtml(template.body_template));
+  const displaySubject = template.subject_template.replace(/<[^>]*>/g, '');
+  const displayBody = template.body_template;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -107,9 +78,10 @@ export default function TemplatePreviewModal({
               Message Body
             </label>
             <div className="bg-white/5 rounded-lg p-6 border border-white/10 max-h-96 overflow-y-auto">
-              <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                {displayBody}
-              </pre>
+              <div
+                className="text-white/90 text-sm leading-relaxed prose prose-invert prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_h3]:text-white [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h4]:text-white/90 [&_h4]:font-semibold [&_h4]:mt-3 [&_h4]:mb-1 [&_a]:text-purple-400 [&_a]:underline [&_strong]:text-white [&_hr]:border-white/20"
+                dangerouslySetInnerHTML={{ __html: displayBody }}
+              />
             </div>
           </div>
 
