@@ -300,8 +300,28 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       );
     }
 
-    // Sort by scheduled_for date (ascending)
+    // Sort by category group first, then by scheduled_for date within each group
+    // Group order: invitation → application received/accepted/waitlist → art calls → payment reminders → payment confirmed → countdown
+    const TRIGGER_GROUP_ORDER: Record<string, number> = {
+      on_application_open: 1,       // Invitation
+      on_application_submit: 2,     // Application Received
+      on_approval: 3,               // Application Accepted
+      on_waitlist: 4,               // Waitlist
+      days_before_event: 5,         // Art Calls & Countdown (sorted by date desc within)
+      days_before_payment_deadline: 6, // Payment Reminders
+      on_payment_deadline: 6,
+      on_payment_received: 7,       // Payment Confirmed
+      on_event_date: 8,             // Day Of
+      days_after_event: 9,          // Post-event
+    };
+
     return result.sort((a, b) => {
+      const groupA = TRIGGER_GROUP_ORDER[a.trigger_type] ?? 99;
+      const groupB = TRIGGER_GROUP_ORDER[b.trigger_type] ?? 99;
+
+      if (groupA !== groupB) return groupA - groupB;
+
+      // Within the same group, sort by scheduled_for date ascending
       const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
