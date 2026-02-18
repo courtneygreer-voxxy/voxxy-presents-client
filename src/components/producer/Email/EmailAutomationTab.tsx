@@ -38,6 +38,21 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
 
+  // Sort state
+  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
+  type SortDirection = 'asc' | 'desc';
+  const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const handleSort = (column: SortColumn) => {
+    if (sortColumn === column) {
+      setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
+
   // Load scheduled emails
   useEffect(() => {
     loadEmails();
@@ -300,19 +315,65 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       );
     }
 
-    // Sort by category group first, then by scheduled_for date within each group
-    // Group order: invitation → application received/accepted/waitlist → art calls → payment reminders → payment confirmed → countdown
+    // If a column sort is active, use that
+    if (sortColumn) {
+      return result.sort((a, b) => {
+        let valA: string | number = '';
+        let valB: string | number = '';
+
+        switch (sortColumn) {
+          case 'name':
+            valA = a.name.toLowerCase();
+            valB = b.name.toLowerCase();
+            break;
+          case 'subject':
+            valA = a.subject_template.toLowerCase();
+            valB = b.subject_template.toLowerCase();
+            break;
+          case 'scheduled_for':
+            valA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
+            valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
+            break;
+          case 'category':
+            valA = (a.trigger_type ?? '').toLowerCase();
+            valB = (b.trigger_type ?? '').toLowerCase();
+            break;
+          case 'recipient_count':
+            valA = a.recipient_count ?? 0;
+            valB = b.recipient_count ?? 0;
+            break;
+          case 'undelivered_count':
+            valA = a.undelivered_count ?? 0;
+            valB = b.undelivered_count ?? 0;
+            break;
+          case 'unsubscribed_count':
+            valA = a.unsubscribed_count ?? 0;
+            valB = b.unsubscribed_count ?? 0;
+            break;
+          case 'status':
+            valA = a.status.toLowerCase();
+            valB = b.status.toLowerCase();
+            break;
+        }
+
+        if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+        if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Default: sort by trigger-type group, then by scheduled_for within each group
     const TRIGGER_GROUP_ORDER: Record<string, number> = {
-      on_application_open: 1,       // Invitation
-      on_application_submit: 2,     // Application Received
-      on_approval: 3,               // Application Accepted
-      on_waitlist: 4,               // Waitlist
-      days_before_event: 5,         // Art Calls & Countdown (sorted by date desc within)
-      days_before_payment_deadline: 6, // Payment Reminders
+      on_application_open: 1,
+      on_application_submit: 2,
+      on_approval: 3,
+      on_waitlist: 4,
+      days_before_event: 5,
+      days_before_payment_deadline: 6,
       on_payment_deadline: 6,
-      on_payment_received: 7,       // Payment Confirmed
-      on_event_date: 8,             // Day Of
-      days_after_event: 9,          // Post-event
+      on_payment_received: 7,
+      on_event_date: 8,
+      days_after_event: 9,
     };
 
     return result.sort((a, b) => {
@@ -321,12 +382,11 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
       if (groupA !== groupB) return groupA - groupB;
 
-      // Within the same group, sort by scheduled_for date ascending
       const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
     });
-  }, [emails, searchQuery, statusFilter]);
+  }, [emails, searchQuery, statusFilter, sortColumn, sortDirection]);
 
   // Calculate statistics
   const stats = {
@@ -510,6 +570,9 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             onSendNow={handleSendNow}
             onRetryFailed={handleRetryFailed}
             onDelete={handleDelete}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
           />
         </div>
       )}
