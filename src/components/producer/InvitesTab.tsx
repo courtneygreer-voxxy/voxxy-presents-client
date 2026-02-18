@@ -132,14 +132,13 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         }
       }
 
-      // Build available categories from both sources:
-      // 1. app.categories — the configured list set by the producer in event settings (primary)
-      // 2. submission vendor_category values — catches any values not yet in the configured list
+      // Build available categories from vendor application names (the canonical source)
+      // supplemented by any vendor_category values from submissions.
+      // We use app.name (not app.categories) because each vendor application IS a category
+      // (e.g. "Artists", "Vendors", "Premium Corner Booth") and app.categories is unreliably populated.
       const categoriesSet = new Set<string>();
       vendorApps.forEach((app: any) => {
-        if (app.categories && Array.isArray(app.categories)) {
-          app.categories.forEach((cat: string) => categoriesSet.add(cat));
-        }
+        if (app.name) categoriesSet.add(app.name);
       });
       allSubmissions.forEach((sub: any) => {
         if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
