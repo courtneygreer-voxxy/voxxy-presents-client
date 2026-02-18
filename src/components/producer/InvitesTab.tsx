@@ -132,9 +132,15 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         }
       }
 
-      // Extract unique categories from actual submission vendor_category values
-      // (not app.categories, which may be empty for P&B-style events)
+      // Build available categories from both sources:
+      // 1. app.categories — the configured list set by the producer in event settings (primary)
+      // 2. submission vendor_category values — catches any values not yet in the configured list
       const categoriesSet = new Set<string>();
+      vendorApps.forEach((app: any) => {
+        if (app.categories && Array.isArray(app.categories)) {
+          app.categories.forEach((cat: string) => categoriesSet.add(cat));
+        }
+      });
       allSubmissions.forEach((sub: any) => {
         if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
       });
