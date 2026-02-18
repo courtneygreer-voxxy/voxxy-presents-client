@@ -117,15 +117,6 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
       // Fetch vendor applications and their submissions
       const vendorApps = await vendorApplicationsApi.getByEvent(eventSlug);
 
-      // Extract unique categories from all applications
-      const categoriesSet = new Set<string>();
-      vendorApps.forEach((app: any) => {
-        if (app.categories && Array.isArray(app.categories)) {
-          app.categories.forEach((cat: string) => categoriesSet.add(cat));
-        }
-      });
-      setAvailableCategories(Array.from(categoriesSet).sort());
-
       const allSubmissions: any[] = [];
 
       for (const app of vendorApps) {
@@ -140,6 +131,14 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
           console.error(`Failed to fetch submissions for app ${app.id}:`, err);
         }
       }
+
+      // Extract unique categories from actual submission vendor_category values
+      // (not app.categories, which may be empty for P&B-style events)
+      const categoriesSet = new Set<string>();
+      allSubmissions.forEach((sub: any) => {
+        if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
+      });
+      setAvailableCategories(Array.from(categoriesSet).sort());
 
       // Merge logic: match by email (case-insensitive)
       const emailMap = new Map<string, InviteRow>();
