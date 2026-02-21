@@ -34,6 +34,11 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [eventData, setEventData] = useState<any | null>(null); // Store event data for preview calculations
 
+  // Auto-refresh state
+  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastRefreshTime, setLastRefreshTime] = useState<Date | null>(null);
+
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
@@ -58,8 +63,23 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     loadEmails();
   }, [eventSlug]);
 
-  const loadEmails = async () => {
-    setIsLoading(true);
+  // Auto-refresh delivery stats every 30 seconds
+  useEffect(() => {
+    if (!autoRefresh || isEditOpen) return;
+
+    const interval = setInterval(() => {
+      loadEmails(true); // Silent refresh
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
+  }, [autoRefresh, isEditOpen, eventSlug]);
+
+  const loadEmails = async (silent = false) => {
+    if (!silent) {
+      setIsLoading(true);
+    } else {
+      setIsRefreshing(true);
+    }
     setError(null);
     try {
       console.log('📧 Loading emails for event:', eventSlug);
@@ -160,11 +180,15 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       console.log('   - Virtual invitation email:', allEmails.some(e => e.isInvitationAnnouncement) ? 'YES' : 'NO');
 
       setEmails(allEmails);
+      setLastRefreshTime(new Date());
     } catch (err: any) {
       console.error('❌ Failed to load emails:', err);
-      setError(err.message || 'Failed to load scheduled emails');
+      if (!silent) {
+        setError(err.message || 'Failed to load scheduled emails');
+      }
     } finally {
       setIsLoading(false);
+      setIsRefreshing(false);
     }
   };
 
@@ -448,13 +472,54 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
               </button>
             )}
             <button
-              onClick={loadEmails}
+              onClick={() => loadEmails()}
               className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
+        </div>
+
+        {/* Auto-refresh toggle and stats */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
+          <div className="flex items-center gap-3">
+            <label className="flex items-center gap-2 cursor-pointer group">
+              <div className="relative">
+                <input
+                  type="checkbox"
+                  checked={autoRefresh}
+                  onChange={(e) => setAutoRefresh(e.target.checked)}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-white/10 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-blue-500 transition-all"></div>
+                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+              </div>
+              <span className="text-sm text-white/80 group-hover:text-white transition-colors">
+                Auto-refresh delivery stats
+              </span>
+            </label>
+            {autoRefresh && (
+              <span className="text-xs text-white/40">
+                Updates every 30s
+              </span>
+            )}
+          </div>
+          {lastRefreshTime && (
+            <div className="text-xs text-white/40 flex items-center gap-2">
+              {isRefreshing && (
+                <span className="flex items-center gap-1">
+                  <Loader2 className="w-3 h-3 animate-spin" />
+                  Updating...
+                </span>
+              )}
+              {!isRefreshing && (
+                <span>
+                  Last updated: {lastRefreshTime.toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
