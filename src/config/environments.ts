@@ -32,7 +32,7 @@ const environments: Record<EnvironmentType, EnvironmentConfig> = {
   staging: {
     name: 'staging',
     dataSource: 'api',
-    apiBaseUrl: 'https://voxxy-rails-react-staging.onrender.com/api',
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://voxxy-rails-react.onrender.com/api',
     features: {
       adminControls: true,
       debugMode: true,
