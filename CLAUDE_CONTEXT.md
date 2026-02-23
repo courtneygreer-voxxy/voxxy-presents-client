@@ -15,7 +15,19 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 
 ---
 
-## ⚡ RECENT UPDATES (January 24, 2026)
+## ⚡ RECENT UPDATES
+
+### Infrastructure & Deployment (February 22, 2026)
+- ✅ **Environment Isolation Fixed** - Resolved staging-to-production data leakage issue
+- ✅ **Secret Key Separation** - Implemented different `SECRET_KEY_BASE` per environment
+- ✅ **JWT Token Isolation** - Staging and production tokens no longer cross-validate
+- ✅ **Frontend API URL Fix** - Corrected typo in staging API URL (`voxyai` → `voxxyai`)
+- ✅ **Complete Infrastructure Documentation** - See `docs/deployment/INFRASTRUCTURE_GUIDE.md` in backend repo
+- 🚧 **Redis Namespacing** - Recommended but not yet implemented (see infrastructure guide)
+- **Status:** ✅ Production ready - environments fully isolated
+- **Documentation:** See `/Users/beaulazear/Desktop/voxxy-rails/docs/deployment/INFRASTRUCTURE_GUIDE.md`
+
+### Email Unsubscribe System (January 24, 2026)
 
 ### Email Unsubscribe System (NEW - January 24, 2026)
 - ✅ **Three-Tier Unsubscribe** - Event-specific, organization-wide, or global unsubscribe
@@ -57,6 +69,104 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 - 📚 `PAUSE_DELETE_FIX_SUMMARY.md` - Email action fixes
 - 📚 `INVITATION_EMAIL_FIX.md` - Invitation debugging enhancements
 - 📚 `SCHEDULED_EMAILS_SYSTEM.md` - Complete email system documentation
+
+---
+
+# 🚀 DEPLOYMENT & INFRASTRUCTURE
+
+## Production vs Staging Environments
+
+### Environment Isolation Strategy
+
+**Critical Principle:** Environment separation comes from three variables, NOT from `RAILS_ENV`:
+
+1. **DATABASE_URL** - Separates data storage
+2. **SECRET_KEY_BASE** - Separates authentication tokens
+3. **PRIMARY_DOMAIN** - Separates email/CORS/sessions
+
+Both staging and production use `RAILS_ENV=production` (for code optimization).
+
+### Production Environment
+
+**Frontend:**
+- URL: `https://www.voxxypresents.com`
+- Service: `voxxy-presents-client`
+- API Endpoint: `https://www.heyvoxxy.com/api`
+
+**Backend API:**
+- URL: `https://www.heyvoxxy.com`
+- Service: `hey-voxxy-prod` (Render URL: `voxxy-rails-react-staging.onrender.com`)
+- Database: `voxxydb_ru8k` (host: `dpg-d6b5c5cr85hc739tu6l0-a`)
+- Secret Key: `6e61438bfbf30c9638ee...` (first 20 chars)
+- Primary Domain: `heyvoxxy.com`
+
+**Environment Variables:**
+```bash
+VITE_API_BASE_URL=https://www.heyvoxxy.com/api
+VITE_ENVIRONMENT=production
+```
+
+### Staging Environment
+
+**Frontend:**
+- URL: `https://voxxy-presents-client-dev.onrender.com`
+- Service: `voxxy-presents-client-dev`
+- API Endpoint: `https://www.voxxyai.com/api` ⚠️ Note: TWO x's (not `voxyai`)
+
+**Backend API:**
+- URL: `https://www.voxxyai.com`
+- Service: `voxxy-rails-react` (Render URL: `voxxy-rails-react.onrender.com`)
+- Database: `voxxydb_ru8k_t0qq` (host: `dpg-d6dm09ctgctc73cfdke0-a`)
+- Secret Key: `ca227ed6429daf80...` (first 20 chars)
+- Primary Domain: `voxxyai.com`
+
+**Environment Variables:**
+```bash
+VITE_API_BASE_URL=https://www.voxxyai.com/api
+VITE_ENVIRONMENT=staging
+```
+
+### JWT Token Isolation
+
+**How it works:**
+1. User logs into staging → JWT signed with staging secret (`ca227ed6...`)
+2. User tries to access production with staging token → Production verifies with production secret (`6e61438b...`)
+3. Signature mismatch → 401 Unauthorized ✓ Environments isolated!
+
+**Critical:** Never put `VITE_JWT_SECRET` in frontend environment variables! JWT signing/verification only happens on backend.
+
+### Common Deployment Gotchas
+
+1. **Service Name Confusion:** Render service names don't match URLs
+   - `hey-voxxy-prod` has URL `voxxy-rails-react-staging.onrender.com` (renamed service)
+   - Always use custom domains, never Render URLs
+
+2. **Typo Alert:** `voxyai` vs `voxxyai` (two x's!)
+   - Incorrect: `https://www.voxyai.com/api`
+   - Correct: `https://www.voxxyai.com/api`
+
+3. **Environment Variable Changes:** Vite env vars (`VITE_*`) require rebuild
+   - Must trigger manual deploy after changing
+   - Not hot-reloaded like backend env vars
+
+4. **localStorage Isolation:** Browser localStorage is domain-specific
+   - `www.heyvoxxy.com` localStorage ≠ `www.voxxyai.com` localStorage
+   - Additional isolation beyond JWT signatures
+
+### Troubleshooting Deployment Issues
+
+**"Changes in staging affecting production":**
+- ✅ Check `VITE_API_BASE_URL` points to correct backend
+- ✅ Verify backend `SECRET_KEY_BASE` is different per environment
+- ✅ Test JWT token isolation (staging token should fail in production)
+- ✅ Clear browser localStorage and cache
+
+**"Build failing after env var change":**
+- Frontend env var changes require **manual deploy** (not auto-detected)
+- Use Render dashboard → Manual Deploy → Clear build cache
+
+**For complete infrastructure troubleshooting:**
+See `/Users/beaulazear/Desktop/voxxy-rails/docs/deployment/INFRASTRUCTURE_GUIDE.md`
 
 ---
 
@@ -195,7 +305,10 @@ The platform supports **6 roles** with different capabilities:
 
 **All API calls** centralized in `/Users/beaulazear/Desktop/voxxy-presents-client/src/services/api.ts`
 
-**Base URL:** `https://www.voxxyai.com/api`
+**Base URLs:**
+- Production: `https://www.heyvoxxy.com/api`
+- Staging: `https://www.voxxyai.com/api` (note: two x's)
+- Development: `http://localhost:3001/api`
 
 **Pattern:**
 ```typescript
@@ -332,11 +445,16 @@ interface EventInvitation {
 
 - **Framework:** Rails 7.2.2.1 (API mode with cookies enabled)
 - **Database:** PostgreSQL 14+ (with JSONB support)
+  - Production: `voxxydb_ru8k`
+  - Staging: `voxxydb_ru8k_t0qq`
 - **Authentication:** JWT (24-hour expiration) + Session cookies (dual auth)
+  - JWT signed with environment-specific `SECRET_KEY_BASE`
+  - Production and staging tokens are NOT interchangeable
 - **Background Jobs:** Sidekiq (Redis-backed)
 - **File Storage:** ActiveStorage (AWS S3 in production, local in dev)
 - **Email:** SendGrid (transactional emails)
 - **Cache:** Redis (Google Places, OpenAI responses, rate limiting)
+  - ⚠️ Currently shared between environments (namespacing recommended)
 
 ## Backend Architecture
 
@@ -1452,7 +1570,7 @@ After pasting this context, ask Claude:
 
 ---
 
-**Last Updated:** 2026-01-18 (Smart Lists feature added)
+**Last Updated:** 2026-02-22 (Infrastructure & deployment documentation)
 **Schema Version:** 2026_01_18_190827 (contact_lists table)
 **Frontend Version:** React 18.3.1 + Vite 6.3.6
 **Backend Version:** Rails 7.2.2
