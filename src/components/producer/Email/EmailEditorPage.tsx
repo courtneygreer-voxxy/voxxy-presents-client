@@ -9,6 +9,7 @@ import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import type { Editor } from '@tiptap/react';
 import {
   ArrowLeft,
   Eye,
@@ -32,7 +33,7 @@ import {
 import { getEightAmLocalAsUTC, getTimezoneInfo, formatDateWithTimezone } from '@/utils/timezone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { RichTextEditor } from './RichTextEditor';
 import {
   Select,
   SelectContent,
@@ -83,9 +84,9 @@ export function EmailEditorPage({
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [recipientsOpen, setRecipientsOpen] = useState(false);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
+  const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
 
   const subjectRef = useRef<HTMLInputElement>(null);
-  const bodyRef = useRef<HTMLTextAreaElement>(null);
   const timezoneInfo = getTimezoneInfo();
 
   const {
@@ -174,9 +175,9 @@ export function EmailEditorPage({
     if (activeField === 'subject' && subjectRef.current) {
       const newValue = insertVariableAtCursor(subjectRef.current, variable);
       setValue('subject_template', newValue, { shouldValidate: true });
-    } else if (activeField === 'body' && bodyRef.current) {
-      const newValue = insertVariableAtCursor(bodyRef.current, variable);
-      setValue('body_template', newValue, { shouldValidate: true });
+    } else if (activeField === 'body' && bodyEditor) {
+      // Insert variable at current cursor position in TipTap editor
+      bodyEditor.chain().focus().insertContent(variable).run();
     }
   };
 
@@ -318,22 +319,13 @@ export function EmailEditorPage({
               <label className="block text-xs font-medium text-white/70 mb-1.5">
                 Email Body
               </label>
-              <Textarea
-                {...register('body_template', {
-                  onChange: (e) => {
-                    if (bodyRef.current) {
-                      bodyRef.current.value = e.target.value;
-                    }
-                  }
-                })}
-                ref={(e) => {
-                  register('body_template').ref(e);
-                  if (e) (bodyRef as React.MutableRefObject<HTMLTextAreaElement | null>).current = e;
-                }}
+              <RichTextEditor
+                content={body || ''}
+                onChange={(html) => setValue('body_template', html, { shouldValidate: true })}
+                onEditorReady={(editor) => setBodyEditor(editor)}
                 onFocus={() => setActiveField('body')}
                 onBlur={() => setTimeout(() => setActiveField(null), 200)}
-                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 min-h-[400px] font-mono text-sm leading-relaxed resize-none"
-                placeholder="Write your email message here... Click variables on the right to insert."
+                placeholder="Write your email message here... Use the toolbar to format text and click variables on the right to insert."
               />
               <div className="mt-2 p-3 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
                 <p className="text-[10px] text-purple-400 font-semibold mb-2 uppercase tracking-wide">Email Footer (auto-included)</p>
