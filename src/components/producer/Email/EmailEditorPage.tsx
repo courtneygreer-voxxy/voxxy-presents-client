@@ -13,6 +13,7 @@ import type { Editor } from '@tiptap/react';
 import {
   ArrowLeft,
   Eye,
+  EyeOff,
   Save,
   Loader2,
   ChevronDown,
@@ -20,7 +21,10 @@ import {
   Clock,
   Tag,
   Users,
-  Globe
+  Globe,
+  CheckCircle2,
+  AlertCircle,
+  Send
 } from 'lucide-react';
 import type { ScheduledEmail, UpdateEmailRequest, TriggerType } from '@/types/email';
 import {
@@ -41,14 +45,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { addDays, subDays, parseISO } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
+import { scheduledEmailsApi } from '@/services/api';
 
 interface EmailEditorPageProps {
   email: ScheduledEmail | null;
   eventData: any | null;
+  eventSlug: string;
   onBack: () => void;
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
-  onPreview: () => void;
 }
 
 const editEmailSchema = z.object({
@@ -74,20 +88,27 @@ const TRIGGER_TYPES = [
 export function EmailEditorPage({
   email,
   eventData,
+  eventSlug,
   onBack,
   onSave,
-  onPreview,
 }: EmailEditorPageProps) {
   const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [recipientsOpen, setRecipientsOpen] = useState(false);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   const subjectRef = useRef<HTMLInputElement>(null);
   const timezoneInfo = getTimezoneInfo();
+  const { toast } = useToast();
 
   const {
     register,
@@ -107,6 +128,22 @@ export function EmailEditorPage({
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
 
+  // Computed: Check if save should be allowed (extra safety check)
+  const canSave = () => {
+    // Must have subject and body
+    if (!subject || !body) return false;
+
+    // Must have no validation errors
+    if (validationErrors.length > 0) return false;
+
+    // Double-check by running validation on current values
+    const plainSubject = subject || '';
+    const plainBody = stripHtmlForValidation(body || '');
+    const check = validateEmailContent(plainSubject, plainBody);
+
+    return check.isValid;
+  };
+
   // Initialize form with email data - CONVERT backend format to frontend
   useEffect(() => {
     if (!email) return;
@@ -124,11 +161,24 @@ export function EmailEditorPage({
     });
   }, [email, reset]);
 
+  // Strip HTML tags for validation (TipTap editor produces HTML)
+  const stripHtmlForValidation = (html: string): string => {
+    if (!html) return '';
+    // Create a temporary div to parse HTML
+    const tmp = document.createElement('div');
+    tmp.innerHTML = html;
+    return tmp.textContent || tmp.innerText || '';
+  };
+
   // Validate content when it changes
   useEffect(() => {
     if (!subject && !body) return;
 
-    const validation = validateEmailContent(subject || '', body || '');
+    // Strip HTML from body before validating (editor produces HTML)
+    const plainSubject = subject || '';
+    const plainBody = stripHtmlForValidation(body || '');
+
+    const validation = validateEmailContent(plainSubject, plainBody);
 
     const errors: string[] = [];
     if (validation.unknownVariables.length > 0) {
@@ -181,11 +231,73 @@ export function EmailEditorPage({
     }
   };
 
+  const handleSendTestEmail = async () => {
+    if (!email || !testEmailAddress) return;
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(testEmailAddress)) {
+      toast({
+        title: "Invalid Email Address",
+        description: "Please enter a valid email address.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSendingTest(true);
+
+    try {
+      const result = await scheduledEmailsApi.sendTest(eventSlug, email.id, testEmailAddress);
+
+      toast({
+        title: "Test Email Sent!",
+        description: `Test email sent to ${result.recipient}. Check your inbox!`,
+        variant: "default",
+        className: "bg-green-500/10 border-green-500/30 text-green-400",
+      });
+
+      setShowTestEmailDialog(false);
+      setTestEmailAddress('');
+    } catch (error: any) {
+      console.error('Failed to send test email:', error);
+      toast({
+        title: "Failed to Send Test Email",
+        description: error?.message || 'An error occurred while sending the test email.',
+        variant: "destructive",
+      });
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
   const onSubmit = async (data: EditEmailFormData) => {
     if (!email) return;
-    if (validationErrors.length > 0) return;
+
+    // Double-check validation before saving (extra safety)
+    const plainSubject = data.subject_template || '';
+    const plainBody = stripHtmlForValidation(data.body_template || '');
+    const finalValidation = validateEmailContent(plainSubject, plainBody);
+
+    if (!finalValidation.isValid || validationErrors.length > 0) {
+      console.error('🚫 BLOCKED SAVE - Validation errors:', {
+        unknownVariables: finalValidation.unknownVariables,
+        unclosedBrackets: finalValidation.unclosedBrackets,
+        validationErrors
+      });
+
+      toast({
+        title: "Cannot Save Email",
+        description: "Please fix all variable errors before saving.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     setIsSaving(true);
+    setSaveSuccess(false);
+    setSaveError(null);
+
     try {
       const convertedSubject = frontendToBackend(data.subject_template);
       const convertedBody = frontendToBackend(data.body_template);
@@ -201,8 +313,29 @@ export function EmailEditorPage({
       };
 
       await onSave(email.id, updateData);
-    } catch (error) {
+
+      // Success!
+      setSaveSuccess(true);
+      toast({
+        title: "Email Saved Successfully",
+        description: `"${data.name}" has been updated.`,
+        variant: "default",
+        className: "bg-green-500/10 border-green-500/30 text-green-400",
+      });
+
+      // Clear success state after 3 seconds
+      setTimeout(() => setSaveSuccess(false), 3000);
+
+    } catch (error: any) {
       console.error('Failed to save email:', error);
+      const errorMessage = error?.message || 'An unexpected error occurred while saving.';
+      setSaveError(errorMessage);
+
+      toast({
+        title: "Failed to Save Email",
+        description: errorMessage,
+        variant: "destructive",
+      });
     } finally {
       setIsSaving(false);
     }
@@ -212,12 +345,141 @@ export function EmailEditorPage({
 
   const previewDate = calculatePreviewDate();
 
+  // HTML-aware variable resolver for live preview
+  // Properly handles variables in HTML content without breaking structure
+  const resolvePreviewVariables = (html: string): string => {
+    if (!html) return html;
+
+    // Parse HTML using DOM parser
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+
+    // Get list of valid variables
+    const validVars = EMAIL_VARIABLES.map(v => v.frontendVar);
+
+    // Function to resolve a single variable
+    const resolveVariable = (varName: string): string => {
+      if (!eventData && !varName.match(/\[firstName\]|\[lastName\]|\[fullName\]|\[greetingName\]|\[businessName\]|\[email\]|\[vendorCategory\]|\[boothNumber\]|\[applicationDate\]|\[installDate\]|\[installTime\]|\[installStartTime\]|\[installEndTime\]/)) {
+        return varName; // No event data, return as-is
+      }
+
+      // Event variables
+      if (varName === '[eventName]') return eventData?.title || 'Event Name';
+      if (varName === '[eventDate]') return eventData?.start_date ? new Date(eventData.start_date).toLocaleDateString() : 'Event Date';
+      if (varName === '[eventLocation]') return eventData?.location || 'Event Location';
+      if (varName === '[eventVenue]') return eventData?.venue || 'Event Venue';
+      if (varName === '[eventTime]') return eventData?.start_time || 'Event Time';
+      if (varName === '[eventDescription]') return eventData?.description || 'Event Description';
+      if (varName === '[organizationName]') return eventData?.organization?.name || 'Organization Name';
+      if (varName === '[organizationEmail]') return eventData?.organization?.email || 'team@voxxypresents.com';
+      if (varName === '[applicationDeadline]') return eventData?.application_deadline ? new Date(eventData.application_deadline).toLocaleDateString() : 'Application Deadline';
+      if (varName === '[paymentDueDate]') return eventData?.payment_due_date ? new Date(eventData.payment_due_date).toLocaleDateString() : 'Payment Due Date';
+      if (varName === '[boothPrice]') return eventData?.booth_price ? `$${eventData.booth_price}` : '$150.00';
+      if (varName === '[categoryPrice]') return eventData?.booth_price ? `$${eventData.booth_price}` : '$150.00';
+      if (varName === '[ageRestriction]') return eventData?.age_restriction || '21+';
+      if (varName === '[dateRange]') return eventData?.start_date ? new Date(eventData.start_date).toLocaleDateString() : 'Event Date';
+
+      // Vendor placeholders
+      if (varName === '[firstName]') return 'John';
+      if (varName === '[lastName]') return 'Doe';
+      if (varName === '[fullName]') return 'John Doe';
+      if (varName === '[greetingName]') return 'John';
+      if (varName === '[businessName]') return 'Sample Business';
+      if (varName === '[email]') return 'vendor@example.com';
+      if (varName === '[vendorCategory]') return 'Food Vendor';
+      if (varName === '[boothNumber]') return 'A-12';
+      if (varName === '[applicationDate]') return new Date().toLocaleDateString();
+      if (varName === '[installDate]') return new Date().toLocaleDateString();
+      if (varName === '[installTime]') return '8:00 AM - 10:00 AM';
+      if (varName === '[installStartTime]') return '8:00 AM';
+      if (varName === '[installEndTime]') return '10:00 AM';
+
+      // Link variables - just return placeholder text, don't inject HTML
+      if (varName === '[paymentLink]') return 'https://payment.link';
+      if (varName === '[eventLink]') return 'https://event.link';
+      if (varName === '[invitationLink]') return 'https://invitation.link';
+      if (varName === '[bulletinLink]') return 'https://bulletin.link';
+      if (varName === '[dashboardLink]') return 'https://dashboard.link';
+      if (varName === '[unsubscribeLink]') return 'https://unsubscribe.link';
+      if (varName === '[categoryPaymentLink]') return 'https://payment.link';
+      if (varName === '[categoryList]') return '• Art Vendor\n• Food Vendor\n• Table Vendor';
+
+      return varName; // Return as-is if not recognized
+    };
+
+    // Walk through all text nodes in the document
+    const walk = (node: Node) => {
+      if (node.nodeType === Node.TEXT_NODE) {
+        // This is a text node - check for variables
+        let text = node.textContent || '';
+
+        // Find all variables in the text
+        const matches = text.match(/\[[^\]]*\]?/g) || [];
+
+        matches.forEach(match => {
+          if (match.endsWith(']')) {
+            // Complete variable
+            if (validVars.includes(match)) {
+              // Valid variable - resolve it
+              text = text.replace(match, resolveVariable(match));
+            } else {
+              // Invalid variable - highlight in red (using span with data attribute)
+              const span = doc.createElement('span');
+              span.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+              span.style.color = '#fca5a5';
+              span.style.padding = '2px 4px';
+              span.style.borderRadius = '3px';
+              span.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+              span.title = `Unknown variable: ${match}`;
+              span.textContent = match;
+              text = text.replace(match, span.outerHTML);
+            }
+          } else {
+            // Unclosed bracket - highlight in red
+            const span = doc.createElement('span');
+            span.style.backgroundColor = 'rgba(239, 68, 68, 0.2)';
+            span.style.color = '#fca5a5';
+            span.style.padding = '2px 4px';
+            span.style.borderRadius = '3px';
+            span.style.border = '1px solid rgba(239, 68, 68, 0.4)';
+            span.title = 'Unclosed bracket';
+            span.textContent = match;
+            text = text.replace(match, span.outerHTML);
+          }
+        });
+
+        // Update the text node
+        if (node.textContent !== text) {
+          const temp = doc.createElement('div');
+          temp.innerHTML = text;
+          const parent = node.parentNode;
+          if (parent) {
+            while (temp.firstChild) {
+              parent.insertBefore(temp.firstChild, node);
+            }
+            parent.removeChild(node);
+          }
+        }
+      } else if (node.nodeType === Node.ELEMENT_NODE) {
+        // Walk through child nodes
+        const children = Array.from(node.childNodes);
+        children.forEach(child => walk(child));
+      }
+    };
+
+    // Walk the body
+    walk(doc.body);
+
+    // Return the processed HTML
+    return doc.body.innerHTML;
+  };
+
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex">
       {/* Left Side - Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className={`${showPreview ? 'w-1/2' : 'flex-1'} flex flex-col border-r border-white/10 transition-all duration-300`}>
         {/* Top Bar */}
-        <div className="border-b border-white/10 px-12 py-3 flex items-center justify-between backdrop-blur-sm bg-black/20">
+        <div className="border-b border-white/10 px-12 py-3 flex items-center justify-between backdrop-blur-sm bg-black/20 min-h-[60px]">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
@@ -226,32 +488,62 @@ export function EmailEditorPage({
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
             </button>
-            <Input
-              {...register('name')}
-              className="bg-white/5 border-white/20 text-white text-base font-medium max-w-md h-9"
-              placeholder="Email name"
-            />
           </div>
           <div className="flex items-center gap-2">
             <Button
-              onClick={onPreview}
+              onClick={() => setShowPreview(!showPreview)}
+              variant="outline"
+              size="sm"
+              className={`border-white/20 text-white h-9 ${showPreview ? 'bg-purple-500/20 hover:bg-purple-500/30' : 'bg-white/5 hover:bg-white/10'}`}
+            >
+              {showPreview ? (
+                <>
+                  <EyeOff className="w-3.5 h-3.5 mr-1.5" />
+                  Hide Preview
+                </>
+              ) : (
+                <>
+                  <Eye className="w-3.5 h-3.5 mr-1.5" />
+                  Show Preview
+                </>
+              )}
+            </Button>
+            <Button
+              onClick={() => setShowTestEmailDialog(true)}
               variant="outline"
               size="sm"
               className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
             >
-              <Eye className="w-3.5 h-3.5 mr-1.5" />
-              Preview
+              <Send className="w-3.5 h-3.5 mr-1.5" />
+              Send Test
             </Button>
             <Button
               onClick={handleSubmit(onSubmit)}
-              disabled={isSaving || validationErrors.length > 0}
+              disabled={isSaving || !canSave()}
               size="sm"
-              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white h-9"
+              className={`h-9 transition-all ${
+                saveSuccess
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : !canSave()
+                  ? 'bg-red-600/50 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
+              } text-white`}
+              title={!canSave() ? 'Fix variable errors before saving' : ''}
             >
               {isSaving ? (
                 <>
                   <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
                   Saving...
+                </>
+              ) : saveSuccess ? (
+                <>
+                  <CheckCircle2 className="w-3.5 h-3.5 mr-1.5" />
+                  Saved!
+                </>
+              ) : !canSave() ? (
+                <>
+                  <AlertCircle className="w-3.5 h-3.5 mr-1.5" />
+                  Fix Errors to Save
                 </>
               ) : (
                 <>
@@ -268,13 +560,49 @@ export function EmailEditorPage({
           <div className="max-w-3xl mx-auto">
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
-              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-red-400 font-medium text-sm mb-1">Validation Errors:</p>
-                <ul className="text-red-400/80 text-xs space-y-0.5">
-                  {validationErrors.map((error, i) => (
-                    <li key={i}>• {error}</li>
-                  ))}
-                </ul>
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-400 font-medium text-sm mb-1">Cannot Save - Variable Errors:</p>
+                    <ul className="text-red-400/80 text-xs space-y-0.5">
+                      {validationErrors.map((error, i) => (
+                        <li key={i}>• {error}</li>
+                      ))}
+                    </ul>
+                    <p className="text-red-400/60 text-xs mt-2 italic">
+                      Fix these errors to enable saving. Invalid variables are highlighted in red in the preview.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Success Message */}
+            {saveSuccess && (
+              <div className="mb-4 p-3 bg-green-500/10 border border-green-500/30 rounded-lg animate-in fade-in duration-300">
+                <div className="flex items-start gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-green-400 font-medium text-sm">Email saved successfully!</p>
+                    <p className="text-green-400/60 text-xs mt-1">
+                      Your changes have been saved and will be sent according to the schedule.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Error Message */}
+            {saveError && (
+              <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-red-400 font-medium text-sm mb-1">Failed to save email</p>
+                    <p className="text-red-400/80 text-xs">{saveError}</p>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -289,6 +617,18 @@ export function EmailEditorPage({
                 </ul>
               </div>
             )}
+
+            {/* Email Name */}
+            <div className="mb-4">
+              <label className="block text-xs font-medium text-white/70 mb-1.5">
+                Email Name
+              </label>
+              <Input
+                {...register('name')}
+                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
+                placeholder="e.g., Day Before Event Reminder"
+              />
+            </div>
 
             {/* Subject Line */}
             <div className="mb-4">
@@ -347,6 +687,111 @@ export function EmailEditorPage({
           </div>
         </div>
       </div>
+
+      {/* Live Preview Panel */}
+      {showPreview && (
+        <div className="w-1/2 flex flex-col bg-gradient-to-b from-black/40 to-black/20">
+          {/* Preview Header */}
+          <div className="border-b border-white/10 px-12 py-3 flex items-center backdrop-blur-sm bg-black/20 min-h-[60px]">
+            <h3 className="text-sm font-medium text-white flex items-center gap-2">
+              <Eye className="w-4 h-4 text-purple-400" />
+              Live Preview
+            </h3>
+          </div>
+
+          {/* Preview Content */}
+          <div className="flex-1 overflow-y-auto px-6 py-6">
+            <div className="max-w-2xl mx-auto space-y-6">
+              {/* Preview Subject */}
+              <div>
+                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                  Subject
+                </label>
+                <div className="bg-white/5 rounded-lg p-4 border border-purple-500/20">
+                  <div
+                    className="text-white font-medium text-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: resolvePreviewVariables(subject || '<span style="color: rgba(255, 255, 255, 0.4); font-style: italic;">Subject will appear here...</span>')
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Preview Body */}
+              <div>
+                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                  Message Body
+                </label>
+                {validationErrors.length > 0 && (
+                  <div className="mb-2 p-2 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <p className="text-red-400 text-xs font-semibold mb-1">⚠️ Variable Errors:</p>
+                    <ul className="text-red-400/80 text-[10px] space-y-0.5">
+                      {validationErrors.map((error, i) => (
+                        <li key={i}>• {error}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+                <div className="bg-white/5 rounded-lg p-6 border border-purple-500/20">
+                  {body ? (
+                    <div
+                      className="email-preview-content"
+                      dangerouslySetInnerHTML={{
+                        __html: resolvePreviewVariables(body)
+                      }}
+                    />
+                  ) : (
+                    <p className="text-white/40 text-sm italic">
+                      Email body will appear here as you type...
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Preview Footer */}
+              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
+                <p className="text-[10px] text-purple-400 font-semibold mb-2 uppercase tracking-wide">
+                  Email Footer (auto-included)
+                </p>
+                <div className="text-[10px] text-white/60 leading-relaxed space-y-1.5">
+                  <p>Please do not reply to this email.</p>
+                  <p>
+                    For questions, contact{' '}
+                    <span className="text-purple-300 font-medium">
+                      {resolvePreviewVariables('[organizationEmail]')}
+                    </span>
+                  </p>
+                  <p>
+                    <span className="text-purple-300 underline cursor-pointer">
+                      Unsubscribe from these emails
+                    </span>
+                  </p>
+                  <p className="text-white/40 text-[9px] mt-2">
+                    Powered by Voxxy
+                  </p>
+                </div>
+              </div>
+
+              {/* Preview Info */}
+              {previewDate && (
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-3.5 h-3.5 text-blue-400" />
+                    <div>
+                      <p className="text-xs text-blue-400 font-medium">
+                        Scheduled to send: {previewDate}
+                      </p>
+                      <p className="text-[10px] text-blue-300/60 mt-0.5">
+                        {email?.recipient_count || 0} recipients
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Right Sidebar */}
       <div className="w-80 border-l border-white/10 bg-gradient-to-b from-black/40 to-black/20 backdrop-blur-sm overflow-y-auto">
@@ -506,6 +951,71 @@ export function EmailEditorPage({
           </div>
         </div>
       </div>
+
+      {/* Test Email Dialog */}
+      <Dialog open={showTestEmailDialog} onOpenChange={setShowTestEmailDialog}>
+        <DialogContent className="sm:max-w-md bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Send className="w-5 h-5 text-purple-400" />
+              Send Test Email
+            </DialogTitle>
+            <DialogDescription className="text-white/60">
+              Send a test version of this email to see how it will look when delivered.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="block text-sm font-medium text-white/80 mb-2">
+                Email Address
+              </label>
+              <Input
+                type="email"
+                placeholder="you@example.com"
+                value={testEmailAddress}
+                onChange={(e) => setTestEmailAddress(e.target.value)}
+                className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleSendTestEmail();
+                  }
+                }}
+              />
+              <p className="text-xs text-white/50 mt-2">
+                The email will be sent with "[TEST]" in the subject line and will include resolved variables.
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setShowTestEmailDialog(false)}
+              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+              disabled={isSendingTest}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendTestEmail}
+              disabled={isSendingTest || !testEmailAddress}
+              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white"
+            >
+              {isSendingTest ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="w-4 h-4 mr-2" />
+                  Send Test
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

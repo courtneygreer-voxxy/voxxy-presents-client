@@ -1262,6 +1262,20 @@ export const scheduledEmailsApi = {
   },
 
   /**
+   * Send test email to specified email address
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/send_test
+   */
+  async sendTest(eventSlug: string, id: number, testEmail: string) {
+    return fetchApi<{ message: string; recipient: string; subject: string }>(
+      `/v1/presents/events/${eventSlug}/scheduled_emails/${id}/send_test`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ test_email: testEmail }),
+      }
+    )
+  },
+
+  /**
    * Retry all failed deliveries for a scheduled email (soft bounces only)
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/retry_failed
    */

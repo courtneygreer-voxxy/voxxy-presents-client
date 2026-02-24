@@ -112,15 +112,24 @@ export default function EventEmailPreviewModal({
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showingTemplate, setShowingTemplate] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>(
     availableCategories[0]?.value || 'artist'
   );
 
   // Remove footer text from body since we have hard-coded footer card
-  const removeFooter = (text: string): string => {
-    // Remove common footer patterns
+  // Works with both HTML and plain text
+  const removeFooter = (html: string): string => {
+    if (!html) return '';
+
+    // Remove common footer patterns (handles both HTML and text)
     const footerPatterns = [
+      /<p[^>]*>Best regards,?\s*<\/p>/gi,
+      /<p[^>]*>Thank you,?\s*<\/p>/gi,
+      /<p[^>]*>Sincerely,?\s*<\/p>/gi,
+      /<p[^>]*>Please do not reply to this email\.?<\/p>/gi,
+      /<p[^>]*>For questions,?\s*contact.*?<\/p>/gi,
+      /<p[^>]*>If you have any questions.*?<\/p>/gi,
+      /<p[^>]*>Powered by Voxxy.*?<\/p>/gi,
       /Best regards,?\s*\n?\[?organizationName\]?/gi,
       /Thank you,?\s*\n?\[?organizationName\]?/gi,
       /Sincerely,?\s*\n?\[?organizationName\]?/gi,
@@ -130,13 +139,15 @@ export default function EventEmailPreviewModal({
       /Powered by Voxxy\.?/gi,
     ];
 
-    let cleanedText = text;
+    let cleanedHtml = html;
     footerPatterns.forEach(pattern => {
-      cleanedText = cleanedText.replace(pattern, '');
+      cleanedHtml = cleanedHtml.replace(pattern, '');
     });
 
-    // Trim excessive whitespace at the end
-    return cleanedText.trim();
+    // Remove trailing empty paragraphs
+    cleanedHtml = cleanedHtml.replace(/(<p[^>]*>\s*<\/p>\s*)+$/gi, '');
+
+    return cleanedHtml.trim();
   };
 
   useEffect(() => {
@@ -153,7 +164,6 @@ export default function EventEmailPreviewModal({
 
     setIsLoading(true);
     setError(null);
-    setShowingTemplate(false);
     try {
       // Special handling for invitation emails
       if (email.isInvitationAnnouncement) {
@@ -174,27 +184,8 @@ export default function EventEmailPreviewModal({
       }
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load email preview';
-
-      // When no registrations exist, show template with [brackets]
-      if (errorMessage.includes('No registration found')) {
-        setShowingTemplate(true);
-
-        // Strip HTML from templates for clean display
-        const stripHtml = (html: string) => {
-          const tmp = document.createElement('div');
-          tmp.innerHTML = html;
-          return tmp.textContent || tmp.innerText || '';
-        };
-
-        setPreviewData({
-          subject: stripHtml(email.subject_template || ''),
-          body: removeFooter(stripHtml(email.body_template || '')),
-          recipient_email: '[vendorEmail]',
-          recipient_name: '[vendorName]',
-        });
-      } else {
-        setError(errorMessage);
-      }
+      console.error('Preview error:', errorMessage);
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -299,15 +290,6 @@ export default function EventEmailPreviewModal({
             </div>
           )}
 
-          {/* Template Fallback Notice */}
-          {showingTemplate && !isLoading && (
-            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-              <p className="text-yellow-400 text-sm">
-                No vendor applications found yet. Showing template with [variables] unresolved.
-              </p>
-            </div>
-          )}
-
           {/* Error State */}
           {error && !isLoading && (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -334,9 +316,12 @@ export default function EventEmailPreviewModal({
                   Message Body
                 </label>
                 <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                  <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
-                    {removeFooter(previewData.body.replace(/<[^>]*>/g, ''))}
-                  </pre>
+                  <div
+                    className="email-preview-content"
+                    dangerouslySetInnerHTML={{
+                      __html: removeFooter(previewData.body)
+                    }}
+                  />
                 </div>
               </div>
 
