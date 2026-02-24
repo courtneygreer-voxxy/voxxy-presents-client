@@ -14,6 +14,17 @@ interface Organization {
   name: string;
   user_id: number;
   timezone?: string;
+  description?: string;
+  logo_url?: string;
+  website?: string;
+  instagram_handle?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  state?: string;
+  zip_code?: string;
+  verified?: boolean;
 }
 
 export default function SettingsPage({ onBack }: SettingsPageProps) {
@@ -25,9 +36,23 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
   const [profileData, setProfileData] = useState({
     fullName: userProfile?.name || '',
     email: userProfile?.email || '',
-    companyName: '',
-    timezone: 'America/Los_Angeles',
     bio: '',
+  });
+
+  // Organization form state
+  const [organizationData, setOrganizationData] = useState({
+    name: '',
+    timezone: 'America/Los_Angeles',
+    description: '',
+    logo_url: '',
+    website: '',
+    instagram_handle: '',
+    phone: '',
+    email: '',
+    address: '',
+    city: '',
+    state: '',
+    zip_code: '',
   });
 
   // Fetch user's organization
@@ -42,12 +67,21 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
         if (userOrg) {
           setOrganization(userOrg);
-          // Update companyName and timezone with organization data
-          setProfileData(prev => ({
-            ...prev,
-            companyName: userOrg.name || '',
+          // Populate organization form with fetched data
+          setOrganizationData({
+            name: userOrg.name || '',
             timezone: userOrg.timezone || 'America/Los_Angeles',
-          }));
+            description: userOrg.description || '',
+            logo_url: userOrg.logo_url || '',
+            website: userOrg.website || '',
+            instagram_handle: userOrg.instagram_handle || '',
+            phone: userOrg.phone || '',
+            email: userOrg.email || '',
+            address: userOrg.address || '',
+            city: userOrg.city || '',
+            state: userOrg.state || '',
+            zip_code: userOrg.zip_code || '',
+          });
         }
       } catch (err) {
         console.error('Failed to fetch organization:', err);
@@ -89,15 +123,22 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       console.log('🔵 [Settings] Updating user with:', userPayload);
       await authApi.updateUser(userProfile.id, userPayload);
 
-      // Update organization if exists and name or timezone changed
-      if (organization && (profileData.companyName !== organization.name || profileData.timezone !== organization.timezone)) {
-        console.log('🔵 [Settings] Updating organization:', {
-          name: profileData.companyName,
-          timezone: profileData.timezone
-        });
+      // Update organization if exists
+      if (organization) {
+        console.log('🔵 [Settings] Updating organization:', organizationData);
         await organizationsApi.update(organization.slug, {
-          name: profileData.companyName,
-          timezone: profileData.timezone,
+          name: organizationData.name,
+          timezone: organizationData.timezone,
+          description: organizationData.description,
+          logo_url: organizationData.logo_url,
+          website: organizationData.website,
+          instagram_handle: organizationData.instagram_handle,
+          phone: organizationData.phone,
+          email: organizationData.email,
+          address: organizationData.address,
+          city: organizationData.city,
+          state: organizationData.state,
+          zip_code: organizationData.zip_code,
         });
         console.log('✅ [Settings] Organization updated');
       }
@@ -107,7 +148,7 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
       await refreshUserProfile();
       console.log('🔵 [Settings] User profile refreshed');
 
-      alert('Profile and organization updated successfully! Check the sidebar.');
+      alert('Profile and organization information updated successfully!');
     } catch (error: any) {
       console.error('❌ [Settings] Failed to save profile:', error);
       alert(`Failed to save changes: ${error.message || 'Please try again.'}`);
@@ -128,6 +169,10 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
   const handleChange = (field: string, value: string) => {
     setProfileData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleOrganizationChange = (field: string, value: string) => {
+    setOrganizationData(prev => ({ ...prev, [field]: value }));
   };
 
   const toggleNotification = (key: keyof typeof notifications) => {
@@ -192,46 +237,6 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               </div>
             </div>
 
-            {/* Company Name and Timezone Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-              {/* Company Name */}
-              <div>
-                <label htmlFor="companyName" className="block text-sm text-white/70 font-medium mb-2">
-                  Company Name
-                </label>
-                <input
-                  id="companyName"
-                  type="text"
-                  value={profileData.companyName}
-                  onChange={(e) => handleChange('companyName', e.target.value)}
-                  placeholder="Voxxy Events Co."
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
-                />
-              </div>
-
-              {/* Timezone */}
-              <div>
-                <label htmlFor="timezone" className="block text-sm text-white/70 font-medium mb-2">
-                  Timezone
-                </label>
-                <select
-                  id="timezone"
-                  value={profileData.timezone}
-                  onChange={(e) => handleChange('timezone', e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all appearance-none cursor-pointer"
-                  style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' fill-opacity='0.6' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
-                >
-                  <option value="America/Los_Angeles">Pacific Time (PT)</option>
-                  <option value="America/Denver">Mountain Time (MT)</option>
-                  <option value="America/Chicago">Central Time (CT)</option>
-                  <option value="America/New_York">Eastern Time (ET)</option>
-                  <option value="America/Phoenix">Arizona (MST)</option>
-                  <option value="America/Anchorage">Alaska Time (AKT)</option>
-                  <option value="Pacific/Honolulu">Hawaii Time (HST)</option>
-                </select>
-              </div>
-            </div>
-
             {/* Bio */}
             <div>
               <label htmlFor="bio" className="block text-sm text-white/70 font-medium mb-2">
@@ -257,6 +262,229 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             </button>
           </div>
         </div>
+
+        {/* Organization Information Section */}
+        {organization && (
+          <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 lg:p-8 border border-white/10 space-y-6">
+            <div>
+              <h2 className="text-lg font-semibold text-white mb-1">Organization Information</h2>
+              <p className="text-sm text-white/60">Manage your organization profile and contact details</p>
+            </div>
+
+            <div className="space-y-5">
+              {/* Organization Name and Timezone Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Organization Name */}
+                <div>
+                  <label htmlFor="orgName" className="block text-sm text-white/70 font-medium mb-2">
+                    Organization Name
+                  </label>
+                  <input
+                    id="orgName"
+                    type="text"
+                    value={organizationData.name}
+                    onChange={(e) => handleOrganizationChange('name', e.target.value)}
+                    placeholder="Voxxy Events Co."
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+
+                {/* Timezone */}
+                <div>
+                  <label htmlFor="orgTimezone" className="block text-sm text-white/70 font-medium mb-2">
+                    Timezone
+                  </label>
+                  <select
+                    id="orgTimezone"
+                    value={organizationData.timezone}
+                    onChange={(e) => handleOrganizationChange('timezone', e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all appearance-none cursor-pointer"
+                    style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='white' fill-opacity='0.6' d='M6 9L1 4h10z'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center' }}
+                  >
+                    <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                    <option value="America/Denver">Mountain Time (MT)</option>
+                    <option value="America/Chicago">Central Time (CT)</option>
+                    <option value="America/New_York">Eastern Time (ET)</option>
+                    <option value="America/Phoenix">Arizona (MST)</option>
+                    <option value="America/Anchorage">Alaska Time (AKT)</option>
+                    <option value="Pacific/Honolulu">Hawaii Time (HST)</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div>
+                <label htmlFor="orgDescription" className="block text-sm text-white/70 font-medium mb-2">
+                  Description
+                </label>
+                <textarea
+                  id="orgDescription"
+                  value={organizationData.description}
+                  onChange={(e) => handleOrganizationChange('description', e.target.value)}
+                  placeholder="Tell us about your organization..."
+                  rows={3}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all resize-none"
+                />
+              </div>
+
+              {/* Website and Instagram Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Website */}
+                <div>
+                  <label htmlFor="orgWebsite" className="block text-sm text-white/70 font-medium mb-2">
+                    Website
+                  </label>
+                  <input
+                    id="orgWebsite"
+                    type="url"
+                    value={organizationData.website}
+                    onChange={(e) => handleOrganizationChange('website', e.target.value)}
+                    placeholder="https://yoursite.com"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+
+                {/* Instagram Handle */}
+                <div>
+                  <label htmlFor="orgInstagram" className="block text-sm text-white/70 font-medium mb-2">
+                    Instagram Handle
+                  </label>
+                  <input
+                    id="orgInstagram"
+                    type="text"
+                    value={organizationData.instagram_handle}
+                    onChange={(e) => handleOrganizationChange('instagram_handle', e.target.value)}
+                    placeholder="@yourhandle"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Logo URL */}
+              <div>
+                <label htmlFor="orgLogo" className="block text-sm text-white/70 font-medium mb-2">
+                  Logo URL
+                </label>
+                <input
+                  id="orgLogo"
+                  type="url"
+                  value={organizationData.logo_url}
+                  onChange={(e) => handleOrganizationChange('logo_url', e.target.value)}
+                  placeholder="https://yoursite.com/logo.png"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                />
+              </div>
+
+              {/* Email and Phone Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {/* Organization Email */}
+                <div>
+                  <label htmlFor="orgEmail" className="block text-sm text-white/70 font-medium mb-2">
+                    Organization Email
+                  </label>
+                  <input
+                    id="orgEmail"
+                    type="email"
+                    value={organizationData.email}
+                    onChange={(e) => handleOrganizationChange('email', e.target.value)}
+                    placeholder="contact@yourorg.com"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+
+                {/* Phone */}
+                <div>
+                  <label htmlFor="orgPhone" className="block text-sm text-white/70 font-medium mb-2">
+                    Phone Number
+                  </label>
+                  <input
+                    id="orgPhone"
+                    type="tel"
+                    value={organizationData.phone}
+                    onChange={(e) => handleOrganizationChange('phone', e.target.value)}
+                    placeholder="(555) 123-4567"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Address */}
+              <div>
+                <label htmlFor="orgAddress" className="block text-sm text-white/70 font-medium mb-2">
+                  Street Address
+                </label>
+                <input
+                  id="orgAddress"
+                  type="text"
+                  value={organizationData.address}
+                  onChange={(e) => handleOrganizationChange('address', e.target.value)}
+                  placeholder="123 Main Street"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                />
+              </div>
+
+              {/* City, State, Zip Row */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {/* City */}
+                <div>
+                  <label htmlFor="orgCity" className="block text-sm text-white/70 font-medium mb-2">
+                    City
+                  </label>
+                  <input
+                    id="orgCity"
+                    type="text"
+                    value={organizationData.city}
+                    onChange={(e) => handleOrganizationChange('city', e.target.value)}
+                    placeholder="San Francisco"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+
+                {/* State */}
+                <div>
+                  <label htmlFor="orgState" className="block text-sm text-white/70 font-medium mb-2">
+                    State
+                  </label>
+                  <input
+                    id="orgState"
+                    type="text"
+                    value={organizationData.state}
+                    onChange={(e) => handleOrganizationChange('state', e.target.value)}
+                    placeholder="CA"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+
+                {/* Zip Code */}
+                <div>
+                  <label htmlFor="orgZip" className="block text-sm text-white/70 font-medium mb-2">
+                    Zip Code
+                  </label>
+                  <input
+                    id="orgZip"
+                    type="text"
+                    value={organizationData.zip_code}
+                    onChange={(e) => handleOrganizationChange('zip_code', e.target.value)}
+                    placeholder="94103"
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  />
+                </div>
+              </div>
+
+              {/* Verification Status (Read-only) */}
+              {organization.verified !== undefined && (
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-white/70">Verification Status:</span>
+                    <span className={`text-sm font-medium ${organization.verified ? 'text-green-400' : 'text-yellow-400'}`}>
+                      {organization.verified ? '✓ Verified' : 'Pending Verification'}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Integrations Section */}
         {organization && (

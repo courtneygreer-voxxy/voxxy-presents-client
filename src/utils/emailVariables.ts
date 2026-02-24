@@ -308,8 +308,10 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
 ];
 
 /**
+ * @deprecated Use RichTextEditor component instead
  * Convert HTML to plain text
  * Strips HTML tags and converts to readable plain text
+ * Kept for backwards compatibility with legacy code
  */
 export function htmlToPlainText(html: string): string {
   if (!html) return '';
@@ -345,8 +347,10 @@ export function htmlToPlainText(html: string): string {
 }
 
 /**
+ * @deprecated Use RichTextEditor component instead
  * Convert plain text to HTML
  * Wraps paragraphs and converts newlines to HTML
+ * Kept for backwards compatibility with legacy code
  */
 export function plainTextToHtml(text: string): string {
   if (!text) return '';
@@ -371,17 +375,16 @@ export function plainTextToHtml(text: string): string {
 
 /**
  * Convert backend format to frontend format
- * 1. Convert HTML to plain text
+ * 1. Preserve HTML formatting (NO LONGER strips HTML)
  * 2. Convert {{mustache}} → [bracket] for backwards compatibility
  *    (old emails may still have {{mustache}} format in database)
  */
 export function backendToFrontend(text: string): string {
   if (!text) return text;
 
-  // Step 1: Convert HTML to plain text
-  let result = htmlToPlainText(text);
+  let result = text;
 
-  // Step 2: Convert old {{mustache}} format to [bracket] format
+  // Convert old {{mustache}} format to [bracket] format
   // This handles emails that were saved with the old format
   EMAIL_VARIABLES.forEach(variable => {
     // Escape special regex characters in backend var
@@ -396,20 +399,15 @@ export function backendToFrontend(text: string): string {
 /**
  * Convert frontend format to backend format
  * 1. Keep variables in [bracket] format - backend expects this
- * 2. Convert plain text to HTML
+ * 2. Preserve HTML from rich text editor (NO LONGER converts plain text to HTML)
  */
 export function frontendToBackend(text: string): string {
   if (!text) return text;
 
-  let result = text;
-
-  // Step 1: Variables stay in [bracket] format - backend expects [eventName], not {{event_title}}
+  // Variables stay in [bracket] format - backend expects [eventName], not {{event_title}}
   // Backend EmailVariableResolver only knows how to resolve [bracket] format
-
-  // Step 2: Convert plain text to HTML
-  result = plainTextToHtml(result);
-
-  return result;
+  // HTML is already formatted by TipTap rich text editor - return as-is
+  return text;
 }
 
 /**

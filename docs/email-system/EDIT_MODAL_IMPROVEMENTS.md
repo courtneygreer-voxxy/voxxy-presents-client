@@ -1,6 +1,6 @@
 # Edit Modal Improvements - Implementation Summary
 
-**Date:** 2026-01-17
+**Date:** 2026-01-17 (Updated: 2026-02-23)
 **Status:** ✅ Complete & Ready to Test
 
 ## 📑 Table of Contents
@@ -586,6 +586,68 @@ New York User:
 - Automatic daylight saving time handling
 
 **Result:** All scheduled emails now send at 8:00 AM in the user's local timezone ✅
+
+---
+
+### ✅ FIXED: Empty Editor on Load (2026-02-23 - Bug Fix #4)
+
+**Issue:** Rich text editor appeared empty when editing existing emails, even though the email had content
+
+**Root Cause:** The TipTap `useEditor` hook only uses the `content` prop during initial render. When the email data loaded asynchronously (after the editor initialized), the `content` prop changed from empty to the actual email body, but the editor didn't update because `useEditor` doesn't react to prop changes.
+
+**Solution:** Added a `useEffect` hook to sync the `content` prop to the editor when it changes:
+
+```typescript
+// Update editor content when prop changes (e.g., when email data loads)
+useEffect(() => {
+  if (editor && content !== editor.getHTML()) {
+    editor.commands.setContent(content);
+  }
+}, [editor, content]);
+```
+
+**Files Changed:**
+- `src/components/producer/Email/RichTextEditor.tsx` (lines 88-92)
+
+**How It Works:**
+1. Component mounts → Editor initializes with empty content (email data hasn't loaded yet)
+2. Email data loads from backend → `content` prop updates with actual email body
+3. `useEffect` detects prop change → Updates editor content using `editor.commands.setContent()`
+4. Editor now displays the loaded email content
+
+**Result:** Editor now loads with existing email content when editing emails ✅
+
+---
+
+### ✅ FIXED: Two-Click Toolbar Issue (2026-02-23 - Bug Fix #5)
+
+**Issue:** Toolbar formatting buttons (Bold, Italic, etc.) required **two clicks** to work instead of one
+
+**Root Cause:** When clicking a toolbar button, the button's `onClick` event triggered before the `onMouseDown` event, causing the editor to lose focus. The first click focused the button (removing editor focus), and the second click applied the formatting.
+
+**Solution:** Added `onMouseDown` event handler with `preventDefault()` to toolbar buttons:
+
+```typescript
+<button
+  type="button"
+  onClick={onClick}
+  onMouseDown={(e) => e.preventDefault()} // Prevent losing editor focus
+  disabled={disabled}
+  title={title}
+  // ...
+>
+```
+
+**Files Changed:**
+- `src/components/producer/Email/RichTextEditor.tsx` (line 113)
+
+**How It Works:**
+- `onMouseDown` fires before `onClick`
+- `preventDefault()` prevents the button from taking focus
+- Editor maintains focus and text selection
+- `onClick` then applies formatting immediately
+
+**Result:** Toolbar buttons now work on the first click ✅
 
 ---
 

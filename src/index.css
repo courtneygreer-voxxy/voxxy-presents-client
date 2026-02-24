@@ -133,3 +133,172 @@
     font-size: 13px;
   }
 }
+
+/* TipTap Rich Text Editor Styles */
+.ProseMirror {
+  min-height: 400px;
+  padding: 0.75rem;
+  outline: none;
+  color: white;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror p {
+  margin: 0.75rem 0;
+}
+
+.ProseMirror p:first-child {
+  margin-top: 0;
+}
+
+.ProseMirror p:last-child {
+  margin-bottom: 0;
+}
+
+.ProseMirror h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+  color: #e9d5ff;
+}
+
+.ProseMirror h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75rem 0 0.5rem;
+  color: #e9d5ff;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+}
+
+.ProseMirror a {
+  color: #c4b5fd;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.ProseMirror a:hover {
+  color: #ddd6fe;
+}
+
+.ProseMirror strong {
+  font-weight: bold;
+  color: white;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+.ProseMirror code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #fbbf24;
+}
+
+.ProseMirror s {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* Placeholder styling */
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: rgba(255, 255, 255, 0.3);
+  pointer-events: none;
+  height: 0;
+}
+
+/* Email Preview Content - Matches ProseMirror editor styling */
+.email-preview-content {
+  color: white;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.email-preview-content p {
+  margin: 0.75rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.email-preview-content p:first-child {
+  margin-top: 0;
+}
+
+.email-preview-content p:last-child {
+  margin-bottom: 0;
+}
+
+.email-preview-content h1 {
+  font-size: 2em;
+  font-weight: bold;
+  margin: 1rem 0 0.5rem;
+  color: #e9d5ff;
+  line-height: 1.2;
+}
+
+.email-preview-content h2 {
+  font-size: 1.5em;
+  font-weight: bold;
+  margin: 0.75rem 0 0.5rem;
+  color: #e9d5ff;
+  line-height: 1.3;
+}
+
+.email-preview-content ul,
+.email-preview-content ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+.email-preview-content li {
+  margin: 0.25rem 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.email-preview-content a {
+  color: #c4b5fd;
+  text-decoration: underline;
+}
+
+.email-preview-content a:hover {
+  color: #ddd6fe;
+}
+
+.email-preview-content strong {
+  font-weight: bold;
+  color: white;
+}
+
+.email-preview-content em {
+  font-style: italic;
+}
+
+.email-preview-content code {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9em;
+  color: #fbbf24;
+}
+
+.email-preview-content s {
+  text-decoration: line-through;
+  opacity: 0.7;
+}

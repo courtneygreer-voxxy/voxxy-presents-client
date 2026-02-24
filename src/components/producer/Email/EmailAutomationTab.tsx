@@ -4,7 +4,6 @@ import { scheduledEmailsApi, eventInvitationsApi, eventsApi } from '@/services/a
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus } from '@/types/email';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
-import EmailPreviewModal from './EmailPreviewModal';
 import { EmailEditorPage } from './EmailEditorPage';
 
 interface EmailAutomationTabProps {
@@ -28,11 +27,9 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [previewEmail, setPreviewEmail] = useState<ScheduledEmail | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [eventData, setEventData] = useState<any | null>(null); // Store event data for preview calculations
+  const [eventData, setEventData] = useState<any | null>(null);
 
   // Auto-refresh state
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -282,11 +279,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     showSuccess('Template saved successfully! You can now reuse it for other events.');
   };
 
-  const handlePreview = (email: ScheduledEmail) => {
-    setPreviewEmail(email);
-    setIsPreviewOpen(true);
-  };
-
   const handleEdit = (email: ScheduledEmail) => {
     // Don't allow editing invitation announcements (virtual emails)
     if (email.isInvitationAnnouncement) {
@@ -427,12 +419,9 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       <EmailEditorPage
         email={editEmail}
         eventData={eventData}
+        eventSlug={eventSlug}
         onBack={handleCloseEditor}
         onSave={handleSaveEdit}
-        onPreview={() => {
-          handleCloseEditor();
-          handlePreview(editEmail);
-        }}
       />
     );
   }
@@ -629,7 +618,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             emails={filteredEmails}
             eventSlug={eventSlug}
             onEdit={handleEdit}
-            onPreview={handlePreview}
             onPause={handlePause}
             onResume={handleResume}
             onSendNow={handleSendNow}
@@ -651,13 +639,6 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         onSuccess={handleSaveAsTemplate}
       />
 
-      {/* Email Preview Modal */}
-      <EmailPreviewModal
-        isOpen={isPreviewOpen}
-        onClose={() => setIsPreviewOpen(false)}
-        email={previewEmail}
-        eventSlug={eventSlug}
-      />
     </div>
   );
 }

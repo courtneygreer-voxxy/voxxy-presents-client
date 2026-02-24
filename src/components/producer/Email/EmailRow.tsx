@@ -11,7 +11,6 @@ interface EmailRowProps {
   email: ScheduledEmail;
   eventSlug: string;
   onEdit?: (email: ScheduledEmail) => void;
-  onPreview?: (email: ScheduledEmail) => void;
   onPause?: (emailId: number) => Promise<void>;
   onResume?: (emailId: number) => Promise<void>;
   onSendNow?: (emailId: number) => Promise<void>;
@@ -62,7 +61,6 @@ export default function EmailRow({
   email,
   eventSlug,
   onEdit,
-  onPreview,
   onPause,
   onResume,
   onSendNow,
@@ -202,12 +200,31 @@ export default function EmailRow({
           </Tooltip.Provider>
         )}
         <div className="flex-1 min-w-0">
-          <div className={`font-medium truncate ${email.overdue ? 'text-red-400' : 'text-white'}`}>{email.name}</div>
+          <div
+            className={`font-medium truncate ${email.overdue ? 'text-red-400' : 'text-white'} ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+            onClick={(e) => {
+              if (onEdit) {
+                e.stopPropagation();
+                onEdit(email);
+              }
+            }}
+          >
+            {email.name}
+          </div>
         </div>
       </div>
 
       {/* Subject */}
-      <div className="text-white/70 truncate" title={backendToFrontend(email.subject_template || '')}>
+      <div
+        className={`text-white/70 truncate ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+        title={backendToFrontend(email.subject_template || '')}
+        onClick={(e) => {
+          if (onEdit) {
+            e.stopPropagation();
+            onEdit(email);
+          }
+        }}
+      >
         {backendToFrontend(email.subject_template || '')}
       </div>
 
@@ -336,20 +353,7 @@ export default function EmailRow({
                     top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`
                   }}
                 >
-                  {onPreview && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu(false);
-                        onPreview(email);
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      Preview
-                    </button>
-                  )}
-                  {onEdit && !isSent && (
+                  {onEdit && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -359,7 +363,7 @@ export default function EmailRow({
                       className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
-                      Edit
+                      {isSent ? 'View' : 'Edit'}
                     </button>
                   )}
                   {(isScheduled || isPaused) && !isSent && onSendNow && (
