@@ -11,14 +11,15 @@
 import * as Sentry from '@sentry/react';
 
 /**
- * Error severity levels matching Sentry's classification
+ * Error severity levels matching Sentry's SeverityLevel type
  */
 export enum ErrorSeverity {
-  CRITICAL = 'critical',   // Payment forms, data loss
-  HIGH = 'high',          // Application forms, user-blocking issues
-  MEDIUM = 'medium',      // Contact forms, non-blocking issues
-  LOW = 'low',            // Analytics, tracking failures
-  INFO = 'info'           // Informational events
+  FATAL = 'fatal',        // Critical system failures
+  ERROR = 'error',        // Payment forms, data loss
+  WARNING = 'warning',    // Application forms, user-blocking issues
+  INFO = 'info',          // Contact forms, non-blocking issues
+  DEBUG = 'debug',        // Analytics, tracking failures
+  LOG = 'log'             // Informational events
 }
 
 /**
@@ -178,7 +179,7 @@ export function initializeErrorMonitoring(): void {
 export function trackFormError(
   error: Error | string,
   context: FormErrorContext,
-  severity: ErrorSeverity = ErrorSeverity.HIGH
+  severity: ErrorSeverity = ErrorSeverity.ERROR
 ): void {
   const errorMessage = typeof error === 'string' ? error : error.message;
 
@@ -187,7 +188,7 @@ export function trackFormError(
   Sentry.captureException(
     typeof error === 'string' ? new Error(error) : error,
     {
-      level: severity,
+      level: severity as Sentry.SeverityLevel,
       tags: {
         form_type: context.formType,
         event_slug: context.eventSlug,
@@ -199,7 +200,7 @@ export function trackFormError(
           ...context,
           // Sanitize sensitive data
           formData: sanitizeFormData(context.formData),
-        },
+        } as Record<string, any>,
       },
       fingerprint: [
         context.formType,
@@ -218,7 +219,7 @@ export function trackFormError(
 export function trackEmailError(
   error: Error | string,
   context: EmailErrorContext,
-  severity: ErrorSeverity = ErrorSeverity.HIGH
+  severity: ErrorSeverity = ErrorSeverity.ERROR
 ): void {
   const errorMessage = typeof error === 'string' ? error : error.message;
 
@@ -227,7 +228,7 @@ export function trackEmailError(
   Sentry.captureException(
     typeof error === 'string' ? new Error(error) : error,
     {
-      level: severity,
+      level: severity as Sentry.SeverityLevel,
       tags: {
         email_type: context.emailType,
         email_status: context.status,
@@ -235,7 +236,7 @@ export function trackEmailError(
         provider: context.provider,
       },
       contexts: {
-        email_delivery: context,
+        email_delivery: context as Record<string, any>,
       },
       fingerprint: [
         'email_failure',
@@ -338,23 +339,23 @@ function sanitizeFormData(formData?: Record<string, any>): Record<string, any> |
  * Helper to determine error severity based on form type
  */
 export function getFormErrorSeverity(formType: FormType, httpStatus?: number): ErrorSeverity {
-  // Critical: Payment-related or data loss
+  // Fatal: Payment-related or data loss
   if (formType === FormType.EVENT_CREATION) {
-    return ErrorSeverity.CRITICAL;
+    return ErrorSeverity.FATAL;
   }
 
-  // High: User-blocking issues
+  // Error: User-blocking issues
   if (formType === FormType.VENDOR_APPLICATION || formType === FormType.SIGNUP) {
-    return httpStatus && httpStatus >= 500 ? ErrorSeverity.CRITICAL : ErrorSeverity.HIGH;
+    return httpStatus && httpStatus >= 500 ? ErrorSeverity.FATAL : ErrorSeverity.ERROR;
   }
 
-  // Medium: Non-blocking issues
+  // Warning: Non-blocking issues
   if (formType === FormType.CONTACT_FORM || formType === FormType.BUG_REPORT) {
-    return ErrorSeverity.MEDIUM;
+    return ErrorSeverity.WARNING;
   }
 
-  // Low: Everything else
-  return ErrorSeverity.LOW;
+  // Info: Everything else
+  return ErrorSeverity.INFO;
 }
 
 /**
@@ -364,21 +365,21 @@ export function getEmailErrorSeverity(
   emailType: EmailErrorContext['emailType'],
   status: EmailDeliveryStatus
 ): ErrorSeverity {
-  // Critical: Payment confirmations must be delivered
+  // Fatal: Payment confirmations must be delivered
   if (emailType === 'payment_confirmation') {
-    return ErrorSeverity.CRITICAL;
+    return ErrorSeverity.FATAL;
   }
 
-  // High: Registration confirmations and cancellations are important
+  // Error: Registration confirmations and cancellations are important
   if (emailType === 'registration_confirmation' || emailType === 'cancellation') {
-    return status === EmailDeliveryStatus.BOUNCED ? ErrorSeverity.CRITICAL : ErrorSeverity.HIGH;
+    return status === EmailDeliveryStatus.BOUNCED ? ErrorSeverity.FATAL : ErrorSeverity.ERROR;
   }
 
-  // Medium: Event updates and scheduled emails
+  // Warning: Event updates and scheduled emails
   if (emailType === 'event_update' || emailType === 'scheduled') {
-    return ErrorSeverity.MEDIUM;
+    return ErrorSeverity.WARNING;
   }
 
-  // Low: Custom emails
-  return ErrorSeverity.LOW;
+  // Info: Custom emails
+  return ErrorSeverity.INFO;
 }
