@@ -255,16 +255,16 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // Only open audit log for sent emails (not invitation announcement)
-            // All other emails (scheduled, paused, failed, invitation) → show recipients modal
-            if (email.status === 'sent' && !isInvitationAnnouncement && onViewAuditLog) {
+            // Open audit log for all non-invitation emails (sent, scheduled, paused, failed)
+            // Only show recipients modal for invitation announcement
+            if (!isInvitationAnnouncement && onViewAuditLog) {
               onViewAuditLog({ email_name: email.name });
             } else {
               setShowRecipientsModal(true);
             }
           }}
           className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
-          title={email.status === 'sent' && !isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
+          title={!isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
         >
           <Users className="w-3 h-3" />
           <span>{email.recipient_count || 0}</span>
