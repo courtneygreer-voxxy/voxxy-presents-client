@@ -9,7 +9,6 @@ interface EmailTableProps {
   emails: ScheduledEmail[];
   eventSlug: string;
   onEdit?: (email: ScheduledEmail) => void;
-  onPreview?: (email: ScheduledEmail) => void;
   onPause?: (emailId: number) => Promise<void>;
   onResume?: (emailId: number) => Promise<void>;
   onSendNow?: (emailId: number) => Promise<void>;
@@ -31,7 +30,6 @@ export default function EmailTable({
   emails,
   eventSlug,
   onEdit,
-  onPreview,
   onPause,
   onResume,
   onSendNow,
@@ -93,7 +91,6 @@ export default function EmailTable({
             email={email}
             eventSlug={eventSlug}
             onEdit={onEdit}
-            onPreview={onPreview}
             onPause={onPause}
             onResume={onResume}
             onSendNow={onSendNow}
