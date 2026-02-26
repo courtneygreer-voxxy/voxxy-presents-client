@@ -34,6 +34,11 @@ config/*.json
 *service-account*.json
 *firebase-adminsdk*.json
 
+# Sensitive data files (customer data, scripts)
+files/*.csv
+files/*.rb
+data/
+
 # vercel
 .vercel
 
