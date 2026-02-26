@@ -249,6 +249,18 @@ export default function VendorApplicationForm() {
       return;
     }
 
+    // Validate at least one social/portfolio link is provided
+    const hasAtLeastOneLink =
+      (formData.website && formData.website.trim()) ||
+      (formData.instagram_handle && formData.instagram_handle.trim()) ||
+      (formData.tiktok_handle && formData.tiktok_handle.trim()) ||
+      (formData.facebook_handle && formData.facebook_handle.trim());
+
+    if (!hasAtLeastOneLink) {
+      setError('Please provide at least one link to your work (website or social media)');
+      return;
+    }
+
     if (!formData.agreed_to_terms) {
       setError('You must agree to the Privacy Policy and Terms of Service to submit your application');
       return;
