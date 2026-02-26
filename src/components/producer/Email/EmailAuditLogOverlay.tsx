@@ -8,14 +8,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, FileSearch, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { Event } from '@/types';
 import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery } from '@/types/email';
 import { scheduledEmailsApi, emailDeliveriesApi, eventInvitationsApi } from '@/services/api';
 import { EmailAuditTable } from './EmailAuditTable';
 import { EmailAuditFilters } from './EmailAuditFilters';
 
 interface EmailAuditLogOverlayProps {
-  event: Event;
+  event: any; // From eventsApi.getById()
   initialFilters?: AuditFilters | null;
   onClose: () => void;
 }
@@ -76,14 +75,14 @@ export function EmailAuditLogOverlay({
         for (const invitation of sentInvitations) {
           entries.push({
             id: `invitation-${invitation.id}`,
-            sent_at: invitation.sent_at,
-            recipient_name: invitation.recipient_name || null,
-            recipient_email: invitation.email,
+            sent_at: invitation.sent_at || null,
+            recipient_name: invitation.vendor_contact?.name || null,
+            recipient_email: invitation.vendor_contact?.email || 'unknown@example.com',
             email_name: 'Event Announcement (Invitation)',
             email_subject: 'Submissions Open for ' + event.title,
             trigger_type: 'on_application_open',
-            category: invitation.vendor_category || 'Unknown',
-            status: invitation.delivery_status || 'delivered',
+            category: (invitation.vendor_contact as any)?.vendor_category || 'Unknown',
+            status: (invitation as any).delivery_status || 'delivered',
             bounce_reason: null,
             drop_reason: null,
             unsubscribed_at: null,
