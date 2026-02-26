@@ -467,6 +467,38 @@ export const DELIVERY_STATUS_CONFIGS: Record<DeliveryStatus, DeliveryStatusConfi
   }
 };
 
+// ============================================================================
+// Email Audit Log Types
+// ============================================================================
+
+export interface AuditEntry {
+  id: string; // Composite key: `${scheduled_email_id}-${registration_id}`
+  sent_at: string | null;
+  recipient_name: string | null;
+  recipient_email: string;
+  email_name: string; // From scheduled_email.name
+  email_subject: string; // From scheduled_email.subject_template
+  trigger_type: TriggerType;
+  category: string; // From registration.vendor_category (NOT inferred from trigger)
+  status: DeliveryStatus;
+  bounce_reason?: string | null;
+  drop_reason?: string | null;
+  unsubscribed_at?: string | null;
+  scheduled_email_id: number;
+  registration_id: number;
+}
+
+export interface AuditFilters {
+  email_name?: string;
+  status?: DeliveryStatus | 'undelivered'; // 'undelivered' = bounced + dropped
+  category?: string;
+  search?: string; // Search recipient name or email
+}
+
+// ============================================================================
+// Constants
+// ============================================================================
+
 // Available email variables for template editor
 export const EMAIL_VARIABLES: EmailVariable[] = [
   // Event variables

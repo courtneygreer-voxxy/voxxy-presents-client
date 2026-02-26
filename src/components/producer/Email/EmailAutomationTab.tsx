@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter } from 'lucide-react';
+import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch } from 'lucide-react';
 import { scheduledEmailsApi, eventInvitationsApi, eventsApi } from '@/services/api';
-import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus } from '@/types/email';
+import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
+import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -30,6 +31,10 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [eventData, setEventData] = useState<any | null>(null);
+
+  // Email Audit Log overlay state
+  const [showAuditLog, setShowAuditLog] = useState(false);
+  const [auditLogFilters, setAuditLogFilters] = useState<AuditFilters | null>(null);
 
   // Auto-refresh state
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -413,6 +418,20 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     failed: emails.filter(e => e.status === 'failed').length,
   };
 
+  // Show full-screen audit log overlay if opened
+  if (showAuditLog && eventData) {
+    return (
+      <EmailAuditLogOverlay
+        event={eventData}
+        initialFilters={auditLogFilters}
+        onClose={() => {
+          setShowAuditLog(false);
+          setAuditLogFilters(null);
+        }}
+      />
+    );
+  }
+
   // Show full-screen editor if editing
   if (isEditOpen && editEmail) {
     return (
@@ -452,13 +471,25 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
           </div>
           <div className="flex items-center gap-3">
             {emails.length > 0 && (
-              <button
-                onClick={() => setIsSaveDialogOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
-              >
-                <Save className="w-4 h-4" />
-                <span className="hidden sm:inline">Save as Template</span>
-              </button>
+              <>
+                <button
+                  onClick={() => {
+                    setAuditLogFilters(null);
+                    setShowAuditLog(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                >
+                  <FileSearch className="w-4 h-4" />
+                  <span className="hidden sm:inline">View Audit Log</span>
+                </button>
+                <button
+                  onClick={() => setIsSaveDialogOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                >
+                  <Save className="w-4 h-4" />
+                  <span className="hidden sm:inline">Save as Template</span>
+                </button>
+              </>
             )}
             <button
               onClick={() => loadEmails()}
