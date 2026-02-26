@@ -8,8 +8,7 @@
  * @module errorMonitoring
  */
 
-// TODO: Install @sentry/react: npm install @sentry/react
-// import * as Sentry from '@sentry/react';
+import * as Sentry from '@sentry/react';
 
 /**
  * Error severity levels matching Sentry's classification
@@ -129,8 +128,6 @@ export function initializeErrorMonitoring(): void {
     return;
   }
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.init({
     dsn: sentryDsn,
     environment,
@@ -142,17 +139,8 @@ export function initializeErrorMonitoring(): void {
 
     // Configure integrations
     integrations: [
-      new Sentry.BrowserTracing({
-        // Track navigation between pages
-        routingInstrumentation: Sentry.reactRouterV6Instrumentation(
-          React.useEffect,
-          useLocation,
-          useNavigationType,
-          createRoutesFromChildren,
-          matchRoutes
-        ),
-      }),
-      new Sentry.Replay({
+      Sentry.browserTracingIntegration(),
+      Sentry.replayIntegration({
         // Mask all text and input content by default
         maskAllText: true,
         blockAllMedia: true,
@@ -179,7 +167,6 @@ export function initializeErrorMonitoring(): void {
       return event;
     },
   });
-  */
 
   console.log(`[Error Monitoring] Initialized for environment: ${environment}`);
 }
@@ -197,8 +184,6 @@ export function trackFormError(
 
   console.error(`[Form Error] ${context.formType}:`, errorMessage, context);
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.captureException(
     typeof error === 'string' ? new Error(error) : error,
     {
@@ -224,7 +209,6 @@ export function trackFormError(
       ],
     }
   );
-  */
 }
 
 /**
@@ -240,8 +224,6 @@ export function trackEmailError(
 
   console.error(`[Email Error] ${context.emailType}:`, errorMessage, context);
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.captureException(
     typeof error === 'string' ? new Error(error) : error,
     {
@@ -263,7 +245,6 @@ export function trackEmailError(
       ],
     }
   );
-  */
 }
 
 /**
@@ -273,8 +254,6 @@ export function trackEmailError(
 export function trackFormSuccess(context: Omit<FormErrorContext, 'errorMessage' | 'errorCode'>): void {
   console.log(`[Form Success] ${context.formType}:`, context);
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.captureMessage(`Form submission successful: ${context.formType}`, {
     level: 'info',
     tags: {
@@ -289,7 +268,6 @@ export function trackFormSuccess(context: Omit<FormErrorContext, 'errorMessage' 
       },
     },
   });
-  */
 }
 
 /**
@@ -298,8 +276,6 @@ export function trackFormSuccess(context: Omit<FormErrorContext, 'errorMessage' 
 export function trackEmailSuccess(context: Omit<EmailErrorContext, 'failureReason' | 'bounceReason'>): void {
   console.log(`[Email Success] ${context.emailType}:`, context);
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.captureMessage(`Email delivered successfully: ${context.emailType}`, {
     level: 'info',
     tags: {
@@ -310,7 +286,6 @@ export function trackEmailSuccess(context: Omit<EmailErrorContext, 'failureReaso
       email_delivery: context,
     },
   });
-  */
 }
 
 /**
@@ -320,14 +295,11 @@ export function trackEmailSuccess(context: Omit<EmailErrorContext, 'failureReaso
 export function setUserContext(userId: string, email?: string, organizationId?: number): void {
   console.log('[Error Monitoring] User context set:', { userId, email, organizationId });
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.setUser({
     id: userId,
     email,
     organization_id: organizationId?.toString(),
   });
-  */
 }
 
 /**
@@ -336,10 +308,7 @@ export function setUserContext(userId: string, email?: string, organizationId?: 
 export function clearUserContext(): void {
   console.log('[Error Monitoring] User context cleared');
 
-  // TODO: Uncomment when @sentry/react is installed
-  /*
   Sentry.setUser(null);
-  */
 }
 
 /**
