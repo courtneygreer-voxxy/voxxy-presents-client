@@ -654,6 +654,10 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             onSendNow={handleSendNow}
             onRetryFailed={handleRetryFailed}
             onDelete={handleDelete}
+            onViewAuditLog={(filters) => {
+              setAuditLogFilters(filters);
+              setShowAuditLog(true);
+            }}
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             onSort={handleSort}

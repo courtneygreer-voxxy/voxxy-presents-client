@@ -1,5 +1,5 @@
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
-import { ScheduledEmail } from '@/types/email';
+import { ScheduledEmail, AuditFilters } from '@/types/email';
 import EmailRow from './EmailRow';
 
 type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
@@ -14,6 +14,7 @@ interface EmailTableProps {
   onSendNow?: (emailId: number) => Promise<void>;
   onRetryFailed?: (emailId: number) => Promise<void>;
   onDelete?: (emailId: number) => Promise<void>;
+  onViewAuditLog?: (filters: AuditFilters) => void;
   sortColumn?: SortColumn | null;
   sortDirection?: SortDirection;
   onSort?: (column: SortColumn) => void;
@@ -35,6 +36,7 @@ export default function EmailTable({
   onSendNow,
   onRetryFailed,
   onDelete,
+  onViewAuditLog,
   sortColumn,
   sortDirection,
   onSort,
@@ -96,6 +98,7 @@ export default function EmailTable({
             onSendNow={onSendNow}
             onRetryFailed={onRetryFailed}
             onDelete={onDelete}
+            onViewAuditLog={onViewAuditLog}
           />
         ))}
       </div>
