@@ -102,38 +102,66 @@ export function EmailAuditLogOverlay({
 
         // 3b. Process scheduled emails
         for (const email of scheduledEmails) {
-          // Skip if email hasn't been sent yet
-          if (email.status !== 'sent' || !email.sent_at) {
-            continue;
-          }
+          // Handle sent emails - fetch actual delivery records
+          if (email.status === 'sent' && email.sent_at) {
+            try {
+              const deliveries = await emailDeliveriesApi.getByScheduledEmail(email.id);
+              console.log(`📬 [Audit Log] Fetched ${deliveries.length} deliveries for email: ${email.name}`);
 
-          // Fetch deliveries for this email
-          try {
-            const deliveries = await emailDeliveriesApi.getByScheduledEmail(email.id);
-            console.log(`📬 [Audit Log] Fetched ${deliveries.length} deliveries for email: ${email.name}`);
-
-            // Transform each delivery into an audit entry
-            for (const delivery of deliveries) {
-              entries.push({
-                id: `${email.id}-${delivery.registration_id}`,
-                sent_at: delivery.sent_at,
-                recipient_name: null, // TODO: Fetch from registration when backend supports it
-                recipient_email: delivery.recipient_email,
-                email_name: email.name,
-                email_subject: email.subject_template,
-                trigger_type: email.trigger_type,
-                category: 'Unknown', // TODO: Fetch from registration.vendor_category when backend supports it
-                status: delivery.status,
-                bounce_reason: delivery.bounce_reason,
-                drop_reason: delivery.drop_reason,
-                unsubscribed_at: delivery.unsubscribed_at,
-                scheduled_email_id: email.id,
-                registration_id: delivery.registration_id,
-              });
+              // Transform each delivery into an audit entry
+              for (const delivery of deliveries) {
+                entries.push({
+                  id: `${email.id}-${delivery.registration_id}`,
+                  sent_at: delivery.sent_at,
+                  recipient_name: null, // TODO: Fetch from registration when backend supports it
+                  recipient_email: delivery.recipient_email,
+                  email_name: email.name,
+                  email_subject: email.subject_template,
+                  trigger_type: email.trigger_type,
+                  category: 'Unknown', // TODO: Fetch from registration.vendor_category when backend supports it
+                  status: delivery.status,
+                  bounce_reason: delivery.bounce_reason,
+                  drop_reason: delivery.drop_reason,
+                  unsubscribed_at: delivery.unsubscribed_at,
+                  scheduled_email_id: email.id,
+                  registration_id: delivery.registration_id,
+                });
+              }
+            } catch (err: any) {
+              console.error(`❌ [Audit Log] Failed to fetch deliveries for email ${email.id}:`, err);
+              // Continue with other emails
             }
-          } catch (err: any) {
-            console.error(`❌ [Audit Log] Failed to fetch deliveries for email ${email.id}:`, err);
-            // Continue with other emails
+          }
+          // Handle scheduled/paused emails - show who WILL receive the email
+          else if (email.status === 'scheduled' || email.status === 'paused') {
+            try {
+              const recipientsData = await scheduledEmailsApi.getRecipients(event.slug, email.id);
+              console.log(`📅 [Audit Log] Fetched ${recipientsData.count} recipients for scheduled email: ${email.name}`);
+
+              // Transform each recipient into an audit entry with 'scheduled' status
+              for (const recipient of recipientsData.recipients) {
+                entries.push({
+                  id: `scheduled-${email.id}-${recipient.email}`,
+                  sent_at: null, // Not sent yet
+                  scheduled_for: email.scheduled_for, // When it will be sent
+                  recipient_name: recipient.name,
+                  recipient_email: recipient.email,
+                  email_name: email.name,
+                  email_subject: email.subject_template,
+                  trigger_type: email.trigger_type,
+                  category: recipientsData.category || 'Unknown',
+                  status: 'scheduled',
+                  bounce_reason: null,
+                  drop_reason: null,
+                  unsubscribed_at: null,
+                  scheduled_email_id: email.id,
+                  registration_id: -1, // No registration_id for future recipients
+                });
+              }
+            } catch (err: any) {
+              console.error(`❌ [Audit Log] Failed to fetch recipients for scheduled email ${email.id}:`, err);
+              // Continue with other emails
+            }
           }
         }
 

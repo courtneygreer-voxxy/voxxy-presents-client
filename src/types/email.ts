@@ -213,6 +213,7 @@ export type ScheduledEmailStatus =
   | 'cancelled';
 
 export type DeliveryStatus =
+  | 'scheduled'
   | 'pending'
   | 'queued'
   | 'sent'
@@ -423,6 +424,12 @@ export const TRIGGER_TYPES: { value: TriggerType; label: string }[] = [
 ];
 
 export const DELIVERY_STATUS_CONFIGS: Record<DeliveryStatus, DeliveryStatusConfig> = {
+  scheduled: {
+    label: 'Scheduled',
+    color: 'blue',
+    icon: '◷',
+    description: 'Email is scheduled to be sent'
+  },
   pending: {
     label: 'Not Sent',
     color: 'gray',
@@ -474,6 +481,7 @@ export const DELIVERY_STATUS_CONFIGS: Record<DeliveryStatus, DeliveryStatusConfi
 export interface AuditEntry {
   id: string; // Composite key: `${scheduled_email_id}-${registration_id}`
   sent_at: string | null;
+  scheduled_for?: string | null; // For scheduled emails (not yet sent)
   recipient_name: string | null;
   recipient_email: string;
   email_name: string; // From scheduled_email.name

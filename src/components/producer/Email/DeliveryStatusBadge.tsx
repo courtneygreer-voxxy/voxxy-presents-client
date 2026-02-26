@@ -16,6 +16,14 @@ const STATUS_CONFIG: Record<DeliveryStatus, {
   iconClass: string;
   description: string;
 }> = {
+  scheduled: {
+    label: 'Scheduled',
+    icon: Clock,
+    bgClass: 'bg-blue-500/10',
+    textClass: 'text-blue-400',
+    iconClass: 'text-blue-400',
+    description: 'Email is scheduled to be sent'
+  },
   pending: {
     label: 'Not Sent',
     icon: Circle,
