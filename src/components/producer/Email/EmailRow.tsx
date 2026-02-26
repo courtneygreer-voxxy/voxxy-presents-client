@@ -255,16 +255,16 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // For sent emails (non-invitation), open audit log
-            // For invitation announcement or non-sent emails, open recipients modal
-            if (isSent && !isInvitationAnnouncement && onViewAuditLog) {
+            // Only open audit log for sent emails (not invitation announcement)
+            // All other emails (scheduled, paused, failed, invitation) → show recipients modal
+            if (email.status === 'sent' && !isInvitationAnnouncement && onViewAuditLog) {
               onViewAuditLog({ email_name: email.name });
             } else {
               setShowRecipientsModal(true);
             }
           }}
           className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
-          title={isSent && !isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
+          title={email.status === 'sent' && !isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
         >
           <Users className="w-3 h-3" />
           <span>{email.recipient_count || 0}</span>
@@ -276,13 +276,13 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (isSent && onViewAuditLog && undeliveredCount > 0) {
+            if (email.status === 'sent' && onViewAuditLog && undeliveredCount > 0) {
               onViewAuditLog({ email_name: email.name, status: 'undelivered' });
             }
           }}
-          disabled={!isSent || !onViewAuditLog || undeliveredCount === 0}
-          className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${isSent && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
-          title={isSent && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
+          disabled={email.status !== 'sent' || !onViewAuditLog || undeliveredCount === 0}
+          className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${email.status === 'sent' && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
+          title={email.status === 'sent' && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
         >
           {undeliveredCount}
         </button>
@@ -293,13 +293,13 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (isSent && onViewAuditLog && unsubscribedCount > 0) {
+            if (email.status === 'sent' && onViewAuditLog && unsubscribedCount > 0) {
               onViewAuditLog({ email_name: email.name, status: 'unsubscribed' });
             }
           }}
-          disabled={!isSent || !onViewAuditLog || unsubscribedCount === 0}
-          className={`${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''} ${isSent && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-yellow-300 transition-colors' : ''}`}
-          title={isSent && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : undefined}
+          disabled={email.status !== 'sent' || !onViewAuditLog || unsubscribedCount === 0}
+          className={`${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''} ${email.status === 'sent' && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-yellow-300 transition-colors' : ''}`}
+          title={email.status === 'sent' && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : undefined}
         >
           {unsubscribedCount}
         </button>
