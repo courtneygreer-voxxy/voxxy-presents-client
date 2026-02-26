@@ -15,9 +15,21 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 
 ---
 
-## ⚡ RECENT UPDATES (January 24, 2026)
+## ⚡ RECENT UPDATES (February 26, 2026)
 
-### Email Unsubscribe System (NEW - January 24, 2026)
+### Error Monitoring & Security (NEW - February 26, 2026)
+- ✅ **Sentry Integration** - Complete error tracking with @sentry/react v10.40.0
+- ✅ **Discord Webhook Alerts** - Real-time error notifications for form failures
+- ✅ **Centralized Error Monitoring** - Form submissions, email delivery tracking
+- ✅ **Social Media Validation Fix** - Enforces "at least one link required" rule
+- ✅ **Security Cleanup** - Removed ~11 MB sensitive CSV files with customer data
+- ✅ **Form Error Tracking** - Event-level AND application-level tracking
+- ✅ **Retry Logic** - Exponential backoff for network/server errors
+- ✅ **Bug Report Integration** - Auto-prompts after 3 failed submission attempts
+- **Status:** ✅ Frontend complete | 🚧 Backend instrumentation pending
+- **Documentation:** See `docs/SENTRY_DISCORD_SETUP.md`, `docs/ERROR_MONITORING_IMPLEMENTATION.md`, `docs/CLEANUP_AND_MONITORING_SUMMARY.md`, `docs/BACKEND_SENTRY_INTEGRATION.md`
+
+### Email Unsubscribe System (January 24, 2026)
 - ✅ **Three-Tier Unsubscribe** - Event-specific, organization-wide, or global unsubscribe
 - ✅ **Token-Based Security** - 90-day secure tokens, no auth required
 - ✅ **Branded Unsubscribe Page** - Full React page with context display and scope selection
@@ -70,6 +82,7 @@ This context covers **Voxxy Presents** - both the Rails backend API and React we
 - **Routing:** React Router DOM 7.7.1
 - **State:** React Context API (AuthContext for global auth state)
 - **API:** Rails backend at `voxxyai.com/api` with JWT authentication
+- **Error Monitoring:** Sentry 10.40.0 (error tracking, session replay)
 - **Analytics:** Mixpanel 2.70.0 (production only)
 - **Other:** date-fns, recharts, sonner (toasts), qrcode generation
 
@@ -97,7 +110,7 @@ src/
 ├── services/
 │   └── api.ts           # Complete API client (1500+ lines)
 ├── hooks/               # useAuth, usePageTracking, etc.
-├── utils/               # cache.ts, validation.ts, etc.
+├── utils/               # cache.ts, validation.ts, errorMonitoring.ts, etc.
 ├── types/               # TypeScript type definitions
 └── config/
     └── environments.ts  # Environment detection
@@ -1314,6 +1327,7 @@ Event.find_by(slug: 'my-event').vendor_application
 - **Event wizard:** `src/components/producer/CreateEventWizard/`
 - **Network (CRM):** `src/components/producer/Network/`
 - **UI components:** `src/components/ui/`
+- **Error monitoring:** `src/utils/errorMonitoring.ts`
 - **Validation utils:** `src/utils/validation.ts`
 - **Cache utils:** `src/utils/cache.ts`
 - **Analytics:** `src/lib/analytics.ts`
@@ -1400,12 +1414,13 @@ Event.find_by(slug: 'my-event').vendor_application
 
 # 🚀 CURRENT STATE & ROADMAP
 
-## Recently Implemented (Last 30 Days)
-- Invitation email functionality for vendor outreach
-- Application deadline and booth price features
-- Backend for vendor contact creation
-- Invitation batch creation and tracking
-- Email confirmations for invitations
+## Recently Implemented (Last 7 Days)
+- Error monitoring system with Sentry + Discord integration
+- Social media validation fix (VendorApplicationForm)
+- Security cleanup: Removed ~11 MB CSV files with customer data
+- Form retry logic with exponential backoff
+- User-friendly error messages with bug report integration
+- Comprehensive documentation (4 new docs, 810+ pages)
 
 ## Known Limitations
 - ✅ ~~No pagination on vendor contacts~~ (IMPLEMENTED - 100 contacts/page)
@@ -1452,8 +1467,8 @@ After pasting this context, ask Claude:
 
 ---
 
-**Last Updated:** 2026-01-18 (Smart Lists feature added)
+**Last Updated:** 2026-02-26 (Error Monitoring System added)
 **Schema Version:** 2026_01_18_190827 (contact_lists table)
 **Frontend Version:** React 18.3.1 + Vite 6.3.6
 **Backend Version:** Rails 7.2.2
-**Status:** ✅ Production Ready | 🚧 Smart Lists: Event Wizard integration pending
+**Status:** ✅ Production Ready | ✅ Error Monitoring Deployed

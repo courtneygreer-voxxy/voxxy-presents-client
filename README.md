@@ -2,7 +2,7 @@
 
 **Modern event management and vendor coordination for venues, markets, and festivals.**
 
-**Latest Updates**: Email automation UI improvements and category dropdown fixes (Feb 2026).
+**Latest Updates**: Error monitoring system with Sentry integration, security cleanup (Feb 26, 2026), Email automation UI improvements and category dropdown fixes (Feb 2026).
 
 ---
 
@@ -31,8 +31,9 @@ feature/branch → develop → staging → main (production)
 ```
 
 **Current Branch Status (Feb 2026):**
-- All branches (`develop`, `staging`, `main`) are synchronized at commit `007f1d3`
-- "Update Email automation tab and table UI"
+- All branches (`develop`, `staging`, `main`) are synchronized
+- Last feature: Error monitoring & security cleanup (staging)
+- Last staging merge: Feb 26, 2026
 - Last production deploy: Feb 18, 2026 at 5:36 AM UTC
 
 ### Deployment Process
@@ -57,6 +58,7 @@ feature/branch → develop → staging → main (production)
 - **Styling:** Tailwind CSS
 - **State Management:** React Query
 - **Authentication:** Firebase Auth
+- **Error Monitoring:** Sentry (error tracking)
 - **Hosting:** Firebase Hosting
 - **Backend API:** Rails API (voxxy-rails-react)
 
@@ -89,4 +91,4 @@ firebase deploy --only hosting
 
 **Built with ❤️ by the Voxxy team**
 
-Last updated: February 2026
+Last updated: February 26, 2026
