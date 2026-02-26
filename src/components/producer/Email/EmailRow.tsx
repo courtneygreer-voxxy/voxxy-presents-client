@@ -255,14 +255,16 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            if (isSent && onViewAuditLog) {
+            // For sent emails (non-invitation), open audit log
+            // For invitation announcement or non-sent emails, open recipients modal
+            if (isSent && !isInvitationAnnouncement && onViewAuditLog) {
               onViewAuditLog({ email_name: email.name });
             } else {
               setShowRecipientsModal(true);
             }
           }}
           className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
-          title={isSent ? "Click to view audit log for this email" : "Click to view recipients list"}
+          title={isSent && !isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
         >
           <Users className="w-3 h-3" />
           <span>{email.recipient_count || 0}</span>
@@ -271,98 +273,36 @@ export default function EmailRow({
 
       {/* Undelivered Count */}
       <div className="text-center text-white/60">
-        {hasDeliveryData ? (
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isSent && onViewAuditLog && undeliveredCount > 0) {
-                      onViewAuditLog({ email_name: email.name, status: 'undelivered' });
-                    }
-                  }}
-                  disabled={!isSent || !onViewAuditLog || undeliveredCount === 0}
-                  className={`cursor-help hover:bg-white/10 px-2 py-1 rounded transition-colors ${undeliveredCount > 0 ? 'text-red-400 font-medium hover:text-red-300' : ''} ${isSent && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer' : ''}`}
-                  title={isSent && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : "Delivery breakdown"}
-                >
-                  {undeliveredCount}
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content
-                  className="z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl border border-white/10 max-w-xs"
-                  sideOffset={5}
-                >
-                  <DeliveryTooltipContent />
-                  <Tooltip.Arrow className="fill-gray-900" />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        ) : (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isSent && onViewAuditLog && undeliveredCount > 0) {
-                onViewAuditLog({ email_name: email.name, status: 'undelivered' });
-              }
-            }}
-            disabled={!isSent || !onViewAuditLog || undeliveredCount === 0}
-            className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${isSent && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
-            title={isSent && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
-          >
-            {undeliveredCount}
-          </button>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isSent && onViewAuditLog && undeliveredCount > 0) {
+              onViewAuditLog({ email_name: email.name, status: 'undelivered' });
+            }
+          }}
+          disabled={!isSent || !onViewAuditLog || undeliveredCount === 0}
+          className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${isSent && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
+          title={isSent && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
+        >
+          {undeliveredCount}
+        </button>
       </div>
 
       {/* Unsubscribed Count */}
       <div className="text-center text-white/60">
-        {hasDeliveryData ? (
-          <Tooltip.Provider delayDuration={200}>
-            <Tooltip.Root>
-              <Tooltip.Trigger asChild>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (isSent && onViewAuditLog && unsubscribedCount > 0) {
-                      onViewAuditLog({ email_name: email.name, status: 'unsubscribed' });
-                    }
-                  }}
-                  disabled={!isSent || !onViewAuditLog || unsubscribedCount === 0}
-                  className={`cursor-help hover:bg-white/10 px-2 py-1 rounded transition-colors ${unsubscribedCount > 0 ? 'text-yellow-400 font-medium hover:text-yellow-300' : ''} ${isSent && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer' : ''}`}
-                  title={isSent && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : "Delivery breakdown"}
-                >
-                  {unsubscribedCount}
-                </button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content
-                  className="z-50 bg-gray-900 text-white px-3 py-2 rounded-lg shadow-xl border border-white/10 max-w-xs"
-                  sideOffset={5}
-                >
-                  <DeliveryTooltipContent />
-                  <Tooltip.Arrow className="fill-gray-900" />
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
-          </Tooltip.Provider>
-        ) : (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (isSent && onViewAuditLog && unsubscribedCount > 0) {
-                onViewAuditLog({ email_name: email.name, status: 'unsubscribed' });
-              }
-            }}
-            disabled={!isSent || !onViewAuditLog || unsubscribedCount === 0}
-            className={`${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''} ${isSent && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-yellow-300 transition-colors' : ''}`}
-            title={isSent && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : undefined}
-          >
-            {unsubscribedCount}
-          </button>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isSent && onViewAuditLog && unsubscribedCount > 0) {
+              onViewAuditLog({ email_name: email.name, status: 'unsubscribed' });
+            }
+          }}
+          disabled={!isSent || !onViewAuditLog || unsubscribedCount === 0}
+          className={`${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''} ${isSent && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-yellow-300 transition-colors' : ''}`}
+          title={isSent && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : undefined}
+        >
+          {unsubscribedCount}
+        </button>
       </div>
 
       {/* Status */}

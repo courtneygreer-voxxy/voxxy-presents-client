@@ -162,7 +162,10 @@ export function EmailAuditLogOverlay({
 
     // Apply filters
     if (filters.email_name) {
+      console.log('🔍 [Audit Log] Filtering by email_name:', filters.email_name);
+      console.log('📊 [Audit Log] Available email names:', [...new Set(auditEntries.map(e => e.email_name))]);
       result = result.filter(entry => entry.email_name === filters.email_name);
+      console.log('✅ [Audit Log] Filtered results:', result.length, 'entries');
     }
 
     if (filters.category) {
