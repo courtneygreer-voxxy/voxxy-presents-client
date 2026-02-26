@@ -17,6 +17,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown, Info } from 'lucide-react';
 import { format } from 'date-fns';
 import type { AuditEntry } from '@/types/email';
 import { DELIVERY_STATUS_CONFIGS } from '@/types/email';
+import { EmailAuditActionMenu } from './EmailAuditActionMenu';
 
 type SortColumn = 'sent_at' | 'recipient_name' | 'recipient_email' | 'email_name' | 'category' | 'status';
 type SortDirection = 'asc' | 'desc';
@@ -26,7 +27,7 @@ interface EmailAuditTableProps {
   sortColumn?: SortColumn | null;
   sortDirection?: SortDirection;
   onSort?: (column: SortColumn) => void;
-  onActionClick?: (entry: AuditEntry) => void;
+  onContactSupport?: (entry: AuditEntry) => void;
 }
 
 function SortIcon({
@@ -98,7 +99,7 @@ export function EmailAuditTable({
   sortColumn,
   sortDirection,
   onSort,
-  onActionClick,
+  onContactSupport,
 }: EmailAuditTableProps) {
   if (entries.length === 0) {
     return (
@@ -193,12 +194,10 @@ export function EmailAuditTable({
 
             {/* Actions */}
             <div className="flex justify-end pr-2">
-              <button
-                onClick={() => onActionClick?.(entry)}
-                className="p-1 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
-              >
-                ⋮
-              </button>
+              <EmailAuditActionMenu
+                entry={entry}
+                onContactSupport={(entry) => onContactSupport?.(entry)}
+              />
             </div>
           </div>
         ))}

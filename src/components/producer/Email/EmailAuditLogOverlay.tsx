@@ -12,6 +12,8 @@ import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery } from '@/
 import { scheduledEmailsApi, emailDeliveriesApi, eventInvitationsApi } from '@/services/api';
 import { EmailAuditTable } from './EmailAuditTable';
 import { EmailAuditFilters } from './EmailAuditFilters';
+import { ContactSupportDialog } from './ContactSupportDialog';
+import { useAuth } from '@/hooks/useAuth';
 
 interface EmailAuditLogOverlayProps {
   event: any; // From eventsApi.getById()
@@ -29,6 +31,13 @@ export function EmailAuditLogOverlay({
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<AuditFilters>(initialFilters || {});
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Contact Support dialog state
+  const [showContactSupport, setShowContactSupport] = useState(false);
+  const [selectedEntry, setSelectedEntry] = useState<AuditEntry | null>(null);
+
+  // Get user info for support form
+  const { userProfile } = useAuth();
 
   // Sorting state
   type SortColumn = 'sent_at' | 'recipient_name' | 'recipient_email' | 'email_name' | 'category' | 'status';
@@ -140,6 +149,12 @@ export function EmailAuditLogOverlay({
 
     fetchAuditData();
   }, [event.slug, event.title]);
+
+  // Handle contact support
+  const handleContactSupport = (entry: AuditEntry) => {
+    setSelectedEntry(entry);
+    setShowContactSupport(true);
+  };
 
   // Client-side filtering and sorting
   const filteredAndSortedEntries = useMemo(() => {
@@ -328,10 +343,7 @@ export function EmailAuditLogOverlay({
             sortColumn={sortColumn}
             sortDirection={sortDirection}
             onSort={handleSort}
-            onActionClick={(entry) => {
-              console.log('Action clicked for entry:', entry);
-              // TODO: Open action menu
-            }}
+            onContactSupport={handleContactSupport}
           />
         )}
 
@@ -370,6 +382,19 @@ export function EmailAuditLogOverlay({
           </div>
         )}
       </div>
+
+      {/* Contact Support Dialog */}
+      <ContactSupportDialog
+        isOpen={showContactSupport}
+        onClose={() => {
+          setShowContactSupport(false);
+          setSelectedEntry(null);
+        }}
+        entry={selectedEntry}
+        eventTitle={event.title}
+        userEmail={userProfile?.email}
+        userName={userProfile?.name}
+      />
     </div>
   );
 }
