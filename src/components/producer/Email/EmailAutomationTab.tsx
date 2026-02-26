@@ -655,6 +655,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             onRetryFailed={handleRetryFailed}
             onDelete={handleDelete}
             onViewAuditLog={(filters) => {
+              console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
               setAuditLogFilters(filters);
               setShowAuditLog(true);
             }}
