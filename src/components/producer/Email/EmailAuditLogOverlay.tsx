@@ -270,8 +270,8 @@ export function EmailAuditLogOverlay({
   return (
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       {/* Header */}
-      <div className="border-b bg-background sticky top-0 z-10">
-        <div className="px-6 py-4">
+      <div className="border-b bg-background sticky top-0 z-10 shadow-lg">
+        <div className="px-8 py-5">
           <div className="flex items-center justify-between">
             {/* Left: Back button and title */}
             <div className="flex items-center gap-4">
@@ -285,10 +285,10 @@ export function EmailAuditLogOverlay({
                 Back to Mail
               </Button>
               <div className="h-6 w-px bg-border" />
-              <div className="flex items-center gap-2">
-                <FileSearch className="w-5 h-5 text-muted-foreground" />
+              <div className="flex items-center gap-3">
+                <FileSearch className="w-6 h-6 text-purple-400" />
                 <div>
-                  <h1 className="text-lg font-semibold">Email Audit Log</h1>
+                  <h1 className="text-xl font-semibold">Email Audit Log</h1>
                   <p className="text-sm text-muted-foreground">
                     {event.title}
                   </p>
@@ -314,7 +314,7 @@ export function EmailAuditLogOverlay({
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto px-6 py-6">
+      <div className="flex-1 overflow-auto px-8 py-8">
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 border border-red-500/20 rounded-lg bg-red-500/10">
@@ -380,16 +380,16 @@ export function EmailAuditLogOverlay({
 
         {/* Pagination */}
         {!isLoading && !error && filteredAndSortedEntries.length > 0 && (
-          <div className="mt-6 flex items-center justify-between">
-            <p className="text-sm text-white/60">
-              Showing {(currentPage - 1) * itemsPerPage + 1} -{' '}
-              {Math.min(currentPage * itemsPerPage, filteredAndSortedEntries.length)} of{' '}
-              {filteredAndSortedEntries.length} emails
+          <div className="mt-8 flex items-center justify-between bg-white/5 px-6 py-4 rounded-lg border border-white/10">
+            <p className="text-sm text-white/70">
+              Showing <span className="font-semibold text-white">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
+              <span className="font-semibold text-white">{Math.min(currentPage * itemsPerPage, filteredAndSortedEntries.length)}</span> of{' '}
+              <span className="font-semibold text-white">{filteredAndSortedEntries.length}</span> emails
               {filters.search || filters.email_name || filters.category || filters.status
                 ? ` (filtered from ${auditEntries.length} total)`
                 : ''}
             </p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 size="sm"
@@ -398,8 +398,8 @@ export function EmailAuditLogOverlay({
               >
                 Previous
               </Button>
-              <span className="text-sm text-white/60 px-3">
-                Page {currentPage} of {totalPages}
+              <span className="text-sm text-white/70 px-4 py-1.5 bg-white/5 rounded border border-white/10">
+                Page <span className="font-semibold text-white">{currentPage}</span> of <span className="font-semibold text-white">{totalPages}</span>
               </span>
               <Button
                 variant="outline"

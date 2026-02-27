@@ -123,7 +123,7 @@ export function EmailAuditTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10 overflow-x-auto">
-        <div className="grid grid-cols-[140px,180px,220px,200px,100px,120px,130px,80px,60px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide min-w-[1230px]">
+        <div className="grid grid-cols-[160px,minmax(180px,1fr),minmax(220px,1fr),minmax(200px,1fr),120px,140px,140px,100px,80px] gap-4 px-6 py-3 items-center text-xs font-semibold text-white/70 uppercase tracking-wide min-w-[1400px]">
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email Address')}
@@ -141,7 +141,7 @@ export function EmailAuditTable({
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className="grid grid-cols-[140px,180px,220px,200px,100px,120px,130px,80px,60px] gap-3 px-4 py-3 items-center border-b border-white/5 hover:bg-white/5 transition-colors min-w-[1230px]"
+            className="grid grid-cols-[160px,minmax(180px,1fr),minmax(220px,1fr),minmax(200px,1fr),120px,140px,140px,100px,80px] gap-4 px-6 py-4 items-center border-b border-white/5 hover:bg-white/5 transition-colors min-w-[1400px]"
           >
             {/* Date Sent */}
             <div className="text-sm text-white/80">
@@ -149,17 +149,26 @@ export function EmailAuditTable({
             </div>
 
             {/* Recipient Name */}
-            <div className="text-sm text-white/80 truncate" title={entry.recipient_name || 'Unknown'}>
+            <div
+              className="text-sm text-white/80 truncate cursor-help"
+              title={entry.recipient_name || 'Unknown'}
+            >
               {entry.recipient_name || <span className="text-white/40">Unknown</span>}
             </div>
 
             {/* Email Address */}
-            <div className="text-sm text-white/80 truncate" title={entry.recipient_email}>
+            <div
+              className="text-sm text-white/80 truncate cursor-help font-mono"
+              title={entry.recipient_email}
+            >
               {entry.recipient_email}
             </div>
 
             {/* Email Name */}
-            <div className="text-sm text-white/80 truncate" title={entry.email_name}>
+            <div
+              className="text-sm text-white/80 truncate cursor-help"
+              title={entry.email_name}
+            >
               {entry.email_name}
             </div>
 
@@ -182,7 +191,7 @@ export function EmailAuditTable({
             <div className="flex justify-center">
               {(entry.bounce_reason || entry.drop_reason) ? (
                 <button
-                  className="p-1 hover:bg-white/10 rounded"
+                  className="p-1.5 hover:bg-white/10 rounded transition-colors"
                   title={entry.bounce_reason || entry.drop_reason || ''}
                 >
                   <Info className="w-4 h-4 text-red-400" />
