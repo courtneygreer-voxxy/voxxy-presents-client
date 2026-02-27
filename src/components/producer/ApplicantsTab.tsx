@@ -28,7 +28,7 @@ interface Applicant {
   email: string;
   phone?: string;
   vendor_category: string;
-  status: 'pending' | 'waitlist';
+  status: 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
   portfolio?: string;
   website?: string;
   instagram_handle?: string;
@@ -44,7 +44,7 @@ interface ApplicantsTabProps {
   eventSlug: string;
 }
 
-type StatusFilter = 'all' | 'pending' | 'waitlist';
+type StatusFilter = 'all' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
 
 export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
@@ -87,11 +87,8 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
       for (const app of applications) {
         try {
           const submissions = await vendorApplicationsApi.getSubmissions(app.id);
-          // Filter to only non-approved (pending/waitlist)
-          const nonApprovedSubmissions = submissions.filter(
-            (sub: any) => sub.status === 'pending' || sub.status === 'waitlist'
-          );
-          allSubmissions.push(...nonApprovedSubmissions);
+          // Show ALL submissions (no status filtering - preparing to merge with Invites tab)
+          allSubmissions.push(...submissions);
         } catch (err) {
           console.error(`Failed to fetch submissions for application ${app.id}:`, err);
         }
@@ -186,11 +183,35 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
           color: 'bg-blue-500/20 text-blue-400',
           icon: Clock,
         };
+      case 'approved':
+        return {
+          label: 'Approved',
+          color: 'bg-green-500/20 text-green-400',
+          icon: CheckCircle,
+        };
+      case 'confirmed':
+        return {
+          label: 'Confirmed',
+          color: 'bg-green-600/20 text-green-300',
+          icon: CheckCircle,
+        };
       case 'waitlist':
         return {
           label: 'Waitlisted',
           color: 'bg-yellow-500/20 text-yellow-400',
           icon: AlertCircle,
+        };
+      case 'rejected':
+        return {
+          label: 'Rejected',
+          color: 'bg-red-500/20 text-red-400',
+          icon: XCircle,
+        };
+      case 'cancelled':
+        return {
+          label: 'Cancelled',
+          color: 'bg-gray-500/20 text-gray-400',
+          icon: XCircle,
         };
       default:
         return {
@@ -301,7 +322,11 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="confirmed">Confirmed</option>
                 <option value="waitlist">Waitlist</option>
+                <option value="rejected">Rejected</option>
+                <option value="cancelled">Cancelled</option>
               </select>
               {hasActiveFilters && (
                 <button
