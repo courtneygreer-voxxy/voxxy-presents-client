@@ -123,7 +123,7 @@ export function EmailAuditTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10 overflow-x-auto">
-        <div className="grid grid-cols-[160px,minmax(180px,1fr),minmax(220px,1fr),minmax(200px,1fr),120px,140px,140px,100px,80px] gap-4 px-6 py-3 items-center text-xs font-semibold text-white/70 uppercase tracking-wide min-w-[1400px]">
+        <div className="grid grid-cols-[180px,200px,280px,280px,140px,200px,160px,160px,100px] gap-4 px-6 py-3 items-center text-xs font-semibold text-white/70 uppercase tracking-wide min-w-max">
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email Address')}
@@ -141,7 +141,7 @@ export function EmailAuditTable({
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className="grid grid-cols-[160px,minmax(180px,1fr),minmax(220px,1fr),minmax(200px,1fr),120px,140px,140px,100px,80px] gap-4 px-6 py-4 items-center border-b border-white/5 hover:bg-white/5 transition-colors min-w-[1400px]"
+            className="grid grid-cols-[180px,200px,280px,280px,140px,200px,160px,160px,100px] gap-4 px-6 py-4 items-center border-b border-white/5 hover:bg-white/5 transition-colors min-w-max"
           >
             {/* Date Sent */}
             <div className="text-sm text-white/80">
