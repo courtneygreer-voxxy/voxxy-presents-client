@@ -91,25 +91,34 @@ export function EmailAuditActionMenu({
         break;
     }
 
-    // Always add Contact Support (separator if other items exist)
-    if (items.length > 0) {
-      items.push({ separator: true });
-    }
+    // Only show Contact Support for undelivered emails (bounced or dropped)
+    const isUndelivered = entry.status === 'bounced' || entry.status === 'dropped';
 
-    items.push({
-      icon: HelpCircle,
-      label: 'Contact Voxxy Support',
-      disabled: false,
-      onClick: () => {
-        setIsOpen(false);
-        onContactSupport(entry);
-      },
-    });
+    if (isUndelivered) {
+      if (items.length > 0) {
+        items.push({ separator: true });
+      }
+
+      items.push({
+        icon: HelpCircle,
+        label: 'Contact Voxxy Support',
+        disabled: false,
+        onClick: () => {
+          setIsOpen(false);
+          onContactSupport(entry);
+        },
+      });
+    }
 
     return items;
   };
 
   const menuItems = getMenuItems();
+
+  // Don't show menu button if no items (for delivered, scheduled, etc.)
+  if (menuItems.length === 0) {
+    return <span className="text-white/40 text-xs">-</span>;
+  }
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
