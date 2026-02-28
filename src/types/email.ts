@@ -194,16 +194,25 @@ export type EmailCategory =
   | 'system';
 
 export type TriggerType =
+  // Time-based triggers (scheduled by worker)
   | 'days_before_event'
   | 'days_after_event'
   | 'days_before_deadline'
   | 'days_after_deadline'
   | 'on_application_open'
-  | 'on_application_submit'
-  | 'on_approval'
   | 'on_event_date'
   | 'days_before_payment_deadline'
-  | 'on_payment_deadline';
+  | 'on_payment_deadline'
+  // Event-based triggers (sent immediately on action)
+  | 'on_application_submit'
+  | 'on_approval'
+  | 'on_rejection'
+  | 'on_waitlist'
+  | 'on_payment_received'
+  | 'on_category_change'
+  | 'on_event_update'
+  | 'on_event_cancel'
+  | 'on_invitation_send';
 
 export type ScheduledEmailStatus =
   | 'scheduled'
@@ -411,16 +420,25 @@ export const EMAIL_CATEGORIES: { value: EmailCategory; label: string }[] = [
 ];
 
 export const TRIGGER_TYPES: { value: TriggerType; label: string }[] = [
+  // Time-based triggers
   { value: 'days_before_event', label: 'Days Before Event' },
   { value: 'days_after_event', label: 'Days After Event' },
   { value: 'days_before_deadline', label: 'Days Before Application Deadline' },
   { value: 'days_after_deadline', label: 'Days After Application Deadline' },
   { value: 'on_application_open', label: 'When Applications Open' },
-  { value: 'on_application_submit', label: 'When Application Submitted' },
-  { value: 'on_approval', label: 'When Application Approved' },
   { value: 'on_event_date', label: 'On Event Date' },
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Deadline' },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline' }
+  { value: 'on_payment_deadline', label: 'On Payment Deadline' },
+  // Event-based triggers (immediate)
+  { value: 'on_application_submit', label: 'When Application Submitted' },
+  { value: 'on_approval', label: 'When Application Approved' },
+  { value: 'on_rejection', label: 'When Application Rejected' },
+  { value: 'on_waitlist', label: 'When Moved to Waitlist' },
+  { value: 'on_payment_received', label: 'When Payment Received' },
+  { value: 'on_category_change', label: 'When Category Changed' },
+  { value: 'on_event_update', label: 'When Event Details Updated' },
+  { value: 'on_event_cancel', label: 'When Event Canceled' },
+  { value: 'on_invitation_send', label: 'When Invitation Sent' }
 ];
 
 export const DELIVERY_STATUS_CONFIGS: Record<DeliveryStatus, DeliveryStatusConfig> = {
