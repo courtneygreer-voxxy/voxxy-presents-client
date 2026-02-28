@@ -110,7 +110,6 @@ export default function EmailRow({
   const isPaused = email.status === 'paused';
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
-  const isInvitationAnnouncement = email.isInvitationAnnouncement || false;
 
   // Status badge component
   const getStatusBadge = () => {
@@ -255,16 +254,13 @@ export default function EmailRow({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            // Open audit log for all non-invitation emails (sent, scheduled, paused, failed)
-            // Only show recipients modal for invitation announcement
-            if (!isInvitationAnnouncement && onViewAuditLog) {
+            // ✅ Fixed: All emails (including Position 1 Initial Invitation) now open audit log
+            if (onViewAuditLog) {
               onViewAuditLog({ email_name: email.name });
-            } else {
-              setShowRecipientsModal(true);
             }
           }}
           className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
-          title={!isInvitationAnnouncement ? "Click to view audit log for this email" : "Click to view recipients list"}
+          title="Click to view audit log for this email"
         >
           <Users className="w-3 h-3" />
           <span>{email.recipient_count || 0}</span>
@@ -312,9 +308,8 @@ export default function EmailRow({
 
       {/* Actions */}
       <div className="flex items-center justify-end">
-        {!isInvitationAnnouncement && (
-          <>
-            <button
+        <>
+          <button
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
@@ -416,8 +411,7 @@ export default function EmailRow({
                 </div>
               </>
             )}
-          </>
-        )}
+        </>
       </div>
 
       {/* Error message row (spans full width) */}
@@ -434,7 +428,6 @@ export default function EmailRow({
         eventSlug={eventSlug}
         emailId={email.id}
         emailName={email.name}
-        isInvitationAnnouncement={isInvitationAnnouncement}
       />
     </div>
   );

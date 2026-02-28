@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch } from 'lucide-react';
-import { scheduledEmailsApi, eventInvitationsApi, eventsApi } from '@/services/api';
+import { scheduledEmailsApi, eventsApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
@@ -94,94 +94,9 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       // Fetch scheduled emails
       const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
       console.log('✅ Fetched', scheduledEmailsData.length, 'scheduled emails');
+      console.log('   Position 1 (Initial Invitation) is now a real scheduled email from database');
 
-      // Fetch invitations (non-blocking)
-      const invitationsData = await eventInvitationsApi.getByEvent(eventSlug).catch((err) => {
-        console.error('❌ Failed to fetch invitations:', err.message);
-        console.error('   Full error:', err);
-        return { invitations: [], meta: { total_count: 0, sent_count: 0, pending_count: 0, viewed_count: 0, accepted_count: 0, declined_count: 0, expired_count: 0 } };
-      });
-
-      console.log('📨 Invitations API Response:', {
-        total_count: invitationsData.meta.total_count,
-        sent_count: invitationsData.meta.sent_count,
-        viewed_count: invitationsData.meta.viewed_count,
-        invitations_with_sent_at: invitationsData.invitations.filter((inv: any) => inv.sent_at).length
-      });
-
-      // Create virtual invitation email (always show, even if not sent yet)
-      const allEmails: ScheduledEmail[] = [...scheduledEmailsData];
-
-      // Always create virtual invitation email for preview/tracking
-      const hasSentInvitations = invitationsData.meta.sent_count > 0;
-      console.log('🎯 Creating virtual invitation email (sent_count:', invitationsData.meta.sent_count, ')');
-
-      // Find the earliest sent invitation to use as the sent date
-      const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
-      console.log('   Found', sentInvitations.length, 'invitations with sent_at timestamp');
-
-      const earliestSentDate: string = sentInvitations.length > 0
-        ? (sentInvitations.reduce((earliest: any, inv: any) => {
-            return new Date(inv.sent_at) < new Date(earliest.sent_at) ? inv : earliest;
-          }).sent_at as string)
-        : new Date().toISOString();
-
-      console.log('   Using earliest sent date:', earliestSentDate);
-
-      // Create virtual invitation announcement email with delivery stats
-      const deliveryStats = (invitationsData.meta as any).delivery_stats || {};
-      const invitationEmail: ScheduledEmail = {
-        id: -1, // Negative ID to avoid conflicts
-        event_id: -1,
-        email_campaign_template_id: null,
-        email_template_item_id: null,
-        name: hasSentInvitations ? 'Event Announcement (Invitations Sent)' : 'Event Announcement (Invitation Preview)',
-        subject_template: 'Submissions Open for {{event_title}}',
-        body_template: '',
-        trigger_type: 'on_application_open',
-        trigger_value: 0,
-        trigger_time: null,
-        scheduled_for: hasSentInvitations ? earliestSentDate : new Date().toISOString(),
-        filter_criteria: {},
-        status: (hasSentInvitations ? 'sent' : 'scheduled') as ScheduledEmailStatus,
-        sent_at: hasSentInvitations ? earliestSentDate : null,
-        recipient_count: hasSentInvitations ? invitationsData.meta.sent_count : (invitationsData.meta.total_count || 0),
-        // Add delivery tracking stats from API (only if sent)
-        undelivered_count: hasSentInvitations ? (deliveryStats.undelivered || 0) : 0,
-        unsubscribed_count: hasSentInvitations ? (deliveryStats.unsubscribed || 0) : 0,
-        delivered_count: hasSentInvitations ? (deliveryStats.delivered || 0) : 0,
-        delivery_counts: hasSentInvitations ? {
-          total_sent: deliveryStats.total_sent || invitationsData.meta.sent_count,
-          delivered: deliveryStats.delivered || 0,
-          bounced: deliveryStats.bounced || 0,
-          dropped: deliveryStats.dropped || 0,
-          unsubscribed: deliveryStats.unsubscribed || 0,
-          pending: deliveryStats.pending || 0
-        } : undefined,
-        error_message: null,
-        created_at: earliestSentDate,
-        updated_at: earliestSentDate,
-        isInvitationAnnouncement: true, // Flag for special handling
-        isPreviewOnly: !hasSentInvitations // Flag to indicate this is preview mode
-      };
-
-      // Add invitation email at the beginning
-      allEmails.unshift(invitationEmail);
-      console.log('✅ Added invitation announcement email to position 0');
-      console.log('   Virtual email object:', {
-        name: invitationEmail.name,
-        status: invitationEmail.status,
-        recipient_count: invitationEmail.recipient_count,
-        scheduled_for: invitationEmail.scheduled_for,
-        isInvitationAnnouncement: invitationEmail.isInvitationAnnouncement,
-        isPreviewOnly: invitationEmail.isPreviewOnly
-      });
-
-      console.log('📋 Total emails to display:', allEmails.length);
-      console.log('   - Scheduled emails from API:', scheduledEmailsData.length);
-      console.log('   - Virtual invitation email:', allEmails.some(e => e.isInvitationAnnouncement) ? 'YES' : 'NO');
-
-      setEmails(allEmails);
+      setEmails(scheduledEmailsData);
       setLastRefreshTime(new Date());
     } catch (err: any) {
       console.error('❌ Failed to load emails:', err);
@@ -285,12 +200,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   };
 
   const handleEdit = (email: ScheduledEmail) => {
-    // Don't allow editing invitation announcements (virtual emails)
-    if (email.isInvitationAnnouncement) {
-      setError('Invitation emails cannot be edited. They are sent immediately when you create invitations.');
-      return;
-    }
-
+    // Position 1 (Initial Invitation) is now a real scheduled email and CAN be edited
     setEditEmail(email);
     setIsEditOpen(true);
   };

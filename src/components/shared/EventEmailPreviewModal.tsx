@@ -42,7 +42,6 @@ type EmailPreviewData = {
   status?: 'sent' | 'scheduled' | 'pending' | 'sending';
   overdue?: boolean;
   overdue_message?: string;
-  isInvitationAnnouncement?: boolean;
   trigger_type?: string;
   trigger_value?: number | null;
 };
@@ -165,23 +164,17 @@ export default function EventEmailPreviewModal({
     setIsLoading(true);
     setError(null);
     try {
-      // Special handling for invitation emails
-      if (email.isInvitationAnnouncement) {
-        const data = await eventInvitationsApi.previewEmail(eventSlug);
-        setPreviewData(data);
-      } else {
-        // Pass category context if needed
-        const context = hasCategorySpecificContent
-          ? { category: selectedCategory }
-          : {};
+      // All emails (including Position 1 Initial Invitation) use the standard preview endpoint
+      const context = hasCategorySpecificContent
+        ? { category: selectedCategory }
+        : {};
 
-        const data = await scheduledEmailsApi.preview(
-          eventSlug,
-          email.id,
-          context as any
-        );
-        setPreviewData(data);
-      }
+      const data = await scheduledEmailsApi.preview(
+        eventSlug,
+        email.id,
+        context as any
+      );
+      setPreviewData(data);
     } catch (err: any) {
       const errorMessage = err.message || 'Failed to load email preview';
       console.error('Preview error:', errorMessage);

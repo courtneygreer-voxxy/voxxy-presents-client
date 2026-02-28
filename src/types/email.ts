@@ -119,10 +119,9 @@ export interface ScheduledEmail {
   minutes_overdue?: number;
   overdue_message?: string | null; // e.g., "45 minutes late"
 
-  // Frontend-only flag for virtual invitation announcement emails
-  isInvitationAnnouncement?: boolean;
-  // Frontend-only flag to indicate invitation is in preview mode (not sent yet)
-  isPreviewOnly?: boolean;
+  // Removed fields (Feb 28, 2026):
+  // - isInvitationAnnouncement: Position 1 is now a real scheduled email (not virtual)
+  // - isPreviewOnly: No longer needed with unified invitation system
 }
 
 // ============================================================================

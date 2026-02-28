@@ -62,18 +62,17 @@ export default function ScheduledEmailCard({
   const isPaused = email.status === 'paused';
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
-  const isInvitationAnnouncement = email.isInvitationAnnouncement || false;
 
   // Debug: Log when component receives new scheduled_for value
-  if (scheduledDate && !isInvitationAnnouncement) {
+  if (scheduledDate) {
     console.log(`🗓️  Card rendering "${email.name}" with date:`, email.scheduled_for, '→', scheduledDate.toLocaleString());
   }
 
-  // Determine if card should be clickable
-  const isClickable = onEdit && !isSent && !isInvitationAnnouncement;
+  // Determine if card should be clickable (all scheduled emails are now editable)
+  const isClickable = onEdit && !isSent;
 
   const handleCardClick = () => {
-    console.log('Card clicked!', { email: email.name, isClickable, onEdit: !!onEdit, isSent, isInvitationAnnouncement });
+    console.log('Card clicked!', { email: email.name, isClickable, onEdit: !!onEdit, isSent });
     if (isClickable && onEdit) {
       onEdit(email);
     }
@@ -162,8 +161,7 @@ export default function ScheduledEmailCard({
         </div>
 
         {/* Actions Dropdown */}
-        {!isInvitationAnnouncement && (
-          <DropdownMenu>
+        <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
                 className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
@@ -227,8 +225,7 @@ export default function ScheduledEmailCard({
                 </>
               )}
             </DropdownMenuContent>
-          </DropdownMenu>
-        )}
+        </DropdownMenu>
       </div>
 
       {/* Error message if failed */}
