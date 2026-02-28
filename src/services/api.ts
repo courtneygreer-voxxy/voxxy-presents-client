@@ -1337,10 +1337,10 @@ export const scheduledEmailsApi = {
 export const emailDeliveriesApi = {
   /**
    * Get all deliveries for a scheduled email
-   * GET /api/v1/presents/scheduled_emails/:scheduled_email_id/email_deliveries
+   * GET /api/v1/presents/events/:event_slug/scheduled_emails/:scheduled_email_id/email_deliveries
    */
-  async getByScheduledEmail(scheduledEmailId: number) {
-    return fetchApi<EmailDelivery[]>(`/v1/presents/scheduled_emails/${scheduledEmailId}/email_deliveries`)
+  async getByScheduledEmail(eventSlug: string, scheduledEmailId: number) {
+    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${eventSlug}/scheduled_emails/${scheduledEmailId}/email_deliveries`)
   },
 
   /**

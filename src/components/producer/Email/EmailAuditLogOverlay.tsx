@@ -105,7 +105,7 @@ export function EmailAuditLogOverlay({
           // Handle sent emails - fetch actual delivery records
           if (email.status === 'sent' && email.sent_at) {
             try {
-              const deliveries = await emailDeliveriesApi.getByScheduledEmail(email.id);
+              const deliveries = await emailDeliveriesApi.getByScheduledEmail(event.slug, email.id);
               console.log(`📬 [Audit Log] Fetched ${deliveries.length} deliveries for email: ${email.name}`);
 
               // Transform each delivery into an audit entry
