@@ -159,6 +159,10 @@ export interface EmailDelivery {
 
   created_at: string;
   updated_at: string;
+
+  // ✅ Phase 1-3: Backend now includes registration data for audit log
+  recipient_name?: string | null;
+  vendor_category?: string | null;
 }
 
 // ============================================================================

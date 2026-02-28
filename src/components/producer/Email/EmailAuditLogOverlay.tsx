@@ -113,12 +113,12 @@ export function EmailAuditLogOverlay({
                 entries.push({
                   id: `${email.id}-${delivery.registration_id}`,
                   sent_at: delivery.sent_at,
-                  recipient_name: null, // TODO: Fetch from registration when backend supports it
+                  recipient_name: delivery.recipient_name || null, // ✅ Phase 1-3: Backend now includes this
                   recipient_email: delivery.recipient_email,
                   email_name: email.name,
                   email_subject: email.subject_template,
                   trigger_type: email.trigger_type,
-                  category: 'Unknown', // TODO: Fetch from registration.vendor_category when backend supports it
+                  category: delivery.vendor_category || 'Unknown', // ✅ Phase 1-3: Backend now includes this
                   status: delivery.status,
                   bounce_reason: delivery.bounce_reason,
                   drop_reason: delivery.drop_reason,
