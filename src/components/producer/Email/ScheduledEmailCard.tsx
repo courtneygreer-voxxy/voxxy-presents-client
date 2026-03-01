@@ -13,7 +13,7 @@ import {
   AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
-import type { ScheduledEmail } from '@/types/email';
+import type { ScheduledEmail, DeliveryStatus } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import { backendToFrontend } from '@/utils/emailVariables';
 import {
@@ -80,7 +80,7 @@ export default function ScheduledEmailCard({
 
   // Determine status badge
   const statusBadge = isSent ? (
-    <DeliveryStatusBadge status={email.status} />
+    <DeliveryStatusBadge status={email.status as DeliveryStatus} />
   ) : (
     <span
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${

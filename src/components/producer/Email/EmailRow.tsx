@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2, AlertTriangle } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { ScheduledEmail, EmailCategory, AuditFilters } from '@/types/email';
+import { ScheduledEmail, EmailCategory, AuditFilters, DeliveryStatus } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
@@ -114,7 +114,7 @@ export default function EmailRow({
   // Status badge component
   const getStatusBadge = () => {
     if (isSent) {
-      return <DeliveryStatusBadge status={email.status} />;
+      return <DeliveryStatusBadge status={email.status as DeliveryStatus} />;
     }
 
     const statusColors = {
