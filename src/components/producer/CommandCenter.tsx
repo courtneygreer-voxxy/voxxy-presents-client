@@ -42,12 +42,13 @@ interface CommandCenterProps {
   onBack: () => void;
   onUpdateEvent?: (eventSlug: string, updates: any) => Promise<void>;
   onDeleteEvent?: (eventSlug: string) => Promise<void>;
+  onRefreshEvent?: () => Promise<void>;
   organizationId?: number;
 }
 
 type Tab = 'details' | 'invites' | 'applicants' | 'bulletins' | 'emails' | 'payments' | 'settings';
 
-export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, organizationId }: CommandCenterProps) {
+export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, onRefreshEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
 
   const tabs = [
@@ -68,6 +69,7 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
             event={event}
             onUpdate={onUpdateEvent}
             onNavigateToTab={(tab) => setActiveTab(tab as Tab)}
+            onRefreshEvent={onRefreshEvent}
             organizationId={organizationId}
           />
         );

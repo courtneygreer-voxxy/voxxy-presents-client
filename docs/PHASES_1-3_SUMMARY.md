@@ -53,7 +53,8 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 - Position 17: `on_application_submit` - New Submission Notification
 
 **What This Means:**
-- Mail tab will show 18 total rows (17 scheduled + 1 virtual invitation)
+- Mail tab will show exactly 17 rows (including Position 1 "Initial Invitation")
+- Position 1 is now a REAL scheduled email used for sending invitations (not virtual)
 - Event-based emails (approve/reject/etc.) send via unified system
 - All create proper EmailDelivery records for audit log tracking
 
@@ -107,9 +108,10 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 ```
 
 **What This Enables:**
-- ✅ Virtual invitation email shows accurate delivery stats
+- ✅ Position 1 "Initial Invitation" shows accurate delivery stats
 - ✅ Undelivered count works for invitations
 - ✅ Invitation audit log entries show correct statuses
+- ℹ️ Note: Legacy `/invitations` endpoint still exists but deprecated (Position 1 is now used)
 
 ---
 
@@ -147,6 +149,35 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 
 ---
 
+## ✅ Recently Fixed Issues (Feb 28, 2026)
+
+### ✅ Issue #3: Invitation Unification Complete
+
+**Problem:** Frontend created a virtual invitation email (id: -1) causing:
+- Duplicate invitation rows in Mail tab (18 total instead of 17)
+- Recipients button opened old modal instead of audit log
+- Couldn't edit Position 1 template
+- Confusion between real vs virtual email
+
+**Solution Implemented:**
+1. ✅ Removed virtual invitation email creation logic
+2. ✅ Position 1 "Initial Invitation" is now the REAL template used for sending
+3. ✅ All emails (including Position 1) now open audit log when clicking recipients
+4. ✅ Position 1 is fully editable (subject, body, triggers)
+5. ✅ Mail tab shows exactly 17 rows (no duplicates)
+
+**Files Changed:**
+- `src/components/producer/Email/EmailAutomationTab.tsx` - Removed ~85 lines of virtual email logic
+- `src/components/producer/Email/EmailRow.tsx` - Removed special case for invitations
+- `src/types/email.ts` - Removed `isInvitationAnnouncement` flag
+- `src/components/producer/Email/ScheduledEmailCard.tsx` - Removed invitation restrictions
+- `src/components/shared/EventEmailPreviewModal.tsx` - Removed special invitation preview
+
+**Documentation:**
+- See: **[INVITATION_UNIFICATION_FRONTEND_UPDATE.md](./INVITATION_UNIFICATION_FRONTEND_UPDATE.md)**
+
+---
+
 ## Testing Plan
 
 ### 🎯 Critical Tests (Must Pass)
@@ -161,7 +192,8 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
    - Check badges display correctly
 
 3. **✅ 17 Email Types Visible**
-   - Mail tab should show 18 total rows
+   - Mail tab should show exactly 17 total rows
+   - Position 1 "Initial Invitation" is a real scheduled email (NOT virtual)
    - Verify new email types appear (Application Approved, etc.)
 
 4. **✅ Event-Based Emails Send**

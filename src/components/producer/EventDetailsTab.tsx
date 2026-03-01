@@ -52,6 +52,7 @@ interface EventDetailsTabProps {
   event: Event;
   onUpdate?: (eventSlug: string, updates: any) => Promise<void>;
   onNavigateToTab?: (tab: string) => void;
+  onRefreshEvent?: () => Promise<void>;
   organizationId?: number;
 }
 
@@ -62,7 +63,7 @@ interface ApplicationStats {
   waitlisted: number;
 }
 
-export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, organizationId }: EventDetailsTabProps) {
+export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRefreshEvent, organizationId }: EventDetailsTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -239,7 +240,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, orga
 
   return (
     <>
-      <HomeDashboard eventSlug={event.slug} event={event} onNavigateToTab={onNavigateToTab} organizationId={organizationId} />
+      <HomeDashboard eventSlug={event.slug} event={event} onNavigateToTab={onNavigateToTab} onRefreshEvent={onRefreshEvent} organizationId={organizationId} />
       {/* Original detailed view below - can be accessed via Edit button */}
       <div className="hidden p-6 space-y-6">
       {/* Dashboard Cards */}

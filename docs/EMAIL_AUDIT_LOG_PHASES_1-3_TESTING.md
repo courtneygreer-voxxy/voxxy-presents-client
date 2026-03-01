@@ -88,8 +88,9 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 
 **Steps:**
 1. Navigate to Command Center → Mail tab for any event
-2. Count the number of email rows (should be 17 + virtual invitation email = 18 total)
-3. Verify new email types appear:
+2. Count the number of email rows (should be exactly 17 total)
+3. Verify Position 1 is "Initial Invitation" (real scheduled email, NOT virtual)
+4. Verify new email types appear:
    - "Application Approved" (on_approval)
    - "Application Rejected" (on_rejection)
    - "Moved to Waitlist" (on_waitlist)
@@ -100,7 +101,8 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
    - "New Submission Notification" (on_application_submit)
 
 **Expected Result:**
-- ✅ 18 total rows (17 scheduled + 1 virtual invitation)
+- ✅ Exactly 17 total rows (no virtual invitation email)
+- ✅ Position 1 "Initial Invitation" is a real scheduled email
 - ✅ New email types visible with proper names
 
 **If Fails:**
@@ -227,25 +229,28 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 
 ---
 
-### Test 7: Virtual Invitation Email Data
+### Test 7: Position 1 Initial Invitation Email Data
 
-**Goal:** Verify invitation email shows correct delivery stats
+**Goal:** Verify Position 1 invitation email shows correct delivery stats
 
 **Steps:**
-1. Mail tab → Find "Event Announcement (Invitation)" row
+1. Mail tab → Find "Initial Invitation" (Position 1) row
 2. Check recipient count matches sent invitations
 3. Check undelivered count (if any bounced invitations)
 4. Click recipient count
 5. Audit log opens showing invitation deliveries
 6. Verify:
-   - Recipient names show
-   - Vendor categories show
+   - Recipient names show (NOT "Unknown")
+   - Vendor categories show (NOT "Unknown")
    - Delivery statuses accurate
+7. Verify you can edit Position 1 subject/body
 
 **Expected Result:**
+- ✅ Position 1 is a real scheduled email (not virtual)
 - ✅ Invitation stats match actual invitations sent
 - ✅ Audit log shows invitation deliveries with full data
 - ✅ Categories from vendor contacts
+- ✅ Can edit Position 1 template
 
 ---
 

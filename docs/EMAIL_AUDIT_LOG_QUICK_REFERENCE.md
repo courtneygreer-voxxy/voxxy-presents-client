@@ -29,13 +29,14 @@ A full-screen email tracking dashboard that shows **all email deliveries** for a
 The audit log aggregates data from **three sources**:
 
 1. **Scheduled Emails** (`/events/:slug/scheduled_emails`)
-   - Application confirmations, reminders, etc.
+   - All 17 email types including Position 1 "Initial Invitation"
+   - Application confirmations, reminders, event-based emails
 
 2. **Email Deliveries** (`/events/:slug/scheduled_emails/:id/email_deliveries`)
    - Individual delivery records with SendGrid webhook status
 
 3. **Event Invitations** (`/events/:slug/invitations`)
-   - Invitation emails (virtual email in the table)
+   - Legacy invitation delivery stats (deprecated - now uses Position 1)
 
 ## Column Details
 
@@ -67,21 +68,22 @@ The audit log aggregates data from **three sources**:
 
 ## Current Limitations
 
-### 1. Recipient Name Shows "Unknown"
-**Why:** Backend doesn't include registration data in delivery response
-**Fix:** Include `registration.vendor_contact.name` in `/email_deliveries` endpoint
+### 1. ✅ FIXED - Recipient Name Shows "Unknown"
+**Status:** ✅ Fixed in Phases 1-3 (Feb 28, 2026)
+**Solution:** Backend now includes `recipient_name` in `/email_deliveries` endpoint
 
-### 2. Category Shows "Unknown"
-**Why:** Backend doesn't include vendor category in delivery response
-**Fix:** Include `registration.vendor_contact.vendor_category` in `/email_deliveries` endpoint
+### 2. ✅ FIXED - Category Shows "Unknown"
+**Status:** ✅ Fixed in Phases 1-3 (Feb 28, 2026)
+**Solution:** Backend now includes `vendor_category` in `/email_deliveries` endpoint
 
-### 3. Invitation Email Opens Old Modal
-**Why:** Special case code for invitation announcement email
-**Fix:** Remove special case, use audit log for all emails (frontend-only)
+### 3. ✅ FIXED - Invitation Email Opens Old Modal
+**Status:** ✅ Fixed in Invitation Unification (Feb 28, 2026)
+**Solution:** Removed virtual invitation email logic, all emails now open audit log
 
-### 4. Data Discrepancy Between Mail Tab & Audit Log
+### 4. ⏳ PENDING - Data Discrepancy Between Mail Tab & Audit Log
 **Why:** Mail tab uses aggregated counts, audit log uses individual records
-**Fix:** Ensure backend keeps both in sync via webhooks (backend)
+**Fix:** Ensure backend keeps both in sync via webhooks (backend Phase 4)
+**Status:** Will be fixed with `recalculate_delivery_counts!` method
 
 ## Backend API Requirements
 

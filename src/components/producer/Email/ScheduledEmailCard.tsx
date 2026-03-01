@@ -80,7 +80,7 @@ export default function ScheduledEmailCard({
 
   // Determine status badge
   const statusBadge = isSent ? (
-    <DeliveryStatusBadge status={email.delivery_status || 'sent'} />
+    <DeliveryStatusBadge status={email.status} />
   ) : (
     <span
       className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${

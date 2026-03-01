@@ -95,9 +95,6 @@ export interface ScheduledEmail {
   latest_delivery?: EmailDelivery;
   email_deliveries?: EmailDelivery[];
 
-  // Computed field from backend
-  delivery_status?: DeliveryStatus;
-
   // Aggregated delivery counts (for sent emails)
   delivery_counts?: {
     total_sent: number;
