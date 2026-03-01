@@ -57,15 +57,15 @@ Users can open the Email Audit Log from three places:
 ```
 EmailAutomationTab (Mail Tab)
 ├── State Management
-│   ├── Emails list (scheduled + virtual invitation)
+│   ├── Emails list (all scheduled emails from database)
 │   ├── Audit log overlay state
 │   └── Auto-refresh timer (30s)
 ├── EmailTable
 │   └── EmailRow (per email)
-│       ├── Recipients button → Opens audit log
+│       ├── Recipients button → Opens audit log (ALL emails)
 │       ├── Undelivered count → Deep link to audit log
 │       ├── Unsubscribed count → Deep link to audit log
-│       └── Action menu
+│       └── Action menu (ALL emails)
 └── EmailAuditLogOverlay ← FULL-SCREEN OVERLAY
     ├── EmailAuditFilters (Search + 3 dropdowns)
     ├── EmailAuditTable (9 columns)
@@ -73,31 +73,18 @@ EmailAutomationTab (Mail Tab)
     └── ContactSupportDialog (Discord webhook)
 ```
 
-### Virtual Invitation Email
+### ~~Virtual Invitation Email~~ **DEPRECATED** (Feb 28, 2026)
 
-The frontend creates a **virtual `ScheduledEmail` object** to represent event invitations in the email table:
+**Old System (Removed):**
+The frontend used to create a virtual `ScheduledEmail` object with `id: -1` to represent invitations. This caused duplicate rows and inconsistent behavior.
 
-```typescript
-const invitationEmail: ScheduledEmail = {
-  id: -1,                           // Negative ID (no DB record)
-  name: 'Event Announcement (Invitations Sent)',
-  status: 'sent',
-  trigger_type: 'on_application_open',
-  isInvitationAnnouncement: true,   // Special flag
-  recipient_count: invitationsData.meta.sent_count,
-  undelivered_count: deliveryStats.undelivered || 0,
-  delivery_counts: {
-    total_sent: deliveryStats.total_sent,
-    delivered: deliveryStats.delivered,
-    bounced: deliveryStats.bounced,
-    dropped: deliveryStats.dropped,
-    unsubscribed: deliveryStats.unsubscribed,
-    pending: deliveryStats.pending
-  }
-}
-```
+**New System (Current):**
+- **Position 1** ("Initial Invitation") is now a **real `ScheduledEmail`** from the database
+- Backend uses Position 1 template for sending invitation emails
+- No special flags or virtual emails needed
+- Position 1 behaves like any other scheduled email (editable, full action menu)
 
-**Why?** Invitations use a different system (`event_invitations` table) but need to appear alongside scheduled emails for unified tracking.
+**See:** [INVITATION_UNIFICATION_FRONTEND_UPDATE.md](./INVITATION_UNIFICATION_FRONTEND_UPDATE.md) for details
 
 ---
 
@@ -116,10 +103,7 @@ sequenceDiagram
     Frontend->>Backend: GET /events/:slug/scheduled_emails
     Backend-->>Frontend: ScheduledEmail[]
 
-    Frontend->>Backend: GET /events/:slug/invitations
-    Backend-->>Frontend: Invitations + delivery_stats
-
-    Note over Frontend: Create virtual invitation email
+    Note over Frontend: Position 1 (Initial Invitation) is now included in scheduled_emails
 
     loop For each sent scheduled email
         Frontend->>Backend: GET /events/:slug/scheduled_emails/:id/email_deliveries
@@ -685,29 +669,24 @@ GROUP BY status;
 
 ---
 
-### Issue #1: Invitation Recipients Button Opens Old Modal
+### ~~Issue #1: Invitation Recipients Button Opens Old Modal~~ ✅ **FIXED** (Feb 28, 2026)
 
-**Location:** `EmailRow.tsx:260-264`
+**Status:** ✅ Resolved with invitation system unification
 
-**Current Code:**
-```typescript
-if (!isInvitationAnnouncement && onViewAuditLog) {
-  onViewAuditLog({ email_name: email.name });
-} else {
-  setShowRecipientsModal(true);  // OLD MODAL ❌
-}
-```
+**What Was Fixed:**
+- Removed special case for `isInvitationAnnouncement`
+- ALL emails now open audit log when clicking recipient count
+- Position 1 (Initial Invitation) behaves like any other scheduled email
 
-**Fix:** Remove special case, use audit log for ALL emails:
+**Code After Fix:**
 ```typescript
 if (onViewAuditLog) {
   onViewAuditLog({ email_name: email.name });
 }
+// ✅ No special case needed - all emails use audit log
 ```
 
-**Backend Requirement:** None - this is frontend-only.
-
-**Blocker:** Once fixed, `RecipientsModal` component can be deleted.
+**See:** [INVITATION_UNIFICATION_FRONTEND_UPDATE.md](./INVITATION_UNIFICATION_FRONTEND_UPDATE.md)
 
 ---
 

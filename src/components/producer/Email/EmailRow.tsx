@@ -114,7 +114,7 @@ export default function EmailRow({
   // Status badge component
   const getStatusBadge = () => {
     if (isSent) {
-      return <DeliveryStatusBadge status={email.delivery_status || 'sent'} />;
+      return <DeliveryStatusBadge status={email.status} />;
     }
 
     const statusColors = {

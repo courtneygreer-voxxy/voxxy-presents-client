@@ -9,7 +9,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, FileSearch, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery } from '@/types/email';
-import { scheduledEmailsApi, emailDeliveriesApi, eventInvitationsApi } from '@/services/api';
+import { scheduledEmailsApi, emailDeliveriesApi } from '@/services/api';
 import { EmailAuditTable } from './EmailAuditTable';
 import { EmailAuditFilters } from './EmailAuditFilters';
 import { ContactSupportDialog } from './ContactSupportDialog';
@@ -65,42 +65,16 @@ export function EmailAuditLogOverlay({
       try {
         console.log('📧 [Audit Log] Fetching scheduled emails for event:', event.slug);
 
-        // 1. Fetch all scheduled emails
+        // 1. Fetch all scheduled emails (including Position 1 - Initial Invitation)
         const scheduledEmails = await scheduledEmailsApi.getByEvent(event.slug);
         console.log('✅ [Audit Log] Fetched', scheduledEmails.length, 'scheduled emails');
 
-        // 2. Fetch invitations for the virtual invitation email
-        const invitationsData = await eventInvitationsApi.getByEvent(event.slug).catch(() => ({
-          invitations: [],
-          meta: { total_count: 0, sent_count: 0 }
-        }));
-        console.log('📨 [Audit Log] Fetched', invitationsData.meta.sent_count, 'sent invitations');
-
-        // 3. Build audit entries array
+        // 2. Build audit entries array
         const entries: AuditEntry[] = [];
 
-        // 3a. Process invitation emails (virtual email)
-        const sentInvitations = invitationsData.invitations.filter((inv: any) => inv.sent_at);
-        for (const invitation of sentInvitations) {
-          entries.push({
-            id: `invitation-${invitation.id}`,
-            sent_at: invitation.sent_at || null,
-            recipient_name: invitation.vendor_contact?.name || null,
-            recipient_email: invitation.vendor_contact?.email || 'unknown@example.com',
-            email_name: 'Event Announcement (Invitation)',
-            email_subject: 'Submissions Open for ' + event.title,
-            trigger_type: 'on_application_open',
-            category: (invitation.vendor_contact as any)?.vendor_category || 'Unknown',
-            status: (invitation as any).delivery_status || 'delivered',
-            bounce_reason: null,
-            drop_reason: null,
-            unsubscribed_at: null,
-            scheduled_email_id: -1, // Virtual email
-            registration_id: invitation.id,
-          });
-        }
-
-        // 3b. Process scheduled emails
+        // Process scheduled emails (including Position 1 - Initial Invitation)
+        // Position 1 invitation deliveries are now linked via scheduled_email_id,
+        // so they'll be fetched via the API like all other scheduled emails
         for (const email of scheduledEmails) {
           // Handle sent emails - fetch actual delivery records
           if (email.status === 'sent' && email.sent_at) {

@@ -27,6 +27,7 @@ interface HomeDashboardProps {
   eventSlug: string;
   event: any;
   onNavigateToTab?: (tab: string) => void;
+  onRefreshEvent?: () => Promise<void>;
   organizationId?: number;
 }
 
@@ -52,7 +53,7 @@ interface Bulletin {
   created_at: string;
 }
 
-export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organizationId }: HomeDashboardProps) {
+export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRefreshEvent, organizationId }: HomeDashboardProps) {
   const [stats, setStats] = useState<DashboardStats>({
     applied: 0,
     newUnreviewed: 0,
@@ -237,7 +238,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, organ
           {/* Go Live Card */}
           <GoLiveCard
             event={event}
-            onGoLive={fetchDashboardData}
+            onGoLive={onRefreshEvent || fetchDashboardData}
             organizationId={organizationId}
           />
           {/* Upcoming Emails */}

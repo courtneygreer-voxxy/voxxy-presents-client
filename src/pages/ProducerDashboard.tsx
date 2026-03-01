@@ -366,6 +366,31 @@ export default function ProducerDashboard() {
     }
   };
 
+  // Refetch selected event (for Go Live and other status changes)
+  const refetchSelectedEvent = async () => {
+    if (!selectedEvent) {
+      console.warn('No selected event to refetch');
+      return;
+    }
+
+    try {
+      console.log('Refetching event:', selectedEvent.slug);
+      const updatedEvent = await eventsApi.getById(selectedEvent.slug);
+      console.log('Event refetched successfully:', updatedEvent);
+      setSelectedEvent(updatedEvent);
+    } catch (err) {
+      console.error('Failed to refetch event:', err);
+      // Fallback: refresh entire events list
+      if (organization) {
+        await fetchEvents(organization.slug);
+        const refreshedEvent = events.find(e => e.slug === selectedEvent.slug);
+        if (refreshedEvent) {
+          setSelectedEvent(refreshedEvent);
+        }
+      }
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await signOut();
@@ -457,6 +482,7 @@ export default function ProducerDashboard() {
               setEventsView('list');
               setSelectedEvent(null);
             }}
+            onRefreshEvent={refetchSelectedEvent}
           />
         );
       }
