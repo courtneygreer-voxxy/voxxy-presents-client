@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2, AlertTriangle } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
-import { ScheduledEmail, EmailCategory, AuditFilters, DeliveryStatus } from '@/types/email';
+import { ScheduledEmail, EmailCategory, AuditFilters, DeliveryStatus, TRIGGER_TYPES } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
@@ -110,6 +110,20 @@ export default function EmailRow({
   const isPaused = email.status === 'paused';
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
+
+  // Determine if this is a system/trigger email (event-based, not time-based)
+  const systemTriggers = [
+    'on_application_submit',
+    'on_approval',
+    'on_rejection',
+    'on_waitlist',
+    'on_payment_received',
+    'on_category_change',
+    'on_event_update',
+    'on_event_cancel',
+    'on_invitation_send'
+  ];
+  const isSystemEmail = systemTriggers.includes(email.trigger_type);
 
   // Status badge component
   const getStatusBadge = () => {
@@ -229,9 +243,15 @@ export default function EmailRow({
         {backendToFrontend(email.subject_template || '')}
       </div>
 
-      {/* Scheduled Date/Time */}
+      {/* Scheduled Date/Time or Trigger */}
       <div className="text-white/60">
-        {scheduledDate ? (
+        {isSystemEmail ? (
+          // Show trigger type for system/trigger emails (event-based)
+          <span className="text-white/50 text-[11px]">
+            {TRIGGER_TYPES.find(t => t.value === email.trigger_type)?.label || email.trigger_type}
+          </span>
+        ) : scheduledDate ? (
+          // Show date/time for scheduled emails (time-based)
           <div className="flex flex-col">
             <span className="text-[11px]">{format(scheduledDate, 'MMM d, yyyy')}</span>
             <span className="text-[10px] text-white/40">{format(scheduledDate, 'h:mm a')}</span>

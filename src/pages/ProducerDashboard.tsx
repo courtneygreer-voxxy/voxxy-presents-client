@@ -467,11 +467,25 @@ export default function ProducerDashboard() {
         return <LoadingCommandCenter eventName={selectedEvent.title} progress={creationProgress} />;
       }
 
+      // Don't render CommandCenter until organization loads
+      if (loadingOrg) {
+        return <LoadingCommandCenter eventName={selectedEvent?.title || "Event"} progress="Loading organization..." />;
+      }
+
+      // Show error if organization failed to load
+      if (!organization) {
+        return (
+          <div className="flex items-center justify-center min-h-[400px]">
+            <p className="text-red-400">Failed to load organization. Please refresh.</p>
+          </div>
+        );
+      }
+
       if (selectedEvent) {
         return (
           <CommandCenter
             event={selectedEvent}
-            organizationId={organization?.id}
+            organizationId={organization.id}
             onBack={() => {
               setEventsView('list');
               setSelectedEvent(null);

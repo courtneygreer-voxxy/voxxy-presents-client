@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch } from 'lucide-react';
+import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Calendar, Zap, ChevronDown } from 'lucide-react';
 import { scheduledEmailsApi, eventsApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
 import EmailTable from './EmailTable';
@@ -44,6 +44,10 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
+
+  // Section collapse state
+  const [scheduledCollapsed, setScheduledCollapsed] = useState(false);
+  const [systemCollapsed, setSystemCollapsed] = useState(false);
 
   // Sort state
   type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
@@ -319,6 +323,44 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
     });
   }, [emails, searchQuery, statusFilter, sortColumn, sortDirection]);
 
+  // Categorize emails into scheduled vs system/trigger
+  const categorizedEmails = useMemo(() => {
+    // Time-based triggers (have scheduled_for dates)
+    const scheduledTriggers = [
+      'on_application_open',
+      'days_before_deadline',
+      'days_after_deadline',
+      'on_event_date',
+      'days_before_event',
+      'days_after_event',
+      'on_payment_deadline',
+      'days_before_payment_deadline'
+    ];
+
+    // Event-based triggers (sent immediately on action)
+    const systemTriggers = [
+      'on_application_submit',
+      'on_approval',
+      'on_rejection',
+      'on_waitlist',
+      'on_payment_received',
+      'on_category_change',
+      'on_event_update',
+      'on_event_cancel',
+      'on_invitation_send'
+    ];
+
+    const scheduled = filteredEmails.filter(email =>
+      scheduledTriggers.includes(email.trigger_type)
+    );
+
+    const system = filteredEmails.filter(email =>
+      systemTriggers.includes(email.trigger_type)
+    );
+
+    return { scheduled, system };
+  }, [filteredEmails]);
+
   // Calculate statistics
   const stats = {
     total: emails.length,
@@ -554,25 +596,109 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
             )}
           </div>
 
-          {/* Email Table */}
-          <EmailTable
-            emails={filteredEmails}
-            eventSlug={eventSlug}
-            onEdit={handleEdit}
-            onPause={handlePause}
-            onResume={handleResume}
-            onSendNow={handleSendNow}
-            onRetryFailed={handleRetryFailed}
-            onDelete={handleDelete}
-            onViewAuditLog={(filters) => {
-              console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
-              setAuditLogFilters(filters);
-              setShowAuditLog(true);
-            }}
-            sortColumn={sortColumn}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-          />
+          {/* Scheduled Emails Section */}
+          {categorizedEmails.scheduled.length > 0 && (
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              {/* Section Header */}
+              <button
+                onClick={() => setScheduledCollapsed(!scheduledCollapsed)}
+                className="w-full flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <Calendar className="w-5 h-5 text-purple-400" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-white">
+                      Scheduled Emails
+                    </h3>
+                    <p className="text-sm text-white/60">
+                      Time-based automated emails ({categorizedEmails.scheduled.length})
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown
+                  className={`w-5 h-5 text-white/60 transition-transform ${
+                    scheduledCollapsed ? '-rotate-90' : ''
+                  }`}
+                />
+              </button>
+
+              {/* Section Content */}
+              {!scheduledCollapsed && (
+                <EmailTable
+                  emails={categorizedEmails.scheduled}
+                  eventSlug={eventSlug}
+                  onEdit={handleEdit}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onSendNow={handleSendNow}
+                  onRetryFailed={handleRetryFailed}
+                  onDelete={handleDelete}
+                  onViewAuditLog={(filters) => {
+                    console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
+                    setAuditLogFilters(filters);
+                    setShowAuditLog(true);
+                  }}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+              )}
+            </div>
+          )}
+
+          {/* System/Trigger Emails Section */}
+          {categorizedEmails.system.length > 0 && (
+            <div className="border border-white/10 rounded-lg overflow-hidden">
+              {/* Section Header */}
+              <button
+                onClick={() => setSystemCollapsed(!systemCollapsed)}
+                className="w-full flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-blue-500/20">
+                    <Zap className="w-5 h-5 text-blue-400" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-white">
+                      System/Trigger Emails
+                    </h3>
+                    <p className="text-sm text-white/60">
+                      Event-based automated emails ({categorizedEmails.system.length})
+                    </p>
+                  </div>
+                </div>
+                <ChevronDown
+                  className={`w-5 h-5 text-white/60 transition-transform ${
+                    systemCollapsed ? '-rotate-90' : ''
+                  }`}
+                />
+              </button>
+
+              {/* Section Content */}
+              {!systemCollapsed && (
+                <EmailTable
+                  emails={categorizedEmails.system}
+                  eventSlug={eventSlug}
+                  onEdit={handleEdit}
+                  onPause={handlePause}
+                  onResume={handleResume}
+                  onSendNow={handleSendNow}
+                  onRetryFailed={handleRetryFailed}
+                  onDelete={handleDelete}
+                  onViewAuditLog={(filters) => {
+                    console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
+                    setAuditLogFilters(filters);
+                    setShowAuditLog(true);
+                  }}
+                  sortColumn={sortColumn}
+                  sortDirection={sortDirection}
+                  onSort={handleSort}
+                />
+              )}
+            </div>
+          )}
         </div>
       )}
 

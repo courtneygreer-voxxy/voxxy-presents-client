@@ -85,14 +85,14 @@ export function EmailAuditLogOverlay({
               // Transform each delivery into an audit entry
               for (const delivery of deliveries) {
                 entries.push({
-                  id: `${email.id}-${delivery.registration_id}`,
+                  id: `${email.id}-${delivery.registration_id || delivery.event_invitation_id}`,
                   sent_at: delivery.sent_at,
-                  recipient_name: delivery.recipient_name || null, // ✅ Phase 1-3: Backend now includes this
+                  recipient_name: delivery.recipient_name || null,
                   recipient_email: delivery.recipient_email,
                   email_name: email.name,
                   email_subject: email.subject_template,
                   trigger_type: email.trigger_type,
-                  category: delivery.vendor_category || 'Unknown', // ✅ Phase 1-3: Backend now includes this
+                  category: email.email_template_item?.category || 'Unknown', // Use email template category
                   status: delivery.status,
                   bounce_reason: delivery.bounce_reason,
                   drop_reason: delivery.drop_reason,
@@ -123,7 +123,7 @@ export function EmailAuditLogOverlay({
                   email_name: email.name,
                   email_subject: email.subject_template,
                   trigger_type: email.trigger_type,
-                  category: recipientsData.category || 'Unknown',
+                  category: email.email_template_item?.category || 'Unknown', // Use email template category
                   status: 'scheduled',
                   bounce_reason: null,
                   drop_reason: null,

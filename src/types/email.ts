@@ -91,7 +91,8 @@ export interface ScheduledEmail {
   created_at: string;
   updated_at: string;
 
-  // Optional: Delivery tracking (included when requested)
+  // Optional: Associated objects (included when requested)
+  email_template_item?: EmailTemplateItem; // Included by backend via .includes(:email_template_item)
   latest_delivery?: EmailDelivery;
   email_deliveries?: EmailDelivery[];
 
@@ -129,7 +130,8 @@ export interface EmailDelivery {
   id: number;
   scheduled_email_id: number;
   event_id: number;
-  registration_id: number;
+  registration_id: number | null;
+  event_invitation_id: number | null; // For invitation deliveries (before registration)
 
   // Email identifiers
   sendgrid_message_id: string;
@@ -159,6 +161,10 @@ export interface EmailDelivery {
   // ✅ Phase 1-3: Backend now includes registration data for audit log
   recipient_name?: string | null;
   vendor_category?: string | null;
+
+  // Associated objects (included when requested)
+  registration?: any;
+  event_invitation?: any;
 }
 
 // ============================================================================
@@ -505,13 +511,13 @@ export interface AuditEntry {
   email_name: string; // From scheduled_email.name
   email_subject: string; // From scheduled_email.subject_template
   trigger_type: TriggerType;
-  category: string; // From registration.vendor_category (NOT inferred from trigger)
+  category: string; // From registration.vendor_category OR email_template_item.category
   status: DeliveryStatus;
   bounce_reason?: string | null;
   drop_reason?: string | null;
   unsubscribed_at?: string | null;
   scheduled_email_id: number;
-  registration_id: number;
+  registration_id: number | null; // Can be null for invitation deliveries or scheduled emails
 }
 
 export interface AuditFilters {
