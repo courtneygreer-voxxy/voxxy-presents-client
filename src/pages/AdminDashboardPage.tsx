@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Users, ArrowRight, Shield, Building2, Store } from "lucide-react"
+import { Users, ArrowRight, Shield, Building2, Store, ChevronDown, ChevronUp, Calendar, Mail, Key, Database } from "lucide-react"
 import { Link } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { adminApi } from "@/services/api"
@@ -15,6 +15,15 @@ interface User {
   status?: 'active' | 'suspended' | 'banned'
   confirmed_at: string | null
   created_at?: string
+  updated_at?: string
+  last_sign_in_at?: string
+  sign_in_count?: number
+  current_sign_in_ip?: string
+  organizations?: any[]
+  events?: any[]
+  vendor_applications?: any[]
+  registrations?: any[]
+  [key: string]: any // Allow additional fields
 }
 
 export default function AdminDashboardPage() {
@@ -22,6 +31,7 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [expandedUserId, setExpandedUserId] = useState<number | null>(null)
 
   useEffect(() => {
     loadUsers()
@@ -173,49 +183,179 @@ export default function AdminDashboardPage() {
                   <p className="text-gray-300">No Voxxy Presents users found</p>
                 </div>
               ) : (
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden">
-                  <div className="overflow-x-auto">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-white/10">
-                          <th className="text-left px-4 py-3 text-sm font-semibold text-white">Name</th>
-                          <th className="text-left px-4 py-3 text-sm font-semibold text-white">Email</th>
-                          <th className="text-left px-4 py-3 text-sm font-semibold text-white">Role</th>
-                          <th className="text-left px-4 py-3 text-sm font-semibold text-white">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {users.map((user) => (
-                          <tr key={user.id} className="border-b border-white/5 hover:bg-white/5 transition-colors">
-                            <td className="px-4 py-3 text-sm text-gray-200">
-                              {user.name || 'No name'}
-                            </td>
-                            <td className="px-4 py-3 text-sm text-gray-200">
-                              {user.email}
-                            </td>
-                            <td className="px-4 py-3">
-                              <Badge className={`${getRoleBadgeColor(user.role)} text-xs flex items-center gap-1 w-fit`}>
-                                {getRoleIcon(user.role)}
-                                {getDisplayRole(user.role)}
-                              </Badge>
-                            </td>
-                            <td className="px-4 py-3">
-                              <Badge
-                                variant={user.confirmed_at ? "default" : "outline"}
-                                className={
-                                  user.confirmed_at
-                                    ? "bg-green-500/20 border-green-400/30 text-green-300 text-xs"
-                                    : "bg-yellow-500/20 border-yellow-400/30 text-yellow-300 text-xs"
-                                }
-                              >
-                                {user.confirmed_at ? 'Verified' : 'Unverified'}
-                              </Badge>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                <div className="space-y-3">
+                  {users.map((user) => {
+                    const isExpanded = expandedUserId === user.id
+                    return (
+                      <div
+                        key={user.id}
+                        className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg overflow-hidden transition-all"
+                      >
+                        {/* User Header - Always Visible */}
+                        <button
+                          onClick={() => setExpandedUserId(isExpanded ? null : user.id)}
+                          className="w-full px-4 py-3 flex items-center justify-between hover:bg-white/5 transition-colors text-left"
+                        >
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="flex items-center gap-3">
+                              {getRoleIcon(user.role)}
+                              <div>
+                                <h4 className="text-sm font-semibold text-white">
+                                  {user.name || 'No name'}
+                                </h4>
+                                <p className="text-xs text-gray-300">{user.email}</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge className={`${getRoleBadgeColor(user.role)} text-xs`}>
+                              {getDisplayRole(user.role)}
+                            </Badge>
+                            <Badge
+                              className={
+                                user.confirmed_at
+                                  ? "bg-green-500/20 border-green-400/30 text-green-300 text-xs"
+                                  : "bg-yellow-500/20 border-yellow-400/30 text-yellow-300 text-xs"
+                              }
+                            >
+                              {user.confirmed_at ? 'Verified' : 'Unverified'}
+                            </Badge>
+                            {isExpanded ? (
+                              <ChevronUp className="h-5 w-5 text-gray-300" />
+                            ) : (
+                              <ChevronDown className="h-5 w-5 text-gray-300" />
+                            )}
+                          </div>
+                        </button>
+
+                        {/* Expanded User Context - Shows ALL Data */}
+                        {isExpanded && (
+                          <div className="px-4 pb-4 space-y-4 border-t border-white/10 pt-4">
+                            {/* Basic Info Section */}
+                            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 space-y-2">
+                              <h5 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+                                <Database className="h-4 w-4 text-purple-300" />
+                                User Context
+                              </h5>
+                              <div className="grid grid-cols-2 gap-3 text-xs">
+                                <div>
+                                  <p className="text-gray-400">User ID</p>
+                                  <p className="text-white font-mono">#{user.id}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Email</p>
+                                  <p className="text-white break-all">{user.email}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Name</p>
+                                  <p className="text-white">{user.name || 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Role</p>
+                                  <p className="text-white">{user.role || 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Created At</p>
+                                  <p className="text-white">{user.created_at ? new Date(user.created_at).toLocaleString() : 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Updated At</p>
+                                  <p className="text-white">{user.updated_at ? new Date(user.updated_at).toLocaleString() : 'N/A'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Last Sign In</p>
+                                  <p className="text-white">{user.last_sign_in_at ? new Date(user.last_sign_in_at).toLocaleString() : 'Never'}</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-400">Sign In Count</p>
+                                  <p className="text-white">{user.sign_in_count || 0} times</p>
+                                </div>
+                                {user.current_sign_in_ip && (
+                                  <div>
+                                    <p className="text-gray-400">Last IP</p>
+                                    <p className="text-white font-mono">{user.current_sign_in_ip}</p>
+                                  </div>
+                                )}
+                                <div>
+                                  <p className="text-gray-400">Confirmed At</p>
+                                  <p className="text-white">{user.confirmed_at ? new Date(user.confirmed_at).toLocaleString() : 'Not confirmed'}</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Organizations Section */}
+                            {user.organizations && user.organizations.length > 0 && (
+                              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                                <h5 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+                                  <Building2 className="h-4 w-4 text-green-300" />
+                                  Organizations ({user.organizations.length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {user.organizations.map((org: any, idx: number) => (
+                                    <div key={idx} className="bg-white/5 border border-white/10 rounded p-3 text-xs space-y-1">
+                                      <p className="text-white font-semibold">{org.name || `Organization #${org.id}`}</p>
+                                      <p className="text-gray-300">ID: {org.id}</p>
+                                      {org.created_at && <p className="text-gray-400">Created: {new Date(org.created_at).toLocaleDateString()}</p>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Events Section */}
+                            {user.events && user.events.length > 0 && (
+                              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                                <h5 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+                                  <Calendar className="h-4 w-4 text-blue-300" />
+                                  Events ({user.events.length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {user.events.map((event: any, idx: number) => (
+                                    <div key={idx} className="bg-white/5 border border-white/10 rounded p-3 text-xs space-y-1">
+                                      <p className="text-white font-semibold">{event.title || `Event #${event.id}`}</p>
+                                      <p className="text-gray-300">Slug: {event.slug}</p>
+                                      {event.event_date && <p className="text-gray-400">Date: {new Date(event.event_date).toLocaleDateString()}</p>}
+                                      {event.location && <p className="text-gray-400">Location: {event.location}</p>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Registrations Section */}
+                            {user.registrations && user.registrations.length > 0 && (
+                              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                                <h5 className="text-sm font-semibold text-white flex items-center gap-2 mb-3">
+                                  <Store className="h-4 w-4 text-yellow-300" />
+                                  Registrations ({user.registrations.length})
+                                </h5>
+                                <div className="space-y-2">
+                                  {user.registrations.map((reg: any, idx: number) => (
+                                    <div key={idx} className="bg-white/5 border border-white/10 rounded p-3 text-xs space-y-1">
+                                      <p className="text-white font-semibold">{reg.business_name || `Registration #${reg.id}`}</p>
+                                      <p className="text-gray-300">Status: {reg.status}</p>
+                                      {reg.vendor_category && <p className="text-gray-400">Category: {reg.vendor_category}</p>}
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {/* Raw JSON Dump - Shows EVERYTHING */}
+                            <details className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4">
+                              <summary className="text-sm font-semibold text-white cursor-pointer flex items-center gap-2">
+                                <Key className="h-4 w-4 text-red-300" />
+                                Raw User Object (Debug)
+                              </summary>
+                              <pre className="mt-3 text-xs text-gray-300 overflow-auto max-h-96 bg-black/30 p-3 rounded border border-white/10">
+                                {JSON.stringify(user, null, 2)}
+                              </pre>
+                            </details>
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
                 </div>
               )}
 

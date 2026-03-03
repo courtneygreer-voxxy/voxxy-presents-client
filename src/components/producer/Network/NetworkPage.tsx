@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Filter, UserPlus, Upload, List, Save } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload, List, Save, Trash2 } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
@@ -145,6 +145,48 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       setSelectedContacts(prev => prev.filter(id => id !== contactId));
     } catch (err: any) {
       alert(err.message || 'Failed to delete contact');
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    const count = selectedContacts.length;
+    if (!confirm(`Are you sure you want to delete ${count} contact${count > 1 ? 's' : ''}? This action cannot be undone.`)) {
+      return;
+    }
+
+    // Track progress
+    let successCount = 0;
+    let failedCount = 0;
+    const failedContacts: number[] = [];
+
+    // Delete contacts one by one
+    for (const contactId of selectedContacts) {
+      try {
+        await vendorContactsApi.delete(contactId);
+        successCount++;
+      } catch (err: any) {
+        console.error(`Failed to delete contact ${contactId}:`, err);
+        failedCount++;
+        failedContacts.push(contactId);
+      }
+    }
+
+    // Update local state - remove successful deletions
+    setContacts(prev => prev.filter(c => !selectedContacts.includes(c.id) || failedContacts.includes(c.id)));
+    setSelectedContacts(failedContacts);
+
+    // Show result message
+    if (failedCount === 0) {
+      alert(`Successfully deleted ${successCount} contact${successCount > 1 ? 's' : ''}`);
+    } else if (successCount === 0) {
+      alert(`Failed to delete all contacts. Please try again.`);
+    } else {
+      alert(`Deleted ${successCount} contact${successCount > 1 ? 's' : ''}. Failed to delete ${failedCount}.`);
+    }
+
+    // Refresh the list to ensure consistency
+    if (successCount > 0) {
+      fetchContacts(currentPage);
     }
   };
 
@@ -480,13 +522,22 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
       {/* Selection info */}
       {selectedContacts.length > 0 && (
-        <div className="flex items-center gap-3 text-xs text-white/60 bg-white/5 rounded-lg px-3 py-2">
-          <span className="font-medium">{selectedContacts.length} selected</span>
+        <div className="flex items-center justify-between gap-3 text-xs bg-white/5 rounded-lg px-3 py-2 border border-white/10">
+          <div className="flex items-center gap-3 text-white/60">
+            <span className="font-medium">{selectedContacts.length} selected</span>
+            <button
+              onClick={() => setSelectedContacts([])}
+              className="text-purple-400 hover:text-purple-300 underline"
+            >
+              Clear
+            </button>
+          </div>
           <button
-            onClick={() => setSelectedContacts([])}
-            className="text-purple-400 hover:text-purple-300 underline"
+            onClick={handleBulkDelete}
+            className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 text-xs font-medium rounded-lg transition-colors border border-red-500/30"
           >
-            Clear
+            <Trash2 className="w-3.5 h-3.5" />
+            Delete Selected
           </button>
         </div>
       )}

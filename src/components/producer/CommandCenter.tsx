@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Users, ClipboardList, Settings, Info, Mail, Megaphone, DollarSign } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Settings, Info, Mail, DollarSign } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import EventSettings from './EventSettings';
-import InvitesTab from './InvitesTab';
 import ApplicantsTab from './ApplicantsTab';
 import EventDetailsTab from './EventDetailsTab';
 import { EmailAutomationTab } from './Email';
-import { BulletinsTab } from './Bulletins';
 import { PaymentSettingsTab } from './PaymentIntegrations';
 
 interface Event {
@@ -46,16 +45,16 @@ interface CommandCenterProps {
   organizationId?: number;
 }
 
-type Tab = 'details' | 'invites' | 'applicants' | 'bulletins' | 'emails' | 'payments' | 'settings';
+type Tab = 'details' | 'applicants' | 'emails' | 'payments' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, onRefreshEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
 
   const tabs = [
     { id: 'details' as Tab, label: 'Home', icon: Info },
-    { id: 'invites' as Tab, label: 'Invites', icon: Users },
-    { id: 'applicants' as Tab, label: 'Applicants', icon: ClipboardList },
-    { id: 'bulletins' as Tab, label: 'Bulletins', icon: Megaphone },
+    { id: 'applicants' as Tab, label: 'Vendors', icon: ClipboardList },
     { id: 'emails' as Tab, label: 'Mail', icon: Mail },
     { id: 'payments' as Tab, label: 'Payments', icon: DollarSign },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
@@ -71,29 +70,22 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
             onNavigateToTab={(tab) => setActiveTab(tab as Tab)}
             onRefreshEvent={onRefreshEvent}
             organizationId={organizationId}
-          />
-        );
-      case 'invites':
-        return (
-          <InvitesTab
-            eventSlug={event.slug}
-            organizationId={organizationId}
+            isAdmin={isAdmin}
           />
         );
       case 'applicants':
-        return <ApplicantsTab eventSlug={event.slug} />;
-      case 'bulletins':
-        return <BulletinsTab eventSlug={event.slug} />;
+        return <ApplicantsTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
       case 'emails':
-        return <EmailAutomationTab eventSlug={event.slug} />;
+        return <EmailAutomationTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
       case 'payments':
-        return <PaymentSettingsTab eventSlug={event.slug} organizationId={organizationId || 1} />;
+        return <PaymentSettingsTab eventSlug={event.slug} organizationId={organizationId || 1} event={event} isAdmin={isAdmin} />;
       case 'settings':
         return (
           <EventSettings
             event={event}
             onUpdate={onUpdateEvent}
             onDelete={onDeleteEvent}
+            isAdmin={isAdmin}
           />
         );
       default:

@@ -10,7 +10,7 @@ interface GoLiveInvitationEditorProps {
     invitation_list_ids: number[];
     invitation_contact_ids: number[];
     invitation_excluded_ids: number[];
-  }) => void;
+  }) => void | Promise<void>;
   onCancel: () => void;
 }
 
@@ -236,6 +236,7 @@ export default function GoLiveInvitationEditor({
         <div className="text-center">
           <p className="text-red-400 mb-4">Organization information is missing</p>
           <button
+            type="button"
             onClick={onCancel}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
           >
@@ -265,6 +266,7 @@ export default function GoLiveInvitationEditor({
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
           <button
+            type="button"
             onClick={fetchContacts}
             className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
           >
@@ -279,41 +281,43 @@ export default function GoLiveInvitationEditor({
     filteredContacts.length > 0 && filteredContacts.every((c) => finalContactIds.includes(c.id));
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white/5 rounded-2xl p-6 lg:p-8 space-y-6">
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h2 className="text-xl font-semibold text-white">Edit Invitation List</h2>
-            <p className="text-white/60 text-sm mt-1">
-              Review and update who will be invited when you go live
-            </p>
-          </div>
-          <button
-            onClick={onCancel}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-white/60 hover:text-white" />
-          </button>
+    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      {/* Header */}
+      <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <div>
+          <h2 className="text-xl font-semibold text-white">Edit Invitation List</h2>
+          <p className="text-white/60 text-sm mt-1">
+            Review and update who will be invited when you go live
+          </p>
         </div>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="text-white/60 hover:text-white transition-colors"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6">{/* Content wrapper */}
 
         {/* Current Count Summary */}
-        <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20">
-          <div className="flex items-center gap-3">
-            <Users className="w-5 h-5 text-purple-400" />
-            <div>
-              <p className="text-sm text-white">
-                <strong className="text-lg">{finalContactIds.length}</strong> contacts will be
-                invited
-              </p>
-              <p className="text-xs text-white/50 mt-0.5">
+        <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-500/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Users className="w-5 h-5 text-purple-400" />
+              <div>
+                <p className="text-sm font-medium text-white">
+                  {finalContactIds.length} contacts will be invited
+                </p>
                 {selectedListIds.length > 0 && (
-                  <span>
+                  <p className="text-xs text-white/50 mt-0.5">
                     {listContacts.length} from lists, {invitedContactIds.length} manual
                     {excludedContactIds.length > 0 && `, ${excludedContactIds.length} excluded`}
-                  </span>
+                  </p>
                 )}
-              </p>
+              </div>
             </div>
           </div>
         </div>
@@ -329,7 +333,7 @@ export default function GoLiveInvitationEditor({
 
         {/* Exclusion UI - Show when lists are selected */}
         {selectedListIds.length > 0 && listOnlyContacts.length > 0 && (
-          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+          <div>
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h4 className="text-sm font-semibold text-white">Exclude Contacts (Optional)</h4>
@@ -338,20 +342,22 @@ export default function GoLiveInvitationEditor({
                 </p>
               </div>
               {excludedContactIds.length > 0 && (
-                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded">
+                <span className="text-xs px-2 py-1 bg-red-500/20 text-red-300 rounded-full border border-red-500/30">
                   {excludedContactIds.length} excluded
                 </span>
               )}
             </div>
 
-            <div className="max-h-48 overflow-y-auto space-y-1">
+            <div className="max-h-48 overflow-y-auto space-y-2">
               {listOnlyContacts.map((contact) => {
                 const isExcluded = excludedContactIds.includes(contact.id);
                 return (
                   <label
                     key={contact.id}
-                    className={`flex items-center gap-3 p-2 rounded hover:bg-white/5 cursor-pointer transition-colors ${
-                      isExcluded ? 'opacity-50' : ''
+                    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                      isExcluded
+                        ? 'bg-white/5 border-white/10 opacity-50'
+                        : 'bg-purple-500/10 border-purple-500/30'
                     }`}
                   >
                     <input
@@ -394,7 +400,7 @@ export default function GoLiveInvitationEditor({
         )}
 
         {/* Search and Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-3">
+        <div className="flex flex-col sm:flex-row gap-2">
           {/* Search */}
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
@@ -403,7 +409,7 @@ export default function GoLiveInvitationEditor({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name, business, email, or tags..."
-              className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
 
@@ -411,7 +417,7 @@ export default function GoLiveInvitationEditor({
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-transparent transition-all"
           >
             <option value="all">All Types</option>
             <option value="vendor">Vendors</option>
@@ -422,177 +428,113 @@ export default function GoLiveInvitationEditor({
         </div>
 
         {/* Selection Summary */}
-        <div className="bg-white/5 rounded-lg px-4 py-3 border border-white/10 flex items-center justify-between">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-white/90">
-              <strong>{finalContactIds.length}</strong> contacts selected
+            <span className="text-sm text-white/70">
+              <strong className="text-white">{finalContactIds.length}</strong> selected
             </span>
             {(invitedContactIds.length > 0 || selectedListIds.length > 0) && (
               <button
+                type="button"
                 onClick={handleClearAll}
-                className="text-xs text-purple-400 hover:text-purple-300 underline"
+                className="text-xs text-purple-400 hover:text-purple-300 transition-colors"
               >
-                Clear Manual Selections
+                Clear all
               </button>
             )}
           </div>
 
           {filteredContacts.length > 0 && (
             <button
+              type="button"
               onClick={handleSelectAll}
               className="text-sm text-white/70 hover:text-white transition-colors"
             >
-              {allFilteredSelected ? 'Deselect' : 'Select'} All Filtered
+              {allFilteredSelected ? 'Deselect' : 'Select'} all
             </button>
           )}
         </div>
 
         {/* Contacts List */}
-        {filteredContacts.length === 0 ? (
-          <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-white/50 text-sm">No contacts match your search criteria</p>
-            <button
-              onClick={() => {
-                setSearchTerm('');
-                setFilterType('all');
-              }}
-              className="mt-3 text-purple-400 hover:text-purple-300 text-sm underline"
-            >
-              Clear filters
-            </button>
-          </div>
-        ) : (
-          <div className="bg-white/5 rounded-lg border border-white/10 divide-y divide-white/5 max-h-[400px] overflow-y-auto">
-            {filteredContacts.map((contact) => {
+        <div className="space-y-2 max-h-[300px] overflow-y-auto">
+          {filteredContacts.length === 0 ? (
+            <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
+              <p className="text-white/50 text-sm">No contacts match your search criteria</p>
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchTerm('');
+                  setFilterType('all');
+                }}
+                className="mt-3 text-purple-400 hover:text-purple-300 text-sm transition-colors"
+              >
+                Clear filters
+              </button>
+            </div>
+          ) : (
+            filteredContacts.map((contact) => {
               const isSelected = finalContactIds.includes(contact.id);
               const isFromList = listContacts.some((c) => c.id === contact.id);
 
               return (
-                <div
+                <label
                   key={contact.id}
-                  className={`p-4 hover:bg-white/5 transition-colors cursor-pointer ${
-                    isSelected ? 'bg-purple-500/10' : ''
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                    isSelected
+                      ? 'bg-purple-500/20 border-purple-500/40'
+                      : 'bg-white/5 border-white/10 hover:bg-white/10'
                   }`}
-                  onClick={() => handleToggleContact(contact.id)}
                 >
-                  <div className="flex items-start gap-3">
-                    {/* Checkbox */}
-                    <div className="pt-0.5 flex-shrink-0">
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => handleToggleContact(contact.id)}
-                        className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-
-                    {/* Contact Info */}
-                    <div className="flex-1 min-w-0">
-                      {/* Name & Business */}
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <h4 className="text-sm font-semibold text-white">{contact.contact_name}</h4>
-                        {contact.business_name && (
-                          <>
-                            <span className="text-white/30">•</span>
-                            <div className="flex items-center gap-1.5 text-white/60">
-                              <Building2 className="w-3 h-3" />
-                              <span className="text-xs truncate">{contact.business_name}</span>
-                            </div>
-                          </>
-                        )}
-                        {isFromList && (
-                          <span className="flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs">
-                            <Filter className="w-3 h-3" />
-                            From List
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Email & Type */}
-                      <div className="flex items-center gap-3 text-xs text-white/50">
-                        <div className="flex items-center gap-1.5">
-                          <Mail className="w-3 h-3" />
-                          <span className="truncate">{contact.email}</span>
-                        </div>
-                        <span className="px-2 py-0.5 bg-white/10 text-white/60 rounded text-xs">
-                          {contact.contact_type}
-                        </span>
-                      </div>
-
-                      {/* Tags */}
-                      {contact.tags && contact.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {contact.tags.slice(0, 3).map((tag) => (
-                            <span
-                              key={tag}
-                              className="px-2 py-0.5 text-xs bg-purple-500/20 text-purple-300 rounded"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                          {contact.tags.length > 3 && (
-                            <span className="px-2 py-0.5 text-xs bg-white/10 text-white/50 rounded">
-                              +{contact.tags.length - 3}
-                            </span>
-                          )}
-                        </div>
+                  <input
+                    type="checkbox"
+                    checked={isSelected}
+                    onChange={() => handleToggleContact(contact.id)}
+                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-sm font-medium text-white truncate">{contact.contact_name}</span>
+                      {contact.business_name && (
+                        <>
+                          <span className="text-white/30">•</span>
+                          <span className="text-xs text-white/50 truncate">{contact.business_name}</span>
+                        </>
                       )}
                     </div>
+                    <div className="flex items-center gap-2 text-xs text-white/50">
+                      <Mail className="w-3 h-3" />
+                      <span className="truncate">{contact.email}</span>
+                    </div>
                   </div>
-                </div>
+                  {isFromList && (
+                    <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
+                      From List
+                    </span>
+                  )}
+                </label>
               );
-            })}
-          </div>
-        )}
+            })
+          )}
+        </div>
 
-        {/* Selected Contacts Preview */}
-        {selectedContacts.length > 0 && (
-          <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-500/20">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-semibold text-white">
-                Selected Contacts ({selectedContacts.length})
-              </h4>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {selectedContacts.slice(0, 20).map((contact) => (
-                <div
-                  key={contact.id}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-white/10 rounded-lg text-xs text-white"
-                >
-                  <span className="truncate max-w-[150px]">{contact.contact_name}</span>
-                  <button
-                    onClick={() => handleToggleContact(contact.id)}
-                    className="text-white/60 hover:text-white transition-colors"
-                  >
-                    <X className="w-3 h-3" />
-                  </button>
-                </div>
-              ))}
-              {selectedContacts.length > 20 && (
-                <div className="flex items-center px-3 py-1.5 bg-white/5 rounded-lg text-xs text-white/50">
-                  +{selectedContacts.length - 20} more
-                </div>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex items-center gap-3">
+      {/* Footer */}
+      <div className="px-6 py-4 border-t border-white/10 flex items-center justify-between">
         <button
-          onClick={handleSave}
-          className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
-        >
-          <Check className="w-5 h-5" />
-          Save Changes
-        </button>
-        <button
+          type="button"
           onClick={onCancel}
-          className="px-6 py-3 bg-white/5 hover:bg-white/10 text-white rounded-lg transition-colors"
+          className="text-sm text-white/70 hover:text-white transition-colors"
         >
           Cancel
+        </button>
+        <button
+          type="button"
+          onClick={handleSave}
+          className="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium flex items-center gap-2"
+        >
+          <Check className="w-4 h-4" />
+          Save {finalContactIds.length} contacts
         </button>
       </div>
     </div>

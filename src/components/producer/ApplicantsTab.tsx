@@ -15,20 +15,28 @@ import {
   AlertCircle,
   MapPin,
   Calendar,
-  CreditCard,
+  ChevronDown,
+  ChevronUp,
+  DollarSign,
 } from 'lucide-react';
-import { vendorApplicationsApi, registrationsApi } from '@/services/api';
+import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
+import { DebugPanel } from './DebugPanel';
 
 interface Applicant {
-  id: number;
+  id: string; // Changed to string to support "inv-X" and "reg-X" format
+  registrationId?: number; // Actual registration ID for API calls
+  invitationId?: number; // Invitation ID for email history
   business_name: string;
   contact_name?: string;
   email: string;
   phone?: string;
   vendor_category: string;
-  status: 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
+  status: 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
+  payment_status?: 'paid' | 'pending' | 'confirmed' | 'overdue' | 'n/a';
+  source?: 'contact' | 'net_new';
+  is_returning?: boolean;
   portfolio?: string;
   website?: string;
   instagram_handle?: string;
@@ -38,24 +46,39 @@ interface Applicant {
   location?: string;
   portfolio_images?: string[];
   producer_notes?: string;
+  tags?: string[];
 }
 
 interface ApplicantsTabProps {
   eventSlug: string;
+  event?: any;
+  isAdmin?: boolean;
 }
 
-type StatusFilter = 'all' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
+type StatusFilter = 'all' | 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
 
-export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
+export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsTabProps) {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
-  const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+
+  // Email history state
+  const [emailHistoryExpanded, setEmailHistoryExpanded] = useState(false);
+  const [emailHistoryData, setEmailHistoryData] = useState<any[]>([]);
+  const [loadingEmailHistory, setLoadingEmailHistory] = useState(false);
+
+  // Status change confirmation modal state
+  const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
+  const [pendingStatusChange, setPendingStatusChange] = useState<{
+    applicant: Applicant;
+    newStatus: 'approved' | 'waitlist' | 'rejected';
+  } | null>(null);
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
@@ -70,34 +93,124 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
       setLoading(true);
       setError(null);
 
+      // Fetch invitations (people who were invited)
+      const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, 1, 100);
+      const invitations = invitationsResponse.invitations || [];
+
       // Fetch all vendor applications for this event
       const applications = await vendorApplicationsApi.getByEvent(eventSlug);
 
-      // Extract unique categories from all applications
+      // Build available categories from vendor application names
       const categoriesSet = new Set<string>();
       applications.forEach((app: any) => {
-        if (app.categories && Array.isArray(app.categories)) {
-          app.categories.forEach((cat: string) => categoriesSet.add(cat));
-        }
+        if (app.name) categoriesSet.add(app.name);
       });
-      setAvailableCategories(Array.from(categoriesSet).sort());
 
       // Fetch submissions for each application
-      const allSubmissions: Applicant[] = [];
+      const allSubmissions: any[] = [];
       for (const app of applications) {
         try {
           const submissions = await vendorApplicationsApi.getSubmissions(app.id);
-          // Show ALL submissions (no status filtering - preparing to merge with Invites tab)
-          allSubmissions.push(...submissions);
+          const submissionsWithApp = submissions.map((sub: any) => ({
+            ...sub,
+            vendor_application: { id: app.id, name: app.name },
+          }));
+          allSubmissions.push(...submissionsWithApp);
+
+          // Add submission categories to the set
+          submissions.forEach((sub: any) => {
+            if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
+          });
         } catch (err) {
           console.error(`Failed to fetch submissions for application ${app.id}:`, err);
         }
       }
 
-      setApplicants(allSubmissions);
+      setAvailableCategories(Array.from(categoriesSet).sort());
+
+      // Merge logic: match by email (case-insensitive)
+      const emailMap = new Map<string, Applicant>();
+
+      // First, add all submissions/registrations
+      allSubmissions.forEach((submission) => {
+        const email = submission.email?.toLowerCase();
+        if (!email) return;
+
+        emailMap.set(email, {
+          id: `reg-${submission.id}`,
+          registrationId: submission.id,
+          business_name: submission.business_name,
+          contact_name: submission.contact_name || submission.name,
+          email: submission.email,
+          phone: submission.phone,
+          instagram_handle: submission.instagram_handle,
+          tiktok_handle: submission.tiktok_handle,
+          website: submission.website,
+          portfolio: submission.portfolio,
+          vendor_category: submission.vendor_category,
+          status: mapRegistrationStatus(submission.status),
+          payment_status: submission.payment_status || 'pending',
+          source: 'net_new', // Will be updated if matched with invitation
+          created_at: submission.created_at,
+          location: submission.location,
+          portfolio_images: submission.portfolio_images,
+          producer_notes: submission.producer_notes,
+        });
+      });
+
+      // Then, merge invitations
+      invitations.forEach((invitation: any) => {
+        const contact = invitation.vendor_contact;
+        if (!contact) return;
+
+        const email = contact.email?.toLowerCase();
+        if (!email) return;
+
+        if (emailMap.has(email)) {
+          // Contact applied - update source and merge contact data
+          const existing = emailMap.get(email)!;
+          existing.source = 'contact';
+          existing.is_returning = contact.source === 'returning' || contact.source === 'past_event';
+          existing.producer_notes = contact.notes || existing.producer_notes;
+          existing.tags = contact.tags || [];
+          existing.location = contact.location || existing.location;
+          existing.invitationId = invitation.id;
+          // Merge social media - prefer application data but fall back to contact data
+          existing.instagram_handle = existing.instagram_handle || contact.instagram_handle;
+          existing.tiktok_handle = existing.tiktok_handle || contact.tiktok_handle;
+          existing.website = existing.website || contact.website;
+          existing.phone = existing.phone || contact.phone;
+        } else {
+          // Contact was invited but hasn't applied yet
+          emailMap.set(email, {
+            id: `inv-${invitation.id}`,
+            invitationId: invitation.id,
+            business_name: contact.business_name || contact.name,
+            contact_name: contact.name,
+            email: contact.email,
+            phone: contact.phone,
+            instagram_handle: contact.instagram_handle,
+            tiktok_handle: contact.tiktok_handle,
+            website: contact.website,
+            vendor_category: 'Pending Application',
+            status: 'invited',
+            payment_status: 'n/a',
+            source: 'contact',
+            is_returning: contact.source === 'returning' || contact.source === 'past_event',
+            producer_notes: contact.notes,
+            tags: contact.tags || [],
+            location: contact.location,
+            created_at: invitation.created_at || new Date().toISOString(),
+          });
+        }
+      });
+
+      const mergedApplicants = Array.from(emailMap.values());
+      setApplicants(mergedApplicants);
+
       // Auto-select first applicant if available
-      if (allSubmissions.length > 0 && !selectedApplicant) {
-        setSelectedApplicant(allSubmissions[0]);
+      if (mergedApplicants.length > 0 && !selectedApplicant) {
+        setSelectedApplicant(mergedApplicants[0]);
       }
     } catch (err: any) {
       console.error('Failed to fetch applicants:', err);
@@ -107,10 +220,35 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
     }
   };
 
+  // Map registration status to applicant status
+  const mapRegistrationStatus = (regStatus: string): Applicant['status'] => {
+    switch (regStatus) {
+      case 'pending':
+        return 'pending';
+      case 'approved':
+        return 'approved';
+      case 'confirmed':
+        return 'confirmed';
+      case 'waitlist':
+        return 'waitlist';
+      case 'rejected':
+        return 'rejected';
+      case 'cancelled':
+        return 'cancelled';
+      default:
+        return 'pending';
+    }
+  };
+
   const handleUpdateCategory = async (applicant: Applicant, newCategory: string) => {
+    if (!applicant.registrationId) {
+      alert('Cannot update category: No application found');
+      return;
+    }
+
     try {
       setIsUpdatingCategory(true);
-      await registrationsApi.update(applicant.id, { vendor_category: newCategory });
+      await registrationsApi.update(applicant.registrationId, { vendor_category: newCategory });
 
       // Update local state
       setApplicants((prev) =>
@@ -131,41 +269,67 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
     }
   };
 
+  // Show confirmation modal before status change
+  const requestStatusChange = (applicant: Applicant, newStatus: 'approved' | 'waitlist' | 'rejected') => {
+    setPendingStatusChange({ applicant, newStatus });
+    setShowStatusConfirmModal(true);
+  };
+
+  // Confirm and execute status change
+  const confirmStatusChange = async () => {
+    if (!pendingStatusChange) return;
+
+    const { applicant, newStatus } = pendingStatusChange;
+
+    // Close modal
+    setShowStatusConfirmModal(false);
+    setPendingStatusChange(null);
+
+    // Execute the status change
+    await handleUpdateStatus(applicant, newStatus);
+  };
+
+  // Cancel status change
+  const cancelStatusChange = () => {
+    setShowStatusConfirmModal(false);
+    setPendingStatusChange(null);
+  };
+
   const handleUpdateStatus = async (
     applicant: Applicant,
     newStatus: 'approved' | 'waitlist' | 'rejected'
   ) => {
+    if (!applicant.registrationId) {
+      alert('Cannot update status: No application found');
+      return;
+    }
+
     try {
       setUpdatingId(applicant.id);
 
-      const response = await registrationsApi.update(applicant.id, { status: newStatus });
+      const response = await registrationsApi.update(applicant.registrationId, { status: newStatus });
 
       // Handle email notification
       if (response.email_notification) {
-        handleEmailNotification(response.email_notification, undefined, applicant.id);
+        handleEmailNotification(response.email_notification, undefined, applicant.registrationId);
       }
 
-      // Remove from list if approved or rejected
-      if (newStatus === 'approved' || newStatus === 'rejected') {
-        setApplicants((prev) => {
-          const updated = prev.filter((a) => a.id !== applicant.id);
-          // Select next applicant if current one was selected
-          if (selectedApplicant?.id === applicant.id && updated.length > 0) {
-            setSelectedApplicant(updated[0]);
-          } else if (updated.length === 0) {
-            setSelectedApplicant(null);
-          }
-          return updated;
+      // Update status in local state
+      setApplicants((prev) =>
+        prev.map((a) =>
+          a.id === applicant.id
+            ? { ...a, status: newStatus, reviewed_at: a.reviewed_at || new Date().toISOString() }
+            : a
+        )
+      );
+
+      // Update selected applicant if it's the one being modified
+      if (selectedApplicant?.id === applicant.id) {
+        setSelectedApplicant({
+          ...selectedApplicant,
+          status: newStatus,
+          reviewed_at: selectedApplicant.reviewed_at || new Date().toISOString(),
         });
-      } else {
-        // Update status for waitlist
-        setApplicants((prev) =>
-          prev.map((a) => (a.id === applicant.id ? { ...a, status: newStatus } : a))
-        );
-        // Update selected applicant if it's the one being modified
-        if (selectedApplicant?.id === applicant.id) {
-          setSelectedApplicant({ ...selectedApplicant, status: newStatus });
-        }
       }
     } catch (err: any) {
       console.error('Failed to update status:', err);
@@ -175,11 +339,88 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
     }
   };
 
+  // Handle payment status toggle
+  const handleTogglePayment = async (applicant: Applicant) => {
+    if (!applicant.registrationId || applicant.status !== 'approved') return;
+
+    try {
+      setUpdatingId(applicant.id);
+      const newPaymentStatus = applicant.payment_status === 'paid' ? 'pending' : 'paid';
+      const response = await registrationsApi.update(applicant.registrationId, { payment_status: newPaymentStatus });
+
+      // Handle email notification
+      if (response.email_notification) {
+        handleEmailNotification(response.email_notification, undefined, applicant.registrationId);
+      }
+
+      setApplicants((prev) =>
+        prev.map((a) => (a.id === applicant.id ? { ...a, payment_status: newPaymentStatus } : a))
+      );
+
+      if (selectedApplicant?.id === applicant.id) {
+        setSelectedApplicant({ ...selectedApplicant, payment_status: newPaymentStatus });
+      }
+    } catch (err: any) {
+      console.error('Failed to update payment status:', err);
+      alert(`Failed to update payment: ${err.message}`);
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
+  // Handle email history toggle
+  const handleToggleEmailHistory = async () => {
+    if (!selectedApplicant) return;
+
+    // If already expanded, collapse it
+    if (emailHistoryExpanded) {
+      setEmailHistoryExpanded(false);
+      return;
+    }
+
+    // Expand and fetch data if we don't have it
+    setEmailHistoryExpanded(true);
+
+    if (emailHistoryData.length > 0) return; // Already have data
+
+    try {
+      setLoadingEmailHistory(true);
+      let history;
+
+      if (selectedApplicant.registrationId) {
+        history = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+      } else if (selectedApplicant.invitationId) {
+        history = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+      } else {
+        throw new Error('No registration or invitation ID available');
+      }
+
+      setEmailHistoryData(history || []);
+    } catch (err: any) {
+      console.error('Failed to fetch email history:', err);
+      setEmailHistoryData([]);
+    } finally {
+      setLoadingEmailHistory(false);
+    }
+  };
+
+  // Reset email history when selected applicant changes
+  useEffect(() => {
+    setEmailHistoryExpanded(false);
+    setEmailHistoryData([]);
+  }, [selectedApplicant?.id]);
+
   const getStatusBadge = (status: string) => {
     switch (status) {
+      case 'invited':
+        return {
+          label: 'Invited',
+          color: 'bg-slate-500/20 text-slate-400',
+          icon: Mail,
+        };
       case 'pending':
         return {
-          label: 'Pending Review',
+          label: 'Pending',
           color: 'bg-blue-500/20 text-blue-400',
           icon: Clock,
         };
@@ -203,7 +444,7 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
         };
       case 'rejected':
         return {
-          label: 'Rejected',
+          label: 'Declined',
           color: 'bg-red-500/20 text-red-400',
           icon: XCircle,
         };
@@ -219,6 +460,21 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
           color: 'bg-gray-500/20 text-gray-400',
           icon: Clock,
         };
+    }
+  };
+
+  const getPaymentBadge = (paymentStatus?: string) => {
+    switch (paymentStatus) {
+      case 'paid':
+      case 'confirmed':
+        return { label: 'Paid', color: 'bg-green-500/20 text-green-400' };
+      case 'overdue':
+        return { label: 'Overdue', color: 'bg-red-500/20 text-red-400' };
+      case 'pending':
+        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400' };
+      case 'n/a':
+      default:
+        return null;
     }
   };
 
@@ -287,17 +543,18 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col p-3 md:p-4">
       {/* Two-Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Applicant List */}
-        <div className="w-80 border-r border-white/10 flex flex-col bg-[#0f0820]/50">
+        <div className="w-80 border-r border-white/10 flex flex-col">
           {/* List Header */}
           <div className="p-3 border-b border-white/10">
             <div className="mb-2">
-              <h2 className="text-sm font-bold text-white">Applicants</h2>
+              <h2 className="text-sm font-bold text-white">Vendors & Applicants</h2>
               <p className="text-[10px] text-white/60">
-                {filteredApplicants.length} pending review
+                {filteredApplicants.length} total
+                {statusFilter !== 'all' && ` • Filtered by ${statusFilter}`}
               </p>
             </div>
 
@@ -321,11 +578,12 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                 className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
               >
                 <option value="all">All Status</option>
-                <option value="pending">Pending</option>
+                <option value="invited">Invited (No Application)</option>
+                <option value="pending">Pending Review</option>
                 <option value="approved">Approved</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="waitlist">Waitlist</option>
-                <option value="rejected">Rejected</option>
+                <option value="rejected">Declined</option>
                 <option value="cancelled">Cancelled</option>
               </select>
               {hasActiveFilters && (
@@ -355,6 +613,8 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                   const StatusIcon = statusBadge.icon;
                   const isSelected = selectedApplicant?.id === applicant.id;
 
+                  const paymentBadge = getPaymentBadge(applicant.payment_status);
+
                   return (
                     <button
                       key={applicant.id}
@@ -366,22 +626,42 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
-                        <h3 className="text-xs font-semibold text-white truncate flex-1">
-                          {applicant.business_name}
-                        </h3>
+                        <div className="flex items-center gap-1 flex-1 min-w-0">
+                          <h3 className="text-xs font-semibold text-white truncate">
+                            {applicant.business_name}
+                          </h3>
+                          {applicant.is_returning && (
+                            <Star className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" fill="currentColor" />
+                          )}
+                        </div>
                         <span
                           className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${statusBadge.color} flex-shrink-0 ml-2`}
                         >
                           <StatusIcon className="w-2 h-2" />
-                          {statusBadge.label === 'Pending Review' ? 'Pending' : statusBadge.label}
+                          {statusBadge.label}
                         </span>
                       </div>
-                      <p className="text-[10px] text-white/60 truncate mb-1">
+                      <p className="text-[10px] text-white/60 truncate mb-1.5">
                         {applicant.contact_name || applicant.email}
                       </p>
-                      <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-500/20 text-purple-400">
-                        {applicant.vendor_category}
-                      </span>
+                      <div className="flex flex-wrap items-center gap-1">
+                        {applicant.status !== 'invited' && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-500/20 text-purple-400">
+                            {applicant.vendor_category}
+                          </span>
+                        )}
+                        {applicant.source === 'net_new' && (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-cyan-500/20 text-cyan-400">
+                            New
+                          </span>
+                        )}
+                        {paymentBadge && applicant.status === 'approved' && (
+                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium ${paymentBadge.color}`}>
+                            <DollarSign className="w-2 h-2" />
+                            {paymentBadge.label}
+                          </span>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
@@ -401,12 +681,29 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
               </div>
             </div>
           ) : (
-            <div className="p-4 max-w-3xl mx-auto">
+            <div className="p-4">
               {/* Detail Header */}
-              <div className="glass-card p-3 mb-3">
-                <div className="flex items-start justify-between mb-3">
+              <div className="glass-card p-4 mb-3">
+                <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <h2 className="text-lg font-bold text-white mb-1">{selectedApplicant.business_name}</h2>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h2 className="text-lg font-bold text-white">{selectedApplicant.business_name}</h2>
+                      {selectedApplicant.is_returning && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/30">
+                          <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
+                          <span className="text-[10px] font-medium text-yellow-400">Returning</span>
+                        </div>
+                      )}
+                      {selectedApplicant.source && (
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
+                          selectedApplicant.source === 'net_new'
+                            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+                            : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
+                        }`}>
+                          {selectedApplicant.source === 'net_new' ? 'New Applicant' : 'From Contacts'}
+                        </span>
+                      )}
+                    </div>
                     {selectedApplicant.contact_name && (
                       <p className="text-sm text-white/80 mb-2">{selectedApplicant.contact_name}</p>
                     )}
@@ -468,25 +765,31 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                 {/* Category */}
                 <div className="mb-3">
                   <p className="text-[10px] text-white/60 mb-1">Category</p>
-                  <select
-                    value={selectedApplicant.vendor_category}
-                    onChange={(e) => handleUpdateCategory(selectedApplicant, e.target.value)}
-                    disabled={isUpdatingCategory}
-                    className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {availableCategories.length > 0 ? (
-                      // Show all available categories, ensuring current category is included
-                      [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort().map((category) => (
-                        <option key={category} value={category}>
-                          {category}
+                  {selectedApplicant.status === 'invited' ? (
+                    <div className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white/40 text-xs border border-white/10 italic">
+                      Pending Application
+                    </div>
+                  ) : (
+                    <select
+                      value={selectedApplicant.vendor_category}
+                      onChange={(e) => handleUpdateCategory(selectedApplicant, e.target.value)}
+                      disabled={isUpdatingCategory}
+                      className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {availableCategories.length > 0 ? (
+                        // Show all available categories, ensuring current category is included
+                        [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort().map((category) => (
+                          <option key={category} value={category}>
+                            {category}
+                          </option>
+                        ))
+                      ) : (
+                        <option value={selectedApplicant.vendor_category}>
+                          {selectedApplicant.vendor_category}
                         </option>
-                      ))
-                    ) : (
-                      <option value={selectedApplicant.vendor_category}>
-                        {selectedApplicant.vendor_category}
-                      </option>
-                    )}
-                  </select>
+                      )}
+                    </select>
+                  )}
                 </div>
               </div>
 
@@ -558,11 +861,6 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                       <ExternalLink className="w-3 h-3 ml-auto" />
                     </a>
                   )}
-                  <button className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10">
-                    <CreditCard className="w-4 h-4 text-purple-400" />
-                    <span>Voxxy Card</span>
-                    <ExternalLink className="w-3 h-3 ml-auto" />
-                  </button>
                 </div>
               </div>
 
@@ -587,54 +885,194 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
                 </div>
               )}
 
-              {/* Producer Notes */}
-              <div className="glass-card p-3 mb-3">
-                <h3 className="text-sm font-semibold text-white mb-2">Producer Notes</h3>
-                {selectedApplicant.producer_notes ? (
-                  <p className="text-xs text-white/80">{selectedApplicant.producer_notes}</p>
-                ) : (
-                  <p className="text-xs text-white/40 italic">No notes yet</p>
-                )}
-              </div>
+              {/* Email History */}
+              {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
+                <div className="glass-card p-3 mb-3">
+                  <button
+                    onClick={handleToggleEmailHistory}
+                    className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth -m-2 mb-0"
+                  >
+                    <h3 className="text-sm font-semibold text-white">Email History</h3>
+                    {emailHistoryExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-white/60" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-white/60" />
+                    )}
+                  </button>
 
-              {/* Event History */}
-              <div className="glass-card p-3 mb-3">
-                <h3 className="text-sm font-semibold text-white mb-2">Event History</h3>
-                <p className="text-xs text-white/40 italic">Coming soon - past events attended</p>
-              </div>
+                  {emailHistoryExpanded && (
+                    <div className="mt-3 space-y-2">
+                      {loadingEmailHistory ? (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                        </div>
+                      ) : emailHistoryData.length > 0 ? (
+                        emailHistoryData.map((delivery: any) => {
+                          const deliveryStatus = delivery.status;
+                          const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
+                          const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
-              {/* Action Buttons */}
-              <div className="glass-card p-3">
-                {updatingId === selectedApplicant.id ? (
-                  <div className="flex items-center justify-end py-2">
-                    <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                          let statusColor = 'bg-gray-500/20 text-gray-400';
+                          if (deliveryStatus === 'delivered') statusColor = 'bg-green-500/20 text-green-400';
+                          else if (deliveryStatus === 'bounced') statusColor = 'bg-red-500/20 text-red-400';
+                          else if (deliveryStatus === 'dropped') statusColor = 'bg-orange-500/20 text-orange-400';
+                          else if (deliveryStatus === 'unsubscribed') statusColor = 'bg-yellow-500/20 text-yellow-400';
+
+                          return (
+                            <div key={delivery.id} className="bg-white/5 border border-white/10 rounded-lg p-2.5 space-y-1.5">
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-xs text-white font-medium truncate">{emailSubject}</p>
+                                  <p className="text-[10px] text-white/60 mt-0.5">
+                                    {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
+                                      month: 'short',
+                                      day: 'numeric',
+                                      year: 'numeric',
+                                      hour: 'numeric',
+                                      minute: '2-digit'
+                                    }) : 'Date unknown'}
+                                  </p>
+                                </div>
+                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor} whitespace-nowrap`}>
+                                  {deliveryStatus}
+                                </span>
+                              </div>
+
+                              {(delivery.bounce_reason || delivery.drop_reason) && (
+                                <p className="text-[10px] text-red-400/80 mt-1">
+                                  {delivery.bounce_type && `${delivery.bounce_type}: `}
+                                  {delivery.bounce_reason || delivery.drop_reason}
+                                </p>
+                              )}
+
+                              {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      await emailDeliveriesApi.retry(delivery.id);
+                                      alert('Email queued for retry');
+                                      // Refresh email history
+                                      if (selectedApplicant.registrationId) {
+                                        const updated = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+                                        setEmailHistoryData(updated || []);
+                                      }
+                                    } catch (err: any) {
+                                      alert(`Failed to retry: ${err.message}`);
+                                    }
+                                  }}
+                                  className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 transition-smooth"
+                                >
+                                  Retry
+                                </button>
+                              )}
+                            </div>
+                          );
+                        })
+                      ) : (
+                        <p className="text-xs text-white/40 italic py-2">No email history found</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Status & Payment Management - Only show for applicants who have applied */}
+              {selectedApplicant.status !== 'invited' && selectedApplicant.registrationId && (
+                <div className="glass-card p-3">
+                  <h3 className="text-sm font-semibold text-white mb-3">Status & Actions</h3>
+                  {updatingId === selectedApplicant.id ? (
+                    <div className="flex items-center justify-center py-2">
+                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                    </div>
+                  ) : selectedApplicant.status === 'pending' ? (
+                    <div className="flex justify-end gap-2">
+                      <button
+                        onClick={() => requestStatusChange(selectedApplicant, 'approved')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs font-medium transition-smooth"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => requestStatusChange(selectedApplicant, 'waitlist')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
+                      >
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        Waitlist
+                      </button>
+                      <button
+                        onClick={() => requestStatusChange(selectedApplicant, 'rejected')}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        Decline
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {/* Vendor Status Row */}
+                      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                        <div>
+                          <p className="text-[10px] text-white/60 mb-1">Vendor Status</p>
+                          <p className="text-xs text-white font-medium">{getStatusBadge(selectedApplicant.status).label}</p>
+                        </div>
+                        <select
+                          value={selectedApplicant.status}
+                          onChange={(e) => {
+                            const newStatus = e.target.value as 'approved' | 'waitlist' | 'rejected';
+                            if (newStatus !== selectedApplicant.status) {
+                              requestStatusChange(selectedApplicant, newStatus);
+                            }
+                          }}
+                          className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth"
+                        >
+                          <option value={selectedApplicant.status}>Keep as {getStatusBadge(selectedApplicant.status).label}</option>
+                          <option value="approved">Change to Approved</option>
+                          <option value="waitlist">Change to Waitlist</option>
+                          <option value="rejected">Change to Declined</option>
+                        </select>
+                      </div>
+
+                      {/* Payment Status Row - Only for approved with payment tracking */}
+                      {selectedApplicant.status === 'approved' && selectedApplicant.payment_status !== 'n/a' && (
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-[10px] text-white/60 mb-1">Payment Status</p>
+                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${
+                              getPaymentBadge(selectedApplicant.payment_status)?.color || 'bg-gray-500/20 text-gray-400'
+                            }`}>
+                              <DollarSign className="w-3.5 h-3.5" />
+                              {getPaymentBadge(selectedApplicant.payment_status)?.label || 'Unknown'}
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => handleTogglePayment(selectedApplicant)}
+                            disabled={updatingId === selectedApplicant.id}
+                            className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Mark as {selectedApplicant.payment_status === 'paid' ? 'Pending' : 'Paid'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Invited but not applied message */}
+              {selectedApplicant.status === 'invited' && (
+                <div className="glass-card p-3 border border-slate-500/30">
+                  <div className="flex items-start gap-2">
+                    <Mail className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-xs text-white/80 font-medium mb-1">Invited - Awaiting Application</p>
+                      <p className="text-[10px] text-white/60">
+                        This vendor was invited but hasn't submitted an application yet. Actions will be available once they apply.
+                      </p>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex justify-end gap-2">
-                    <button
-                      onClick={() => handleUpdateStatus(selectedApplicant, 'approved')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs font-medium transition-smooth"
-                    >
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(selectedApplicant, 'waitlist')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
-                    >
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      Waitlist
-                    </button>
-                    <button
-                      onClick={() => handleUpdateStatus(selectedApplicant, 'rejected')}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
-                    >
-                      <XCircle className="w-3.5 h-3.5" />
-                      Decline
-                    </button>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -651,6 +1089,98 @@ export default function ApplicantsTab({ eventSlug }: ApplicantsTabProps) {
         recipientEmail={dialogProps.recipientEmail}
         type={dialogProps.type}
         isLoading={dialogProps.isLoading}
+      />
+
+      {/* Status Change Confirmation Modal */}
+      {showStatusConfirmModal && pendingStatusChange && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+            {/* Header */}
+            <div className="flex items-start gap-3">
+              <div className={`p-2 rounded-lg ${
+                pendingStatusChange.newStatus === 'approved'
+                  ? 'bg-green-500/20'
+                  : pendingStatusChange.newStatus === 'rejected'
+                  ? 'bg-red-500/20'
+                  : 'bg-yellow-500/20'
+              }`}>
+                <Mail className={`w-5 h-5 ${
+                  pendingStatusChange.newStatus === 'approved'
+                    ? 'text-green-400'
+                    : pendingStatusChange.newStatus === 'rejected'
+                    ? 'text-red-400'
+                    : 'text-yellow-400'
+                }`} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  Change Status to {pendingStatusChange.newStatus === 'approved' ? 'Approved' : pendingStatusChange.newStatus === 'rejected' ? 'Declined' : 'Waitlisted'}?
+                </h3>
+                <p className="text-sm text-white/60">
+                  This will send an automated email notification
+                </p>
+              </div>
+            </div>
+
+            {/* Warning */}
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+              <p className="text-xs text-orange-400">
+                <strong>⚠️ Email will be sent to:</strong><br />
+                {pendingStatusChange.applicant.email}
+              </p>
+            </div>
+
+            {/* Vendor Info */}
+            <div className="bg-white/5 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-white font-medium">
+                {pendingStatusChange.applicant.business_name}
+              </p>
+              <p className="text-xs text-white/60">
+                {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
+              </p>
+              <p className="text-xs text-purple-400">
+                {pendingStatusChange.applicant.vendor_category}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={cancelStatusChange}
+                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmStatusChange}
+                className={`flex-1 px-4 py-2 rounded-lg text-white text-sm font-medium transition-smooth ${
+                  pendingStatusChange.newStatus === 'approved'
+                    ? 'bg-green-600 hover:bg-green-500'
+                    : pendingStatusChange.newStatus === 'rejected'
+                    ? 'bg-red-600 hover:bg-red-500'
+                    : 'bg-yellow-600 hover:bg-yellow-500'
+                }`}
+              >
+                Confirm & Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Applicants Tab"
+        data={{
+          event,
+          eventSlug,
+          applicants,
+          selectedApplicant,
+          statusFilter,
+          searchQuery,
+          availableCategories,
+        }}
+        isAdmin={isAdmin}
       />
     </div>
   );

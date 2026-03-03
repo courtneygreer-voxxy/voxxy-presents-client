@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Send, Mail, AlertCircle, Check, Edit } from 'lucide-react';
 import { eventsApi } from '@/services/api';
 import GoLiveInvitationEditor from './GoLiveInvitationEditor';
 
 interface GoLiveCardProps {
   event: any;
-  onGoLive: () => void;
+  onGoLive: () => void | Promise<void>;
   organizationId?: number;
 }
 
@@ -16,6 +16,9 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [updatingInvitations, setUpdatingInvitations] = useState(false);
+
+  // Track previous invitation count to detect changes
+  const prevCountRef = useRef<number>(0);
 
   const isLive = event.status?.is_live || false;
   const invitationCount = event.invitation_draft?.total_count || 0;
@@ -36,18 +39,8 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
 
     try {
       await eventsApi.update(event.slug, data);
-      console.log('Invitation list updated successfully');
-
-      // Update local event data if needed
-      event.invitation_draft = {
-        list_ids: data.invitation_list_ids,
-        contact_ids: data.invitation_contact_ids,
-        excluded_ids: data.invitation_excluded_ids,
-        total_count: 0, // Will be recalculated on next page load
-      };
-
+      await onGoLive();
       setShowEditor(false);
-      setShowConfirm(true);
     } catch (err: any) {
       console.error('Failed to update invitation list:', err);
       setError(err.message || 'Failed to update invitation list');
@@ -61,16 +54,11 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
     setError(null);
 
     try {
-      const result = await eventsApi.goLive(event.slug);
-      console.log('Go live result:', result);
-
+      await eventsApi.goLive(event.slug);
       setSuccess(true);
       setShowConfirm(false);
-
-      // Wait a moment to show success, then refresh
-      setTimeout(() => {
-        onGoLive();
-      }, 2000);
+      await onGoLive();
+      setSuccess(false);
     } catch (err: any) {
       console.error('Failed to go live:', err);
       setError(err.message || 'Failed to activate event');
@@ -184,15 +172,15 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   if (showEditor) {
     return (
       <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div className="bg-gradient-to-br from-gray-900 to-black rounded-2xl border border-purple-500/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-          {updatingInvitations ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="flex flex-col items-center gap-4">
-                <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <p className="text-white/60">Saving changes...</p>
-              </div>
+        {updatingInvitations ? (
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 p-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <p className="text-white/60">Saving changes...</p>
             </div>
-          ) : (
+          </div>
+        ) : (
+          <>
             <GoLiveInvitationEditor
               event={event}
               organizationId={organizationId}
@@ -202,14 +190,13 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
                 setError(null);
               }}
             />
-          )}
-
-          {error && (
-            <div className="m-6 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-              <p className="text-red-400 text-sm">{error}</p>
-            </div>
-          )}
-        </div>
+            {error && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 max-w-md w-full mx-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg backdrop-blur-sm">
+                <p className="text-red-400 text-sm text-center">{error}</p>
+              </div>
+            )}
+          </>
+        )}
       </div>
     );
   }
@@ -234,11 +221,22 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
       )}
 
       <div className="flex flex-col gap-2">
+        {error && (
+          <div className="p-2 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <p className="text-red-400 text-xs">{error}</p>
+          </div>
+        )}
         <button
-          onClick={() => setShowEditor(true)}
-          disabled={!organizationId}
-          className="w-full px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
-          title={!organizationId ? 'Organization information required' : 'Review and edit invitations'}
+          onClick={() => {
+            if (!organizationId) {
+              setError('Organization information is required');
+              console.error('Missing organizationId for invitation editor');
+              return;
+            }
+            setShowEditor(true);
+            setError(null);
+          }}
+          className="w-full px-3 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-medium rounded-lg transition-all flex items-center justify-center gap-1.5"
         >
           <Edit className="w-3.5 h-3.5" />
           Review Invitations

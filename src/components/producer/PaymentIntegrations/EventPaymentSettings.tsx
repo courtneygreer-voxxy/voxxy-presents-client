@@ -10,6 +10,9 @@ import {
   Link2,
   Calendar,
   ExternalLink,
+  Edit2,
+  X,
+  Save,
 } from 'lucide-react';
 import {
   organizationIntegrationsApi,
@@ -47,6 +50,10 @@ export default function EventPaymentSettings({
   const [selectedEventId, setSelectedEventId] = useState('');
   const [autoSync, setAutoSync] = useState(true);
   const [autoUpdate, setAutoUpdate] = useState(true);
+
+  // Edit mode state
+  const [isEditingUrl, setIsEditingUrl] = useState(false);
+  const [editedUrl, setEditedUrl] = useState('');
 
   useEffect(() => {
     fetchIntegration();
@@ -163,6 +170,48 @@ export default function EventPaymentSettings({
     } catch (err: any) {
       console.error('Failed to toggle auto-sync:', err);
       setError(err.message || 'Failed to update settings');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleStartEditUrl = () => {
+    setEditedUrl(integration?.provider_url || '');
+    setIsEditingUrl(true);
+    setError(null);
+    setSuccess(null);
+  };
+
+  const handleCancelEditUrl = () => {
+    setIsEditingUrl(false);
+    setEditedUrl('');
+  };
+
+  const handleSaveUrl = async () => {
+    if (!integration) return;
+
+    if (!editedUrl.trim()) {
+      setError('Please enter a valid Eventbrite URL');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      setSuccess(null);
+
+      const updated = await paymentIntegrationsApi.update(eventSlug, integration.id, {
+        provider_url: editedUrl.trim(),
+      });
+
+      setIntegration(updated);
+      setIsEditingUrl(false);
+      setEditedUrl('');
+      setSuccess('Ticket link updated successfully!');
+      onIntegrationChange?.(updated);
+    } catch (err: any) {
+      console.error('Failed to update ticket link:', err);
+      setError(err.message || 'Failed to update ticket link');
     } finally {
       setIsLoading(false);
     }
@@ -426,18 +475,64 @@ export default function EventPaymentSettings({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-sm text-white/60 mb-1">Eventbrite Event</p>
-              <p className="font-medium text-sm text-white truncate">{integration.provider_event_id || 'Connected'}</p>
-              {integration.provider_url && (
-                <a
-                  href={integration.provider_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs text-purple-400 hover:underline flex items-center gap-1 mt-1"
-                >
-                  View on Eventbrite
-                  <ExternalLink className="w-3 h-3" />
-                </a>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-white/60">Eventbrite Event</p>
+                {!isEditingUrl && (
+                  <button
+                    onClick={handleStartEditUrl}
+                    disabled={isLoading}
+                    className="p-1 text-purple-400 hover:text-purple-300 transition-colors disabled:opacity-50"
+                    title="Edit ticket link"
+                  >
+                    <Edit2 className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              {isEditingUrl ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={editedUrl}
+                    onChange={(e) => setEditedUrl(e.target.value)}
+                    placeholder="https://www.eventbrite.com/e/..."
+                    className="w-full px-3 py-2 text-sm bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    disabled={isLoading}
+                  />
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveUrl}
+                      disabled={isLoading}
+                      className="flex-1 px-3 py-1.5 text-xs bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <Save className="w-3 h-3" />
+                      Save
+                    </button>
+                    <button
+                      onClick={handleCancelEditUrl}
+                      disabled={isLoading}
+                      className="flex-1 px-3 py-1.5 text-xs bg-white/10 text-white rounded hover:bg-white/20 disabled:opacity-50 transition-colors flex items-center justify-center gap-1"
+                    >
+                      <X className="w-3 h-3" />
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="font-medium text-sm text-white truncate">{integration.provider_event_id || 'Connected'}</p>
+                  {integration.provider_url && (
+                    <a
+                      href={integration.provider_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-purple-400 hover:underline flex items-center gap-1 mt-1"
+                    >
+                      View on Eventbrite
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
+                </>
               )}
             </div>
 

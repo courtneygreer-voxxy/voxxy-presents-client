@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
 import { WizardState } from './types';
 import WizardProgress from './WizardProgress';
 import WizardNavigation from './WizardNavigation';
@@ -15,6 +16,9 @@ interface CreateEventWizardProps {
 }
 
 export default function CreateEventWizard({ onCancel, onSubmit, organizationId }: CreateEventWizardProps) {
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
+
   const [wizardState, setWizardState] = useState<WizardState>({
     currentStep: 1,
     eventDetails: {
@@ -47,6 +51,68 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Admin-only: Prefill with test data
+  const prefillTestData = () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const nextWeek = new Date();
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const twoWeeksOut = new Date();
+    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
+
+    // Generate a random 6-digit event code
+    const randomCode = Math.floor(100000 + Math.random() * 900000);
+
+    setWizardState({
+      currentStep: 1,
+      eventDetails: {
+        title: `Test Event #${randomCode}`,
+        description: 'This is a test event created with prefilled data for testing purposes. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        event_date: tomorrow.toISOString().split('T')[0],
+        event_end_date: nextWeek.toISOString().split('T')[0],
+        start_time: '10:00',
+        end_time: '18:00',
+        venue: 'Test Venue',
+        location: 'New York, NY',
+        age_restriction: '21+',
+        ticket_link: 'https://example.com/tickets',
+        application_deadline: nextWeek.toISOString().split('T')[0],
+        payment_deadline: twoWeeksOut.toISOString().split('T')[0],
+      },
+      applicationDetails: {
+        applications: [
+          {
+            id: `app-${Date.now()}-1`,
+            name: 'Artists',
+            description: 'Visual artists and painters',
+            booth_price: 150,
+            categories: ['painting', 'sculpture', 'photography'],
+            payment_link: 'https://example.com/pay/artists',
+          },
+          {
+            id: `app-${Date.now()}-2`,
+            name: 'Food Vendors',
+            description: 'Food trucks and food vendors',
+            booth_price: 250,
+            categories: ['food', 'beverage'],
+            payment_link: 'https://example.com/pay/food',
+          },
+        ],
+      },
+      inviteList: {
+        selectedListIds: [],
+        invitedContactIds: [],
+        excludedContactIds: [],
+      },
+      automaticMessages: {
+        messages: [],
+      },
+    });
+    setCompletedSteps([]);
+    setErrors({});
+    alert('✅ Test data prefilled! You can now proceed through the wizard or modify the fields.');
+  };
 
   const updateWizardState = (updates: Partial<WizardState>) => {
     setWizardState((prev) => ({ ...prev, ...updates }));
@@ -284,10 +350,24 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Create New Event</h1>
-        <p className="text-white/60">
-          Follow the steps to set up your event and vendor applications
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Create New Event</h1>
+            <p className="text-white/60">
+              Follow the steps to set up your event and vendor applications
+            </p>
+          </div>
+          {/* Admin Only: Prefill Test Data Button */}
+          {isAdmin && (
+            <button
+              onClick={prefillTestData}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-500/20"
+            >
+              <Sparkles className="w-4 h-4" />
+              Prefill Test Data
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Progress Indicator */}

@@ -2,15 +2,18 @@ import { useState } from 'react';
 import { DollarSign, Receipt } from 'lucide-react';
 import EventPaymentSettings from './EventPaymentSettings';
 import PaymentTransactionsList from './PaymentTransactionsList';
+import { DebugPanel } from '../DebugPanel';
 
 interface PaymentSettingsTabProps {
   eventSlug: string;
   organizationId: number;
+  event?: any;
+  isAdmin?: boolean;
 }
 
 type TabView = 'settings' | 'transactions';
 
-export default function PaymentSettingsTab({ eventSlug, organizationId }: PaymentSettingsTabProps) {
+export default function PaymentSettingsTab({ eventSlug, organizationId, event, isAdmin }: PaymentSettingsTabProps) {
   const [activeTab, setActiveTab] = useState<TabView>('settings');
 
   const tabs = [
@@ -19,7 +22,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId }: Paymen
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="p-3 md:p-4 space-y-6">
       {/* Tabs */}
       <div className="border-b border-purple-500/20">
         <div className="flex gap-2">
@@ -64,6 +67,18 @@ export default function PaymentSettingsTab({ eventSlug, organizationId }: Paymen
           />
         )}
       </div>
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Payment Settings Tab"
+        data={{
+          event,
+          eventSlug,
+          organizationId,
+          activeTab,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

@@ -24,6 +24,27 @@ interface Organization {
   slug: string;
   name: string;
   user_id: number;
+  verified?: boolean;
+  active?: boolean;
+  description?: string;
+  logo_url?: string;
+  contact?: {
+    email?: string;
+    phone?: string;
+    website?: string;
+    instagram?: string;
+  };
+  location?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+    latitude?: number | null;
+    longitude?: number | null;
+  };
+  timezone?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface Event {
@@ -91,12 +112,20 @@ export default function ProducerDashboard() {
         const response = await organizationsApi.getMine();
         console.log('My organization response:', response);
 
-        let userOrg = response?.organization !== null ? response : null;
-
-        // Handle case where response is { organization: null }
-        if (response?.organization === null) {
-          userOrg = null;
+        // Backend returns org directly when it exists: { id, name, slug, ... }
+        // But returns { organization: null } when it doesn't exist
+        let userOrg = null;
+        if (response) {
+          // If response has an 'organization' key with null, no org exists
+          if ('organization' in response && response.organization === null) {
+            userOrg = null;
+          } else {
+            // Otherwise, response IS the organization
+            userOrg = response;
+          }
         }
+
+        console.log('Extracted organization:', userOrg);
 
         // If no organization exists, create one automatically
         if (!userOrg) {
@@ -107,6 +136,7 @@ export default function ProducerDashboard() {
               description: 'Event production and venue management',
             });
             console.log('Organization created:', newOrg);
+            // Create endpoint returns org directly (same as getMine when org exists)
             userOrg = newOrg;
           } catch (createErr: any) {
             console.error('Failed to create organization:', createErr);
@@ -122,7 +152,8 @@ export default function ProducerDashboard() {
               const retryResponse = await organizationsApi.getMine();
               console.log('Retry response:', retryResponse);
 
-              if (retryResponse && retryResponse.organization !== null) {
+              // Same logic: response IS the org unless it has organization: null
+              if (retryResponse && !('organization' in retryResponse && retryResponse.organization === null)) {
                 userOrg = retryResponse;
               } else {
                 setError('Organization exists but could not be loaded. Please contact support or try logging out and back in.');
@@ -138,7 +169,9 @@ export default function ProducerDashboard() {
         }
 
         if (userOrg) {
-          console.log('Setting organization:', userOrg);
+          console.log('🏢 [ProducerDashboard] Setting organization:', userOrg);
+          console.log('🏢 [ProducerDashboard] Organization ID:', userOrg.id);
+          console.log('🏢 [ProducerDashboard] Organization slug:', userOrg.slug);
           setOrganization(userOrg);
           // Fetch events for this organization
           await fetchEvents(userOrg.slug);
@@ -224,8 +257,6 @@ export default function ProducerDashboard() {
         published: false,
       });
 
-      console.log('✅ Event created:', newEvent.slug);
-
       // Step 2: Batch create vendor applications with all application fields
       if (wizardState.applicationDetails.applications.length > 0) {
         setCreationProgress('Setting up vendor applications...');
@@ -253,7 +284,6 @@ export default function ProducerDashboard() {
         if (failures.length > 0) {
           console.error(`${failures.length} applications failed to create:`, failures);
         }
-        console.log('✅ Vendor applications created');
       }
 
       // Step 3: Save invitation data for "Go Live" later (don't send yet)
@@ -264,18 +294,12 @@ export default function ProducerDashboard() {
       if (hasInvites) {
         setCreationProgress('Saving invitation selections...');
 
-        console.log(`Saving invitation data to event:`);
-        console.log(`  - ${wizardState.inviteList.selectedListIds.length} lists`);
-        console.log(`  - ${wizardState.inviteList.invitedContactIds.length} manual contacts`);
-        console.log(`  - ${wizardState.inviteList.excludedContactIds.length} excluded contacts`);
-
         try {
           await eventsApi.update(newEvent.slug, {
             invitation_list_ids: wizardState.inviteList.selectedListIds,
             invitation_contact_ids: wizardState.inviteList.invitedContactIds,
             invitation_excluded_ids: wizardState.inviteList.excludedContactIds,
           });
-          console.log('✅ Invitation data saved for later');
         } catch (error) {
           console.error('Failed to save invitation data:', error);
           // Don't throw - event creation succeeded, just log the error
@@ -369,14 +393,11 @@ export default function ProducerDashboard() {
   // Refetch selected event (for Go Live and other status changes)
   const refetchSelectedEvent = async () => {
     if (!selectedEvent) {
-      console.warn('No selected event to refetch');
       return;
     }
 
     try {
-      console.log('Refetching event:', selectedEvent.slug);
       const updatedEvent = await eventsApi.getById(selectedEvent.slug);
-      console.log('Event refetched successfully:', updatedEvent);
       setSelectedEvent(updatedEvent);
     } catch (err) {
       console.error('Failed to refetch event:', err);
@@ -482,6 +503,11 @@ export default function ProducerDashboard() {
       }
 
       if (selectedEvent) {
+        // Create a wrapper function to ensure it's always defined
+        const handleRefreshEvent = async () => {
+          await refetchSelectedEvent();
+        };
+
         return (
           <CommandCenter
             event={selectedEvent}
@@ -496,7 +522,7 @@ export default function ProducerDashboard() {
               setEventsView('list');
               setSelectedEvent(null);
             }}
-            onRefreshEvent={refetchSelectedEvent}
+            onRefreshEvent={handleRefreshEvent}
           />
         );
       }
@@ -656,6 +682,44 @@ export default function ProducerDashboard() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
+          {/* DEBUG PANEL - Organization Info */}
+          <div className="sticky top-0 z-50 bg-red-500/20 border-2 border-red-500 p-3 m-3 rounded-lg">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-bold text-white">🐛 DEBUG: Organization Data</h3>
+              <span className="text-xs text-white/60">ProducerDashboard State</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div>
+                <span className="text-white/60">loadingOrg:</span>
+                <span className="text-white ml-2">{String(loadingOrg)}</span>
+              </div>
+              <div>
+                <span className="text-white/60">organization exists:</span>
+                <span className="text-white ml-2">{String(!!organization)}</span>
+              </div>
+              <div>
+                <span className="text-white/60">organization.id:</span>
+                <span className="text-yellow-300 ml-2 font-bold">{organization?.id || 'UNDEFINED'}</span>
+              </div>
+              <div>
+                <span className="text-white/60">organization.slug:</span>
+                <span className="text-white ml-2">{organization?.slug || 'N/A'}</span>
+              </div>
+              <div className="col-span-2">
+                <span className="text-white/60">organization.name:</span>
+                <span className="text-white ml-2">{organization?.name || 'N/A'}</span>
+              </div>
+              <div className="col-span-2">
+                <details className="mt-2">
+                  <summary className="text-white/60 cursor-pointer hover:text-white">Full organization object (click to expand)</summary>
+                  <pre className="mt-2 p-2 bg-black/50 rounded text-[10px] overflow-auto max-h-40 text-green-300">
+                    {JSON.stringify(organization, null, 2)}
+                  </pre>
+                </details>
+              </div>
+            </div>
+          </div>
+
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} />
           ) : activeNav === 'events' ? (

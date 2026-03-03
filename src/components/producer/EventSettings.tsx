@@ -3,6 +3,7 @@ import { Eye, EyeOff, Calendar, Trash2, FileText, Edit, Pause, Link, Copy, Exter
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
+import { DebugPanel } from './DebugPanel';
 
 interface Event {
   id: number;
@@ -63,11 +64,12 @@ interface EventSettingsProps {
   event: Event;
   onUpdate?: (eventSlug: string, updates: any) => Promise<void>;
   onDelete?: (eventSlug: string) => Promise<void>;
+  isAdmin?: boolean;
 }
 
 type View = 'settings' | 'create_app' | 'edit_app';
 
-export default function EventSettings({ event, onUpdate, onDelete }: EventSettingsProps) {
+export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: EventSettingsProps) {
   const [currentView, setCurrentView] = useState<View>('settings');
   const [applications, setApplications] = useState<VendorApplication[]>([]);
   const [selectedApplication, setSelectedApplication] = useState<VendorApplication | null>(null);
@@ -362,7 +364,7 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
   }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-8">
+    <div className="p-3 md:p-4 max-w-6xl mx-auto space-y-8">
       {/* Event Details Section - MOVED TO TOP */}
       <div>
         <div className="flex items-center gap-3 mb-6">
@@ -892,6 +894,18 @@ export default function EventSettings({ event, onUpdate, onDelete }: EventSettin
           </div>
         </div>
       </div>
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Event Settings Tab"
+        data={{
+          event,
+          currentView,
+          applications,
+          selectedApplication,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

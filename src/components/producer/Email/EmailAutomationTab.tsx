@@ -6,9 +6,12 @@ import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
+import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
+  event?: any;
+  isAdmin?: boolean;
 }
 
 type FilterType = 'all' | ScheduledEmailStatus;
@@ -22,7 +25,7 @@ const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
-export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProps) {
+export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailAutomationTabProps) {
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -397,7 +400,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
   if (isLoading) {
     return (
-      <div className="p-6 lg:p-8">
+      <div className="p-3 md:p-4">
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
           <p className="text-white/60">Loading email automation...</p>
@@ -407,7 +410,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   }
 
   return (
-    <div className="p-6 lg:p-8">
+    <div className="p-3 md:p-4">
       {/* Header with Stats */}
       <div className="mb-8">
         <div className="flex items-start justify-between mb-6">
@@ -709,6 +712,19 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
         onSuccess={handleSaveAsTemplate}
       />
 
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Email Automation Tab"
+        data={{
+          event,
+          eventSlug,
+          emails,
+          isLoading,
+          error,
+          successMessage,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

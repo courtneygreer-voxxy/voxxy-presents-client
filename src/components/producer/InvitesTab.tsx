@@ -17,6 +17,7 @@ import {
 import { eventInvitationsApi, vendorApplicationsApi, registrationsApi, emailDeliveriesApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
+import { DebugPanel } from './DebugPanel';
 
 // Unified invite row interface
 interface InviteRow {
@@ -48,6 +49,8 @@ interface InviteRow {
 interface InvitesTabProps {
   eventSlug: string;
   organizationId?: number;
+  event?: any;
+  isAdmin?: boolean;
 }
 
 type StatusFilter = 'all' | 'invited' | 'applied' | 'approved' | 'waitlist' | 'declined' | 'bounced' | 'unsubscribed';
@@ -55,7 +58,7 @@ type ReviewFilter = 'all' | 'reviewed' | 'unreviewed';
 type PaymentFilter = 'all' | 'paid' | 'pending' | 'n/a';
 type SourceFilter = 'all' | 'contact' | 'net_new';
 
-export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProps) {
+export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }: InvitesTabProps) {
   const [inviteRows, setInviteRows] = useState<InviteRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -517,7 +520,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
 
   if (error) {
     return (
-      <div className="p-3 md:p-4">
+      <div className="p-6 lg:p-8">
         <div className="text-center py-12">
           <p className="text-sm text-red-400 mb-3">{error}</p>
           <button
@@ -532,7 +535,7 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
   }
 
   return (
-    <div className="p-3 md:p-4">
+    <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="mb-3">
         <h2 className="text-lg font-bold text-white mb-0.5">Invites</h2>
@@ -1089,6 +1092,20 @@ export default function InvitesTab({ eventSlug, organizationId }: InvitesTabProp
         recipientEmail={dialogProps.recipientEmail}
         type={dialogProps.type}
         isLoading={dialogProps.isLoading}
+      />
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Invites Tab"
+        data={{
+          event,
+          eventSlug,
+          organizationId,
+          inviteRows,
+          loading,
+          error,
+        }}
+        isAdmin={isAdmin}
       />
     </div>
   );
