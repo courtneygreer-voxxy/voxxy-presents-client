@@ -5,6 +5,7 @@ import VenueAutocomplete from '../VenueAutocomplete';
 import LocationAutocomplete from '../LocationAutocomplete';
 import googlePlacesService, { LocationData } from '@/services/googlePlacesService';
 import { isDevOrStaging } from '@/config/environments';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function Step1EventDetails({
   wizardState,
@@ -13,6 +14,8 @@ export default function Step1EventDetails({
   setErrors,
 }: WizardStepProps) {
   const { eventDetails } = wizardState;
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
 
   // Track if venue was selected from autocomplete (for locking location)
   const [isVenueSelected, setIsVenueSelected] = useState(false);
@@ -97,7 +100,7 @@ export default function Step1EventDetails({
     updateWizardState({
       eventDetails: {
         ...eventDetails,
-        title: 'Brooklyn Art & Vendor Market',
+        title: `Test Event #${generateRandomCode()}`,
         description: 'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
         venue: 'Prospect Park Bandshell',
         location: 'Brooklyn, NY',
@@ -119,15 +122,20 @@ export default function Step1EventDetails({
     setErrors({});
   };
 
+  // Generate random event code for unique titles
+  const generateRandomCode = () => Math.floor(100000 + Math.random() * 900000);
+
   return (
     <div className="space-y-4">
-      {/* DEV ONLY: Prefill Button */}
-      {isDevOrStaging() && (
+      {/* DEV/ADMIN: Prefill Button */}
+      {(isDevOrStaging() || isAdmin) && (
         <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-xs text-yellow-200/90 font-medium">Dev Mode</span>
+              <span className="text-xs text-yellow-200/90 font-medium">
+                {isDevOrStaging() ? 'Dev Mode' : 'Admin Mode'}
+              </span>
             </div>
             <button
               onClick={handlePrefill}

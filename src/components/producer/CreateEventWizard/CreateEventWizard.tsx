@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { ArrowLeft, Sparkles } from 'lucide-react';
-import { useAuth } from '@/contexts/AuthContext';
+import { ArrowLeft } from 'lucide-react';
 import { WizardState } from './types';
 import WizardProgress from './WizardProgress';
 import WizardNavigation from './WizardNavigation';
@@ -16,9 +15,6 @@ interface CreateEventWizardProps {
 }
 
 export default function CreateEventWizard({ onCancel, onSubmit, organizationId }: CreateEventWizardProps) {
-  const { userProfile } = useAuth();
-  const isAdmin = userProfile?.role === 'admin';
-
   const [wizardState, setWizardState] = useState<WizardState>({
     currentStep: 1,
     eventDetails: {
@@ -51,58 +47,6 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Admin-only: Prefill with test data
-  const prefillTestData = () => {
-    // Calculate dates relative to today (same as staging)
-    const today = new Date();
-    const eventDate = new Date(today);
-    eventDate.setDate(today.getDate() + 30); // Event in 30 days
-
-    const eventEndDate = new Date(eventDate);
-    eventEndDate.setDate(eventDate.getDate() + 2); // 3-day event
-
-    const applicationDeadline = new Date(eventDate);
-    applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
-
-    const paymentDeadline = new Date(eventDate);
-    paymentDeadline.setDate(eventDate.getDate() - 7); // 1 week before event
-
-    // Generate a random 6-digit event code
-    const randomCode = Math.floor(100000 + Math.random() * 900000);
-
-    setWizardState({
-      currentStep: 1,
-      eventDetails: {
-        title: `Test Event #${randomCode}`,
-        description: 'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
-        venue: 'Prospect Park Bandshell',
-        location: 'Brooklyn, NY',
-        event_date: eventDate.toISOString().split('T')[0],
-        event_end_date: eventEndDate.toISOString().split('T')[0],
-        start_time: '10:00',
-        end_time: '18:00',
-        age_restriction: 'All Ages',
-        ticket_link: 'https://www.example.com/tickets/brooklyn-market',
-        application_deadline: applicationDeadline.toISOString().split('T')[0],
-        payment_deadline: paymentDeadline.toISOString().split('T')[0],
-      },
-      applicationDetails: {
-        applications: [],
-      },
-      inviteList: {
-        selectedListIds: [],
-        invitedContactIds: [],
-        excludedContactIds: [],
-      },
-      automaticMessages: {
-        messages: [],
-      },
-    });
-    setCompletedSteps([]);
-    setErrors({});
-    alert('✅ Test data prefilled! You can now proceed through the wizard or modify the fields.');
-  };
 
   const updateWizardState = (updates: Partial<WizardState>) => {
     setWizardState((prev) => ({ ...prev, ...updates }));
@@ -340,24 +284,10 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
       {/* Header */}
       <div className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Create New Event</h1>
-            <p className="text-white/60">
-              Follow the steps to set up your event and vendor applications
-            </p>
-          </div>
-          {/* Admin Only: Prefill Test Data Button */}
-          {isAdmin && (
-            <button
-              onClick={prefillTestData}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium hover:from-purple-500 hover:to-pink-500 transition-all shadow-lg shadow-purple-500/20"
-            >
-              <Sparkles className="w-4 h-4" />
-              Prefill Test Data
-            </button>
-          )}
-        </div>
+        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Create New Event</h1>
+        <p className="text-white/60">
+          Follow the steps to set up your event and vendor applications
+        </p>
       </div>
 
       {/* Progress Indicator */}
