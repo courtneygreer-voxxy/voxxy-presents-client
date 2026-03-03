@@ -327,9 +327,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
   const categorizedEmails = useMemo(() => {
     // Time-based triggers (have scheduled_for dates)
     const scheduledTriggers = [
-      'on_application_open',
       'days_before_deadline',
-      'days_after_deadline',
       'on_event_date',
       'days_before_event',
       'days_after_event',
@@ -339,6 +337,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
 
     // Event-based triggers (sent immediately on action)
     const systemTriggers = [
+      'on_application_open',        // Initial Invitation (fires on "Go Live" action)
       'on_application_submit',
       'on_approval',
       'on_rejection',
@@ -346,8 +345,7 @@ export default function EmailAutomationTab({ eventSlug }: EmailAutomationTabProp
       'on_payment_received',
       'on_category_change',
       'on_event_update',
-      'on_event_cancel',
-      'on_invitation_send'
+      'on_event_cancel'
     ];
 
     const scheduled = filteredEmails.filter(email =>

@@ -113,6 +113,7 @@ export default function EmailRow({
 
   // Determine if this is a system/trigger email (event-based, not time-based)
   const systemTriggers = [
+    'on_application_open',        // Initial Invitation (fires on "Go Live" action)
     'on_application_submit',
     'on_approval',
     'on_rejection',
@@ -120,8 +121,7 @@ export default function EmailRow({
     'on_payment_received',
     'on_category_change',
     'on_event_update',
-    'on_event_cancel',
-    'on_invitation_send'
+    'on_event_cancel'
   ];
   const isSystemEmail = systemTriggers.includes(email.trigger_type);
 
