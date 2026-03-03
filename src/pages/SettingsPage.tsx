@@ -16,14 +16,18 @@ interface Organization {
   timezone?: string;
   description?: string;
   logo_url?: string;
-  website?: string;
-  instagram_handle?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  city?: string;
-  state?: string;
-  zip_code?: string;
+  contact?: {
+    website?: string;
+    instagram?: string;
+    phone?: string;
+    email?: string;
+  };
+  location?: {
+    address?: string;
+    city?: string;
+    state?: string;
+    zip_code?: string;
+  };
   verified?: boolean;
 }
 
@@ -67,20 +71,20 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
         if (userOrg) {
           setOrganization(userOrg);
-          // Populate organization form with fetched data
+          // Populate organization form with fetched data (extract from nested structure)
           setOrganizationData({
             name: userOrg.name || '',
             timezone: userOrg.timezone || 'America/Los_Angeles',
             description: userOrg.description || '',
             logo_url: userOrg.logo_url || '',
-            website: userOrg.website || '',
-            instagram_handle: userOrg.instagram_handle || '',
-            phone: userOrg.phone || '',
-            email: userOrg.email || '',
-            address: userOrg.address || '',
-            city: userOrg.city || '',
-            state: userOrg.state || '',
-            zip_code: userOrg.zip_code || '',
+            website: userOrg.contact?.website || '',
+            instagram_handle: userOrg.contact?.instagram || '',
+            phone: userOrg.contact?.phone || '',
+            email: userOrg.contact?.email || '',
+            address: userOrg.location?.address || '',
+            city: userOrg.location?.city || '',
+            state: userOrg.location?.state || '',
+            zip_code: userOrg.location?.zip_code || '',
           });
         }
       } catch (err) {
