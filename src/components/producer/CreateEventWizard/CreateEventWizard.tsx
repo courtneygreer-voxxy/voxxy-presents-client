@@ -54,12 +54,19 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
   // Admin-only: Prefill with test data
   const prefillTestData = () => {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const nextWeek = new Date();
-    nextWeek.setDate(nextWeek.getDate() + 7);
-    const twoWeeksOut = new Date();
-    twoWeeksOut.setDate(twoWeeksOut.getDate() + 14);
+    // Calculate dates relative to today (same as staging)
+    const today = new Date();
+    const eventDate = new Date(today);
+    eventDate.setDate(today.getDate() + 30); // Event in 30 days
+
+    const eventEndDate = new Date(eventDate);
+    eventEndDate.setDate(eventDate.getDate() + 2); // 3-day event
+
+    const applicationDeadline = new Date(eventDate);
+    applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
+
+    const paymentDeadline = new Date(eventDate);
+    paymentDeadline.setDate(eventDate.getDate() - 7); // 1 week before event
 
     // Generate a random 6-digit event code
     const randomCode = Math.floor(100000 + Math.random() * 900000);
@@ -68,37 +75,20 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       currentStep: 1,
       eventDetails: {
         title: `Test Event #${randomCode}`,
-        description: 'This is a test event created with prefilled data for testing purposes. Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-        event_date: tomorrow.toISOString().split('T')[0],
-        event_end_date: nextWeek.toISOString().split('T')[0],
+        description: 'Join us for a three-day celebration of local artists, makers, and food vendors in beautiful Prospect Park. This family-friendly event features live music, food trucks, artisan booths, and interactive workshops.',
+        venue: 'Prospect Park Bandshell',
+        location: 'Brooklyn, NY',
+        event_date: eventDate.toISOString().split('T')[0],
+        event_end_date: eventEndDate.toISOString().split('T')[0],
         start_time: '10:00',
         end_time: '18:00',
-        venue: 'Test Venue',
-        location: 'New York, NY',
-        age_restriction: '21+',
-        ticket_link: 'https://example.com/tickets',
-        application_deadline: nextWeek.toISOString().split('T')[0],
-        payment_deadline: twoWeeksOut.toISOString().split('T')[0],
+        age_restriction: 'All Ages',
+        ticket_link: 'https://www.example.com/tickets/brooklyn-market',
+        application_deadline: applicationDeadline.toISOString().split('T')[0],
+        payment_deadline: paymentDeadline.toISOString().split('T')[0],
       },
       applicationDetails: {
-        applications: [
-          {
-            id: `app-${Date.now()}-1`,
-            name: 'Artists',
-            description: 'Visual artists and painters',
-            booth_price: 150,
-            categories: ['painting', 'sculpture', 'photography'],
-            payment_link: 'https://example.com/pay/artists',
-          },
-          {
-            id: `app-${Date.now()}-2`,
-            name: 'Food Vendors',
-            description: 'Food trucks and food vendors',
-            booth_price: 250,
-            categories: ['food', 'beverage'],
-            payment_link: 'https://example.com/pay/food',
-          },
-        ],
+        applications: [],
       },
       inviteList: {
         selectedListIds: [],

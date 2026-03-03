@@ -80,6 +80,20 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     newStatus: 'approved' | 'waitlist' | 'rejected';
   } | null>(null);
 
+  // Category change confirmation modal state
+  const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
+  const [pendingCategoryChange, setPendingCategoryChange] = useState<{
+    applicant: Applicant;
+    newCategory: string;
+  } | null>(null);
+
+  // Payment change confirmation modal state
+  const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
+  const [pendingPaymentChange, setPendingPaymentChange] = useState<{
+    applicant: Applicant;
+    newPaymentStatus: 'paid' | 'pending';
+  } | null>(null);
+
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
     useEmailNotifications();
@@ -240,6 +254,37 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
   };
 
+  // Show confirmation modal before category change
+  const requestCategoryChange = (applicant: Applicant, newCategory: string) => {
+    if (newCategory === applicant.vendor_category) return; // No change
+    setPendingCategoryChange({ applicant, newCategory });
+    setShowCategoryConfirmModal(true);
+  };
+
+  // Confirm and execute category change
+  const confirmCategoryChange = async () => {
+    if (!pendingCategoryChange) return;
+
+    const { applicant, newCategory } = pendingCategoryChange;
+
+    // Close modal
+    setShowCategoryConfirmModal(false);
+    setPendingCategoryChange(null);
+
+    // Execute the category change
+    await handleUpdateCategory(applicant, newCategory);
+  };
+
+  // Cancel category change
+  const cancelCategoryChange = () => {
+    setShowCategoryConfirmModal(false);
+    setPendingCategoryChange(null);
+    // Reset the dropdown to original value
+    if (selectedApplicant) {
+      setSelectedApplicant({ ...selectedApplicant });
+    }
+  };
+
   const handleUpdateCategory = async (applicant: Applicant, newCategory: string) => {
     if (!applicant.registrationId) {
       alert('Cannot update category: No application found');
@@ -248,7 +293,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
     try {
       setIsUpdatingCategory(true);
-      await registrationsApi.update(applicant.registrationId, { vendor_category: newCategory });
+      const response = await registrationsApi.update(applicant.registrationId, { vendor_category: newCategory });
+
+      // Handle email notification
+      if (response.email_notification) {
+        handleEmailNotification(response.email_notification, undefined, applicant.registrationId);
+      }
 
       // Update local state
       setApplicants((prev) =>
@@ -339,13 +389,42 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
   };
 
+  // Show confirmation modal before payment change
+  const requestPaymentChange = (applicant: Applicant) => {
+    if (!applicant.registrationId || applicant.status !== 'approved') return;
+    // Only allow marking as paid, not reversing back to pending
+    if (applicant.payment_status === 'paid') return;
+    const newPaymentStatus = 'paid';
+    setPendingPaymentChange({ applicant, newPaymentStatus });
+    setShowPaymentConfirmModal(true);
+  };
+
+  // Confirm and execute payment change
+  const confirmPaymentChange = async () => {
+    if (!pendingPaymentChange) return;
+
+    const { applicant, newPaymentStatus } = pendingPaymentChange;
+
+    // Close modal
+    setShowPaymentConfirmModal(false);
+    setPendingPaymentChange(null);
+
+    // Execute the payment change
+    await handleTogglePayment(applicant, newPaymentStatus);
+  };
+
+  // Cancel payment change
+  const cancelPaymentChange = () => {
+    setShowPaymentConfirmModal(false);
+    setPendingPaymentChange(null);
+  };
+
   // Handle payment status toggle
-  const handleTogglePayment = async (applicant: Applicant) => {
+  const handleTogglePayment = async (applicant: Applicant, newPaymentStatus: 'paid' | 'pending') => {
     if (!applicant.registrationId || applicant.status !== 'approved') return;
 
     try {
       setUpdatingId(applicant.id);
-      const newPaymentStatus = applicant.payment_status === 'paid' ? 'pending' : 'paid';
       const response = await registrationsApi.update(applicant.registrationId, { payment_status: newPaymentStatus });
 
       // Handle email notification
@@ -385,17 +464,33 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
     try {
       setLoadingEmailHistory(true);
-      let history;
+      let allHistory: any[] = [];
 
+      // Fetch registration emails if registrationId exists
       if (selectedApplicant.registrationId) {
-        history = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-      } else if (selectedApplicant.invitationId) {
-        history = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
-      } else {
+        const registrationHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+        allHistory = [...(registrationHistory || [])];
+      }
+
+      // Fetch invitation emails if invitationId exists
+      if (selectedApplicant.invitationId) {
+        const invitationHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+        allHistory = [...allHistory, ...(invitationHistory || [])];
+      }
+
+      // If no emails fetched, throw error
+      if (allHistory.length === 0 && !selectedApplicant.registrationId && !selectedApplicant.invitationId) {
         throw new Error('No registration or invitation ID available');
       }
 
-      setEmailHistoryData(history || []);
+      // Sort by date (most recent first)
+      allHistory.sort((a, b) => {
+        const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+        const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+        return dateB - dateA;
+      });
+
+      setEmailHistoryData(allHistory);
     } catch (err: any) {
       console.error('Failed to fetch email history:', err);
       setEmailHistoryData([]);
@@ -772,7 +867,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   ) : (
                     <select
                       value={selectedApplicant.vendor_category}
-                      onChange={(e) => handleUpdateCategory(selectedApplicant, e.target.value)}
+                      onChange={(e) => requestCategoryChange(selectedApplicant, e.target.value)}
                       disabled={isUpdatingCategory}
                       className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -951,11 +1046,23 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                                     try {
                                       await emailDeliveriesApi.retry(delivery.id);
                                       alert('Email queued for retry');
-                                      // Refresh email history
+                                      // Refresh email history - fetch both registration and invitation emails
+                                      let refreshedHistory: any[] = [];
                                       if (selectedApplicant.registrationId) {
-                                        const updated = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-                                        setEmailHistoryData(updated || []);
+                                        const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+                                        refreshedHistory = [...(regHistory || [])];
                                       }
+                                      if (selectedApplicant.invitationId) {
+                                        const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+                                        refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
+                                      }
+                                      // Sort by date (most recent first)
+                                      refreshedHistory.sort((a, b) => {
+                                        const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+                                        const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+                                        return dateB - dateA;
+                                      });
+                                      setEmailHistoryData(refreshedHistory);
                                     } catch (err: any) {
                                       alert(`Failed to retry: ${err.message}`);
                                     }
@@ -1045,13 +1152,15 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                               {getPaymentBadge(selectedApplicant.payment_status)?.label || 'Unknown'}
                             </span>
                           </div>
-                          <button
-                            onClick={() => handleTogglePayment(selectedApplicant)}
-                            disabled={updatingId === selectedApplicant.id}
-                            className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
-                          >
-                            Mark as {selectedApplicant.payment_status === 'paid' ? 'Pending' : 'Paid'}
-                          </button>
+                          {selectedApplicant.payment_status !== 'paid' && (
+                            <button
+                              onClick={() => requestPaymentChange(selectedApplicant)}
+                              disabled={updatingId === selectedApplicant.id}
+                              className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              Mark as Paid
+                            </button>
+                          )}
                         </div>
                       )}
                     </div>
@@ -1158,6 +1267,151 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     ? 'bg-green-600 hover:bg-green-500'
                     : pendingStatusChange.newStatus === 'rejected'
                     ? 'bg-red-600 hover:bg-red-500'
+                    : 'bg-yellow-600 hover:bg-yellow-500'
+                }`}
+              >
+                Confirm & Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Category Change Confirmation Modal */}
+      {showCategoryConfirmModal && pendingCategoryChange && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+            {/* Header */}
+            <div className="flex items-start gap-3">
+              <div className="p-2 rounded-lg bg-purple-500/20">
+                <Mail className="w-5 h-5 text-purple-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  Change Category?
+                </h3>
+                <p className="text-sm text-white/60">
+                  This will send an automated email notification
+                </p>
+              </div>
+            </div>
+
+            {/* Warning */}
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+              <p className="text-xs text-orange-400">
+                <strong>⚠️ Email will be sent to:</strong><br />
+                {pendingCategoryChange.applicant.email}
+              </p>
+            </div>
+
+            {/* Category Change Info */}
+            <div className="bg-white/5 rounded-lg p-3 space-y-2">
+              <p className="text-sm text-white font-medium">
+                {pendingCategoryChange.applicant.business_name}
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <span className="px-2 py-1 rounded bg-red-500/20 text-red-400 line-through">
+                  {pendingCategoryChange.applicant.vendor_category}
+                </span>
+                <span className="text-white/40">→</span>
+                <span className="px-2 py-1 rounded bg-green-500/20 text-green-400">
+                  {pendingCategoryChange.newCategory}
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={cancelCategoryChange}
+                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmCategoryChange}
+                className="flex-1 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-smooth"
+              >
+                Confirm & Send Email
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Payment Change Confirmation Modal */}
+      {showPaymentConfirmModal && pendingPaymentChange && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+            {/* Header */}
+            <div className="flex items-start gap-3">
+              <div className={`p-2 rounded-lg ${
+                pendingPaymentChange.newPaymentStatus === 'paid'
+                  ? 'bg-green-500/20'
+                  : 'bg-yellow-500/20'
+              }`}>
+                <Mail className={`w-5 h-5 ${
+                  pendingPaymentChange.newPaymentStatus === 'paid'
+                    ? 'text-green-400'
+                    : 'text-yellow-400'
+                }`} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
+                  Mark as {pendingPaymentChange.newPaymentStatus === 'paid' ? 'Paid' : 'Pending'}?
+                </h3>
+                <p className="text-sm text-white/60">
+                  This will send an automated email notification
+                </p>
+              </div>
+            </div>
+
+            {/* Warning */}
+            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+              <p className="text-xs text-orange-400">
+                <strong>⚠️ Email will be sent to:</strong><br />
+                {pendingPaymentChange.applicant.email}
+              </p>
+            </div>
+
+            {/* Payment Change Info */}
+            <div className="bg-white/5 rounded-lg p-3 space-y-2">
+              <p className="text-sm text-white font-medium">
+                {pendingPaymentChange.applicant.business_name}
+              </p>
+              <div className="flex items-center gap-2 text-xs">
+                <DollarSign className="w-4 h-4 text-white/60" />
+                <span className={`px-2 py-1 rounded ${
+                  pendingPaymentChange.applicant.payment_status === 'paid'
+                    ? 'bg-green-500/20 text-green-400'
+                    : 'bg-yellow-500/20 text-yellow-400'
+                } line-through`}>
+                  {pendingPaymentChange.applicant.payment_status === 'paid' ? 'Paid' : 'Pending'}
+                </span>
+                <span className="text-white/40">→</span>
+                <span className={`px-2 py-1 rounded ${
+                  pendingPaymentChange.newPaymentStatus === 'paid'
+                    ? 'bg-green-500/20 text-green-400'
+                    : 'bg-yellow-500/20 text-yellow-400'
+                }`}>
+                  {pendingPaymentChange.newPaymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                </span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={cancelPaymentChange}
+                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmPaymentChange}
+                className={`flex-1 px-4 py-2 rounded-lg text-white text-sm font-medium transition-smooth ${
+                  pendingPaymentChange.newPaymentStatus === 'paid'
+                    ? 'bg-green-600 hover:bg-green-500'
                     : 'bg-yellow-600 hover:bg-yellow-500'
                 }`}
               >
