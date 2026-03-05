@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Edit2, Plus, Search, SlidersHorizontal, Eye, EyeOff } from 'lucide-react';
+import { Calendar, Edit2, Plus, Search, SlidersHorizontal, Eye, EyeOff, Trash2 } from 'lucide-react';
 import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers';
+import { DebugPanel } from './DebugPanel';
 
 interface Event {
   id: number;
@@ -34,6 +35,8 @@ interface EventsListProps {
   onCreateEvent: () => void;
   onEditEvent: (eventSlug: string) => void;
   onCommandCenter: (eventSlug: string) => void;
+  onDeleteEvent?: (eventSlug: string) => Promise<void>;
+  isAdmin?: boolean;
   loading?: boolean;
 }
 
@@ -42,6 +45,8 @@ export default function EventsList({
   onCreateEvent,
   onEditEvent,
   onCommandCenter,
+  onDeleteEvent,
+  isAdmin = false,
   loading = false,
 }: EventsListProps) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -305,14 +310,31 @@ export default function EventsList({
                     </div>
                   </div>
 
-                  {/* Action Button */}
-                  <div className="flex">
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
                     <button
                       onClick={() => onCommandCenter(event.slug)}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm whitespace-nowrap"
                     >
                       Command Center
                     </button>
+
+                    {/* Admin Quick Delete Button - Only in Dev/Staging */}
+                    {isAdmin && onDeleteEvent && import.meta.env.MODE !== 'production' && (
+                      <button
+                        onClick={() => onDeleteEvent(event.slug)}
+                        className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white font-medium hover:shadow-lg hover:shadow-red-500/30 transition-smooth whitespace-nowrap"
+                        title="Admin Quick Delete - No Confirmation (Dev/Staging Only)"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <Trash2 className="w-4 h-4" />
+                          <span className="text-sm">Delete</span>
+                        </div>
+                        <span className="text-[9px] text-red-200 font-bold uppercase tracking-wide">
+                          ⚠️ Immediate
+                        </span>
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -320,6 +342,23 @@ export default function EventsList({
           })
         )}
       </div>
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Events List"
+        data={{
+          events,
+          filteredAndSortedEvents,
+          searchTerm,
+          statusFilter,
+          showPastEvents,
+          sortBy,
+          eventsCount: events.length,
+          filteredCount: filteredAndSortedEvents.length,
+          loading,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

@@ -79,8 +79,10 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   });
   const [scheduledEmails, setScheduledEmails] = useState<ScheduledEmail[]>([]);
   const [bulletins, setBulletins] = useState<Bulletin[]>([]);
+  const [vendorApplications, setVendorApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [copiedLink, setCopiedLink] = useState<'application' | 'vendor' | null>(null);
+  const [copiedApplicationId, setCopiedApplicationId] = useState<number | null>(null);
   const [isCreateBulletinModalOpen, setIsCreateBulletinModalOpen] = useState(false);
 
   // Ticket link edit state
@@ -110,6 +112,9 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         scheduledEmailsApi.getByEvent(eventSlug).catch(() => []),
         bulletinsApi.getByEvent(eventSlug).catch(() => []),
       ]);
+
+      // Save applications to state
+      setVendorApplications(applications);
 
       // Fetch all submissions
       let allSubmissions: any[] = [];
@@ -215,6 +220,18 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
       })
       .catch((err) => {
         console.error('Failed to copy link to clipboard:', err);
+        alert('Failed to copy link to clipboard');
+      });
+  };
+
+  const handleCopyApplicationLink = (applicationId: number, shareableUrl: string) => {
+    navigator.clipboard.writeText(shareableUrl)
+      .then(() => {
+        setCopiedApplicationId(applicationId);
+        setTimeout(() => setCopiedApplicationId(null), 2000);
+      })
+      .catch((err) => {
+        console.error('Failed to copy application link to clipboard:', err);
         alert('Failed to copy link to clipboard');
       });
   };
@@ -658,6 +675,39 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               )}
             </button>
           </div>
+
+          {/* Application Category Links */}
+          {vendorApplications.length > 0 && (
+            <div className="mt-4 pt-3 border-t border-white/10">
+              <p className="text-[10px] text-white/60 uppercase tracking-wide mb-2">Category Application Links</p>
+              <div className="space-y-2">
+                {vendorApplications.map((app) => (
+                  <button
+                    key={app.id}
+                    onClick={() => handleCopyApplicationLink(app.id, app.shareable_url)}
+                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg transition-smooth text-xs text-white ${
+                      copiedApplicationId === app.id
+                        ? 'bg-green-500/20 border border-green-500/30'
+                        : app.status === 'active'
+                        ? 'bg-white/5 hover:bg-white/10'
+                        : 'bg-white/5 opacity-50'
+                    }`}
+                    disabled={app.status !== 'active'}
+                  >
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <FileText className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                      <span className="truncate">{copiedApplicationId === app.id ? 'Copied!' : app.name}</span>
+                    </div>
+                    {copiedApplicationId === app.id ? (
+                      <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
+                    ) : (
+                      <Copy className="w-3 h-3 text-white/60 flex-shrink-0" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

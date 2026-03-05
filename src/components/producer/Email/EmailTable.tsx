@@ -49,38 +49,41 @@ export default function EmailTable({
     );
   }
 
-  const col = (column: SortColumn, label: string, className?: string, title?: string) => (
-    <button
-      onClick={() => onSort?.(column)}
-      className={`flex items-center gap-1 hover:text-white transition-colors ${sortColumn === column ? 'text-white' : ''} ${className ?? ''}`}
-      title={title}
-    >
-      {label}
-      <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
-    </button>
-  );
+  const col = (column: SortColumn, label: string, className?: string, title?: string) => {
+    // Only show sort icons if onSort is provided (scheduled emails table)
+    if (!onSort) {
+      return (
+        <div className={`flex items-center gap-1 ${className ?? ''}`} title={title}>
+          {label}
+        </div>
+      );
+    }
+
+    return (
+      <button
+        onClick={() => onSort(column)}
+        className={`flex items-center gap-1 hover:text-white transition-colors ${sortColumn === column ? 'text-white' : ''} ${className ?? ''}`}
+        title={title}
+      >
+        {label}
+        <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
+      </button>
+    );
+  };
 
   return (
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
         <div className="grid grid-cols-[200px,240px,130px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
-          {col('name', 'Email Name')}
-          {col('subject', 'Subject')}
+          <div className="flex items-center gap-1">Email Name</div>
+          <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}
-          {col('category', 'Category')}
-          <div className="flex items-center justify-center">
-            {col('recipient_count', 'Recipients', 'justify-center')}
-          </div>
-          <div className="flex items-center justify-center">
-            {col('undelivered_count', 'Undelivered', 'justify-center', 'Emails that bounced or were dropped by SendGrid')}
-          </div>
-          <div className="flex items-center justify-center">
-            {col('unsubscribed_count', 'Unsub', 'justify-center', 'Recipients who unsubscribed from emails')}
-          </div>
-          <div className="flex items-center justify-center">
-            {col('status', 'Status', 'justify-center')}
-          </div>
+          <div className="flex items-center gap-1">Category</div>
+          <div className="flex items-center justify-center">Recipients</div>
+          <div className="flex items-center justify-center" title="Emails that bounced or were dropped by SendGrid">Undelivered</div>
+          <div className="flex items-center justify-center" title="Recipients who unsubscribed from emails">Unsub</div>
+          <div className="flex items-center justify-center">Status</div>
           <div className="text-right">Actions</div>
         </div>
       </div>

@@ -50,6 +50,10 @@ const ProducerDashboard = lazy(() => import('./pages/ProducerDashboard'))
 const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AdminUnsubscribesPage = lazy(() => import('./pages/AdminUnsubscribesPage'))
+const AdminBugReportsPage = lazy(() => import('./pages/AdminBugReportsPage'))
+
+// Lazy load: Email Template Manager (load on-demand)
+const TemplateManager = lazy(() => import('./components/producer/Email/TemplateManager'))
 
 // Debug Panel (keep eager for development)
 import { DebugPanel } from './components/debug/DebugPanel'
@@ -214,6 +218,9 @@ export default function App() {
           {/* Producer Dashboard */}
           <Route path="/producer/pending" element={<ProducerDashboard />} />
 
+          {/* Email Template Manager */}
+          <Route path="/producer/templates" element={<TemplateManager />} />
+
           {/* Vendor Dashboard */}
           <Route path="/vendor/pending" element={<VendorDashboard />} />
 
@@ -228,6 +235,13 @@ export default function App() {
           <Route path="/admin/unsubscribes" element={
             <AdminRoute>
               <AdminUnsubscribesPage />
+            </AdminRoute>
+          } />
+
+          {/* Admin Bug Reports - Protected */}
+          <Route path="/admin/bug-reports" element={
+            <AdminRoute>
+              <AdminBugReportsPage />
             </AdminRoute>
           } />
 

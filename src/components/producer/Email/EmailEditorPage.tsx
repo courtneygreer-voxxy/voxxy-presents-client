@@ -56,6 +56,7 @@ import {
 import { addDays, subDays, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { scheduledEmailsApi } from '@/services/api';
+import { DebugPanel } from '../DebugPanel';
 
 interface EmailEditorPageProps {
   email: ScheduledEmail | null;
@@ -63,6 +64,7 @@ interface EmailEditorPageProps {
   eventSlug: string;
   onBack: () => void;
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
+  isAdmin?: boolean;
 }
 
 const editEmailSchema = z.object({
@@ -76,6 +78,7 @@ const editEmailSchema = z.object({
 type EditEmailFormData = z.infer<typeof editEmailSchema>;
 
 const TRIGGER_TYPES = [
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event' },
   { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date' },
   { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date' },
   { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline' },
@@ -83,6 +86,8 @@ const TRIGGER_TYPES = [
   { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created' },
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline' },
   { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin' },
 ];
 
 export function EmailEditorPage({
@@ -91,6 +96,7 @@ export function EmailEditorPage({
   eventSlug,
   onBack,
   onSave,
+  isAdmin,
 }: EmailEditorPageProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -116,7 +122,8 @@ export function EmailEditorPage({
     setValue,
     watch,
     reset,
-    formState: { errors },
+    getValues,
+    formState,
   } = useForm<EditEmailFormData>({
     resolver: zodResolver(editEmailSchema),
   });
@@ -206,11 +213,13 @@ export function EmailEditorPage({
           scheduledDate = subDays(eventDate, triggerValue || 0);
           break;
         case 'days_after_event':
+        case 'days_after_payment_deadline':
           scheduledDate = addDays(eventDate, triggerValue || 0);
           break;
         case 'on_event_date':
         case 'on_application_open':
         case 'on_payment_deadline':
+        case 'on_bulletin_post':
           scheduledDate = eventDate;
           break;
       }
@@ -344,6 +353,7 @@ export function EmailEditorPage({
   if (!email) return null;
 
   const previewDate = calculatePreviewDate();
+  const canSendNow = email.status === 'scheduled' && email.scheduled_for && new Date(email.scheduled_for) <= new Date();
 
   // HTML-aware variable resolver for live preview
   // Properly handles variables in HTML content without breaking structure
@@ -475,7 +485,9 @@ export function EmailEditorPage({
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
+      {/* Main Editor Area */}
+      <div className="flex-1 flex overflow-hidden">
       {/* Left Side - Main Content */}
       <div className={`${showPreview ? 'w-1/2' : 'flex-1'} flex flex-col border-r border-white/10 transition-all duration-300`}>
         {/* Top Bar */}
@@ -607,13 +619,13 @@ export function EmailEditorPage({
             )}
 
             {/* Form Errors */}
-            {(errors.name || errors.subject_template || errors.body_template) && (
+            {(formState.errors.name || formState.errors.subject_template || formState.errors.body_template) && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
                 <p className="text-red-400 font-medium text-sm mb-1">Please fix the following:</p>
                 <ul className="text-red-400/80 text-xs space-y-0.5">
-                  {errors.name && <li>• {errors.name.message}</li>}
-                  {errors.subject_template && <li>• {errors.subject_template.message}</li>}
-                  {errors.body_template && <li>• {errors.body_template.message}</li>}
+                  {formState.errors.name && <li>• {formState.errors.name.message}</li>}
+                  {formState.errors.subject_template && <li>• {formState.errors.subject_template.message}</li>}
+                  {formState.errors.body_template && <li>• {formState.errors.body_template.message}</li>}
                 </ul>
               </div>
             )}
@@ -927,30 +939,91 @@ export function EmailEditorPage({
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
+                  {(() => {
+                    // Show helper text if this is a pre-application email
+                    const position = email.email_template_item?.position;
+                    const category = email.email_template_item?.category;
+                    const isEarlyPosition = position && position <= 3;
+                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
+                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
+                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
+                    const nameLower = email.name.toLowerCase();
+                    const hasPreApplicationKeyword = nameLower.includes('invitation') || nameLower.includes('invite') || nameLower.includes('reminder') || nameLower.includes('deadline');
+
+                    return (isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword) && (
+                      <span className="block mt-1 text-yellow-400/80">
+                        Note: Some variables are disabled for pre-application emails (greyed out)
+                      </span>
+                    );
+                  })()}
                 </p>
                 <div className="space-y-0.5">
-                  {EMAIL_VARIABLES.map((variable) => (
-                    <button
-                      key={variable.frontendVar}
-                      type="button"
-                      onClick={() => handleInsertVariable(variable.frontendVar)}
-                      onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
-                      className="flex items-center gap-1.5 w-full px-2 py-1.5 text-xs text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 rounded transition-all border border-white/10 bg-white/5 group"
-                      title={variable.description}
-                    >
-                      <Tag className="w-3 h-3 text-purple-400 group-hover:text-purple-300 flex-shrink-0" />
-                      <span className="flex-1 text-left truncate">{variable.label}</span>
-                      <span className="text-[9px] text-purple-400 font-mono px-1.5 py-0.5 bg-purple-500/10 rounded">
-                        {variable.frontendVar.replace('[', '').replace(']', '')}
-                      </span>
-                    </button>
-                  ))}
+                  {EMAIL_VARIABLES.map((variable) => {
+                    // Check if this is a PRE-APPLICATION email (sent before vendor applies/chooses category)
+                    // These emails don't have access to category-specific or registration data
+
+                    // Method 1: Check position (1-3 are typically pre-application)
+                    const position = email.email_template_item?.position;
+                    const isEarlyPosition = position && position <= 3;
+
+                    // Method 2: Check category
+                    const category = email.email_template_item?.category;
+                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
+
+                    // Method 3: Check trigger type (before application)
+                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
+                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
+
+                    // Method 4: Check email name keywords
+                    const nameLower = email.name.toLowerCase();
+                    const hasPreApplicationKeyword = nameLower.includes('invitation') ||
+                                                       nameLower.includes('invite') ||
+                                                       nameLower.includes('reminder') ||
+                                                       nameLower.includes('deadline') ||
+                                                       nameLower.includes('applications open');
+
+                    // Email is pre-application if ANY of these conditions are true
+                    const isPreApplicationEmail = isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword;
+                    const isDisabled = isPreApplicationEmail && !variable.worksInInvitations;
+
+                    return (
+                      <button
+                        key={variable.frontendVar}
+                        type="button"
+                        onClick={() => !isDisabled && handleInsertVariable(variable.frontendVar)}
+                        onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
+                        disabled={isDisabled}
+                        className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
+                          isDisabled
+                            ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
+                            : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                        }`}
+                        title={
+                          isDisabled
+                            ? `${variable.description} (Not available in pre-application emails - requires vendor to apply and choose category first)`
+                            : variable.description
+                        }
+                      >
+                        <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                        <span className="flex-1 text-left truncate">{variable.label}</span>
+                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                          isDisabled
+                            ? 'text-white/30 bg-white/5'
+                            : 'text-purple-400 bg-purple-500/10'
+                        }`}>
+                          {variable.frontendVar.replace('[', '').replace(']', '')}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
           </div>
         </div>
       </div>
+      </div>
+      {/* End Main Editor Area */}
 
       {/* Test Email Dialog */}
       <Dialog open={showTestEmailDialog} onOpenChange={setShowTestEmailDialog}>
@@ -1016,6 +1089,26 @@ export function EmailEditorPage({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Admin Debug Panel */}
+      <div className="overflow-y-auto max-h-96">
+        <DebugPanel
+          title="Email Editor"
+          data={{
+            email,
+            eventData,
+            eventSlug,
+            formValues: getValues(),
+            previewDate,
+            canSendNow,
+            triggerType,
+            triggerValue,
+            validationErrors,
+            errors: formState.errors,
+          }}
+          isAdmin={isAdmin}
+        />
+      </div>
     </div>
   );
 }

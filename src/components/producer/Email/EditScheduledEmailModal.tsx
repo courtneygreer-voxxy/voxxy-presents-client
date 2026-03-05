@@ -107,6 +107,8 @@ const TRIGGER_TYPES: { value: TriggerType; label: string; requiresValue: boolean
   { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created' },
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline' },
   { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin' },
 ];
 
 export default function EditScheduledEmailModal({
@@ -192,6 +194,7 @@ export default function EditScheduledEmailModal({
 
         case 'days_before_payment_deadline':
         case 'on_payment_deadline':
+        case 'days_after_payment_deadline':
           if (!eventData.payment_deadline) {
             console.warn('⚠️ Payment deadline not available');
             return null;
@@ -215,12 +218,14 @@ export default function EditScheduledEmailModal({
           break;
 
         case 'days_after_event':
+        case 'days_after_payment_deadline':
           scheduledDate = addDays(baseDate, days);
           break;
 
         case 'on_event_date':
         case 'on_application_open':
         case 'on_payment_deadline':
+        case 'on_bulletin_post':
           scheduledDate = baseDate;
           break;
 

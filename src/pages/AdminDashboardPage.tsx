@@ -368,7 +368,7 @@ export default function AdminDashboardPage() {
                       className="bg-purple-600 hover:bg-purple-700 justify-start"
                       asChild
                     >
-                      <Link to="/admin/unsubscribes">
+                      <Link to="/admin/unsubscribes" target="_blank" rel="noopener noreferrer">
                         <Mail className="h-4 w-4 mr-2" />
                         View Unsubscribed Users
                       </Link>

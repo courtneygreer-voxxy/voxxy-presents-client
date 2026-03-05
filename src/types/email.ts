@@ -209,6 +209,7 @@ export type TriggerType =
   | 'on_event_date'
   | 'days_before_payment_deadline'
   | 'on_payment_deadline'
+  | 'days_after_payment_deadline'
   // Event-based triggers (sent immediately on action)
   | 'on_application_submit'
   | 'on_approval'
@@ -218,7 +219,8 @@ export type TriggerType =
   | 'on_category_change'
   | 'on_event_update'
   | 'on_event_cancel'
-  | 'on_invitation_send';
+  | 'on_invitation_send'
+  | 'on_bulletin_post';
 
 export type ScheduledEmailStatus =
   | 'scheduled'

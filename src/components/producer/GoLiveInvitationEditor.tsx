@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Search, X, Building2, Mail, XCircle, Filter, Check } from 'lucide-react';
+import { Users, Search, X, Building2, Mail, XCircle, Filter, Check, AlertTriangle } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, VendorContact } from '@/services/api';
 import ListSelector from './CreateEventWizard/ListSelector';
 
@@ -226,6 +226,12 @@ export default function GoLiveInvitationEditor({
   // Get selected contacts for display
   const selectedContacts = allAvailableContacts.filter((c) => finalContactIds.includes(c.id));
 
+  // Calculate unsubscribed contacts count
+  const unsubscribedContacts = selectedContacts.filter(
+    (c) => c.unsubscribe_status?.is_unsubscribed
+  );
+  const unsubscribedCount = unsubscribedContacts.length;
+
   // Get contacts from lists that can be excluded
   const listOnlyContacts = listContacts.filter((c) => !invitedContactIds.includes(c.id));
 
@@ -321,6 +327,23 @@ export default function GoLiveInvitationEditor({
             </div>
           </div>
         </div>
+
+        {/* Unsubscribe Warning Banner */}
+        {unsubscribedCount > 0 && (
+          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm text-yellow-300">
+                  <strong>Warning:</strong> {unsubscribedCount} {unsubscribedCount === 1 ? 'contact is' : 'contacts are'} unsubscribed and won't receive invitations
+                </p>
+                <p className="text-xs text-yellow-300/70 mt-1">
+                  Unsubscribed contacts are highlighted below. They opted out at the global or organization level.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* List Selector */}
         {organizationId && (
@@ -475,6 +498,8 @@ export default function GoLiveInvitationEditor({
             filteredContacts.map((contact) => {
               const isSelected = finalContactIds.includes(contact.id);
               const isFromList = listContacts.some((c) => c.id === contact.id);
+              const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
+              const unsubscribeScope = contact.unsubscribe_status?.scope;
 
               return (
                 <label
@@ -482,6 +507,8 @@ export default function GoLiveInvitationEditor({
                   className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-purple-500/20 border-purple-500/40'
+                      : isUnsubscribed
+                      ? 'bg-red-500/5 border-red-500/20'
                       : 'bg-white/5 border-white/10 hover:bg-white/10'
                   }`}
                 >
@@ -506,11 +533,24 @@ export default function GoLiveInvitationEditor({
                       <span className="truncate">{contact.email}</span>
                     </div>
                   </div>
-                  {isFromList && (
-                    <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
-                      From List
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {isUnsubscribed && (
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${
+                          unsubscribeScope === 'global'
+                            ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                            : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                        }`}
+                      >
+                        {unsubscribeScope === 'global' ? 'Unsubscribed (Global)' : 'Unsubscribed (Org)'}
+                      </span>
+                    )}
+                    {isFromList && (
+                      <span className="text-xs px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded-full">
+                        From List
+                      </span>
+                    )}
+                  </div>
                 </label>
               );
             })

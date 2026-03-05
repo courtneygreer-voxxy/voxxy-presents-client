@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Mail, ArrowLeft, Plus, Eye, Trash2, HelpCircle } from 'lucide-react';
+import { Mail, ArrowLeft, Plus, Eye, Trash2, HelpCircle, Send, Loader2, CheckCircle2, XCircle } from 'lucide-react';
 import { emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
+import { DebugPanel } from '@/components/producer/DebugPanel';
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 
 interface EmailTemplatesPageProps {
   organizationId: number;
@@ -22,6 +25,9 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; order: number }> =
 };
 
 export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPageProps) {
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
+
   const [viewMode, setViewMode] = useState<ViewMode>('library');
   const [templates, setTemplates] = useState<EmailCampaignTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
@@ -31,6 +37,11 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   // Email preview modal state
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null);
+
+  // Email testing state (admin-only)
+  const [testingLoading, setTestingLoading] = useState(false);
+  const [testResults, setTestResults] = useState<Array<{ name: string; status: 'sent' | 'failed'; error?: string }>>([]);
+  const [testEmail, setTestEmail] = useState('');
 
   useEffect(() => {
     fetchTemplates();
@@ -70,6 +81,54 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   const handlePreviewEmail = (email: EmailTemplateItem) => {
     setPreviewEmail(email);
     setPreviewModalOpen(true);
+  };
+
+  const sendTestSequence = async () => {
+    if (!selectedTemplate) return;
+
+    setTestingLoading(true);
+    setTestResults([]);
+
+    try {
+      const token = localStorage.getItem('railsAuthToken');
+      const response = await fetch('/api/v1/presents/email_tests/send_all', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to send test emails');
+      }
+
+      const data = await response.json();
+      setTestResults(data.results || []);
+      setTestEmail(data.recipient || '');
+
+      const successCount = data.success_count || 0;
+      const failureCount = data.failure_count || 0;
+
+      if (failureCount > 0) {
+        toast.warning(`Sent ${successCount} test emails, ${failureCount} failed`);
+      } else {
+        toast.success(`Successfully sent ${successCount} test emails to ${data.recipient}`);
+      }
+    } catch (error: any) {
+      console.error('Failed to send test emails:', error);
+      toast.error(error.message || 'Failed to send test emails');
+    } finally {
+      setTestingLoading(false);
+    }
+  };
+
+  const getStatusIcon = (status: 'sent' | 'failed') => {
+    if (status === 'sent') {
+      return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+    }
+    return <XCircle className="w-4 h-4 text-red-500" />;
   };
 
   const getTemplateTypeBadge = (template: EmailCampaignTemplate) => {
@@ -312,6 +371,19 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             }}
           />
         )}
+
+        {/* Admin Debug Panel */}
+        <DebugPanel
+          title="Email Templates - Library View"
+          data={{
+            viewMode,
+            templates,
+            templatesCount: templates.length,
+            loading,
+            error,
+          }}
+          isAdmin={isAdmin}
+        />
       </>
     );
   }
@@ -367,6 +439,79 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             </button>
           </div>
         </div>
+
+        {/* Admin-Only Test Section */}
+        {isAdmin && (
+          <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-lg p-6">
+            <div className="flex items-start justify-between gap-6">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Send className="w-5 h-5 text-purple-400" />
+                  <h3 className="text-lg font-bold text-white">Test This Sequence</h3>
+                  <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded border border-purple-500/30">
+                    Admin Only
+                  </span>
+                </div>
+                <p className="text-sm text-white/60 mb-4">
+                  Send all emails from this sequence to your email for testing.
+                  {testEmail && (
+                    <span className="block mt-1">
+                      Test emails will be sent to: <span className="font-mono text-purple-400">{testEmail}</span>
+                    </span>
+                  )}
+                </p>
+                <button
+                  onClick={sendTestSequence}
+                  disabled={testingLoading}
+                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all flex items-center gap-2 font-medium"
+                >
+                  {testingLoading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Sending Test Emails...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="w-4 h-4" />
+                      Send Test Emails
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Test Results */}
+              {testResults.length > 0 && (
+                <div className="flex-1 bg-black/20 rounded-lg p-4 border border-white/10">
+                  <div className="flex items-center gap-2 mb-3">
+                    <CheckCircle2 className="w-4 h-4 text-green-400" />
+                    <h4 className="text-sm font-semibold text-white">Test Results</h4>
+                  </div>
+                  <div className="text-xs text-white/60 mb-3">
+                    {testResults.filter(r => r.status === 'sent').length} sent • {testResults.filter(r => r.status === 'failed').length} failed
+                  </div>
+                  <div className="space-y-1.5 max-h-64 overflow-y-auto">
+                    {testResults.map((result, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-center gap-2 p-2 rounded text-xs border ${
+                          result.status === 'sent'
+                            ? 'bg-green-500/10 border-green-500/20 text-green-300'
+                            : 'bg-red-500/10 border-red-500/20 text-red-300'
+                        }`}
+                      >
+                        {getStatusIcon(result.status)}
+                        <span className="flex-1 truncate">{result.name}</span>
+                        {result.error && (
+                          <span className="text-red-400 text-[10px]" title={result.error}>!</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Email Table */}
         <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
@@ -444,6 +589,21 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             }}
           />
         )}
+
+        {/* Admin Debug Panel */}
+        <DebugPanel
+          title="Email Templates - Detail View"
+          data={{
+            viewMode,
+            selectedTemplate,
+            emailItems,
+            enabledCount,
+            totalCount,
+            loading,
+            error,
+          }}
+          isAdmin={isAdmin}
+        />
       </>
     );
   }

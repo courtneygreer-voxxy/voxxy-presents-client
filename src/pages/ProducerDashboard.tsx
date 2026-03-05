@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Send } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
@@ -11,12 +11,11 @@ import EventsList from '@/components/producer/EventsList';
 import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
-import EmailTemplatesPage from './EmailTemplatesPage';
-import EmailTestingPage from './EmailTestingPage';
+import { TemplateManager } from '@/components/producer/Email';
 import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmationDialog';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 
-type NavItem = 'events' | 'network' | 'email-templates' | 'email-testing' | 'settings';
+type NavItem = 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface Organization {
@@ -87,7 +86,7 @@ export default function ProducerDashboard() {
   const [creationProgress, setCreationProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
+  const { userProfile, isAuthenticated, loading: authLoading, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
 
@@ -425,7 +424,6 @@ export default function ProducerDashboard() {
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
-    { id: 'email-testing' as NavItem, label: 'Test Emails', icon: Send },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -552,6 +550,8 @@ export default function ProducerDashboard() {
             }, 2000);
           }
         }}
+        onDeleteEvent={handleDeleteEvent}
+        isAdmin={isAdmin}
       />
     );
   };
@@ -603,8 +603,9 @@ export default function ProducerDashboard() {
                   setActiveNav(item.id);
                   setIsMobileMenuOpen(false);
                   // Reset to appropriate events view when clicking Events nav
-                  if (item.id === 'events' && eventsView === 'create') {
+                  if (item.id === 'events' && (eventsView === 'create' || eventsView === 'command-center' || eventsView === 'edit')) {
                     setEventsView(events.length > 0 ? 'list' : 'empty');
+                    setSelectedEvent(null);
                   }
                 }}
                 className={`
@@ -682,44 +683,6 @@ export default function ProducerDashboard() {
 
         {/* Main Content */}
         <main className="flex-1 overflow-auto">
-          {/* DEBUG PANEL - Organization Info */}
-          <div className="sticky top-0 z-50 bg-red-500/20 border-2 border-red-500 p-3 m-3 rounded-lg">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-bold text-white">🐛 DEBUG: Organization Data</h3>
-              <span className="text-xs text-white/60">ProducerDashboard State</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-              <div>
-                <span className="text-white/60">loadingOrg:</span>
-                <span className="text-white ml-2">{String(loadingOrg)}</span>
-              </div>
-              <div>
-                <span className="text-white/60">organization exists:</span>
-                <span className="text-white ml-2">{String(!!organization)}</span>
-              </div>
-              <div>
-                <span className="text-white/60">organization.id:</span>
-                <span className="text-yellow-300 ml-2 font-bold">{organization?.id || 'UNDEFINED'}</span>
-              </div>
-              <div>
-                <span className="text-white/60">organization.slug:</span>
-                <span className="text-white ml-2">{organization?.slug || 'N/A'}</span>
-              </div>
-              <div className="col-span-2">
-                <span className="text-white/60">organization.name:</span>
-                <span className="text-white ml-2">{organization?.name || 'N/A'}</span>
-              </div>
-              <div className="col-span-2">
-                <details className="mt-2">
-                  <summary className="text-white/60 cursor-pointer hover:text-white">Full organization object (click to expand)</summary>
-                  <pre className="mt-2 p-2 bg-black/50 rounded text-[10px] overflow-auto max-h-40 text-green-300">
-                    {JSON.stringify(organization, null, 2)}
-                  </pre>
-                </details>
-              </div>
-            </div>
-          </div>
-
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} />
           ) : activeNav === 'events' ? (
@@ -735,17 +698,7 @@ export default function ProducerDashboard() {
               )}
             </div>
           ) : activeNav === 'email-templates' ? (
-            <div className="p-3 md:p-4">
-              {organization ? (
-                <EmailTemplatesPage organizationId={organization.id} />
-              ) : (
-                <div className="flex items-center justify-center py-8">
-                  <p className="text-xs text-white/60">Loading organization...</p>
-                </div>
-              )}
-            </div>
-          ) : activeNav === 'email-testing' ? (
-            <EmailTestingPage onBack={() => setActiveNav('events')} />
+            <TemplateManager />
           ) : (
             <div className="p-3 md:p-4">
               <div className="text-white/40 text-center mt-12">

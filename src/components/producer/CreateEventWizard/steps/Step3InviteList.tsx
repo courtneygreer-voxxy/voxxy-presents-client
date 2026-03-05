@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2 } from 'lucide-react';
+import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { WizardStepProps } from '../types';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 import ImportContactsModal from '../ImportContactsModal';
+import { DebugPanel } from '../../DebugPanel';
 
 interface Step3InviteListProps extends WizardStepProps {
   organizationId: number;
@@ -12,6 +13,7 @@ export default function Step3InviteList({
   wizardState,
   updateWizardState,
   organizationId,
+  isAdmin,
 }: Step3InviteListProps) {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [contacts, setContacts] = useState<VendorContact[]>([]);
@@ -135,6 +137,12 @@ export default function Step3InviteList({
     currentPage * perPage
   );
 
+  // Calculate unsubscribed contacts count
+  const unsubscribedContacts = contacts.filter(
+    (c) => c.unsubscribe_status?.is_unsubscribed
+  );
+  const unsubscribedCount = unsubscribedContacts.length;
+
   // Empty state - no contacts invited yet
   if (invitedContactIds.length === 0) {
     return (
@@ -201,6 +209,23 @@ export default function Step3InviteList({
             </p>
           </div>
 
+          {/* Unsubscribe Warning Banner */}
+          {unsubscribedCount > 0 && (
+            <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-yellow-300">
+                    <strong>Warning:</strong> {unsubscribedCount} {unsubscribedCount === 1 ? 'contact is' : 'contacts are'} unsubscribed and won't receive invitations
+                  </p>
+                  <p className="text-xs text-yellow-300/70 mt-1">
+                    Unsubscribed contacts are highlighted below. They opted out at the global or organization level.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Search Bar and Actions */}
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
@@ -242,7 +267,7 @@ export default function Step3InviteList({
               <div className="overflow-x-auto">
                 {/* Table Header */}
                 <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-                  <div className="grid grid-cols-[28px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide min-w-[1600px]">
+                  <div className="grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide min-w-[1700px]">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -251,6 +276,7 @@ export default function Step3InviteList({
                         className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                       />
                     </div>
+                    <div>Status</div>
                     <div>Name</div>
                     <div>Business</div>
                     <div>Category</div>
@@ -266,12 +292,21 @@ export default function Step3InviteList({
                 <div>
                   {paginatedContacts.map((contact) => {
                     const isSelected = selectedContactIds.includes(contact.id);
+                    const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
+                    const unsubscribeScope = contact.unsubscribe_status?.scope;
+
+                    // Determine background color based on selection and unsubscribe status
+                    let bgClass = '';
+                    if (isSelected) {
+                      bgClass = 'bg-purple-500/10';
+                    } else if (isUnsubscribed) {
+                      bgClass = 'bg-red-500/5';
+                    }
+
                     return (
                       <div
                         key={contact.id}
-                        className={`grid grid-cols-[28px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center border-b border-white/5 hover:bg-white/5 transition-colors text-[11px] min-w-[1600px] ${
-                          isSelected ? 'bg-purple-500/10' : ''
-                        }`}
+                        className={`grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center border-b border-white/5 hover:bg-white/5 transition-colors text-[11px] min-w-[1700px] ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">
@@ -282,6 +317,25 @@ export default function Step3InviteList({
                             className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                             onClick={(e) => e.stopPropagation()}
                           />
+                        </div>
+
+                        {/* Status */}
+                        <div className="flex items-center">
+                          {isUnsubscribed ? (
+                            <span
+                              className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
+                                unsubscribeScope === 'global'
+                                  ? 'bg-red-500/20 text-red-300 border border-red-500/30'
+                                  : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                              }`}
+                            >
+                              {unsubscribeScope === 'global' ? 'Global' : 'Org'}
+                            </span>
+                          ) : (
+                            <span className="px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 rounded text-[9px] font-medium">
+                              Active
+                            </span>
+                          )}
                         </div>
 
                         {/* Name */}
@@ -421,6 +475,19 @@ export default function Step3InviteList({
         onClose={() => setIsImportModalOpen(false)}
         organizationId={organizationId}
         onImport={handleImport}
+      />
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Step 3: Invite List"
+        data={{
+          wizardState,
+          inviteList: wizardState.inviteList,
+          contacts,
+          unsubscribedCount,
+          loading,
+        }}
+        isAdmin={isAdmin}
       />
     </>
   );

@@ -174,7 +174,7 @@ export async function fetchPortalData(eventSlug: string): Promise<EventPortalDat
     throw new PortalApiError('No active portal session. Please log in again.', 401)
   }
 
-  const url = `${API_BASE_URL}/v1/presents/portals/${eventSlug}`
+  const url = `${API_BASE_URL}/v1/presents/portals/${encodeURIComponent(eventSlug)}`
 
   try {
     const response = await fetch(url, {

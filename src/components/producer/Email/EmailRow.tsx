@@ -113,7 +113,8 @@ export default function EmailRow({
 
   // Determine if this is a system/trigger email (event-based, not time-based)
   const systemTriggers = [
-    'on_application_open',        // Initial Invitation (fires on "Go Live" action)
+    'on_application_open',        // Initial Invitation (legacy)
+    'on_invitation_send',         // Invitation to Apply (fires on "Go Live" action)
     'on_application_submit',
     'on_approval',
     'on_rejection',
@@ -121,7 +122,8 @@ export default function EmailRow({
     'on_payment_received',
     'on_category_change',
     'on_event_update',
-    'on_event_cancel'
+    'on_event_cancel',
+    'on_bulletin_post'            // Bulletin Blast (fires when producer posts bulletin)
   ];
   const isSystemEmail = systemTriggers.includes(email.trigger_type);
 
@@ -248,7 +250,7 @@ export default function EmailRow({
         {isSystemEmail ? (
           // Show trigger type for system/trigger emails (event-based)
           <span className="text-white/50 text-[11px]">
-            {TRIGGER_TYPES.find(t => t.value === email.trigger_type)?.label || email.trigger_type}
+            {TRIGGER_TYPES.find(t => t.value === email.trigger_type)?.label || 'Event-triggered'}
           </span>
         ) : scheduledDate ? (
           // Show date/time for scheduled emails (time-based)
@@ -257,7 +259,7 @@ export default function EmailRow({
             <span className="text-[10px] text-white/40">{format(scheduledDate, 'h:mm a')}</span>
           </div>
         ) : (
-          <span className="text-white/40">Not scheduled</span>
+          <span className="text-white/40 text-[11px]">Event-triggered</span>
         )}
       </div>
 

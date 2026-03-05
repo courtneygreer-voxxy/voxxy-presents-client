@@ -6,16 +6,17 @@ import LocationAutocomplete from '../LocationAutocomplete';
 import googlePlacesService, { LocationData } from '@/services/googlePlacesService';
 import { isDevOrStaging } from '@/config/environments';
 import { useAuth } from '@/contexts/AuthContext';
+import { DebugPanel } from '../../DebugPanel';
 
 export default function Step1EventDetails({
   wizardState,
   updateWizardState,
   errors,
   setErrors,
+  isAdmin,
 }: WizardStepProps) {
   const { eventDetails } = wizardState;
   const { userProfile } = useAuth();
-  const isAdmin = userProfile?.role === 'admin';
 
   // Track if venue was selected from autocomplete (for locking location)
   const [isVenueSelected, setIsVenueSelected] = useState(false);
@@ -397,6 +398,17 @@ export default function Step1EventDetails({
           )}
         </div>
       </div>
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Step 1: Event Details"
+        data={{
+          wizardState,
+          eventDetails: wizardState.eventDetails,
+          errors,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

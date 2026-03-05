@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Mail, ChevronDown, ChevronUp, Eye, Edit, Users, Plus, Calendar, Clock } from 'lucide-react';
-import { format, addDays, subDays } from 'date-fns';
+import { format, addDays, subDays, parseISO } from 'date-fns';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import ImportTemplateModal from '../ImportTemplateModal';
 import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
+import { DebugPanel } from '../../DebugPanel';
 
 interface Step4AutoMessagesProps {
   selectedTemplateId?: number | null;
@@ -12,6 +13,7 @@ interface Step4AutoMessagesProps {
   eventDate?: string;
   applicationDeadline?: string;
   paymentDeadline?: string;
+  isAdmin?: boolean;
 }
 
 // Category display names and order
@@ -33,7 +35,11 @@ const getTriggerLabel = (triggerType: string, triggerValue: number | null): stri
     case 'days_after_event':
       return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
     case 'days_before_deadline':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before application deadline`;
+    case 'days_before_payment_deadline':
       return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
+    case 'days_after_payment_deadline':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`;
     case 'on_application_open':
       return 'When applications open';
     case 'on_application_submit':
@@ -60,7 +66,7 @@ const calculateSendDate = (
   if (!eventDate) return null;
 
   try {
-    const eventDateObj = new Date(eventDate);
+    const eventDateObj = parseISO(eventDate);
 
     switch (triggerType) {
       case 'days_before_event':
@@ -70,14 +76,20 @@ const calculateSendDate = (
         if (triggerValue === null) return null;
         return format(addDays(eventDateObj, triggerValue), 'MMM d, yyyy');
       case 'days_before_deadline':
+        if (triggerValue === null || !applicationDeadline) return null;
+        return format(subDays(parseISO(applicationDeadline), triggerValue), 'MMM d, yyyy');
+      case 'days_before_payment_deadline':
         if (triggerValue === null || !paymentDeadline) return null;
-        return format(subDays(new Date(paymentDeadline), triggerValue), 'MMM d, yyyy');
+        return format(subDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy');
+      case 'days_after_payment_deadline':
+        if (triggerValue === null || !paymentDeadline) return null;
+        return format(addDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy');
       case 'on_application_open':
-        return applicationDeadline ? format(new Date(applicationDeadline), 'MMM d, yyyy') : null;
+        return applicationDeadline ? format(parseISO(applicationDeadline), 'MMM d, yyyy') : null;
       case 'on_event_date':
         return format(eventDateObj, 'MMM d, yyyy');
       case 'on_payment_deadline':
-        return paymentDeadline ? format(new Date(paymentDeadline), 'MMM d, yyyy') : null;
+        return paymentDeadline ? format(parseISO(paymentDeadline), 'MMM d, yyyy') : null;
       default:
         return null;
     }
@@ -91,7 +103,8 @@ export default function Step4AutoMessages({
   onTemplateSelect,
   eventDate,
   applicationDeadline,
-  paymentDeadline
+  paymentDeadline,
+  isAdmin
 }: Step4AutoMessagesProps) {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
@@ -308,6 +321,19 @@ export default function Step4AutoMessages({
           }}
         />
       )}
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Step 4: Auto Messages"
+        data={{
+          selectedTemplateId,
+          selectedTemplate,
+          eventDate,
+          applicationDeadline,
+          paymentDeadline,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

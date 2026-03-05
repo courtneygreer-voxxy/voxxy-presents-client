@@ -7,6 +7,7 @@ import Step1EventDetails from './steps/Step1EventDetails';
 import Step2ApplicationDetails from './steps/Step2ApplicationDetails';
 import Step3InviteList from './steps/Step3InviteList';
 import Step4AutoMessages from './steps/Step4AutoMessages';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateEventWizardProps {
   onCancel: () => void;
@@ -15,6 +16,8 @@ interface CreateEventWizardProps {
 }
 
 export default function CreateEventWizard({ onCancel, onSubmit, organizationId }: CreateEventWizardProps) {
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
   const [wizardState, setWizardState] = useState<WizardState>({
     currentStep: 1,
     eventDetails: {
@@ -240,6 +243,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       updateWizardState,
       errors,
       setErrors,
+      isAdmin,
     };
 
     switch (wizardState.currentStep) {
@@ -264,6 +268,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
             eventDate={wizardState.eventDetails.event_date}
             applicationDeadline={wizardState.eventDetails.application_deadline}
             paymentDeadline={wizardState.eventDetails.payment_deadline}
+            isAdmin={isAdmin}
           />
         );
       default:

@@ -56,6 +56,7 @@ export interface WizardStepProps {
   updateWizardState: (updates: Partial<WizardState>) => void;
   errors: Record<string, string>;
   setErrors: (errors: Record<string, string>) => void;
+  isAdmin?: boolean;
 }
 
 export interface WizardNavigationProps {

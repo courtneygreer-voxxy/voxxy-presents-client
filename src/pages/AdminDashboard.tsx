@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { adminApi, eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi } from "@/services/api";
 import SettingsPage from './SettingsPage';
-import EmailTestingPanel from '@/components/admin/EmailTestingPanel';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
 import EditEventForm from '@/components/producer/EditEventForm';
@@ -14,10 +13,9 @@ import EventsList from '@/components/producer/EventsList';
 import LoadingCommandCenter from '@/components/producer/LoadingCommandCenter';
 import CommandCenter from '@/components/producer/CommandCenter';
 import { NetworkPage } from '@/components/producer/Network';
-import EmailTemplatesPage from './EmailTemplatesPage';
-import BugReportsTab from '@/components/admin/BugReportsTab';
+import { TemplateManager } from '@/components/producer/Email';
 
-type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'email-testing' | 'bug-reports' | 'settings';
+type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface User {
@@ -144,7 +142,7 @@ export default function AdminDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('admin');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [eventsView, setEventsView] = useState<EventsView>('empty');
-  const { userProfile, isAuthenticated, loading: authLoading, signOut } = useAuth();
+  const { userProfile, isAuthenticated, loading: authLoading, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
 
   // Admin tab state
@@ -582,8 +580,6 @@ export default function AdminDashboard() {
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
-    { id: 'email-testing' as NavItem, label: 'Email Testing', icon: Mail },
-    { id: 'bug-reports' as NavItem, label: 'Bug Reports', icon: Bug },
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
@@ -727,6 +723,8 @@ export default function AdminDashboard() {
             }, 2000);
           }
         }}
+        onDeleteEvent={handleDeleteEvent}
+        isAdmin={isAdmin}
       />
     );
   };
@@ -784,8 +782,9 @@ export default function AdminDashboard() {
                   setActiveNav(item.id);
                   setIsMobileMenuOpen(false);
                   // Reset to appropriate events view when clicking Events nav
-                  if (item.id === 'events' && eventsView === 'create') {
+                  if (item.id === 'events' && (eventsView === 'create' || eventsView === 'command-center' || eventsView === 'edit')) {
                     setEventsView(events.length > 0 ? 'list' : 'empty');
+                    setSelectedEvent(null);
                   }
                 }}
                 className={`
@@ -878,9 +877,6 @@ export default function AdminDashboard() {
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-green-500/20 border border-green-400/50 rounded flex items-center justify-center animate-pulse">
-              <span className="text-green-400 text-lg">●</span>
-            </div>
             <div>
               <h2 className="text-cyan-300 font-mono font-bold text-sm">
                 {'>'} {userProfile?.name || 'ADMIN_SYSTEM'}
@@ -909,19 +905,7 @@ export default function AdminDashboard() {
               )}
             </div>
           ) : activeNav === 'email-templates' ? (
-            <div className="p-4 lg:p-6">
-              {organization ? (
-                <EmailTemplatesPage organizationId={organization.id} />
-              ) : (
-                <div className="flex items-center justify-center py-12">
-                  <p className="text-white/60">Loading organization...</p>
-                </div>
-              )}
-            </div>
-          ) : activeNav === 'email-testing' ? (
-            <EmailTestingPanel />
-          ) : activeNav === 'bug-reports' ? (
-            <BugReportsTab />
+            <TemplateManager />
           ) : activeNav === 'admin' ? (
             <div className="p-4 lg:p-6">
               <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
@@ -952,9 +936,6 @@ export default function AdminDashboard() {
                     </Button>
                   </div>
                   <div className="mt-4 flex items-center gap-2 text-xs font-mono">
-                    <div className="px-2 py-1 bg-green-500/20 border border-green-400/50 rounded text-green-300 animate-pulse">
-                      ● SYSTEM ONLINE
-                    </div>
                     <div className="px-2 py-1 bg-cyan-500/20 border border-cyan-400/50 rounded text-cyan-300">
                       USER: {userProfile?.email}
                     </div>
@@ -980,7 +961,7 @@ export default function AdminDashboard() {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     <button
-                      onClick={() => navigate('/admin/unsubscribes')}
+                      onClick={() => window.open('/admin/unsubscribes', '_blank')}
                       className="bg-black/60 border-2 border-red-500/50 rounded p-4 hover:bg-red-500/10 transition-all hover:border-red-500/70 text-left group"
                     >
                       <div className="flex items-center gap-3 mb-2">
@@ -999,6 +980,32 @@ export default function AdminDashboard() {
                           DEBUG
                         </div>
                         <div className="text-red-400/60">
+                          {'>'} Click to access
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Bug Reports Tool */}
+                    <button
+                      onClick={() => window.open('/admin/bug-reports', '_blank')}
+                      className="bg-black/60 border-2 border-yellow-500/50 rounded p-4 hover:bg-yellow-500/10 transition-all hover:border-yellow-500/70 text-left group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-yellow-500/20 border border-yellow-400/50 rounded flex items-center justify-center group-hover:bg-yellow-500/30 transition-colors">
+                          <Bug className="h-4 w-4 text-yellow-300" />
+                        </div>
+                        <h3 className="text-yellow-300 font-mono font-bold text-sm group-hover:text-yellow-200 transition-colors">
+                          BUG REPORTS
+                        </h3>
+                      </div>
+                      <p className="text-yellow-400/60 font-mono text-[10px] mb-2">
+                        View all user-submitted bug reports
+                      </p>
+                      <div className="flex items-center gap-2 text-[9px] font-mono">
+                        <div className="px-2 py-1 bg-yellow-500/20 border border-yellow-400/50 rounded text-yellow-300">
+                          DEBUG
+                        </div>
+                        <div className="text-yellow-400/60">
                           {'>'} Click to access
                         </div>
                       </div>

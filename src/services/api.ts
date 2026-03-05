@@ -604,7 +604,7 @@ export const eventsApi = {
    * GET /api/v1/presents/events/:id
    */
   async getById(id: string) {
-    return fetchApi<any>(`/v1/presents/events/${id}`)
+    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(id)}`)
   },
 
   /**
@@ -692,7 +692,7 @@ export const eventsApi = {
     invitation_contact_ids: number[]
     invitation_excluded_ids: number[]
   }>) {
-    return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
+    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}`, {
       method: 'PATCH',
       body: JSON.stringify({ event: eventData }),
     })
@@ -703,7 +703,7 @@ export const eventsApi = {
    * DELETE /api/v1/presents/events/:id
    */
   async delete(eventSlug: string) {
-    return fetchApi<any>(`/v1/presents/events/${eventSlug}`, {
+    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}`, {
       method: 'DELETE',
     })
   },
@@ -718,7 +718,7 @@ export const eventsApi = {
       invitations_sent: number
       emails_activated: number
       is_live: boolean
-    }>(`/v1/presents/events/${eventSlug}/go_live`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/go_live`, {
       method: 'POST',
     })
   },
@@ -734,7 +734,7 @@ export const eventsApi = {
       event: any
       warning: string
       requires_confirmation: boolean
-    }>(`/v1/presents/events/${eventSlug}/email_notifications/check_event_update_impact`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_event_update_impact`, {
       method: 'POST',
     })
   },
@@ -749,7 +749,7 @@ export const eventsApi = {
       message: string
       sent_count: number
       failed_count: number
-    }>(`/v1/presents/events/${eventSlug}/email_notifications/send_event_update`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_event_update`, {
       method: 'POST',
       body: JSON.stringify({ confirmed: true }),
     })
@@ -766,7 +766,7 @@ export const eventsApi = {
       event: any
       warning: string
       requires_confirmation: boolean
-    }>(`/v1/presents/events/${eventSlug}/email_notifications/check_cancellation_impact`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_cancellation_impact`, {
       method: 'POST',
     })
   },
@@ -781,7 +781,7 @@ export const eventsApi = {
       message: string
       sent_count: number
       failed_count: number
-    }>(`/v1/presents/events/${eventSlug}/email_notifications/send_cancellation`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_cancellation`, {
       method: 'POST',
       body: JSON.stringify({ confirmed: true }),
     })
@@ -835,7 +835,7 @@ export const registrationsApi = {
     website?: string
     note_to_host?: string
   }) {
-    return fetchApi<any>(`/v1/presents/events/${eventSlug}/registrations`, {
+    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/registrations`, {
       method: 'POST',
       body: JSON.stringify({ registration: data }),
     })
@@ -912,7 +912,7 @@ export const vendorApplicationsApi = {
    * GET /api/v1/presents/events/:event_slug/vendor_applications
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<any[]>(`/v1/presents/events/${eventSlug}/vendor_applications`)
+    return fetchApi<any[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`)
   },
 
   /**
@@ -939,7 +939,7 @@ export const vendorApplicationsApi = {
     payment_link?: string
     application_tags?: string
   }) {
-    return fetchApi<any>(`/v1/presents/events/${eventSlug}/vendor_applications`, {
+    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`, {
       method: 'POST',
       body: JSON.stringify({ vendor_application: data }),
     })
@@ -1140,13 +1140,16 @@ export const emailTemplateItemsApi = {
 
   /**
    * Update email item in template
-   * PATCH /api/v1/presents/email_template_items/:id
+   * PATCH /api/v1/presents/email_campaign_templates/:template_id/email_template_items/:id
    */
-  async update(id: number, data: UpdateEmailRequest) {
-    return fetchApi<EmailTemplateItem>(`/v1/presents/email_template_items/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ email_template_item: data }),
-    })
+  async update(templateId: number, id: number, data: UpdateEmailRequest) {
+    return fetchApi<EmailTemplateItem>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ email_template_item: data }),
+      }
+    )
   },
 
   /**
@@ -1165,12 +1168,15 @@ export const emailTemplateItemsApi = {
 
   /**
    * Delete email item from template
-   * DELETE /api/v1/presents/email_template_items/:id
+   * DELETE /api/v1/presents/email_campaign_templates/:template_id/email_template_items/:id
    */
-  async delete(id: number) {
-    return fetchApi<void>(`/v1/presents/email_template_items/${id}`, {
-      method: 'DELETE',
-    })
+  async delete(templateId: number, id: number) {
+    return fetchApi<void>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items/${id}`,
+      {
+        method: 'DELETE',
+      }
+    )
   },
 }
 
@@ -1181,7 +1187,7 @@ export const scheduledEmailsApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<ScheduledEmail[]>(`/v1/presents/events/${eventSlug}/scheduled_emails`)
+    return fetchApi<ScheduledEmail[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails`)
   },
 
   /**
@@ -1189,7 +1195,7 @@ export const scheduledEmailsApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async getById(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`)
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`)
   },
 
   /**
@@ -1198,7 +1204,7 @@ export const scheduledEmailsApi = {
    */
   async generate(eventSlug: string, data?: GenerateScheduledEmailsRequest) {
     return fetchApi<GenerateScheduledEmailsResponse>(
-      `/v1/presents/events/${eventSlug}/scheduled_emails/generate`,
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/generate`,
       {
         method: 'POST',
         body: JSON.stringify(data || {}),
@@ -1211,7 +1217,7 @@ export const scheduledEmailsApi = {
    * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async update(eventSlug: string, id: number, data: UpdateEmailRequest) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`, {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ scheduled_email: data }),
     })
@@ -1222,7 +1228,7 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
    */
   async pause(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/pause`, {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/pause`, {
       method: 'POST',
     })
   },
@@ -1232,7 +1238,7 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
    */
   async resume(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/resume`, {
+    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/resume`, {
       method: 'POST',
     })
   },
@@ -1242,7 +1248,7 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/send_now
    */
   async sendNow(eventSlug: string, id: number) {
-    return fetchApi<SendNowResponse>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/send_now`, {
+    return fetchApi<SendNowResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/send_now`, {
       method: 'POST',
     })
   },
@@ -1253,7 +1259,7 @@ export const scheduledEmailsApi = {
    */
   async preview(eventSlug: string, id: number, data: EmailPreviewRequest) {
     return fetchApi<EmailPreviewResponse>(
-      `/v1/presents/events/${eventSlug}/scheduled_emails/${id}/preview`,
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/preview`,
       {
         method: 'POST',
         body: JSON.stringify(data),
@@ -1267,7 +1273,7 @@ export const scheduledEmailsApi = {
    */
   async sendTest(eventSlug: string, id: number, testEmail: string) {
     return fetchApi<{ message: string; recipient: string; subject: string }>(
-      `/v1/presents/events/${eventSlug}/scheduled_emails/${id}/send_test`,
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/send_test`,
       {
         method: 'POST',
         body: JSON.stringify({ test_email: testEmail }),
@@ -1286,7 +1292,7 @@ export const scheduledEmailsApi = {
       retry_failed_count: number
       skipped_count: number
       total_failed: number
-    }>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/retry_failed`, {
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/retry_failed`, {
       method: 'POST',
     })
   },
@@ -1305,7 +1311,7 @@ export const scheduledEmailsApi = {
         name: string
         organization: string
       }>
-    }>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}/recipients`)
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/recipients`)
   },
 
   /**
@@ -1313,7 +1319,7 @@ export const scheduledEmailsApi = {
    * DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async delete(eventSlug: string, id: number) {
-    return fetchApi<void>(`/v1/presents/events/${eventSlug}/scheduled_emails/${id}`, {
+    return fetchApi<void>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`, {
       method: 'DELETE',
     })
   },
@@ -1324,7 +1330,7 @@ export const scheduledEmailsApi = {
    */
   async saveAsTemplate(eventSlug: string, data: SaveAsTemplateRequest) {
     return fetchApi<EmailCampaignTemplate>(
-      `/v1/presents/events/${eventSlug}/scheduled_emails/save_as_template`,
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/save_as_template`,
       {
         method: 'POST',
         body: JSON.stringify(data),
@@ -1340,7 +1346,7 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails/:scheduled_email_id/email_deliveries
    */
   async getByScheduledEmail(eventSlug: string, scheduledEmailId: number) {
-    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${eventSlug}/scheduled_emails/${scheduledEmailId}/email_deliveries`)
+    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${scheduledEmailId}/email_deliveries`)
   },
 
   /**
@@ -1355,7 +1361,7 @@ export const emailDeliveriesApi = {
       dropped: number
       unsubscribed: number
       delivery_rate: number
-    }>(`/v1/presents/events/${eventSlug}/email_deliveries/stats`)
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_deliveries/stats`)
   },
 
   /**
@@ -1402,7 +1408,7 @@ export const emailDeliveriesApi = {
    */
   async getByInvitation(eventSlug: string, invitationId: number) {
     console.log('[API DEBUG] getByInvitation called with:', { eventSlug, invitationId });
-    const url = `/v1/presents/events/${eventSlug}/invitations/${invitationId}/email_history`;
+    const url = `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/${invitationId}/email_history`;
     console.log('[API DEBUG] Full URL:', url);
     const result = await fetchApi<EmailDelivery[]>(url);
     console.log('[API DEBUG] getByInvitation result:', result);
@@ -1806,6 +1812,10 @@ export interface VendorContact {
   featured?: boolean
   created_at: string
   updated_at: string
+  unsubscribe_status?: {
+    is_unsubscribed: boolean
+    scope: 'global' | 'organization' | 'event' | null
+  }
 }
 
 export interface VendorContactsListResponse {
@@ -1937,6 +1947,7 @@ export const vendorContactsApi = {
         website: contact.website || contact.social?.website || undefined,
         created_at: contact.created_at || contact.metadata?.created_at || '',
         updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+        unsubscribe_status: contact.unsubscribe_status || undefined,
       }
       return mapped
     }
@@ -2003,6 +2014,7 @@ export const vendorContactsApi = {
       website: contact.website || contact.social?.website || undefined,
       created_at: contact.created_at || contact.metadata?.created_at || '',
       updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+      unsubscribe_status: contact.unsubscribe_status || undefined,
     }
   },
 
@@ -2137,6 +2149,7 @@ export const vendorContactsApi = {
       website: contact.website || contact.social?.website || undefined,
       created_at: contact.created_at || contact.metadata?.created_at || '',
       updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+      unsubscribe_status: contact.unsubscribe_status || undefined,
     }
   },
 
@@ -2205,6 +2218,7 @@ export const vendorContactsApi = {
       imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
       created_at: contact.created_at || contact.metadata?.created_at || '',
       updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+      unsubscribe_status: contact.unsubscribe_status || undefined,
     }
   },
 
@@ -2559,7 +2573,7 @@ export const eventInvitationsApi = {
       created_count: number
       errors: any[]
     }>(
-      `/v1/presents/events/${eventSlug}/invitations/batch`,
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/batch`,
       {
         method: 'POST',
         body: JSON.stringify(body),
@@ -2588,6 +2602,7 @@ export const eventInvitationsApi = {
         accepted_count: number
         declined_count: number
         expired_count: number
+        unsubscribed_count: number
         delivery_stats: {
           total_sent: number
           delivered: number
@@ -2607,7 +2622,7 @@ export const eventInvitationsApi = {
         }
       }
     }>(
-      `/v1/presents/events/${eventSlug}/invitations${query ? `?${query}` : ''}`
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations${query ? `?${query}` : ''}`
     )
   },
 
@@ -2650,7 +2665,7 @@ export const eventInvitationsApi = {
       recipient_email: string
       is_sample: boolean
     }>(
-      `/v1/presents/events/${eventSlug}/invitations/preview_email`
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/preview_email`
     )
   },
 
@@ -2753,7 +2768,7 @@ export const bulletinsApi = {
    * GET /api/v1/presents/events/:eventSlug/bulletins
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<import('@/types/bulletin').BulletinsResponse>(`/v1/presents/events/${eventSlug}/bulletins`)
+    return fetchApi<import('@/types/bulletin').BulletinsResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`)
   },
 
   /**
@@ -2769,7 +2784,7 @@ export const bulletinsApi = {
    * POST /api/v1/presents/events/:eventSlug/bulletins
    */
   async create(eventSlug: string, data: import('@/types/bulletin').CreateBulletinRequest) {
-    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/events/${eventSlug}/bulletins`, {
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`, {
       method: 'POST',
       body: JSON.stringify({ bulletin: data }),
     })

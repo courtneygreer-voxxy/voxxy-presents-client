@@ -31,6 +31,11 @@ export interface EmailVariable {
 
   // Example value
   example: string;
+
+  // Whether this variable works in invitation emails (Position 1)
+  // Invitation emails only have access to event + vendor_contact data
+  // Category-specific and registration-level variables don't work in invitations
+  worksInInvitations: boolean;
 }
 
 export const EMAIL_VARIABLES: EmailVariable[] = [
@@ -41,7 +46,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_title}}',
     category: 'event',
     description: 'Name of the event',
-    example: 'Summer Market 2025'
+    example: 'Summer Market 2025',
+    worksInInvitations: true
   },
   {
     label: 'Event Date',
@@ -49,7 +55,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_date}}',
     category: 'event',
     description: 'Date of the event',
-    example: 'June 15, 2025'
+    example: 'June 15, 2025',
+    worksInInvitations: true
+  },
+  {
+    label: 'Event End Date',
+    frontendVar: '[eventEndDate]',
+    backendVar: '{{event_end_date}}',
+    category: 'event',
+    description: 'End date of the event (for multi-day events)',
+    example: 'June 17, 2025',
+    worksInInvitations: true
   },
   {
     label: 'Event Time',
@@ -57,7 +73,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_time}}',
     category: 'event',
     description: 'Time of the event',
-    example: '10:00 AM - 6:00 PM'
+    example: '10:00 AM - 6:00 PM',
+    worksInInvitations: true
   },
   {
     label: 'Event Location',
@@ -65,7 +82,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_location}}',
     category: 'event',
     description: 'Venue and address',
-    example: 'Piedmont Park, Atlanta, GA'
+    example: 'Piedmont Park, Atlanta, GA',
+    worksInInvitations: true
   },
   {
     label: 'Event Venue',
@@ -73,7 +91,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_venue}}',
     category: 'event',
     description: 'Venue name only',
-    example: 'Piedmont Park'
+    example: 'Piedmont Park',
+    worksInInvitations: true
   },
   {
     label: 'Event Description',
@@ -81,7 +100,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_description}}',
     category: 'event',
     description: 'Event description text',
-    example: 'A family-friendly outdoor market...'
+    example: 'A family-friendly outdoor market...',
+    worksInInvitations: true
   },
   {
     label: 'Application Deadline',
@@ -89,23 +109,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{application_deadline}}',
     category: 'event',
     description: 'Last day to apply',
-    example: 'May 30, 2025'
+    example: 'May 30, 2025',
+    worksInInvitations: true
   },
   {
     label: 'Booth Price',
     frontendVar: '[boothPrice]',
     backendVar: '{{booth_price}}',
     category: 'event',
-    description: 'Cost per booth',
-    example: '$150.00'
-  },
-  {
-    label: 'Category Price',
-    frontendVar: '[categoryPrice]',
-    backendVar: '{{category_price}}',
-    category: 'event',
-    description: 'Cost per booth (alias for boothPrice)',
-    example: '$150.00'
+    description: 'Cost per booth (category-specific - only works after vendor applies)',
+    example: '$150.00',
+    worksInInvitations: false
   },
   {
     label: 'Payment Due Date',
@@ -113,7 +127,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{payment_due_date}}',
     category: 'event',
     description: 'Payment deadline',
-    example: 'June 1, 2025'
+    example: 'June 1, 2025',
+    worksInInvitations: true
   },
   {
     label: 'Age Restriction',
@@ -121,7 +136,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{age_restriction}}',
     category: 'event',
     description: 'Age policy for the event',
-    example: '21+'
+    example: '21+',
+    worksInInvitations: true
+  },
+  {
+    label: 'Categories List',
+    frontendVar: '[categoriesList]',
+    backendVar: '{{categories_list}}',
+    category: 'event',
+    description: 'List of all vendor categories with prices and install times',
+    example: 'Artist Booth - $150 (Setup: 8:00 AM - 10:00 AM)\nFood Vendor - $200 (Setup: 2:00 PM - 4:00 PM)',
+    worksInInvitations: true
   },
 
   // Organization Variables
@@ -131,7 +156,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_name}}',
     category: 'organization',
     description: 'Your organization name',
-    example: 'Voxxy Presents'
+    example: 'Voxxy Presents',
+    worksInInvitations: true
   },
   {
     label: 'Organization Email',
@@ -139,7 +165,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_email}}',
     category: 'organization',
     description: 'Your contact email',
-    example: 'hello@voxxypresents.com'
+    example: 'hello@voxxypresents.com',
+    worksInInvitations: true
   },
 
   // Vendor Variables
@@ -149,7 +176,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{greeting_name}}',
     category: 'vendor',
     description: 'Smart greeting (business name or first name)',
-    example: "John's Tacos (or John)"
+    example: "John's Tacos (or John)",
+    worksInInvitations: true
   },
   {
     label: 'First Name',
@@ -157,7 +185,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{first_name}}',
     category: 'vendor',
     description: "Vendor's first name",
-    example: 'John'
+    example: 'John',
+    worksInInvitations: true
   },
   {
     label: 'Last Name',
@@ -165,7 +194,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{last_name}}',
     category: 'vendor',
     description: "Vendor's last name",
-    example: 'Doe'
+    example: 'Doe',
+    worksInInvitations: true
   },
   {
     label: 'Full Name',
@@ -173,7 +203,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{full_name}}',
     category: 'vendor',
     description: "Vendor's full name",
-    example: 'John Doe'
+    example: 'John Doe',
+    worksInInvitations: true
   },
   {
     label: 'Business Name',
@@ -181,7 +212,17 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{business_name}}',
     category: 'vendor',
     description: "Vendor's business name",
-    example: "John's Tacos"
+    example: "John's Tacos",
+    worksInInvitations: true
+  },
+  {
+    label: 'Contact Name',
+    frontendVar: '[contactName]',
+    backendVar: '{{contact_name}}',
+    category: 'vendor',
+    description: "Vendor's contact person name",
+    example: 'Jane Smith',
+    worksInInvitations: true
   },
   {
     label: 'Email',
@@ -189,71 +230,107 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{email}}',
     category: 'vendor',
     description: "Vendor's email address",
-    example: 'john@example.com'
+    example: 'john@example.com',
+    worksInInvitations: true
+  },
+  {
+    label: 'Phone',
+    frontendVar: '[phone]',
+    backendVar: '{{phone}}',
+    category: 'vendor',
+    description: "Vendor's phone number",
+    example: '(555) 123-4567',
+    worksInInvitations: true
+  },
+  {
+    label: 'Website',
+    frontendVar: '[website]',
+    backendVar: '{{website}}',
+    category: 'vendor',
+    description: "Vendor's website URL",
+    example: 'https://johnstacos.com',
+    worksInInvitations: true
   },
   {
     label: 'Vendor Category',
     frontendVar: '[vendorCategory]',
     backendVar: '{{vendor_category}}',
     category: 'vendor',
-    description: 'Type of vendor',
-    example: 'Food'
+    description: 'Application type vendor applied for (only works after they apply)',
+    example: 'Food',
+    worksInInvitations: false
+  },
+  {
+    label: 'Category Description',
+    frontendVar: '[categoryDescription]',
+    backendVar: '{{category_description}}',
+    category: 'vendor',
+    description: 'Description of the vendor category they applied for',
+    example: 'Local restaurants and food service vendors',
+    worksInInvitations: false
   },
   {
     label: 'Category List',
     frontendVar: '[categoryList]',
     backendVar: '{{category_list}}',
     category: 'vendor',
-    description: 'Bulleted list of all vendor application names',
-    example: '• Art Vendor Application\n• Music Vendor Application\n• Food Vendor Application'
+    description: 'Bulleted list of vendor application names they applied for',
+    example: '• Art Vendor Application\n• Music Vendor Application',
+    worksInInvitations: false
   },
   {
     label: 'Booth Number',
     frontendVar: '[boothNumber]',
     backendVar: '{{booth_number}}',
     category: 'vendor',
-    description: 'Assigned booth location',
-    example: 'A-12'
+    description: 'Assigned booth location (only available after assignment)',
+    example: 'A-12',
+    worksInInvitations: false
   },
   {
     label: 'Application Date',
     frontendVar: '[applicationDate]',
     backendVar: '{{application_date}}',
     category: 'vendor',
-    description: 'Date vendor applied',
-    example: 'May 15, 2025'
+    description: 'Date vendor applied (only works after they apply)',
+    example: 'May 15, 2025',
+    worksInInvitations: false
   },
   {
     label: 'Install Date',
     frontendVar: '[installDate]',
     backendVar: '{{install_date}}',
     category: 'vendor',
-    description: 'Vendor setup/install date',
-    example: 'June 14, 2025'
+    description: 'Vendor setup date (category-specific - only works after they apply)',
+    example: 'June 14, 2025',
+    worksInInvitations: false
   },
   {
     label: 'Install Time',
     frontendVar: '[installTime]',
     backendVar: '{{install_time}}',
     category: 'vendor',
-    description: 'Vendor setup time range',
-    example: '8:00 AM - 10:00 AM'
+    description: 'Vendor setup time range (category-specific - only works after they apply)',
+    example: '8:00 AM - 10:00 AM',
+    worksInInvitations: false
   },
   {
     label: 'Install Start Time',
     frontendVar: '[installStartTime]',
     backendVar: '{{install_start_time}}',
     category: 'vendor',
-    description: 'Setup start time',
-    example: '8:00 AM'
+    description: 'Setup start time (category-specific - only works after they apply)',
+    example: '8:00 AM',
+    worksInInvitations: false
   },
   {
     label: 'Install End Time',
     frontendVar: '[installEndTime]',
     backendVar: '{{install_end_time}}',
     category: 'vendor',
-    description: 'Setup end time',
-    example: '10:00 AM'
+    description: 'Setup end time (category-specific - only works after they apply)',
+    example: '10:00 AM',
+    worksInInvitations: false
   },
 
   // Computed/Link Variables
@@ -262,8 +339,9 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[paymentLink]',
     backendVar: '{{payment_link}}',
     category: 'computed',
-    description: 'Payment URL for vendor',
-    example: 'https://pay.voxxypresents.com/...'
+    description: 'Payment URL for vendor (category-specific - only works after they apply)',
+    example: 'https://pay.voxxypresents.com/...',
+    worksInInvitations: false
   },
   {
     label: 'Event Link',
@@ -271,7 +349,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_link}}',
     category: 'computed',
     description: 'Public application page URL',
-    example: 'https://voxxy.io/events/summer-market'
+    example: 'https://voxxy.io/events/summer-market',
+    worksInInvitations: true
   },
   {
     label: 'Invitation Link',
@@ -279,7 +358,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{invitation_link}}',
     category: 'computed',
     description: 'Event invitation URL (same as event link)',
-    example: 'https://voxxy.io/events/summer-market'
+    example: 'https://voxxy.io/events/summer-market',
+    worksInInvitations: true
   },
   {
     label: 'Bulletin Link',
@@ -287,7 +367,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{bulletin_link}}',
     category: 'computed',
     description: 'Event bulletin page URL',
-    example: 'https://voxxy.io/events/summer-market'
+    example: 'https://voxxy.io/events/summer-market',
+    worksInInvitations: true
   },
   {
     label: 'Dashboard Link',
@@ -295,7 +376,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{dashboard_link}}',
     category: 'computed',
     description: 'Vendor dashboard URL',
-    example: 'https://voxxy.io/vendor/dashboard'
+    example: 'https://voxxy.io/vendor/dashboard',
+    worksInInvitations: true
   },
   {
     label: 'Unsubscribe Link',
@@ -303,7 +385,44 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{unsubscribe_link}}',
     category: 'computed',
     description: 'Unsubscribe URL',
-    example: 'Click here to unsubscribe'
+    example: 'Click here to unsubscribe',
+    worksInInvitations: true
+  },
+  {
+    label: 'Application Link',
+    frontendVar: '[applicationLink]',
+    backendVar: '{{application_link}}',
+    category: 'computed',
+    description: 'Link to apply for the event',
+    example: 'https://voxxy.io/events/summer-market/apply',
+    worksInInvitations: true
+  },
+  {
+    label: 'Event Portal Link',
+    frontendVar: '[eventPortalLink]',
+    backendVar: '{{event_portal_link}}',
+    category: 'computed',
+    description: 'Vendor portal/dashboard link (only available after registration)',
+    example: 'https://voxxy.io/vendor/events/summer-market',
+    worksInInvitations: false
+  },
+  {
+    label: 'Event Opt-Out Link',
+    frontendVar: '[eventOptOutLink]',
+    backendVar: '{{event_opt_out_link}}',
+    category: 'computed',
+    description: 'Link to decline invitation for this specific event',
+    example: 'https://voxxy.io/events/summer-market/opt-out',
+    worksInInvitations: true
+  },
+  {
+    label: 'Application Code',
+    frontendVar: '[applicationCode]',
+    backendVar: '{{application_code}}',
+    category: 'vendor',
+    description: 'Unique application reference code (only available after application)',
+    example: 'APP-2024-12345',
+    worksInInvitations: false
   },
 ];
 

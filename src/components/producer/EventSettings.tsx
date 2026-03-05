@@ -103,6 +103,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   // Copy link states
   const [copiedEventPageLink, setCopiedEventPageLink] = useState(false);
   const [copiedPortalLink, setCopiedPortalLink] = useState(false);
+  const [copiedApplicationId, setCopiedApplicationId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchApplications();
@@ -208,6 +209,17 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         setCopiedPortalLink(true);
         setTimeout(() => setCopiedPortalLink(false), 2000);
       }
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      alert('Failed to copy link to clipboard');
+    }
+  };
+
+  const copyApplicationLinkToClipboard = async (applicationId: number, shareableUrl: string) => {
+    try {
+      await navigator.clipboard.writeText(shareableUrl);
+      setCopiedApplicationId(applicationId);
+      setTimeout(() => setCopiedApplicationId(null), 2000);
     } catch (err) {
       console.error('Failed to copy:', err);
       alert('Failed to copy link to clipboard');
@@ -781,6 +793,79 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               </div>
             </div>
           </div>
+
+          {/* Application Category Links */}
+          {applications.length > 0 && (
+            <div className="mt-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg bg-indigo-500/20">
+                  <FileText className="w-4 h-4 text-indigo-400" />
+                </div>
+                <div>
+                  <h3 className="text-white font-semibold text-sm">Application Category Links</h3>
+                  <p className="text-white/60 text-xs mt-1">
+                    Share these links with vendors to apply to specific categories
+                  </p>
+                </div>
+              </div>
+
+              {applications.map((app) => (
+                <div
+                  key={app.id}
+                  className={`bg-[#1e1536] rounded-xl p-4 border ${
+                    app.status === 'active'
+                      ? 'border-purple-500/20'
+                      : 'border-white/10 opacity-60'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
+                      <h4 className="text-white font-semibold text-sm mb-1">{app.name}</h4>
+                      <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2.5">
+                        <code className="text-xs text-indigo-400 flex-1 overflow-x-auto">
+                          {app.shareable_url}
+                        </code>
+                      </div>
+                      {app.status !== 'active' && (
+                        <p className="text-white/40 text-xs mt-2">
+                          This application is inactive
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => copyApplicationLinkToClipboard(app.id, app.shareable_url)}
+                        disabled={app.status !== 'active'}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all ${
+                          app.status === 'active'
+                            ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
+                            : 'bg-white/5 text-white/40 cursor-not-allowed'
+                        }`}
+                        title={app.status === 'active' ? 'Copy link' : 'Application is inactive'}
+                      >
+                        {copiedApplicationId === app.id ? (
+                          <Check className="w-4 h-4" />
+                        ) : (
+                          <Copy className="w-4 h-4" />
+                        )}
+                      </button>
+                      {app.status === 'active' && (
+                        <a
+                          href={app.shareable_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+                          title="Open in new tab"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

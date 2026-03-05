@@ -1076,7 +1076,15 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           );
                         })
                       ) : (
-                        <p className="text-xs text-white/40 italic py-2">No email history found</p>
+                        <div className="py-2">
+                          {selectedApplicant.status === 'invited' ? (
+                            <p className="text-xs text-white/60 italic">
+                              No emails sent yet. Check invitation status in Vendors tab for unsubscribe info.
+                            </p>
+                          ) : (
+                            <p className="text-xs text-white/40 italic">No email history found</p>
+                          )}
+                        </div>
                       )}
                     </div>
                   )}

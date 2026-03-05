@@ -84,6 +84,8 @@ const formatTrigger = (triggerType?: string, triggerValue?: number | null): stri
       return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
     case 'days_before_deadline':
       return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
+    case 'days_after_payment_deadline':
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`;
     case 'on_application_open':
       return 'When applications open';
     case 'on_application_submit':
@@ -94,6 +96,8 @@ const formatTrigger = (triggerType?: string, triggerValue?: number | null): stri
       return 'On payment deadline';
     case 'on_event_date':
       return 'On event day';
+    case 'on_bulletin_post':
+      return 'On bulletin post';
     default:
       return triggerType.replace(/_/g, ' ');
   }

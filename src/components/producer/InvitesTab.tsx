@@ -199,6 +199,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           existing.phone = existing.phone || contact.phone;
         } else {
           // Contact was invited but hasn't applied yet
+          // Map invitation status - use 'unsubscribed' if they were unsubscribed, otherwise 'invited'
+          const inviteStatus = invitation.status === 'unsubscribed' ? 'unsubscribed' : 'invited';
+
           emailMap.set(email, {
             id: `inv-${invitation.id}`,
             businessName: contact.business_name || contact.name,
@@ -209,7 +212,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
             tiktok: contact.tiktok_handle,
             website: contact.website,
             category: contact.contact_type || 'Unknown',
-            status: 'invited',
+            status: inviteStatus,
             paymentStatus: 'n/a',
             source: 'contact',
             isReturning: contact.source === 'returning' || contact.source === 'past_event',
@@ -568,6 +571,8 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           <option value="approved">Approved</option>
           <option value="waitlist">Waitlist</option>
           <option value="declined">Declined</option>
+          <option value="bounced">Bounced</option>
+          <option value="unsubscribed">Unsubscribed</option>
         </select>
 
         {/* Review Filter */}
@@ -886,7 +891,18 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                       );
                                     })
                                   ) : (
-                                    <p className="text-xs text-white/40 italic py-2">No email history found</p>
+                                    <div className="py-2">
+                                      {row.status === 'unsubscribed' ? (
+                                        <div className="flex items-start gap-2 px-3 py-2 rounded bg-yellow-500/10 border border-yellow-500/20">
+                                          <span className="text-yellow-400 text-xs">⊘</span>
+                                          <p className="text-xs text-yellow-400/90">
+                                            This contact is unsubscribed and will not receive emails
+                                          </p>
+                                        </div>
+                                      ) : (
+                                        <p className="text-xs text-white/40 italic">No email history found</p>
+                                      )}
+                                    </div>
                                   )}
                                 </div>
                               )}

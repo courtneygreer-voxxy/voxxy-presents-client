@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, X, Tag, Zap } from 'lucide-react';
 import { WizardStepProps, ApplicationRow } from '../types';
 import { isDevOrStaging } from '@/config/environments';
+import { DebugPanel } from '../../DebugPanel';
 
 const MAX_APPLICATIONS = 20;
 
@@ -10,6 +11,7 @@ export default function Step2ApplicationDetails({
   updateWizardState,
   errors,
   setErrors,
+  isAdmin,
 }: WizardStepProps) {
   const { applicationDetails } = wizardState;
 
@@ -610,6 +612,17 @@ export default function Step2ApplicationDetails({
           )}
         </div>
       </div>
+
+      {/* Admin Debug Panel */}
+      <DebugPanel
+        title="Step 2: Application Details"
+        data={{
+          wizardState,
+          applicationDetails: wizardState.applicationDetails,
+          errors,
+        }}
+        isAdmin={isAdmin}
+      />
     </div>
   );
 }

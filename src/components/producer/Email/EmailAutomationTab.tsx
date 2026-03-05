@@ -335,12 +335,14 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       'days_before_event',
       'days_after_event',
       'on_payment_deadline',
-      'days_before_payment_deadline'
+      'days_before_payment_deadline',
+      'days_after_payment_deadline'  // Payment overdue emails
     ];
 
     // Event-based triggers (sent immediately on action)
     const systemTriggers = [
       'on_application_open',        // Initial Invitation (fires on "Go Live" action)
+      'on_invitation_send',         // Invitation to Apply (sent when invitation is created)
       'on_application_submit',
       'on_approval',
       'on_rejection',
@@ -348,19 +350,41 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       'on_payment_received',
       'on_category_change',
       'on_event_update',
-      'on_event_cancel'
+      'on_event_cancel',
+      'on_bulletin_post'            // Bulletin Blast (sent when bulletin is posted)
     ];
 
-    const scheduled = filteredEmails.filter(email =>
-      scheduledTriggers.includes(email.trigger_type)
-    );
+    const scheduled = filteredEmails
+      .filter(email => scheduledTriggers.includes(email.trigger_type))
+      .sort((a, b) => {
+        // If user has applied column sorting, filteredEmails is already sorted
+        // Only apply chronological sort if no column sort is active
+        if (sortColumn) return 0; // Keep existing order from filteredEmails
 
-    const system = filteredEmails.filter(email =>
-      systemTriggers.includes(email.trigger_type)
-    );
+        // Default: chronological order by scheduled_for date
+        const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
+        const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
+        return dateA - dateB;
+      });
+
+    const system = filteredEmails
+      .filter(email => systemTriggers.includes(email.trigger_type))
+      .sort((a, b) => {
+        // Always show invitation emails first (both legacy and new trigger types)
+        const aIsInvitation = a.trigger_type === 'on_invitation_send' || a.trigger_type === 'on_application_open';
+        const bIsInvitation = b.trigger_type === 'on_invitation_send' || b.trigger_type === 'on_application_open';
+
+        if (aIsInvitation && !bIsInvitation) return -1;
+        if (!aIsInvitation && bIsInvitation) return 1;
+
+        // For other emails, sort by position if available
+        const posA = a.email_template_item?.position ?? 999;
+        const posB = b.email_template_item?.position ?? 999;
+        return posA - posB;
+      });
 
     return { scheduled, system };
-  }, [filteredEmails]);
+  }, [filteredEmails, sortColumn]);
 
   // Calculate statistics
   const stats = {
@@ -394,6 +418,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         eventSlug={eventSlug}
         onBack={handleCloseEditor}
         onSave={handleSaveEdit}
+        isAdmin={isAdmin}
       />
     );
   }
@@ -570,10 +595,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as FilterType)}
-                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer [&>option]:bg-gray-900 [&>option]:text-white"
               >
                 {FILTER_OPTIONS.map(option => (
-                  <option key={option.value} value={option.value}>
+                  <option key={option.value} value={option.value} className="bg-gray-900 text-white">
                     {option.label}
                     {option.value !== 'all' && ` (${stats[option.value as keyof typeof stats] || 0})`}
                   </option>
@@ -693,9 +718,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                     setAuditLogFilters(filters);
                     setShowAuditLog(true);
                   }}
-                  sortColumn={sortColumn}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
                 />
               )}
             </div>

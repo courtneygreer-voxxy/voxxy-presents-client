@@ -3,8 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { MailX, ArrowLeft, Calendar, Building2, Globe, Search, Filter, ChevronDown, ChevronUp, Mail } from "lucide-react"
-import { Link } from "react-router-dom"
+import { MailX, Calendar, Building2, Globe, Search, Filter, ChevronDown, ChevronUp, Mail } from "lucide-react"
 import { useAuth } from "@/contexts/AuthContext"
 import { adminApi } from "@/services/api"
 
@@ -148,22 +147,14 @@ export default function AdminUnsubscribesPage() {
           {/* Header Card */}
           <Card className="bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl">
             <CardHeader className="border-b border-white/10">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
-                    <MailX className="h-8 w-8 text-red-400" />
-                    Unsubscribed Users
-                  </CardTitle>
-                  <CardDescription className="text-gray-200 mt-1">
-                    Monitor and analyze email unsubscribes
-                  </CardDescription>
-                </div>
-                <Button variant="outline" size="sm" asChild className="bg-white/10 border-white/20 text-white hover:bg-white/15">
-                  <Link to="/admin">
-                    <ArrowLeft className="h-4 w-4 mr-2" />
-                    Back to Dashboard
-                  </Link>
-                </Button>
+              <div>
+                <CardTitle className="text-2xl font-bold text-white flex items-center gap-3">
+                  <MailX className="h-8 w-8 text-red-400" />
+                  Unsubscribed Users
+                </CardTitle>
+                <CardDescription className="text-gray-200 mt-1">
+                  Monitor and analyze email unsubscribes
+                </CardDescription>
               </div>
             </CardHeader>
 
