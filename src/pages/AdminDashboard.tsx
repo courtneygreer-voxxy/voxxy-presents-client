@@ -964,6 +964,63 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
+                {/* Admin Tools - Quick Access */}
+                <div className="bg-black/40 backdrop-blur-sm border-2 border-yellow-500/50 rounded-lg p-4 lg:p-6 shadow-lg shadow-yellow-500/20">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-yellow-500/20 border border-yellow-400/50 rounded flex items-center justify-center">
+                      <Database className="h-5 w-5 text-yellow-300" />
+                    </div>
+                    <div>
+                      <h2 className="text-base font-bold text-yellow-300 font-mono flex items-center gap-2">
+                        <span className="text-green-400">{'>'}</span> ADMIN_TOOLS
+                      </h2>
+                      <p className="text-xs text-yellow-400/60 font-mono">system.admin.quick_access</p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <button
+                      onClick={() => navigate('/admin/unsubscribes')}
+                      className="bg-black/60 border-2 border-red-500/50 rounded p-4 hover:bg-red-500/10 transition-all hover:border-red-500/70 text-left group"
+                    >
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-red-500/20 border border-red-400/50 rounded flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                          <Mail className="h-4 w-4 text-red-300" />
+                        </div>
+                        <h3 className="text-red-300 font-mono font-bold text-sm group-hover:text-red-200 transition-colors">
+                          UNSUBSCRIBES
+                        </h3>
+                      </div>
+                      <p className="text-red-400/60 font-mono text-[10px] mb-2">
+                        View all email unsubscribe records
+                      </p>
+                      <div className="flex items-center gap-2 text-[9px] font-mono">
+                        <div className="px-2 py-1 bg-red-500/20 border border-red-400/50 rounded text-red-300">
+                          DEBUG
+                        </div>
+                        <div className="text-red-400/60">
+                          {'>'} Click to access
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Placeholder for future admin tools */}
+                    <div className="bg-black/60 border-2 border-gray-500/30 rounded p-4 opacity-50">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div className="w-8 h-8 bg-gray-500/20 border border-gray-400/50 rounded flex items-center justify-center">
+                          <Key className="h-4 w-4 text-gray-300" />
+                        </div>
+                        <h3 className="text-gray-300 font-mono font-bold text-sm">
+                          MORE TOOLS
+                        </h3>
+                      </div>
+                      <p className="text-gray-400/60 font-mono text-[10px]">
+                        Coming soon...
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Organization System Info - Developer Style */}
                 <div className="bg-black/40 backdrop-blur-sm border-2 border-cyan-500/50 rounded-lg p-4 lg:p-6 shadow-lg shadow-cyan-500/20">
                   <div className="flex items-center justify-between mb-4">
