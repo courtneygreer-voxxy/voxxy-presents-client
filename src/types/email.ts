@@ -264,7 +264,6 @@ export type PaymentStatus =
 
 // Create custom template (clone from existing)
 export interface CreateTemplateRequest {
-  source_template_id: number;
   name: string;
   description?: string;
 }
@@ -300,6 +299,7 @@ export interface UpdateEmailRequest {
   trigger_value?: number;
   trigger_time?: string;
   filter_criteria?: FilterCriteria;
+  enabled_by_default?: boolean;
   scheduled_for?: string;
   status?: ScheduledEmailStatus;
 }
