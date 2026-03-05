@@ -197,7 +197,12 @@ export type EmailCategory =
   | 'pre_event'
   | 'event_day'
   | 'post_event'
-  | 'system';
+  | 'system'
+  | 'event_announcements'
+  | 'application_updates'
+  | 'payment_reminders'
+  | 'event_countdown'
+  | 'event_updates';
 
 export type TriggerType =
   // Time-based triggers (scheduled by worker)

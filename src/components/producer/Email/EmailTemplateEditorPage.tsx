@@ -122,7 +122,7 @@ export function EmailTemplateEditorPage({
 
     // Parse filter criteria
     if (item.filter_criteria) {
-      setFilterStatus(item.filter_criteria.statuses || []);
+      setFilterStatus(item.filter_criteria.status || []);
       setFilterPaymentStatus(item.filter_criteria.payment_status || []);
     }
   }, [item]);
@@ -174,7 +174,8 @@ export function EmailTemplateEditorPage({
         }
       }, 0);
     } else if (activeField === 'body' && bodyEditor) {
-      insertVariableAtCursor(bodyEditor, variable);
+      // Insert variable at current cursor position in TipTap editor
+      bodyEditor.chain().focus().insertContent(variable).run();
     }
   };
 
@@ -229,7 +230,7 @@ export function EmailTemplateEditorPage({
 
     // Replace variables with sample values for preview
     EMAIL_VARIABLES.forEach(v => {
-      const regex = new RegExp(`\\[${v.variable}\\]`, 'g');
+      const regex = new RegExp(v.frontendVar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
       previewHtml = previewHtml.replace(regex, v.example);
     });
 
@@ -572,16 +573,16 @@ export function EmailTemplateEditorPage({
                     Click to insert into {activeField === 'subject' ? 'subject' : activeField === 'body' ? 'body' : 'email'}
                   </p>
                   <div className="space-y-1">
-                    {EMAIL_VARIABLES.filter(v => v.enabled).map((variable) => (
+                    {EMAIL_VARIABLES.map((variable) => (
                       <button
-                        key={variable.variable}
-                        onClick={() => handleVariableClick(`[${variable.variable}]`)}
+                        key={variable.frontendVar}
+                        onClick={() => handleVariableClick(variable.frontendVar)}
                         disabled={!activeField}
                         className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       >
                         <div className="flex items-start justify-between gap-2">
                           <code className="text-xs text-purple-400 font-mono">
-                            [{variable.variable}]
+                            {variable.frontendVar}
                           </code>
                         </div>
                         <p className="text-xs text-white/50 mt-1">{variable.description}</p>

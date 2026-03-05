@@ -202,6 +202,10 @@ export default function EditScheduledEmailModal({
           baseDate = parseISO(eventData.payment_deadline);
           break;
 
+        case 'on_bulletin_post':
+          // Event-triggered, no specific date needed for preview
+          return null;
+
         default:
           return null;
       }
