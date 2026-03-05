@@ -249,18 +249,18 @@ export function EmailTemplateEditorPage({
     <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-white/10 bg-black/20 backdrop-blur-sm">
-        <div className="px-6 py-4">
+        <div className="px-4 py-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <button
                 onClick={onBack}
-                className="p-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white transition-all"
+                className="p-1.5 rounded-lg hover:bg-white/5 text-white/70 hover:text-white transition-all"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-xl font-bold text-white">Edit Email Template</h1>
-                <p className="text-sm text-white/60 mt-0.5">{item.name}</p>
+                <h1 className="text-base font-bold text-white">Edit Email Template</h1>
+                <p className="text-xs text-white/60 mt-0.5">{item.name}</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -287,15 +287,15 @@ export function EmailTemplateEditorPage({
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden flex">
         {/* Left Panel - Editor */}
-        <div className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-4xl mx-auto space-y-6">
+        <div className="flex-1 overflow-y-auto p-4">
+          <div className="max-w-4xl mx-auto space-y-4">
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
-              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-red-400 font-medium">Validation Errors</p>
-                  <ul className="text-red-400/80 text-sm mt-1 space-y-1">
+                  <p className="text-red-400 text-sm font-medium">Validation Errors</p>
+                  <ul className="text-red-400/80 text-xs mt-0.5 space-y-0.5">
                     {validationErrors.map((err, idx) => (
                       <li key={idx}>{err}</li>
                     ))}
@@ -306,14 +306,14 @@ export function EmailTemplateEditorPage({
 
             {/* Save Error */}
             {saveError && (
-              <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-                <p className="text-red-400">{saveError}</p>
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                <p className="text-red-400 text-sm">{saveError}</p>
               </div>
             )}
 
             {/* Template Name */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs font-medium text-white/60 mb-1">
                 Template Name
               </label>
               <Input
@@ -326,7 +326,7 @@ export function EmailTemplateEditorPage({
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs font-medium text-white/60 mb-1">
                 Description (Optional)
               </label>
               <Input
@@ -339,7 +339,7 @@ export function EmailTemplateEditorPage({
 
             {/* Subject */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs font-medium text-white/60 mb-1">
                 Subject Line
               </label>
               <Input
@@ -357,7 +357,7 @@ export function EmailTemplateEditorPage({
 
             {/* Body */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-xs font-medium text-white/60 mb-1">
                 Email Body
               </label>
               <div onFocus={() => setActiveField('body')}>
@@ -374,7 +374,7 @@ export function EmailTemplateEditorPage({
 
         {/* Right Panel - Settings & Variables */}
         <div className="w-96 border-l border-white/10 overflow-y-auto bg-black/20 backdrop-blur-sm">
-          <div className="p-6 space-y-6">
+          <div className="p-4 space-y-4">
             {/* Trigger Settings */}
             <div>
               <button
@@ -383,7 +383,7 @@ export function EmailTemplateEditorPage({
               >
                 <div className="flex items-center gap-2">
                   <Clock className="w-4 h-4" />
-                  <span className="font-medium">Trigger Settings</span>
+                  <span className="text-sm font-medium">Trigger Settings</span>
                 </div>
                 {triggerSettingsOpen ? (
                   <ChevronDown className="w-4 h-4" />
@@ -393,10 +393,10 @@ export function EmailTemplateEditorPage({
               </button>
 
               {triggerSettingsOpen && (
-                <div className="mt-4 space-y-4">
+                <div className="mt-3 space-y-3">
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-xs font-medium text-white/60 mb-1">
                       Category
                     </label>
                     <select
@@ -412,7 +412,7 @@ export function EmailTemplateEditorPage({
 
                   {/* Trigger Type */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-xs font-medium text-white/60 mb-1">
                       When to Send
                     </label>
                     <select
@@ -429,7 +429,7 @@ export function EmailTemplateEditorPage({
                   {/* Trigger Value */}
                   {selectedTriggerConfig?.requiresValue && (
                     <div>
-                      <label className="block text-sm font-medium text-white/70 mb-2">
+                      <label className="block text-xs font-medium text-white/60 mb-1">
                         Days
                       </label>
                       <Input
@@ -444,7 +444,7 @@ export function EmailTemplateEditorPage({
 
                   {/* Send Time */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-xs font-medium text-white/60 mb-1">
                       Send Time
                     </label>
                     <Input
@@ -480,7 +480,7 @@ export function EmailTemplateEditorPage({
               >
                 <div className="flex items-center gap-2">
                   <Filter className="w-4 h-4" />
-                  <span className="font-medium">Recipient Filters</span>
+                  <span className="text-sm font-medium">Recipient Filters</span>
                 </div>
                 {filtersOpen ? (
                   <ChevronDown className="w-4 h-4" />
@@ -490,9 +490,9 @@ export function EmailTemplateEditorPage({
               </button>
 
               {filtersOpen && (
-                <div className="mt-4 space-y-4">
+                <div className="mt-3 space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-xs font-medium text-white/60 mb-1">
                       Application Status
                     </label>
                     <div className="space-y-2">
@@ -520,7 +520,7 @@ export function EmailTemplateEditorPage({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-xs font-medium text-white/60 mb-1">
                       Payment Status
                     </label>
                     <div className="space-y-2">
@@ -558,7 +558,7 @@ export function EmailTemplateEditorPage({
               >
                 <div className="flex items-center gap-2">
                   <Tag className="w-4 h-4" />
-                  <span className="font-medium">Available Variables</span>
+                  <span className="text-sm font-medium">Available Variables</span>
                 </div>
                 {availableTagsOpen ? (
                   <ChevronDown className="w-4 h-4" />
@@ -568,7 +568,7 @@ export function EmailTemplateEditorPage({
               </button>
 
               {availableTagsOpen && (
-                <div className="mt-4">
+                <div className="mt-3">
                   <p className="text-xs text-white/40 mb-3">
                     Click to insert into {activeField === 'subject' ? 'subject' : activeField === 'body' ? 'body' : 'email'}
                   </p>
@@ -599,14 +599,14 @@ export function EmailTemplateEditorPage({
         {/* Preview Panel (Conditional) */}
         {showPreview && (
           <div className="w-96 border-l border-white/10 overflow-y-auto bg-black/30 backdrop-blur-sm">
-            <div className="p-6">
-              <div className="flex items-center gap-2 mb-4">
+            <div className="p-4">
+              <div className="flex items-center gap-2 mb-3">
                 <Eye className="w-4 h-4 text-purple-400" />
-                <h3 className="font-medium text-white">Live Preview</h3>
+                <h3 className="text-sm font-medium text-white">Live Preview</h3>
               </div>
 
               {/* Preview Subject */}
-              <div className="mb-4">
+              <div className="mb-3">
                 <p className="text-xs text-white/40 mb-1">Subject:</p>
                 <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                   <p className="text-sm text-white">{formData.subject_template || '(No subject)'}</p>
@@ -616,7 +616,7 @@ export function EmailTemplateEditorPage({
               {/* Preview Body */}
               <div>
                 <p className="text-xs text-white/40 mb-1">Body:</p>
-                <div className="p-6 rounded-lg bg-white/5 border border-purple-500/20">
+                <div className="p-4 rounded-lg bg-white/5 border border-purple-500/20">
                   <div
                     className="email-preview-content prose prose-sm max-w-none prose-invert"
                     dangerouslySetInnerHTML={{ __html: renderPreview() }}

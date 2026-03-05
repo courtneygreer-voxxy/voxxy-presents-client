@@ -346,23 +346,23 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-6">
+    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="mb-4">
+          <div className="flex items-center gap-3 mb-2">
             <button
               onClick={onBack}
-              className="p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
+              className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                <Mail className="w-8 h-8 text-purple-400" />
+              <h1 className="text-lg font-bold text-white flex items-center gap-2">
+                <Mail className="w-5 h-5 text-purple-400" />
                 {template ? (isSystem ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
               </h1>
-              <p className="text-white/60 mt-1">
+              <p className="text-white/60 text-xs mt-0.5">
                 {isSystem
                   ? 'System sequences are read-only. Clone to customize.'
                   : 'Create a reusable email sequence'}
@@ -392,11 +392,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
           {/* System Sequence Warning */}
           {isSystem && (
-            <div className="p-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-yellow-400 font-medium">Read-Only Sequence</p>
-                <p className="text-yellow-400/80 text-sm mt-1">
+                <p className="text-yellow-400 text-sm font-medium">Read-Only Sequence</p>
+                <p className="text-yellow-400/80 text-xs mt-0.5">
                   This is a system sequence and cannot be edited. Use the "Clone" button to create a customizable copy.
                 </p>
               </div>
@@ -405,11 +405,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
           {/* Creating New Sequence Info */}
           {createFromDefault && !template && (
-            <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-blue-400 font-medium">Creating New Sequence</p>
-                <p className="text-blue-400/80 text-sm mt-1">
+                <p className="text-blue-400 text-sm font-medium">Creating New Sequence</p>
+                <p className="text-blue-400/80 text-xs mt-0.5">
                   You can edit emails now and your changes will be automatically saved when you save the sequence.
                   {modifiedEmails.size > 0 && (
                     <span className="font-medium"> ({modifiedEmails.size} email{modifiedEmails.size !== 1 ? 's' : ''} modified)</span>
@@ -422,37 +422,37 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
-            <p className="text-white/60">Loading sequence...</p>
+          <div className="flex flex-col items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+            <p className="text-white/60 text-sm">Loading sequence...</p>
           </div>
         )}
 
         {/* Success Message */}
         {successMessage && (
-          <div className="mb-6 p-4 rounded-lg bg-green-500/10 border border-green-500/20">
-            <p className="text-green-400">{successMessage}</p>
+          <div className="mb-4 p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+            <p className="text-green-400 text-sm">{successMessage}</p>
           </div>
         )}
 
         {/* Error Message */}
         {error && (
-          <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/20">
-            <p className="text-red-400">{error}</p>
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+            <p className="text-red-400 text-sm">{error}</p>
           </div>
         )}
 
         {/* Form */}
         {!isLoading && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Sequence Details */}
-            <div className="p-6 rounded-lg border border-white/10 bg-white/5">
-              <h2 className="text-lg font-semibold text-white mb-4">Sequence Details</h2>
+            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+              <h2 className="text-base font-semibold text-white mb-3">Sequence Details</h2>
 
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Name */}
                 <div>
-                  <label htmlFor="template-name" className="block text-sm font-medium text-white mb-2">
+                  <label htmlFor="template-name" className="block text-xs font-medium text-white/60 mb-1">
                     Sequence Name *
                   </label>
                   <input
@@ -461,7 +461,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="e.g., Summer Festival Campaign"
-                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50"
                     disabled={!canEdit}
                     maxLength={100}
                   />
@@ -469,7 +469,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
                 {/* Description */}
                 <div>
-                  <label htmlFor="template-description" className="block text-sm font-medium text-white mb-2">
+                  <label htmlFor="template-description" className="block text-xs font-medium text-white/60 mb-1">
                     Description <span className="text-white/40 font-normal">(Optional)</span>
                   </label>
                   <textarea
@@ -478,7 +478,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe when to use this template..."
                     rows={3}
-                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none disabled:opacity-50"
+                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none disabled:opacity-50"
                     disabled={!canEdit}
                     maxLength={500}
                   />
@@ -490,9 +490,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             </div>
 
             {/* Email Items */}
-            <div className="p-6 rounded-lg border border-white/10 bg-white/5">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-white">
+            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-base font-semibold text-white">
                   Email Sequence ({emailItems.length})
                 </h2>
                 {canEdit && template && (
@@ -507,9 +507,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               </div>
 
               {emailItems.length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-lg">
-                  <Mail className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                  <p className="text-white/60 mb-4">No emails in this template</p>
+                <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
+                  <Mail className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                  <p className="text-white/60 text-sm mb-3">No emails in this template</p>
                   {canEdit && template && (
                     <button
                       onClick={handleAddEmail}
@@ -608,8 +608,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
             {/* Help Text */}
             {!template && (
-              <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                <p className="text-sm text-blue-400">
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <p className="text-xs text-blue-400">
                   <strong>Tip:</strong> Save the sequence first, then add emails to build your email campaign.
                 </p>
               </div>

@@ -8,12 +8,26 @@
 import { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, FileSearch, Download, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery } from '@/types/email';
+import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery, EmailCategory } from '@/types/email';
 import { scheduledEmailsApi, emailDeliveriesApi } from '@/services/api';
-import { EmailAuditTable } from './EmailAuditTable';
+import { EmailAuditTable, type SortColumn } from './EmailAuditTable';
 import { EmailAuditFilters } from './EmailAuditFilters';
 import { ContactSupportDialog } from './ContactSupportDialog';
 import { useAuth } from '@/hooks/useAuth';
+
+/** Infer lifecycle category from email name/trigger (matches Mail tab grouping) */
+function inferCategory(email: ScheduledEmail): EmailCategory {
+  const name = email.name.toLowerCase();
+  const trigger = email.trigger_type;
+
+  if (name.includes('payment') || trigger.includes('payment')) return 'payment';
+  if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist') || name.includes('accepted')) return 'application';
+  if (trigger === 'days_before_event' || name.includes('countdown') || name.includes('days before')) return 'pre_event';
+  if (trigger === 'on_event_date' || name.includes('day of')) return 'event_day';
+  if (trigger === 'days_after_event') return 'post_event';
+  if (name.includes('announcement') || name.includes('immediate') || name.includes('invitation') || name.includes('art call')) return 'pre_application';
+  return 'pre_application';
+}
 
 interface EmailAuditLogOverlayProps {
   event: any; // From eventsApi.getById()
@@ -40,10 +54,8 @@ export function EmailAuditLogOverlay({
   const { userProfile } = useAuth();
 
   // Sorting state
-  type SortColumn = 'sent_at' | 'recipient_name' | 'recipient_email' | 'email_name' | 'category' | 'status';
-  type SortDirection = 'asc' | 'desc';
   const [sortColumn, setSortColumn] = useState<SortColumn | null>('sent_at');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
   const itemsPerPage = 100;
 
@@ -68,6 +80,10 @@ export function EmailAuditLogOverlay({
         // 1. Fetch all scheduled emails (including Position 1 - Initial Invitation)
         const scheduledEmails = await scheduledEmailsApi.getByEvent(event.slug);
         console.log('✅ [Audit Log] Fetched', scheduledEmails.length, 'scheduled emails');
+        // Debug: log email_template_item data to diagnose category values
+        for (const email of scheduledEmails) {
+          console.log(`🔍 [Audit Log] Email "${email.name}" → template_item:`, email.email_template_item, '→ category:', email.email_template_item?.category);
+        }
 
         // 2. Build audit entries array
         const entries: AuditEntry[] = [];
@@ -92,7 +108,7 @@ export function EmailAuditLogOverlay({
                   email_name: email.name,
                   email_subject: email.subject_template,
                   trigger_type: email.trigger_type,
-                  category: email.email_template_item?.category || 'Unknown', // Use email template category
+                  category: inferCategory(email),
                   status: delivery.status,
                   bounce_reason: delivery.bounce_reason,
                   drop_reason: delivery.drop_reason,
@@ -123,7 +139,7 @@ export function EmailAuditLogOverlay({
                   email_name: email.name,
                   email_subject: email.subject_template,
                   trigger_type: email.trigger_type,
-                  category: email.email_template_item?.category || 'Unknown', // Use email template category
+                  category: inferCategory(email),
                   status: 'scheduled',
                   bounce_reason: null,
                   drop_reason: null,
@@ -191,6 +207,24 @@ export function EmailAuditLogOverlay({
       );
     }
 
+    if (filters.date_from) {
+      const fromDate = new Date(filters.date_from);
+      fromDate.setHours(0, 0, 0, 0);
+      result = result.filter(entry => {
+        const entryDate = entry.sent_at ? new Date(entry.sent_at) : null;
+        return entryDate && entryDate >= fromDate;
+      });
+    }
+
+    if (filters.date_to) {
+      const toDate = new Date(filters.date_to);
+      toDate.setHours(23, 59, 59, 999);
+      result = result.filter(entry => {
+        const entryDate = entry.sent_at ? new Date(entry.sent_at) : null;
+        return entryDate && entryDate <= toDate;
+      });
+    }
+
     // Apply sorting
     if (sortColumn) {
       result.sort((a, b) => {
@@ -245,25 +279,25 @@ export function EmailAuditLogOverlay({
     <div className="fixed inset-0 bg-background z-50 flex flex-col">
       {/* Header */}
       <div className="border-b bg-background sticky top-0 z-10 shadow-lg">
-        <div className="px-8 py-5">
+        <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Left: Back button and title */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="gap-2"
+                className="gap-1.5 text-xs"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Mail
               </Button>
-              <div className="h-6 w-px bg-border" />
-              <div className="flex items-center gap-3">
-                <FileSearch className="w-6 h-6 text-purple-400" />
+              <div className="h-5 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <FileSearch className="w-5 h-5 text-purple-400" />
                 <div>
-                  <h1 className="text-xl font-semibold">Email Audit Log</h1>
-                  <p className="text-sm text-muted-foreground">
+                  <h1 className="text-base font-semibold">Email Audit Log</h1>
+                  <p className="text-xs text-muted-foreground">
                     {event.title}
                   </p>
                 </div>
@@ -288,7 +322,7 @@ export function EmailAuditLogOverlay({
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-auto px-8 py-8">
+      <div className="flex-1 overflow-auto px-6 py-4">
         {/* Error Message */}
         {error && (
           <div className="mb-6 p-4 border border-red-500/20 rounded-lg bg-red-500/10">
@@ -298,12 +332,25 @@ export function EmailAuditLogOverlay({
 
         {/* Filter Bar */}
         {!isLoading && !error && auditEntries.length > 0 && (
-          <div className="mb-6">
+          <div className="mb-4">
             <EmailAuditFilters
               filters={filters}
               onFiltersChange={setFilters}
               entries={auditEntries}
             />
+          </div>
+        )}
+
+        {/* Total Count */}
+        {!isLoading && !error && auditEntries.length > 0 && (
+          <div className="mb-4">
+            <p className="text-sm text-white/60">
+              <span className="font-semibold text-white">{filteredAndSortedEntries.length}</span>
+              {' '}email{filteredAndSortedEntries.length !== 1 ? 's' : ''}
+              {(filters.search || filters.email_name || filters.category || filters.status || filters.date_from || filters.date_to)
+                ? ' matched'
+                : ' in total'}
+            </p>
           </div>
         )}
 
@@ -354,12 +401,12 @@ export function EmailAuditLogOverlay({
 
         {/* Pagination */}
         {!isLoading && !error && filteredAndSortedEntries.length > 0 && (
-          <div className="mt-8 flex items-center justify-between bg-white/5 px-6 py-4 rounded-lg border border-white/10">
-            <p className="text-sm text-white/70">
+          <div className="mt-4 flex items-center justify-between bg-white/5 px-4 py-2.5 rounded-lg border border-white/10">
+            <p className="text-xs text-white/70">
               Showing <span className="font-semibold text-white">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
               <span className="font-semibold text-white">{Math.min(currentPage * itemsPerPage, filteredAndSortedEntries.length)}</span> of{' '}
               <span className="font-semibold text-white">{filteredAndSortedEntries.length}</span> emails
-              {filters.search || filters.email_name || filters.category || filters.status
+              {filters.search || filters.email_name || filters.category || filters.status || filters.date_from || filters.date_to
                 ? ` (filtered from ${auditEntries.length} total)`
                 : ''}
             </p>
@@ -372,7 +419,7 @@ export function EmailAuditLogOverlay({
               >
                 Previous
               </Button>
-              <span className="text-sm text-white/70 px-4 py-1.5 bg-white/5 rounded border border-white/10">
+              <span className="text-xs text-white/70 px-3 py-1 bg-white/5 rounded border border-white/10">
                 Page <span className="font-semibold text-white">{currentPage}</span> of <span className="font-semibold text-white">{totalPages}</span>
               </span>
               <Button

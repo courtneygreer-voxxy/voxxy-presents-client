@@ -736,22 +736,6 @@ export default function VendorApplicationForm() {
                   </label>
                 </div>
 
-                {/* Application Updates */}
-                <div className="flex items-start gap-2.5">
-                  <input
-                    type="checkbox"
-                    id="subscribed"
-                    checked={formData.subscribed}
-                    onChange={(e) => setFormData({ ...formData, subscribed: e.target.checked })}
-                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
-                  />
-                  <label htmlFor="subscribed" className="text-xs text-white/80">
-                    Receive email updates about my application <span className="text-red-400">*</span>
-                    <p className="text-white/60 text-[10px] mt-0.5">
-                      Get notified about application status changes and event updates. You can unsubscribe at any time.
-                    </p>
-                  </label>
-                </div>
               </div>
             </div>
 

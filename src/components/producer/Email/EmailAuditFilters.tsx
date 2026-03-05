@@ -6,10 +6,16 @@
  * - Email Name dropdown
  * - Category dropdown
  * - Status dropdown
+ * - Date range (single calendar range picker)
  */
 
-import { Search, X } from 'lucide-react';
+import { useState } from 'react';
+import { Search, X, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 import type { AuditEntry, AuditFilters, DeliveryStatus } from '@/types/email';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 interface EmailAuditFiltersProps {
   filters: AuditFilters;
@@ -22,6 +28,8 @@ export function EmailAuditFilters({
   onFiltersChange,
   entries,
 }: EmailAuditFiltersProps) {
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   // Extract unique values for dropdowns
   const emailNames = Array.from(new Set(entries.map(e => e.email_name))).sort();
   const categories = Array.from(new Set(entries.map(e => e.category))).sort();
@@ -33,22 +41,57 @@ export function EmailAuditFilters({
     'unsubscribed',
   ];
 
+  // Build DateRange from filters
+  const dateRange: DateRange | undefined =
+    filters.date_from || filters.date_to
+      ? {
+          from: filters.date_from ? new Date(filters.date_from + 'T00:00:00') : undefined,
+          to: filters.date_to ? new Date(filters.date_to + 'T00:00:00') : undefined,
+        }
+      : undefined;
+
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    onFiltersChange({
+      ...filters,
+      date_from: range?.from ? format(range.from, 'yyyy-MM-dd') : undefined,
+      date_to: range?.to ? format(range.to, 'yyyy-MM-dd') : undefined,
+    });
+  };
+
   const hasActiveFilters = !!(
     filters.search ||
     filters.email_name ||
     filters.category ||
-    filters.status
+    filters.status ||
+    filters.date_from ||
+    filters.date_to
   );
 
   const clearFilters = () => {
     onFiltersChange({});
   };
 
+  const inputClasses = "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-white/10";
+
+  // Format the date range display text
+  const dateRangeLabel = () => {
+    if (filters.date_from && filters.date_to) {
+      return `${format(new Date(filters.date_from + 'T00:00:00'), 'MMM d, yyyy')} – ${format(new Date(filters.date_to + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    if (filters.date_from) {
+      return `From ${format(new Date(filters.date_from + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    if (filters.date_to) {
+      return `Until ${format(new Date(filters.date_to + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    return 'All Dates';
+  };
+
   return (
-    <div className="p-6 border border-white/10 rounded-lg bg-gradient-to-br from-white/5 to-white/[0.02] space-y-5">
+    <div className="p-4 border border-white/10 rounded-lg bg-gradient-to-br from-white/5 to-white/[0.02] space-y-3">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
         <input
           type="text"
           placeholder="Search by recipient name or email..."
@@ -56,15 +99,15 @@ export function EmailAuditFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, search: e.target.value || undefined })
           }
-          className="w-full pl-11 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+          className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
         />
       </div>
 
-      {/* Filter Dropdowns */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {/* Filter Dropdowns + Date Range */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Email Name */}
         <div>
-          <label className="block text-xs font-semibold text-white/70 mb-2 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
             Email Name
           </label>
           <select
@@ -75,7 +118,7 @@ export function EmailAuditFilters({
                 email_name: e.target.value || undefined,
               })
             }
-            className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-white/10"
+            className={inputClasses}
           >
             <option value="">All Emails</option>
             {emailNames.map((name) => (
@@ -88,7 +131,7 @@ export function EmailAuditFilters({
 
         {/* Category */}
         <div>
-          <label className="block text-xs font-semibold text-white/70 mb-2 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
             Category
           </label>
           <select
@@ -99,7 +142,7 @@ export function EmailAuditFilters({
                 category: e.target.value || undefined,
               })
             }
-            className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-white/10"
+            className={inputClasses}
           >
             <option value="">All Categories</option>
             {categories.map((category) => (
@@ -112,7 +155,7 @@ export function EmailAuditFilters({
 
         {/* Status */}
         <div>
-          <label className="block text-xs font-semibold text-white/70 mb-2 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
             Status
           </label>
           <select
@@ -123,7 +166,7 @@ export function EmailAuditFilters({
                 status: (e.target.value as DeliveryStatus | 'undelivered') || undefined,
               })
             }
-            className="w-full px-3.5 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-white/10"
+            className={inputClasses}
           >
             <option value="">All Statuses</option>
             {statuses.map((status) => (
@@ -134,6 +177,45 @@ export function EmailAuditFilters({
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Date Range - Single calendar picker */}
+        <div>
+          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
+            Date Range
+          </label>
+          <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+            <PopoverTrigger asChild>
+              <button className={`${inputClasses} flex items-center gap-2 text-left`}>
+                <CalendarIcon className="w-3.5 h-3.5 text-white/40 shrink-0" />
+                <span className={filters.date_from || filters.date_to ? 'text-white' : 'text-white/40'}>
+                  {dateRangeLabel()}
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0 bg-background border-white/10" align="start">
+              <Calendar
+                mode="range"
+                selected={dateRange}
+                onSelect={handleDateRangeChange}
+                numberOfMonths={2}
+                defaultMonth={dateRange?.from || new Date()}
+              />
+              {(filters.date_from || filters.date_to) && (
+                <div className="border-t border-white/10 p-2 flex justify-end">
+                  <button
+                    onClick={() => {
+                      handleDateRangeChange(undefined);
+                      setCalendarOpen(false);
+                    }}
+                    className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition-colors"
+                  >
+                    Clear dates
+                  </button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 

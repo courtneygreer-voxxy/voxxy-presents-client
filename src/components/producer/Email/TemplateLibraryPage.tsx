@@ -231,31 +231,31 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-6">
+    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
+        <div className="mb-4">
+          <div className="flex items-center gap-3 mb-2">
             {onBack && (
               <button
                 onClick={onBack}
-                className="p-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
+                className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
               >
-                <ArrowLeft className="w-5 h-5" />
+                <ArrowLeft className="w-4 h-4" />
               </button>
             )}
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white flex items-center gap-3">
-                <Mail className="w-8 h-8 text-purple-400" />
+              <h1 className="text-lg font-bold text-white flex items-center gap-2">
+                <Mail className="w-5 h-5 text-purple-400" />
                 Email Sequence Library
               </h1>
-              <p className="text-white/60 mt-1">
+              <p className="text-white/60 text-xs mt-0.5">
                 Create and manage reusable email sequences
               </p>
             </div>
             <button
               onClick={() => onNavigateToBuilder?.()}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               New Sequence
@@ -265,19 +265,19 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
         {/* Loading State */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
-            <p className="text-white/60">Loading sequences...</p>
+          <div className="flex flex-col items-center justify-center py-8">
+            <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+            <p className="text-white/60 text-sm">Loading sequences...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && !isLoading && (
-          <div className="p-6 rounded-lg bg-red-500/10 border border-red-500/20">
-            <p className="text-red-400">{error}</p>
+          <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+            <p className="text-red-400 text-sm">{error}</p>
             <button
               onClick={loadTemplates}
-              className="mt-4 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
+              className="mt-3 px-4 py-2 rounded-lg bg-red-500/20 text-red-400 text-sm hover:bg-red-500/30 transition-all"
             >
               Try Again
             </button>
@@ -287,9 +287,9 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         {/* All Sequences */}
         {!isLoading && !error && templates.length > 0 && (
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <Mail className="w-5 h-5 text-purple-400" />
-              <h2 className="text-xl font-semibold text-white">All Sequences</h2>
+            <div className="flex items-center gap-2 mb-3">
+              <Mail className="w-4 h-4 text-purple-400" />
+              <h2 className="text-base font-semibold text-white">All Sequences</h2>
               <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
                 {templates.length}
               </span>
@@ -313,15 +313,15 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
         {/* Empty State */}
         {!isLoading && !error && templates.length === 0 && (
-          <div className="text-center py-20">
-            <Mail className="w-16 h-16 text-white/20 mx-auto mb-4" />
-            <h3 className="text-xl font-medium text-white mb-2">No Sequences Found</h3>
-            <p className="text-white/60 mb-6">Create your first email sequence</p>
+          <div className="text-center py-8">
+            <Mail className="w-10 h-10 text-white/20 mx-auto mb-3" />
+            <h3 className="text-base font-medium text-white mb-1">No Sequences Found</h3>
+            <p className="text-white/60 text-sm mb-4">Create your first email sequence</p>
             <button
               onClick={() => onNavigateToBuilder?.()}
-              className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all inline-flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all inline-flex items-center gap-2"
             >
-              <Plus className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
               Create Sequence
             </button>
           </div>
@@ -333,27 +333,27 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-lg border border-white/20 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div>
-                <h2 className="text-xl font-bold text-white">{previewTemplate.name}</h2>
-                <p className="text-sm text-white/60 mt-1">
+                <h2 className="text-base font-bold text-white">{previewTemplate.name}</h2>
+                <p className="text-xs text-white/60 mt-0.5">
                   {previewTemplate.description || 'Preview all emails in this sequence'}
                 </p>
               </div>
               <button
                 onClick={() => setPreviewOpen(false)}
-                className="p-2 rounded-lg hover:bg-white/5 text-white/60 hover:text-white transition-all"
+                className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white transition-all"
               >
                 ✕
               </button>
             </div>
 
             {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6">
+            <div className="flex-1 overflow-y-auto p-4">
               {loadingPreview ? (
-                <div className="flex flex-col items-center justify-center py-20">
-                  <Loader2 className="w-12 h-12 text-purple-400 animate-spin mb-4" />
-                  <p className="text-white/60">Loading emails...</p>
+                <div className="flex flex-col items-center justify-center py-8">
+                  <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+                  <p className="text-white/60 text-sm">Loading emails...</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -393,7 +393,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-white/10 space-y-4">
+            <div className="p-4 border-t border-white/10 space-y-3">
               {/* Test Section */}
               <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-lg p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -481,36 +481,36 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-lg border border-white/20 shadow-2xl w-full max-w-md">
             {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
               <div>
-                <h2 className="text-xl font-bold text-white">Clone Sequence</h2>
-                <p className="text-sm text-white/60 mt-1">
+                <h2 className="text-base font-bold text-white">Clone Sequence</h2>
+                <p className="text-xs text-white/60 mt-0.5">
                   Create a copy of "{cloneTemplate.name}"
                 </p>
               </div>
               <button
                 onClick={() => setCloneModalOpen(false)}
-                className="p-2 rounded-lg hover:bg-white/5 text-white/60 hover:text-white transition-all"
+                className="p-1.5 rounded-lg hover:bg-white/5 text-white/60 hover:text-white transition-all"
               >
                 ✕
               </button>
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-4">
+            <div className="p-4 space-y-3">
               {/* Error Message */}
               {cloneError && (
-                <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-red-400 font-medium">Error</p>
-                    <p className="text-red-400/80 text-sm mt-1">{cloneError}</p>
+                    <p className="text-red-400 text-sm font-medium">Error</p>
+                    <p className="text-red-400/80 text-xs mt-0.5">{cloneError}</p>
                   </div>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-xs font-medium text-white/60 mb-1">
                   Sequence Name *
                 </label>
                 <input
@@ -521,13 +521,13 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                     setCloneError(null); // Clear error when user types
                   }}
                   placeholder="Enter sequence name"
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-white mb-2">
+                <label className="block text-xs font-medium text-white/60 mb-1">
                   Description (Optional)
                 </label>
                 <textarea
@@ -535,13 +535,13 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                   onChange={(e) => setCloneDescription(e.target.value)}
                   placeholder="Enter sequence description"
                   rows={3}
-                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
                 />
               </div>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
               <button
                 onClick={() => setCloneModalOpen(false)}
                 disabled={isCloning}
@@ -583,16 +583,16 @@ function TemplateCard({ template, onEdit, onClone, onDelete, onPreview, deleteCo
   const canDelete = !isDefault && (template.template_type === 'user' || isAdmin);
 
   return (
-    <div className={`p-5 rounded-lg border transition-all group ${
+    <div className={`p-4 rounded-lg border transition-all group ${
       isDefault
         ? 'border-yellow-500/50 bg-gradient-to-br from-yellow-500/5 via-white/5 to-white/5 hover:border-yellow-500/70 hover:shadow-lg hover:shadow-yellow-500/20'
         : 'border-white/10 bg-white/5 hover:bg-white/[0.07]'
     }`}>
       {/* Header */}
-      <div className="flex items-start justify-between mb-3">
+      <div className="flex items-start justify-between mb-2">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <h3 className="font-medium text-white truncate">
+          <div className="flex items-center gap-2 mb-0.5">
+            <h3 className="text-sm font-medium text-white truncate">
               {template.name}
             </h3>
             {isDefault && (
@@ -603,7 +603,7 @@ function TemplateCard({ template, onEdit, onClone, onDelete, onPreview, deleteCo
             )}
           </div>
           {template.description && (
-            <p className="text-sm text-white/60 line-clamp-2 mb-3">
+            <p className="text-xs text-white/60 line-clamp-2 mb-2">
               {template.description}
             </p>
           )}
@@ -611,7 +611,7 @@ function TemplateCard({ template, onEdit, onClone, onDelete, onPreview, deleteCo
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 text-xs text-white/50 mb-4">
+      <div className="flex items-center gap-4 text-xs text-white/50 mb-3">
         <div className="flex items-center gap-1">
           <Mail className="w-3.5 h-3.5" />
           <span>{template.email_count || 0} emails</span>

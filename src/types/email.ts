@@ -475,7 +475,7 @@ export const DELIVERY_STATUS_CONFIGS: Record<DeliveryStatus, DeliveryStatusConfi
   },
   sent: {
     label: 'Sent',
-    color: 'blue',
+    color: 'green',
     icon: '↗',
     description: 'Email has been sent to SendGrid'
   },
@@ -532,6 +532,8 @@ export interface AuditFilters {
   status?: DeliveryStatus | 'undelivered'; // 'undelivered' = bounced + dropped
   category?: string;
   search?: string; // Search recipient name or email
+  date_from?: string; // ISO date string 'YYYY-MM-DD'
+  date_to?: string; // ISO date string 'YYYY-MM-DD'
 }
 
 // ============================================================================
