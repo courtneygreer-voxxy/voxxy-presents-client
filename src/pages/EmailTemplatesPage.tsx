@@ -22,6 +22,11 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; order: number }> =
   event_day: { label: 'Event Day', order: 5 },
   post_event: { label: 'Post Event', order: 6 },
   system: { label: 'System Notifications', order: 7 },
+  event_announcements: { label: 'Event Announcements', order: 1 },
+  application_updates: { label: 'Application Updates', order: 2 },
+  payment_reminders: { label: 'Payment Reminders', order: 3 },
+  event_countdown: { label: 'Event Countdown', order: 4 },
+  event_updates: { label: 'Event Updates', order: 8 },
 };
 
 export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPageProps) {

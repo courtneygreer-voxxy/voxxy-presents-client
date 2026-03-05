@@ -184,7 +184,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               await emailTemplateItemsApi.update(newTemplate.id, clonedItem.id, {
                 name: modifiedVersion.name,
                 description: modifiedVersion.description ?? undefined,
-                category: modifiedVersion.category,
                 subject_template: modifiedVersion.subject_template,
                 body_template: modifiedVersion.body_template,
                 trigger_type: modifiedVersion.trigger_type,
@@ -209,8 +208,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         // Create new empty template
         const newTemplate = await emailCampaignTemplatesApi.create({
           name: name.trim(),
-          description: description.trim() || undefined,
-          template_type: 'user'
+          description: description.trim() || undefined
         });
         setTemplate(newTemplate);
         setSuccessMessage('Sequence created successfully');
@@ -278,13 +276,12 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     try {
       const saved = await emailTemplateItemsApi.update(template.id, updatedItem.id, {
         name: updatedItem.name,
-        description: updatedItem.description,
-        category: updatedItem.category,
+        description: updatedItem.description ?? undefined,
         subject_template: updatedItem.subject_template,
         body_template: updatedItem.body_template,
         trigger_type: updatedItem.trigger_type,
-        trigger_value: updatedItem.trigger_value,
-        trigger_time: updatedItem.trigger_time,
+        trigger_value: updatedItem.trigger_value ?? undefined,
+        trigger_time: updatedItem.trigger_time ?? undefined,
         enabled_by_default: updatedItem.enabled_by_default,
         filter_criteria: updatedItem.filter_criteria,
       });

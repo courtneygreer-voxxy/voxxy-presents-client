@@ -10,7 +10,7 @@ import {
   Clock,
   Tag
 } from 'lucide-react';
-import type { EmailTemplateItem, FilterCriteria, RegistrationStatus } from '@/types/email';
+import type { EmailTemplateItem, FilterCriteria, RegistrationStatus, PaymentStatus } from '@/types/email';
 import { RichTextEditor } from './RichTextEditor';
 
 interface EmailTemplateItemEditorProps {
@@ -61,7 +61,6 @@ export default function EmailTemplateItemEditor({
     trigger_value: 0,
     trigger_time: '09:00:00',
     enabled_by_default: true,
-    filter_criteria: {} as Record<string, any>,
   });
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +82,6 @@ export default function EmailTemplateItemEditor({
         trigger_value: item.trigger_value || 0,
         trigger_time: item.trigger_time || '09:00:00',
         enabled_by_default: item.enabled_by_default !== false,
-        filter_criteria: item.filter_criteria || {},
       });
 
       // Parse filter criteria
@@ -116,16 +114,24 @@ export default function EmailTemplateItemEditor({
       // Build filter criteria
       const filter_criteria: FilterCriteria = {};
       if (filterStatus.length > 0) filter_criteria.status = filterStatus as RegistrationStatus[];
-      if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus;
+      if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus as PaymentStatus[];
       if (filterVendorCategory) filter_criteria.vendor_category = [filterVendorCategory];
 
-      const updatedItem: EmailTemplateItem = {
+      const updatedItem = {
         ...item,
-        ...formData,
+        name: formData.name,
+        description: formData.description || null,
+        category: formData.category as any,
+        subject_template: formData.subject_template,
+        body_template: formData.body_template,
+        trigger_type: formData.trigger_type as any,
+        trigger_value: formData.trigger_value,
+        trigger_time: formData.trigger_time,
+        enabled_by_default: formData.enabled_by_default,
         filter_criteria,
       };
 
-      onSave(updatedItem);
+      onSave(updatedItem as EmailTemplateItem);
     } catch (err: any) {
       setError(err.message || 'Failed to save email');
     } finally {
