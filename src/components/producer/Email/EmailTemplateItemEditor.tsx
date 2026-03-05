@@ -10,7 +10,7 @@ import {
   Clock,
   Tag
 } from 'lucide-react';
-import type { EmailTemplateItem } from '@/types/email';
+import type { EmailTemplateItem, FilterCriteria, RegistrationStatus } from '@/types/email';
 import { RichTextEditor } from './RichTextEditor';
 
 interface EmailTemplateItemEditorProps {
@@ -88,9 +88,10 @@ export default function EmailTemplateItemEditor({
 
       // Parse filter criteria
       if (item.filter_criteria) {
-        setFilterStatus(item.filter_criteria.statuses || []);
+        setFilterStatus(item.filter_criteria.status || []);
         setFilterPaymentStatus(item.filter_criteria.payment_status || []);
-        setFilterVendorCategory(item.filter_criteria.vendor_category || '');
+        const vendorCat = item.filter_criteria.vendor_category;
+        setFilterVendorCategory(Array.isArray(vendorCat) ? vendorCat[0] || '' : vendorCat || '');
       }
     }
   }, [item]);
@@ -113,10 +114,10 @@ export default function EmailTemplateItemEditor({
 
     try {
       // Build filter criteria
-      const filter_criteria: Record<string, any> = {};
-      if (filterStatus.length > 0) filter_criteria.statuses = filterStatus;
+      const filter_criteria: FilterCriteria = {};
+      if (filterStatus.length > 0) filter_criteria.status = filterStatus as RegistrationStatus[];
       if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus;
-      if (filterVendorCategory) filter_criteria.vendor_category = filterVendorCategory;
+      if (filterVendorCategory) filter_criteria.vendor_category = [filterVendorCategory];
 
       const updatedItem: EmailTemplateItem = {
         ...item,
@@ -244,7 +245,7 @@ export default function EmailTemplateItemEditor({
                 Body Template *
               </label>
               <RichTextEditor
-                value={formData.body_template}
+                content={formData.body_template}
                 onChange={(value) => setFormData({ ...formData, body_template: value })}
                 placeholder="Write your email content here..."
               />

@@ -255,7 +255,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
     // If a column sort is active, use that
     if (sortColumn) {
-      return result.sort((a, b) => {
+      return [...result].sort((a, b) => {
         let valA: string | number = '';
         let valB: string | number = '';
 
@@ -314,7 +314,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       days_after_event: 9,
     };
 
-    return result.sort((a, b) => {
+    return [...result].sort((a, b) => {
       const groupA = TRIGGER_GROUP_ORDER[a.trigger_type] ?? 99;
       const groupB = TRIGGER_GROUP_ORDER[b.trigger_type] ?? 99;
 
@@ -354,18 +354,19 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       'on_bulletin_post'            // Bulletin Blast (sent when bulletin is posted)
     ];
 
-    const scheduled = filteredEmails
-      .filter(email => scheduledTriggers.includes(email.trigger_type))
-      .sort((a, b) => {
-        // If user has applied column sorting, filteredEmails is already sorted
-        // Only apply chronological sort if no column sort is active
-        if (sortColumn) return 0; // Keep existing order from filteredEmails
+    const scheduledFiltered = filteredEmails
+      .filter(email => scheduledTriggers.includes(email.trigger_type));
 
-        // Default: chronological order by scheduled_for date
-        const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
-        const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
-        return dateA - dateB;
-      });
+    // If user has applied column sorting, keep that order
+    // Otherwise, apply default chronological sort
+    const scheduled = sortColumn
+      ? scheduledFiltered
+      : [...scheduledFiltered].sort((a, b) => {
+          // Default: chronological order by scheduled_for date
+          const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
+          const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
+          return dateA - dateB;
+        });
 
     const system = filteredEmails
       .filter(email => systemTriggers.includes(email.trigger_type))

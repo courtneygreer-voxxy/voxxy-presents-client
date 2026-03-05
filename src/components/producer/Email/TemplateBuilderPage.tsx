@@ -183,13 +183,13 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               console.log(`Updating email at position ${clonedItem.position}: ${clonedItem.name}`);
               await emailTemplateItemsApi.update(newTemplate.id, clonedItem.id, {
                 name: modifiedVersion.name,
-                description: modifiedVersion.description,
+                description: modifiedVersion.description ?? undefined,
                 category: modifiedVersion.category,
                 subject_template: modifiedVersion.subject_template,
                 body_template: modifiedVersion.body_template,
                 trigger_type: modifiedVersion.trigger_type,
-                trigger_value: modifiedVersion.trigger_value,
-                trigger_time: modifiedVersion.trigger_time,
+                trigger_value: modifiedVersion.trigger_value ?? undefined,
+                trigger_time: modifiedVersion.trigger_time ?? undefined,
                 enabled_by_default: modifiedVersion.enabled_by_default,
                 filter_criteria: modifiedVersion.filter_criteria,
               });

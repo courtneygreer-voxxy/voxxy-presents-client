@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { format } from 'date-fns';
 import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2, AlertTriangle } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -55,6 +55,31 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: 
     label: 'System',
     icon: Settings2,
     color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+  },
+  event_announcements: {
+    label: 'Announcement',
+    icon: Megaphone,
+    color: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
+  },
+  application_updates: {
+    label: 'Application',
+    icon: FileText,
+    color: 'bg-pink-500/20 text-pink-300 border-pink-500/30'
+  },
+  payment_reminders: {
+    label: 'Payment',
+    icon: CreditCard,
+    color: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
+  },
+  event_countdown: {
+    label: 'Event Countdown',
+    icon: Calendar,
+    color: 'bg-green-500/20 text-green-300 border-green-500/30'
+  },
+  event_updates: {
+    label: 'Event Updates',
+    icon: Settings2,
+    color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
   }
 };
 
@@ -72,6 +97,7 @@ export default function EmailRow({
   const [showMenu, setShowMenu] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showRecipientsModal, setShowRecipientsModal] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const handleAction = async (action: () => Promise<void>) => {
     setIsProcessing(true);
@@ -332,6 +358,7 @@ export default function EmailRow({
       <div className="flex items-center justify-end">
         <>
           <button
+              ref={menuButtonRef}
               onClick={(e) => {
                 e.stopPropagation();
                 setShowMenu(!showMenu);
@@ -343,7 +370,7 @@ export default function EmailRow({
               <MoreVertical className="w-4 h-4" />
             </button>
 
-            {showMenu && (
+            {showMenu && menuButtonRef.current && (
               <>
                 <div
                   className="fixed inset-0 z-[100]"
@@ -352,8 +379,8 @@ export default function EmailRow({
                 <div
                   className="fixed z-[101] bg-gray-900 border border-white/20 rounded-lg shadow-xl py-1 min-w-[140px]"
                   style={{
-                    right: '20px',
-                    top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`
+                    right: `${window.innerWidth - menuButtonRef.current.getBoundingClientRect().right}px`,
+                    top: `${menuButtonRef.current.getBoundingClientRect().bottom + 4}px`
                   }}
                 >
                   {onEdit && (

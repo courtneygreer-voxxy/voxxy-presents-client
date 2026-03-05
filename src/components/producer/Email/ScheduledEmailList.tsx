@@ -67,6 +67,36 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: 
     icon: Settings2,
     color: 'text-yellow-400',
     bgColor: 'bg-yellow-500/20'
+  },
+  event_announcements: {
+    label: 'Event Announcements',
+    icon: Megaphone,
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/20'
+  },
+  application_updates: {
+    label: 'Application Updates',
+    icon: FileText,
+    color: 'text-pink-400',
+    bgColor: 'bg-pink-500/20'
+  },
+  payment_reminders: {
+    label: 'Payment Reminders',
+    icon: CreditCard,
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-500/20'
+  },
+  event_countdown: {
+    label: 'Event Countdown',
+    icon: Calendar,
+    color: 'text-green-400',
+    bgColor: 'bg-green-500/20'
+  },
+  event_updates: {
+    label: 'Event Updates',
+    icon: Settings2,
+    color: 'text-yellow-400',
+    bgColor: 'bg-yellow-500/20'
   }
 };
 

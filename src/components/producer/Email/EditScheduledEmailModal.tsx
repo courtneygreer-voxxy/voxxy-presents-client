@@ -229,7 +229,6 @@ export default function EditScheduledEmailModal({
         case 'on_event_date':
         case 'on_application_open':
         case 'on_payment_deadline':
-        case 'on_bulletin_post':
           scheduledDate = baseDate;
           break;
 
