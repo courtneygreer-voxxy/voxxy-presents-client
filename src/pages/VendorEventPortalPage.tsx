@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useLocation } from 'react-router-dom';
 import {
   Calendar,
   MapPin,
@@ -27,11 +27,14 @@ import { bulletinsApi } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function VendorEventPortalPage() {
-  const { portalIdentifier } = useParams<{ portalIdentifier: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
 
-  // Detect if portalIdentifier is a token (long base64) or slug (short kebab-case)
-  // Tokens are 43 chars (urlsafe_base64(32)), slugs are typically < 100 chars with hyphens
+  // Extract identifier from path: /portal/[identifier] or /portal/[org-slug]-[org_id]/[event-slug]-[event_id]
+  const portalIdentifier = location.pathname.replace('/portal/', '');
+
+  // Detect if portalIdentifier is a token (long base64) or slug (short kebab-case or namespaced)
+  // Tokens are 43 chars (urlsafe_base64(32)), slugs can have slashes for namespaced format
   const isToken = portalIdentifier && portalIdentifier.length > 40 && !/[^A-Za-z0-9_-]/.test(portalIdentifier);
   const eventSlug = !isToken ? portalIdentifier : undefined;
   const accessToken = isToken ? portalIdentifier : undefined;

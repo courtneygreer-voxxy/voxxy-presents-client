@@ -359,7 +359,24 @@ export default function AdminDashboardPage() {
                 </div>
               )}
 
-              <div className="text-center pt-6 border-t border-white/10">
+              <div className="pt-6 border-t border-white/10">
+                {/* Admin Tools Section */}
+                <div className="mb-6">
+                  <h3 className="text-lg font-semibold text-white mb-3">Admin Tools</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <Button
+                      className="bg-purple-600 hover:bg-purple-700 justify-start"
+                      asChild
+                    >
+                      <Link to="/admin/unsubscribes">
+                        <Mail className="h-4 w-4 mr-2" />
+                        View Unsubscribed Users
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Bottom Actions */}
                 <div className="flex justify-center gap-4">
                   <Button
                     onClick={handleSignOut}

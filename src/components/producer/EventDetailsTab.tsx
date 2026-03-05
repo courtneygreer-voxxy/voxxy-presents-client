@@ -28,6 +28,7 @@ import { formatEventDate } from '@/utils/dateHelpers';
 interface Event {
   id: number;
   slug: string;
+  namespaced_slug?: string;
   title: string;
   description?: string;
   event_date?: string;
@@ -205,8 +206,8 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
     }
   };
 
-  // Construct public event URL
-  const publicEventUrl = `${window.location.origin}/events/${event.slug}`;
+  // Construct public event URL using namespaced slug
+  const publicEventUrl = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`;
 
   const handleCopyUrl = async () => {
     try {
@@ -349,7 +350,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
             </div>
             <div className="text-left">
               <p className="text-sm font-semibold text-white">View Link</p>
-              <p className="text-xs text-white/60">Open event page</p>
+              <p className="text-xs text-white/60">Open application page</p>
             </div>
           </div>
           <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />

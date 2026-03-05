@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock, Building2 } from 'lucide-react';
 import { eventsApi } from '@/services/api';
 
@@ -57,11 +57,14 @@ interface Event {
 }
 
 export default function PublicEventDetailPage() {
-  const { slug } = useParams<{ slug: string }>();
+  const location = useLocation();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Extract slug from path: /events/[slug] or /events/[org-slug]-[org_id]/[event-slug]-[event_id]
+  const slug = location.pathname.replace('/events/', '');
 
   const getDaysUntilDeadline = (deadline: string) => {
     const now = new Date();

@@ -49,6 +49,7 @@ const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
 const ProducerDashboard = lazy(() => import('./pages/ProducerDashboard'))
 const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
+const AdminUnsubscribesPage = lazy(() => import('./pages/AdminUnsubscribesPage'))
 
 // Debug Panel (keep eager for development)
 import { DebugPanel } from './components/debug/DebugPanel'
@@ -145,8 +146,10 @@ export default function App() {
           <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
 
           {/* Public Event & Vendor Application Routes */}
-          <Route path="/events/:slug" element={<PublicEventDetailPage />} />
-          <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
+          {/* Supports both new namespaced format (/org-slug-id/event-slug-id) and legacy (/event-slug) */}
+          {/* Note: More specific routes must come BEFORE wildcard routes */}
+          <Route path="/events/*/apply/*" element={<VendorApplicationForm />} />
+          <Route path="/events/*" element={<PublicEventDetailPage />} />
           <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
           <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
           <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />
@@ -154,8 +157,8 @@ export default function App() {
           {/* Public Invitation View Route */}
           <Route path="/invitations/:token" element={<InvitationViewPage />} />
 
-          {/* Vendor Event Portal Routes - Token-based (primary) and slug-based (legacy) */}
-          <Route path="/portal/:portalIdentifier" element={<VendorEventPortalPage />} />
+          {/* Vendor Event Portal Routes - Supports namespaced format and legacy formats */}
+          <Route path="/portal/*" element={<VendorEventPortalPage />} />
 
           {/* Unsubscribe Route (public - token-based) */}
           <Route path="/unsubscribe/:token" element={<UnsubscribePage />} />
@@ -218,6 +221,13 @@ export default function App() {
           <Route path="/admin/dashboard" element={
             <AdminRoute>
               <AdminDashboard />
+            </AdminRoute>
+          } />
+
+          {/* Admin Unsubscribes - Protected */}
+          <Route path="/admin/unsubscribes" element={
+            <AdminRoute>
+              <AdminUnsubscribesPage />
             </AdminRoute>
           } />
 

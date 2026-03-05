@@ -1527,6 +1527,33 @@ export const adminApi = {
     return await response.json()
   },
 
+  async getUnsubscribedUsers(params?: { page?: number; per_page?: number; scope?: string; source?: string; search?: string }) {
+    const queryParams = new URLSearchParams()
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
+    if (params?.scope) queryParams.append('scope', params.scope)
+    if (params?.source) queryParams.append('source', params.source)
+    if (params?.search) queryParams.append('search', params.search)
+
+    const queryString = queryParams.toString()
+    const url = `${API_BASE_URL.replace('/api', '')}/admin/unsubscribed_users${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch unsubscribed users' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch unsubscribed users', response.status)
+    }
+
+    return await response.json()
+  },
+
   async updateUserBetaStatus(userId: string, status: 'approved' | 'denied', notes?: string) {
     return fetchApi<any>(`/admin/users/${userId}/beta-status`, {
       method: 'PUT',

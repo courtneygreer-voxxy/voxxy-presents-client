@@ -270,7 +270,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventLink]',
     backendVar: '{{event_link}}',
     category: 'computed',
-    description: 'Public event page URL',
+    description: 'Public application page URL',
     example: 'https://voxxy.io/events/summer-market'
   },
   {

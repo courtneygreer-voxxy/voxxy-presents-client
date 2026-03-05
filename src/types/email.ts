@@ -628,7 +628,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'computed',
     label: 'Event URL',
     variable: '{{event_url}}',
-    description: 'Link to event page',
+    description: 'Link to application page',
     example: 'https://voxxypresents.com/events/summer-market-2025'
   },
   {

@@ -8,6 +8,7 @@ import { DebugPanel } from './DebugPanel';
 interface Event {
   id: number;
   slug: string;
+  namespaced_slug?: string;
   title: string;
   description?: string;
   event_date?: string;
@@ -335,13 +336,12 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     }
   };
 
-  // Generate public event page URL
-  const eventPageLink = `${window.location.origin}/events/${event.slug}`;
+  // Generate public event page URL using namespaced slug
+  // Format: /events/[org-slug]-[org_id]/[event-slug]-[event_id]
+  const eventPageLink = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`;
 
-  // Use token-based portal URL (primary) or fallback to slug-based (legacy)
-  const portalLink = event.event_portal?.access_token
-    ? `${window.location.origin}/portal/${event.event_portal.access_token}`
-    : `${window.location.origin}/portal/${event.slug}`;
+  // Generate portal URL using namespaced slug
+  const portalLink = `${window.location.origin}/portal/${event.namespaced_slug || event.slug}`;
 
   // Show create/edit form
   if (currentView === 'create_app' || currentView === 'edit_app') {
@@ -701,13 +701,13 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         </div>
 
         <div className="space-y-4">
-          {/* Event Page Link */}
+          {/* Application Page Link */}
           <div className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <h3 className="text-white font-semibold mb-1">Event Page</h3>
+                <h3 className="text-white font-semibold mb-1">Application Page</h3>
                 <p className="text-white/60 text-sm mb-3">
-                  Share this link to the public event landing page
+                  Share this link to the public application page where vendors can apply
                 </p>
                 <div className="flex items-center gap-2 bg-black/30 rounded-lg p-3">
                   <code className="text-purple-400 text-sm flex-1 overflow-x-auto">
