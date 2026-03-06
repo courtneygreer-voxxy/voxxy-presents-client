@@ -49,9 +49,25 @@ interface Event {
 }
 
 export default function VendorApplicationForm() {
-  const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>();
+  const params = useParams<{ '*': string }>();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+
+  // Parse the wildcard route: /events/[slug]/apply/[applicationId]
+  // Supports both namespaced format (org-slug-id/event-slug-id) and legacy (event-slug)
+  const parseRouteParams = () => {
+    const path = params['*'] || '';
+    // Path will be like "slug/apply/123" or "org-slug-1/event-slug-2/apply/123"
+    const applyIndex = path.indexOf('/apply/');
+    if (applyIndex === -1) return { slug: null, applicationId: null };
+
+    const slug = path.substring(0, applyIndex);
+    const applicationId = path.substring(applyIndex + 7); // "/apply/".length = 7
+
+    return { slug, applicationId };
+  };
+
+  const { slug, applicationId } = parseRouteParams();
   const [event, setEvent] = useState<Event | null>(null);
   const [application, setApplication] = useState<VendorApplication | null>(null);
   const [loading, setLoading] = useState(true);
