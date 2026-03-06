@@ -230,6 +230,7 @@ export type TriggerType =
 export type ScheduledEmailStatus =
   | 'scheduled'
   | 'paused'
+  | 'active'
   | 'sent'
   | 'failed'
   | 'cancelled';

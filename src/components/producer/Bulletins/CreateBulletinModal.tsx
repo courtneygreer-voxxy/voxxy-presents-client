@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,6 +25,7 @@ export function CreateBulletinModal({
   const [subject, setSubject] = useState(editBulletin?.subject || '');
   const [body, setBody] = useState(editBulletin?.body || '');
   const [pinned, setPinned] = useState(editBulletin?.pinned || false);
+  const [sendEmail, setSendEmail] = useState(editBulletin?.send_email_notification || false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +40,7 @@ export function CreateBulletinModal({
     try {
       setIsSubmitting(true);
       setError(null);
-      await onSubmit({ subject, body, pinned });
+      await onSubmit({ subject, body, pinned, send_email_notification: sendEmail });
       handleClose();
     } catch (err) {
       console.error('Failed to create bulletin:', err);
@@ -53,6 +54,7 @@ export function CreateBulletinModal({
     setSubject('');
     setBody('');
     setPinned(false);
+    setSendEmail(false);
     setError(null);
     onClose();
   };
@@ -75,12 +77,6 @@ export function CreateBulletinModal({
           <DialogTitle className="text-2xl font-bold text-white">
             {editBulletin ? 'Edit Bulletin Message' : 'Create Bulletin Message'}
           </DialogTitle>
-          <button
-            onClick={handleClose}
-            className="text-white/60 hover:text-white transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
         </div>
 
         {/* Producer Info */}
@@ -138,6 +134,21 @@ export function CreateBulletinModal({
             <Switch
               checked={pinned}
               onCheckedChange={setPinned}
+            />
+          </div>
+
+          {/* Send Email Option */}
+          <div className="flex items-center justify-between p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-purple-400" />
+              <div>
+                <p className="text-sm font-medium text-white">Send as Email</p>
+                <p className="text-xs text-white/60">Email all approved vendors with this bulletin</p>
+              </div>
+            </div>
+            <Switch
+              checked={sendEmail}
+              onCheckedChange={setSendEmail}
             />
           </div>
 

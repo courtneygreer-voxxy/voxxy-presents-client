@@ -16,6 +16,7 @@ export interface Bulletin {
   body: string;
   bulletin_type: BulletinType;
   pinned: boolean;
+  send_email_notification: boolean;
   view_count: number;
   read_count: number;
   read_by_current_user: boolean;
@@ -29,6 +30,7 @@ export interface CreateBulletinRequest {
   body: string;
   bulletin_type?: BulletinType;
   pinned?: boolean;
+  send_email_notification?: boolean;
 }
 
 export interface UpdateBulletinRequest {

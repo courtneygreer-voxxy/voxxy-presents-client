@@ -111,22 +111,23 @@ export default function EmailRow({
     }
   };
 
-  // Infer category from email name/trigger
+  // Infer category from email name/trigger (fallback only)
   const inferCategory = (): EmailCategory => {
     const name = email.name.toLowerCase();
     const trigger = email.trigger_type;
 
-    if (name.includes('payment') || trigger.includes('payment')) return 'payment';
-    if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application';
-    if (trigger === 'days_before_event' || name.includes('days before')) return 'pre_event';
-    if (trigger === 'on_event_date' || name.includes('day of')) return 'event_day';
-    if (trigger === 'days_after_event') return 'post_event';
-    if (name.includes('announcement') || name.includes('immediate') || name.includes('invitation')) return 'pre_application';
+    if (name.includes('payment') || trigger.includes('payment')) return 'payment_reminders';
+    if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
+    if (trigger === 'days_before_event' || name.includes('days before')) return 'event_countdown';
+    if (trigger === 'on_event_date' || name.includes('day of')) return 'event_countdown';
+    if (trigger === 'days_after_event') return 'event_countdown';
+    if (name.includes('announcement') || name.includes('immediate') || name.includes('invitation')) return 'event_announcements';
 
-    return 'pre_application';
+    return 'event_announcements';
   };
 
-  const category = inferCategory();
+  // Use actual category from template item if available, otherwise infer
+  const category = email.email_template_item?.category || inferCategory();
   const categoryConfig = CATEGORY_CONFIG[category];
   const CategoryIcon = categoryConfig.icon;
 
@@ -162,6 +163,7 @@ export default function EmailRow({
     const statusColors = {
       scheduled: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
       paused: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
+      active: 'bg-green-500/10 text-green-400 border-green-500/30',
       failed: 'bg-red-500/10 text-red-400 border-red-500/30',
       cancelled: 'bg-gray-500/10 text-gray-400 border-gray-500/30'
     };

@@ -64,7 +64,10 @@ export default function PublicEventDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Extract slug from path: /events/[slug] or /events/[org-slug]-[org_id]/[event-slug]-[event_id]
-  const slug = location.pathname.replace('/events/', '');
+  // Split on '/' to handle cases where path includes /apply/id (safety check)
+  const slug = location.pathname.replace('/events/', '').split('/')[0];
+
+  console.log('🔍 [PublicEventDetailPage] RENDERING - pathname:', location.pathname, 'slug:', slug);
 
   const getDaysUntilDeadline = (deadline: string) => {
     const now = new Date();

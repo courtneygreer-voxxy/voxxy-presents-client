@@ -152,7 +152,7 @@ export default function App() {
           {/* Public Event & Vendor Application Routes */}
           {/* Supports both new namespaced format (/org-slug-id/event-slug-id) and legacy (/event-slug) */}
           {/* Note: More specific routes must come BEFORE wildcard routes */}
-          <Route path="/events/*/apply/*" element={<VendorApplicationForm />} />
+          <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
           <Route path="/events/*" element={<PublicEventDetailPage />} />
           <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
           <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
