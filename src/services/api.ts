@@ -1110,6 +1110,28 @@ export const emailCampaignTemplatesApi = {
       method: 'DELETE',
     })
   },
+
+  /**
+   * Send test emails for all items in template
+   * POST /api/v1/presents/email_campaign_templates/:id/send_test_emails
+   */
+  async sendTestEmails(id: number, testEmail?: string) {
+    return fetchApi<{
+      message: string
+      recipient: string
+      results: Array<{
+        email_name: string
+        status: 'sent' | 'failed'
+        error?: string
+        timestamp?: string
+      }>
+      success_count: number
+      failure_count: number
+    }>(`/v1/presents/email_campaign_templates/${id}/send_test_emails`, {
+      method: 'POST',
+      body: JSON.stringify({ test_email: testEmail }),
+    })
+  },
 }
 
 // Email Template Items API (Individual emails within templates)
@@ -2891,6 +2913,81 @@ export const bugReportsApi = {
       error_context?: any
       created_at: string
     }>(`/v1/shared/bug_reports/${id}`)
+  },
+}
+
+// Email Testing API
+export const emailTestsApi = {
+  /**
+   * Send all test emails (scheduled + notification)
+   * POST /api/v1/presents/email_tests/send_all
+   */
+  async sendAll() {
+    return fetchApi<{
+      message: string
+      recipient: string
+      results: Array<{
+        email_name: string
+        status: 'sent' | 'failed'
+        message?: string
+      }>
+      success_count: number
+      failure_count: number
+    }>('/v1/presents/email_tests/send_all', {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Send scheduled test emails only
+   * POST /api/v1/presents/email_tests/send_scheduled
+   */
+  async sendScheduled() {
+    return fetchApi<{
+      message: string
+      recipient: string
+      results: Array<{
+        email_name: string
+        status: 'sent' | 'failed'
+        message?: string
+      }>
+      success_count: number
+      failure_count: number
+    }>('/v1/presents/email_tests/send_scheduled', {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Send notification test emails only
+   * POST /api/v1/presents/email_tests/send_notification_emails
+   */
+  async sendNotificationEmails() {
+    return fetchApi<{
+      message: string
+      recipient: string
+      results: Array<{
+        email_name: string
+        status: 'sent' | 'failed'
+        message?: string
+      }>
+      success_count: number
+      failure_count: number
+    }>('/v1/presents/email_tests/send_notification_emails', {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Get test email categories and info
+   * GET /api/v1/presents/email_tests
+   */
+  async getInfo() {
+    return fetchApi<{
+      test_email: string
+      email_categories: any[]
+      total_count: number
+    }>('/v1/presents/email_tests')
   },
 }
 

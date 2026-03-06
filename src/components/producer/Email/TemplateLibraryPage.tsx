@@ -185,26 +185,23 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   };
 
   const sendTestSequence = async () => {
+    if (!previewTemplate) {
+      toast.error('No template selected');
+      return;
+    }
+
     setTestingLoading(true);
     setTestResults([]);
 
     try {
-      const token = localStorage.getItem('railsAuthToken');
-      const response = await fetch('/api/v1/presents/email_tests/send_all', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to send test emails');
-      }
-
-      const data = await response.json();
-      setTestResults(data.results || []);
+      const data = await emailCampaignTemplatesApi.sendTestEmails(previewTemplate.id);
+      // Transform results to match expected type (email_name -> name)
+      const transformedResults = (data.results || []).map(r => ({
+        name: r.email_name,
+        status: r.status,
+        error: r.error,
+      }));
+      setTestResults(transformedResults);
       setTestEmail(data.recipient || '');
 
       const successCount = data.success_count || 0;
