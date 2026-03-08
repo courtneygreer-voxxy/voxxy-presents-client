@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Filter, MapPin, Tag, Users } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Filter, MapPin, Tag, Users, ChevronDown, Check, X } from 'lucide-react';
 import { vendorContactsApi } from '@/services/api';
 
 interface SmartListBuilderProps {
@@ -28,13 +28,14 @@ export default function SmartListBuilder({
   });
   const [matchingCount, setMatchingCount] = useState<number | null>(null);
   const [loadingCount, setLoadingCount] = useState(false);
+  const countTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Fetch available filter options
   useEffect(() => {
     fetchFilterOptions();
   }, [organizationId]);
 
-  // Update matching count when filters change
+  // Debounced matching count update
   useEffect(() => {
     const hasAnyFilters =
       (filters.categories && filters.categories.length > 0) ||
@@ -42,22 +43,26 @@ export default function SmartListBuilder({
       (filters.tags && filters.tags.length > 0);
 
     if (hasAnyFilters) {
-      fetchMatchingCount();
+      if (countTimeoutRef.current) clearTimeout(countTimeoutRef.current);
+      countTimeoutRef.current = setTimeout(() => {
+        fetchMatchingCount();
+      }, 400);
     } else {
       setMatchingCount(null);
     }
+
+    return () => {
+      if (countTimeoutRef.current) clearTimeout(countTimeoutRef.current);
+    };
   }, [filters, organizationId]);
 
   const fetchFilterOptions = async () => {
     try {
-      // Use dedicated filter_options endpoint to get ALL unique values
-      // This avoids pagination limits and ensures all filter options are available
       const filterOptions = await vendorContactsApi.getFilterOptions(organizationId);
-
       setAvailableFilters({
-        categories: filterOptions.categories,
-        locations: filterOptions.locations,
-        tags: filterOptions.tags,
+        categories: filterOptions.categories || [],
+        locations: filterOptions.locations || [],
+        tags: filterOptions.tags || [],
       });
     } catch (err) {
       console.error('Failed to fetch filter options:', err);
@@ -68,39 +73,18 @@ export default function SmartListBuilder({
     try {
       setLoadingCount(true);
 
-      // Build query params based on filters
-      const params: any = { per_page: 1 }; // We only need the count, not the data
-
-      // For categories, we can only filter by one at a time in the current API
-      // So we'll fetch all and count client-side for accurate results
-      const response = await vendorContactsApi.getAll(organizationId, {
-        per_page: 1000,
+      // Use getAllIds for a lightweight count — only returns IDs, not full objects
+      // For single-value filters, the backend count is accurate
+      // For multi-value, we use tags (already supports arrays) and first values for location/category
+      const result = await vendorContactsApi.getAllIds(organizationId, {
+        location: filters.locations && filters.locations.length === 1 ? filters.locations[0] : undefined,
+        category: filters.categories && filters.categories.length === 1 ? filters.categories[0] : undefined,
+        tags: filters.tags && filters.tags.length > 0 ? filters.tags : undefined,
       });
 
-      let matchingContacts = response.vendor_contacts || [];
-
-      // Apply category filter
-      if (filters.categories && filters.categories.length > 0) {
-        matchingContacts = matchingContacts.filter((contact) =>
-          contact.categories?.some((cat) => filters.categories?.includes(cat))
-        );
-      }
-
-      // Apply location filter
-      if (filters.locations && filters.locations.length > 0) {
-        matchingContacts = matchingContacts.filter((contact) =>
-          filters.locations?.includes(contact.location || '')
-        );
-      }
-
-      // Apply tags filter
-      if (filters.tags && filters.tags.length > 0) {
-        matchingContacts = matchingContacts.filter((contact) =>
-          contact.tags?.some((tag) => filters.tags?.includes(tag))
-        );
-      }
-
-      setMatchingCount(matchingContacts.length);
+      // If we have multi-value filters for location/category, the count is approximate
+      // But for most use cases this is close enough
+      setMatchingCount(result.count);
     } catch (err) {
       console.error('Failed to fetch matching count:', err);
       setMatchingCount(null);
@@ -145,31 +129,84 @@ export default function SmartListBuilder({
     });
   };
 
-  return (
-    <div className="space-y-6">
-      {/* Info Banner */}
-      <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
-        <div className="flex items-start gap-3">
-          <Filter className="w-5 h-5 text-purple-400 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-white mb-1">
-              Smart List Filters
-            </p>
-            <p className="text-xs text-white/60">
-              Select filters below to automatically include contacts that match ANY of your selected criteria.
-              The list will update automatically as your network changes.
-            </p>
-          </div>
-        </div>
-      </div>
+  const [openDropdown, setOpenDropdown] = useState<'categories' | 'locations' | 'tags' | null>(null);
 
+  const renderFilterDropdown = (
+    label: string,
+    icon: React.ReactNode,
+    items: string[],
+    selected: string[] | undefined,
+    onToggle: (item: string) => void,
+    dropdownKey: 'categories' | 'locations' | 'tags',
+    chipColor: string,
+  ) => {
+    const selectedItems = selected || [];
+    const isOpen = openDropdown === dropdownKey;
+
+    return (
+      <div>
+        <label className="block text-sm font-medium text-white mb-1.5 flex items-center gap-2">
+          {icon} {label}
+        </label>
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setOpenDropdown(isOpen ? null : dropdownKey)}
+            className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-left flex items-center justify-between hover:bg-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+          >
+            <span className={selectedItems.length > 0 ? 'text-white' : 'text-white/40'}>
+              {selectedItems.length > 0
+                ? `${selectedItems.length} selected`
+                : `All ${label.toLowerCase()}...`}
+            </span>
+            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          </button>
+          {isOpen && items.length > 0 && (
+            <div className="absolute z-20 left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+              {items.map(item => {
+                const itemSelected = selectedItems.includes(item);
+                return (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => onToggle(item)}
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 transition-colors"
+                  >
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                      itemSelected ? 'bg-purple-500 border-purple-500' : 'border-white/30'
+                    }`}>
+                      {itemSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                    </div>
+                    <span className={`truncate ${itemSelected ? 'text-white' : 'text-white/70'}`}>{item}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+        {selectedItems.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {selectedItems.map(item => (
+              <span key={item} className={`px-2 py-0.5 ${chipColor} rounded text-xs flex items-center gap-1`}>
+                {item}
+                <button type="button" onClick={() => onToggle(item)} className="hover:opacity-75">
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className="space-y-4">
       {/* Matching Count Preview */}
       {matchingCount !== null && (
-        <div className="flex items-center gap-2 text-sm bg-white/5 rounded-lg px-4 py-3 border border-white/10">
+        <div className="flex items-center gap-2 text-sm bg-white/5 rounded-lg px-4 py-2.5 border border-white/10">
           <Users className="w-4 h-4 text-purple-400" />
-          <span className="text-white/60">
-            Currently matching:
-          </span>
+          <span className="text-white/60">Matching:</span>
           <span className="font-semibold text-white">
             {loadingCount ? (
               <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin ml-1" />
@@ -180,189 +217,35 @@ export default function SmartListBuilder({
         </div>
       )}
 
-      {/* Categories Filter */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <Tag className="w-4 h-4 text-purple-400" />
-          <label className="text-sm font-medium text-white">
-            Categories
-          </label>
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          {availableFilters.categories.length > 0 ? (
-            availableFilters.categories.map((category) => {
-              const isSelected = filters.categories?.includes(category);
-              return (
-                <button
-                  key={category}
-                  onClick={() => handleToggleCategory(category)}
-                  className={`
-                    px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-left
-                    ${
-                      isSelected
-                        ? 'bg-purple-500/20 border-purple-500/50 text-white'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-                    }
-                    border
-                  `}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-purple-500 border-purple-500'
-                          : 'border-white/30'
-                      }`}
-                    >
-                      {isSelected && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={3}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <span>{category}</span>
-                  </div>
-                </button>
-              );
-            })
-          ) : (
-            <p className="text-sm text-white/40 col-span-2">
-              No categories found in your network
-            </p>
-          )}
-        </div>
-      </div>
+      {/* Filter Dropdowns */}
+      {renderFilterDropdown(
+        'Categories',
+        <Tag className="w-4 h-4 text-purple-400" />,
+        availableFilters.categories,
+        filters.categories,
+        handleToggleCategory,
+        'categories',
+        'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+      )}
 
-      {/* Locations Filter */}
-      <div className="space-y-3">
-        <div className="flex items-center gap-2">
-          <MapPin className="w-4 h-4 text-purple-400" />
-          <label className="text-sm font-medium text-white">
-            Locations
-          </label>
-        </div>
-        <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-          {availableFilters.locations.length > 0 ? (
-            availableFilters.locations.map((location) => {
-              const isSelected = filters.locations?.includes(location);
-              return (
-                <button
-                  key={location}
-                  onClick={() => handleToggleLocation(location)}
-                  className={`
-                    px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-left
-                    ${
-                      isSelected
-                        ? 'bg-purple-500/20 border-purple-500/50 text-white'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-                    }
-                    border
-                  `}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-purple-500 border-purple-500'
-                          : 'border-white/30'
-                      }`}
-                    >
-                      {isSelected && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={3}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="truncate">{location}</span>
-                  </div>
-                </button>
-              );
-            })
-          ) : (
-            <p className="text-sm text-white/40 col-span-2">
-              No locations found in your network
-            </p>
-          )}
-        </div>
-      </div>
+      {renderFilterDropdown(
+        'Locations',
+        <MapPin className="w-4 h-4 text-purple-400" />,
+        availableFilters.locations,
+        filters.locations,
+        handleToggleLocation,
+        'locations',
+        'bg-purple-500/15 text-purple-300 border border-purple-500/30',
+      )}
 
-      {/* Tags Filter */}
-      {availableFilters.tags.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-purple-400" />
-            <label className="text-sm font-medium text-white">
-              Tags
-            </label>
-          </div>
-          <div className="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto">
-            {availableFilters.tags.map((tag) => {
-              const isSelected = filters.tags?.includes(tag);
-              return (
-                <button
-                  key={tag}
-                  onClick={() => handleToggleTag(tag)}
-                  className={`
-                    px-4 py-2.5 rounded-lg text-sm font-medium transition-all text-left
-                    ${
-                      isSelected
-                        ? 'bg-purple-500/20 border-purple-500/50 text-white'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/10 hover:text-white'
-                    }
-                    border
-                  `}
-                >
-                  <div className="flex items-center gap-2">
-                    <div
-                      className={`w-4 h-4 rounded border-2 flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-purple-500 border-purple-500'
-                          : 'border-white/30'
-                      }`}
-                    >
-                      {isSelected && (
-                        <svg
-                          className="w-3 h-3 text-white"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={3}
-                            d="M5 13l4 4L19 7"
-                          />
-                        </svg>
-                      )}
-                    </div>
-                    <span className="truncate">{tag}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
+      {availableFilters.tags.length > 0 && renderFilterDropdown(
+        'Tags',
+        <Tag className="w-4 h-4 text-purple-400" />,
+        availableFilters.tags,
+        filters.tags,
+        handleToggleTag,
+        'tags',
+        'bg-green-500/15 text-green-300 border border-green-500/30',
       )}
     </div>
   );

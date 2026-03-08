@@ -1817,7 +1817,7 @@ export interface VendorContact {
   email: string
   phone?: string
   location?: string
-  contact_type: 'vendor' | 'partner' | 'sponsor' | 'staff'
+  contact_type: 'lead' | 'vendor' | 'partner' | 'client' | 'other'
   status: 'new' | 'contacted' | 'interested' | 'converted' | 'closed'
   tags?: string[]
   categories?: string[]

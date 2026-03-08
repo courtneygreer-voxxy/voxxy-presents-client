@@ -1,24 +1,35 @@
-import { useState } from 'react';
-import { X, Plus } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { X, Plus, ChevronDown, Check } from 'lucide-react';
 import { vendorContactsApi, VendorContact } from '@/services/api';
 
 interface EditContactModalProps {
+  organizationId: number;
   contact: VendorContact;
   onClose: () => void;
   onSuccess: (contact: VendorContact) => void;
 }
 
-const CATEGORY_OPTIONS = [
-  { value: 'Artist', label: 'Artist' },
-  { value: 'Table Vendor', label: 'Table Vendor' },
-  { value: 'Sponsor', label: 'Sponsor' },
-  { value: 'Food & Beverage', label: 'Food & Beverage' },
-];
-
-export default function EditContactModal({ contact, onClose, onSuccess }: EditContactModalProps) {
+export default function EditContactModal({ organizationId, contact, onClose, onSuccess }: EditContactModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
+  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [availableTags, setAvailableTags] = useState<string[]>([]);
+  const [customCategoryInput, setCustomCategoryInput] = useState('');
+  const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
+  const categoryDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    vendorContactsApi.getFilterOptions(organizationId).then(options => {
+      // Merge available categories with any the contact already has (handles legacy data)
+      const merged = Array.from(new Set([
+        ...(options.categories || []),
+        ...(contact.categories || []),
+      ]));
+      setAvailableCategories(merged);
+      setAvailableTags(options.tags || []);
+    }).catch(() => {});
+  }, [organizationId]);
 
   const [formData, setFormData] = useState({
     contact_name: contact.contact_name,
@@ -281,29 +292,99 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
 
           {/* Categories */}
           <div>
-            <label className="block text-white/90 text-sm font-medium mb-2">
+            <label className="block text-white/90 text-sm font-medium mb-1.5">
               Categories
             </label>
-            <div className="grid grid-cols-2 gap-3">
-              {CATEGORY_OPTIONS.map((category) => (
-                <label
-                  key={category.value}
-                  className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
-                    formData.categories.includes(category.value)
-                      ? 'bg-purple-500/20 border-purple-500/50 text-purple-300'
-                      : 'bg-white/5 border-white/20 text-white/70 hover:bg-white/10'
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={formData.categories.includes(category.value)}
-                    onChange={() => handleCategoryToggle(category.value)}
-                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-2"
-                  />
-                  <span className="text-sm font-medium">{category.label}</span>
-                </label>
-              ))}
+            <div className="relative" ref={categoryDropdownRef}>
+              <button
+                type="button"
+                onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-left flex items-center justify-between hover:bg-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              >
+                <span className={formData.categories.length > 0 ? 'text-white' : 'text-white/40'}>
+                  {formData.categories.length > 0
+                    ? `${formData.categories.length} selected`
+                    : 'Select categories...'}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+              </button>
+              {categoryDropdownOpen && (
+                <div className="absolute z-20 left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                  {/* Custom category input */}
+                  <div className="p-2 border-b border-white/10">
+                    <div className="flex gap-1.5">
+                      <input
+                        type="text"
+                        value={customCategoryInput}
+                        onChange={(e) => setCustomCategoryInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const cat = customCategoryInput.trim();
+                            if (cat && !formData.categories.includes(cat)) {
+                              handleCategoryToggle(cat);
+                              if (!availableCategories.includes(cat)) {
+                                setAvailableCategories(prev => [...prev, cat]);
+                              }
+                              setCustomCategoryInput('');
+                            }
+                          }
+                        }}
+                        placeholder="Add custom..."
+                        className="flex-1 px-2 py-1.5 text-xs rounded bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const cat = customCategoryInput.trim();
+                          if (cat && !formData.categories.includes(cat)) {
+                            handleCategoryToggle(cat);
+                            if (!availableCategories.includes(cat)) {
+                              setAvailableCategories(prev => [...prev, cat]);
+                            }
+                            setCustomCategoryInput('');
+                          }
+                        }}
+                        className="px-2 py-1.5 text-xs bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  {availableCategories.length > 0 ? (
+                    availableCategories.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => handleCategoryToggle(category)}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 transition-colors"
+                      >
+                        <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
+                          formData.categories.includes(category) ? 'bg-purple-500 border-purple-500' : 'border-white/30'
+                        }`}>
+                          {formData.categories.includes(category) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                        </div>
+                        <span className={formData.categories.includes(category) ? 'text-white' : 'text-white/70'}>{category}</span>
+                      </button>
+                    ))
+                  ) : (
+                    <p className="px-3 py-2 text-xs text-white/40">No categories yet. Type above to add one.</p>
+                  )}
+                </div>
+              )}
             </div>
+            {formData.categories.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {formData.categories.map(cat => (
+                  <span key={cat} className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs flex items-center gap-1 border border-purple-500/30">
+                    {cat}
+                    <button type="button" onClick={() => handleCategoryToggle(cat)} className="hover:text-purple-100">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Tags */}
@@ -311,29 +392,51 @@ export default function EditContactModal({ contact, onClose, onSuccess }: EditCo
             <label htmlFor="tags" className="block text-white/90 text-sm font-medium mb-2">
               Tags
             </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                id="tags"
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddTag();
-                  }
-                }}
-                placeholder="Add tag..."
-                className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              />
-              <button
-                type="button"
-                onClick={handleAddTag}
-                className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                Add
-              </button>
+            <div className="relative">
+              <div className="flex gap-2 mb-2">
+                <input
+                  id="tags"
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTag();
+                    }
+                  }}
+                  placeholder="Add tag..."
+                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={handleAddTag}
+                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add
+                </button>
+              </div>
+              {tagInput.length > 0 && availableTags.filter(t => t.toLowerCase().includes(tagInput.toLowerCase()) && !formData.tags.includes(t)).length > 0 && (
+                <div className="absolute left-0 right-16 z-10 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-32 overflow-y-auto">
+                  {availableTags
+                    .filter(t => t.toLowerCase().includes(tagInput.toLowerCase()) && !formData.tags.includes(t))
+                    .slice(0, 5)
+                    .map(tag => (
+                      <button
+                        key={tag}
+                        type="button"
+                        onClick={() => {
+                          setFormData(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+                          setTagInput('');
+                        }}
+                        className="w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                      >
+                        #{tag}
+                      </button>
+                    ))}
+                </div>
+              )}
             </div>
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">

@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Plus, List, Filter, Users, Calendar, Trash2, Edit3, Eye } from 'lucide-react';
+import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save } from 'lucide-react';
 import { contactListsApi, ContactList } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
-import CreateListModal from './CreateListModal';
-
+import SmartListBuilder from './SmartListBuilder';
 
 interface ListsManagementProps {
   organizationId: number;
@@ -14,8 +13,17 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
   const [lists, setLists] = useState<ContactList[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const [viewingList, setViewingList] = useState<ContactList | null>(null);
+
+  // Inline edit state
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editDescription, setEditDescription] = useState('');
+  const [editFilters, setEditFilters] = useState<{
+    categories?: string[];
+    locations?: string[];
+    tags?: string[];
+  }>({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     fetchLists();
@@ -42,8 +50,41 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     try {
       await contactListsApi.delete(listId);
       setLists(prev => prev.filter(l => l.id !== listId));
+      if (editingId === listId) setEditingId(null);
     } catch (err: any) {
       alert(err.message || 'Failed to delete list');
+    }
+  };
+
+  const handleStartEdit = (list: ContactList) => {
+    setEditingId(list.id);
+    setEditName(list.name);
+    setEditDescription(list.description || '');
+    setEditFilters(list.filters || {});
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditName('');
+    setEditDescription('');
+    setEditFilters({});
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingId || !editName.trim()) return;
+    setSavingEdit(true);
+    try {
+      const updated = await contactListsApi.update(editingId, {
+        name: editName.trim(),
+        description: editDescription.trim() || undefined,
+        filters: editFilters,
+      });
+      setLists(prev => prev.map(l => l.id === editingId ? { ...l, ...updated, name: editName.trim(), description: editDescription.trim(), filters: editFilters } : l));
+      setEditingId(null);
+    } catch (err: any) {
+      alert(err.message || 'Failed to update list');
+    } finally {
+      setSavingEdit(false);
     }
   };
 
@@ -79,77 +120,39 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
   // Empty state
   if (lists.length === 0) {
     return (
-      <>
-        <div className="flex flex-col items-center justify-center py-12">
-          <div className="text-center max-w-md">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-              <List className="w-8 h-8 text-white/40" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              Create Your First Contact List
-            </h3>
-            <p className="text-white/50 text-sm mb-6">
-              Organize your contacts into smart lists or manual collections for easy event invitations.
-            </p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-            >
-              Create Your First List
-            </button>
-            <div className="mt-6 space-y-2 text-left bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-white/70 text-xs font-medium mb-2">List Types:</p>
-              <div className="flex items-start gap-2">
-                <Filter className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-white text-xs font-medium">Smart Lists</p>
-                  <p className="text-white/50 text-xs">Auto-update based on filters like category, location, and tags</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-2">
-                <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-white text-xs font-medium">Manual Lists</p>
-                  <p className="text-white/50 text-xs">Hand-pick specific contacts that stay fixed</p>
-                </div>
-              </div>
-            </div>
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Filter className="w-8 h-8 text-white/40" />
+          </div>
+          <h3 className="text-lg font-semibold text-white mb-2">
+            No Saved Lists Yet
+          </h3>
+          <p className="text-white/50 text-sm mb-4">
+            Use the filters on the All Contacts tab to find the contacts you need, then save the filter combination as a reusable list.
+          </p>
+          <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-left">
+            <p className="text-white/70 text-xs font-medium mb-2">How it works:</p>
+            <ol className="text-white/50 text-xs space-y-1.5 list-decimal list-inside">
+              <li>Go to the All Contacts tab</li>
+              <li>Select filters for locations, categories, or tags</li>
+              <li>Click "Save as List" to save the filter combination</li>
+              <li>Use saved lists to quickly invite contacts to events</li>
+            </ol>
           </div>
         </div>
-
-        {/* Modal */}
-        {showCreateModal && (
-          <CreateListModal
-            organizationId={organizationId}
-            onClose={() => setShowCreateModal(false)}
-            onSuccess={(newList) => {
-              setLists(prev => [newList, ...prev]);
-              setShowCreateModal(false);
-            }}
-          />
-        )}
-      </>
+      </div>
     );
   }
 
-  // Lists view
   return (
     <div className="space-y-6">
-      {/* Header with stats */}
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h3 className="text-lg font-semibold text-white mb-1">Contact Lists</h3>
-          <p className="text-sm text-white/60">
-            {lists.length} {lists.length === 1 ? 'list' : 'lists'} • {lists.reduce((sum, list) => sum + list.contacts_count, 0)} total contacts
-          </p>
-        </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-        >
-          <Plus className="w-4 h-4" />
-          Create List
-        </button>
+      {/* Header */}
+      <div>
+        <h3 className="text-lg font-semibold text-white mb-1">Saved Lists</h3>
+        <p className="text-sm text-white/60">
+          {lists.length} {lists.length === 1 ? 'list' : 'lists'} saved
+        </p>
       </div>
 
       {/* Lists Table */}
@@ -159,9 +162,6 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
             <tr className="border-b border-white/10 bg-white/5">
               <th className="px-4 py-3 text-left">
                 <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Name</span>
-              </th>
-              <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Type</span>
               </th>
               <th className="px-4 py-3 text-left">
                 <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Filters</span>
@@ -186,11 +186,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 {/* Name */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    {list.list_type === 'smart' ? (
-                      <Filter className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                    ) : (
-                      <Users className="w-4 h-4 text-blue-400 flex-shrink-0" />
-                    )}
+                    <Filter className="w-4 h-4 text-purple-400 flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-white truncate">
                         {list.name}
@@ -204,42 +200,37 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   </div>
                 </td>
 
-                {/* Type */}
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center text-xs px-2 py-1 rounded-full ${
-                    list.list_type === 'smart'
-                      ? 'bg-purple-500/20 text-purple-300'
-                      : 'bg-blue-500/20 text-blue-300'
-                  }`}>
-                    {list.list_type === 'smart' ? 'Smart' : 'Manual'}
-                  </span>
-                </td>
-
                 {/* Filters */}
                 <td className="px-4 py-3">
-                  {list.list_type === 'smart' && list.filters ? (
-                    <div className="space-y-0.5 max-w-xs">
+                  {list.filters ? (
+                    <div className="flex flex-wrap gap-1 max-w-xs">
                       {list.filters.categories && list.filters.categories.length > 0 && (
-                        <p className="text-xs text-white/60 truncate">
-                          <span className="text-white/40">Cat:</span> {list.filters.categories.join(', ')}
-                        </p>
+                        list.filters.categories.map(cat => (
+                          <span key={cat} className="text-xs px-1.5 py-0.5 bg-blue-500/15 text-blue-300 rounded">
+                            {cat}
+                          </span>
+                        ))
                       )}
                       {list.filters.locations && list.filters.locations.length > 0 && (
-                        <p className="text-xs text-white/60 truncate">
-                          <span className="text-white/40">Loc:</span> {list.filters.locations.join(', ')}
-                        </p>
+                        list.filters.locations.map(loc => (
+                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-purple-500/15 text-purple-300 rounded">
+                            {loc}
+                          </span>
+                        ))
                       )}
                       {list.filters.tags && list.filters.tags.length > 0 && (
-                        <p className="text-xs text-white/60 truncate">
-                          <span className="text-white/40">Tags:</span> {list.filters.tags.join(', ')}
-                        </p>
+                        list.filters.tags.map(tag => (
+                          <span key={tag} className="text-xs px-1.5 py-0.5 bg-green-500/15 text-green-300 rounded">
+                            {tag}
+                          </span>
+                        ))
                       )}
                       {!list.filters.categories?.length && !list.filters.locations?.length && !list.filters.tags?.length && (
                         <span className="text-xs text-white/40">No filters</span>
                       )}
                     </div>
                   ) : (
-                    <span className="text-xs text-white/40">—</span>
+                    <span className="text-xs text-white/40">No filters</span>
                   )}
                 </td>
 
@@ -270,20 +261,18 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => {
-                        if (list.list_type === 'smart' && list.filters && onViewList) {
+                        if (list.filters && onViewList) {
                           onViewList(list.filters);
                         }
                       }}
                       className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
-                      title={list.list_type === 'smart' ? 'View filtered contacts' : 'Manual list view coming soon'}
-                      disabled={list.list_type !== 'smart'}
+                      title="View filtered contacts"
+                      disabled={!list.filters}
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>
                     <button
-                      onClick={() => {
-                        alert('Edit functionality coming soon');
-                      }}
+                      onClick={() => handleStartEdit(list)}
                       className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
                       title="Edit list"
                     >
@@ -304,20 +293,87 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
         </table>
       </div>
 
-      {/* Modals */}
-      {showCreateModal && (
-        <CreateListModal
-          organizationId={organizationId}
-          onClose={() => setShowCreateModal(false)}
-          onSuccess={(newList) => {
-            setLists(prev => [newList, ...prev]);
-            setShowCreateModal(false);
-          }}
-        />
-      )}
+      {/* Edit List Modal */}
+      {editingId !== null && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">Edit List</h2>
+              <button
+                onClick={handleCancelEdit}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* TODO: ViewListModal */}
-      {/* {viewingList && <ViewListModal list={viewingList} onClose={() => setViewingList(null)} />} */}
+            {/* Modal Body */}
+            <div className="p-6 space-y-5">
+              {/* List Name */}
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">List Name</label>
+                <input
+                  type="text"
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="List name"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-1.5">Description (optional)</label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  rows={2}
+                  placeholder="Description (optional)"
+                />
+              </div>
+
+              {/* Filters */}
+              <div>
+                <label className="block text-sm font-medium text-white/90 mb-2">Filters</label>
+                <SmartListBuilder
+                  organizationId={organizationId}
+                  filters={editFilters}
+                  onFiltersChange={setEditFilters}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleCancelEdit}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-white/30 text-white/90 hover:bg-white/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  disabled={savingEdit || !editName.trim()}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                >
+                  {savingEdit ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
