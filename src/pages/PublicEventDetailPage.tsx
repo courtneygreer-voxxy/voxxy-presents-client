@@ -64,8 +64,8 @@ export default function PublicEventDetailPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Extract slug from path: /events/[slug] or /events/[org-slug]-[org_id]/[event-slug]-[event_id]
-  // Split on '/' to handle cases where path includes /apply/id (safety check)
-  const slug = location.pathname.replace('/events/', '').split('/')[0];
+  // Preserve full namespaced slug (e.g., org-slug-id/event-slug-id)
+  const slug = location.pathname.replace('/events/', '');
 
   console.log('🔍 [PublicEventDetailPage] RENDERING - pathname:', location.pathname, 'slug:', slug);
 
