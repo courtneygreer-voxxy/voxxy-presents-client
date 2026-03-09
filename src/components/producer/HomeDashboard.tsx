@@ -52,6 +52,14 @@ interface DashboardStats {
   missingPayments: number;
 }
 
+interface CategoryStat {
+  name: string;
+  applied: number;
+  unreviewed: number;
+  paid: number;
+  unpaid: number;
+}
+
 interface BulletinAuthor {
   id: number;
   name: string;
@@ -84,6 +92,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   const [copiedLink, setCopiedLink] = useState<'application' | 'vendor' | null>(null);
   const [copiedApplicationId, setCopiedApplicationId] = useState<number | null>(null);
   const [isCreateBulletinModalOpen, setIsCreateBulletinModalOpen] = useState(false);
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
+  const [showAllBulletins, setShowAllBulletins] = useState(false);
 
   // Ticket link edit state
   const [isEditingTicketLink, setIsEditingTicketLink] = useState(false);
@@ -116,16 +126,28 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
       // Save applications to state
       setVendorApplications(applications);
 
-      // Fetch all submissions
+      // Fetch all submissions and build per-category stats
       let allSubmissions: any[] = [];
+      const perCategoryStats: CategoryStat[] = [];
       for (const app of applications) {
         try {
           const submissions = await vendorApplicationsApi.getSubmissions(app.id);
           allSubmissions.push(...submissions);
+          const catApproved = submissions.filter(
+            (s: any) => s.status === 'approved' || s.status === 'confirmed'
+          );
+          perCategoryStats.push({
+            name: app.name,
+            applied: submissions.length,
+            unreviewed: submissions.filter((s: any) => s.status === 'pending').length,
+            paid: catApproved.filter((s: any) => s.payment_status === 'paid').length,
+            unpaid: catApproved.filter((s: any) => s.payment_status !== 'paid').length,
+          });
         } catch (err) {
           console.error(`Failed to fetch submissions for app ${app.id}`);
         }
       }
+      setCategoryStats(perCategoryStats);
 
       const applied = allSubmissions.length;
       const newUnreviewed = allSubmissions.filter((sub) => sub.status === 'pending').length;
@@ -151,9 +173,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
       );
       setScheduledEmails(upcomingEmails.slice(0, 4));
 
-      // Set bulletins (limit to 3 most recent)
+      // Set bulletins (all, sorted newest first)
       const bulletinsArray = Array.isArray(bulletinsRes) ? bulletinsRes : ('bulletins' in bulletinsRes ? bulletinsRes.bulletins : []);
-      setBulletins(bulletinsArray.slice(0, 3));
+      bulletinsArray.sort((a: Bulletin, b: Bulletin) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+      setBulletins(bulletinsArray);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
     } finally {
@@ -290,11 +315,18 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
   return (
     <div className="p-3 md:p-4">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+      {/* Stats Cards + Go Live */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+        {/* Go Live */}
+        <GoLiveCard
+          event={event}
+          onGoLive={handleRefresh}
+          organizationId={organizationId}
+        />
+
         {/* Applied */}
         <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-purple-500/20">
               <ClipboardList className="w-4 h-4 text-purple-400" />
             </div>
@@ -303,11 +335,21 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               <p className="text-[10px] text-white/60">Applied</p>
             </div>
           </div>
+          {categoryStats.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+              {categoryStats.map((cat) => (
+                <div key={cat.name} className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.applied}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* New / Unreviewed */}
         <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-yellow-500/20">
               <Eye className="w-4 h-4 text-yellow-400" />
             </div>
@@ -316,11 +358,21 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               <p className="text-[10px] text-white/60">New / Unreviewed</p>
             </div>
           </div>
+          {categoryStats.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+              {categoryStats.map((cat) => (
+                <div key={cat.name} className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unreviewed}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Approved & Paid */}
         <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-green-500/20">
               <CheckCircle className="w-4 h-4 text-green-400" />
             </div>
@@ -329,11 +381,21 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               <p className="text-[10px] text-white/60">Approved & Paid</p>
             </div>
           </div>
+          {categoryStats.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+              {categoryStats.map((cat) => (
+                <div key={cat.name} className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.paid}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Missing Payments */}
         <div className="glass-card p-3">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2">
             <div className="p-2 rounded-lg bg-red-500/20">
               <DollarSign className="w-4 h-4 text-red-400" />
             </div>
@@ -342,6 +404,16 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               <p className="text-[10px] text-white/60">Missing Payments</p>
             </div>
           </div>
+          {categoryStats.length > 0 && (
+            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+              {categoryStats.map((cat) => (
+                <div key={cat.name} className="flex items-center justify-between">
+                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unpaid}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
@@ -349,12 +421,6 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Left Column - Upcoming Emails & Bulletins */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Go Live Card */}
-          <GoLiveCard
-            event={event}
-            onGoLive={handleRefresh}
-            organizationId={organizationId}
-          />
           {/* Upcoming Emails */}
           <div className="glass-card p-3">
             <div className="flex items-center justify-between mb-3">
@@ -406,13 +472,23 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 <h3 className="text-sm font-semibold text-white">Bulletin Board</h3>
                 <span className="text-[10px] text-white/40">({bulletins.length})</span>
               </div>
-              <button
-                onClick={() => setIsCreateBulletinModalOpen(true)}
-                className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs font-medium hover:shadow-lg transition-smooth flex items-center gap-1"
-              >
-                <MessageSquare className="w-3 h-3" />
-                Create Bulletin
-              </button>
+              <div className="flex items-center gap-2">
+                {bulletins.length > 3 && (
+                  <button
+                    onClick={() => setShowAllBulletins(!showAllBulletins)}
+                    className="text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                  >
+                    {showAllBulletins ? 'Show Less' : 'View All →'}
+                  </button>
+                )}
+                <button
+                  onClick={() => setIsCreateBulletinModalOpen(true)}
+                  className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs font-medium hover:shadow-lg transition-smooth flex items-center gap-1"
+                >
+                  <MessageSquare className="w-3 h-3" />
+                  Create Bulletin
+                </button>
+              </div>
             </div>
 
             {bulletins.length === 0 ? (
@@ -420,8 +496,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 Post updates for your vendors
               </p>
             ) : (
-              <div className="space-y-3">
-                {bulletins.map((bulletin) => (
+              <div className={`space-y-3 ${showAllBulletins ? 'max-h-[400px] overflow-y-auto pr-1' : ''}`}>
+                {(showAllBulletins ? bulletins : bulletins.slice(0, 3)).map((bulletin) => (
                   <div
                     key={bulletin.id}
                     className={`p-3 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border transition-smooth ${
@@ -477,11 +553,11 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
         {/* Right Column - Event Details */}
         <div className="glass-card p-3">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-purple-400" />
-              <h3 className="text-sm font-semibold text-white">Event Details</h3>
-            </div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-purple-400" />
+                <h3 className="text-sm font-semibold text-white">Event Details</h3>
+              </div>
             <button
               onClick={() => onNavigateToTab?.('settings')}
               className="text-xs text-purple-400 hover:text-purple-300 transition-smooth flex items-center gap-1"
