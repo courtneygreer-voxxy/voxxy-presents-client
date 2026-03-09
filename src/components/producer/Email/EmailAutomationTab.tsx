@@ -477,13 +477,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
             </button>
-          </div>
-        </div>
-
-        {/* Auto-refresh toggle and stats */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-white/5 rounded-lg border border-white/10">
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 cursor-pointer group">
+            <label className="flex items-center gap-1.5 cursor-pointer" title="Auto-refresh every 30s">
               <div className="relative">
                 <input
                   type="checkbox"
@@ -491,34 +485,12 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                   onChange={(e) => setAutoRefresh(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-white/10 rounded-full peer-checked:bg-gradient-to-r peer-checked:from-purple-600 peer-checked:to-blue-500 transition-all"></div>
-                <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                <div className="w-8 h-4 bg-white/10 rounded-full peer-checked:bg-purple-600 transition-all"></div>
+                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
               </div>
-              <span className="text-sm text-white/80 group-hover:text-white transition-colors">
-                Auto-refresh delivery stats
-              </span>
+              <span className="text-[10px] text-white/50">Auto</span>
             </label>
-            {autoRefresh && (
-              <span className="text-xs text-white/40">
-                Updates every 30s
-              </span>
-            )}
           </div>
-          {lastRefreshTime && (
-            <div className="text-xs text-white/40 flex items-center gap-2">
-              {isRefreshing && (
-                <span className="flex items-center gap-1">
-                  <Loader2 className="w-3 h-3 animate-spin" />
-                  Updating...
-                </span>
-              )}
-              {!isRefreshing && (
-                <span>
-                  Last updated: {lastRefreshTime.toLocaleTimeString()}
-                </span>
-              )}
-            </div>
-          )}
         </div>
       </div>
 

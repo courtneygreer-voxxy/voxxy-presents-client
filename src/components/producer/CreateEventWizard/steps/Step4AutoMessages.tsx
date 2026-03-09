@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Mail, ChevronDown, ChevronUp, Eye, Edit, Users, Plus, Calendar, Clock } from 'lucide-react';
+import { Mail, Eye } from 'lucide-react';
 import { format, addDays, subDays, parseISO } from 'date-fns';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
-import ImportTemplateModal from '../ImportTemplateModal';
 import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 import { DebugPanel } from '../../DebugPanel';
 
@@ -111,25 +110,25 @@ export default function Step4AutoMessages({
   paymentDeadline,
   isAdmin
 }: Step4AutoMessagesProps) {
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
   const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
+  const [allTemplates, setAllTemplates] = useState<EmailCampaignTemplate[]>([]);
   const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchDefaultTemplate();
+    fetchTemplates();
   }, []);
 
-  const fetchDefaultTemplate = async () => {
+  const fetchTemplates = async () => {
     try {
       setLoading(true);
       const templates = await emailCampaignTemplatesApi.getAll();
-      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'system');
+      setAllTemplates(templates);
 
+      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'system');
       if (defaultTemplate) {
-        // Fetch full template with email items
         const fullTemplate = await emailCampaignTemplatesApi.getById(defaultTemplate.id);
         setSelectedTemplate(fullTemplate);
         setEmailItems(fullTemplate.email_template_items || []);
@@ -139,13 +138,16 @@ export default function Step4AutoMessages({
         }
       }
     } catch (err) {
-      console.error('Failed to fetch template:', err);
+      console.error('Failed to fetch templates:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleTemplateSelect = async (template: EmailCampaignTemplate) => {
+  const handleTemplateChange = async (templateId: number) => {
+    const template = allTemplates.find((t) => t.id === templateId);
+    if (!template) return;
+
     try {
       setLoading(true);
       const fullTemplate = await emailCampaignTemplatesApi.getById(template.id);
@@ -187,26 +189,29 @@ export default function Step4AutoMessages({
             Review and select automated email sequence for your event
           </p>
 
-          {/* Current Template Display & Change Button */}
-          <div className="flex items-center justify-between bg-white/10 rounded-lg p-4 border border-white/20">
-            <div>
-              <p className="text-xs text-white/50 mb-1">Email Sequence</p>
-              <p className="text-white font-medium">
-                {selectedTemplate ? selectedTemplate.name : 'No template selected'}
-              </p>
-              {selectedTemplate && (
-                <p className="text-xs text-white/50 mt-1">
-                  {emailItems.length} {emailItems.length === 1 ? 'email' : 'emails'}
-                </p>
-              )}
-            </div>
-            <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-colors flex items-center gap-2 font-medium shadow-lg"
+          {/* Email Sequence Selector */}
+          <div className="flex items-center gap-3">
+            <p className="text-xs text-white/50 flex-shrink-0">Email Sequence</p>
+            <select
+              value={selectedTemplate?.id || ''}
+              onChange={(e) => {
+                const id = Number(e.target.value);
+                if (id) handleTemplateChange(id);
+              }}
+              className="flex-1 px-3 py-2 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/15 transition-all"
             >
-              <Plus className="w-4 h-4" />
-              {selectedTemplate ? 'Change Sequence' : 'Select Sequence'}
-            </button>
+              <option value="" disabled>Select a sequence...</option>
+              {allTemplates.map((t) => (
+                <option key={t.id} value={t.id}>
+                  {t.name}{t.is_default ? ' (Default)' : ''}
+                </option>
+              ))}
+            </select>
+            {selectedTemplate && (
+              <span className="text-[10px] text-white/40 flex-shrink-0 tabular-nums">
+                {emailItems.length} {emailItems.length === 1 ? 'email' : 'emails'}
+              </span>
+            )}
           </div>
         </div>
 
@@ -221,94 +226,64 @@ export default function Step4AutoMessages({
             <p className="text-white/50 text-sm">No template selected. Click "Select Template" to choose one.</p>
           </div>
         ) : (
-          /* Email List - Table View */
-          <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-            {/* Table Header */}
-            <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-12 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
-              <div className="col-span-3">Trigger Type</div>
-              <div className="col-span-4">Email</div>
-              <div className="col-span-3">Send Date</div>
-              <div className="col-span-2 text-right">Actions</div>
-            </div>
-
-            {/* Table Body */}
-            <div className="divide-y divide-white/10">
-              {[...emailItems].sort((a, b) => (a.position ?? 0) - (b.position ?? 0)).map((email: EmailTemplateItem) => {
-                const sendDate = calculateSendDate(
-                  email.trigger_type,
-                  email.trigger_value ?? null,
-                  eventDate,
-                  applicationDeadline,
-                  paymentDeadline
-                );
-
-                return (
-                  <div
-                    key={email.id}
-                    className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-12 gap-4 items-center"
-                  >
-                    {/* Trigger Type */}
-                    <div className="col-span-3 text-sm text-white/80">
-                      {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
-                    </div>
-
-                    {/* Email Name & Subject */}
-                    <div className="col-span-4 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
-                        {!email.enabled_by_default && (
-                          <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
-                            Auto
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
-                    </div>
-
-                    {/* Send Date */}
-                    <div className="col-span-3">
-                      {sendDate ? (
-                        <div className="flex items-center gap-1.5 text-sm text-white/80">
-                          <Calendar className="w-3.5 h-3.5 text-purple-400" />
-                          <span>{sendDate}</span>
-                        </div>
-                      ) : (
-                        <span className="text-xs text-white/40">Not calculated</span>
-                      )}
-                    </div>
-
-                    {/* Actions */}
-                    <div className="col-span-2 flex justify-end gap-2">
-                      <button
-                        onClick={() => handlePreviewEmail(email)}
-                        className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
-                        title="Preview email"
-                      >
-                        <Eye className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => alert('Edit features coming soon')}
-                        className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
-                        title="Edit email"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                    </div>
+          /* Email List - Grouped by Category */
+          <div className="space-y-4">
+            {Object.entries(
+              [...emailItems]
+                .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
+                .reduce((groups, item) => {
+                  const cat = item.category || 'system';
+                  if (!groups[cat]) groups[cat] = [];
+                  groups[cat].push(item);
+                  return groups;
+                }, {} as Record<string, EmailTemplateItem[]>)
+            )
+              .sort(([a], [b]) => (CATEGORY_CONFIG[a as EmailCategory]?.order ?? 99) - (CATEGORY_CONFIG[b as EmailCategory]?.order ?? 99))
+              .map(([category, items]) => (
+                <div key={category}>
+                  <div className="flex items-center gap-2 mb-1.5 px-1">
+                    <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                      {CATEGORY_CONFIG[category as EmailCategory]?.label || category}
+                    </h3>
+                    <span className="text-[10px] text-white/30 tabular-nums">{items.length}</span>
                   </div>
-                );
-              })}
-            </div>
+                  <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
+                    {items.map((email) => {
+                      const sendDate = calculateSendDate(
+                        email.trigger_type,
+                        email.trigger_value ?? null,
+                        eventDate,
+                        applicationDeadline,
+                        paymentDeadline
+                      );
+                      return (
+                        <div key={email.id} className="flex items-center gap-3 py-2.5 px-3">
+                          <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                          <span className="text-sm text-white truncate flex-1">{email.name}</span>
+                          <span className="text-[10px] text-white/40 flex-shrink-0 hidden sm:inline">
+                            {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
+                          </span>
+                          {sendDate && (
+                            <span className="text-[10px] text-white/40 tabular-nums flex-shrink-0 hidden md:inline">
+                              {sendDate}
+                            </span>
+                          )}
+                          <button
+                            onClick={() => handlePreviewEmail(email)}
+                            className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                            title="Preview email"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
           </div>
         )}
       </div>
-
-      {/* Import Template Modal */}
-      <ImportTemplateModal
-        isOpen={isImportModalOpen}
-        onClose={() => setIsImportModalOpen(false)}
-        onSelect={handleTemplateSelect}
-        currentTemplateId={selectedTemplate?.id}
-      />
 
       {/* Email Preview Modal */}
       {previewEmail && (

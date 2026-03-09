@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, FileText, Calendar, Eye, Send, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
+import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
 import { useAuth } from '@/contexts/AuthContext';
@@ -284,26 +284,84 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         {/* All Sequences */}
         {!isLoading && !error && templates.length > 0 && (
           <div>
-            <div className="flex items-center gap-2 mb-3">
-              <Mail className="w-4 h-4 text-purple-400" />
-              <h2 className="text-base font-semibold text-white">All Sequences</h2>
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
-                {templates.length}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {templates.map(template => (
-                <TemplateCard
-                  key={template.id}
-                  template={template}
-                  onEdit={() => onNavigateToBuilder?.(template.id)}
-                  onClone={() => handleClone(template)}
-                  onDelete={() => handleDelete(template)}
-                  onPreview={() => handlePreview(template)}
-                  deleteConfirm={deleteConfirmId === template.id}
-                  isAdmin={isAdmin}
-                />
-              ))}
+            <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
+              {templates.map(template => {
+                const isDefault = template.is_default;
+                const isSystem = template.template_type === 'system';
+                const canDelete = !isDefault && (template.template_type === 'user' || isAdmin);
+
+                return (
+                  <div
+                    key={template.id}
+                    className={`flex items-center gap-3 py-3 px-4 ${
+                      isDefault ? 'bg-yellow-500/[0.03]' : ''
+                    }`}
+                  >
+                    <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-white font-medium truncate">{template.name}</span>
+                        {isDefault && (
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex-shrink-0">
+                            Default
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-[10px] text-white/40 mt-0.5">
+                        <span>{template.email_count || 0} emails</span>
+                        {template.events_count > 0 && (
+                          <>
+                            <span className="text-white/20">·</span>
+                            <span>{template.events_count} events</span>
+                          </>
+                        )}
+                        {template.description && (
+                          <>
+                            <span className="text-white/20">·</span>
+                            <span className="truncate">{template.description}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={() => onNavigateToBuilder?.(template.id)}
+                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        title={isSystem ? 'View sequence' : 'Edit sequence'}
+                      >
+                        <Edit className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handlePreview(template)}
+                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        title="Preview emails"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleClone(template)}
+                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        title="Clone sequence"
+                      >
+                        <Copy className="w-3.5 h-3.5" />
+                      </button>
+                      {canDelete && (
+                        <button
+                          onClick={() => handleDelete(template)}
+                          className={`p-1.5 rounded transition-all ${
+                            deleteConfirmId === template.id
+                              ? 'text-red-400 bg-red-500/10'
+                              : 'text-white/30 hover:text-red-400 hover:bg-white/10'
+                          }`}
+                          title={deleteConfirmId === template.id ? 'Click again to confirm' : 'Delete sequence'}
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -562,106 +620,3 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   );
 }
 
-interface TemplateCardProps {
-  template: EmailCampaignTemplate;
-  onEdit: () => void;
-  onClone: () => void;
-  onDelete: () => void;
-  onPreview: () => void;
-  deleteConfirm: boolean;
-  isAdmin: boolean;
-}
-
-function TemplateCard({ template, onEdit, onClone, onDelete, onPreview, deleteConfirm, isAdmin }: TemplateCardProps) {
-  const isSystem = template.template_type === 'system';
-  const isDefault = template.is_default;
-
-  // Can delete if: (1) Not default, AND (2) Either user template OR (admin + system template)
-  const canDelete = !isDefault && (template.template_type === 'user' || isAdmin);
-
-  return (
-    <div className={`p-4 rounded-lg border transition-all group ${
-      isDefault
-        ? 'border-yellow-500/50 bg-gradient-to-br from-yellow-500/5 via-white/5 to-white/5 hover:border-yellow-500/70 hover:shadow-lg hover:shadow-yellow-500/20'
-        : 'border-white/10 bg-white/5 hover:bg-white/[0.07]'
-    }`}>
-      {/* Header */}
-      <div className="flex items-start justify-between mb-2">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="text-sm font-medium text-white truncate">
-              {template.name}
-            </h3>
-            {isDefault && (
-              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex-shrink-0 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
-                Default
-              </span>
-            )}
-          </div>
-          {template.description && (
-            <p className="text-xs text-white/60 line-clamp-2 mb-2">
-              {template.description}
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="flex items-center gap-4 text-xs text-white/50 mb-3">
-        <div className="flex items-center gap-1">
-          <Mail className="w-3.5 h-3.5" />
-          <span>{template.email_count || 0} emails</span>
-        </div>
-        {template.events_count > 0 && (
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3.5 h-3.5" />
-            <span>{template.events_count} events</span>
-          </div>
-        )}
-      </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={onEdit}
-          className="flex-1 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-1.5"
-          title={isSystem ? 'View sequence details' : 'Edit sequence'}
-        >
-          <Edit className="w-3.5 h-3.5" />
-          {isSystem ? 'View' : 'Edit'}
-        </button>
-        <button
-          onClick={onPreview}
-          className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all flex items-center gap-1.5"
-          title="Preview all emails in this sequence"
-        >
-          <Eye className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Preview</span>
-        </button>
-        <button
-          onClick={onClone}
-          className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all flex items-center gap-1.5"
-          title="Create a copy of this sequence"
-        >
-          <Copy className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Clone</span>
-        </button>
-        {canDelete && (
-          <button
-            onClick={onDelete}
-            className={`px-3 py-1.5 rounded-lg border text-sm transition-all flex items-center gap-1.5 ${
-              deleteConfirm
-                ? 'bg-red-500/20 border-red-500/40 text-red-400 hover:bg-red-500/30'
-                : 'bg-white/5 border-white/10 text-white/60 hover:text-red-400 hover:border-red-500/40'
-            }`}
-            title={deleteConfirm ? 'Click again to confirm deletion' : 'Delete this sequence'}
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{deleteConfirm ? 'Confirm' : 'Delete'}</span>
-          </button>
-        )}
-      </div>
-    </div>
-  );
-}

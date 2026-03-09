@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, ClipboardList, Settings, Info, Mail, DollarSign } from 'lucide-react';
+import { ArrowLeft, ClipboardList, Settings, Info, Mail } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import EventSettings from './EventSettings';
 import ApplicantsTab from './ApplicantsTab';
 import EventDetailsTab from './EventDetailsTab';
 import { EmailAutomationTab } from './Email';
-import { PaymentSettingsTab } from './PaymentIntegrations';
 
 interface Event {
   id: number;
@@ -45,7 +44,7 @@ interface CommandCenterProps {
   organizationId?: number;
 }
 
-type Tab = 'details' | 'applicants' | 'emails' | 'payments' | 'settings';
+type Tab = 'details' | 'applicants' | 'emails' | 'settings';
 
 export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEvent, onRefreshEvent, organizationId }: CommandCenterProps) {
   const [activeTab, setActiveTab] = useState<Tab>('details');
@@ -56,7 +55,6 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
     { id: 'details' as Tab, label: 'Home', icon: Info },
     { id: 'applicants' as Tab, label: 'Vendors', icon: ClipboardList },
     { id: 'emails' as Tab, label: 'Mail', icon: Mail },
-    { id: 'payments' as Tab, label: 'Payments', icon: DollarSign },
     { id: 'settings' as Tab, label: 'Settings', icon: Settings },
   ];
 
@@ -77,8 +75,6 @@ export default function CommandCenter({ event, onBack, onUpdateEvent, onDeleteEv
         return <ApplicantsTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
       case 'emails':
         return <EmailAutomationTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
-      case 'payments':
-        return <PaymentSettingsTab eventSlug={event.slug} organizationId={organizationId || 1} event={event} isAdmin={isAdmin} />;
       case 'settings':
         return (
           <EventSettings

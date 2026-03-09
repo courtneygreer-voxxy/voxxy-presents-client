@@ -264,7 +264,6 @@ export default function EventsList({
           filteredAndSortedEvents.map((event) => {
             const badge = getStatusBadge(event);
             const applicantCount = event.capacity?.registered || event.registered_count || 0;
-            const acceptedCount = Math.floor(applicantCount * 0.6); // Mock calculation
 
             return (
               <div
@@ -305,8 +304,6 @@ export default function EventsList({
                       )}
                       <span className="text-white/30">•</span>
                       <span>{applicantCount} applicants</span>
-                      <span className="text-white/30">•</span>
-                      <span>{acceptedCount} accepted</span>
                     </div>
                   </div>
 
