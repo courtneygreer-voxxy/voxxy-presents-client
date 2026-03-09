@@ -18,6 +18,7 @@ import {
   ChevronDown,
   ChevronUp,
   DollarSign,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
@@ -1292,24 +1293,16 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             {/* Header */}
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-lg bg-purple-500/20">
-                <Mail className="w-5 h-5 text-purple-400" />
+                <ArrowLeftRight className="w-5 h-5 text-purple-400" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-white mb-1">
-                  Change Category?
+                  Reassign Category?
                 </h3>
                 <p className="text-sm text-white/60">
-                  This will send an automated email notification
+                  This may affect pricing. You can notify the vendor in the next step.
                 </p>
               </div>
-            </div>
-
-            {/* Warning */}
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
-              <p className="text-xs text-orange-400">
-                <strong>⚠️ Email will be sent to:</strong><br />
-                {pendingCategoryChange.applicant.email}
-              </p>
             </div>
 
             {/* Category Change Info */}
@@ -1340,7 +1333,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 onClick={confirmCategoryChange}
                 className="flex-1 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-smooth"
               >
-                Confirm & Send Email
+                Reassign Category
               </button>
             </div>
           </div>

@@ -127,7 +127,7 @@ export function useEmailNotifications(): UseEmailNotificationsReturn {
       case 'payment_confirmed':
         return 'Send Payment Confirmation?'
       case 'category_changed':
-        return 'Send Category Change Notification?'
+        return 'Notify Vendor of Category Change?'
       default:
         return 'Send Email Notification?'
     }

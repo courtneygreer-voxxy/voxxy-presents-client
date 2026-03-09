@@ -12,6 +12,7 @@ import {
   Building2,
   Megaphone,
   Pin,
+  Eye,
 } from 'lucide-react';
 import {
   verifyPortalAccess,
@@ -21,14 +22,16 @@ import {
   clearPortalSession,
   hasActiveSession,
 } from '@/services/eventPortalService';
+import { useAuth } from '@/contexts/AuthContext';
+import { eventsApi, vendorApplicationsApi, bulletinsApi } from '@/services/api';
 import type { EventPortalData } from '@/types/eventPortal';
 import type { Bulletin } from '@/types/bulletin';
-import { bulletinsApi } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 
 export default function VendorEventPortalPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const { isAuthenticated: isLoggedIn, isProducer, isAdmin } = useAuth();
 
   // Extract identifier from path: /portal/[identifier] or /portal/[org-slug]-[org_id]/[event-slug]-[event_id]
   const portalIdentifier = location.pathname.replace('/portal/', '');
@@ -44,6 +47,7 @@ export default function VendorEventPortalPage() {
   const [email, setEmail] = useState('');
   const [verifying, setVerifying] = useState(false);
   const [authError, setAuthError] = useState<string | null>(null);
+  const [isProducerPreview, setIsProducerPreview] = useState(false);
 
   // Portal data state
   const [portalData, setPortalData] = useState<EventPortalData | null>(null);
@@ -64,12 +68,18 @@ export default function VendorEventPortalPage() {
       return;
     }
 
+    // Producer/admin bypass: skip email gate, fetch via authenticated APIs
+    if (isLoggedIn && (isProducer || isAdmin)) {
+      loadPortalDataAsProducer();
+      return;
+    }
+
     // Check if user already has an active session
     if (eventSlug && hasActiveSession(eventSlug)) {
       setIsAuthenticated(true);
       loadPortalData();
     }
-  }, [portalIdentifier, eventSlug, searchParams]);
+  }, [portalIdentifier, eventSlug, searchParams, isLoggedIn, isProducer, isAdmin]);
 
   const handleAccessPortal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,6 +135,89 @@ export default function VendorEventPortalPage() {
         setIsAuthenticated(false);
         clearPortalSession();
       }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Producer bypass: load portal data using authenticated producer APIs
+  const loadPortalDataAsProducer = async () => {
+    try {
+      setLoading(true);
+      setIsAuthenticated(true);
+      setIsProducerPreview(true);
+
+      let slug = eventSlug;
+
+      // For token-based URLs, resolve the token to an event slug
+      if (isToken && accessToken) {
+        const events = await eventsApi.getAll();
+        const matchingEvent = (events as any[]).find(
+          (e: any) => e.event_portal?.access_token === accessToken
+        );
+        if (matchingEvent) {
+          slug = matchingEvent.namespaced_slug || matchingEvent.slug;
+        } else {
+          throw new Error('Could not find event for this portal link');
+        }
+      }
+
+      if (!slug) {
+        throw new Error('Could not determine event');
+      }
+
+      // Fetch event data, vendor applications, and bulletins in parallel
+      const [eventData, vendorApps, bulletinsResponse] = await Promise.all([
+        eventsApi.getById(slug),
+        vendorApplicationsApi.getByEvent(slug).catch(() => []),
+        bulletinsApi.getByEvent(slug).catch(() => ({ bulletins: [] })),
+      ]);
+
+      // Map to EventPortalData shape
+      const data: EventPortalData = {
+        id: eventData.id,
+        view_count: eventData.event_portal?.view_count || 0,
+        last_viewed_at: null,
+        event: {
+          id: eventData.id,
+          title: eventData.title,
+          slug: eventData.slug,
+          description: eventData.description || '',
+          dates: {
+            event_date: eventData.event_date,
+            event_end_date: eventData.event_end_date || null,
+            start_time: eventData.start_time || null,
+            end_time: eventData.end_time || null,
+          },
+          venue: eventData.venue || '',
+          location: eventData.location || '',
+          age_restriction: eventData.age_restriction || null,
+          ticket_url: eventData.ticket_url || eventData.ticket_link || null,
+          application_deadline: eventData.application_deadline || null,
+          payment_deadline: eventData.payment_deadline || null,
+          organization: eventData.organization || null,
+        },
+        vendor_categories: (Array.isArray(vendorApps) ? vendorApps : []).map((app: any) => ({
+          id: app.id,
+          name: app.name,
+          description: app.description || '',
+          categories: app.categories || [],
+          booth_price: app.pricing?.booth_price || app.booth_price || null,
+          payment_link: app.payment_link || null,
+          install: {
+            install_date: app.install_date || null,
+            install_start_time: app.install_start_time || null,
+            install_end_time: app.install_end_time || null,
+          },
+          application_tags: app.application_tags || [],
+        })),
+        producer_updates: (bulletinsResponse as any)?.bulletins || [],
+      };
+
+      setPortalData(data);
+    } catch (error: any) {
+      console.error('Producer portal preview error:', error);
+      setDataError(error.message || 'Failed to load portal preview');
     } finally {
       setLoading(false);
     }
@@ -343,19 +436,31 @@ export default function VendorEventPortalPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
       <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16 py-8">
+        {/* Producer Preview Banner */}
+        {isProducerPreview && (
+          <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-3 mb-6 flex items-center gap-2">
+            <Eye className="w-4 h-4 text-purple-400 flex-shrink-0" />
+            <p className="text-sm text-purple-200">
+              <span className="font-semibold">Producer Preview</span> — This is how vendors see your event portal.
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="mb-6 md:mb-8">
           <div className="flex items-center justify-between mb-3 md:mb-4">
             <h1 className="text-2xl md:text-4xl font-bold">{event.title}</h1>
-            <button
-              onClick={() => {
-                clearPortalSession();
-                setIsAuthenticated(false);
-              }}
-              className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors"
-            >
-              Sign Out
-            </button>
+            {!isProducerPreview && (
+              <button
+                onClick={() => {
+                  clearPortalSession();
+                  setIsAuthenticated(false);
+                }}
+                className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
           {event.organization && (
             <div className="flex items-center gap-2 text-gray-400 text-sm">

@@ -38,46 +38,55 @@ export function EmailConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 border border-white/10">
         <AlertDialogHeader>
-          <div className="flex items-center gap-2">
-            {isHighPriority ? (
-              <AlertTriangle className="h-5 w-5 text-red-500" />
-            ) : (
-              <Mail className="h-5 w-5 text-purple-600" />
-            )}
-            <AlertDialogTitle>{title}</AlertDialogTitle>
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${isHighPriority ? 'bg-red-500/20' : 'bg-purple-500/20'}`}>
+              {isHighPriority ? (
+                <AlertTriangle className="h-5 w-5 text-red-400" />
+              ) : (
+                <Mail className="h-5 w-5 text-purple-400" />
+              )}
+            </div>
+            <AlertDialogTitle className="text-white">{title}</AlertDialogTitle>
           </div>
-          <AlertDialogDescription className="space-y-4">
-            <p className="text-sm text-gray-700">{warning}</p>
+          <AlertDialogDescription asChild>
+            <div className="space-y-3 pt-2">
+              <p className="text-sm text-white/60">{warning}</p>
 
-            {isBulkEmail && (
-              <div className="flex items-center gap-2 rounded-md bg-purple-50 p-3 text-sm">
-                <Users className="h-4 w-4 text-purple-600" />
-                <span className="text-purple-900 font-medium">
-                  {recipientCount} {recipientCount === 1 ? 'recipient' : 'recipients'} will receive this email
-                </span>
-              </div>
-            )}
+              {isBulkEmail && (
+                <div className="flex items-center gap-2 rounded-lg bg-purple-500/10 border border-purple-500/20 p-3 text-sm">
+                  <Users className="h-4 w-4 text-purple-400" />
+                  <span className="text-purple-300 font-medium">
+                    {recipientCount} {recipientCount === 1 ? 'recipient' : 'recipients'} will receive this email
+                  </span>
+                </div>
+              )}
 
-            {recipientEmail && (
-              <div className="flex items-center gap-2 rounded-md bg-blue-50 p-3 text-sm">
-                <Mail className="h-4 w-4 text-blue-600" />
-                <span className="text-blue-900 font-medium">
-                  Recipient: {recipientEmail}
-                </span>
-              </div>
-            )}
+              {recipientEmail && (
+                <div className="flex items-center gap-2 rounded-lg bg-blue-500/10 border border-blue-500/20 p-3 text-sm">
+                  <Mail className="h-4 w-4 text-blue-400" />
+                  <span className="text-blue-300 font-medium">
+                    Recipient: {recipientEmail}
+                  </span>
+                </div>
+              )}
 
-            {isHighPriority && (
-              <div className="rounded-md bg-red-50 p-3 text-sm">
-                <p className="text-red-800 font-medium">⚠️ This action cannot be undone</p>
-              </div>
-            )}
+              {isHighPriority && (
+                <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3 text-sm">
+                  <p className="text-red-400 font-medium">This action cannot be undone</p>
+                </div>
+              )}
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel disabled={isLoading}>Cancel</AlertDialogCancel>
+        <AlertDialogFooter className="pt-2">
+          <AlertDialogCancel
+            disabled={isLoading}
+            className="border-white/20 text-white hover:bg-white/5 hover:text-white bg-transparent"
+          >
+            {type === 'category_changed' ? 'Skip Notification' : 'Cancel'}
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={(e) => {
               e.preventDefault()
@@ -86,11 +95,11 @@ export function EmailConfirmationDialog({
             disabled={isLoading}
             className={
               isHighPriority
-                ? 'bg-red-600 hover:bg-red-700 focus:ring-red-600'
-                : 'bg-purple-600 hover:bg-purple-700 focus:ring-purple-600'
+                ? 'bg-red-600 hover:bg-red-700 text-white'
+                : 'bg-purple-600 hover:bg-purple-500 text-white'
             }
           >
-            {isLoading ? 'Sending...' : isBulkEmail ? 'Yes, Send Emails' : 'Yes, Send Email'}
+            {isLoading ? 'Sending...' : type === 'category_changed' ? 'Send Notification' : isBulkEmail ? 'Yes, Send Emails' : 'Yes, Send Email'}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
