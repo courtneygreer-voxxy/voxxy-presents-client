@@ -24,7 +24,17 @@ export default function ShortLinkRedirectPage() {
           return;
         }
 
-        const applicationId = eventData.vendor_applications[0].id;
+        // Find the specific application that matches the shareable_code
+        const matchingApp = eventData.vendor_applications.find(
+          (app: any) => app.shareable_code === code
+        );
+
+        if (!matchingApp) {
+          setError('Application not found for this code');
+          return;
+        }
+
+        const applicationId = matchingApp.id;
 
         // Redirect to the vendor application form for this event
         navigate(`/events/${eventData.slug}/apply/${applicationId}`, { replace: true });

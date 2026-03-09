@@ -68,6 +68,15 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: true
   },
   {
+    label: 'Date Range',
+    frontendVar: '[dateRange]',
+    backendVar: '{{date_range}}',
+    category: 'event',
+    description: 'Formatted date range for multi-day events (e.g., "June 15-17, 2025")',
+    example: 'June 15-17, 2025',
+    worksInInvitations: true
+  },
+  {
     label: 'Event Time',
     frontendVar: '[eventTime]',
     backendVar: '{{event_time}}',
@@ -82,6 +91,24 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_location}}',
     category: 'event',
     description: 'Venue and address',
+    example: 'Piedmont Park, Atlanta, GA',
+    worksInInvitations: true
+  },
+  {
+    label: 'Event City',
+    frontendVar: '[eventCity]',
+    backendVar: '{{event_city}}',
+    category: 'event',
+    description: 'City extracted from event location',
+    example: 'Atlanta',
+    worksInInvitations: true
+  },
+  {
+    label: 'Address',
+    frontendVar: '[address]',
+    backendVar: '{{address}}',
+    category: 'event',
+    description: 'Full event location/address (same as Event Location)',
     example: 'Piedmont Park, Atlanta, GA',
     worksInInvitations: true
   },
@@ -270,15 +297,6 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: false
   },
   {
-    label: 'Category List',
-    frontendVar: '[categoryList]',
-    backendVar: '{{category_list}}',
-    category: 'vendor',
-    description: 'Bulleted list of vendor application names they applied for',
-    example: '• Art Vendor Application\n• Music Vendor Application',
-    worksInInvitations: false
-  },
-  {
     label: 'Booth Number',
     frontendVar: '[boothNumber]',
     backendVar: '{{booth_number}}',
@@ -346,7 +364,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[categoryApplicationLink]',
     backendVar: '{{category_application_link}}',
     category: 'vendor',
-    description: 'Public application URL for the specific vendor category',
+    description: 'Public application URL (same as Application Link)',
     example: 'https://voxxy.io/apply/abc123',
     worksInInvitations: true
   },
@@ -411,8 +429,26 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[applicationLink]',
     backendVar: '{{application_link}}',
     category: 'computed',
-    description: 'Link to apply for the event',
+    description: 'Link to apply for the event (uses first vendor application or falls back to event page)',
     example: 'https://voxxy.io/apply/abc123',
+    worksInInvitations: true
+  },
+  {
+    label: 'Artist Application Link',
+    frontendVar: '[artistApplicationLink]',
+    backendVar: '{{artist_application_link}}',
+    category: 'computed',
+    description: 'Link to apply for artist/gallery/wall categories',
+    example: 'https://voxxy.io/apply/artist-abc123',
+    worksInInvitations: true
+  },
+  {
+    label: 'Vendor Application Link',
+    frontendVar: '[vendorApplicationLink]',
+    backendVar: '{{vendor_application_link}}',
+    category: 'computed',
+    description: 'Link to apply for vendor/table/market categories',
+    example: 'https://voxxy.io/apply/vendor-abc123',
     worksInInvitations: true
   },
   {
@@ -420,18 +456,18 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventPortalLink]',
     backendVar: '{{event_portal_link}}',
     category: 'computed',
-    description: 'Vendor portal/dashboard link (only available after registration)',
+    description: 'Vendor portal/dashboard link (alias for Dashboard Link)',
     example: 'https://voxxy.io/portal/voxxy-presents-1/summer-market-123',
-    worksInInvitations: false
+    worksInInvitations: true
   },
   {
     label: 'Event Opt-Out Link',
     frontendVar: '[eventOptOutLink]',
     backendVar: '{{event_opt_out_link}}',
     category: 'computed',
-    description: 'Link to decline invitation for this specific event',
+    description: 'Link to decline invitation for this specific event (only available after registration)',
     example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123/opt-out',
-    worksInInvitations: true
+    worksInInvitations: false
   },
   {
     label: 'Application Code',

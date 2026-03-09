@@ -1,5 +1,11 @@
 # Invitation Email System - Quick Reference
 
+**Last Updated:** March 8, 2026
+**Format:** `[bracket]` variables
+**Total Variables Available:** 34 out of 48
+
+---
+
 ## What is Position 1?
 
 **Position 1 ("Initial Invitation")** is the email sent when invitations are created.
@@ -8,95 +14,302 @@ It's a **real ScheduledEmail** (not virtual) that:
 - Uses `on_invitation_send` trigger
 - Is in the pre_application category
 - Can be edited like any other email
-- Creates `EmailDelivery` records for tracking
+- Creates `EmailDelivery` records with `event_invitation_id` (not `registration_id`)
+- Uses `InvitationVariableResolver` (NOT `EmailVariableResolver`)
 
 ---
 
 ## When Invitations Are Sent
 
-1. Producer creates event
+1. Producer creates event with vendor applications
 2. Producer selects vendor contacts to invite
 3. `POST /api/v1/presents/events/:slug/invitations/batch` is called
 4. Backend immediately sends Position 1 email to each contact
-5. Backend creates `EmailDelivery` with `event_invitation_id` (not `registration_id`)
+5. Backend creates `EmailDelivery` with `event_invitation_id`
+6. `InvitationVariableResolver` resolves variables
 
 ---
 
-## What Variables CAN Be Used
+## What Variables CAN Be Used (34 total)
 
-### Event-Level (Same for all invitees)
+### ✅ Event Variables (14/15)
 ```
 [eventName]              → "Summer Market 2025"
-[eventDate]              → "June 15, 2025"
+[eventDate]              → "Saturday, June 15, 2025"
+[eventEndDate]           → "Sunday, June 17, 2025"
+[dateRange]              → "June 15-17, 2025"
+[eventTime]              → "10:00 AM - 6:00 PM"
 [eventLocation]          → "Piedmont Park, Atlanta, GA"
-[applicationDeadline]    → "May 30, 2025"
-[eventLink]              → Application page URL
-[organizationName]       → "Voxxy Presents"
+[eventCity]              → "Atlanta"
+[address]                → "Piedmont Park, Atlanta, GA"
+[eventVenue]             → "Piedmont Park"
+[eventDescription]       → "A family-friendly outdoor market..."
+[applicationDeadline]    → "Thursday, May 30, 2025"
+[paymentDueDate]         → "Monday, June 1, 2025"
+[ageRestriction]         → "21+"
+[categoryList]           → "• Artist Booth\n• Food Vendor\n• Beverage Vendor"
 ```
 
-### Vendor Contact Level (Personalized)
+### ✅ Organization Variables (2/2)
 ```
-[greetingName]           → "John's Tacos" or "John"
+[organizationName]       → "Voxxy Presents"
+[organizationEmail]      → "hello@voxxypresents.com"
+```
+
+### ✅ Vendor Contact Variables (10/19)
+```
+[greetingName]           → "John's Tacos" or "John" (smart!)
 [firstName]              → "John"
+[lastName]               → "Doe"
+[fullName]               → "John Doe"
 [businessName]           → "John's Tacos"
+[contactName]            → "Jane Smith"
 [email]                  → "john@example.com"
+[phone]                  → "(555) 123-4567"
+[website]                → "https://johnstacos.com"
+[categoryApplicationLink] → "https://voxxy.io/apply/abc123"
+```
+
+### ✅ Link Variables (9/12)
+```
+[eventLink]              → Public event page URL
+[invitationLink]         → Same as eventLink
+[bulletinLink]           → Event bulletin page
+[dashboardLink]          → Vendor portal URL
+[eventPortalLink]        → Same as dashboardLink
+[unsubscribeLink]        → Unsubscribe URL (REQUIRED!)
+[applicationLink]        → First application or event page
+[artistApplicationLink]  → Artist/gallery application link
+[vendorApplicationLink]  → Vendor/market application link
 ```
 
 ---
 
-## What Variables CAN'T Be Used
+## What Variables CAN'T Be Used (14 total)
 
-### Category-Specific (Don't use!)
+### ❌ Category-Specific (Don't use!)
 ```
-[boothPrice]             ❌ Unknown until they apply
+[boothPrice]             ❌ Unknown until they pick category
 [installDate]            ❌ Varies by category
 [installTime]            ❌ Varies by category
-[paymentLink]            ❌ Per-category URL
+[installStartTime]       ❌ Varies by category
+[installEndTime]         ❌ Varies by category
+[categoryDescription]    ❌ Varies by category
+[categoryPaymentLink]    ❌ Per-category URL
 ```
 
-### Registration-Level (Don't use!)
+### ❌ Registration-Level (Don't use!)
 ```
 [vendorCategory]         ❌ They haven't applied yet
 [boothNumber]            ❌ Not assigned yet
 [applicationDate]        ❌ No registration yet
+[applicationCode]        ❌ No application yet
+[paymentLink]            ❌ Per-registration URL
+[eventOptOutLink]        ❌ Post-registration only
+```
+
+**Why?** These variables require data that only exists AFTER the vendor applies!
+
+---
+
+## Best Practices for Invitations
+
+### 1. Use [categoryList] for Multi-Category Events ✅
+
+```
+Hi [greetingName],
+
+We'd love to have you at [eventName]!
+
+Available categories:
+[categoryList]
+
+Apply here: [eventLink]
+```
+
+**Result:**
+```
+Hi John's Tacos,
+
+We'd love to have you at Summer Market 2025!
+
+Available categories:
+• Artist Booth
+• Food Vendor
+• Beverage Vendor
+
+Apply here: https://voxxy.io/events/your-event
+```
+
+### 2. Use Smart Links ✅
+
+```
+Interested in applying as an artist? [artistApplicationLink]
+Food or beverage vendor? [vendorApplicationLink]
+View all options: [eventLink]
+```
+
+### 3. Personalize with [greetingName] ✅
+
+```
+Hi [greetingName], excited to invite you to [eventName]!
+```
+
+**Results:**
+- Business name: "Hi John's Tacos, excited to..."
+- First name only: "Hi John, excited to..."
+- No name: "Hi there, excited to..."
+
+### 4. Always Include Unsubscribe ✅
+
+```
+Questions? Email [organizationEmail]
+To unsubscribe: [unsubscribeLink]
+```
+
+**Note:** Footer is automatically locked to ensure this!
+
+---
+
+## Common Mistakes
+
+### ❌ WRONG: Using Post-Application Variables
+
+```
+Subject: Your [vendorCategory] booth is ready! (BLANK!)
+
+Hi [greetingName],
+
+Your booth number is [boothNumber] (BLANK!)
+Please pay [boothPrice] (BLANK!)
+```
+
+### ✅ CORRECT: Use Invitation-Safe Variables
+
+```
+Subject: You're invited to [eventName]!
+
+Hi [greetingName],
+
+Check out our available categories:
+[categoryList]
+
+Apply now: [eventLink]
 ```
 
 ---
 
 ## Solution for Multi-Category Events
 
-### Option 1: Show All Categories (Recommended)
+### ✅ Option 1: Use [categoryList] Variable (BEST)
 ```
-Dear [greetingName],
+Hi [greetingName],
 
-We're looking for vendors for [eventName]!
+We have the following options for [eventName]:
 
-Available categories:
-• Artist Booth - $100
-• Food Vendor - $200
-• Sponsor Package - $500
+[categoryList]
 
-Apply here: [eventLink]
+Each category has different pricing and setup times.
+View details and apply: [eventLink]
+
+Deadline: [applicationDeadline]
 ```
 
-### Option 2: Generic Language
+### ✅ Option 2: Provide Specific Links
 ```
-Dear [greetingName],
+Hi [greetingName],
 
-Vendor fees vary by category. Learn more and apply: [eventLink]
+Apply for [eventName]:
+
+Artists & Galleries: [artistApplicationLink]
+Food & Beverage Vendors: [vendorApplicationLink]
+View all options: [eventLink]
+```
+
+### ✅ Option 3: Generic Language
+```
+Hi [greetingName],
+
+Join us at [eventName]!
+
+Vendor fees vary by category.
+Learn more and apply: [eventLink]
+```
+
+---
+
+## Variable Resolution
+
+### InvitationVariableResolver
+
+**File:** `/app/services/invitation_variable_resolver.rb`
+
+**What it has access to:**
+- `event` - Full event record
+- `vendor_contact` - Contact being invited
+- `event.vendor_applications` - Public application info
+
+**What it resolves:**
+- ✅ 34 variables (see above lists)
+- ❌ 14 variables (post-application only)
+
+**Example:**
+```ruby
+resolver = InvitationVariableResolver.new(event, vendor_contact)
+subject = resolver.resolve("[greetingName], join us at [eventName]!")
+# => "John's Tacos, join us at Summer Market 2025!"
 ```
 
 ---
 
 ## Key Files
 
+### Frontend
 | File | Purpose |
 |------|---------|
-| `/src/utils/emailVariables.ts` | Define all variables ([eventName], etc.) |
-| `/src/types/email.ts` | EmailDelivery type (has event_invitation_id) |
+| `/src/utils/emailVariables.ts` | All 48 variables with `worksInInvitations` flags |
+| `/src/types/email.ts` | EmailDelivery type (has `event_invitation_id`) |
 | `/src/components/producer/Email/EmailAutomationTab.tsx` | Mail tab showing emails |
 | `/src/services/api.ts` | EventInvitation API calls |
 | `/src/components/shared/EventEmailPreviewModal.tsx` | Preview modal |
+
+### Backend
+| File | Purpose |
+|------|---------|
+| `/app/services/invitation_variable_resolver.rb` | Resolves 34 invitation variables |
+| `/app/services/email_variable_resolver.rb` | Resolves all 48 registration variables |
+| `/app/controllers/api/v1/presents/event_invitations_controller.rb` | Handles batch invitation sends |
+| `/app/models/email_delivery.rb` | Tracks delivery with `event_invitation_id` |
+
+---
+
+## Testing Checklist
+
+Before sending invitations:
+
+- [ ] Preview email with real contact data
+- [ ] Verify all `[variables]` resolved correctly
+- [ ] Check that `[categoryList]` shows all categories
+- [ ] Verify `[eventLink]` goes to correct page
+- [ ] Test `[artistApplicationLink]` and `[vendorApplicationLink]`
+- [ ] Confirm `[unsubscribeLink]` is present
+- [ ] Check personalization with `[greetingName]`
+- [ ] No blank spaces where variables should be
+- [ ] No post-application variables used
+
+---
+
+## Complete Documentation
+
+For more details, see:
+
+- **[EMAIL_SYSTEM_GUIDE.md](./email-system/EMAIL_SYSTEM_GUIDE.md)** - Complete system overview
+- **[EMAIL_VARIABLES_REFERENCE.md](./email-system/EMAIL_VARIABLES_REFERENCE.md)** - All 48 variables
+- **[EMAIL_EDITOR_GUIDE.md](./email-system/EMAIL_EDITOR_GUIDE.md)** - How to use the editor
+
+---
+
+**Updated:** March 8, 2026 - Complete variable alignment
 
 ---
 
