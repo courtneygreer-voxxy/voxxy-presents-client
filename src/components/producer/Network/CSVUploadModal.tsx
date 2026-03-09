@@ -74,6 +74,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      transformHeader: (header: string) => header.trim().toLowerCase().replace(/^\uFEFF/, ''),
       preview: 10, // Only parse first 10 rows for preview
       complete: (results) => {
         console.log('📊 CSV preview parsed:', {
@@ -84,11 +85,12 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
 
         const headers = results.meta.fields || [];
 
-        // Check for required headers
-        const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+        // Check for required headers (case-insensitive, already lowercased by transformHeader)
+        const normalizedHeaders = headers.map(h => h.replace(/\s+/g, '_'));
+        const missingHeaders = requiredHeaders.filter(h => !normalizedHeaders.includes(h));
         if (missingHeaders.length > 0) {
-          console.error('❌ Missing required headers:', missingHeaders);
-          setErrorMessage(`Missing required columns: ${missingHeaders.join(', ')}`);
+          console.error('❌ Missing required headers:', missingHeaders, 'Found:', headers);
+          setErrorMessage(`Missing required columns: ${missingHeaders.join(', ')}. Found columns: ${headers.join(', ')}`);
           setState('error');
           return;
         }
@@ -97,6 +99,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
         Papa.parse(file, {
           header: true,
           skipEmptyLines: true,
+          transformHeader: (header: string) => header.trim().toLowerCase().replace(/^\uFEFF/, ''),
           complete: (fullResults) => {
             console.log('✅ Full CSV parsed:', {
               totalRows: fullResults.data.length,

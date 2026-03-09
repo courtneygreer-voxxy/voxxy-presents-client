@@ -79,8 +79,8 @@ export default function ListSelector({
     return (
       <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
         <p className="text-sm text-blue-200/80">
-          You don't have any saved contact lists yet. You can create lists from the Network
-          tab to quickly select groups of contacts for future events.
+          You don't have any saved lists yet. Use the filters on the Network
+          tab to create reusable lists for quickly selecting groups of contacts.
         </p>
       </div>
     );
@@ -165,23 +165,10 @@ export default function ListSelector({
                     {/* List Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        {list.list_type === 'smart' ? (
-                          <Filter className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
-                        ) : (
-                          <Users className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                        )}
+                        <Filter className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                         <h4 className="text-sm font-medium text-white truncate">
                           {list.name}
                         </h4>
-                        <span
-                          className={`text-xs px-1.5 py-0.5 rounded flex-shrink-0 ${
-                            list.list_type === 'smart'
-                              ? 'bg-purple-500/20 text-purple-300'
-                              : 'bg-blue-500/20 text-blue-300'
-                          }`}
-                        >
-                          {list.list_type === 'smart' ? 'Smart' : 'Manual'}
-                        </span>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -203,8 +190,8 @@ export default function ListSelector({
                         )}
                       </div>
 
-                      {/* Smart List Filters Preview */}
-                      {list.list_type === 'smart' && list.filters && (
+                      {/* List Filters Preview */}
+                      {list.filters && (
                         <div className="mt-1.5 flex flex-wrap gap-1">
                           {list.filters.categories && list.filters.categories.length > 0 && (
                             <span className="text-xs px-1.5 py-0.5 bg-white/10 text-white/60 rounded">
