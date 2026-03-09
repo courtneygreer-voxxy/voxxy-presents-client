@@ -50,7 +50,7 @@
 - Default invitation templates
 - 6 prioritized recommendations
 
-**Key Takeaway:** System is well-designed but needs [categoriesList] variable for multi-category support.
+**Key Takeaway:** System is well-designed but needs [categoryList] variable for multi-category support.
 
 ---
 
@@ -84,7 +84,7 @@
 - Testing considerations
 - Conclusion and next steps
 
-**Key Takeaway:** Main gap is no [categoriesList] variable; main recommendation is to add it.
+**Key Takeaway:** Main gap is no [categoryList] variable; main recommendation is to add it.
 
 ---
 
@@ -150,12 +150,12 @@ Registration: [vendorCategory], [categoryList], [boothNumber],
 3. Let them explore via [eventLink]
 
 ### Recommended Solution
-Add [categoriesList] variable:
+Add [categoryList] variable:
 ```
 Dear [greetingName],
 
 Available categories:
-[categoriesList]
+[categoryList]
 
 Learn more: [eventLink]
 ```
@@ -229,7 +229,7 @@ Learn more: [eventLink]
 
 ### Multi-Category Testing (Future)
 - [ ] Create event with 3+ categories
-- [ ] Add [categoriesList] to Position 1 template
+- [ ] Add [categoryList] to Position 1 template
 - [ ] Preview shows all categories with prices
 - [ ] Format is clean and readable
 - [ ] Prices are correct for each category
@@ -239,7 +239,7 @@ Learn more: [eventLink]
 ## Recommendations Summary
 
 ### IMMEDIATE (Do Now)
-1. **Add [categoriesList] Variable**
+1. **Add [categoryList] Variable**
    - Priority: HIGH
    - Impact: Enables transparent multi-category invitations
    - Effort: 2-3 hours (frontend + backend)
@@ -294,7 +294,7 @@ A: It's Position 1 ("Initial Invitation") in the Mail tab. Edit it like any othe
 A: Because the invitee hasn't chosen their category yet. We don't know which price to show.
 
 **Q: How can I show all category prices in the invitation?**
-A: Use [categoriesList] (once implemented) or manually list them in the email body.
+A: Use [categoryList] (once implemented) or manually list them in the email body.
 
 **Q: Can I preview the invitation email?**
 A: Yes, click Preview on Position 1 in the Mail tab. (Currently uses generic sample data.)
@@ -316,7 +316,7 @@ A: Currently the same. [invitationLink] is just an alias for clarity in invitati
 |------|---------|--------|--------|
 | 2026-02-28 | 1.0 | Unified Position 1 system | Deployed |
 | 2026-03-04 | 1.1 | Complete analysis & documentation | Current |
-| TBD | 1.2 | Add [categoriesList] variable | Planned |
+| TBD | 1.2 | Add [categoryList] variable | Planned |
 | TBD | 2.0 | Enhanced preview & multi-category | Future |
 
 ---
@@ -344,4 +344,4 @@ A: Currently the same. [invitationLink] is just an alias for clarity in invitati
 ---
 
 **Last Reviewed:** March 4, 2026  
-**Next Review:** After [categoriesList] implementation
+**Next Review:** After [categoryList] implementation

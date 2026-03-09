@@ -151,7 +151,7 @@ Body: Hello [greetingName], You're invited to participate...
 2. List categories manually in email body
 3. Use [eventLink] to let them explore
 
-**Recommended Solution:** Add [categoriesList] variable
+**Recommended Solution:** Add [categoryList] variable
 
 ### 10. Audit Log Integration
 
@@ -178,13 +178,13 @@ Body: Hello [greetingName], You're invited to participate...
 
 ### What's Limited
 1. **No Category Context:** Invitations can't access vendor_application data
-2. **Missing Variables:** No [categoriesList] for multi-category events
+2. **Missing Variables:** No [categoryList] for multi-category events
 3. **Preview Limitations:** Can't preview with specific vendor contact
 4. **Trigger Locked:** Can't change Position 1 trigger type
 5. **No Invitation Token Link:** Can't provide direct accept/decline URL
 
 ### What Needs Enhancement
-1. Add [categoriesList] variable - HIGH PRIORITY
+1. Add [categoryList] variable - HIGH PRIORITY
 2. Improve invitation preview - MEDIUM PRIORITY
 3. Add [applicationsList] for registrations - MEDIUM PRIORITY
 4. Document resolver limitations - LOW PRIORITY
@@ -195,7 +195,7 @@ Body: Hello [greetingName], You're invited to participate...
 ## Recommendations (Prioritized)
 
 ### IMMEDIATE (Critical for multi-category support)
-1. **Add [categoriesList] Variable**
+1. **Add [categoryList] Variable**
    - Shows all categories with prices
    - Essential for transparent multi-category invitations
    - Simple backend implementation
@@ -314,7 +314,7 @@ REGISTRATION EMAIL:
 5. Check for missing variables (should be blank or error)
 
 ### To Verify Multi-Category Support (Future):
-1. Add [categoriesList] variable to template
+1. Add [categoryList] variable to template
 2. Preview with multi-category event
 3. Verify all categories and prices are shown
 4. Send test and verify formatting
@@ -327,6 +327,6 @@ The invitation system is well-designed with clear separation between invitations
 
 **Main Gap:** No built-in support for showing all categories/prices in multi-category invitations.
 
-**Main Recommendation:** Add [categoriesList] variable to enable transparent multi-category marketing.
+**Main Recommendation:** Add [categoryList] variable to enable transparent multi-category marketing.
 
 The system is ready for enhancement with the recommended improvements.

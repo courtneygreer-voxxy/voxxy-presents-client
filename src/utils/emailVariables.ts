@@ -141,8 +141,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
   },
   {
     label: 'Categories List',
-    frontendVar: '[categoriesList]',
-    backendVar: '{{categories_list}}',
+    frontendVar: '[categoryList]',
+    backendVar: '{{category_list}}',
     category: 'event',
     description: 'List of all vendor categories with prices and install times',
     example: 'Artist Booth - $150 (Setup: 8:00 AM - 10:00 AM)\nFood Vendor - $200 (Setup: 2:00 PM - 4:00 PM)',

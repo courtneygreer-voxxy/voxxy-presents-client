@@ -123,7 +123,7 @@ Vendor fees vary by category. Learn more and apply: [eventLink]
 ## Common Questions
 
 **Q: Can I use [boothPrice] in invitation emails?**
-A: No - the invitee hasn't chosen their category yet. Use [categoriesList] (once added) instead.
+A: No - the invitee hasn't chosen their category yet. Use [categoryList] instead.
 
 **Q: Why can't I see invitations in the Mail tab?**
 A: Position 1 "Initial Invitation" is in the Mail tab. Invitations are tracked separately in event_invitations table but emails are sent via Position 1.
@@ -177,7 +177,7 @@ A: Yes - click Preview on Position 1 email in Mail tab.
 ## What's Coming
 
 Planned enhancements:
-- [ ] [categoriesList] variable (shows all categories with prices)
+- [ ] [categoryList] variable (shows all categories with prices)
 - [ ] [applicationsList] variable (for registrations)
 - [ ] Invite-specific preview (select vendor contact)
 - [ ] [invitationTokenLink] for direct accept/decline

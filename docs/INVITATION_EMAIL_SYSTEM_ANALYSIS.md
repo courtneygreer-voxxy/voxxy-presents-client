@@ -440,7 +440,7 @@ const loadPreview = async () => {
 
 **New Variable (Proposal):**
 ```typescript
-[categoriesList]  → Bulleted list of all categories with prices
+[categoryList]  → Bulleted list of all categories with prices
 
 Example output:
 • Artist Booth - $100
@@ -452,7 +452,7 @@ Example output:
 ```typescript
 {
   label: 'All Categories',
-  frontendVar: '[categoriesList]',
+  frontendVar: '[categoryList]',
   backendVar: '{{categories_list}}',
   category: 'vendor',
   description: 'Bulleted list of all vendor applications with prices',
@@ -544,7 +544,7 @@ happening on [eventDate] at [eventLocation].</p>
 
 ## Recommendations
 
-### 1. Add [categoriesList] Variable (HIGH PRIORITY)
+### 1. Add [categoryList] Variable (HIGH PRIORITY)
 
 **Purpose:** Support multi-category invitation emails
 
@@ -553,7 +553,7 @@ happening on [eventDate] at [eventLocation].</p>
 // In emailVariables.ts
 {
   label: 'Categories List',
-  frontendVar: '[categoriesList]',
+  frontendVar: '[categoryList]',
   backendVar: '{{categories_list}}',
   category: 'vendor',
   description: 'Bulleted list of all vendor applications with their prices',
@@ -576,7 +576,7 @@ Subject: You're invited to [eventName]!
 
 Available vendor categories:
 
-[categoriesList]
+[categoryList]
 
 Learn more and apply: [eventLink]
 ```
@@ -689,7 +689,7 @@ trigger_types: [
 
 1. **Position 1 is the invitation email** - no special virtual email handling
 2. **Invitations lack category context** - can't resolve category-specific variables
-3. **[categoriesList] should be added** - supports multi-category marketing
+3. **[categoryList] should be added** - supports multi-category marketing
 4. **Preview mode needs vendor selection** - currently uses generic samples
 5. **EmailDelivery supports both** - registration_id OR event_invitation_id (not both)
 6. **Variable resolver differs** - `InvitationVariableResolver` vs `RegistrationVariableResolver`
