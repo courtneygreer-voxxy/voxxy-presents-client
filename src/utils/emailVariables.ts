@@ -332,6 +332,24 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     example: '10:00 AM',
     worksInInvitations: false
   },
+  {
+    label: 'Category Payment Link',
+    frontendVar: '[categoryPaymentLink]',
+    backendVar: '{{category_payment_link}}',
+    category: 'vendor',
+    description: 'Payment link for the specific vendor category (only works after they apply)',
+    example: 'https://pay.stripe.com/...',
+    worksInInvitations: false
+  },
+  {
+    label: 'Category Application Link',
+    frontendVar: '[categoryApplicationLink]',
+    backendVar: '{{category_application_link}}',
+    category: 'vendor',
+    description: 'Public application URL for the specific vendor category',
+    example: 'https://voxxy.io/apply/abc123',
+    worksInInvitations: true
+  },
 
   // Computed/Link Variables
   {
@@ -349,7 +367,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_link}}',
     category: 'computed',
     description: 'Public application page URL',
-    example: 'https://voxxy.io/events/summer-market',
+    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
     worksInInvitations: true
   },
   {
@@ -358,7 +376,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{invitation_link}}',
     category: 'computed',
     description: 'Event invitation URL (same as event link)',
-    example: 'https://voxxy.io/events/summer-market',
+    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
     worksInInvitations: true
   },
   {
@@ -367,7 +385,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{bulletin_link}}',
     category: 'computed',
     description: 'Event bulletin page URL',
-    example: 'https://voxxy.io/events/summer-market',
+    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
     worksInInvitations: true
   },
   {
@@ -375,8 +393,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[dashboardLink]',
     backendVar: '{{dashboard_link}}',
     category: 'computed',
-    description: 'Vendor dashboard URL',
-    example: 'https://voxxy.io/vendor/dashboard',
+    description: 'Event-specific vendor portal URL',
+    example: 'https://voxxy.io/portal/voxxy-presents-1/summer-market-123',
     worksInInvitations: true
   },
   {
@@ -385,7 +403,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{unsubscribe_link}}',
     category: 'computed',
     description: 'Unsubscribe URL',
-    example: 'Click here to unsubscribe',
+    example: 'https://voxxy.io/unsubscribe/abc123token',
     worksInInvitations: true
   },
   {
@@ -394,7 +412,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{application_link}}',
     category: 'computed',
     description: 'Link to apply for the event',
-    example: 'https://voxxy.io/events/summer-market/apply',
+    example: 'https://voxxy.io/apply/abc123',
     worksInInvitations: true
   },
   {
@@ -403,7 +421,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_portal_link}}',
     category: 'computed',
     description: 'Vendor portal/dashboard link (only available after registration)',
-    example: 'https://voxxy.io/vendor/events/summer-market',
+    example: 'https://voxxy.io/portal/voxxy-presents-1/summer-market-123',
     worksInInvitations: false
   },
   {
@@ -412,7 +430,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{event_opt_out_link}}',
     category: 'computed',
     description: 'Link to decline invitation for this specific event',
-    example: 'https://voxxy.io/events/summer-market/opt-out',
+    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123/opt-out',
     worksInInvitations: true
   },
   {

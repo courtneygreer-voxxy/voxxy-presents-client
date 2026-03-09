@@ -21,6 +21,7 @@ import {
   Filter,
   CheckCircle2,
   AlertCircle,
+  Lock,
 } from 'lucide-react';
 import type { EmailTemplateItem } from '@/types/email';
 import {
@@ -28,6 +29,7 @@ import {
   insertVariableAtCursor,
   validateEmailContent,
 } from '@/utils/emailVariables';
+import { splitEmailBody, joinEmailBody } from '@/utils/emailFooter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from './RichTextEditor';
@@ -82,6 +84,7 @@ export function EmailTemplateEditorPage({
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content
 
   const subjectRef = useRef<HTMLInputElement>(null);
 
@@ -91,7 +94,7 @@ export function EmailTemplateEditorPage({
     description: '',
     category: 'application_updates',
     subject_template: '',
-    body_template: '',
+    body_template: '', // This will now contain only editable content (without footer)
     trigger_type: 'on_application_submit',
     trigger_value: 0,
     trigger_time: '09:00:00',
@@ -107,18 +110,24 @@ export function EmailTemplateEditorPage({
   useEffect(() => {
     if (!item) return;
 
+    // Split body into content and footer
+    const { content, footer } = splitEmailBody(item.body_template || '');
+
     setFormData({
       name: item.name || '',
       description: item.description || '',
       category: item.category || 'application_updates',
       subject_template: item.subject_template || '',
-      body_template: item.body_template || '',
+      body_template: content, // Only editable content, footer separated
       trigger_type: item.trigger_type || 'on_application_submit',
       trigger_value: item.trigger_value || 0,
       trigger_time: item.trigger_time?.substring(11, 19) || '09:00:00',
       enabled_by_default: item.enabled_by_default !== false,
       filter_criteria: item.filter_criteria || {},
     });
+
+    // Store footer separately (locked from editing)
+    setEmailFooter(footer);
 
     // Parse filter criteria
     if (item.filter_criteria) {
@@ -202,13 +211,16 @@ export function EmailTemplateEditorPage({
       if (filterStatus.length > 0) filter_criteria.statuses = filterStatus;
       if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus;
 
+      // Join content and footer back together for backend storage
+      const fullBodyTemplate = joinEmailBody(formData.body_template, emailFooter);
+
       const updatedItem: EmailTemplateItem = {
         ...item,
         name: formData.name,
         description: formData.description,
         category: formData.category as any,
         subject_template: formData.subject_template,
-        body_template: formData.body_template,
+        body_template: fullBodyTemplate, // Content + footer rejoined
         trigger_type: formData.trigger_type as any,
         trigger_value: formData.trigger_value,
         trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
@@ -226,7 +238,8 @@ export function EmailTemplateEditorPage({
 
   // Render preview HTML
   const renderPreview = () => {
-    let previewHtml = formData.body_template;
+    // Join content and footer for preview
+    let previewHtml = joinEmailBody(formData.body_template, emailFooter);
 
     // Replace variables with sample values for preview
     EMAIL_VARIABLES.forEach(v => {
@@ -368,6 +381,37 @@ export function EmailTemplateEditorPage({
                   placeholder="Write your email content here..."
                 />
               </div>
+            </div>
+
+            {/* Locked Footer Section */}
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                <Lock className="w-4 h-4 text-purple-400" />
+                <label className="block text-xs font-medium text-white/60">
+                  Email Footer (Locked)
+                </label>
+              </div>
+              <div className="relative">
+                <div className="p-4 rounded-lg bg-white/5 border border-purple-500/20 opacity-60 pointer-events-none">
+                  <div
+                    className="email-footer-preview prose prose-sm max-w-none prose-invert"
+                    dangerouslySetInnerHTML={{ __html: emailFooter }}
+                  />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <div className="bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full border border-purple-500/30">
+                    <div className="flex items-center gap-2">
+                      <Lock className="w-3 h-3 text-purple-300" />
+                      <span className="text-xs text-purple-300 font-medium">
+                        Footer is locked to ensure unsubscribe link is always present
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <p className="mt-2 text-xs text-white/40">
+                The footer contains the unsubscribe link required by email regulations and cannot be edited.
+              </p>
             </div>
           </div>
         </div>
@@ -567,28 +611,91 @@ export function EmailTemplateEditorPage({
                 )}
               </button>
 
-              {availableTagsOpen && (
+{availableTagsOpen && (
                 <div className="mt-3">
                   <p className="text-xs text-white/40 mb-3">
                     Click to insert into {activeField === 'subject' ? 'subject' : activeField === 'body' ? 'body' : 'email'}
+                    {(() => {
+                      // Check if this is a pre-application email
+                      const position = item?.position;
+                      const category = item?.category;
+                      const isEarlyPosition = position && position <= 3;
+                      const isPreApplicationCategory = category === 'event_announcements';
+                      const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
+                      const isPreApplicationTrigger = preApplicationTriggers.includes(formData.trigger_type);
+                      const nameLower = (item?.name || '').toLowerCase();
+                      const hasPreApplicationKeyword = nameLower.includes('invitation') ||
+                                                        nameLower.includes('invite') ||
+                                                        nameLower.includes('reminder') ||
+                                                        nameLower.includes('deadline');
+
+                      const isPreApplicationEmail = isEarlyPosition || isPreApplicationCategory ||
+                                                    isPreApplicationTrigger || hasPreApplicationKeyword;
+
+                      return isPreApplicationEmail && (
+                        <span className="block mt-1 text-yellow-400/80">
+                          Note: Some variables are disabled for pre-application emails (greyed out)
+                        </span>
+                      );
+                    })()}
                   </p>
                   <div className="space-y-1">
-                    {EMAIL_VARIABLES.map((variable) => (
-                      <button
-                        key={variable.frontendVar}
-                        onClick={() => handleVariableClick(variable.frontendVar)}
-                        disabled={!activeField}
-                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/5 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <code className="text-xs text-purple-400 font-mono">
-                            {variable.frontendVar}
-                          </code>
-                        </div>
-                        <p className="text-xs text-white/50 mt-1">{variable.description}</p>
-                        <p className="text-xs text-white/30 mt-0.5 italic">Example: {variable.example}</p>
-                      </button>
-                    ))}
+                    {EMAIL_VARIABLES.map((variable) => {
+                      // Check if this is a PRE-APPLICATION email (sent before vendor applies/chooses category)
+                      // Method 1: Check position (1-3 are typically pre-application)
+                      const position = item?.position;
+                      const isEarlyPosition = position && position <= 3;
+
+                      // Method 2: Check category
+                      const category = item?.category;
+                      const isPreApplicationCategory = category === 'event_announcements';
+
+                      // Method 3: Check trigger type (before application)
+                      const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
+                      const isPreApplicationTrigger = preApplicationTriggers.includes(formData.trigger_type);
+
+                      // Method 4: Check email name keywords
+                      const nameLower = (item?.name || '').toLowerCase();
+                      const hasPreApplicationKeyword = nameLower.includes('invitation') ||
+                                                        nameLower.includes('invite') ||
+                                                        nameLower.includes('reminder') ||
+                                                        nameLower.includes('deadline');
+
+                      // Email is pre-application if ANY of these conditions are true
+                      const isPreApplicationEmail = isEarlyPosition || isPreApplicationCategory ||
+                                                    isPreApplicationTrigger || hasPreApplicationKeyword;
+                      const isDisabled = (isPreApplicationEmail && !variable.worksInInvitations) || !activeField;
+
+                      return (
+                        <button
+                          key={variable.frontendVar}
+                          onClick={() => !isDisabled && handleVariableClick(variable.frontendVar)}
+                          disabled={isDisabled}
+                          className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                            isDisabled
+                              ? 'opacity-40 cursor-not-allowed'
+                              : 'hover:bg-white/5'
+                          }`}
+                          title={
+                            isPreApplicationEmail && !variable.worksInInvitations
+                              ? `${variable.description} (Not available in pre-application emails - requires vendor to apply and choose category first)`
+                              : variable.description
+                          }
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <code className={`text-xs font-mono ${
+                              isDisabled && isPreApplicationEmail && !variable.worksInInvitations
+                                ? 'text-white/30'
+                                : 'text-purple-400'
+                            }`}>
+                              {variable.frontendVar}
+                            </code>
+                          </div>
+                          <p className="text-xs text-white/50 mt-1">{variable.description}</p>
+                          <p className="text-xs text-white/30 mt-0.5 italic">Example: {variable.example}</p>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               )}

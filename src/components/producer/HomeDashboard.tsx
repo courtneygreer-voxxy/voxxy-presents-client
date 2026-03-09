@@ -205,12 +205,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     let link: string;
 
     if (linkType === 'application') {
-      link = `${baseUrl}/events/${eventSlug}`;
+      link = `${baseUrl}/events/${event.namespaced_slug || event.slug}`;
     } else {
       // Use token-based portal URL (primary) or fallback to slug-based (legacy)
       link = event.event_portal?.access_token
         ? `${baseUrl}/portal/${event.event_portal.access_token}`
-        : `${baseUrl}/portal/${eventSlug}`;
+        : `${baseUrl}/portal/${event.namespaced_slug || event.slug}`;
     }
 
     navigator.clipboard.writeText(link)

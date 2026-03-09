@@ -16,6 +16,7 @@ import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api
 import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
+import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 
 interface TemplateBuilderPageProps {
   templateId?: number;
@@ -231,8 +232,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         name: `Email ${emailItems.length + 1}`,
         position: emailItems.length + 1,
         category: 'application_updates',
-        subject_template: '',
-        body_template: '',
+        subject_template: 'New Email - [eventName]',
+        body_template: '<p>Hi [firstName],</p><p>This is a new email for [eventName].</p><p>Edit this email to customize the content.</p>' + STANDARD_EMAIL_FOOTER,
         trigger_type: 'on_application_submit',
         enabled_by_default: true
       });

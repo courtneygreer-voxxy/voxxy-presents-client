@@ -356,11 +356,15 @@ export interface DeliveryStatusConfig {
   description: string;
 }
 
-// Email variable for insertion in editor
+/**
+ * @deprecated This interface uses outdated {{mustache}} format.
+ * Use EmailVariable from '@/utils/emailVariables' instead, which uses
+ * the [bracket] format and includes additional fields like worksInInvitations.
+ */
 export interface EmailVariable {
   category: 'event' | 'organization' | 'vendor' | 'computed';
   label: string;
-  variable: string; // e.g., "{{event_title}}"
+  variable: string; // e.g., "{{event_title}}" (deprecated format)
   description: string;
   example: string;
 }
@@ -541,7 +545,14 @@ export interface AuditFilters {
 // Constants
 // ============================================================================
 
-// Available email variables for template editor
+/**
+ * @deprecated This constant uses outdated {{mustache}} format variables.
+ * Use EMAIL_VARIABLES from '@/utils/emailVariables' instead, which uses the
+ * current [bracket] format that matches the backend EmailVariableResolver.
+ *
+ * This is kept only for backwards compatibility with old code that may reference it.
+ * All new code should import from '@/utils/emailVariables' instead.
+ */
 export const EMAIL_VARIABLES: EmailVariable[] = [
   // Event variables
   {

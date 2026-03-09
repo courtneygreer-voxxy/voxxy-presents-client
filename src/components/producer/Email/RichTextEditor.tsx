@@ -10,7 +10,7 @@
  * - Variable insertion support
  */
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useMemo } from 'react';
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -29,6 +29,7 @@ import {
   LinkIcon as UnlinkIcon,
   ChevronDown,
 } from 'lucide-react';
+import { EMAIL_VARIABLES } from '@/utils/emailVariables';
 
 interface RichTextEditorProps {
   content: string;
@@ -171,15 +172,37 @@ export function RichTextEditor({
     setShowLinkVarDropdown(false);
   };
 
-  const linkVariableOptions = [
-    { variable: '[eventLink]', label: 'Event Page Link', displayText: 'View Event Details' },
-    { variable: '[eventPortalLink]', label: 'Vendor Portal Link', displayText: 'View Portal' },
-    { variable: '[applicationLink]', label: 'Application Link', displayText: 'Apply Now' },
-    { variable: '[paymentLink]', label: 'Payment Link', displayText: 'Pay Now' },
-    { variable: '[artistApplicationLink]', label: 'Artist Application', displayText: 'Apply as Artist' },
-    { variable: '[vendorApplicationLink]', label: 'Vendor Application', displayText: 'Apply as Vendor' },
-    { variable: '[unsubscribeLink]', label: 'Unsubscribe Link', displayText: 'Unsubscribe' },
-  ];
+  // Default display text for link variables (what users see as the clickable text)
+  const linkDisplayText: Record<string, string> = {
+    '[eventLink]': 'View Event Details',
+    '[eventPortalLink]': 'View Portal',
+    '[dashboardLink]': 'Access Dashboard',
+    '[applicationLink]': 'Apply Now',
+    '[categoryApplicationLink]': 'Apply Here',
+    '[artistApplicationLink]': 'Apply as Artist',
+    '[vendorApplicationLink]': 'Apply as Vendor',
+    '[paymentLink]': 'Pay Now',
+    '[categoryPaymentLink]': 'Submit Payment',
+    '[invitationLink]': 'View Invitation',
+    '[bulletinLink]': 'View Event Bulletin',
+    '[eventOptOutLink]': 'Decline Invitation',
+    '[unsubscribeLink]': 'Unsubscribe',
+  };
+
+  // Dynamically generate link variable options from EMAIL_VARIABLES
+  const linkVariableOptions = useMemo(() => {
+    return EMAIL_VARIABLES
+      .filter(v =>
+        v.category === 'computed' ||
+        v.frontendVar === '[categoryPaymentLink]' ||
+        v.frontendVar === '[categoryApplicationLink]'
+      )
+      .map(v => ({
+        variable: v.frontendVar,
+        label: v.label,
+        displayText: linkDisplayText[v.frontendVar] || 'Click Here',
+      }));
+  }, []);
 
   return (
     <div className="border border-white/20 rounded-lg bg-white/5 overflow-hidden">

@@ -50,19 +50,22 @@ import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { X, Save, Loader2, Calendar, Clock, Type, AlignLeft, Sparkles, Globe } from 'lucide-react';
+import { X, Save, Loader2, Calendar, Clock, Type, AlignLeft, Sparkles, Globe, Lock } from 'lucide-react';
 import { format, addDays, subDays, parseISO } from 'date-fns';
 import type { ScheduledEmail, UpdateEmailRequest, TriggerType } from '@/types/email';
 import {
   EMAIL_VARIABLES,
   backendToFrontend,
   frontendToBackend,
+  htmlToPlainText,
+  plainTextToHtml,
   insertVariableAtCursor,
   getVariablesByCategory,
   validateEmailContent,
   type ValidationResult,
 } from '@/utils/emailVariables';
 import { getEightAmLocalAsUTC, getTimezoneInfo, formatDateWithTimezone } from '@/utils/timezone';
+import { splitEmailBody, joinEmailBody, htmlFooterToPlain, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import {
   Dialog,
   DialogContent,
@@ -124,6 +127,7 @@ export default function EditScheduledEmailModal({
   const [previewScheduledDate, setPreviewScheduledDate] = useState<Date | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content (plain text)
 
   // Get timezone info for display
   const timezoneInfo = getTimezoneInfo();
@@ -284,27 +288,40 @@ export default function EditScheduledEmailModal({
       console.log('   📥 Backend Body (HTML + {{vars}}):', email.body_template?.substring(0, 150));
       console.log('   🌍 Timezone:', timezoneInfo.timezone, '(' + timezoneInfo.eightAmLocal + ')');
 
-      // Convert backend to frontend: HTML + {{}} → Plain Text + []
+      // Step 1: Convert {{mustache}} → [bracket] variables (but keep HTML)
+      const htmlWithBrackets = backendToFrontend(email.body_template || '');
+
+      // Step 2: Split HTML into content and footer (at <hr> tag)
+      const { content: htmlContent, footer: htmlFooter } = splitEmailBody(htmlWithBrackets);
+
+      // Step 3: Convert HTML to plain text for editing in Textarea
+      const plainContent = htmlToPlainText(htmlContent);
+      const plainFooter = htmlToPlainText(htmlFooter);
+
+      // Subject is just text, no HTML conversion needed
       const frontendSubject = backendToFrontend(email.subject_template || '');
-      const frontendBody = backendToFrontend(email.body_template || '');
 
       console.log('   📤 Frontend Subject (Plain + [vars]):', frontendSubject);
-      console.log('   📤 Frontend Body (Plain + [vars]):', frontendBody?.substring(0, 150));
+      console.log('   📤 Frontend Body Content (Plain + [vars]):', plainContent?.substring(0, 150));
+      console.log('   🔒 Frontend Footer (Plain + [vars]):', plainFooter?.substring(0, 100));
 
-      // Reset form with converted values
+      // Reset form with converted values (content only, footer separated)
       // Note: trigger_time is NOT in the form - it's set automatically on save
       reset({
         name: email.name || '',
         subject_template: frontendSubject, // Plain text with [eventName] format
-        body_template: frontendBody,       // Plain text with [eventName] format
+        body_template: plainContent,       // Plain text with [eventName] format (footer removed)
         trigger_type: email.trigger_type || 'on_event_date',
         trigger_value: email.trigger_value || 0,
       });
 
+      // Store footer separately (locked from editing)
+      setEmailFooter(plainFooter);
+
       setError(null);
       setActiveField(null);
 
-      console.log('✅ Form reset complete - User sees plain text with [variables]');
+      console.log('✅ Form reset complete - User sees plain text with [variables], footer locked');
     }
   }, [email, isOpen, reset]);
 
@@ -329,25 +346,35 @@ export default function EditScheduledEmailModal({
     try {
       console.log('💾 Saving email...');
       console.log('   📤 Frontend Subject (Plain + [vars]):', data.subject_template);
-      console.log('   📤 Frontend Body (Plain + [vars]):', data.body_template?.substring(0, 150));
+      console.log('   📤 Frontend Body Content (Plain + [vars]):', data.body_template?.substring(0, 150));
+      console.log('   🔒 Frontend Footer (Plain + [vars]):', emailFooter?.substring(0, 100));
 
-      // Convert frontend to backend: Plain Text + [vars] → HTML + [vars]
-      // Note: Variables stay in [bracket] format - backend expects this
-      const backendSubject = frontendToBackend(data.subject_template);
-      const backendBody = frontendToBackend(data.body_template);
+      // Step 1: Convert plain text content and footer to HTML
+      const htmlContent = plainTextToHtml(data.body_template);
+      const htmlFooter = plainTextToHtml(emailFooter);
+
+      // Step 2: Join HTML content and footer back together
+      // But we need to convert plain footer back to standard HTML footer format
+      // Since plainTextToHtml wraps everything in <p> tags, we need the original HTML footer
+
+      // Use the standard HTML footer instead of converting plain text
+      const fullHtmlBody = joinEmailBody(htmlContent, STANDARD_EMAIL_FOOTER);
+
+      // Subject stays as plain text
+      const backendSubject = data.subject_template;
 
       // Automatically set trigger_time to 8:00 AM in user's local timezone (converted to UTC)
       const triggerTimeUtc = getEightAmLocalAsUTC();
 
-      console.log('   📥 Backend Subject (HTML + [vars]):', backendSubject);
-      console.log('   📥 Backend Body (HTML + [vars]):', backendBody?.substring(0, 150));
+      console.log('   📥 Backend Subject (Plain + [vars]):', backendSubject);
+      console.log('   📥 Backend Body (HTML + [vars] + footer):', fullHtmlBody?.substring(0, 150));
       console.log('   🕐 Trigger Time (8 AM local → UTC):', triggerTimeUtc);
       console.log('   🌍 User Timezone:', timezoneInfo.timezone, '(' + timezoneInfo.eightAmLocal + ')');
 
       const updateData: UpdateEmailRequest = {
         name: data.name,
-        subject_template: backendSubject,  // HTML with [eventName] format
-        body_template: backendBody,        // HTML with [eventName] format
+        subject_template: backendSubject,  // Plain text with [eventName] format
+        body_template: fullHtmlBody,       // HTML with [eventName] format + footer
         trigger_type: data.trigger_type as TriggerType,
         trigger_value: data.trigger_value,
         trigger_time: triggerTimeUtc,      // Automatically set to 8:00 AM local (in UTC)
@@ -680,6 +707,37 @@ export default function EditScheduledEmailModal({
                 </div>
               </div>
             )}
+          </div>
+
+          {/* Locked Footer Section */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Lock className="w-4 h-4 text-purple-400" />
+              <label className="block text-sm font-medium text-white/80">
+                Email Footer (Locked)
+              </label>
+            </div>
+            <div className="relative">
+              <Textarea
+                value={emailFooter}
+                disabled
+                readOnly
+                className="bg-white/5 border-purple-500/20 text-white/60 min-h-[120px] resize-none cursor-not-allowed opacity-60"
+              />
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div className="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-500/40">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-purple-300" />
+                    <span className="text-sm text-purple-300 font-medium">
+                      Footer is locked to ensure unsubscribe link is always present
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <p className="mt-2 text-xs text-white/50">
+              The footer contains the unsubscribe link required by email regulations and cannot be edited.
+            </p>
           </div>
 
           {/* Validation Errors */}
