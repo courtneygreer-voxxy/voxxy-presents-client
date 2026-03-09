@@ -6,15 +6,15 @@ import {
   Plus,
   Trash2,
   Edit,
-  GripVertical,
+
   Loader2,
   AlertCircle,
   ChevronDown,
   ChevronUp
 } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
-import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
-import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
+import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
+
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 
@@ -221,20 +221,29 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     }
   };
 
-  const handleAddEmail = async () => {
+  const handleAddEmail = async (category?: string) => {
     if (!template) {
       setError('Please save the template first');
       return;
     }
 
+    const cat = (category || 'application_updates') as EmailCategory;
+    const defaultTriggers: Record<string, TriggerType> = {
+      event_announcements: 'on_application_open',
+      application_updates: 'on_application_submit',
+      payment_reminders: 'on_payment_deadline',
+      event_countdown: 'days_before_event',
+      event_updates: 'on_event_date',
+    };
+
     try {
       const newItem = await emailTemplateItemsApi.create(template.id, {
-        name: `Email ${emailItems.length + 1}`,
+        name: `New Email`,
         position: emailItems.length + 1,
-        category: 'application_updates',
+        category: cat,
         subject_template: 'New Email - [eventName]',
         body_template: '<p>Hi [firstName],</p><p>This is a new email for [eventName].</p><p>Edit this email to customize the content.</p>' + STANDARD_EMAIL_FOOTER,
-        trigger_type: 'on_application_submit',
+        trigger_type: defaultTriggers[cat] || 'on_application_submit' as TriggerType,
         enabled_by_default: true
       });
 
@@ -303,33 +312,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     setEditingItem(null);
   };
 
-  const handleDragEnd = async (result: DropResult) => {
-    if (!result.destination || !template) return;
-
-    const items = Array.from(emailItems);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    // Update positions
-    const updatedItems = items.map((item, index) => ({
-      ...item,
-      position: index + 1
-    }));
-
-    setEmailItems(updatedItems);
-
-    // Save to backend
-    try {
-      await emailTemplateItemsApi.reorder(
-        template.id,
-        updatedItems.map(item => item.id)
-      );
-    } catch (err: any) {
-      setError(err.message || 'Failed to reorder emails');
-      // Revert on error
-      setEmailItems(emailItems);
-    }
-  };
 
   const isSystem = template?.template_type === 'system';
   const canEdit = !isSystem;
@@ -496,15 +478,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 <h2 className="text-base font-semibold text-white">
                   Email Sequence ({emailItems.length})
                 </h2>
-                {canEdit && template && (
-                  <button
-                    onClick={handleAddEmail}
-                    className="px-3 py-1.5 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Email
-                  </button>
-                )}
               </div>
 
               {emailItems.length === 0 ? (
@@ -513,7 +486,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   <p className="text-white/60 text-sm mb-3">No emails in this template</p>
                   {canEdit && template && (
                     <button
-                      onClick={handleAddEmail}
+                      onClick={() => handleAddEmail()}
                       className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all text-sm inline-flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
@@ -522,88 +495,76 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   )}
                 </div>
               ) : (
-                <DragDropContext onDragEnd={handleDragEnd}>
-                  <Droppable droppableId="email-items">
-                    {(provided) => (
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="space-y-2"
-                      >
-                        {emailItems.map((item, index) => (
-                          <Draggable
-                            key={item.id}
-                            draggableId={item.id.toString()}
-                            index={index}
-                            isDragDisabled={!canEdit}
-                          >
-                            {(provided, snapshot) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.draggableProps}
-                                className={`p-4 rounded-lg border transition-all ${
-                                  snapshot.isDragging
-                                    ? 'border-purple-500 bg-purple-500/10 shadow-lg'
-                                    : 'border-white/10 bg-white/5 hover:bg-white/[0.07]'
-                                }`}
-                              >
-                                <div className="flex items-start gap-3">
-                                  {canEdit && (
-                                    <div
-                                      {...provided.dragHandleProps}
-                                      className="text-white/40 hover:text-white/60 cursor-grab active:cursor-grabbing mt-1"
-                                    >
-                                      <GripVertical className="w-5 h-5" />
-                                    </div>
-                                  )}
-
-                                  <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
-                                    <span className="text-sm font-medium text-purple-400">
-                                      {item.position}
-                                    </span>
-                                  </div>
-
-                                  <div className="flex-1 min-w-0">
-                                    <h3 className="font-medium text-white mb-1">{item.name}</h3>
-                                    <p className="text-sm text-white/60 truncate">
-                                      {item.subject_template || 'No subject'}
-                                    </p>
-                                    <div className="flex items-center gap-3 mt-2 text-xs text-white/50">
-                                      <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">
-                                        {item.category}
-                                      </span>
-                                      <span>{item.trigger_type}</span>
-                                    </div>
-                                  </div>
-
-                                  {canEdit && (
-                                    <div className="flex items-center gap-2">
-                                      <button
-                                        onClick={() => handleEditEmail(item)}
-                                        className="p-2 rounded-lg bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all"
-                                        title="Edit email"
-                                      >
-                                        <Edit className="w-4 h-4" />
-                                      </button>
-                                      <button
-                                        onClick={() => handleDeleteEmail(item.id)}
-                                        className="p-2 rounded-lg bg-white/5 border border-white/10 text-white/60 hover:text-red-400 hover:border-red-500/40 transition-all"
-                                        title="Delete email"
-                                      >
-                                        <Trash2 className="w-4 h-4" />
-                                      </button>
-                                    </div>
-                                  )}
+                <div className="space-y-4">
+                  {Object.entries(
+                    emailItems.reduce((groups, item) => {
+                      const cat = item.category || 'uncategorized';
+                      if (!groups[cat]) groups[cat] = [];
+                      groups[cat].push(item);
+                      return groups;
+                    }, {} as Record<string, EmailTemplateItem[]>)
+                  ).map(([category, items]) => {
+                    const categoryLabels: Record<string, string> = {
+                      event_announcements: 'Event Announcements',
+                      application_updates: 'Application Updates',
+                      payment_reminders: 'Payment Reminders',
+                      art_calls: 'Art Calls',
+                      artist_payment: 'Artist Payment',
+                      vendor_payment: 'Vendor Payment',
+                      artist_countdown: 'Artist Countdown',
+                      vendor_countdown: 'Vendor Countdown',
+                      uncategorized: 'Other',
+                    };
+                    return (
+                      <div key={category}>
+                        <div className="flex items-center gap-2 mb-1.5 px-1">
+                          <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                            {categoryLabels[category] || category}
+                          </h3>
+                          <span className="text-[10px] text-white/30 tabular-nums">{items.length}</span>
+                          {canEdit && template && (
+                            <button
+                              onClick={() => handleAddEmail(category)}
+                              className="p-0.5 rounded text-white/30 hover:text-purple-400 hover:bg-white/10 transition-all ml-auto"
+                              title={`Add email to ${categoryLabels[category] || category}`}
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                        <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
+                          {items.map((item) => (
+                            <div key={item.id} className="flex items-center gap-3 py-2.5 px-3">
+                              <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                              <span className="text-sm text-white truncate flex-1">{item.name}</span>
+                              <span className="text-[10px] text-white/40 flex-shrink-0 hidden sm:inline">
+                                {item.trigger_type}
+                              </span>
+                              {canEdit && (
+                                <div className="flex items-center gap-1 flex-shrink-0">
+                                  <button
+                                    onClick={() => handleEditEmail(item)}
+                                    className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                    title="Edit email"
+                                  >
+                                    <Edit className="w-3.5 h-3.5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteEmail(item.id)}
+                                    className="p-1.5 rounded text-white/30 hover:text-red-400 hover:bg-white/10 transition-all"
+                                    title="Delete email"
+                                  >
+                                    <Trash2 className="w-3.5 h-3.5" />
+                                  </button>
                                 </div>
-                              </div>
-                            )}
-                          </Draggable>
-                        ))}
-                        {provided.placeholder}
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    )}
-                  </Droppable>
-                </DragDropContext>
+                    );
+                  })}
+                </div>
               )}
             </div>
 

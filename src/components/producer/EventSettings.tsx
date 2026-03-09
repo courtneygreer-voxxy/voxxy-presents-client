@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, Trash2, FileText, Edit, Pause, Link, Copy, ExternalLink, Check, X, Download, Database } from 'lucide-react';
+import { Trash2, FileText, Edit, Link, Copy, ExternalLink, Check, X, Plus } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
@@ -68,20 +68,12 @@ interface EventSettingsProps {
   isAdmin?: boolean;
 }
 
-type View = 'settings' | 'create_app' | 'edit_app';
+type View = 'settings' | 'create_app';
 
 export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: EventSettingsProps) {
   const [currentView, setCurrentView] = useState<View>('settings');
   const [applications, setApplications] = useState<VendorApplication[]>([]);
-  const [selectedApplication, setSelectedApplication] = useState<VendorApplication | null>(null);
   const [loadingApps, setLoadingApps] = useState(false);
-
-  // Original settings state
-  const [isPublished, setIsPublished] = useState(event.published || event.status?.published || false);
-  const [registrationOpen, setRegistrationOpen] = useState(event.status?.registration_open || false);
-  const [eventStatus, setEventStatus] = useState<'draft' | 'published' | 'cancelled' | 'completed'>(
-    event.status?.status || 'draft'
-  );
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -99,6 +91,23 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     application_deadline: formatDateForInput(event.application_deadline) || '',
     payment_deadline: formatDateForInput(event.payment_deadline) || '',
   });
+
+  // Inline application editing state
+  const [editingAppId, setEditingAppId] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    description: '',
+    booth_price: 0,
+    install_date: '',
+    install_start_time: '',
+    install_end_time: '',
+    payment_link: '',
+    status: 'active' as 'active' | 'inactive',
+  });
+  const [editTags, setEditTags] = useState<string[]>([]);
+  const [editNewTag, setEditNewTag] = useState('');
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
 
   // Copy link states
   const [copiedEventPageLink, setCopiedEventPageLink] = useState(false);
@@ -118,28 +127,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       console.error('Failed to fetch applications:', err);
     } finally {
       setLoadingApps(false);
-    }
-  };
-
-  const handleSaveSettings = async () => {
-    if (!onUpdate) {
-      alert('Settings will be saved');
-      return;
-    }
-
-    try {
-      setIsSaving(true);
-      await onUpdate(event.slug, {
-        published: isPublished,
-        status: eventStatus,
-        registration_open: registrationOpen,
-      });
-      alert('Settings saved successfully!');
-    } catch (err) {
-      console.error('Failed to save settings:', err);
-      alert('Failed to save settings. Please try again.');
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -196,7 +183,74 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const handleApplicationSuccess = () => {
     fetchApplications();
     setCurrentView('settings');
-    setSelectedApplication(null);
+  };
+
+  const startEditing = (app: VendorApplication) => {
+    setEditingAppId(app.id);
+    setEditFormData({
+      name: app.name || '',
+      description: app.description || '',
+      booth_price: app.pricing?.booth_price || 0,
+      install_date: formatDateForInput(app.install_date) || '',
+      install_start_time: app.install_start_time || '',
+      install_end_time: app.install_end_time || '',
+      payment_link: app.payment_link || '',
+      status: app.status || 'active',
+    });
+    setEditTags(
+      app.application_tags
+        ? app.application_tags.split(',').map(t => t.trim()).filter(t => t)
+        : []
+    );
+    setEditNewTag('');
+    setEditError(null);
+  };
+
+  const handleCancelInlineEdit = () => {
+    setEditingAppId(null);
+    setEditError(null);
+  };
+
+  const handleSaveInlineEdit = async () => {
+    if (!editFormData.name.trim()) {
+      setEditError('Application name is required');
+      return;
+    }
+    if (editFormData.booth_price < 0) {
+      setEditError('Booth price must be $0 or greater');
+      return;
+    }
+
+    try {
+      setEditLoading(true);
+      setEditError(null);
+      await vendorApplicationsApi.update(editingAppId!, {
+        name: editFormData.name.trim(),
+        description: editFormData.description.trim() || undefined,
+        booth_price: editFormData.booth_price,
+        status: editFormData.status,
+        install_date: editFormData.install_date || undefined,
+        install_start_time: editFormData.install_start_time || undefined,
+        install_end_time: editFormData.install_end_time || undefined,
+        payment_link: editFormData.payment_link || undefined,
+        application_tags: editTags.length > 0 ? editTags.join(',') : undefined,
+      });
+      setEditingAppId(null);
+      fetchApplications();
+    } catch (err: any) {
+      console.error('Failed to save application:', err);
+      setEditError(err.message || 'Failed to save application');
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
+  const handleAddEditTag = () => {
+    const trimmed = editNewTag.trim();
+    if (trimmed && !editTags.includes(trimmed)) {
+      setEditTags([...editTags, trimmed]);
+      setEditNewTag('');
+    }
   };
 
   const copyToClipboard = async (text: string, type: 'eventpage' | 'portal') => {
@@ -354,8 +408,8 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
   const inputClasses = "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500";
 
-  // Show create/edit form
-  if (currentView === 'create_app' || currentView === 'edit_app') {
+  // Show create form
+  if (currentView === 'create_app') {
     return (
       <CreateApplicationForm
         event={{
@@ -364,12 +418,8 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           event_date: event.event_date,
           location: event.location,
         }}
-        onBack={() => {
-          setCurrentView('settings');
-          setSelectedApplication(null);
-        }}
+        onBack={() => setCurrentView('settings')}
         onSuccess={handleApplicationSuccess}
-        existingApplication={currentView === 'edit_app' ? selectedApplication || undefined : undefined}
       />
     );
   }
@@ -563,74 +613,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             </div>
           </div>
 
-          {/* Event Status */}
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-purple-500/20 rounded-lg flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-purple-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm text-white font-semibold mb-1">Event Status</h3>
-                <p className="text-white/60 text-xs mb-3">
-                  Update the current status of your event.
-                </p>
-                <div className="max-w-xs">
-                  <select
-                    value={eventStatus}
-                    onChange={(e) => setEventStatus(e.target.value as any)}
-                    className={`${inputClasses} cursor-pointer`}
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="cancelled">Cancelled</option>
-                    <option value="completed">Completed</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Export */}
-          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
-            <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <Database className="w-4 h-4 text-blue-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-sm text-white font-semibold mb-1">Data Export</h3>
-                <p className="text-white/60 text-xs mb-3">
-                  Export your event data for offline use or integration with other tools.
-                </p>
-                <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10 hover:border-blue-500/30 transition-all">
-                  <div>
-                    <h4 className="text-white text-xs font-medium mb-0.5">Invites & Applications CSV</h4>
-                    <p className="text-white/50 text-[11px]">
-                      Download all invited contacts and submitted applications with their current status
-                    </p>
-                  </div>
-                  <button
-                    onClick={handleExportInvitesCSV}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium transition-all"
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    Export
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Save Button */}
-          <div className="flex justify-end">
-            <button
-              onClick={handleSaveSettings}
-              disabled={isSaving}
-              className="px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-105 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSaving ? 'Saving...' : 'Save Settings'}
-            </button>
-          </div>
-
       {/* Application Settings Section */}
       <div>
           <div className="flex items-center gap-2 mb-3">
@@ -640,31 +622,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             <div>
               <h2 className="text-lg font-bold text-white">Application Settings</h2>
               <p className="text-white/60 text-xs">Control which categories are accepting applications</p>
-            </div>
-          </div>
-
-          {/* All Applications Master Toggle */}
-          <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20 mb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <h3 className="text-sm text-white font-semibold">All Applications</h3>
-                <p className="text-white/60 text-xs">Master toggle for all categories</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={`text-xs font-semibold ${registrationOpen ? 'text-green-400' : 'text-white/60'}`}>
-                  {registrationOpen ? 'Open' : 'Closed'}
-                </span>
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={registrationOpen}
-                    onChange={(e) => setRegistrationOpen(e.target.checked)}
-                    className="sr-only peer"
-                  />
-                  <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-green-600 peer-checked:to-green-500 transition-all"></div>
-                  <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                </label>
-              </div>
             </div>
           </div>
 
@@ -691,9 +648,10 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               applications.map((app) => (
                 <div
                   key={app.id}
-                  className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                  className="bg-[#1e1536] rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all"
                 >
-                  <div className="flex items-center justify-between">
+                  {/* Category Row */}
+                  <div className="flex items-center justify-between p-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-0.5">
                         <h4 className="text-sm text-white font-semibold">{app.name}</h4>
@@ -702,51 +660,199 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                             ${app.pricing.booth_price.toFixed(0)}
                           </span>
                         )}
+                        <span className={`text-[10px] font-medium ${app.status === 'active' ? 'text-green-400' : 'text-white/40'}`}>
+                          {app.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
                       </div>
                       <p className="text-white/60 text-xs">
                         {app.submissions_count} {app.submissions_count === 1 ? 'application' : 'applications'}
                       </p>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      <button
-                        disabled
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/20 text-white/40 cursor-not-allowed"
-                        title="Coming soon"
-                      >
-                        <Pause className="w-3.5 h-3.5" />
-                      </button>
+                    <button
+                      onClick={() => editingAppId === app.id ? handleCancelInlineEdit() : startEditing(app)}
+                      className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span className="text-xs">{editingAppId === app.id ? 'Cancel' : 'Edit'}</span>
+                    </button>
+                  </div>
 
-                      <button
-                        onClick={() => {
-                          setSelectedApplication(app);
-                          setCurrentView('edit_app');
-                        }}
-                        className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                      </button>
+                  {/* Inline Edit Form */}
+                  {editingAppId === app.id && (
+                    <div className="border-t border-purple-500/20 p-4 space-y-3">
+                      {editError && (
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
+                          <p className="text-red-400 text-xs">{editError}</p>
+                        </div>
+                      )}
 
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-semibold ${app.status === 'active' ? 'text-green-400' : 'text-white/60'}`}>
-                          {app.status === 'active' ? 'Accepting' : 'Closed'}
-                        </span>
-                        <label className="relative inline-flex items-center cursor-pointer">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Category Name *</label>
                           <input
-                            type="checkbox"
-                            checked={app.status === 'active'}
-                            onChange={() => {
-                              // TODO: Toggle application status
-                              console.log('Toggle application status:', app.id);
-                            }}
-                            className="sr-only peer"
+                            type="text"
+                            value={editFormData.name}
+                            onChange={(e) => setEditFormData({ ...editFormData, name: e.target.value })}
+                            className={inputClasses}
                           />
-                          <div className="w-11 h-6 bg-white/10 rounded-full peer peer-checked:bg-gradient-to-r peer-checked:from-green-600 peer-checked:to-green-500 transition-all"></div>
-                          <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                        </label>
+                        </div>
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Booth Price *</label>
+                          <div className="relative">
+                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 text-sm">$</span>
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={editFormData.booth_price ?? ''}
+                              onChange={(e) => setEditFormData({ ...editFormData, booth_price: parseFloat(e.target.value) || 0 })}
+                              className={`${inputClasses} pl-7`}
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-xs text-white/60 mb-1">Description</label>
+                        <textarea
+                          value={editFormData.description}
+                          onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
+                          rows={2}
+                          className={inputClasses}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Install Date</label>
+                          <input
+                            type="date"
+                            value={editFormData.install_date}
+                            onChange={(e) => setEditFormData({ ...editFormData, install_date: e.target.value })}
+                            className={inputClasses}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Install Start</label>
+                          <input
+                            type="time"
+                            value={editFormData.install_start_time}
+                            onChange={(e) => setEditFormData({ ...editFormData, install_start_time: e.target.value })}
+                            className={inputClasses}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Install End</label>
+                          <input
+                            type="time"
+                            value={editFormData.install_end_time}
+                            onChange={(e) => setEditFormData({ ...editFormData, install_end_time: e.target.value })}
+                            className={inputClasses}
+                          />
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Payment Link</label>
+                          <input
+                            type="url"
+                            value={editFormData.payment_link}
+                            onChange={(e) => setEditFormData({ ...editFormData, payment_link: e.target.value })}
+                            placeholder="https://..."
+                            className={inputClasses}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs text-white/60 mb-1">Status</label>
+                          <select
+                            value={editFormData.status}
+                            onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value as 'active' | 'inactive' })}
+                            className={`${inputClasses} cursor-pointer`}
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Tags */}
+                      <div>
+                        <label className="block text-xs text-white/60 mb-1">Tags</label>
+                        <div className="flex gap-2 mb-2">
+                          <input
+                            type="text"
+                            value={editNewTag}
+                            onChange={(e) => setEditNewTag(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                handleAddEditTag();
+                              }
+                            }}
+                            placeholder="Add tag..."
+                            className={`${inputClasses} flex-1`}
+                          />
+                          <button
+                            type="button"
+                            onClick={handleAddEditTag}
+                            className="px-2.5 py-2 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-all"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                        {editTags.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {editTags.map((tag, index) => (
+                              <span
+                                key={index}
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-[11px]"
+                              >
+                                {tag}
+                                <button
+                                  type="button"
+                                  onClick={() => setEditTags(editTags.filter(t => t !== tag))}
+                                  className="text-white/60 hover:text-white"
+                                >
+                                  <X className="w-2.5 h-2.5" />
+                                </button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Save / Cancel */}
+                      <div className="flex gap-2 pt-1">
+                        <button
+                          onClick={handleSaveInlineEdit}
+                          disabled={editLoading}
+                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {editLoading ? (
+                            <>
+                              <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                              Saving...
+                            </>
+                          ) : (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Save
+                            </>
+                          )}
+                        </button>
+                        <button
+                          onClick={handleCancelInlineEdit}
+                          disabled={editLoading}
+                          className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all disabled:opacity-50"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                          Cancel
+                        </button>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               ))
             )}
@@ -976,7 +1082,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           event,
           currentView,
           applications,
-          selectedApplication,
+          editingAppId,
         }}
         isAdmin={isAdmin}
       />

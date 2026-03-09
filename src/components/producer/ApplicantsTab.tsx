@@ -21,6 +21,7 @@ import {
   ArrowLeftRight,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
+import { toast } from 'sonner';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import { DebugPanel } from './DebugPanel';
@@ -981,117 +982,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 </div>
               )}
 
-              {/* Email History */}
-              {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
-                <div className="glass-card p-3 mb-3">
-                  <button
-                    onClick={handleToggleEmailHistory}
-                    className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth -m-2 mb-0"
-                  >
-                    <h3 className="text-sm font-semibold text-white">Email History</h3>
-                    {emailHistoryExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-white/60" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-white/60" />
-                    )}
-                  </button>
-
-                  {emailHistoryExpanded && (
-                    <div className="mt-3 space-y-2">
-                      {loadingEmailHistory ? (
-                        <div className="flex items-center justify-center py-4">
-                          <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                        </div>
-                      ) : emailHistoryData.length > 0 ? (
-                        emailHistoryData.map((delivery: any) => {
-                          const deliveryStatus = delivery.status;
-                          const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
-                          const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
-
-                          let statusColor = 'bg-gray-500/20 text-gray-400';
-                          if (deliveryStatus === 'delivered') statusColor = 'bg-green-500/20 text-green-400';
-                          else if (deliveryStatus === 'bounced') statusColor = 'bg-red-500/20 text-red-400';
-                          else if (deliveryStatus === 'dropped') statusColor = 'bg-orange-500/20 text-orange-400';
-                          else if (deliveryStatus === 'unsubscribed') statusColor = 'bg-yellow-500/20 text-yellow-400';
-
-                          return (
-                            <div key={delivery.id} className="bg-white/5 border border-white/10 rounded-lg p-2.5 space-y-1.5">
-                              <div className="flex items-start justify-between gap-2">
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-xs text-white font-medium truncate">{emailSubject}</p>
-                                  <p className="text-[10px] text-white/60 mt-0.5">
-                                    {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
-                                      month: 'short',
-                                      day: 'numeric',
-                                      year: 'numeric',
-                                      hour: 'numeric',
-                                      minute: '2-digit'
-                                    }) : 'Date unknown'}
-                                  </p>
-                                </div>
-                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor} whitespace-nowrap`}>
-                                  {deliveryStatus}
-                                </span>
-                              </div>
-
-                              {(delivery.bounce_reason || delivery.drop_reason) && (
-                                <p className="text-[10px] text-red-400/80 mt-1">
-                                  {delivery.bounce_type && `${delivery.bounce_type}: `}
-                                  {delivery.bounce_reason || delivery.drop_reason}
-                                </p>
-                              )}
-
-                              {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
-                                <button
-                                  onClick={async () => {
-                                    try {
-                                      await emailDeliveriesApi.retry(delivery.id);
-                                      alert('Email queued for retry');
-                                      // Refresh email history - fetch both registration and invitation emails
-                                      let refreshedHistory: any[] = [];
-                                      if (selectedApplicant.registrationId) {
-                                        const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-                                        refreshedHistory = [...(regHistory || [])];
-                                      }
-                                      if (selectedApplicant.invitationId) {
-                                        const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
-                                        refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
-                                      }
-                                      // Sort by date (most recent first)
-                                      refreshedHistory.sort((a, b) => {
-                                        const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
-                                        const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
-                                        return dateB - dateA;
-                                      });
-                                      setEmailHistoryData(refreshedHistory);
-                                    } catch (err: any) {
-                                      alert(`Failed to retry: ${err.message}`);
-                                    }
-                                  }}
-                                  className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 transition-smooth"
-                                >
-                                  Retry
-                                </button>
-                              )}
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="py-2">
-                          {selectedApplicant.status === 'invited' ? (
-                            <p className="text-xs text-white/60 italic">
-                              No emails sent yet. Check invitation status in Vendors tab for unsubscribe info.
-                            </p>
-                          ) : (
-                            <p className="text-xs text-white/40 italic">No email history found</p>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* Status & Payment Management - Only show for applicants who have applied */}
               {selectedApplicant.status !== 'invited' && selectedApplicant.registrationId && (
                 <div className="glass-card p-3">
@@ -1169,6 +1059,103 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             >
                               Mark as Paid
                             </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Email History */}
+              {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
+                <div className="glass-card p-3">
+                  <button
+                    onClick={handleToggleEmailHistory}
+                    className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth -m-2 mb-0"
+                  >
+                    <h3 className="text-sm font-semibold text-white">Email History</h3>
+                    {emailHistoryExpanded ? (
+                      <ChevronUp className="w-4 h-4 text-white/60" />
+                    ) : (
+                      <ChevronDown className="w-4 h-4 text-white/60" />
+                    )}
+                  </button>
+
+                  {emailHistoryExpanded && (
+                    <div className="mt-3">
+                      {loadingEmailHistory ? (
+                        <div className="flex items-center justify-center py-4">
+                          <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                        </div>
+                      ) : emailHistoryData.length > 0 ? (
+                        <div className="divide-y divide-white/5">
+                          {emailHistoryData.map((delivery: any) => {
+                            const deliveryStatus = delivery.status;
+                            const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
+                            const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
+
+                            let statusColor = 'text-white/40';
+                            if (deliveryStatus === 'delivered') statusColor = 'text-green-400';
+                            else if (deliveryStatus === 'bounced') statusColor = 'text-red-400';
+                            else if (deliveryStatus === 'dropped') statusColor = 'text-orange-400';
+                            else if (deliveryStatus === 'unsubscribed') statusColor = 'text-yellow-400';
+
+                            return (
+                              <div key={delivery.id} className="flex items-center gap-2 py-1.5">
+                                <Mail className="w-3 h-3 text-white/30 flex-shrink-0" />
+                                <span className="text-[10px] text-white/70 truncate flex-1">{emailSubject}</span>
+                                <span className="text-[10px] text-white/40 tabular-nums flex-shrink-0">
+                                  {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric',
+                                  }) : '—'}
+                                </span>
+                                <span className={`text-[10px] font-medium ${statusColor} flex-shrink-0 w-16 text-right`}>
+                                  {deliveryStatus}
+                                </span>
+                                {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        await emailDeliveriesApi.retry(delivery.id);
+                                        toast.success('Email queued for retry');
+                                        let refreshedHistory: any[] = [];
+                                        if (selectedApplicant.registrationId) {
+                                          const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+                                          refreshedHistory = [...(regHistory || [])];
+                                        }
+                                        if (selectedApplicant.invitationId) {
+                                          const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+                                          refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
+                                        }
+                                        refreshedHistory.sort((a, b) => {
+                                          const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+                                          const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+                                          return dateB - dateA;
+                                        });
+                                        setEmailHistoryData(refreshedHistory);
+                                      } catch (err: any) {
+                                        toast.error(`Failed to retry: ${err.message}`);
+                                      }
+                                    }}
+                                    className="text-[10px] text-purple-400 hover:text-purple-300 flex-shrink-0"
+                                  >
+                                    Retry
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="py-2">
+                          {selectedApplicant.status === 'invited' ? (
+                            <p className="text-xs text-white/60 italic">
+                              No emails sent yet. Check invitation status in Vendors tab for unsubscribe info.
+                            </p>
+                          ) : (
+                            <p className="text-xs text-white/40 italic">No email history found</p>
                           )}
                         </div>
                       )}
