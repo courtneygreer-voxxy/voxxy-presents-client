@@ -1,11 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, Save, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Calendar, Zap, ChevronDown } from 'lucide-react';
+import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail } from 'lucide-react';
 import { scheduledEmailsApi, eventsApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
+import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
 import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
@@ -25,19 +26,22 @@ const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+type ViewState =
+  | { view: 'table' }
+  | { view: 'audit-log'; filters: AuditFilters | null }
+  | { view: 'sequence-editor' }
+  | { view: 'email-editor'; email: ScheduledEmail; returnTo: 'table' | 'sequence-editor' };
+
 export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailAutomationTabProps) {
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [editEmail, setEditEmail] = useState<ScheduledEmail | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [eventData, setEventData] = useState<any | null>(null);
 
-  // Email Audit Log overlay state
-  const [showAuditLog, setShowAuditLog] = useState(false);
-  const [auditLogFilters, setAuditLogFilters] = useState<AuditFilters | null>(null);
+  // Navigation state
+  const [viewState, setViewState] = useState<ViewState>({ view: 'table' });
 
   // Auto-refresh state
   const [autoRefresh, setAutoRefresh] = useState(true);
@@ -47,10 +51,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
-
-  // Section collapse state
-  const [scheduledCollapsed, setScheduledCollapsed] = useState(false);
-  const [systemCollapsed, setSystemCollapsed] = useState(false);
 
   // Sort state
   type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
@@ -72,16 +72,16 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     loadEmails();
   }, [eventSlug]);
 
-  // Auto-refresh delivery stats every 30 seconds
+  // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
-    if (!autoRefresh || isEditOpen) return;
+    if (!autoRefresh || viewState.view !== 'table') return;
 
     const interval = setInterval(() => {
       loadEmails(true); // Silent refresh
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
-  }, [autoRefresh, isEditOpen, eventSlug]);
+  }, [autoRefresh, viewState.view, eventSlug]);
 
   const loadEmails = async (silent = false) => {
     if (!silent) {
@@ -206,17 +206,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     showSuccess('Template saved successfully! You can now reuse it for other events.');
   };
 
-  const handleEdit = (email: ScheduledEmail) => {
-    // Position 1 (Initial Invitation) is now a real scheduled email and CAN be edited
-    setEditEmail(email);
-    setIsEditOpen(true);
-  };
-
-  const handleCloseEditor = () => {
-    setIsEditOpen(false);
-    setEditEmail(null);
-  };
-
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
     const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
     console.log('📧 Updated email received from server:', updated);
@@ -272,10 +261,22 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             valA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
             valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
             break;
-          case 'category':
-            valA = (a.trigger_type ?? '').toLowerCase();
-            valB = (b.trigger_type ?? '').toLowerCase();
+          case 'category': {
+            const toCat: Record<string, string> = {
+              on_application_open: 'event_announcements', on_invitation_send: 'event_announcements',
+              on_application_submit: 'application_updates', on_approval: 'application_updates',
+              on_rejection: 'application_updates', on_waitlist: 'application_updates',
+              on_payment_received: 'payment_reminders', days_before_payment_deadline: 'payment_reminders',
+              on_payment_deadline: 'payment_reminders',
+              days_before_event: 'event_countdown', on_event_date: 'event_countdown',
+              days_after_event: 'event_updates', on_event_update: 'event_updates',
+              on_event_cancel: 'event_updates', on_category_change: 'event_updates',
+              on_bulletin_post: 'event_announcements',
+            };
+            valA = (a.email_template_item?.category ?? toCat[a.trigger_type] ?? 'event_announcements').toLowerCase();
+            valB = (b.email_template_item?.category ?? toCat[b.trigger_type] ?? 'event_announcements').toLowerCase();
             break;
+          }
           case 'recipient_count':
             valA = a.recipient_count ?? 0;
             valB = b.recipient_count ?? 0;
@@ -302,16 +303,22 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
     // Default: sort by trigger-type group, then by scheduled_for within each group
     const TRIGGER_GROUP_ORDER: Record<string, number> = {
+      on_invitation_send: 1,
       on_application_open: 1,
       on_application_submit: 2,
       on_approval: 3,
+      on_rejection: 3,
       on_waitlist: 4,
-      days_before_event: 5,
-      days_before_payment_deadline: 6,
-      on_payment_deadline: 6,
-      on_payment_received: 7,
+      days_before_payment_deadline: 5,
+      on_payment_deadline: 5,
+      on_payment_received: 6,
+      days_before_event: 7,
       on_event_date: 8,
       days_after_event: 9,
+      on_event_update: 10,
+      on_event_cancel: 10,
+      on_category_change: 10,
+      on_bulletin_post: 10,
     };
 
     return [...result].sort((a, b) => {
@@ -326,67 +333,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     });
   }, [emails, searchQuery, statusFilter, sortColumn, sortDirection]);
 
-  // Categorize emails into scheduled vs system/trigger
-  const categorizedEmails = useMemo(() => {
-    // Time-based triggers (have scheduled_for dates)
-    const scheduledTriggers = [
-      'days_before_deadline',
-      'on_event_date',
-      'days_before_event',
-      'days_after_event',
-      'on_payment_deadline',
-      'days_before_payment_deadline',
-      'days_after_payment_deadline'  // Payment overdue emails
-    ];
-
-    // Event-based triggers (sent immediately on action)
-    const systemTriggers = [
-      'on_application_open',        // Initial Invitation (fires on "Go Live" action)
-      'on_invitation_send',         // Invitation to Apply (sent when invitation is created)
-      'on_application_submit',
-      'on_approval',
-      'on_rejection',
-      'on_waitlist',
-      'on_payment_received',
-      'on_category_change',
-      'on_event_update',
-      'on_event_cancel',
-      'on_bulletin_post'            // Bulletin Blast (sent when bulletin is posted)
-    ];
-
-    const scheduledFiltered = filteredEmails
-      .filter(email => scheduledTriggers.includes(email.trigger_type));
-
-    // If user has applied column sorting, keep that order
-    // Otherwise, apply default chronological sort
-    const scheduled = sortColumn
-      ? scheduledFiltered
-      : [...scheduledFiltered].sort((a, b) => {
-          // Default: chronological order by scheduled_for date
-          const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
-          const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
-          return dateA - dateB;
-        });
-
-    const system = filteredEmails
-      .filter(email => systemTriggers.includes(email.trigger_type))
-      .sort((a, b) => {
-        // Always show invitation emails first (both legacy and new trigger types)
-        const aIsInvitation = a.trigger_type === 'on_invitation_send' || a.trigger_type === 'on_application_open';
-        const bIsInvitation = b.trigger_type === 'on_invitation_send' || b.trigger_type === 'on_application_open';
-
-        if (aIsInvitation && !bIsInvitation) return -1;
-        if (!aIsInvitation && bIsInvitation) return 1;
-
-        // For other emails, sort by position if available
-        const posA = a.email_template_item?.position ?? 999;
-        const posB = b.email_template_item?.position ?? 999;
-        return posA - posB;
-      });
-
-    return { scheduled, system };
-  }, [filteredEmails, sortColumn]);
-
   // Calculate statistics
   const stats = {
     total: emails.length,
@@ -396,28 +342,43 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     failed: emails.filter(e => e.status === 'failed').length,
   };
 
-  // Show full-screen audit log overlay if opened
-  if (showAuditLog && eventData) {
+  // Show full-screen audit log overlay
+  if (viewState.view === 'audit-log' && eventData) {
     return (
       <EmailAuditLogOverlay
         event={eventData}
-        initialFilters={auditLogFilters}
-        onClose={() => {
-          setShowAuditLog(false);
-          setAuditLogFilters(null);
-        }}
+        initialFilters={viewState.filters}
+        onClose={() => setViewState({ view: 'table' })}
       />
     );
   }
 
-  // Show full-screen editor if editing
-  if (isEditOpen && editEmail) {
+  // Show full-screen sequence editor overlay
+  if (viewState.view === 'sequence-editor') {
+    return (
+      <EmailSequenceEditorOverlay
+        emails={emails}
+        eventSlug={eventSlug}
+        eventData={eventData}
+        onBack={() => setViewState({ view: 'table' })}
+        onEditEmail={(email) => setViewState({ view: 'email-editor', email, returnTo: 'sequence-editor' })}
+        onPause={handlePause}
+        onResume={handleResume}
+        onSendNow={handleSendNow}
+        onDelete={handleDelete}
+        onSaveAsTemplate={() => setIsSaveDialogOpen(true)}
+      />
+    );
+  }
+
+  // Show full-screen email editor
+  if (viewState.view === 'email-editor') {
     return (
       <EmailEditorPage
-        email={editEmail}
+        email={viewState.email}
         eventData={eventData}
         eventSlug={eventSlug}
-        onBack={handleCloseEditor}
+        onBack={() => setViewState({ view: viewState.returnTo === 'sequence-editor' ? 'sequence-editor' : 'table' })}
         onSave={handleSaveEdit}
         isAdmin={isAdmin}
       />
@@ -452,21 +413,18 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             {emails.length > 0 && (
               <>
                 <button
-                  onClick={() => {
-                    setAuditLogFilters(null);
-                    setShowAuditLog(true);
-                  }}
+                  onClick={() => setViewState({ view: 'sequence-editor' })}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span className="hidden sm:inline">Sequence Editor</span>
+                </button>
+                <button
+                  onClick={() => setViewState({ view: 'audit-log', filters: null })}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
                 >
                   <FileSearch className="w-4 h-4" />
-                  <span className="hidden sm:inline">View Audit Log</span>
-                </button>
-                <button
-                  onClick={() => setIsSaveDialogOpen(true)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
-                >
-                  <Save className="w-4 h-4" />
-                  <span className="hidden sm:inline">Save as Template</span>
+                  <span className="hidden sm:inline">Audit Log</span>
                 </button>
               </>
             )}
@@ -595,106 +553,21 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             )}
           </div>
 
-          {/* Scheduled Emails Section */}
-          {categorizedEmails.scheduled.length > 0 && (
-            <div className="border border-white/10 rounded-lg overflow-hidden">
-              {/* Section Header */}
-              <button
-                onClick={() => setScheduledCollapsed(!scheduledCollapsed)}
-                className="w-full flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <Calendar className="w-5 h-5 text-purple-400" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-semibold text-white">
-                      Scheduled Emails
-                    </h3>
-                    <p className="text-sm text-white/60">
-                      Time-based automated emails ({categorizedEmails.scheduled.length})
-                    </p>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 text-white/60 transition-transform ${
-                    scheduledCollapsed ? '-rotate-90' : ''
-                  }`}
-                />
-              </button>
-
-              {/* Section Content */}
-              {!scheduledCollapsed && (
-                <EmailTable
-                  emails={categorizedEmails.scheduled}
-                  eventSlug={eventSlug}
-                  onEdit={handleEdit}
-                  onPause={handlePause}
-                  onResume={handleResume}
-                  onSendNow={handleSendNow}
-                  onRetryFailed={handleRetryFailed}
-                  onDelete={handleDelete}
-                  onViewAuditLog={(filters) => {
-                    console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
-                    setAuditLogFilters(filters);
-                    setShowAuditLog(true);
-                  }}
-                  sortColumn={sortColumn}
-                  sortDirection={sortDirection}
-                  onSort={handleSort}
-                />
-              )}
-            </div>
-          )}
-
-          {/* System/Trigger Emails Section */}
-          {categorizedEmails.system.length > 0 && (
-            <div className="border border-white/10 rounded-lg overflow-hidden">
-              {/* Section Header */}
-              <button
-                onClick={() => setSystemCollapsed(!systemCollapsed)}
-                className="w-full flex items-center justify-between px-6 py-4 bg-white/5 hover:bg-white/10 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-500/20">
-                    <Zap className="w-5 h-5 text-blue-400" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="text-lg font-semibold text-white">
-                      System/Trigger Emails
-                    </h3>
-                    <p className="text-sm text-white/60">
-                      Event-based automated emails ({categorizedEmails.system.length})
-                    </p>
-                  </div>
-                </div>
-                <ChevronDown
-                  className={`w-5 h-5 text-white/60 transition-transform ${
-                    systemCollapsed ? '-rotate-90' : ''
-                  }`}
-                />
-              </button>
-
-              {/* Section Content */}
-              {!systemCollapsed && (
-                <EmailTable
-                  emails={categorizedEmails.system}
-                  eventSlug={eventSlug}
-                  onEdit={handleEdit}
-                  onPause={handlePause}
-                  onResume={handleResume}
-                  onSendNow={handleSendNow}
-                  onRetryFailed={handleRetryFailed}
-                  onDelete={handleDelete}
-                  onViewAuditLog={(filters) => {
-                    console.log('🔗 [Deep Link] Opening audit log with filters:', filters);
-                    setAuditLogFilters(filters);
-                    setShowAuditLog(true);
-                  }}
-                />
-              )}
-            </div>
-          )}
+          {/* Unified Email Table */}
+          <EmailTable
+            emails={filteredEmails}
+            eventSlug={eventSlug}
+            onEdit={(email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })}
+            onPause={handlePause}
+            onResume={handleResume}
+            onSendNow={handleSendNow}
+            onRetryFailed={handleRetryFailed}
+            onDelete={handleDelete}
+            onViewAuditLog={(filters) => setViewState({ view: 'audit-log', filters })}
+            sortColumn={sortColumn}
+            sortDirection={sortDirection}
+            onSort={handleSort}
+          />
         </div>
       )}
 

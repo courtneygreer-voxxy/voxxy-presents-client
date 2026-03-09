@@ -75,12 +75,13 @@ export default function EmailTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[200px,240px,130px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
-          <div className="flex items-center gap-1">Email Name</div>
+        <div className="grid grid-cols-[200px,220px,130px,70px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
+          {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}
-          <div className="flex items-center gap-1">Category</div>
-          <div className="flex items-center justify-center">Recipients</div>
+          <div className="flex items-center gap-1">Type</div>
+          {col('category', 'Category')}
+          {col('recipient_count', 'Recipients', 'justify-center')}
           <div className="flex items-center justify-center" title="Emails that bounced or were dropped by SendGrid">Undelivered</div>
           <div className="flex items-center justify-center" title="Recipients who unsubscribed from emails">Unsub</div>
           <div className="flex items-center justify-center">Status</div>
