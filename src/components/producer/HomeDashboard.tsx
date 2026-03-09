@@ -684,7 +684,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {vendorApplications.map((app) => (
                   <button
                     key={app.id}
-                    onClick={() => handleCopyApplicationLink(app.id, app.shareable_url)}
+                    onClick={() => handleCopyApplicationLink(app.id, `${window.location.origin}/events/${event.slug}/apply/${app.id}`)}
                     className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg transition-smooth text-xs text-white ${
                       copiedApplicationId === app.id
                         ? 'bg-green-500/20 border border-green-500/30'

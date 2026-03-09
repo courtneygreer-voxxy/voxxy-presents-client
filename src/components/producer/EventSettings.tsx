@@ -885,7 +885,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         <h4 className="text-sm text-white font-semibold mb-1">{app.name}</h4>
                         <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2">
                           <code className="text-[11px] text-indigo-400 flex-1 overflow-x-auto">
-                            {app.shareable_url}
+                            {`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
                           </code>
                         </div>
                         {app.status !== 'active' && (
@@ -896,7 +896,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => copyApplicationLinkToClipboard(app.id, app.shareable_url)}
+                          onClick={() => copyApplicationLinkToClipboard(app.id, `${window.location.origin}/events/${event.slug}/apply/${app.id}`)}
                           disabled={app.status !== 'active'}
                           className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all ${
                             app.status === 'active'
@@ -913,7 +913,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         </button>
                         {app.status === 'active' && (
                           <a
-                            href={app.shareable_url}
+                            href={`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
