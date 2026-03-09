@@ -128,7 +128,7 @@ export default function EmailRow({
 
   // Use actual category from template item if available, otherwise infer
   const category = email.email_template_item?.category || inferCategory();
-  const categoryConfig = CATEGORY_CONFIG[category];
+  const categoryConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['event_announcements'];
   const CategoryIcon = categoryConfig.icon;
 
   const scheduledDate = email.scheduled_for ? new Date(email.scheduled_for) : null;

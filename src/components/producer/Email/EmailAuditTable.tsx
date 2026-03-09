@@ -50,7 +50,7 @@ function SortIcon({
 }
 
 function StatusBadge({ status }: { status: AuditEntry['status'] }) {
-  const config = DELIVERY_STATUS_CONFIGS[status];
+  const config = DELIVERY_STATUS_CONFIGS[status] || DELIVERY_STATUS_CONFIGS['pending'];
   const colorClasses = {
     gray: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
     blue: 'bg-blue-500/20 text-blue-300 border-blue-500/30',

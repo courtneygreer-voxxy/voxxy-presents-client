@@ -288,7 +288,7 @@ export default function ScheduledEmailList({
       {filteredEmails.length > 0 ? (
         <div className="space-y-6">
           {Object.entries(emailsByCategory).map(([category, categoryEmails]) => {
-            const config = CATEGORY_CONFIG[category as EmailCategory];
+            const config = CATEGORY_CONFIG[category as EmailCategory] || CATEGORY_CONFIG['event_announcements'];
             const Icon = config.icon;
             const isExpanded = expandedCategories.has(category as EmailCategory);
 
