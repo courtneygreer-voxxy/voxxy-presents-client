@@ -11,6 +11,7 @@ interface VendorApplication {
 interface Submission {
   id: number;
   business_name: string;
+  contact_name?: string;
   vendor_category: string;
   email: string;
   status: string;
@@ -205,7 +206,7 @@ export default function ViewApplicationSubmissions({
               <thead>
                 <tr className="border-b border-white/10 bg-white/5">
                   <th className="text-left px-6 py-4 text-sm font-semibold text-white">
-                    Business Name
+                    Name
                   </th>
                   <th className="text-left px-6 py-4 text-sm font-semibold text-white">
                     Category
@@ -230,7 +231,12 @@ export default function ViewApplicationSubmissions({
                     key={submission.id}
                     className="border-b border-white/5 hover:bg-white/5 transition-colors"
                   >
-                    <td className="px-6 py-4 text-white">{submission.business_name}</td>
+                    <td className="px-6 py-4">
+                      <p className="text-white font-medium">{submission.contact_name || submission.business_name}</p>
+                      {submission.business_name && submission.contact_name && (
+                        <p className="text-white/60 text-xs">{submission.business_name}</p>
+                      )}
+                    </td>
                     <td className="px-6 py-4">
                       <span className="px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-purple-400">
                         {submission.vendor_category}
