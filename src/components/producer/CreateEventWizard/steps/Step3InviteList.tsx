@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { WizardStepProps } from '../types';
 import { vendorContactsApi, VendorContact } from '@/services/api';
@@ -23,55 +23,66 @@ export default function Step3InviteList({
   const [selectedContactIds, setSelectedContactIds] = useState<number[]>([]);
   const perPage = 50;
 
+  // Track which IDs we've already fetched to avoid redundant requests
+  const fetchedIdsRef = useRef<string>('');
+
   const { inviteList } = wizardState;
-  const invitedContactIds = inviteList.invitedContactIds || [];
+  const invitedContactIds = inviteList.invitedContactIds ?? [];
 
-  // Load full contact details when we have IDs
+  // Stable serialized key for the invited IDs — avoids re-running effect on ref changes
+  const invitedIdsKey = JSON.stringify(invitedContactIds);
+
+  // Load full contact details when we have IDs (and they've actually changed)
   useEffect(() => {
-    if (invitedContactIds.length > 0) {
+    if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
       fetchContactDetails();
-    } else {
+    } else if (invitedContactIds.length === 0) {
       setContacts([]);
+      fetchedIdsRef.current = '';
     }
-  }, [invitedContactIds, organizationId]);
+  }, [invitedIdsKey, organizationId]);
 
-  const fetchContactDetails = async () => {
+  const fetchContactDetails = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Fetch ALL contacts with pagination (backend may cap per_page)
-      let allContacts: VendorContact[] = [];
-      let currentPage = 1;
-      let hasMore = true;
+      // Fetch page 1 to get total_pages, then remaining pages in parallel
+      const firstPage = await vendorContactsApi.getAll(organizationId, {
+        page: 1,
+        per_page: 200,
+      });
 
-      while (hasMore) {
-        const response = await vendorContactsApi.getAll(organizationId, {
-          page: currentPage,
-          per_page: 100,
-        });
+      let allContacts: VendorContact[] = firstPage?.vendor_contacts || [];
+      const totalPages = firstPage?.meta?.total_pages || 1;
 
-        const pageContacts = response?.vendor_contacts || [];
-        allContacts = [...allContacts, ...pageContacts];
-
-        // Check if there are more pages
-        const meta = response?.meta;
-        if (meta && currentPage < meta.total_pages) {
-          currentPage++;
-        } else {
-          hasMore = false;
+      if (totalPages > 1) {
+        // Fetch remaining pages in parallel
+        const remainingPages = Array.from(
+          { length: totalPages - 1 },
+          (_, i) => i + 2
+        );
+        const pageResults = await Promise.all(
+          remainingPages.map((page) =>
+            vendorContactsApi.getAll(organizationId, { page, per_page: 200 })
+          )
+        );
+        for (const result of pageResults) {
+          allContacts = allContacts.concat(result?.vendor_contacts || []);
         }
       }
 
-      // Filter to only invited contacts
-      const invitedContacts = allContacts.filter((c) => invitedContactIds.includes(c.id));
+      // Filter to only invited contacts using a Set for O(1) lookups
+      const invitedSet = new Set(invitedContactIds);
+      const invitedContacts = allContacts.filter((c) => invitedSet.has(c.id));
       setContacts(invitedContacts);
+      fetchedIdsRef.current = invitedIdsKey;
     } catch (err) {
       console.error('Failed to fetch contact details:', err);
       setContacts([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [organizationId, invitedIdsKey]);
 
   const handleImport = (contactIds: number[], source: 'all' | 'lists') => {
     updateWizardState({

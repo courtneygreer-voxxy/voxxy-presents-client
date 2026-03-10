@@ -4,7 +4,7 @@ import { LayoutDashboard, Settings, Shield, Building2, Store, Menu, X, LogOut, M
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { adminApi, eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi } from "@/services/api";
+import { adminApi, eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi } from "@/services/api";
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -361,6 +361,20 @@ export default function AdminDashboard() {
       setEventsView('command-center');
       setCreationProgress('Creating your event...');
 
+      // Ensure we have an email template ID - fetch default if not set
+      let templateId = wizardState.automaticMessages.email_campaign_template_id;
+      if (!templateId) {
+        try {
+          const templates = await emailCampaignTemplatesApi.getAll();
+          const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'system');
+          if (defaultTemplate) {
+            templateId = defaultTemplate.id;
+          }
+        } catch (error) {
+          console.error('Failed to fetch default email template:', error);
+        }
+      }
+
       // Step 1: Create the event with all event fields including new ones
       const newEvent = await eventsApi.create(organization.slug, {
         title: wizardState.eventDetails.title,
@@ -375,6 +389,7 @@ export default function AdminDashboard() {
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
         payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
+        email_campaign_template_id: templateId || undefined,
         status: 'draft',
         published: false,
       });
