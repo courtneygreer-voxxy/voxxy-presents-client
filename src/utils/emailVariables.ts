@@ -171,8 +171,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[categoryList]',
     backendVar: '{{category_list}}',
     category: 'event',
-    description: 'List of all vendor categories with prices and install times',
-    example: 'Artist Booth - $150 (Setup: 8:00 AM - 10:00 AM)\nFood Vendor - $200 (Setup: 2:00 PM - 4:00 PM)',
+    description: 'List of all vendor categories with direct application links',
+    example: '• Artist Booth - https://voxxy.io/events/event-slug/apply/123\n• Food Vendor - https://voxxy.io/events/event-slug/apply/124',
     worksInInvitations: true
   },
 
@@ -359,96 +359,15 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     example: 'https://pay.stripe.com/...',
     worksInInvitations: false
   },
-  {
-    label: 'Category Application Link',
-    frontendVar: '[categoryApplicationLink]',
-    backendVar: '{{category_application_link}}',
-    category: 'vendor',
-    description: 'Public application URL (same as Application Link)',
-    example: 'https://voxxy.io/apply/abc123',
-    worksInInvitations: true
-  },
 
   // Computed/Link Variables
-  {
-    label: 'Payment Link',
-    frontendVar: '[paymentLink]',
-    backendVar: '{{payment_link}}',
-    category: 'computed',
-    description: 'Payment URL for vendor (category-specific - only works after they apply)',
-    example: 'https://pay.voxxypresents.com/...',
-    worksInInvitations: false
-  },
   {
     label: 'Event Link',
     frontendVar: '[eventLink]',
     backendVar: '{{event_link}}',
     category: 'computed',
-    description: 'Public application page URL',
-    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Invitation Link',
-    frontendVar: '[invitationLink]',
-    backendVar: '{{invitation_link}}',
-    category: 'computed',
-    description: 'Event invitation URL (same as event link)',
-    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Bulletin Link',
-    frontendVar: '[bulletinLink]',
-    backendVar: '{{bulletin_link}}',
-    category: 'computed',
-    description: 'Event bulletin page URL',
-    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Dashboard Link',
-    frontendVar: '[dashboardLink]',
-    backendVar: '{{dashboard_link}}',
-    category: 'computed',
-    description: 'Event-specific vendor portal URL',
-    example: 'https://voxxy.io/portal/voxxy-presents-1/summer-market-123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Unsubscribe Link',
-    frontendVar: '[unsubscribeLink]',
-    backendVar: '{{unsubscribe_link}}',
-    category: 'computed',
-    description: 'Unsubscribe URL',
-    example: 'https://voxxy.io/unsubscribe/abc123token',
-    worksInInvitations: true
-  },
-  {
-    label: 'Application Link',
-    frontendVar: '[applicationLink]',
-    backendVar: '{{application_link}}',
-    category: 'computed',
-    description: 'Link to apply for the event (uses first vendor application or falls back to event page)',
-    example: 'https://voxxy.io/apply/abc123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Artist Application Link',
-    frontendVar: '[artistApplicationLink]',
-    backendVar: '{{artist_application_link}}',
-    category: 'computed',
-    description: 'Link to apply for artist/gallery/wall categories',
-    example: 'https://voxxy.io/apply/artist-abc123',
-    worksInInvitations: true
-  },
-  {
-    label: 'Vendor Application Link',
-    frontendVar: '[vendorApplicationLink]',
-    backendVar: '{{vendor_application_link}}',
-    category: 'computed',
-    description: 'Link to apply for vendor/table/market categories',
-    example: 'https://voxxy.io/apply/vendor-abc123',
+    description: 'Public application page URL - main hub for event details',
+    example: 'https://voxxy.io/events/org-slug/event-slug-123',
     worksInInvitations: true
   },
   {
@@ -456,17 +375,26 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventPortalLink]',
     backendVar: '{{event_portal_link}}',
     category: 'computed',
-    description: 'Vendor portal/dashboard link (alias for Dashboard Link)',
-    example: 'https://voxxy.io/portal/voxxy-presents-1/summer-market-123',
+    description: 'Vendor portal/dashboard link (requires email to access)',
+    example: 'https://voxxy.io/portal/org-slug/event-slug-123',
     worksInInvitations: true
   },
   {
-    label: 'Event Opt-Out Link',
-    frontendVar: '[eventOptOutLink]',
-    backendVar: '{{event_opt_out_link}}',
+    label: 'Unsubscribe Link',
+    frontendVar: '[unsubscribeLink]',
+    backendVar: '{{unsubscribe_link}}',
     category: 'computed',
-    description: 'Link to decline invitation for this specific event (only available after registration)',
-    example: 'https://voxxy.io/events/voxxy-presents-1/summer-market-123/opt-out',
+    description: 'Unsubscribe URL (required for all emails)',
+    example: 'https://voxxy.io/unsubscribe/abc123token',
+    worksInInvitations: true
+  },
+  {
+    label: 'Payment Link',
+    frontendVar: '[paymentLink]',
+    backendVar: '{{payment_link}}',
+    category: 'computed',
+    description: 'Payment URL for vendor (category-specific - only works after they apply)',
+    example: 'https://pay.stripe.com/...',
     worksInInvitations: false
   },
   {

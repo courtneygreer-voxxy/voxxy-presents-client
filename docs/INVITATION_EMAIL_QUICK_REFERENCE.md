@@ -1,8 +1,8 @@
 # Invitation Email System - Quick Reference
 
-**Last Updated:** March 8, 2026
+**Last Updated:** March 9, 2026
 **Format:** `[bracket]` variables
-**Total Variables Available:** 34 out of 48
+**Total Variables Available:** 30 out of 42
 
 ---
 
@@ -47,7 +47,7 @@ It's a **real ScheduledEmail** (not virtual) that:
 [applicationDeadline]    → "Thursday, May 30, 2025"
 [paymentDueDate]         → "Monday, June 1, 2025"
 [ageRestriction]         → "21+"
-[categoryList]           → "• Artist Booth\n• Food Vendor\n• Beverage Vendor"
+[categoryList]           → "• Artist Booth - https://voxxy.io/events/event-slug/apply/376\n• Food Vendor - https://voxxy.io/events/event-slug/apply/377"
 ```
 
 ### ✅ Organization Variables (2/2)
@@ -70,18 +70,14 @@ It's a **real ScheduledEmail** (not virtual) that:
 [categoryApplicationLink] → "https://voxxy.io/apply/abc123"
 ```
 
-### ✅ Link Variables (9/12)
+### ✅ Link Variables (3/4)
 ```
-[eventLink]              → Public event page URL
-[invitationLink]         → Same as eventLink
-[bulletinLink]           → Event bulletin page
-[dashboardLink]          → Vendor portal URL
-[eventPortalLink]        → Same as dashboardLink
+[eventLink]              → Public event page URL (main hub)
+[eventPortalLink]        → Vendor portal URL
 [unsubscribeLink]        → Unsubscribe URL (REQUIRED!)
-[applicationLink]        → First application or event page
-[artistApplicationLink]  → Artist/gallery application link
-[vendorApplicationLink]  → Vendor/market application link
 ```
+
+**Note:** Individual application links are now included in `[categoryList]` - see below!
 
 ---
 
@@ -215,15 +211,15 @@ View details and apply: [eventLink]
 Deadline: [applicationDeadline]
 ```
 
-### ✅ Option 2: Provide Specific Links
+### ✅ Option 2: Direct Application Links in [categoryList]
 ```
 Hi [greetingName],
 
-Apply for [eventName]:
+Ready to join [eventName]? Choose your category and apply directly:
 
-Artists & Galleries: [artistApplicationLink]
-Food & Beverage Vendors: [vendorApplicationLink]
-View all options: [eventLink]
+[categoryList]
+
+View full event details: [eventLink]
 ```
 
 ### ✅ Option 3: Generic Language

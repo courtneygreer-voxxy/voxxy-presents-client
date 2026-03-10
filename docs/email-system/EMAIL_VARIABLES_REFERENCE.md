@@ -1,15 +1,16 @@
 # Email Variables Reference - Complete List
 
-**Last Updated:** March 8, 2026
-**Total Variables:** 48
+**Last Updated:** March 9, 2026
+**Total Variables:** 42
 **Format:** `[bracket]` notation
 
 ---
 
 ## 📊 Quick Summary
 
-- **Works in Invitations (Position 1):** 34 variables ✅
-- **Only Works Post-Application (Positions 2-17):** 14 variables ❌
+- **Works in Invitations (Position 1):** 30 variables ✅
+- **Only Works Post-Application (Positions 2-17):** 12 variables ❌
+- **Recent Change:** Simplified link variables from 12 → 4, enhanced [categoryList] to include application links
 
 ---
 
@@ -42,7 +43,7 @@
 | `[applicationDeadline]` | Last day to apply | "Thursday, May 30, 2025" | ✅ | ✅ |
 | `[paymentDueDate]` | Payment deadline | "Monday, June 1, 2025" | ✅ | ✅ |
 | `[ageRestriction]` | Age policy | "21+" | ✅ | ✅ |
-| `[categoryList]` | Bulleted list of all categories | "• Artist Booth\n• Food Vendor\n• Beverage Vendor" | ✅ | ✅ |
+| `[categoryList]` | Bulleted list of all categories with direct application links | "• Artist Booth - https://voxxy.io/events/event-slug/apply/376\n• Food Vendor - https://voxxy.io/events/event-slug/apply/377" | ✅ | ✅ |
 
 ### ❌ Only Post-Application (1/15)
 
@@ -97,28 +98,40 @@
 
 ---
 
-## 🔗 COMPUTED/LINK VARIABLES (12 total)
+## 🔗 COMPUTED/LINK VARIABLES (4 total)
 
-### ✅ Available in Invitations (9/12)
-
-| Variable | Description | Example | Invitation | Registration |
-|----------|-------------|---------|------------|--------------|
-| `[eventLink]` | Public event page URL | "https://voxxy.io/events/org/event-123" | ✅ | ✅ |
-| `[invitationLink]` | Same as eventLink | "https://voxxy.io/events/org/event-123" | ✅ | ✅ |
-| `[bulletinLink]` | Event bulletin page | "https://voxxy.io/events/org/event-123" | ✅ | ✅ |
-| `[dashboardLink]` | Vendor portal URL | "https://voxxy.io/portal/org/event-123" | ✅ | ✅ |
-| `[eventPortalLink]` | Same as dashboardLink | "https://voxxy.io/portal/org/event-123" | ✅ | ✅ |
-| `[unsubscribeLink]` | Unsubscribe URL | "https://voxxy.io/unsubscribe/token123" | ✅ | ✅ |
-| `[applicationLink]` | First application or event page | "https://voxxy.io/apply/abc123" | ✅ | ✅ |
-| `[artistApplicationLink]` | Artist/gallery application | "https://voxxy.io/apply/artist-abc" | ✅ | ✅ |
-| `[vendorApplicationLink]` | Vendor/market application | "https://voxxy.io/apply/vendor-abc" | ✅ | ✅ |
-
-### ❌ Only Post-Application (2/12)
+### ✅ Available in Invitations (3/4)
 
 | Variable | Description | Example | Invitation | Registration |
 |----------|-------------|---------|------------|--------------|
-| `[paymentLink]` | Payment URL for vendor | "https://pay.voxxypresents.com/..." | ❌ | ✅ |
-| `[eventOptOutLink]` | Opt-out link | "https://voxxy.io/events/org/event/opt-out" | ❌ | ✅ |
+| `[eventLink]` | Public application page URL (main hub) | "https://voxxy.io/events/org/event-123" | ✅ | ✅ |
+| `[eventPortalLink]` | Vendor portal/dashboard URL | "https://voxxy.io/portal/org/event-123" | ✅ | ✅ |
+| `[unsubscribeLink]` | Unsubscribe URL (required!) | "https://voxxy.io/unsubscribe/token123" | ✅ | ✅ |
+
+### ❌ Only Post-Application (1/4)
+
+| Variable | Description | Example | Invitation | Registration |
+|----------|-------------|---------|------------|--------------|
+| `[paymentLink]` | Payment URL for vendor | "https://pay.stripe.com/..." | ❌ | ✅ |
+
+### 🎯 Application Links Now in [categoryList]
+
+Individual application links are now included in the **[categoryList]** variable:
+
+```
+• Artist Booth - https://voxxy.io/events/event-slug/apply/376
+• Food Vendor - https://voxxy.io/events/event-slug/apply/377
+```
+
+**Removed Variables** (now redundant):
+- ❌ `[invitationLink]` → use `[eventLink]`
+- ❌ `[bulletinLink]` → use `[eventLink]`
+- ❌ `[dashboardLink]` → use `[eventPortalLink]`
+- ❌ `[categoryApplicationLink]` → now in `[categoryList]`
+- ❌ `[applicationLink]` → now in `[categoryList]`
+- ❌ `[artistApplicationLink]` → now in `[categoryList]`
+- ❌ `[vendorApplicationLink]` → now in `[categoryList]`
+- ❌ `[eventOptOutLink]` → not needed
 
 ---
 
@@ -146,12 +159,11 @@ We have the following categories available:
 
 Application deadline: [applicationDeadline]
 
-Ready to apply? Visit our event page:
-[eventLink]
+Ready to apply? Choose your category:
 
-Or apply directly:
-• Artists: [artistApplicationLink]
-• Vendors: [vendorApplicationLink]
+[categoryList]
+
+View all event details: [eventLink]
 
 Questions? Contact us at [organizationEmail]
 
@@ -345,6 +357,18 @@ To unsubscribe: [unsubscribeLink]
 ---
 
 ## 📝 Change Log
+
+### March 9, 2026
+- **Simplified link variables from 12 → 4**
+- **Enhanced [categoryList]** to include direct application links
+- Removed 8 redundant link variables
+- Updated total variable count: 48 → 42
+- Updated invitation variable count: 34 → 30
+
+**Removed Variables:**
+- `[invitationLink]`, `[bulletinLink]`, `[dashboardLink]` → use `[eventLink]` or `[eventPortalLink]`
+- `[categoryApplicationLink]`, `[applicationLink]`, `[artistApplicationLink]`, `[vendorApplicationLink]` → now in `[categoryList]`
+- `[eventOptOutLink]` → not needed
 
 ### March 8, 2026
 - Complete rewrite with all 48 variables

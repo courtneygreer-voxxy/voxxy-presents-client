@@ -44,6 +44,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
     },
     automaticMessages: {
       messages: [],
+      email_campaign_template_id: undefined,
     },
   });
 
