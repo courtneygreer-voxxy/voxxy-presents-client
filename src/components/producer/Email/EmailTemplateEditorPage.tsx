@@ -32,6 +32,13 @@ import {
 import { splitEmailBody, joinEmailBody } from '@/utils/emailFooter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { RichTextEditor } from './RichTextEditor';
 
 interface EmailTemplateEditorPageProps {
@@ -417,85 +424,97 @@ export function EmailTemplateEditorPage({
         </div>
 
         {/* Right Panel - Settings & Variables */}
-        <div className="w-96 border-l border-white/10 overflow-y-auto bg-black/20 backdrop-blur-sm">
+        <div className="w-80 border-l border-white/10 bg-gradient-to-b from-black/40 to-black/20 backdrop-blur-sm overflow-y-auto">
           <div className="p-4 space-y-4">
             {/* Trigger Settings */}
             <div>
               <button
                 onClick={() => setTriggerSettingsOpen(!triggerSettingsOpen)}
-                className="w-full flex items-center justify-between text-white hover:text-white/80 transition-all"
+                className="flex items-center justify-between w-full mb-2"
               >
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  <span className="text-sm font-medium">Trigger Settings</span>
+                <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+                  <Clock className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Trigger Settings</span>
                 </div>
                 {triggerSettingsOpen ? (
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
                 ) : (
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/60" />
                 )}
               </button>
 
               {triggerSettingsOpen && (
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                   {/* Category */}
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1">
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
                       Category
                     </label>
-                    <select
+                    <Select
                       value={formData.category}
-                      onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
                     >
-                      {CATEGORY_OPTIONS.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                        {CATEGORY_OPTIONS.map(opt => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-white text-sm">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Trigger Type */}
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1">
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
                       When to Send
                     </label>
-                    <select
+                    <Select
                       value={formData.trigger_type}
-                      onChange={(e) => setFormData(prev => ({ ...prev, trigger_type: e.target.value }))}
-                      className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm"
+                      onValueChange={(value) => setFormData(prev => ({ ...prev, trigger_type: value }))}
                     >
-                      {TRIGGER_TYPES.map(opt => (
-                        <option key={opt.value} value={opt.value}>{opt.label}</option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                        {TRIGGER_TYPES.map(opt => (
+                          <SelectItem key={opt.value} value={opt.value} className="text-white text-sm">
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {/* Trigger Value */}
                   {selectedTriggerConfig?.requiresValue && (
                     <div>
-                      <label className="block text-xs font-medium text-white/60 mb-1">
-                        Days
+                      <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                        Number of Days
                       </label>
                       <Input
                         type="number"
                         min="0"
                         value={formData.trigger_value}
                         onChange={(e) => setFormData(prev => ({ ...prev, trigger_value: parseInt(e.target.value) || 0 }))}
-                        className="bg-white/5 border-white/10 text-white"
+                        className="bg-white/5 border-white/20 text-white text-sm h-8"
                       />
                     </div>
                   )}
 
                   {/* Send Time */}
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1">
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
                       Send Time
                     </label>
                     <Input
                       type="time"
                       value={formData.trigger_time}
                       onChange={(e) => setFormData(prev => ({ ...prev, trigger_time: e.target.value }))}
-                      className="bg-white/5 border-white/10 text-white"
+                      className="bg-white/5 border-white/20 text-white text-sm h-8"
                     />
                   </div>
 
@@ -520,23 +539,23 @@ export function EmailTemplateEditorPage({
             <div>
               <button
                 onClick={() => setFiltersOpen(!filtersOpen)}
-                className="w-full flex items-center justify-between text-white hover:text-white/80 transition-all"
+                className="flex items-center justify-between w-full mb-2"
               >
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4" />
-                  <span className="text-sm font-medium">Recipient Filters</span>
+                <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+                  <Filter className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Recipient Filters</span>
                 </div>
                 {filtersOpen ? (
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
                 ) : (
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/60" />
                 )}
               </button>
 
               {filtersOpen && (
-                <div className="mt-3 space-y-3">
+                <div className="space-y-3">
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1">
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
                       Application Status
                     </label>
                     <div className="space-y-2">
@@ -564,7 +583,7 @@ export function EmailTemplateEditorPage({
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-white/60 mb-1">
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
                       Payment Status
                     </label>
                     <div className="space-y-2">
@@ -594,37 +613,35 @@ export function EmailTemplateEditorPage({
               )}
             </div>
 
-            {/* Available Variables */}
+            {/* Available Tags */}
             <div>
               <button
                 onClick={() => setAvailableTagsOpen(!availableTagsOpen)}
-                className="w-full flex items-center justify-between text-white hover:text-white/80 transition-all"
+                className="flex items-center justify-between w-full mb-2"
               >
-                <div className="flex items-center gap-2">
-                  <Tag className="w-4 h-4" />
-                  <span className="text-sm font-medium">Available Variables</span>
+                <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+                  <Tag className="w-3.5 h-3.5 text-purple-400" />
+                  <span>Available tags</span>
                 </div>
                 {availableTagsOpen ? (
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
                 ) : (
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-3.5 h-3.5 text-white/60" />
                 )}
               </button>
 
-{availableTagsOpen && (
-                <div className="mt-3">
-                  <p className="text-xs text-white/40 mb-3">
-                    Click to insert into {activeField === 'subject' ? 'subject' : activeField === 'body' ? 'body' : 'email'}
+              {availableTagsOpen && (
+                <div className="space-y-1">
+                  <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
+                    Click a tag to insert it at your cursor position
                     {formData.category === 'event_announcements' && (
                       <span className="block mt-1 text-yellow-400/80">
                         Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                       </span>
                     )}
                   </p>
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     {EMAIL_VARIABLES.map((variable) => {
-                      // Only gray out category-specific variables for event_announcements
-                      // (recipients haven't applied/chosen a category yet)
                       const isAnnouncementEmail = formData.category === 'event_announcements';
                       const isDisabled = (isAnnouncementEmail && !variable.worksInInvitations) || !activeField;
 
@@ -632,11 +649,12 @@ export function EmailTemplateEditorPage({
                         <button
                           key={variable.frontendVar}
                           onClick={() => !isDisabled && handleVariableClick(variable.frontendVar)}
+                          onMouseDown={(e) => e.preventDefault()}
                           disabled={isDisabled}
-                          className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                          className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                             isDisabled
-                              ? 'opacity-40 cursor-not-allowed'
-                              : 'hover:bg-white/5'
+                              ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
+                              : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
                           }`}
                           title={
                             isAnnouncementEmail && !variable.worksInInvitations
@@ -644,17 +662,15 @@ export function EmailTemplateEditorPage({
                               : variable.description
                           }
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <code className={`text-xs font-mono ${
-                              isDisabled && isAnnouncementEmail && !variable.worksInInvitations
-                                ? 'text-white/30'
-                                : 'text-purple-400'
-                            }`}>
-                              {variable.frontendVar}
-                            </code>
-                          </div>
-                          <p className="text-xs text-white/50 mt-1">{variable.description}</p>
-                          <p className="text-xs text-white/30 mt-0.5 italic">Example: {variable.example}</p>
+                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                          <span className="flex-1 text-left truncate">{variable.label}</span>
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                            isDisabled
+                              ? 'text-white/30 bg-white/5'
+                              : 'text-purple-400 bg-purple-500/10'
+                          }`}>
+                            {variable.frontendVar.replace('[', '').replace(']', '')}
+                          </span>
                         </button>
                       );
                     })}
