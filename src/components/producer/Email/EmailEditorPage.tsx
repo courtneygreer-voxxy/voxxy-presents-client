@@ -957,52 +957,18 @@ export function EmailEditorPage({
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
-                  {(() => {
-                    // Show helper text if this is a pre-application email
-                    const position = email.email_template_item?.position;
-                    const category = email.email_template_item?.category;
-                    const isEarlyPosition = position && position <= 3;
-                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
-                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
-                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
-                    const nameLower = email.name.toLowerCase();
-                    const hasPreApplicationKeyword = nameLower.includes('invitation') || nameLower.includes('invite') || nameLower.includes('reminder') || nameLower.includes('deadline');
-
-                    return (isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword) && (
-                      <span className="block mt-1 text-yellow-400/80">
-                        Note: Some variables are disabled for pre-application emails (greyed out)
-                      </span>
-                    );
-                  })()}
+                  {email.email_template_item?.category === 'event_announcements' && (
+                    <span className="block mt-1 text-yellow-400/80">
+                      Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
+                    </span>
+                  )}
                 </p>
                 <div className="space-y-0.5">
                   {EMAIL_VARIABLES.map((variable) => {
-                    // Check if this is a PRE-APPLICATION email (sent before vendor applies/chooses category)
-                    // These emails don't have access to category-specific or registration data
-
-                    // Method 1: Check position (1-3 are typically pre-application)
-                    const position = email.email_template_item?.position;
-                    const isEarlyPosition = position && position <= 3;
-
-                    // Method 2: Check category
-                    const category = email.email_template_item?.category;
-                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
-
-                    // Method 3: Check trigger type (before application)
-                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
-                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
-
-                    // Method 4: Check email name keywords
-                    const nameLower = email.name.toLowerCase();
-                    const hasPreApplicationKeyword = nameLower.includes('invitation') ||
-                                                       nameLower.includes('invite') ||
-                                                       nameLower.includes('reminder') ||
-                                                       nameLower.includes('deadline') ||
-                                                       nameLower.includes('applications open');
-
-                    // Email is pre-application if ANY of these conditions are true
-                    const isPreApplicationEmail = isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword;
-                    const isDisabled = isPreApplicationEmail && !variable.worksInInvitations;
+                    // Only gray out category-specific variables for event_announcements
+                    // (recipients haven't applied/chosen a category yet)
+                    const isAnnouncementEmail = email.email_template_item?.category === 'event_announcements';
+                    const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
 
                     return (
                       <button
@@ -1018,7 +984,7 @@ export function EmailEditorPage({
                         }`}
                         title={
                           isDisabled
-                            ? `${variable.description} (Not available in pre-application emails - requires vendor to apply and choose category first)`
+                            ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
                             : variable.description
                         }
                       >
