@@ -362,16 +362,16 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
 
   // Computed/Link Variables
   {
-    label: 'Event Link',
+    label: 'Apply to Event',
     frontendVar: '[eventLink]',
     backendVar: '{{event_link}}',
     category: 'computed',
-    description: 'Public application page URL - main hub for event details',
+    description: 'Public application page URL - where vendors apply to your event',
     example: 'https://voxxy.io/events/org-slug/event-slug-123',
     worksInInvitations: true
   },
   {
-    label: 'Event Portal Link',
+    label: 'Vendor Dashboard',
     frontendVar: '[eventPortalLink]',
     backendVar: '{{event_portal_link}}',
     category: 'computed',

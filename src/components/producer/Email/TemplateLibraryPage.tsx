@@ -282,10 +282,31 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         )}
 
         {/* All Sequences */}
-        {!isLoading && !error && templates.length > 0 && (
+        {!isLoading && !error && templates.length > 0 && (() => {
+          // Non-admin users see the default template + their own custom sequences
+          const visibleTemplates = isAdmin
+            ? templates
+            : templates.filter(t => t.is_default || t.template_type === 'user');
+
+          if (visibleTemplates.length === 0) return (
+            <div className="text-center py-8">
+              <Mail className="w-10 h-10 text-white/30 mx-auto mb-3" />
+              <h3 className="text-base font-medium text-white mb-1">No Custom Sequences Yet</h3>
+              <p className="text-white/60 text-sm mb-4">Create your first email sequence to get started</p>
+              <button
+                onClick={() => onNavigateToBuilder?.()}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all inline-flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                Create Sequence
+              </button>
+            </div>
+          );
+
+          return (
           <div>
             <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
-              {templates.map(template => {
+              {visibleTemplates.map(template => {
                 const isDefault = template.is_default;
                 const isSystem = template.template_type === 'system';
                 const canDelete = !isDefault && (template.template_type === 'user' || isAdmin);
@@ -297,7 +318,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                       isDefault ? 'bg-yellow-500/[0.03]' : ''
                     }`}
                   >
-                    <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                    <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-white font-medium truncate">{template.name}</span>
@@ -307,7 +328,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                           </span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-[10px] text-white/40 mt-0.5">
+                      <div className="flex items-center gap-2 text-[10px] text-white/60 mt-0.5">
                         <span>{template.email_count || 0} emails</span>
                         {template.events_count > 0 && (
                           <>
@@ -326,21 +347,21 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => onNavigateToBuilder?.(template.id)}
-                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
                         title={isSystem ? 'View sequence' : 'Edit sequence'}
                       >
                         <Edit className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handlePreview(template)}
-                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
                         title="Preview emails"
                       >
                         <Eye className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => handleClone(template)}
-                        className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                        className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
                         title="Clone sequence"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -351,7 +372,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                           className={`p-1.5 rounded transition-all ${
                             deleteConfirmId === template.id
                               ? 'text-red-400 bg-red-500/10'
-                              : 'text-white/30 hover:text-red-400 hover:bg-white/10'
+                              : 'text-white/50 hover:text-red-400 hover:bg-white/10'
                           }`}
                           title={deleteConfirmId === template.id ? 'Click again to confirm' : 'Delete sequence'}
                         >
@@ -364,7 +385,8 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
               })}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Empty State */}
         {!isLoading && !error && templates.length === 0 && (

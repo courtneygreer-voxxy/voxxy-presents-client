@@ -482,9 +482,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
               {emailItems.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
-                  <Mail className="w-8 h-8 text-white/20 mx-auto mb-2" />
+                  <Mail className="w-8 h-8 text-white/40 mx-auto mb-2" />
                   <p className="text-white/60 text-sm mb-3">No emails in this template</p>
-                  {canEdit && template && (
+                  {canEdit && (
                     <button
                       onClick={() => handleAddEmail()}
                       className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all text-sm inline-flex items-center gap-2"
@@ -518,40 +518,40 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                     return (
                       <div key={category}>
                         <div className="flex items-center gap-2 mb-1.5 px-1">
-                          <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                          <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
                             {categoryLabels[category] || category}
                           </h3>
-                          <span className="text-[10px] text-white/30 tabular-nums">{items.length}</span>
-                          {canEdit && template && (
+                          <span className="text-[10px] text-white/50 tabular-nums">{items.length}</span>
+                          {canEdit && (
                             <button
                               onClick={() => handleAddEmail(category)}
-                              className="p-0.5 rounded text-white/30 hover:text-purple-400 hover:bg-white/10 transition-all ml-auto"
-                              title={`Add email to ${categoryLabels[category] || category}`}
+                              className="p-1 rounded text-white/60 hover:text-purple-400 hover:bg-white/10 transition-all ml-auto"
+                              title={template ? `Add email to ${categoryLabels[category] || category}` : 'Save sequence first to add emails'}
                             >
-                              <Plus className="w-3.5 h-3.5" />
+                              <Plus className="w-4 h-4" />
                             </button>
                           )}
                         </div>
                         <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
                           {items.map((item) => (
                             <div key={item.id} className="flex items-center gap-3 py-2.5 px-3">
-                              <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                              <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                               <span className="text-sm text-white truncate flex-1">{item.name}</span>
-                              <span className="text-[10px] text-white/40 flex-shrink-0 hidden sm:inline">
+                              <span className="text-[10px] text-white/60 flex-shrink-0 hidden sm:inline">
                                 {item.trigger_type}
                               </span>
                               {canEdit && (
                                 <div className="flex items-center gap-1 flex-shrink-0">
                                   <button
                                     onClick={() => handleEditEmail(item)}
-                                    className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all"
+                                    className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
                                     title="Edit email"
                                   >
                                     <Edit className="w-3.5 h-3.5" />
                                   </button>
                                   <button
                                     onClick={() => handleDeleteEmail(item.id)}
-                                    className="p-1.5 rounded text-white/30 hover:text-red-400 hover:bg-white/10 transition-all"
+                                    className="p-1.5 rounded text-white/50 hover:text-red-400 hover:bg-white/10 transition-all"
                                     title="Delete email"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
