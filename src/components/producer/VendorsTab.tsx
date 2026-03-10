@@ -288,7 +288,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
               onClick={() => handleSort('business_name')}
               className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
             >
-              Business Name
+              Name
               <ArrowUpDown className="w-3 h-3" />
             </button>
             <button
@@ -353,13 +353,13 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                       />
                     </div>
 
-                    {/* Business Name */}
+                    {/* Name */}
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-white font-medium truncate">{vendor.business_name}</p>
-                        {vendor.contact_name && (
-                          <p className="text-white/60 text-xs truncate">{vendor.contact_name}</p>
+                        <p className="text-white font-medium truncate">{vendor.contact_name || vendor.business_name}</p>
+                        {vendor.business_name && vendor.contact_name && (
+                          <p className="text-white/60 text-xs truncate">{vendor.business_name}</p>
                         )}
                       </div>
                     </div>
@@ -437,10 +437,10 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                         <div className="space-y-3">
                           <div>
                             <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
-                              Contact Name
+                              Business Name
                             </p>
                             <p className="text-sm text-white">
-                              {vendor.contact_name || '—'}
+                              {vendor.business_name || '—'}
                             </p>
                           </div>
 

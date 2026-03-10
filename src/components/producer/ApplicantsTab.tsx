@@ -725,7 +725,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex items-center gap-1 flex-1 min-w-0">
                           <h3 className="text-xs font-semibold text-white truncate">
-                            {applicant.business_name}
+                            {applicant.contact_name || applicant.business_name}
                           </h3>
                           {applicant.is_returning && (
                             <Star className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" fill="currentColor" />
@@ -739,7 +739,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         </span>
                       </div>
                       <p className="text-[10px] text-white/60 truncate mb-1.5">
-                        {applicant.contact_name || applicant.email}
+                        {applicant.contact_name ? applicant.business_name || applicant.email : applicant.email}
                       </p>
                       <div className="flex flex-wrap items-center gap-1">
                         {applicant.status !== 'invited' && (
@@ -784,7 +784,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h2 className="text-lg font-bold text-white">{selectedApplicant.business_name}</h2>
+                      <h2 className="text-lg font-bold text-white">{selectedApplicant.contact_name || selectedApplicant.business_name}</h2>
                       {selectedApplicant.is_returning && (
                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/30">
                           <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
@@ -801,8 +801,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         </span>
                       )}
                     </div>
-                    {selectedApplicant.contact_name && (
-                      <p className="text-sm text-white/80 mb-2">{selectedApplicant.contact_name}</p>
+                    {selectedApplicant.contact_name && selectedApplicant.business_name && (
+                      <p className="text-sm text-white/80 mb-2">{selectedApplicant.business_name}</p>
                     )}
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -984,7 +984,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Status & Payment Management - Only show for applicants who have applied */}
               {selectedApplicant.status !== 'invited' && selectedApplicant.registrationId && (
-                <div className="glass-card p-3">
+                <div className="glass-card p-3 mb-3">
                   <h3 className="text-sm font-semibold text-white mb-3">Status & Actions</h3>
                   {updatingId === selectedApplicant.id ? (
                     <div className="flex items-center justify-center py-2">
@@ -1069,7 +1069,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Email History */}
               {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
-                <div className="glass-card p-3">
+                <div className="glass-card p-4">
                   <button
                     onClick={handleToggleEmailHistory}
                     className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth -m-2 mb-0"

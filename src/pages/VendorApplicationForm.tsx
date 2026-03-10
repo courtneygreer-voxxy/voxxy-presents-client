@@ -540,6 +540,21 @@ export default function VendorApplicationForm() {
             <div>
               <h3 className="text-base font-semibold text-white mb-3">Your Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Full Name */}
+                <div>
+                  <label className="block text-xs font-medium text-white mb-1.5">
+                    Full Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Your full name"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    required
+                  />
+                </div>
+
                 {/* Business/Brand Name */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
@@ -550,21 +565,6 @@ export default function VendorApplicationForm() {
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                    required
-                  />
-                </div>
-
-                {/* Contact Name */}
-                <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
-                    Contact Name <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Your full name"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />

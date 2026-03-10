@@ -123,7 +123,7 @@ function SequenceRowMenu({
       <button
         ref={btnRef}
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded text-white/30 hover:text-white hover:bg-white/10 transition-all"
+        className="p-1.5 rounded text-white/50 hover:text-white hover:bg-white/10 transition-all"
       >
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
@@ -239,13 +239,13 @@ export default function EmailSequenceEditorOverlay({
               <div>
                 <h1 className="text-lg font-semibold text-white">Email Sequence Editor</h1>
                 {eventData?.title && (
-                  <p className="text-xs text-white/50">{eventData.title}</p>
+                  <p className="text-xs text-white/70">{eventData.title}</p>
                 )}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <p className="text-sm text-white/50">{emails.length} emails</p>
+            <p className="text-sm text-white/60">{emails.length} emails</p>
             {onSaveAsTemplate && (
               <button
                 onClick={onSaveAsTemplate}
@@ -264,7 +264,7 @@ export default function EmailSequenceEditorOverlay({
         <div className="max-w-4xl mx-auto space-y-6">
           {groupedEmails.length === 0 ? (
             <div className="text-center py-16 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-white/50">No emails in sequence</p>
+              <p className="text-white/60">No emails in sequence</p>
             </div>
           ) : (
             groupedEmails.map(group => {
@@ -275,10 +275,10 @@ export default function EmailSequenceEditorOverlay({
                     <div className={`p-1 rounded ${group.bg}`}>
                       <GroupIcon className={`w-3.5 h-3.5 ${group.color}`} />
                     </div>
-                    <h3 className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                    <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
                       {group.label}
                     </h3>
-                    <span className="text-[10px] text-white/30 tabular-nums">{group.emails.length}</span>
+                    <span className="text-[10px] text-white/50 tabular-nums">{group.emails.length}</span>
                   </div>
                   <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
                     {group.emails.map(email => {
@@ -287,7 +287,7 @@ export default function EmailSequenceEditorOverlay({
 
                       return (
                         <div key={email.id} className="flex items-center gap-3 py-2.5 px-3">
-                          <Mail className="w-3.5 h-3.5 text-white/30 flex-shrink-0" />
+                          <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                           <span className="text-sm text-white truncate flex-1">{email.name}</span>
 
                           {/* Status Badge */}
@@ -298,7 +298,7 @@ export default function EmailSequenceEditorOverlay({
                           {/* Edit/View Button */}
                           <button
                             onClick={() => onEditEmail(email)}
-                            className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                            className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
                             title={isSent ? 'View email' : 'Edit email'}
                           >
                             {isSent ? <Eye className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
