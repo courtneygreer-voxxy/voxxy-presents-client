@@ -32,7 +32,6 @@ import {
   EMAIL_VARIABLES,
   backendToFrontend,
   frontendToBackend,
-  insertVariableAtCursor,
   validateEmailContent,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
@@ -241,8 +240,21 @@ export function EmailEditorPage({
 
   const handleInsertVariable = (variable: string) => {
     if (activeField === 'subject' && subjectRef.current) {
-      const newValue = insertVariableAtCursor(subjectRef.current, variable);
-      setValue('subject_template', newValue, { shouldValidate: true });
+      const cursorPos = subjectRef.current.selectionStart || 0;
+      const currentValue = getValues('subject_template') || '';
+      const before = currentValue.substring(0, cursorPos);
+      const after = currentValue.substring(cursorPos);
+      const newValue = before + variable + after;
+      // Update both react-hook-form state and DOM value
+      setValue('subject_template', newValue, { shouldValidate: true, shouldDirty: true });
+      subjectRef.current.value = newValue;
+      setTimeout(() => {
+        if (subjectRef.current) {
+          const newPos = cursorPos + variable.length;
+          subjectRef.current.focus();
+          subjectRef.current.setSelectionRange(newPos, newPos);
+        }
+      }, 0);
     } else if (activeField === 'body' && bodyEditor) {
       // Insert variable at current cursor position in TipTap editor
       bodyEditor.chain().focus().insertContent(variable).run();
