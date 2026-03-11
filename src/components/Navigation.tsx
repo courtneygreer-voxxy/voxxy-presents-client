@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { Menu, X, ArrowRight } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 
 interface NavigationProps {
   activePage?: 'home' | 'features' | 'pricing' | 'about' | 'help' | 'contact'
@@ -27,10 +27,7 @@ export default function Navigation({ activePage }: NavigationProps) {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <span className="text-[22px] font-display font-bold text-white tracking-tight">
-              VOXXY
-            </span>
-            <span className="text-[14px] text-voxxy-purple-brand ml-1.5 font-normal">presents</span>
+            <img src="/voxxylogo.png" alt="Voxxy" className="h-14 md:h-16 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
