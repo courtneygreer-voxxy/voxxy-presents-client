@@ -17,6 +17,11 @@ const config: Config = {
   				brand: '#a855f7',
   				light: '#c084fc',
   			},
+  			'voxxy-pink': {
+  				DEFAULT: '#e879f9',
+  				deep: '#c026d3',
+  				light: '#f0abfc',
+  			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

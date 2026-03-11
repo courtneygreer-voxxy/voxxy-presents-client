@@ -22,12 +22,12 @@ export default function Footer() {
               <h4 className="font-semibold mb-3 text-white text-[15px]">Product</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/features" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/features" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     For Artists
                   </Link>
                 </li>
                 <li>
-                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Voxxy Mobile
                   </a>
                 </li>
@@ -39,17 +39,17 @@ export default function Footer() {
               <h4 className="font-semibold mb-3 text-white text-[15px]">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/about" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/about" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/help" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/help" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/contact" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Contact
                   </Link>
                 </li>
@@ -61,22 +61,22 @@ export default function Footer() {
               <h4 className="font-semibold mb-3 text-white text-[15px]">Legal</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/legal/terms" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/legal/terms" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Terms
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/privacy" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/legal/privacy" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/acceptable-use" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/legal/acceptable-use" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Acceptable Use
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/cookies" className="text-white/70 hover:text-purple-400 transition-colors text-[14px]">
+                  <Link to="/legal/cookies" className="text-white/70 hover:text-fuchsia-400 transition-colors text-[14px]">
                     Cookies
                   </Link>
                 </li>
