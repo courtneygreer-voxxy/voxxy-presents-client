@@ -17,8 +17,6 @@ import {
   ChevronRight,
   Clock,
   Tag,
-  Users,
-  Filter,
   CheckCircle2,
   AlertCircle,
   Lock,
@@ -87,7 +85,6 @@ export function EmailTemplateEditorPage({
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
@@ -109,9 +106,6 @@ export function EmailTemplateEditorPage({
     filter_criteria: {} as Record<string, any>,
   });
 
-  // Filter criteria state
-  const [filterStatus, setFilterStatus] = useState<string[]>([]);
-  const [filterPaymentStatus, setFilterPaymentStatus] = useState<string[]>([]);
 
   // Initialize form with item data
   useEffect(() => {
@@ -135,12 +129,6 @@ export function EmailTemplateEditorPage({
 
     // Store footer separately (locked from editing)
     setEmailFooter(footer);
-
-    // Parse filter criteria
-    if (item.filter_criteria) {
-      setFilterStatus(item.filter_criteria.status || []);
-      setFilterPaymentStatus(item.filter_criteria.payment_status || []);
-    }
   }, [item]);
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === formData.trigger_type);
@@ -213,11 +201,6 @@ export function EmailTemplateEditorPage({
     setSaveError(null);
 
     try {
-      // Build filter criteria
-      const filter_criteria: Record<string, any> = {};
-      if (filterStatus.length > 0) filter_criteria.statuses = filterStatus;
-      if (filterPaymentStatus.length > 0) filter_criteria.payment_status = filterPaymentStatus;
-
       // Join content and footer back together for backend storage
       const fullBodyTemplate = joinEmailBody(formData.body_template, emailFooter);
 
@@ -232,7 +215,6 @@ export function EmailTemplateEditorPage({
         trigger_value: formData.trigger_value,
         trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
         enabled_by_default: formData.enabled_by_default,
-        filter_criteria,
       };
 
       await onSave(updatedItem);
@@ -505,19 +487,6 @@ export function EmailTemplateEditorPage({
                     </div>
                   )}
 
-                  {/* Send Time */}
-                  <div>
-                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
-                      Send Time
-                    </label>
-                    <Input
-                      type="time"
-                      value={formData.trigger_time}
-                      onChange={(e) => setFormData(prev => ({ ...prev, trigger_time: e.target.value }))}
-                      className="bg-white/5 border-white/20 text-white text-sm h-8"
-                    />
-                  </div>
-
                   {/* Enabled by Default */}
                   <div className="flex items-center gap-2">
                     <input
@@ -530,84 +499,6 @@ export function EmailTemplateEditorPage({
                     <label htmlFor="enabled" className="text-sm text-white/70">
                       Enabled by default
                     </label>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Filters */}
-            <div>
-              <button
-                onClick={() => setFiltersOpen(!filtersOpen)}
-                className="flex items-center justify-between w-full mb-2"
-              >
-                <div className="flex items-center gap-1.5 text-white font-medium text-sm">
-                  <Filter className="w-3.5 h-3.5 text-purple-400" />
-                  <span>Recipient Filters</span>
-                </div>
-                {filtersOpen ? (
-                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
-                ) : (
-                  <ChevronRight className="w-3.5 h-3.5 text-white/60" />
-                )}
-              </button>
-
-              {filtersOpen && (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
-                      Application Status
-                    </label>
-                    <div className="space-y-2">
-                      {['pending', 'approved', 'waitlisted', 'rejected', 'confirmed'].map(status => (
-                        <div key={status} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            id={`status-${status}`}
-                            checked={filterStatus.includes(status)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setFilterStatus([...filterStatus, status]);
-                              } else {
-                                setFilterStatus(filterStatus.filter(s => s !== status));
-                              }
-                            }}
-                            className="rounded border-white/20"
-                          />
-                          <label htmlFor={`status-${status}`} className="text-sm text-white/70 capitalize">
-                            {status}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
-                      Payment Status
-                    </label>
-                    <div className="space-y-2">
-                      {['pending', 'paid', 'overdue'].map(status => (
-                        <div key={status} className="flex items-center gap-2">
-                          <input
-                            type="checkbox"
-                            id={`payment-${status}`}
-                            checked={filterPaymentStatus.includes(status)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setFilterPaymentStatus([...filterPaymentStatus, status]);
-                              } else {
-                                setFilterPaymentStatus(filterPaymentStatus.filter(s => s !== status));
-                              }
-                            }}
-                            className="rounded border-white/20"
-                          />
-                          <label htmlFor={`payment-${status}`} className="text-sm text-white/70 capitalize">
-                            {status}
-                          </label>
-                        </div>
-                      ))}
-                    </div>
                   </div>
                 </div>
               )}
