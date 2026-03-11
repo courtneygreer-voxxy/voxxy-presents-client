@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { Users, Search, X, Mail, Check, AlertTriangle, Plus, ChevronDown, Filter } from 'lucide-react';
+import { Users, Search, X, Mail, Check, AlertTriangle, Plus, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+
+const PAGE_SIZE = 50;
 import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api';
 
 interface GoLiveInvitationEditorProps {
@@ -145,14 +147,10 @@ export default function GoLiveInvitationEditor({
   onCancel,
 }: GoLiveInvitationEditorProps) {
   // ── Invitation state ──
-  const [selectedListIds, setSelectedListIds] = useState<number[]>(
-    event.invitation_draft?.list_ids || []
-  );
+  // Lists are purely a filter — selecting a list shows its contacts, doesn't auto-invite
+  const [selectedListIds, setSelectedListIds] = useState<number[]>([]);
   const [invitedContactIds, setInvitedContactIds] = useState<number[]>(
     event.invitation_draft?.contact_ids || []
-  );
-  const [excludedContactIds, setExcludedContactIds] = useState<number[]>(
-    event.invitation_draft?.excluded_ids || []
   );
 
   // ── Contact data ──
@@ -163,9 +161,11 @@ export default function GoLiveInvitationEditor({
   const [loadingListContacts, setLoadingListContacts] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // ── Search & filter ──
+  // ── Search, filter, sort, pagination ──
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<string>('all');
+  const [sortColumn, setSortColumn] = useState<'name' | 'email'>('name');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [currentPage, setCurrentPage] = useState(1);
 
   // ── Add email ──
   const [showAddEmailRow, setShowAddEmailRow] = useState(false);
@@ -187,9 +187,16 @@ export default function GoLiveInvitationEditor({
     }
   }, [selectedListIds, organizationId]);
 
-  // ── Filter contacts ──
+  // ── Filter contacts (lists act as a filter, search on top) ──
   useEffect(() => {
     let filtered = contacts;
+
+    // When lists are selected, show only contacts from those lists
+    if (selectedListIds.length > 0 && listContacts.length > 0) {
+      const listContactIdSet = new Set(listContacts.map((c) => c.id));
+      filtered = filtered.filter((c) => listContactIdSet.has(c.id));
+    }
+
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase();
       filtered = filtered.filter(
@@ -200,11 +207,17 @@ export default function GoLiveInvitationEditor({
           c.tags?.some((tag) => tag.toLowerCase().includes(search))
       );
     }
-    if (filterType !== 'all') {
-      filtered = filtered.filter((c) => c.contact_type === filterType);
-    }
     setFilteredContacts(filtered);
-  }, [contacts, searchTerm, filterType]);
+  }, [contacts, searchTerm, selectedListIds, listContacts]);
+
+  const handleSort = (column: 'name' | 'email') => {
+    if (sortColumn === column) {
+      setSortDirection((prev) => (prev === 'asc' ? 'desc' : 'asc'));
+    } else {
+      setSortColumn(column);
+      setSortDirection('asc');
+    }
+  };
 
   const fetchContacts = async () => {
     if (!organizationId) {
@@ -215,10 +228,41 @@ export default function GoLiveInvitationEditor({
     try {
       setLoading(true);
       setError(null);
-      const response = await vendorContactsApi.getAll(organizationId, { page: 1, per_page: 100 });
-      const contactsData = response?.vendor_contacts || [];
-      setContacts(contactsData);
-      setFilteredContacts(contactsData);
+
+      // Fetch page 1 to get total, then remaining pages in parallel
+      const perPage = 100;
+      const firstResponse = await vendorContactsApi.getAll(organizationId, { page: 1, per_page: perPage });
+      let allContacts = firstResponse?.vendor_contacts || [];
+      const totalPages = firstResponse?.meta?.total_pages || 1;
+
+      if (totalPages > 1) {
+        const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+        const remainingResponses = await Promise.all(
+          remainingPages.map((p) => vendorContactsApi.getAll(organizationId, { page: p, per_page: perPage }))
+        );
+        for (const resp of remainingResponses) {
+          allContacts = [...allContacts, ...(resp?.vendor_contacts || [])];
+        }
+      }
+
+      setContacts(allContacts);
+      setFilteredContacts(allContacts);
+
+      // One-time: resolve any previously saved list IDs into invitedContactIds
+      const draftListIds: number[] = event.invitation_draft?.list_ids || [];
+      const draftExcludedIds: number[] = event.invitation_draft?.excluded_ids || [];
+      if (draftListIds.length > 0) {
+        const promises = draftListIds.map(async (listId: number) => {
+          const res = await contactListsApi.getContacts(listId, 1, 10000);
+          return (res.vendor_contacts || []).map((c: VendorContact) => c.id);
+        });
+        const listContactIdArrays = await Promise.all(promises);
+        const listContactIds = listContactIdArrays.flat();
+        setInvitedContactIds((prev) => {
+          const merged = Array.from(new Set([...prev, ...listContactIds]));
+          return merged.filter((id) => !draftExcludedIds.includes(id));
+        });
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
       setContacts([]);
@@ -249,59 +293,36 @@ export default function GoLiveInvitationEditor({
     }
   };
 
-  // ── Toggle logic (unchanged) ──
+  // ── Toggle logic (simple: check/uncheck in invitedContactIds) ──
   const handleToggleContact = (contactId: number) => {
-    const isFromList = listContacts.some((c) => c.id === contactId);
-    if (isFromList) {
-      const isExcluded = excludedContactIds.includes(contactId);
-      setExcludedContactIds(
-        isExcluded
-          ? excludedContactIds.filter((id) => id !== contactId)
-          : [...excludedContactIds, contactId]
-      );
-    } else {
-      setInvitedContactIds(
-        invitedContactIds.includes(contactId)
-          ? invitedContactIds.filter((id) => id !== contactId)
-          : [...invitedContactIds, contactId]
-      );
-    }
+    setInvitedContactIds((prev) =>
+      prev.includes(contactId) ? prev.filter((id) => id !== contactId) : [...prev, contactId]
+    );
   };
 
   const handleSelectAll = () => {
-    const allFilteredIds = filteredContacts.map((c) => c.id);
-    const allSelected = allFilteredIds.every((id) => finalContactIds.includes(id));
+    const visibleIds = filteredContacts.map((c) => c.id);
+    const allSelected = visibleIds.every((id) => invitedContactIds.includes(id));
 
     if (allSelected) {
-      const listContactIds = listContacts.map((c) => c.id);
-      const toExclude = allFilteredIds.filter((id) => listContactIds.includes(id));
-      const toRemoveFromManual = allFilteredIds.filter((id) => !listContactIds.includes(id));
-      setExcludedContactIds([
-        ...excludedContactIds,
-        ...toExclude.filter((id) => !excludedContactIds.includes(id)),
-      ]);
-      setInvitedContactIds(invitedContactIds.filter((id) => !toRemoveFromManual.includes(id)));
+      // Deselect all visible
+      setInvitedContactIds((prev) => prev.filter((id) => !visibleIds.includes(id)));
     } else {
-      const listContactIds = listContacts.map((c) => c.id);
-      const toUnexclude = allFilteredIds.filter((id) => listContactIds.includes(id));
-      const toAddToManual = allFilteredIds.filter(
-        (id) => !listContactIds.includes(id) && !finalContactIds.includes(id)
-      );
-      setExcludedContactIds(excludedContactIds.filter((id) => !toUnexclude.includes(id)));
-      setInvitedContactIds([...invitedContactIds, ...toAddToManual]);
+      // Select all visible
+      setInvitedContactIds((prev) => Array.from(new Set([...prev, ...visibleIds])));
     }
   };
 
   const handleClearAll = () => {
+    setSelectedListIds([]);
     setInvitedContactIds([]);
-    setExcludedContactIds([]);
   };
 
   const handleSave = () => {
     onSave({
-      invitation_list_ids: selectedListIds,
+      invitation_list_ids: [],
       invitation_contact_ids: invitedContactIds,
-      invitation_excluded_ids: excludedContactIds,
+      invitation_excluded_ids: [],
     });
   };
 
@@ -341,25 +362,35 @@ export default function GoLiveInvitationEditor({
     }
   };
 
+  // ── Reset to page 1 when filters/search change ──
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, selectedListIds, listContacts]);
+
   // ── Computed values ──
-  const getMergedContactIds = (): number[] => {
-    const listContactIds = listContacts.map((c) => c.id);
-    const merged = Array.from(new Set([...listContactIds, ...invitedContactIds]));
-    return merged.filter((id) => !excludedContactIds.includes(id));
-  };
-
-  const finalContactIds = getMergedContactIds();
-
-  const selectedContacts = Array.from(
-    new Map([...listContacts, ...contacts].map((c) => [c.id, c])).values()
-  ).filter((c) => finalContactIds.includes(c.id));
-
-  const unsubscribedCount = selectedContacts.filter(
-    (c) => c.unsubscribe_status?.is_unsubscribed
+  const unsubscribedCount = contacts.filter(
+    (c) => invitedContactIds.includes(c.id) && c.unsubscribe_status?.is_unsubscribed
   ).length;
 
   const allFilteredSelected =
-    filteredContacts.length > 0 && filteredContacts.every((c) => finalContactIds.includes(c.id));
+    filteredContacts.length > 0 && filteredContacts.every((c) => invitedContactIds.includes(c.id));
+
+  // Sort: selected first, then by column
+  const sortedContacts = [...filteredContacts].sort((a, b) => {
+    const aSelected = invitedContactIds.includes(a.id) ? 0 : 1;
+    const bSelected = invitedContactIds.includes(b.id) ? 0 : 1;
+    if (aSelected !== bSelected) return aSelected - bSelected;
+
+    const aVal = sortColumn === 'name' ? a.contact_name : a.email;
+    const bVal = sortColumn === 'name' ? b.contact_name : b.email;
+    const cmp = aVal.localeCompare(bVal);
+    return sortDirection === 'asc' ? cmp : -cmp;
+  });
+
+  // Paginate sorted contacts
+  const totalTablePages = Math.max(1, Math.ceil(sortedContacts.length / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalTablePages);
+  const paginatedContacts = sortedContacts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
 
   // ── Guard states ──
   if (!organizationId) {
@@ -446,18 +477,6 @@ export default function GoLiveInvitationEditor({
           />
         </div>
 
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value)}
-          className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
-        >
-          <option value="all">All Types</option>
-          <option value="vendor">Vendors</option>
-          <option value="partner">Partners</option>
-          <option value="sponsor">Sponsors</option>
-          <option value="staff">Staff</option>
-        </select>
-
         <button
           type="button"
           onClick={() => setShowAddEmailRow(true)}
@@ -473,23 +492,17 @@ export default function GoLiveInvitationEditor({
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <Users className="w-3.5 h-3.5 text-purple-400" />
-            <span className="text-white font-medium">{finalContactIds.length}</span>
-            <span className="text-white/50">will be invited</span>
+            <span className="text-white">
+              <span className="font-medium">{invitedContactIds.length}</span>
+              <span className="text-white/50"> selected out of </span>
+              <span className="font-medium">{contacts.length}</span>
+            </span>
           </div>
 
           {selectedListIds.length > 0 && (
             <span className="text-white/40">
-              {listContacts.length} from lists
-              {invitedContactIds.filter((id) => !listContacts.some((c) => c.id === id)).length > 0 &&
-                ` + ${invitedContactIds.filter((id) => !listContacts.some((c) => c.id === id)).length} manual`}
-              {excludedContactIds.length > 0 && (
-                <span className="text-red-400"> - {excludedContactIds.length} excluded</span>
-              )}
+              Showing {filteredContacts.length} from {selectedListIds.length} list{selectedListIds.length !== 1 ? 's' : ''}
             </span>
-          )}
-
-          {!selectedListIds.length && invitedContactIds.length > 0 && (
-            <span className="text-white/40">{invitedContactIds.length} manual</span>
           )}
 
           {unsubscribedCount > 0 && (
@@ -502,13 +515,13 @@ export default function GoLiveInvitationEditor({
           {loadingListContacts && (
             <span className="flex items-center gap-1 text-white/40">
               <div className="w-3 h-3 border border-white/30 border-t-white rounded-full animate-spin" />
-              Loading lists...
+              Loading...
             </span>
           )}
         </div>
 
         <div className="flex items-center gap-3">
-          {(invitedContactIds.length > 0 || selectedListIds.length > 0) && (
+          {invitedContactIds.length > 0 && (
             <button
               type="button"
               onClick={handleClearAll}
@@ -587,7 +600,7 @@ export default function GoLiveInvitationEditor({
         <div className="bg-white/5 border-t border-white/10 overflow-hidden flex-1 flex flex-col">
           {/* Table header */}
           <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10 flex-shrink-0">
-            <div className="grid grid-cols-[36px,1fr,1fr,1.5fr,80px,70px] gap-2 px-4 py-2 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
+            <div className="grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
               <div className="flex items-center justify-center">
                 <input
                   type="checkbox"
@@ -596,34 +609,51 @@ export default function GoLiveInvitationEditor({
                   className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                 />
               </div>
-              <div>Name</div>
+              <button
+                type="button"
+                onClick={() => handleSort('name')}
+                className="flex items-center gap-1 hover:text-white transition-colors text-left"
+              >
+                Name
+                {sortColumn === 'name' ? (
+                  sortDirection === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3 opacity-30" />
+                )}
+              </button>
               <div>Business</div>
-              <div>Email</div>
+              <button
+                type="button"
+                onClick={() => handleSort('email')}
+                className="flex items-center gap-1 hover:text-white transition-colors text-left"
+              >
+                Email
+                {sortColumn === 'email' ? (
+                  sortDirection === 'asc' ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />
+                ) : (
+                  <ChevronDown className="w-3 h-3 opacity-30" />
+                )}
+              </button>
               <div>Type</div>
-              <div>Source</div>
             </div>
           </div>
 
           {/* Table body */}
           <div className="flex-1 overflow-y-auto">
-            {filteredContacts.length === 0 ? (
+            {sortedContacts.length === 0 ? (
               <div className="text-center py-16">
                 <p className="text-white/50 text-sm">No contacts match your search criteria</p>
                 <button
                   type="button"
-                  onClick={() => {
-                    setSearchTerm('');
-                    setFilterType('all');
-                  }}
+                  onClick={() => setSearchTerm('')}
                   className="mt-3 text-purple-400 hover:text-purple-300 text-sm transition-colors"
                 >
-                  Clear filters
+                  Clear search
                 </button>
               </div>
             ) : (
-              filteredContacts.map((contact) => {
-                const isSelected = finalContactIds.includes(contact.id);
-                const isFromList = listContacts.some((c) => c.id === contact.id);
+              paginatedContacts.map((contact) => {
+                const isSelected = invitedContactIds.includes(contact.id);
                 const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
                 const unsubscribeScope = contact.unsubscribe_status?.scope;
 
@@ -631,7 +661,7 @@ export default function GoLiveInvitationEditor({
                   <div
                     key={contact.id}
                     onClick={() => handleToggleContact(contact.id)}
-                    className={`grid grid-cols-[36px,1fr,1fr,1.5fr,80px,70px] gap-2 px-4 py-2 items-center text-xs border-b border-white/5 last:border-0 cursor-pointer transition-colors ${
+                    className={`grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-xs border-b border-white/5 last:border-0 cursor-pointer transition-colors ${
                       isSelected
                         ? 'bg-purple-500/10 hover:bg-purple-500/15'
                         : isUnsubscribed
@@ -685,19 +715,6 @@ export default function GoLiveInvitationEditor({
                         {contact.contact_type}
                       </span>
                     </div>
-
-                    {/* Source */}
-                    <div>
-                      {isFromList ? (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                          List
-                        </span>
-                      ) : (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30">
-                          Manual
-                        </span>
-                      )}
-                    </div>
                   </div>
                 );
               })
@@ -715,13 +732,39 @@ export default function GoLiveInvitationEditor({
         >
           Cancel
         </button>
+
+        {/* Pagination */}
+        {totalTablePages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage <= 1}
+              className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs text-white/60 min-w-[80px] text-center">
+              Page {safePage} of {totalTablePages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalTablePages, p + 1))}
+              disabled={safePage >= totalTablePages}
+              className="p-1.5 rounded-lg text-white/60 hover:text-white hover:bg-white/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleSave}
           className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium text-sm flex items-center gap-2"
         >
           <Check className="w-4 h-4" />
-          Save {finalContactIds.length} contacts
+          Save {invitedContactIds.length} contact{invitedContactIds.length !== 1 ? 's' : ''}
         </button>
       </div>
     </div>
