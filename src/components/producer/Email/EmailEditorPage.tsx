@@ -104,6 +104,7 @@ export function EmailEditorPage({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
+  const activeFieldRef = useRef<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [recipientsOpen, setRecipientsOpen] = useState(false);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
@@ -117,6 +118,21 @@ export function EmailEditorPage({
   const subjectRef = useRef<HTMLInputElement>(null);
   const timezoneInfo = getTimezoneInfo();
   const { toast } = useToast();
+
+  // Safe field tracking: ref ensures onBlur timeouts don't clobber a newer focus
+  const focusField = (field: 'subject' | 'body') => {
+    activeFieldRef.current = field;
+    setActiveField(field);
+  };
+  const blurField = (field: 'subject' | 'body') => {
+    // Only clear if the active field hasn't been changed to something else
+    setTimeout(() => {
+      if (activeFieldRef.current === field) {
+        activeFieldRef.current = null;
+        setActiveField(null);
+      }
+    }, 200);
+  };
 
   const {
     register,
@@ -684,8 +700,8 @@ export function EmailEditorPage({
                   register('subject_template').ref(e);
                   if (e) (subjectRef as React.MutableRefObject<HTMLInputElement | null>).current = e;
                 }}
-                onFocus={() => setActiveField('subject')}
-                onBlur={() => setTimeout(() => setActiveField(null), 200)}
+                onFocus={() => focusField('subject')}
+                onBlur={() => blurField('subject')}
                 className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
                 placeholder="e.g., Reminder: [eventName] is Tomorrow!"
               />
@@ -700,8 +716,8 @@ export function EmailEditorPage({
                 content={body || ''}
                 onChange={(html) => setValue('body_template', html, { shouldValidate: true })}
                 onEditorReady={(editor) => setBodyEditor(editor)}
-                onFocus={() => setActiveField('body')}
-                onBlur={() => setTimeout(() => setActiveField(null), 200)}
+                onFocus={() => focusField('body')}
+                onBlur={() => blurField('body')}
                 placeholder="Write your email message here... Use the toolbar to format text and click variables on the right to insert."
               />
             </div>
