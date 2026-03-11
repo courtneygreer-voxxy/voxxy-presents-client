@@ -151,13 +151,13 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative pt-[140px] pb-20 px-6 md:px-12 min-h-[90vh] flex items-center">
-        <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/12 via-purple-600/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             {/* Hero Content */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-voxxy-purple-brand/20 border border-voxxy-purple-brand/30 px-4 py-1.5 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-fuchsia-500/15 border border-fuchsia-400/25 px-4 py-1.5 rounded-full mb-6">
                 <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
                 <span className="text-[13px] font-semibold text-purple-200">Now Live — Accepting Event Producers</span>
               </div>
@@ -172,7 +172,7 @@ export default function HomePage() {
 
               <div className="flex gap-4 flex-wrap">
                 <TrackedButton
-                  className="inline-flex items-center px-8 py-3.5 bg-voxxy-purple-brand hover:bg-purple-700 text-white text-[16px] font-semibold rounded-xl transition-all shadow-lg shadow-voxxy-purple-brand/30 hover:shadow-xl hover:-translate-y-0.5"
+                  className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 text-white text-[16px] font-semibold rounded-xl transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-xl hover:-translate-y-0.5"
                   trackingData={{
                     button_text: 'Get Started',
                     button_location: 'hero',
@@ -186,7 +186,7 @@ export default function HomePage() {
                   </Link>
                 </TrackedButton>
                 <TrackedButton
-                  className="inline-flex items-center px-8 py-3.5 bg-white/10 hover:bg-white/15 border border-white/15 hover:border-white/30 text-white text-[16px] font-medium rounded-xl transition-all"
+                  className="inline-flex items-center px-8 py-4 bg-white/10 hover:bg-white/15 border border-white/15 hover:border-fuchsia-400/30 text-white text-[16px] font-medium rounded-xl transition-all"
                   trackingData={{
                     button_text: 'See How It Works',
                     button_location: 'hero',
@@ -218,7 +218,7 @@ export default function HomePage() {
                 <img
                   src="/screenshots/hero-dashboard.png"
                   alt="Voxxy Presents dashboard showing event management, vendor applications, and automated workflows"
-                  className="rounded-2xl shadow-2xl border border-white/10"
+                  className="rounded-2xl shadow-2xl border border-fuchsia-500/20"
                   loading="eager"
                 />
               </div>
@@ -227,62 +227,38 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Metrics Bar */}
-      <section className="bg-gray-50 py-10 px-6 border-y border-gray-200">
-        <div className="container mx-auto max-w-[1200px]">
-          <div className="flex justify-center gap-16 flex-wrap">
-            <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">3,000</div>
-              <div className="text-[14px] text-gray-600">Artists Invited</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">5</div>
-              <div className="text-[14px] text-gray-600">Art Shows This Month</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">~5 min</div>
-              <div className="text-[14px] text-gray-600">Event Setup Time</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[36px] font-display font-bold text-voxxy-purple-brand mb-1">3</div>
-              <div className="text-[14px] text-gray-600">Simple Pricing Tiers</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Problem Section */}
-      <section ref={problemsRef} className="py-[100px] px-6 md:px-12 bg-white">
+      <section ref={problemsRef} className="py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Problem</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">Event coordination is broken</h2>
-            <p className="text-[18px] text-gray-600 max-w-[600px]">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">The Problem</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">Event coordination is broken</h2>
+            <p className="text-[18px] text-white/60 max-w-[600px]">
               The bigger your event calendar grows, the more coordination eats your time — and your margins.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">5–7 Tools, Zero Visibility</h3>
-              <p className="text-[15px] leading-relaxed text-gray-600">
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-purple-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-white">5–7 Tools, Zero Visibility</h3>
+              <p className="text-[15px] leading-relaxed text-white/60">
                 You're chasing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical details get buried. Deadlines slip.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">Hours of Unpaid Coordination</h3>
-              <p className="text-[15px] leading-relaxed text-gray-600">
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-fuchsia-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-white">Hours of Unpaid Coordination</h3>
+              <p className="text-[15px] leading-relaxed text-white/60">
                 Every event eats hours of back-and-forth that doesn't scale. Your calendar grows, but your coordination workflow stays manual.
               </p>
             </div>
 
-            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-voxxy-purple-brand">200+ Applications, No Way to Compare</h3>
-              <p className="text-[15px] leading-relaxed text-gray-600">
+            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-pink-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-white">200+ Applications, No Way to Compare</h3>
+              <p className="text-[15px] leading-relaxed text-white/60">
                 You're scrolling social profiles one by one. Great vendors get lost in the pile. By application 80, you're approving on fatigue.
               </p>
             </div>
@@ -291,33 +267,33 @@ export default function HomePage() {
       </section>
 
       {/* Solution / Features Section */}
-      <section ref={featuresRef} className="py-[100px] px-6 md:px-12 bg-gray-50">
+      <section ref={featuresRef} className="py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Platform</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">One place for everything</h2>
-            <p className="text-[18px] text-gray-600 max-w-[600px]">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">The Platform</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">One place for everything</h2>
+            <p className="text-[18px] text-white/60 max-w-[600px]">
               Replace disconnected tools with a single platform built for how you actually run events.
             </p>
           </div>
 
           {/* Feature Block 1 */}
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-white/10">
             <div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Automated emails that keep vendors in the loop</h3>
-              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Automated emails that keep vendors in the loop</h3>
+              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
                 Application confirmations, approval notices, payment reminders, event-day details — all sent automatically from one branded email thread. Vendors always know where they stand. You never have to write the same email twice.
               </p>
               <div className="flex gap-2 flex-wrap">
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">Automated Sequences</span>
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">Branded Emails</span>
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">Zero Manual Follow-Up</span>
+                <span className="px-3.5 py-1.5 bg-purple-500/15 text-purple-300 text-[12px] font-semibold rounded-full border border-purple-400/20">Automated Sequences</span>
+                <span className="px-3.5 py-1.5 bg-fuchsia-500/15 text-fuchsia-300 text-[12px] font-semibold rounded-full border border-fuchsia-400/20">Branded Emails</span>
+                <span className="px-3.5 py-1.5 bg-purple-500/15 text-purple-300 text-[12px] font-semibold rounded-full border border-purple-400/20">Zero Manual Follow-Up</span>
               </div>
             </div>
             <img
               src="/screenshots/email-flows.png"
               alt="Automated email sequences for vendor communication showing approval notices and payment reminders"
-              className="rounded-2xl shadow-xl border border-gray-200"
+              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
               loading="lazy"
             />
           </div>
@@ -325,21 +301,21 @@ export default function HomePage() {
           {/* Feature Block 2 - Reversed */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="md:order-2">
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-voxxy-purple-brand">Vendor relationships that compound</h3>
-              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Vendor relationships that compound</h3>
+              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
                 Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. Your best vendors are always one search away.
               </p>
               <div className="flex gap-2 flex-wrap">
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">Vendor CRM</span>
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">Performance Tracking</span>
-                <span className="px-3.5 py-1.5 bg-voxxy-purple-brand/10 text-voxxy-purple-brand text-[12px] font-semibold rounded-full border border-voxxy-purple-brand/20">CSV Import</span>
+                <span className="px-3.5 py-1.5 bg-fuchsia-500/15 text-fuchsia-300 text-[12px] font-semibold rounded-full border border-fuchsia-400/20">Vendor CRM</span>
+                <span className="px-3.5 py-1.5 bg-purple-500/15 text-purple-300 text-[12px] font-semibold rounded-full border border-purple-400/20">Performance Tracking</span>
+                <span className="px-3.5 py-1.5 bg-fuchsia-500/15 text-fuchsia-300 text-[12px] font-semibold rounded-full border border-fuchsia-400/20">CSV Import</span>
               </div>
             </div>
             <div className="md:order-1">
               <img
                 src="/screenshots/vendor-crm.png"
                 alt="Vendor CRM showing contact management, tags, ratings, and performance tracking across events"
-                className="rounded-2xl shadow-xl border border-gray-200"
+                className="rounded-2xl shadow-xl border border-fuchsia-500/20"
                 loading="lazy"
               />
             </div>
@@ -348,7 +324,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <TrackedLink
               to="/features"
-              className="inline-flex items-center px-8 py-3.5 bg-transparent hover:bg-voxxy-purple-brand/5 border-2 border-voxxy-purple-brand text-voxxy-purple-brand text-[16px] font-semibold rounded-xl transition-all"
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white text-[16px] font-semibold rounded-xl transition-all shadow-lg shadow-fuchsia-500/20 hover:shadow-xl hover:-translate-y-0.5"
               trackingData={{
                 link_text: 'See All Features',
                 destination_page: 'Features',
@@ -363,35 +339,35 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-[100px] px-6 md:px-12 bg-white">
+      <section className="py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14 text-center">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">How It Works</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-voxxy-purple-brand mb-4">Live in minutes, not months</h2>
-            <p className="text-[18px] text-gray-600 max-w-[600px] mx-auto">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">How It Works</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">Live in minutes, not months</h2>
+            <p className="text-[18px] text-white/60 max-w-[600px] mx-auto">
               No enterprise onboarding. No implementation timeline. You can be running your next event through Voxxy today.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-14 h-14 bg-voxxy-purple-brand text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">1</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5">Create your event</h3>
-              <p className="text-[15px] text-gray-600 leading-relaxed">
+              <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">1</div>
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Create your event</h3>
+              <p className="text-[15px] text-white/60 leading-relaxed">
                 Set up your event details, application form, and vendor categories. Import existing vendor lists via CSV if you have them.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-voxxy-purple-brand text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">2</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5">Open applications</h3>
-              <p className="text-[15px] text-gray-600 leading-relaxed">
+              <div className="w-14 h-14 bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">2</div>
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Open applications</h3>
+              <p className="text-[15px] text-white/60 leading-relaxed">
                 Share your application link. Vendors apply with portfolios and details. Review and approve with side-by-side comparison tools.
               </p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-voxxy-purple-brand text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">3</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5">Coordinate and grow</h3>
-              <p className="text-[15px] text-gray-600 leading-relaxed">
+              <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">3</div>
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Coordinate and grow</h3>
+              <p className="text-[15px] text-white/60 leading-relaxed">
                 Automated emails handle the logistics. Vendor CRM tracks relationships across events. Your community grows with every show.
               </p>
             </div>
@@ -400,8 +376,8 @@ export default function HomePage() {
       </section>
 
       {/* Traction / Testimonial */}
-      <section className="py-[100px] px-6 md:px-12 bg-gradient-to-br from-voxxy-purple-deep to-voxxy-purple-mid relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/20 via-transparent to-transparent opacity-40"></div>
+      <section className="py-[100px] px-6 md:px-12 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/10 via-transparent to-transparent opacity-40"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="mb-14">
@@ -412,7 +388,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="bg-white/10 border border-white/20 rounded-2xl p-10 grid md:grid-cols-2 gap-12 items-center backdrop-blur-sm">
+          <div className="bg-white/10 border border-fuchsia-400/15 rounded-2xl p-10 grid md:grid-cols-2 gap-12 items-center backdrop-blur-sm">
             <div>
               <p className="text-[20px] italic leading-relaxed text-white/85 mb-6">
                 "We've grown from one market every other month to two markets a month with Voxxy. The automation freed us up to focus on bringing more vendors and revenue to Brooklyn. Game changer."
@@ -428,7 +404,7 @@ export default function HomePage() {
             <img
               src="/screenshots/event-photo.png"
               alt="Vibrant art market event with vendors and attendees"
-              className="rounded-2xl shadow-xl border border-white/10"
+              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
               loading="lazy"
             />
           </div>
@@ -436,7 +412,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section with Contact Form */}
-      <section id="contact" className="py-24 px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
+      <section id="contact" className="py-24 px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           {/* Header */}
           <div className="mb-12">
@@ -464,11 +440,11 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-purple-400" />
+                    <Mail className="w-5 h-5 text-fuchsia-400" />
                   </div>
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">EMAIL</div>
-                    <a href="mailto:team@voxxypresents.com" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                    <a href="mailto:team@voxxypresents.com" className="text-[15px] text-white hover:text-fuchsia-400 transition-colors">
                       team@voxxypresents.com
                     </a>
                   </div>
@@ -476,11 +452,11 @@ export default function HomePage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-5 h-5 text-purple-400" />
+                    <MessageCircle className="w-5 h-5 text-fuchsia-400" />
                   </div>
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">COMMUNITY</div>
-                    <a href="https://discord.gg/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                    <a href="https://discord.gg/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-fuchsia-400 transition-colors">
                       Join our Discord
                     </a>
                   </div>
@@ -488,11 +464,11 @@ export default function HomePage() {
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center flex-shrink-0">
-                    <Instagram className="w-5 h-5 text-purple-400" />
+                    <Instagram className="w-5 h-5 text-fuchsia-400" />
                   </div>
                   <div>
                     <div className="text-[11px] font-semibold uppercase tracking-wider text-white/40 mb-1">SOCIAL</div>
-                    <a href="https://instagram.com/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-purple-400 transition-colors">
+                    <a href="https://instagram.com/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white hover:text-fuchsia-400 transition-colors">
                       @voxxypresents on Instagram
                     </a>
                   </div>
@@ -513,7 +489,7 @@ export default function HomePage() {
                   </p>
                 </div>
               ) : (
-                <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
+                <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-fuchsia-400/10 rounded-2xl p-8">
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Name and Email Row */}
                     <div className="grid md:grid-cols-2 gap-4">
@@ -566,7 +542,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg hover:shadow-xl"
+                      className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg shadow-fuchsia-500/20 hover:shadow-xl"
                     >
                       {isSubmitting ? 'Sending...' : 'Send Message'}
                       {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
@@ -575,7 +551,7 @@ export default function HomePage() {
                     {/* Bottom Email Link */}
                     <p className="text-center text-[13px] text-white/50">
                       Or email us directly at{' '}
-                      <a href="mailto:team@voxxypresents.com" className="text-white/70 hover:text-purple-400 transition-colors underline">
+                      <a href="mailto:team@voxxypresents.com" className="text-white/70 hover:text-fuchsia-400 transition-colors underline">
                         team@voxxypresents.com
                       </a>
                     </p>

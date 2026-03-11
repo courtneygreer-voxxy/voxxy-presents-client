@@ -11,23 +11,23 @@ export default function Navigation({ activePage }: NavigationProps) {
 
   const getLinkClass = (page: string) => {
     return activePage === page
-      ? "text-voxxy-purple-brand font-medium"
-      : "text-gray-300 hover:text-voxxy-purple-brand transition-colors"
+      ? "text-fuchsia-400 font-medium"
+      : "text-gray-300 hover:text-fuchsia-400 transition-colors"
   }
 
   const getMobileLinkClass = (page: string) => {
     return activePage === page
-      ? "block text-voxxy-purple-brand font-medium transition-colors py-2"
-      : "block text-gray-300 hover:text-voxxy-purple-brand transition-colors py-2"
+      ? "block text-fuchsia-400 font-medium transition-colors py-2"
+      : "block text-gray-300 hover:text-fuchsia-400 transition-colors py-2"
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-4 bg-gradient-to-r from-voxxy-purple-deep/95 to-voxxy-purple-mid/95 backdrop-blur-xl border-b border-white/10">
+    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-1 bg-gradient-to-r from-voxxy-purple-deep/95 to-voxxy-purple-mid/95 backdrop-blur-xl border-b border-white/10">
       <div className="container mx-auto max-w-[1200px]">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center">
-            <img src="/voxxylogo.png" alt="Voxxy" className="h-14 md:h-16 w-auto" />
+          <Link to="/" className="flex items-center -my-2">
+            <img src="/voxxylogo.png" alt="Voxxy" className="h-16 md:h-20 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -46,7 +46,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/contact"
-              className="bg-voxxy-purple-brand text-white px-6 py-2.5 rounded-lg text-[14px] font-semibold hover:bg-purple-700 transition-all hover:-translate-y-0.5"
+              className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-6 py-3 rounded-lg text-[14px] font-semibold hover:from-purple-700 hover:to-fuchsia-600 transition-all hover:-translate-y-0.5"
             >
               Get Started →
             </Link>
@@ -96,7 +96,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/contact"
-              className="block bg-voxxy-purple-brand text-white px-6 py-2.5 rounded-lg text-center"
+              className="block bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-6 py-3 rounded-lg text-center"
               onClick={() => setMobileMenuOpen(false)}
             >
               Get Started
