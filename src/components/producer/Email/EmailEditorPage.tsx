@@ -32,7 +32,6 @@ import {
   EMAIL_VARIABLES,
   backendToFrontend,
   frontendToBackend,
-  insertVariableAtCursor,
   validateEmailContent,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
@@ -105,6 +104,7 @@ export function EmailEditorPage({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
+  const activeFieldRef = useRef<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [recipientsOpen, setRecipientsOpen] = useState(false);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
@@ -118,6 +118,21 @@ export function EmailEditorPage({
   const subjectRef = useRef<HTMLInputElement>(null);
   const timezoneInfo = getTimezoneInfo();
   const { toast } = useToast();
+
+  // Safe field tracking: ref ensures onBlur timeouts don't clobber a newer focus
+  const focusField = (field: 'subject' | 'body') => {
+    activeFieldRef.current = field;
+    setActiveField(field);
+  };
+  const blurField = (field: 'subject' | 'body') => {
+    // Only clear if the active field hasn't been changed to something else
+    setTimeout(() => {
+      if (activeFieldRef.current === field) {
+        activeFieldRef.current = null;
+        setActiveField(null);
+      }
+    }, 200);
+  };
 
   const {
     register,
@@ -241,8 +256,21 @@ export function EmailEditorPage({
 
   const handleInsertVariable = (variable: string) => {
     if (activeField === 'subject' && subjectRef.current) {
-      const newValue = insertVariableAtCursor(subjectRef.current, variable);
-      setValue('subject_template', newValue, { shouldValidate: true });
+      const cursorPos = subjectRef.current.selectionStart || 0;
+      const currentValue = getValues('subject_template') || '';
+      const before = currentValue.substring(0, cursorPos);
+      const after = currentValue.substring(cursorPos);
+      const newValue = before + variable + after;
+      // Update both react-hook-form state and DOM value
+      setValue('subject_template', newValue, { shouldValidate: true, shouldDirty: true });
+      subjectRef.current.value = newValue;
+      setTimeout(() => {
+        if (subjectRef.current) {
+          const newPos = cursorPos + variable.length;
+          subjectRef.current.focus();
+          subjectRef.current.setSelectionRange(newPos, newPos);
+        }
+      }, 0);
     } else if (activeField === 'body' && bodyEditor) {
       // Insert variable at current cursor position in TipTap editor
       bodyEditor.chain().focus().insertContent(variable).run();
@@ -672,8 +700,8 @@ export function EmailEditorPage({
                   register('subject_template').ref(e);
                   if (e) (subjectRef as React.MutableRefObject<HTMLInputElement | null>).current = e;
                 }}
-                onFocus={() => setActiveField('subject')}
-                onBlur={() => setTimeout(() => setActiveField(null), 200)}
+                onFocus={() => focusField('subject')}
+                onBlur={() => blurField('subject')}
                 className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
                 placeholder="e.g., Reminder: [eventName] is Tomorrow!"
               />
@@ -688,8 +716,8 @@ export function EmailEditorPage({
                 content={body || ''}
                 onChange={(html) => setValue('body_template', html, { shouldValidate: true })}
                 onEditorReady={(editor) => setBodyEditor(editor)}
-                onFocus={() => setActiveField('body')}
-                onBlur={() => setTimeout(() => setActiveField(null), 200)}
+                onFocus={() => focusField('body')}
+                onBlur={() => blurField('body')}
                 placeholder="Write your email message here... Use the toolbar to format text and click variables on the right to insert."
               />
             </div>
@@ -957,52 +985,18 @@ export function EmailEditorPage({
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
-                  {(() => {
-                    // Show helper text if this is a pre-application email
-                    const position = email.email_template_item?.position;
-                    const category = email.email_template_item?.category;
-                    const isEarlyPosition = position && position <= 3;
-                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
-                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
-                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
-                    const nameLower = email.name.toLowerCase();
-                    const hasPreApplicationKeyword = nameLower.includes('invitation') || nameLower.includes('invite') || nameLower.includes('reminder') || nameLower.includes('deadline');
-
-                    return (isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword) && (
-                      <span className="block mt-1 text-yellow-400/80">
-                        Note: Some variables are disabled for pre-application emails (greyed out)
-                      </span>
-                    );
-                  })()}
+                  {email.email_template_item?.category === 'event_announcements' && (
+                    <span className="block mt-1 text-yellow-400/80">
+                      Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
+                    </span>
+                  )}
                 </p>
                 <div className="space-y-0.5">
                   {EMAIL_VARIABLES.map((variable) => {
-                    // Check if this is a PRE-APPLICATION email (sent before vendor applies/chooses category)
-                    // These emails don't have access to category-specific or registration data
-
-                    // Method 1: Check position (1-3 are typically pre-application)
-                    const position = email.email_template_item?.position;
-                    const isEarlyPosition = position && position <= 3;
-
-                    // Method 2: Check category
-                    const category = email.email_template_item?.category;
-                    const isPreApplicationCategory = category === 'pre_application' || category === 'event_announcements';
-
-                    // Method 3: Check trigger type (before application)
-                    const preApplicationTriggers = ['on_invitation_send', 'on_application_open', 'days_before_deadline'];
-                    const isPreApplicationTrigger = preApplicationTriggers.includes(triggerType);
-
-                    // Method 4: Check email name keywords
-                    const nameLower = email.name.toLowerCase();
-                    const hasPreApplicationKeyword = nameLower.includes('invitation') ||
-                                                       nameLower.includes('invite') ||
-                                                       nameLower.includes('reminder') ||
-                                                       nameLower.includes('deadline') ||
-                                                       nameLower.includes('applications open');
-
-                    // Email is pre-application if ANY of these conditions are true
-                    const isPreApplicationEmail = isEarlyPosition || isPreApplicationCategory || isPreApplicationTrigger || hasPreApplicationKeyword;
-                    const isDisabled = isPreApplicationEmail && !variable.worksInInvitations;
+                    // Only gray out category-specific variables for event_announcements
+                    // (recipients haven't applied/chosen a category yet)
+                    const isAnnouncementEmail = email.email_template_item?.category === 'event_announcements';
+                    const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
 
                     return (
                       <button
@@ -1018,7 +1012,7 @@ export function EmailEditorPage({
                         }`}
                         title={
                           isDisabled
-                            ? `${variable.description} (Not available in pre-application emails - requires vendor to apply and choose category first)`
+                            ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
                             : variable.description
                         }
                       >
