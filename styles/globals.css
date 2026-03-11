@@ -111,6 +111,14 @@
   animation: gradient-shift 10s ease-in-out infinite;
 }
 
+.gradient-cta {
+  background: linear-gradient(135deg, #7c3aed 0%, #e879f9 55%, #f472b6 100%);
+}
+
+.gradient-glow-pink {
+  background: radial-gradient(ellipse at center, rgba(232, 121, 249, 0.15), transparent 70%);
+}
+
 /* Glass Morphism Design System - Applied Globally */
 
 /* Core Glass Modal System */
