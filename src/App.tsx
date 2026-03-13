@@ -46,9 +46,8 @@ const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage')
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
 
 // Lazy load: Dashboards (load on-demand)
-const ProducerDashboard = lazy(() => import('./pages/ProducerDashboard'))
+const Dashboard = lazy(() => import('./pages/Dashboard'))
 const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
-const AdminDashboard = lazy(() => import('./pages/AdminDashboard'))
 const AdminUnsubscribesPage = lazy(() => import('./pages/AdminUnsubscribesPage'))
 const AdminBugReportsPage = lazy(() => import('./pages/AdminBugReportsPage'))
 
@@ -87,8 +86,8 @@ function RoleBasedDashboardRedirect() {
 
   // Producer roles (venue_owner = Producer in UI)
   if (role === 'producer' || role === 'venue_owner') {
-    console.log('🟢 Producer detected (role:', role, '), redirecting to producer holding screen')
-    return <Navigate to="/producer/pending" replace />
+    console.log('🟢 Producer detected (role:', role, '), redirecting to dashboard')
+    return <Navigate to="/dashboard" replace />
   }
 
   // Vendor roles
@@ -103,10 +102,10 @@ function RoleBasedDashboardRedirect() {
     return <Navigate to="/pending" replace />
   }
 
-  // Admin - route to admin dashboard
+  // Admin - route to unified dashboard
   if (role === 'admin') {
-    console.log('🟣 Admin detected, redirecting to admin dashboard')
-    return <Navigate to="/admin/dashboard" replace />
+    console.log('🟣 Admin detected, redirecting to dashboard')
+    return <Navigate to="/dashboard" replace />
   }
 
   // Unknown role - redirect to home
@@ -215,8 +214,11 @@ export default function App() {
           {/* Consumer Holding Screen */}
           <Route path="/pending" element={<BetaPendingPage />} />
 
-          {/* Producer Dashboard */}
-          <Route path="/producer/pending" element={<ProducerDashboard />} />
+          {/* Unified Dashboard - Serves both producers and admins */}
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          {/* Legacy producer route - redirect to unified dashboard */}
+          <Route path="/producer/pending" element={<Navigate to="/dashboard" replace />} />
 
           {/* Email Template Manager */}
           <Route path="/producer/templates" element={<TemplateManager />} />
@@ -224,12 +226,8 @@ export default function App() {
           {/* Vendor Dashboard */}
           <Route path="/vendor/pending" element={<VendorDashboard />} />
 
-          {/* Admin Dashboard - Protected */}
-          <Route path="/admin/dashboard" element={
-            <AdminRoute>
-              <AdminDashboard />
-            </AdminRoute>
-          } />
+          {/* Legacy admin dashboard route - redirect to unified dashboard */}
+          <Route path="/admin/dashboard" element={<Navigate to="/dashboard" replace />} />
 
           {/* Admin Unsubscribes - Protected */}
           <Route path="/admin/unsubscribes" element={

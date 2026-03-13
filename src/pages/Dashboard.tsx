@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -14,8 +14,9 @@ import { NetworkPage } from '@/components/producer/Network';
 import { TemplateManager } from '@/components/producer/Email';
 import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmationDialog';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
+import AdminPanel from '@/components/admin/AdminPanel';
 
-type NavItem = 'events' | 'network' | 'email-templates' | 'settings';
+type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
 
 interface Organization {
@@ -23,8 +24,8 @@ interface Organization {
   slug: string;
   name: string;
   user_id: number;
-  verified?: boolean;
-  active?: boolean;
+  verified: boolean;
+  active: boolean;
   description?: string;
   logo_url?: string;
   contact?: {
@@ -73,6 +74,64 @@ interface Event {
   };
 }
 
+// Admin-specific interfaces
+interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest';
+  status?: 'active' | 'suspended' | 'banned';
+  confirmed_at: string | null;
+  created_at?: string;
+  updated_at?: string;
+  last_sign_in_at?: string;
+  sign_in_count?: number;
+  current_sign_in_ip?: string;
+  events_count?: number;
+  organizations?: any[];
+  events?: any[];
+  vendor_applications?: any[];
+  registrations?: any[];
+  [key: string]: any;
+}
+
+interface PresentsAnalytics {
+  users: {
+    total: number;
+    producers: number;
+    vendors: number;
+  };
+  events: {
+    total: number;
+    active: number;
+    past: number;
+    published: number;
+    draft: number;
+  };
+  registrations: {
+    total: number;
+    approved: number;
+    pending: number;
+  };
+  topEventCreators?: Array<{
+    id: number;
+    name: string;
+    email: string;
+    events_count: number;
+  }>;
+  recentEvents?: Array<{
+    id: number;
+    title: string;
+    slug: string;
+    event_date: string;
+    status: string;
+    published: boolean;
+    organization_name: string;
+    vendor_applications_count: number;
+    registrations_count: number;
+  }>;
+}
+
 export default function ProducerDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('events');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -85,6 +144,15 @@ export default function ProducerDashboard() {
   const [loadingCommandCenter, setLoadingCommandCenter] = useState(false);
   const [creationProgress, setCreationProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  // Admin-specific state
+  const [analytics, setAnalytics] = useState<PresentsAnalytics | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [expandedUserId, setExpandedUserId] = useState<number | null>(null);
+  const [expandedAnalyticsSection, setExpandedAnalyticsSection] = useState<string | null>(null);
 
   const { userProfile, isAuthenticated, loading: authLoading, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
@@ -188,6 +256,14 @@ export default function ProducerDashboard() {
     }
   }, [userProfile]);
 
+  // Load admin data when admin tab is active
+  useEffect(() => {
+    if (activeNav === 'admin' && isAdmin) {
+      loadAnalytics();
+      loadUsers();
+    }
+  }, [activeNav, isAdmin]);
+
   // Fetch events for organization
   const fetchEvents = async (orgSlug: string) => {
     try {
@@ -211,6 +287,35 @@ export default function ProducerDashboard() {
       setError('Failed to load events');
     } finally {
       setLoadingEvents(false);
+    }
+  };
+
+  // Admin-specific functions
+  const loadAnalytics = async () => {
+    if (!isAdmin) return;
+    setLoadingAnalytics(true);
+    setAnalyticsError(null);
+    try {
+      const data = await adminApi.getPresentsAnalytics();
+      setAnalytics(data);
+    } catch (err: any) {
+      console.error('Failed to load analytics:', err);
+      setAnalyticsError(err.message || 'Failed to load analytics');
+    } finally {
+      setLoadingAnalytics(false);
+    }
+  };
+
+  const loadUsers = async () => {
+    if (!isAdmin) return;
+    setLoading(true);
+    try {
+      const data = await adminApi.getAllUsers();
+      setUsers(data);
+    } catch (err) {
+      console.error('Failed to load users:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -436,6 +541,7 @@ export default function ProducerDashboard() {
   };
 
   const navItems = [
+    ...(isAdmin ? [{ id: 'admin' as NavItem, label: 'Admin', icon: Shield }] : []),
     { id: 'events' as NavItem, label: 'Events', icon: Calendar },
     { id: 'network' as NavItem, label: 'Network', icon: Users },
     { id: 'email-templates' as NavItem, label: 'Emails', icon: Mail },
@@ -593,7 +699,7 @@ export default function ProducerDashboard() {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <span className="text-lg font-bold text-white tracking-wider block mb-0.5">VOXXY</span>
-              <p className="text-[10px] text-white/60">Event Producer</p>
+              <p className="text-[10px] text-white/60">{isAdmin ? 'Admin Portal' : 'Event Producer'}</p>
             </div>
             {/* Mobile Close Button */}
             <button
@@ -665,7 +771,7 @@ export default function ProducerDashboard() {
                 <p className="text-xs font-medium text-white truncate">
                   {userProfile?.name || userProfile?.email}
                 </p>
-                <p className="text-[10px] text-white/60">Producer</p>
+                <p className="text-[10px] text-white/60">{isAdmin ? 'Admin' : 'Producer'}</p>
               </div>
               <button
                 onClick={handleLogout}
@@ -714,6 +820,25 @@ export default function ProducerDashboard() {
             </div>
           ) : activeNav === 'email-templates' ? (
             <TemplateManager />
+          ) : activeNav === 'admin' && isAdmin ? (
+            <div className="p-3 md:p-4">
+              <AdminPanel
+                analytics={analytics}
+                users={users}
+                organization={organization}
+                userProfile={userProfile}
+                loading={loading}
+                loadingOrg={loadingOrg}
+                loadingAnalytics={loadingAnalytics}
+                analyticsError={analyticsError}
+                expandedUserId={expandedUserId}
+                expandedAnalyticsSection={expandedAnalyticsSection}
+                onLoadUsers={loadUsers}
+                onLoadAnalytics={loadAnalytics}
+                onExpandUser={setExpandedUserId}
+                onExpandAnalyticsSection={setExpandedAnalyticsSection}
+              />
+            </div>
           ) : (
             <div className="p-3 md:p-4">
               <div className="text-white/40 text-center mt-12">

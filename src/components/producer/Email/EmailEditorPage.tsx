@@ -144,6 +144,13 @@ export function EmailEditorPage({
     formState,
   } = useForm<EditEmailFormData>({
     resolver: zodResolver(editEmailSchema),
+    defaultValues: {
+      name: '',
+      subject_template: '',
+      body_template: '',
+      trigger_type: 'on_event_date',
+      trigger_value: 0,
+    },
   });
 
   const subject = watch('subject_template');
