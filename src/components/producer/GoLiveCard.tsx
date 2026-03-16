@@ -20,7 +20,20 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   // Track previous invitation count to detect changes
   const prevCountRef = useRef<number>(0);
 
-  const isLive = event.status?.is_live || false;
+  // Live status state - use state instead of derived value to ensure re-renders
+  const [isLive, setIsLive] = useState(event.status?.is_live || false);
+
+  // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
+  useEffect(() => {
+    const newIsLive = event.status?.is_live || false;
+    console.log('🔄 [GoLiveCard] Event status changed:', {
+      slug: event.slug,
+      isLive: newIsLive,
+      status: event.status
+    });
+    setIsLive(newIsLive);
+  }, [event, event.status?.is_live]);
+
   const invitationCount = event.invitation_draft?.total_count || 0;
   const hasInvitations = invitationCount > 0;
 

@@ -1928,8 +1928,8 @@ export const vendorContactsApi = {
     contact_type?: string
     status?: string
     tags?: string[]
-    location?: string
-    category?: string
+    location?: string | string[]
+    category?: string | string[]
     featured?: string
     page?: number
     per_page?: number
@@ -1944,8 +1944,14 @@ export const vendorContactsApi = {
     if (params?.tags && params.tags.length > 0) {
       params.tags.forEach(tag => queryParams.append('tags[]', tag))
     }
-    if (params?.location) queryParams.append('location', params.location)
-    if (params?.category) queryParams.append('category', params.category)
+    if (params?.location) {
+      const locations = Array.isArray(params.location) ? params.location : [params.location]
+      locations.forEach(loc => queryParams.append('location[]', loc))
+    }
+    if (params?.category) {
+      const categories = Array.isArray(params.category) ? params.category : [params.category]
+      categories.forEach(cat => queryParams.append('category[]', cat))
+    }
     if (params?.featured) queryParams.append('featured', params.featured)
     if (params?.page) queryParams.append('page', params.page.toString())
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
@@ -2067,8 +2073,8 @@ export const vendorContactsApi = {
     contact_type?: string
     status?: string
     tags?: string[]
-    location?: string
-    category?: string
+    location?: string | string[]
+    category?: string | string[]
     featured?: string
   }): Promise<{ ids: number[], count: number }> {
     const queryParams = new URLSearchParams()
@@ -2079,8 +2085,14 @@ export const vendorContactsApi = {
     if (params?.tags && params.tags.length > 0) {
       params.tags.forEach(tag => queryParams.append('tags[]', tag))
     }
-    if (params?.location) queryParams.append('location', params.location)
-    if (params?.category) queryParams.append('category', params.category)
+    if (params?.location) {
+      const locations = Array.isArray(params.location) ? params.location : [params.location]
+      locations.forEach(loc => queryParams.append('location[]', loc))
+    }
+    if (params?.category) {
+      const categories = Array.isArray(params.category) ? params.category : [params.category]
+      categories.forEach(cat => queryParams.append('category[]', cat))
+    }
     if (params?.featured) queryParams.append('featured', params.featured)
 
     const queryString = queryParams.toString()
@@ -2449,6 +2461,50 @@ export const vendorContactsApi = {
       throw error
     }
   },
+
+  /**
+   * Bulk update multiple contacts (e.g., assign category)
+   * PATCH /api/v1/presents/organizations/:org_id/vendor_contacts/bulk_update
+   */
+  async bulkUpdate(
+    organizationId: number,
+    contactIds: number[],
+    updates: {
+      categories?: string[]
+      tags?: string[]
+      status?: string
+      contact_type?: string
+      featured?: boolean
+      location?: string
+      category_mode?: 'replace' | 'append'
+    }
+  ): Promise<{ message: string; updated_count: number; total_selected: number }> {
+    return fetchApi<{ message: string; updated_count: number; total_selected: number }>(
+      `/v1/presents/organizations/${organizationId}/vendor_contacts/bulk_update`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({
+          contact_ids: contactIds,
+          ...updates,
+        }),
+      }
+    )
+  },
+
+  async bulkDelete(
+    organizationId: number,
+    contactIds: number[]
+  ): Promise<{ message: string; deleted_count: number; total_selected: number }> {
+    return fetchApi<{ message: string; deleted_count: number; total_selected: number }>(
+      `/v1/presents/organizations/${organizationId}/vendor_contacts/bulk_delete`,
+      {
+        method: 'DELETE',
+        body: JSON.stringify({
+          contact_ids: contactIds,
+        }),
+      }
+    )
+  },
 }
 
 // Event Invitations API
@@ -2658,6 +2714,38 @@ export const categoriesApi = {
     return fetchApi<void>(`/v1/presents/categories/${categoryId}`, {
       method: 'DELETE',
     });
+  },
+
+  /**
+   * Get last application data for a category
+   * GET /api/v1/presents/organizations/:organization_id/categories/:id/last_application
+   */
+  async getLastApplication(organizationId: number, categoryId: number): Promise<{
+    vendor_application: {
+      id: number;
+      name: string;
+      booth_price: number;
+      description: string;
+      install_date: string;
+      install_start_time: string;
+      install_end_time: string;
+      payment_link: string;
+      application_tags: string[];
+      event_name: string;
+      event_id: number;
+    }
+  } | null> {
+    try {
+      return await fetchApi<any>(
+        `/v1/presents/organizations/${organizationId}/categories/${categoryId}/last_application`
+      );
+    } catch (error: any) {
+      // Return null if no previous application found (404)
+      if (error.message?.includes('No previous application found')) {
+        return null;
+      }
+      throw error;
+    }
   },
 };
 

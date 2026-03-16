@@ -56,43 +56,86 @@ export default function Step2ApplicationDetails({
   };
 
   // Handle category toggle
-  const toggleCategory = (categoryId: number) => {
+  const toggleCategory = async (categoryId: number) => {
     const isSelected = selectedCategoryIds.includes(categoryId);
     const newSelectedIds = isSelected
       ? selectedCategoryIds.filter(id => id !== categoryId)
       : [...selectedCategoryIds, categoryId];
 
-    handleCategoryChange(newSelectedIds);
+    await handleCategoryChange(newSelectedIds);
   };
 
   // Handle category selection changes
-  const handleCategoryChange = (categoryIds: number[]) => {
+  const handleCategoryChange = async (categoryIds: number[]) => {
     const newApps: ApplicationRow[] = [];
 
     // Keep existing applications for still-selected categories
-    categoryIds.forEach(catId => {
+    for (const catId of categoryIds) {
       const existingApp = applicationDetails.applications.find(app => app.category_id === catId);
       const category = categories.find(c => c.id === catId);
 
       if (existingApp) {
         newApps.push(existingApp);
       } else if (category) {
-        // Create new application for this category
-        newApps.push({
-          id: crypto.randomUUID(),
-          category_id: category.id,
-          category_name: category.name,
-          name: category.name, // Use category name as application name
-          booth_price: 0,
-          description: '',
-          install_date: '',
-          install_start_time: '',
-          install_end_time: '',
-          payment_link: '',
-          application_tags: [],
-        });
+        // Try to fetch last application data for this category
+        try {
+          const lastAppData = await categoriesApi.getLastApplication(organizationId, category.id);
+
+          if (lastAppData) {
+            // Pre-fill with data from last application
+            // Use payment_deadline for install_date if available (since install date is typically event-specific)
+            const installDate = eventDetails.payment_deadline || '';
+
+            newApps.push({
+              id: crypto.randomUUID(),
+              category_id: category.id,
+              category_name: category.name,
+              name: lastAppData.vendor_application.name,
+              booth_price: lastAppData.vendor_application.booth_price,
+              description: lastAppData.vendor_application.description,
+              install_date: installDate,
+              install_start_time: lastAppData.vendor_application.install_start_time,
+              install_end_time: lastAppData.vendor_application.install_end_time,
+              payment_link: lastAppData.vendor_application.payment_link,
+              application_tags: lastAppData.vendor_application.application_tags,
+              prefilled_from_event: lastAppData.vendor_application.event_name,
+              prefilled_from_event_id: lastAppData.vendor_application.event_id,
+            });
+          } else {
+            // No previous application - create with empty defaults
+            newApps.push({
+              id: crypto.randomUUID(),
+              category_id: category.id,
+              category_name: category.name,
+              name: category.name,
+              booth_price: 0,
+              description: '',
+              install_date: '',
+              install_start_time: '',
+              install_end_time: '',
+              payment_link: '',
+              application_tags: [],
+            });
+          }
+        } catch (error) {
+          console.error(`Failed to fetch last application for category ${category.id}:`, error);
+          // Fall back to empty defaults if API call fails
+          newApps.push({
+            id: crypto.randomUUID(),
+            category_id: category.id,
+            category_name: category.name,
+            name: category.name,
+            booth_price: 0,
+            description: '',
+            install_date: '',
+            install_start_time: '',
+            install_end_time: '',
+            payment_link: '',
+            application_tags: [],
+          });
+        }
       }
-    });
+    }
 
     updateWizardState({
       applicationDetails: {
@@ -120,7 +163,7 @@ export default function Step2ApplicationDetails({
       setCategories(prev => [...prev, newCategory]);
 
       // Auto-select the new category
-      toggleCategory(newCategory.id);
+      await toggleCategory(newCategory.id);
 
       // Reset form
       setNewCategoryName('');
@@ -205,6 +248,36 @@ export default function Step2ApplicationDetails({
 
     const updatedApplications = applicationDetails.applications.map((a) =>
       a.id === appId ? { ...a, application_tags: updatedTags } : a
+    );
+
+    updateWizardState({
+      applicationDetails: {
+        applications: updatedApplications,
+      },
+    });
+  };
+
+  // Clear pre-filled data for an application
+  const clearPrefilledData = (appId: string) => {
+    const app = applicationDetails.applications.find((a) => a.id === appId);
+    if (!app) return;
+
+    const updatedApplications = applicationDetails.applications.map((a) =>
+      a.id === appId
+        ? {
+            ...a,
+            name: a.category_name || '',
+            booth_price: 0,
+            description: '',
+            install_date: '',
+            install_start_time: '',
+            install_end_time: '',
+            payment_link: '',
+            application_tags: [],
+            prefilled_from_event: undefined,
+            prefilled_from_event_id: undefined,
+          }
+        : a
     );
 
     updateWizardState({
@@ -495,6 +568,26 @@ export default function Step2ApplicationDetails({
                   <div className="flex items-center gap-2 pb-2 border-b border-white/10">
                     <CategoryBadge category={category || null} size="md" />
                   </div>
+
+                  {/* Pre-filled Data Indicator */}
+                  {app.prefilled_from_event && (
+                    <div className="flex items-center justify-between gap-2 p-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+                        <p className="text-xs text-blue-300">
+                          Pre-filled from: <span className="font-medium">{app.prefilled_from_event}</span>
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => clearPrefilledData(app.id)}
+                        className="flex-shrink-0 p-1 rounded hover:bg-blue-500/20 text-blue-300 hover:text-blue-200 transition-colors"
+                        title="Clear pre-filled data"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  )}
 
                   {/* Booth Price */}
                   <div>

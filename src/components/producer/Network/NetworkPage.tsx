@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Search, Filter, UserPlus, Upload, Save, Trash2, X, Check, ChevronDown } from 'lucide-react';
+import { Search, Filter, UserPlus, Upload, Save, Trash2, X, Check, ChevronDown, Plus } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
 import ContactsTable from './ContactsTable';
@@ -8,6 +8,7 @@ import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
 import { CategoryFilterBar } from '@/components/shared/CategoryFilterBar';
+import { BulkActionToolbar } from './BulkActionToolbar';
 
 type NetworkTab = 'contacts' | 'lists';
 
@@ -161,6 +162,14 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   // Inline save list state
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [listName, setListName] = useState('');
+
+  // Category modal state
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    icon: '',
+    color: '#FF6B6B',
+  });
   const [savingList, setSavingList] = useState(false);
 
   // Pagination states
@@ -172,6 +181,9 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     total_count: 0,
     total_pages: 1,
   });
+
+  // Bulk update state
+  const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false);
 
   // Fetch filter options from backend on mount
   useEffect(() => {
@@ -191,15 +203,16 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }, [organizationId]);
 
   // Load category objects for visual filter
+  const loadCategories = async () => {
+    try {
+      const response = await categoriesApi.getAll(organizationId, true);
+      setCategories(response.categories);
+    } catch (error) {
+      console.error('Failed to load categories:', error);
+    }
+  };
+
   useEffect(() => {
-    const loadCategories = async () => {
-      try {
-        const response = await categoriesApi.getAll(organizationId, true);
-        setCategories(response.categories);
-      } catch (error) {
-        console.error('Failed to load categories:', error);
-      }
-    };
     loadCategories();
   }, [organizationId]);
 
@@ -222,12 +235,12 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       setLoading(true);
       setError(null);
 
-      // Send first value of each filter to backend (it only supports single values for location/category)
-      // Tags already supports arrays on the backend
+      // Send filters to backend
+      // Location, tags, and categories all support arrays (OR logic - match ANY of the provided values)
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
-        location: locationFilters.length > 0 ? locationFilters[0] : undefined,
-        category: categoryFilters.length > 0 ? categoryFilters[0] : undefined,
+        location: locationFilters.length > 0 ? locationFilters : undefined,
+        category: categoryFilters.length > 0 ? categoryFilters : undefined,
         tags: tagFilters.length > 0 ? tagFilters : undefined,
         page: page,
         per_page: perPage,
@@ -326,46 +339,25 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   };
 
   const handleBulkDelete = async () => {
-    const count = selectedContacts.length;
-    if (!confirm(`Are you sure you want to delete ${count} contact${count > 1 ? 's' : ''}? This action cannot be undone.`)) {
-      return;
-    }
+    if (selectedContacts.length === 0) return;
 
-    let successCount = 0;
-    let failedCount = 0;
-    const failedContacts: number[] = [];
+    // Confirm deletion
+    const confirmed = window.confirm(
+      `Are you sure you want to delete ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}? This action cannot be undone.`
+    );
 
-    // Delete in parallel batches of 10
-    const batchSize = 10;
-    for (let i = 0; i < selectedContacts.length; i += batchSize) {
-      const batch = selectedContacts.slice(i, i + batchSize);
-      const results = await Promise.allSettled(
-        batch.map(id => vendorContactsApi.delete(id))
-      );
+    if (!confirmed) return;
 
-      results.forEach((result, index) => {
-        if (result.status === 'fulfilled') {
-          successCount++;
-        } else {
-          failedCount++;
-          failedContacts.push(batch[index]);
-        }
-      });
-    }
+    try {
+      setBulkUpdateLoading(true);
+      const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts);
 
-    setContacts(prev => prev.filter(c => !selectedContacts.includes(c.id) || failedContacts.includes(c.id)));
-    setSelectedContacts(failedContacts);
+      // Show success message
+      alert(result.message || `Successfully deleted ${result.deleted_count} contacts`);
 
-    if (failedCount === 0) {
-      alert(`Successfully deleted ${successCount} contact${successCount > 1 ? 's' : ''}`);
-    } else if (successCount === 0) {
-      alert(`Failed to delete all contacts. Please try again.`);
-    } else {
-      alert(`Deleted ${successCount} contact${successCount > 1 ? 's' : ''}. Failed to delete ${failedCount}.`);
-    }
+      // Refresh contacts to show updated list
+      await fetchContacts(currentPage);
 
-    if (successCount > 0) {
-      fetchContacts(currentPage);
       // Refresh filter options in case deleted contacts changed available values
       try {
         const options = await vendorContactsApi.getFilterOptions(organizationId);
@@ -375,6 +367,81 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
           tags: options.tags || [],
         });
       } catch { /* ignore */ }
+
+      // Clear selection
+      setSelectedContacts([]);
+    } catch (error: any) {
+      console.error('Bulk delete failed:', error);
+      alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`);
+    } finally {
+      setBulkUpdateLoading(false);
+    }
+  };
+
+  const handleBulkCategoryUpdate = async (categoryNames: string[]) => {
+    if (selectedContacts.length === 0) return;
+
+    // Check if any selected contacts have existing categories
+    const selectedContactObjects = contacts.filter(c => selectedContacts.includes(c.id));
+    const hasExistingCategories = selectedContactObjects.some(c => c.categories && c.categories.length > 0);
+
+    let categoryMode: 'replace' | 'append' = 'replace';
+
+    // Ask user if they want to replace or add to existing categories
+    if (hasExistingCategories) {
+      const userChoice = window.confirm(
+        `Some selected contacts already have categories.\n\n` +
+        `Click "OK" to ADD this category to their existing categories.\n` +
+        `Click "Cancel" to REPLACE their categories with this new category.`
+      );
+      categoryMode = userChoice ? 'append' : 'replace';
+    }
+
+    try {
+      setBulkUpdateLoading(true);
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+        categories: categoryNames,
+        category_mode: categoryMode,
+      });
+
+      // Show success message
+      alert(result.message || `Successfully updated ${result.updated_count} contacts`);
+
+      // Refresh contacts to show updated categories
+      await fetchContacts(currentPage);
+
+      // Clear selection
+      setSelectedContacts([]);
+    } catch (error: any) {
+      console.error('Bulk update failed:', error);
+      alert(`Failed to update contacts: ${error.message || 'Unknown error'}`);
+    } finally {
+      setBulkUpdateLoading(false);
+    }
+  };
+
+  const handleBulkLocationUpdate = async (location: string) => {
+    if (selectedContacts.length === 0) return;
+
+    try {
+      setBulkUpdateLoading(true);
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
+        location: location,
+      });
+
+      // Show success message
+      alert(result.message || `Successfully updated ${result.updated_count} contacts`);
+
+      // Refresh contacts to show updated location
+      await fetchContacts(currentPage);
+
+      // Clear selection
+      setSelectedContacts([]);
+    } catch (error: any) {
+      console.error('Bulk location update failed:', error);
+      alert(`Failed to update location: ${error.message || 'Unknown error'}`);
+    } finally {
+      setBulkUpdateLoading(false);
     }
   };
 
@@ -409,6 +476,38 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       alert(err.message || 'Failed to save list');
     } finally {
       setSavingList(false);
+    }
+  };
+
+  // Category management functions
+  const openAddCategoryModal = () => {
+    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    setShowCategoryModal(true);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!categoryFormData.name.trim()) {
+      alert('Category name is required');
+      return;
+    }
+
+    try {
+      await categoriesApi.create(organizationId, {
+        name: categoryFormData.name.trim(),
+        icon: categoryFormData.icon.trim() || undefined,
+        color: categoryFormData.color,
+      });
+      alert('Category created successfully!');
+
+      // Refresh categories and filter options
+      await loadCategories();
+      await fetchContacts(currentPage);
+
+      setShowCategoryModal(false);
+      setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    } catch (error: any) {
+      console.error('Failed to save category:', error);
+      alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
     }
   };
 
@@ -601,11 +700,20 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
           {/* Visual Category Filter */}
           {categories.length > 0 && (
             <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-              <div className="mb-3">
-                <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
-                <p className="text-xs text-white/50 mt-0.5">
-                  Select categories to filter your network contacts
-                </p>
+              <div className="mb-3 flex items-start justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
+                  <p className="text-xs text-white/50 mt-0.5">
+                    Select categories to filter your network contacts
+                  </p>
+                </div>
+                <button
+                  onClick={openAddCategoryModal}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-all whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  New Category
+                </button>
               </div>
               <CategoryFilterBar
                 categories={categories}
@@ -731,29 +839,6 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               Search
             </button>
           </div>
-
-          {/* Selection info */}
-          {selectedContacts.length > 0 && (
-            <div className="flex items-center justify-between gap-3 text-xs bg-white/5 rounded-lg px-3 py-2 border border-white/10">
-              <div className="flex items-center gap-3 text-white/60">
-                <span className="font-medium">{selectedContacts.length} selected</span>
-                <button
-                  onClick={() => setSelectedContacts([])}
-                  className="text-purple-400 hover:text-purple-300 underline"
-                >
-                  Clear
-                </button>
-              </div>
-              <button
-                onClick={handleBulkDelete}
-                className="flex items-center gap-2 px-3 py-1.5 bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 text-xs font-medium rounded-lg transition-colors border border-red-500/30"
-              >
-                <Trash2 className="w-3.5 h-3.5" />
-                Delete Selected
-              </button>
-            </div>
-          )}
-
           {/* No results message */}
           {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
             <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
@@ -772,6 +857,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               </button>
             </div>
           )}
+
+          {/* Bulk Action Toolbar */}
+          <BulkActionToolbar
+            selectedCount={selectedContacts.length}
+            categories={categories}
+            onCategoryUpdate={handleBulkCategoryUpdate}
+            onLocationUpdate={handleBulkLocationUpdate}
+            onDelete={handleBulkDelete}
+            onClear={() => setSelectedContacts([])}
+            loading={bulkUpdateLoading}
+          />
 
           {/* Contacts Table */}
           {contacts.length > 0 && (
@@ -836,6 +932,137 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             setActiveTab('contacts');
           }}
         />
+      )}
+
+      {/* Category Add Modal */}
+      {showCategoryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gray-900 rounded-lg border border-white/10 w-full max-w-md">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <h3 className="text-base font-semibold text-white">Add New Category</h3>
+              <button
+                onClick={() => {
+                  setShowCategoryModal(false);
+                  setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+                }}
+                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-4 space-y-4">
+              {/* Category Name */}
+              <div>
+                <label htmlFor="categoryName" className="block text-xs text-white/60 mb-1">
+                  Category Name <span className="text-red-400">*</span>
+                </label>
+                <input
+                  id="categoryName"
+                  type="text"
+                  value={categoryFormData.name}
+                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g., Food Vendor, Artist, Sponsor"
+                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  autoFocus
+                />
+                <p className="text-xs text-white/40 mt-1">
+                  Reserved names: "All", "All Vendors", "All Invitations"
+                </p>
+              </div>
+
+              {/* Icon (Emoji) */}
+              <div>
+                <label htmlFor="categoryIcon" className="block text-xs text-white/60 mb-1">
+                  Icon (Emoji) - Optional
+                </label>
+                <input
+                  id="categoryIcon"
+                  type="text"
+                  value={categoryFormData.icon}
+                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
+                  placeholder="🍕 or 🎨 or 🎤"
+                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  maxLength={2}
+                />
+                <p className="text-xs text-white/40 mt-1">
+                  Paste an emoji to represent this category
+                </p>
+              </div>
+
+              {/* Color Picker */}
+              <div>
+                <label htmlFor="categoryColor" className="block text-xs text-white/60 mb-1">
+                  Color
+                </label>
+                <div className="flex items-center gap-3">
+                  <input
+                    id="categoryColor"
+                    type="color"
+                    value={categoryFormData.color}
+                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
+                    className="w-16 h-10 rounded-lg cursor-pointer bg-white/10 border border-white/10"
+                  />
+                  <input
+                    type="text"
+                    value={categoryFormData.color}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
+                        setCategoryFormData(prev => ({ ...prev, color: value }));
+                      }
+                    }}
+                    placeholder="#FF6B6B"
+                    className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all flex-1"
+                    maxLength={7}
+                  />
+                </div>
+                <p className="text-xs text-white/40 mt-1">
+                  Choose a color to identify this category
+                </p>
+              </div>
+
+              {/* Preview */}
+              <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                <p className="text-xs text-white/60 mb-2">Preview:</p>
+                <div className="flex items-center gap-2">
+                  {categoryFormData.icon && (
+                    <span className="text-2xl">{categoryFormData.icon}</span>
+                  )}
+                  <span className="text-sm text-white font-medium">
+                    {categoryFormData.name || 'Category Name'}
+                  </span>
+                  <div
+                    className="w-4 h-4 rounded border border-white/20"
+                    style={{ backgroundColor: categoryFormData.color }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
+              <button
+                onClick={() => {
+                  setShowCategoryModal(false);
+                  setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+                }}
+                className="px-4 py-2 text-sm rounded-lg border border-white/20 text-white hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveCategory}
+                disabled={!categoryFormData.name.trim()}
+                className="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white font-medium transition-all"
+              >
+                Add Category
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

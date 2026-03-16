@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { authApi, organizationsApi } from '@/services/api';
-import { AlertTriangle } from 'lucide-react';
+import { authApi, organizationsApi, categoriesApi } from '@/services/api';
+import { AlertTriangle, Plus, Edit2, Trash2, X, Tag } from 'lucide-react';
 import { EventbriteConnection } from '@/components/producer/PaymentIntegrations';
+import type { Category } from '@/types/category';
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -89,6 +90,9 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             state: userOrg.location?.state || '',
             zip_code: userOrg.location?.zip_code || '',
           });
+
+          // Fetch categories for this organization
+          fetchCategories(userOrg.id);
         }
       } catch (err) {
         console.error('Failed to fetch organization:', err);
@@ -100,6 +104,19 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
     fetchOrganization();
   }, [userProfile]);
 
+  // Fetch categories
+  const fetchCategories = async (orgId: number) => {
+    try {
+      setLoadingCategories(true);
+      const response = await categoriesApi.getAll(orgId, true);
+      setCategories(response.categories || []);
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
   // Notification preferences state
   const [notifications, setNotifications] = useState({
     newApplications: true,
@@ -109,6 +126,17 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
+
+  // Categories state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    icon: '',
+    color: '#FF6B6B',
+  });
 
   const handleSaveChanges = async () => {
     if (!userProfile?.id) {
@@ -184,6 +212,89 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
 
   const toggleNotification = (key: keyof typeof notifications) => {
     setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Category management functions
+  const openAddCategoryModal = () => {
+    setEditingCategory(null);
+    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    setShowCategoryModal(true);
+  };
+
+  const openEditCategoryModal = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryFormData({
+      name: category.name,
+      icon: category.icon || '',
+      color: category.color || '#FF6B6B',
+    });
+    setShowCategoryModal(true);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!organization) return;
+    if (!categoryFormData.name.trim()) {
+      alert('Category name is required');
+      return;
+    }
+
+    try {
+      if (editingCategory) {
+        // Update existing category
+        await categoriesApi.update(editingCategory.id, {
+          name: categoryFormData.name.trim(),
+          icon: categoryFormData.icon.trim() || undefined,
+          color: categoryFormData.color,
+        });
+        alert('Category updated successfully!');
+      } else {
+        // Create new category
+        await categoriesApi.create(organization.id, {
+          name: categoryFormData.name.trim(),
+          icon: categoryFormData.icon.trim() || undefined,
+          color: categoryFormData.color,
+        });
+        alert('Category created successfully!');
+      }
+
+      // Refresh categories
+      await fetchCategories(organization.id);
+      setShowCategoryModal(false);
+      setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+      setEditingCategory(null);
+    } catch (error: any) {
+      console.error('Failed to save category:', error);
+      alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+    }
+  };
+
+  const handleDeleteCategory = async (category: Category) => {
+    if (!organization) return;
+
+    // Check if category is in use
+    if (category.in_use) {
+      const stats = category.usage_stats;
+      const usageDetails = [];
+      if (stats?.applications_count) usageDetails.push(`${stats.applications_count} vendor application(s)`);
+      if (stats?.email_templates_count) usageDetails.push(`${stats.email_templates_count} email template(s)`);
+      if (stats?.scheduled_emails_count) usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`);
+
+      alert(`Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`);
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) {
+      return;
+    }
+
+    try {
+      await categoriesApi.delete(category.id);
+      alert('Category deleted successfully!');
+      await fetchCategories(organization.id);
+    } catch (error: any) {
+      console.error('Failed to delete category:', error);
+      alert(`Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+    }
   };
 
   if (!userProfile) {
@@ -487,6 +598,85 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               </div>
             )}
 
+            {/* Vendor Categories */}
+            {organization && (
+              <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-base font-semibold text-white mb-0.5">Vendor Categories</h2>
+                    <p className="text-xs text-white/60">Manage categories for organizing vendors and contacts</p>
+                  </div>
+                  <button
+                    onClick={openAddCategoryModal}
+                    className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-all"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Category
+                  </button>
+                </div>
+
+                {loadingCategories ? (
+                  <div className="text-center py-8">
+                    <p className="text-white/60 text-sm">Loading categories...</p>
+                  </div>
+                ) : categories.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Tag className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                    <p className="text-white/60 text-sm">No categories yet</p>
+                    <p className="text-white/40 text-xs mt-1">Create your first category to get started</p>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {categories.map((category) => (
+                      <div
+                        key={category.id}
+                        className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                      >
+                        <div className="flex items-center gap-3">
+                          {category.icon && (
+                            <span className="text-2xl">{category.icon}</span>
+                          )}
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <h3 className="text-sm text-white font-medium">{category.name}</h3>
+                              {category.color && (
+                                <div
+                                  className="w-4 h-4 rounded border border-white/20"
+                                  style={{ backgroundColor: category.color }}
+                                  title={category.color}
+                                />
+                              )}
+                            </div>
+                            {category.usage_stats && (
+                              <p className="text-xs text-white/60 mt-0.5">
+                                {category.usage_stats.applications_count || 0} vendor{category.usage_stats.applications_count !== 1 ? 's' : ''}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => openEditCategoryModal(category)}
+                            className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                            title="Edit category"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(category)}
+                            className="p-2 rounded-lg hover:bg-red-500/20 text-white/60 hover:text-red-400 transition-all"
+                            title="Delete category"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Save Button */}
             <button
               onClick={handleSaveChanges}
@@ -634,6 +824,141 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
             )}
           </div>
         </div>
+
+        {/* Category Add/Edit Modal */}
+        {showCategoryModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="bg-gray-900 rounded-lg border border-white/10 w-full max-w-md">
+              {/* Modal Header */}
+              <div className="flex items-center justify-between p-4 border-b border-white/10">
+                <h3 className="text-base font-semibold text-white">
+                  {editingCategory ? 'Edit Category' : 'Add Category'}
+                </h3>
+                <button
+                  onClick={() => {
+                    setShowCategoryModal(false);
+                    setEditingCategory(null);
+                    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+                  }}
+                  className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-4 space-y-4">
+                {/* Category Name */}
+                <div>
+                  <label htmlFor="categoryName" className="block text-xs text-white/60 mb-1">
+                    Category Name <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    id="categoryName"
+                    type="text"
+                    value={categoryFormData.name}
+                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
+                    placeholder="e.g., Food Vendor, Artist, Sponsor"
+                    className={inputClasses}
+                    autoFocus
+                  />
+                  <p className="text-xs text-white/40 mt-1">
+                    Reserved names: "All", "All Vendors", "All Invitations"
+                  </p>
+                </div>
+
+                {/* Icon (Emoji) */}
+                <div>
+                  <label htmlFor="categoryIcon" className="block text-xs text-white/60 mb-1">
+                    Icon (Emoji) - Optional
+                  </label>
+                  <input
+                    id="categoryIcon"
+                    type="text"
+                    value={categoryFormData.icon}
+                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
+                    placeholder="🍕 or 🎨 or 🎤"
+                    className={inputClasses}
+                    maxLength={2}
+                  />
+                  <p className="text-xs text-white/40 mt-1">
+                    Paste an emoji to represent this category
+                  </p>
+                </div>
+
+                {/* Color Picker */}
+                <div>
+                  <label htmlFor="categoryColor" className="block text-xs text-white/60 mb-1">
+                    Color
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="categoryColor"
+                      type="color"
+                      value={categoryFormData.color}
+                      onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
+                      className="w-16 h-10 rounded-lg cursor-pointer bg-white/10 border border-white/10"
+                    />
+                    <input
+                      type="text"
+                      value={categoryFormData.color}
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
+                          setCategoryFormData(prev => ({ ...prev, color: value }));
+                        }
+                      }}
+                      placeholder="#FF6B6B"
+                      className={`${inputClasses} flex-1`}
+                      maxLength={7}
+                    />
+                  </div>
+                  <p className="text-xs text-white/40 mt-1">
+                    Choose a color to identify this category
+                  </p>
+                </div>
+
+                {/* Preview */}
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <p className="text-xs text-white/60 mb-2">Preview:</p>
+                  <div className="flex items-center gap-2">
+                    {categoryFormData.icon && (
+                      <span className="text-2xl">{categoryFormData.icon}</span>
+                    )}
+                    <span className="text-sm text-white font-medium">
+                      {categoryFormData.name || 'Category Name'}
+                    </span>
+                    <div
+                      className="w-4 h-4 rounded border border-white/20"
+                      style={{ backgroundColor: categoryFormData.color }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
+                <button
+                  onClick={() => {
+                    setShowCategoryModal(false);
+                    setEditingCategory(null);
+                    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+                  }}
+                  className="px-4 py-2 text-sm rounded-lg border border-white/20 text-white hover:bg-white/10 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCategory}
+                  disabled={!categoryFormData.name.trim()}
+                  className="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white font-medium transition-all"
+                >
+                  {editingCategory ? 'Save Changes' : 'Add Category'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

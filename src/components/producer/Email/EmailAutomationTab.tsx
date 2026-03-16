@@ -1,14 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail } from 'lucide-react';
 import { scheduledEmailsApi, eventsApi, categoriesApi } from '@/services/api';
-import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
+import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory } from '@/types/email';
 import type { Category } from '@/types/category';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
-import { CategoryFilterBar } from '@/components/shared/CategoryFilterBar';
 import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
@@ -56,7 +55,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Category filter state
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | 'all' | 'all_invitations' | 'all_vendors'>('all');
 
   // Sort state
   type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
@@ -73,42 +72,31 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
   };
 
-  const handleToggleCategory = (categoryId: number) => {
-    setSelectedCategoryIds(prev => {
-      if (prev.includes(categoryId)) {
-        return prev.filter(id => id !== categoryId);
-      } else {
-        return [...prev, categoryId];
-      }
-    });
-  };
-
-  const handleSelectAllCategories = () => {
-    if (selectedCategoryIds.length === categories.length || selectedCategoryIds.length === 0) {
-      setSelectedCategoryIds([]);
-    } else {
-      setSelectedCategoryIds(categories.map(c => c.id));
-    }
-  };
 
   // Load scheduled emails
   useEffect(() => {
     loadEmails();
   }, [eventSlug]);
 
-  // Load categories
+  // Load categories (organization.id is nested in the event object)
   useEffect(() => {
     const loadCategories = async () => {
-      if (!event?.organization_id) return;
+      const orgId = eventData?.organization?.id || event?.organization?.id || eventData?.organization_id || event?.organization_id;
+      if (!orgId) {
+        console.log('⚠️ No organization ID available, categories will not load');
+        return;
+      }
       try {
-        const response = await categoriesApi.getAll(event.organization_id, true);
+        console.log('📂 Loading categories for organization:', orgId);
+        const response = await categoriesApi.getAll(orgId, true);
+        console.log('✅ Loaded categories:', response.categories);
         setCategories(response.categories);
       } catch (error) {
-        console.error('Failed to load categories:', error);
+        console.error('❌ Failed to load categories:', error);
       }
     };
     loadCategories();
-  }, [event?.organization_id]);
+  }, [eventData?.organization?.id, event?.organization?.id, eventData?.organization_id, event?.organization_id]);
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
@@ -272,14 +260,58 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
 
     // Filter by vendor category
-    if (selectedCategoryIds.length > 0) {
+    if (selectedCategoryId !== 'all') {
       result = result.filter(email => {
-        // Include emails that have a matching category_id
-        if (email.category_id && selectedCategoryIds.includes(email.category_id)) {
-          return true;
+        // Helper function to infer email type using same logic as EmailRow.tsx
+        const inferCategory = (): EmailCategory => {
+          const name = email.name.toLowerCase();
+          const trigger = email.trigger_type;
+
+          // Check triggers first (more reliable than name patterns)
+          if (trigger.includes('payment')) return 'payment_reminders';
+          if (trigger === 'on_invitation_send' || trigger === 'on_application_submit' || trigger === 'on_approval' || trigger === 'on_rejection' || trigger === 'on_waitlist') return 'application_updates';
+          if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') return 'event_countdown';
+
+          // Then check name patterns
+          if (name.includes('payment')) return 'payment_reminders';
+          if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
+          if (name.includes('days before') || name.includes('day of')) return 'event_countdown';
+          if (name.includes('announcement') || name.includes('immediate')) return 'event_announcements';
+
+          return 'event_announcements';
+        };
+
+        const emailCategory = email.email_template_item?.category || inferCategory();
+
+        // Filter by "All Invitations" - show only application emails without specific category
+        if (selectedCategoryId === 'all_invitations') {
+          return !email.category_id && emailCategory === 'application_updates';
         }
-        // Include "All" emails (no category_id) only if filtering is active
-        // This ensures category-specific emails are shown when their category is selected
+
+        // Filter by "All Vendors" - show only announcement emails without specific category
+        if (selectedCategoryId === 'all_vendors') {
+          return !email.category_id && emailCategory !== 'application_updates';
+        }
+
+        // Filter by specific vendor category
+        if (typeof selectedCategoryId === 'number') {
+          // Include emails that have a matching category_id
+          if (email.category_id && email.category_id === selectedCategoryId) {
+            return true;
+          }
+          // For emails without a category_id (All Invitations / All Vendors)
+          if (!email.category_id) {
+            // Exclude "All Invitations" (application_updates) when filtering by specific category
+            // because once someone has a vendor category, they're approved and won't receive application emails
+            if (emailCategory === 'application_updates') {
+              return false;
+            }
+
+            // Include "All Vendors" emails (announcements, event updates, etc.)
+            return true;
+          }
+        }
+
         return false;
       });
     }
@@ -386,7 +418,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
     });
-  }, [emails, searchQuery, statusFilter, selectedCategoryIds, sortColumn, sortDirection]);
+  }, [emails, searchQuery, statusFilter, selectedCategoryId, sortColumn, sortDirection]);
 
   // Calculate statistics
   const stats = {
@@ -591,25 +623,34 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                 ))}
               </select>
             </div>
-          </div>
 
-          {/* Category Filter */}
-          {categories.length > 0 && (
-            <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-              <div className="mb-3">
-                <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
-                <p className="text-xs text-white/50 mt-0.5">
-                  View emails targeting specific vendor categories
-                </p>
-              </div>
-              <CategoryFilterBar
-                categories={categories}
-                selectedCategoryIds={selectedCategoryIds}
-                onToggleCategory={handleToggleCategory}
-                onSelectAll={handleSelectAllCategories}
-              />
+            {/* Category Filter */}
+            <div className="flex items-center gap-2">
+              <select
+                value={selectedCategoryId}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value === 'all' || value === 'all_invitations' || value === 'all_vendors') {
+                    setSelectedCategoryId(value);
+                  } else {
+                    setSelectedCategoryId(Number(value));
+                  }
+                }}
+                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer [&>option]:bg-gray-900 [&>option]:text-white"
+              >
+                <option value="all" className="bg-gray-900 text-white">All Categories ({categories.length})</option>
+                <option value="all_invitations" className="bg-gray-900 text-white italic text-white/80">All Invitations</option>
+                <option value="all_vendors" className="bg-gray-900 text-white italic text-white/80">All Vendors</option>
+                <optgroup label="Vendor Categories" className="bg-gray-900 text-white/60">
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id} className="bg-gray-900 text-white">
+                      {category.icon ? `${category.icon} ${category.name}` : category.name}
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
             </div>
-          )}
+          </div>
 
           {/* Results count */}
           <div className="flex items-center justify-between">

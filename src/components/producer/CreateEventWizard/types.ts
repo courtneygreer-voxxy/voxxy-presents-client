@@ -13,6 +13,8 @@ export interface ApplicationRow {
   install_end_time?: string; // Install end time (HH:MM format)
   payment_link?: string; // Payment link for this application
   application_tags?: string[]; // Tags for this application (stored as array in frontend, comma-separated in backend)
+  prefilled_from_event?: string; // Event name this data was pre-filled from (for UI indicator)
+  prefilled_from_event_id?: number; // Event ID this data was pre-filled from (for reference)
 }
 
 export interface WizardState {

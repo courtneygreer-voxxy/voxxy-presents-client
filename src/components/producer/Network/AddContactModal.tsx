@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { X, Plus, ChevronDown, Check } from 'lucide-react';
-import { vendorContactsApi, VendorContact } from '@/services/api';
+import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api';
+import type { Category } from '@/types/category';
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
 import SuccessMessage from '@/components/ui/SuccessMessage';
 
@@ -15,15 +16,19 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
   const [showSuccess, setShowSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
-  const [availableCategories, setAvailableCategories] = useState<string[]>([]);
+  const [organizationCategories, setOrganizationCategories] = useState<Category[]>([]);
   const [availableTags, setAvailableTags] = useState<string[]>([]);
-  const [customCategoryInput, setCustomCategoryInput] = useState('');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Fetch organization's official categories
+    categoriesApi.getAll(organizationId).then(response => {
+      setOrganizationCategories(response.categories || []);
+    }).catch(() => {});
+
+    // Fetch available tags from filter options
     vendorContactsApi.getFilterOptions(organizationId).then(options => {
-      setAvailableCategories(options.categories || []);
       setAvailableTags(options.tags || []);
     }).catch(() => {});
   }, [organizationId]);
@@ -329,65 +334,29 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
               </button>
               {categoryDropdownOpen && (
                 <div className="absolute z-20 left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto">
-                  {/* Custom category input */}
-                  <div className="p-2 border-b border-white/10">
-                    <div className="flex gap-1.5">
-                      <input
-                        type="text"
-                        value={customCategoryInput}
-                        onChange={(e) => setCustomCategoryInput(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter') {
-                            e.preventDefault();
-                            const cat = customCategoryInput.trim();
-                            if (cat && !formData.categories.includes(cat)) {
-                              handleCategoryToggle(cat);
-                              if (!availableCategories.includes(cat)) {
-                                setAvailableCategories(prev => [...prev, cat]);
-                              }
-                              setCustomCategoryInput('');
-                            }
-                          }
-                        }}
-                        placeholder="Add custom..."
-                        className="flex-1 px-2 py-1.5 text-xs rounded bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                      />
+                  {organizationCategories.length > 0 ? (
+                    organizationCategories.map((category) => (
                       <button
+                        key={category.id}
                         type="button"
-                        onClick={() => {
-                          const cat = customCategoryInput.trim();
-                          if (cat && !formData.categories.includes(cat)) {
-                            handleCategoryToggle(cat);
-                            if (!availableCategories.includes(cat)) {
-                              setAvailableCategories(prev => [...prev, cat]);
-                            }
-                            setCustomCategoryInput('');
-                          }
-                        }}
-                        className="px-2 py-1.5 text-xs bg-purple-500/20 text-purple-300 rounded hover:bg-purple-500/30 transition-colors"
-                      >
-                        <Plus className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
-                  {availableCategories.length > 0 ? (
-                    availableCategories.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => handleCategoryToggle(category)}
+                        onClick={() => handleCategoryToggle(category.name)}
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 transition-colors"
                       >
                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          formData.categories.includes(category) ? 'bg-purple-500 border-purple-500' : 'border-white/30'
+                          formData.categories.includes(category.name) ? 'bg-purple-500 border-purple-500' : 'border-white/30'
                         }`}>
-                          {formData.categories.includes(category) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                          {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                         </div>
-                        <span className={formData.categories.includes(category) ? 'text-white' : 'text-white/70'}>{category}</span>
+                        <span className={formData.categories.includes(category.name) ? 'text-white' : 'text-white/70'}>
+                          {category.icon && <span className="mr-1.5">{category.icon}</span>}
+                          {category.name}
+                        </span>
                       </button>
                     ))
                   ) : (
-                    <p className="px-3 py-2 text-xs text-white/40">No categories yet. Type above to add one.</p>
+                    <div className="px-3 py-2 text-xs text-white/40">
+                      No categories available. Please add categories in the Event Wizard.
+                    </div>
                   )}
                 </div>
               )}

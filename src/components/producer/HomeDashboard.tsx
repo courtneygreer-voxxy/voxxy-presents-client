@@ -3,6 +3,7 @@ import {
   ClipboardList,
   Eye,
   CheckCircle,
+  Check,
   DollarSign,
   Mail,
   Megaphone,
@@ -99,6 +100,20 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   const [isEditingTicketLink, setIsEditingTicketLink] = useState(false);
   const [editedTicketLink, setEditedTicketLink] = useState('');
   const [ticketLinkError, setTicketLinkError] = useState<string | null>(null);
+
+  // Live status state - use state instead of derived value to ensure re-renders
+  const [isLive, setIsLive] = useState(event.status?.is_live || false);
+
+  // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
+  useEffect(() => {
+    const newIsLive = event.status?.is_live || false;
+    console.log('🔄 [HomeDashboard] Event status changed:', {
+      slug: event.slug,
+      isLive: newIsLive,
+      status: event.status
+    });
+    setIsLive(newIsLive);
+  }, [event, event.status?.is_live]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -315,112 +330,114 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
   return (
     <div className="p-3 md:p-4">
-      {/* Stats Cards + Go Live */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
-        {/* Go Live */}
-        <GoLiveCard
-          event={event}
-          onGoLive={handleRefresh}
-          organizationId={organizationId}
-        />
-
-        {/* Applied */}
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-purple-500/20">
-              <ClipboardList className="w-4 h-4 text-purple-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl font-bold text-white">{stats.applied}</p>
-              <p className="text-[10px] text-white/60">Applied</p>
-            </div>
-          </div>
-          {categoryStats.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
-              {categoryStats.map((cat) => (
-                <div key={cat.name} className="flex items-center justify-between">
-                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.applied}</span>
+      {/* Main Grid: Left Column (Stats/Emails/Bulletins) + Right Column (Event Details) */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* Left Column - Vendor Stats (when live) or Go Live Card (when not live), then Emails & Bulletins */}
+        <div className="lg:col-span-3 space-y-4">
+          {isLive ? (
+            /* Vendor Stats Cards - 4 in a row when LIVE */
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {/* Applied */}
+              <div className="glass-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-purple-500/20">
+                    <ClipboardList className="w-4 h-4 text-purple-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-2xl font-bold text-white">{stats.applied}</p>
+                    <p className="text-[10px] text-white/60">Applied</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {categoryStats.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                    {categoryStats.map((cat) => (
+                      <div key={cat.name} className="flex items-center justify-between">
+                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.applied}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-        {/* New / Unreviewed */}
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-yellow-500/20">
-              <Eye className="w-4 h-4 text-yellow-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl font-bold text-white">{stats.newUnreviewed}</p>
-              <p className="text-[10px] text-white/60">New / Unreviewed</p>
-            </div>
-          </div>
-          {categoryStats.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
-              {categoryStats.map((cat) => (
-                <div key={cat.name} className="flex items-center justify-between">
-                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unreviewed}</span>
+              {/* New / Unreviewed */}
+              <div className="glass-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-yellow-500/20">
+                    <Eye className="w-4 h-4 text-yellow-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-2xl font-bold text-white">{stats.newUnreviewed}</p>
+                    <p className="text-[10px] text-white/60">New / Unreviewed</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {categoryStats.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                    {categoryStats.map((cat) => (
+                      <div key={cat.name} className="flex items-center justify-between">
+                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unreviewed}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-        {/* Approved & Paid */}
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-green-500/20">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl font-bold text-white">{stats.approvedPaid}</p>
-              <p className="text-[10px] text-white/60">Approved & Paid</p>
-            </div>
-          </div>
-          {categoryStats.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
-              {categoryStats.map((cat) => (
-                <div key={cat.name} className="flex items-center justify-between">
-                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.paid}</span>
+              {/* Approved & Paid */}
+              <div className="glass-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-green-500/20">
+                    <CheckCircle className="w-4 h-4 text-green-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-2xl font-bold text-white">{stats.approvedPaid}</p>
+                    <p className="text-[10px] text-white/60">Approved & Paid</p>
+                  </div>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {categoryStats.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                    {categoryStats.map((cat) => (
+                      <div key={cat.name} className="flex items-center justify-between">
+                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.paid}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-        {/* Missing Payments */}
-        <div className="glass-card p-3">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-lg bg-red-500/20">
-              <DollarSign className="w-4 h-4 text-red-400" />
-            </div>
-            <div className="flex-1">
-              <p className="text-2xl font-bold text-white">{stats.missingPayments}</p>
-              <p className="text-[10px] text-white/60">Missing Payments</p>
-            </div>
-          </div>
-          {categoryStats.length > 0 && (
-            <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
-              {categoryStats.map((cat) => (
-                <div key={cat.name} className="flex items-center justify-between">
-                  <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                  <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unpaid}</span>
+              {/* Missing Payments */}
+              <div className="glass-card p-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-2 rounded-lg bg-red-500/20">
+                    <DollarSign className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-2xl font-bold text-white">{stats.missingPayments}</p>
+                    <p className="text-[10px] text-white/60">Missing Payments</p>
+                  </div>
                 </div>
-              ))}
+                {categoryStats.length > 0 && (
+                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                    {categoryStats.map((cat) => (
+                      <div key={cat.name} className="flex items-center justify-between">
+                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unpaid}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
+          ) : (
+            /* Go Live Card - Show when event is NOT live */
+            <GoLiveCard
+              event={event}
+              onGoLive={handleRefresh}
+              organizationId={organizationId}
+            />
           )}
-        </div>
-      </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-        {/* Left Column - Upcoming Emails & Bulletins */}
-        <div className="lg:col-span-2 space-y-4">
           {/* Upcoming Emails */}
           <div className="glass-card p-3">
             <div className="flex items-center justify-between mb-3">
@@ -571,6 +588,25 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           <div className="space-y-3">
             <div>
               <p className="text-lg font-semibold text-white mb-1">{event.title}</p>
+            </div>
+
+            {/* Event Status */}
+            <div className="flex items-start gap-2">
+              <div className="flex-shrink-0 mt-0.5">
+                {isLive ? (
+                  <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                ) : (
+                  <div className="w-3.5 h-3.5 rounded-full bg-yellow-500/50" />
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] text-white/60">Event Status</p>
+                <p className={`text-xs font-medium ${isLive ? 'text-green-400' : 'text-yellow-400'}`}>
+                  {isLive ? 'Live' : 'Draft'}
+                </p>
+              </div>
             </div>
 
             {/* Description */}

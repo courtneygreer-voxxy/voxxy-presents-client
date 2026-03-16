@@ -116,12 +116,16 @@ export default function EmailRow({
     const name = email.name.toLowerCase();
     const trigger = email.trigger_type;
 
-    if (name.includes('payment') || trigger.includes('payment')) return 'payment_reminders';
+    // Check triggers first (more reliable than name patterns)
+    if (trigger.includes('payment')) return 'payment_reminders';
+    if (trigger === 'on_invitation_send' || trigger === 'on_application_submit' || trigger === 'on_approval' || trigger === 'on_rejection' || trigger === 'on_waitlist') return 'application_updates';
+    if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') return 'event_countdown';
+
+    // Then check name patterns
+    if (name.includes('payment')) return 'payment_reminders';
     if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
-    if (trigger === 'days_before_event' || name.includes('days before')) return 'event_countdown';
-    if (trigger === 'on_event_date' || name.includes('day of')) return 'event_countdown';
-    if (trigger === 'days_after_event') return 'event_countdown';
-    if (name.includes('announcement') || name.includes('immediate') || name.includes('invitation')) return 'event_announcements';
+    if (name.includes('days before') || name.includes('day of')) return 'event_countdown';
+    if (name.includes('announcement') || name.includes('immediate')) return 'event_announcements';
 
     return 'event_announcements';
   };
@@ -301,7 +305,7 @@ export default function EmailRow({
 
       {/* Vendor Category */}
       <div className="text-white/60 text-[11px] truncate">
-        {email.category?.name || 'All'}
+        {email.category?.name || (category === 'application_updates' ? 'All Invitations' : 'All Vendors')}
       </div>
 
       {/* Recipients Count */}
