@@ -948,6 +948,7 @@ export const vendorApplicationsApi = {
     description?: string
     booth_price?: number
     status?: 'active' | 'inactive'
+    category_id?: number
     categories?: string[]
     install_date?: string
     install_start_time?: string
@@ -970,6 +971,7 @@ export const vendorApplicationsApi = {
     description: string
     booth_price: number
     status: 'active' | 'inactive'
+    category_id: number
     categories: string[]
     install_date: string
     install_start_time: string
