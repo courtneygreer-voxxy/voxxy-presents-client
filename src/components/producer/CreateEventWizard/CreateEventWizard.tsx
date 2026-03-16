@@ -251,7 +251,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       case 1:
         return <Step1EventDetails {...stepProps} />;
       case 2:
-        return <Step2ApplicationDetails {...stepProps} />;
+        return <Step2ApplicationDetails {...stepProps} organizationId={organizationId} />;
       case 3:
         return <Step3InviteList {...stepProps} organizationId={organizationId} />;
       case 4:

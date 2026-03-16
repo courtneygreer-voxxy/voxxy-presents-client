@@ -290,6 +290,11 @@ export default function EmailSequenceEditorOverlay({
                           <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                           <span className="text-sm text-white truncate flex-1">{email.name}</span>
 
+                          {/* Vendor Category Badge */}
+                          <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border flex-shrink-0 bg-white/5 text-white/70 border-white/20">
+                            {email.category?.name || 'All'}
+                          </span>
+
                           {/* Status Badge */}
                           <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium border flex-shrink-0 ${status.className}`}>
                             {status.label}

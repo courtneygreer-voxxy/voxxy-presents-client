@@ -385,6 +385,7 @@ export default function ProducerDashboard() {
             name: app.name,
             description: app.description || undefined,
             booth_price: app.booth_price,
+            category_id: app.category_id || undefined,
             install_date: app.install_date || undefined,
             install_start_time: app.install_start_time || undefined,
             install_end_time: app.install_end_time || undefined,
@@ -425,7 +426,26 @@ export default function ProducerDashboard() {
         }
       }
 
-      // Note: Scheduled emails are generated in "paused" state by backend
+      // Step 3.5: Generate scheduled emails (now that applications exist)
+      // This creates category-specific emails based on vendor applications
+      if (wizardState.applicationDetails.applications.length > 0) {
+        setCreationProgress('Generating scheduled emails...');
+
+        try {
+          const emailResult = await eventsApi.generateEmails(newEvent.slug);
+          console.log(`✅ Generated ${emailResult.emails_count} scheduled emails`);
+
+          if (emailResult.warnings && emailResult.warnings.length > 0) {
+            console.warn('Email generation warnings:', emailResult.warnings);
+          }
+        } catch (error) {
+          console.error('Failed to generate emails:', error);
+          // Don't throw - event creation succeeded, just log the error
+          // Emails can be regenerated later from the Mail tab
+        }
+      }
+
+      // Note: Scheduled emails are created in "paused" state
       // They will be activated when event goes live
 
       // Step 4: Refresh events list and prepare to show Command Center

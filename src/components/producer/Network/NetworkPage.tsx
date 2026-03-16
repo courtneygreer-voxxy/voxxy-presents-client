@@ -1,11 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Filter, UserPlus, Upload, Save, Trash2, X, Check, ChevronDown } from 'lucide-react';
-import { vendorContactsApi, contactListsApi, VendorContact } from '@/services/api';
+import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
+import type { Category } from '@/types/category';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
+import { CategoryFilterBar } from '@/components/shared/CategoryFilterBar';
 
 type NetworkTab = 'contacts' | 'lists';
 
@@ -145,6 +147,10 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
   const [tagFilters, setTagFilters] = useState<string[]>([]);
 
+  // Category objects for visual filter
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+
   // Filter options from backend (all unique values across entire org)
   const [filterOptions, setFilterOptions] = useState<{
     locations: string[];
@@ -183,6 +189,27 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     };
     loadFilterOptions();
   }, [organizationId]);
+
+  // Load category objects for visual filter
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const response = await categoriesApi.getAll(organizationId, true);
+        setCategories(response.categories);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    loadCategories();
+  }, [organizationId]);
+
+  // Sync categoryFilters with selectedCategoryIds
+  useEffect(() => {
+    const selectedCategoryNames = categories
+      .filter(c => selectedCategoryIds.includes(c.id))
+      .map(c => c.name);
+    setCategoryFilters(selectedCategoryNames);
+  }, [selectedCategoryIds, categories]);
 
   // Reset to page 1 when filters change
   useEffect(() => {
@@ -356,6 +383,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const clearAllFilters = () => {
     setLocationFilters([]);
     setCategoryFilters([]);
+    setSelectedCategoryIds([]);
     setTagFilters([]);
     setShowSaveInput(false);
     setListName('');
@@ -386,8 +414,33 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
   const removeFilterChip = (type: 'location' | 'category' | 'tag', value: string) => {
     if (type === 'location') setLocationFilters(prev => prev.filter(v => v !== value));
-    if (type === 'category') setCategoryFilters(prev => prev.filter(v => v !== value));
+    if (type === 'category') {
+      setCategoryFilters(prev => prev.filter(v => v !== value));
+      // Also update selectedCategoryIds
+      const categoryToRemove = categories.find(c => c.name === value);
+      if (categoryToRemove) {
+        setSelectedCategoryIds(prev => prev.filter(id => id !== categoryToRemove.id));
+      }
+    }
     if (type === 'tag') setTagFilters(prev => prev.filter(v => v !== value));
+  };
+
+  const handleToggleCategory = (categoryId: number) => {
+    setSelectedCategoryIds(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
+  const handleSelectAllCategories = () => {
+    if (selectedCategoryIds.length === categories.length || selectedCategoryIds.length === 0) {
+      setSelectedCategoryIds([]);
+    } else {
+      setSelectedCategoryIds(categories.map(c => c.id));
+    }
   };
 
   // Loading state
@@ -545,6 +598,24 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       {/* Tab Content */}
       {activeTab === 'contacts' && (
         <>
+          {/* Visual Category Filter */}
+          {categories.length > 0 && (
+            <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+              <div className="mb-3">
+                <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
+                <p className="text-xs text-white/50 mt-0.5">
+                  Select categories to filter your network contacts
+                </p>
+              </div>
+              <CategoryFilterBar
+                categories={categories}
+                selectedCategoryIds={selectedCategoryIds}
+                onToggleCategory={handleToggleCategory}
+                onSelectAll={handleSelectAllCategories}
+              />
+            </div>
+          )}
+
           {/* Multi-select filter dropdowns */}
           <div className="flex items-center gap-3 flex-wrap">
             <MultiSelectFilterDropdown
@@ -552,12 +623,6 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
               options={filterOptions.locations}
               selected={locationFilters}
               onChange={setLocationFilters}
-            />
-            <MultiSelectFilterDropdown
-              label="Categories"
-              options={filterOptions.categories}
-              selected={categoryFilters}
-              onChange={setCategoryFilters}
             />
             <MultiSelectFilterDropdown
               label="Tags"

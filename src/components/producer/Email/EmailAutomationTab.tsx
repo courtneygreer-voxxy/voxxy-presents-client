@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail } from 'lucide-react';
-import { scheduledEmailsApi, eventsApi } from '@/services/api';
+import { scheduledEmailsApi, eventsApi, categoriesApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters } from '@/types/email';
+import type { Category } from '@/types/category';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
+import { CategoryFilterBar } from '@/components/shared/CategoryFilterBar';
 import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
@@ -52,8 +54,12 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<FilterType>('all');
 
+  // Category filter state
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+
   // Sort state
-  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
+  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
   type SortDirection = 'asc' | 'desc';
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -67,10 +73,42 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
   };
 
+  const handleToggleCategory = (categoryId: number) => {
+    setSelectedCategoryIds(prev => {
+      if (prev.includes(categoryId)) {
+        return prev.filter(id => id !== categoryId);
+      } else {
+        return [...prev, categoryId];
+      }
+    });
+  };
+
+  const handleSelectAllCategories = () => {
+    if (selectedCategoryIds.length === categories.length || selectedCategoryIds.length === 0) {
+      setSelectedCategoryIds([]);
+    } else {
+      setSelectedCategoryIds(categories.map(c => c.id));
+    }
+  };
+
   // Load scheduled emails
   useEffect(() => {
     loadEmails();
   }, [eventSlug]);
+
+  // Load categories
+  useEffect(() => {
+    const loadCategories = async () => {
+      if (!event?.organization_id) return;
+      try {
+        const response = await categoriesApi.getAll(event.organization_id, true);
+        setCategories(response.categories);
+      } catch (error) {
+        console.error('Failed to load categories:', error);
+      }
+    };
+    loadCategories();
+  }, [event?.organization_id]);
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
@@ -233,6 +271,19 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       result = result.filter(email => email.status === statusFilter);
     }
 
+    // Filter by vendor category
+    if (selectedCategoryIds.length > 0) {
+      result = result.filter(email => {
+        // Include emails that have a matching category_id
+        if (email.category_id && selectedCategoryIds.includes(email.category_id)) {
+          return true;
+        }
+        // Include "All" emails (no category_id) only if filtering is active
+        // This ensures category-specific emails are shown when their category is selected
+        return false;
+      });
+    }
+
     // Search by name or subject
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
@@ -261,7 +312,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             valA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
             valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
             break;
-          case 'category': {
+          case 'email_type': {
             const toCat: Record<string, string> = {
               on_application_open: 'event_announcements', on_invitation_send: 'event_announcements',
               on_application_submit: 'application_updates', on_approval: 'application_updates',
@@ -277,6 +328,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             valB = (b.email_template_item?.category ?? toCat[b.trigger_type] ?? 'event_announcements').toLowerCase();
             break;
           }
+          case 'category':
+            valA = (a.category?.name ?? 'All').toLowerCase();
+            valB = (b.category?.name ?? 'All').toLowerCase();
+            break;
           case 'recipient_count':
             valA = a.recipient_count ?? 0;
             valB = b.recipient_count ?? 0;
@@ -331,7 +386,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
     });
-  }, [emails, searchQuery, statusFilter, sortColumn, sortDirection]);
+  }, [emails, searchQuery, statusFilter, selectedCategoryIds, sortColumn, sortDirection]);
 
   // Calculate statistics
   const stats = {
@@ -537,6 +592,24 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
               </select>
             </div>
           </div>
+
+          {/* Category Filter */}
+          {categories.length > 0 && (
+            <div className="bg-white/5 rounded-lg border border-white/10 p-4">
+              <div className="mb-3">
+                <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
+                <p className="text-xs text-white/50 mt-0.5">
+                  View emails targeting specific vendor categories
+                </p>
+              </div>
+              <CategoryFilterBar
+                categories={categories}
+                selectedCategoryIds={selectedCategoryIds}
+                onToggleCategory={handleToggleCategory}
+                onSelectAll={handleSelectAllCategories}
+              />
+            </div>
+          )}
 
           {/* Results count */}
           <div className="flex items-center justify-between">

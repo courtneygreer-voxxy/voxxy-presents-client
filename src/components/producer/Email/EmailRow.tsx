@@ -221,7 +221,7 @@ export default function EmailRow({
   };
 
   return (
-    <div className="grid grid-cols-[200px,220px,130px,70px,110px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
+    <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
         {email.overdue && email.overdue_message && (
@@ -291,24 +291,17 @@ export default function EmailRow({
         )}
       </div>
 
-      {/* Type Badge */}
-      <div>
-        <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium border ${
-          isSystemEmail
-            ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-            : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
-        }`}>
-          {isSystemEmail ? <Zap className="w-2.5 h-2.5" /> : <Clock className="w-2.5 h-2.5" />}
-          {isSystemEmail ? 'System' : 'Time'}
-        </span>
-      </div>
-
-      {/* Category Badge */}
+      {/* Email Type Badge */}
       <div>
         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border ${categoryConfig.color}`}>
           <CategoryIcon className="w-3 h-3" />
           {categoryConfig.label}
         </span>
+      </div>
+
+      {/* Vendor Category */}
+      <div className="text-white/60 text-[11px] truncate">
+        {email.category?.name || 'All'}
       </div>
 
       {/* Recipients Count */}

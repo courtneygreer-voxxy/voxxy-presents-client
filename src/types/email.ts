@@ -82,6 +82,9 @@ export interface ScheduledEmail {
   // Recipient filtering (customizable per event)
   filter_criteria: FilterCriteria;
 
+  // Category-specific email (for vendor categories)
+  category_id: number | null;
+
   // Status tracking
   status: ScheduledEmailStatus;
   sent_at: string | null;
@@ -93,6 +96,7 @@ export interface ScheduledEmail {
 
   // Optional: Associated objects (included when requested)
   email_template_item?: EmailTemplateItem; // Included by backend via .includes(:email_template_item)
+  category?: { id: number; name: string }; // Vendor category (e.g., "Food Vendor", "Artist") - included by backend
   latest_delivery?: EmailDelivery;
   email_deliveries?: EmailDelivery[];
 

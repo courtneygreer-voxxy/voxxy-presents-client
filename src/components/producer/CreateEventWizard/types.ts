@@ -2,10 +2,12 @@
 
 export interface ApplicationRow {
   id: string; // Temporary client-side ID (UUID)
-  name: string; // Application title (e.g., "Artist Booth")
+  category_id?: number; // Category ID (linked to organization's categories)
+  category_name?: string; // Category name for display
+  name: string; // Application title (e.g., "Artist Booth") - kept for backward compatibility
   booth_price: number; // Price for this booth type
   description: string; // Optional description
-  categories?: string[]; // Optional vendor categories (future use)
+  categories?: string[]; // Optional vendor categories (legacy - will be deprecated)
   install_date?: string; // Install date (ISO date string)
   install_start_time?: string; // Install start time (HH:MM format)
   install_end_time?: string; // Install end time (HH:MM format)

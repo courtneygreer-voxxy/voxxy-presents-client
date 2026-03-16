@@ -724,6 +724,22 @@ export const eventsApi = {
   },
 
   /**
+   * Generate scheduled emails - creates category-specific emails
+   * POST /api/v1/presents/events/:slug/generate_emails
+   * Call this after vendor applications are created
+   */
+  async generateEmails(eventSlug: string) {
+    return fetchApi<{
+      message: string
+      emails_count: number
+      warnings?: string[]
+      scheduled_emails: any[]
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/generate_emails`, {
+      method: 'POST',
+    })
+  },
+
+  /**
    * Check impact of event update email notification
    * POST /api/v1/presents/events/:slug/email_notifications/check_event_update_impact
    */
@@ -2563,6 +2579,85 @@ export const contactListsApi = {
     })
   }
 }
+
+export const categoriesApi = {
+  /**
+   * Get all categories for an organization
+   * GET /api/v1/presents/organizations/:organization_id/categories
+   */
+  async getAll(organizationId: number, includeUsage = false): Promise<{ categories: any[] }> {
+    const params = includeUsage ? '?include_usage=true' : '';
+    return fetchApi<{ categories: any[] }>(
+      `/v1/presents/organizations/${organizationId}/categories${params}`
+    );
+  },
+
+  /**
+   * Get single category by ID
+   * GET /api/v1/presents/categories/:id
+   */
+  async getById(categoryId: number): Promise<any> {
+    return fetchApi<any>(`/v1/presents/categories/${categoryId}`);
+  },
+
+  /**
+   * Get category usage stats
+   * GET /api/v1/presents/categories/:id/usage
+   */
+  async getUsage(categoryId: number): Promise<{ category: any; usage: any }> {
+    return fetchApi<{ category: any; usage: any }>(
+      `/v1/presents/categories/${categoryId}/usage`
+    );
+  },
+
+  /**
+   * Create new category
+   * POST /api/v1/presents/organizations/:organization_id/categories
+   */
+  async create(organizationId: number, categoryData: {
+    name: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+  }): Promise<any> {
+    return fetchApi<any>(
+      `/v1/presents/organizations/${organizationId}/categories`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ category: categoryData }),
+      }
+    );
+  },
+
+  /**
+   * Update category
+   * PUT /api/v1/presents/categories/:id
+   */
+  async update(categoryId: number, categoryData: {
+    name?: string;
+    description?: string;
+    color?: string;
+    icon?: string;
+  }): Promise<any> {
+    return fetchApi<any>(
+      `/v1/presents/categories/${categoryId}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({ category: categoryData }),
+      }
+    );
+  },
+
+  /**
+   * Delete category
+   * DELETE /api/v1/presents/categories/:id
+   */
+  async delete(categoryId: number): Promise<void> {
+    return fetchApi<void>(`/v1/presents/categories/${categoryId}`, {
+      method: 'DELETE',
+    });
+  },
+};
 
 export const eventInvitationsApi = {
   /**
