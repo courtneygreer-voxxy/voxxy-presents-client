@@ -1,13 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail } from 'lucide-react';
-import { scheduledEmailsApi, eventsApi, categoriesApi } from '@/services/api';
-import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory } from '@/types/email';
+import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail, Plus } from 'lucide-react';
+import { scheduledEmailsApi, eventsApi, categoriesApi, vendorApplicationsApi } from '@/services/api';
+import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory, CreateScheduledEmailRequest } from '@/types/email';
 import type { Category } from '@/types/category';
 import EmailTable from './EmailTable';
 import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
+import { CreateEmailDialog } from './CreateEmailDialog';
 import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
@@ -38,6 +39,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [eventData, setEventData] = useState<any | null>(null);
 
@@ -78,7 +80,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     loadEmails();
   }, [eventSlug]);
 
-  // Load categories (organization.id is nested in the event object)
+  // Load categories (only those used by this event's vendor applications)
   useEffect(() => {
     const loadCategories = async () => {
       const orgId = eventData?.organization?.id || event?.organization?.id || eventData?.organization_id || event?.organization_id;
@@ -88,15 +90,35 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       }
       try {
         console.log('📂 Loading categories for organization:', orgId);
-        const response = await categoriesApi.getAll(orgId, true);
-        console.log('✅ Loaded categories:', response.categories);
-        setCategories(response.categories);
+
+        // Load all categories for the organization
+        const categoriesResponse = await categoriesApi.getAll(orgId, true);
+        const allCategories = categoriesResponse.categories;
+        console.log('✅ Loaded all categories:', allCategories);
+
+        // Load vendor applications for this event to see which categories are actually used
+        const vendorApplications = await vendorApplicationsApi.getByEvent(eventSlug);
+        console.log('✅ Loaded vendor applications:', vendorApplications);
+
+        // Extract unique category_ids from vendor applications
+        const usedCategoryIds = new Set(
+          vendorApplications
+            .map((app: any) => app.category_id)
+            .filter((id: number | null) => id !== null)
+        );
+        console.log('📋 Categories used by this event:', Array.from(usedCategoryIds));
+
+        // Filter categories to only show those used by this event
+        const eventCategories = allCategories.filter((cat: Category) => usedCategoryIds.has(cat.id));
+        console.log('✅ Filtered event-specific categories:', eventCategories);
+
+        setCategories(eventCategories);
       } catch (error) {
         console.error('❌ Failed to load categories:', error);
       }
     };
     loadCategories();
-  }, [eventData?.organization?.id, event?.organization?.id, eventData?.organization_id, event?.organization_id]);
+  }, [eventSlug, eventData?.organization?.id, event?.organization?.id, eventData?.organization_id, event?.organization_id]);
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {
@@ -207,6 +229,18 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       showSuccess('Email deleted successfully');
     } catch (err: any) {
       setError(err.message || 'Failed to delete email');
+    }
+  };
+
+  const handleCreateEmail = async (data: CreateScheduledEmailRequest) => {
+    try {
+      await scheduledEmailsApi.create(eventSlug, data);
+      await loadEmails();
+      showSuccess('Email created successfully!');
+      setIsCreateDialogOpen(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to create email');
+      throw err; // Re-throw so dialog can handle it
     }
   };
 
@@ -453,6 +487,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onResume={handleResume}
         onSendNow={handleSendNow}
         onDelete={handleDelete}
+        onCreateEmail={handleCreateEmail}
         onSaveAsTemplate={() => setIsSaveDialogOpen(true)}
       />
     );
@@ -499,6 +534,13 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           <div className="flex items-center gap-3">
             {emails.length > 0 && (
               <>
+                <button
+                  onClick={() => setIsCreateDialogOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600 transition-all shadow-lg"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden sm:inline">New Email</span>
+                </button>
                 <button
                   onClick={() => setViewState({ view: 'sequence-editor' })}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
@@ -692,6 +734,15 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         eventSlug={eventSlug}
         emailCount={emails.length}
         onSuccess={handleSaveAsTemplate}
+      />
+
+      {/* Create Email Dialog */}
+      <CreateEmailDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onSubmit={handleCreateEmail}
+        categories={categories}
+        showCategorySelector={true}
       />
 
       {/* Admin Debug Panel */}

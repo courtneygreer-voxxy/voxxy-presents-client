@@ -309,6 +309,19 @@ export interface UpdateEmailRequest {
   status?: ScheduledEmailStatus;
 }
 
+// Create new scheduled email
+export interface CreateScheduledEmailRequest {
+  name: string;
+  subject_template: string;
+  body_template: string;
+  trigger_type: TriggerType;
+  trigger_value?: number;
+  trigger_time?: string;
+  category_id?: number | null;  // For category-specific emails (NULL = all vendors)
+  filter_criteria?: FilterCriteria;
+  status?: 'scheduled' | 'paused';
+}
+
 // Save event's emails as new template
 export interface SaveAsTemplateRequest {
   name: string;

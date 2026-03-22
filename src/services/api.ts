@@ -9,6 +9,7 @@ import type {
   UpdateTemplateRequest,
   CreateEmailTemplateItemRequest,
   UpdateEmailRequest,
+  CreateScheduledEmailRequest,
   SaveAsTemplateRequest,
   EmailPreviewRequest,
   EmailPreviewResponse,
@@ -1352,6 +1353,20 @@ export const scheduledEmailsApi = {
         organization: string
       }>
     }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/recipients`)
+  },
+
+  /**
+   * Create new scheduled email for event
+   * POST /api/v1/presents/events/:event_slug/scheduled_emails
+   */
+  async create(eventSlug: string, data: CreateScheduledEmailRequest) {
+    return fetchApi<ScheduledEmail>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ scheduled_email: data }),
+      }
+    )
   },
 
   /**
