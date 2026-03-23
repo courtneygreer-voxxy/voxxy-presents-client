@@ -16,7 +16,6 @@ import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
 
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
-import { CreateTemplateEmailDialog } from './CreateTemplateEmailDialog';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 
 interface TemplateBuilderPageProps {
@@ -45,9 +44,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   // Email editor state
   const [editingItem, setEditingItem] = useState<EmailTemplateItem | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
-
-  // Create email dialog state
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isCreateMode, setIsCreateMode] = useState(false);
 
   // Track locally modified emails (before template is saved)
   const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
@@ -225,40 +222,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     }
   };
 
-  const handleAddEmail = async (category?: string) => {
-    if (!template) {
-      setError('Please save the template first');
-      return;
-    }
-
-    const cat = (category || 'application_updates') as EmailCategory;
-    const defaultTriggers: Record<string, TriggerType> = {
-      event_announcements: 'on_application_open',
-      application_updates: 'on_application_submit',
-      payment_reminders: 'on_payment_deadline',
-      event_countdown: 'days_before_event',
-      event_updates: 'on_event_date',
-    };
-
-    try {
-      const newItem = await emailTemplateItemsApi.create(template.id, {
-        name: `New Email`,
-        position: emailItems.length + 1,
-        email_type: cat,
-        subject_template: 'New Email - [eventName]',
-        body_template: '<p>Hi [firstName],</p><p>This is a new email for [eventName].</p><p>Edit this email to customize the content.</p>' + STANDARD_EMAIL_FOOTER,
-        trigger_type: defaultTriggers[cat] || 'on_application_submit' as TriggerType,
-        enabled_by_default: true
-      });
-
-      setEmailItems([...emailItems, newItem]);
-    } catch (err: any) {
-      setError(err.message || 'Failed to add email');
-    }
-  };
-
-  // Handle creating email from dialog
-  const handleCreateEmail = async (data: any) => {
+  // Handle creating email from editor
+  const handleCreateEmailFromEditor = async (data: any) => {
     if (!template) {
       // If template doesn't exist yet, show error
       setError('Please save the template first before adding emails');
@@ -266,14 +231,38 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     }
 
     try {
-      const newItem = await emailTemplateItemsApi.create(template.id, data);
+      const newItem = await emailTemplateItemsApi.create(template.id, {
+        name: data.name,
+        description: data.description,
+        email_type: data.email_type as EmailCategory,
+        category_id: data.category_id,
+        position: data.position,
+        subject_template: data.subject_template,
+        body_template: data.body_template,
+        trigger_type: data.trigger_type as TriggerType,
+        trigger_value: data.trigger_value,
+        trigger_time: data.trigger_time,
+        filter_criteria: data.filter_criteria,
+        enabled_by_default: data.enabled_by_default,
+      });
       setEmailItems([...emailItems, newItem]);
       setSuccessMessage('Email added to template successfully!');
-      setIsCreateDialogOpen(false);
+      setIsCreateMode(false);
+      setIsEditorOpen(false);
     } catch (err: any) {
       setError(err.message || 'Failed to add email');
-      throw err; // Re-throw so dialog can handle it
+      throw err; // Re-throw so editor can handle it
     }
+  };
+
+  const handleOpenCreateEditor = (category?: string) => {
+    if (!template) {
+      setError('Please save the template first before adding emails');
+      return;
+    }
+    setIsCreateMode(true);
+    setEditingItem(null);
+    setIsEditorOpen(true);
   };
 
   const handleDeleteEmail = async (itemId: number) => {
@@ -333,20 +322,23 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const handleCloseEditor = () => {
     setIsEditorOpen(false);
     setEditingItem(null);
+    setIsCreateMode(false);
   };
 
 
   const isSystem = template?.template_type === 'system';
   const canEdit = !isSystem;
 
-  // If editing an email, show full-screen editor
-  if (isEditorOpen && editingItem) {
+  // If editor is open (create or edit mode), show full-screen editor
+  if (isEditorOpen) {
     return (
       <EmailTemplateEditorPage
-        item={editingItem}
+        item={editingItem} // null in create mode, EmailTemplateItem in edit mode
         templateId={template?.id || 0}
+        nextPosition={emailItems.length + 1}
         onBack={handleCloseEditor}
-        onSave={handleSaveEmail}
+        onSave={isCreateMode ? undefined : handleSaveEmail}
+        onCreate={isCreateMode ? handleCreateEmailFromEditor : undefined}
       />
     );
   }
@@ -376,7 +368,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             </div>
             {canEdit && template && (
               <button
-                onClick={() => setIsCreateDialogOpen(true)}
+                onClick={() => handleOpenCreateEditor()}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -518,7 +510,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   <p className="text-white/60 text-sm mb-3">No emails in this template</p>
                   {canEdit && (
                     <button
-                      onClick={() => handleAddEmail()}
+                      onClick={() => handleOpenCreateEditor()}
                       className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all text-sm inline-flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
@@ -556,7 +548,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                           <span className="text-[10px] text-white/50 tabular-nums">{items.length}</span>
                           {canEdit && (
                             <button
-                              onClick={() => handleAddEmail(category)}
+                              onClick={() => handleOpenCreateEditor(category)}
                               className="p-1 rounded text-white/60 hover:text-purple-400 hover:bg-white/10 transition-all ml-auto"
                               title={template ? `Add email to ${categoryLabels[category] || category}` : 'Save sequence first to add emails'}
                             >
@@ -611,14 +603,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
           </div>
         )}
       </div>
-
-      {/* Create Email Dialog */}
-      <CreateTemplateEmailDialog
-        isOpen={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-        onSubmit={handleCreateEmail}
-        nextPosition={emailItems.length + 1}
-      />
     </div>
   );
 }

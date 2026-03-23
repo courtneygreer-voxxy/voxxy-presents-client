@@ -42,8 +42,23 @@ import { RichTextEditor } from './RichTextEditor';
 interface EmailTemplateEditorPageProps {
   item: EmailTemplateItem | null;
   templateId: number;
+  nextPosition?: number; // Position for new email (create mode)
   onBack: () => void;
-  onSave: (item: EmailTemplateItem) => Promise<void>;
+  onSave?: (item: EmailTemplateItem) => Promise<void>; // Edit mode
+  onCreate?: (data: {
+    name: string;
+    description?: string;
+    email_type: string;
+    category_id?: number | null;
+    position: number;
+    subject_template: string;
+    body_template: string;
+    trigger_type: string;
+    trigger_value?: number;
+    trigger_time?: string;
+    filter_criteria?: Record<string, any>;
+    enabled_by_default?: boolean;
+  }) => Promise<void>; // Create mode
 }
 
 const TRIGGER_TYPES = [
@@ -77,9 +92,12 @@ const CATEGORY_OPTIONS = [
 export function EmailTemplateEditorPage({
   item,
   templateId,
+  nextPosition = 1,
   onBack,
   onSave,
+  onCreate,
 }: EmailTemplateEditorPageProps) {
+  const isCreateMode = item === null;
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -107,28 +125,44 @@ export function EmailTemplateEditorPage({
   });
 
 
-  // Initialize form with item data
+  // Initialize form with item data (edit mode) or defaults (create mode)
   useEffect(() => {
-    if (!item) return;
+    if (item) {
+      // Edit mode: Load existing item data
+      const { content, footer } = splitEmailBody(item.body_template || '');
 
-    // Split body into content and footer
-    const { content, footer } = splitEmailBody(item.body_template || '');
+      setFormData({
+        name: item.name || '',
+        description: item.description || '',
+        category: item.category || 'application_updates',
+        subject_template: item.subject_template || '',
+        body_template: content,
+        trigger_type: item.trigger_type || 'on_application_submit',
+        trigger_value: item.trigger_value || 0,
+        trigger_time: item.trigger_time?.substring(11, 19) || '09:00:00',
+        enabled_by_default: item.enabled_by_default !== false,
+        filter_criteria: item.filter_criteria || {},
+      });
 
-    setFormData({
-      name: item.name || '',
-      description: item.description || '',
-      category: item.category || 'application_updates',
-      subject_template: item.subject_template || '',
-      body_template: content, // Only editable content, footer separated
-      trigger_type: item.trigger_type || 'on_application_submit',
-      trigger_value: item.trigger_value || 0,
-      trigger_time: item.trigger_time?.substring(11, 19) || '09:00:00',
-      enabled_by_default: item.enabled_by_default !== false,
-      filter_criteria: item.filter_criteria || {},
-    });
+      setEmailFooter(footer);
+    } else {
+      // Create mode: Set defaults
+      setFormData({
+        name: '',
+        description: '',
+        category: 'event_announcements',
+        subject_template: '',
+        body_template: '<p>Hi [firstName],</p><p></p><p>Best regards,</p><p>[organizationName]</p>',
+        trigger_type: 'days_before_event',
+        trigger_value: 7,
+        trigger_time: '09:00:00',
+        enabled_by_default: true,
+        filter_criteria: {},
+      });
 
-    // Store footer separately (locked from editing)
-    setEmailFooter(footer);
+      // No footer for new emails (will be added on save)
+      setEmailFooter('');
+    }
   }, [item]);
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === formData.trigger_type);
@@ -184,8 +218,6 @@ export function EmailTemplateEditorPage({
   };
 
   const handleSave = async () => {
-    if (!item) return;
-
     // Validate
     if (!formData.name || !formData.subject_template || !formData.body_template) {
       setSaveError('Name, subject, and body are required');
@@ -204,20 +236,41 @@ export function EmailTemplateEditorPage({
       // Join content and footer back together for backend storage
       const fullBodyTemplate = joinEmailBody(formData.body_template, emailFooter);
 
-      const updatedItem: EmailTemplateItem = {
-        ...item,
-        name: formData.name,
-        description: formData.description,
-        category: formData.category as any,
-        subject_template: formData.subject_template,
-        body_template: fullBodyTemplate, // Content + footer rejoined
-        trigger_type: formData.trigger_type as any,
-        trigger_value: formData.trigger_value,
-        trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
-        enabled_by_default: formData.enabled_by_default,
-      };
+      if (isCreateMode && onCreate) {
+        // Create mode: Create new template item
+        const newItemData = {
+          name: formData.name,
+          description: formData.description,
+          email_type: formData.category, // Use email_type for templates
+          category_id: null, // Template emails don't have vendor category
+          position: nextPosition,
+          subject_template: formData.subject_template,
+          body_template: fullBodyTemplate,
+          trigger_type: formData.trigger_type,
+          trigger_value: formData.trigger_value,
+          trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
+          filter_criteria: formData.filter_criteria,
+          enabled_by_default: formData.enabled_by_default,
+        };
 
-      await onSave(updatedItem);
+        await onCreate(newItemData);
+      } else if (!isCreateMode && item && onSave) {
+        // Edit mode: Update existing item
+        const updatedItem: EmailTemplateItem = {
+          ...item,
+          name: formData.name,
+          description: formData.description,
+          category: formData.category as any,
+          subject_template: formData.subject_template,
+          body_template: fullBodyTemplate, // Content + footer rejoined
+          trigger_type: formData.trigger_type as any,
+          trigger_value: formData.trigger_value,
+          trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
+          enabled_by_default: formData.enabled_by_default,
+        };
+
+        await onSave(updatedItem);
+      }
     } catch (err: any) {
       setSaveError(err.message || 'Failed to save template');
     } finally {
@@ -239,14 +292,6 @@ export function EmailTemplateEditorPage({
     return previewHtml;
   };
 
-  if (!item) {
-    return (
-      <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex items-center justify-center">
-        <p className="text-white/60">No template selected</p>
-      </div>
-    );
-  }
-
   return (
     <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
       {/* Header */}
@@ -261,8 +306,12 @@ export function EmailTemplateEditorPage({
                 <ArrowLeft className="w-4 h-4" />
               </button>
               <div>
-                <h1 className="text-base font-bold text-white">Edit Email Template</h1>
-                <p className="text-xs text-white/60 mt-0.5">{item.name}</p>
+                <h1 className="text-base font-bold text-white">
+                  {isCreateMode ? 'Create New Email' : 'Edit Email Template'}
+                </h1>
+                {!isCreateMode && item && (
+                  <p className="text-xs text-white/60 mt-0.5">{item.name}</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
