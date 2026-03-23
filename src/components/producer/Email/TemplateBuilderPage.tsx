@@ -16,6 +16,7 @@ import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
 
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
+import { CreateTemplateEmailDialog } from './CreateTemplateEmailDialog';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 
 interface TemplateBuilderPageProps {
@@ -44,6 +45,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   // Email editor state
   const [editingItem, setEditingItem] = useState<EmailTemplateItem | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  // Create email dialog state
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   // Track locally modified emails (before template is saved)
   const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
@@ -253,6 +257,25 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     }
   };
 
+  // Handle creating email from dialog
+  const handleCreateEmail = async (data: any) => {
+    if (!template) {
+      // If template doesn't exist yet, show error
+      setError('Please save the template first before adding emails');
+      throw new Error('Template must be saved first');
+    }
+
+    try {
+      const newItem = await emailTemplateItemsApi.create(template.id, data);
+      setEmailItems([...emailItems, newItem]);
+      setSuccessMessage('Email added to template successfully!');
+      setIsCreateDialogOpen(false);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add email');
+      throw err; // Re-throw so dialog can handle it
+    }
+  };
+
   const handleDeleteEmail = async (itemId: number) => {
     if (!template) return;
     if (!confirm('Delete this email? This cannot be undone.')) return;
@@ -351,6 +374,15 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   : 'Create a reusable email sequence'}
               </p>
             </div>
+            {canEdit && template && (
+              <button
+                onClick={() => setIsCreateDialogOpen(true)}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all flex items-center gap-2"
+              >
+                <Plus className="w-4 h-4" />
+                New Email
+              </button>
+            )}
             {canEdit && (
               <button
                 onClick={handleSave}
@@ -579,6 +611,14 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
           </div>
         )}
       </div>
+
+      {/* Create Email Dialog */}
+      <CreateTemplateEmailDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onSubmit={handleCreateEmail}
+        nextPosition={emailItems.length + 1}
+      />
     </div>
   );
 }

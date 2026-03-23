@@ -283,7 +283,8 @@ export interface UpdateTemplateRequest {
 export interface CreateEmailTemplateItemRequest {
   name: string;
   description?: string;
-  category: EmailCategory;
+  email_type: EmailCategory;  // For organizing emails by type
+  category_id?: number | null;  // Optional: For category-specific template emails
   position: number;
   subject_template: string;
   body_template: string;
