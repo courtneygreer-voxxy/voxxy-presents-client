@@ -308,6 +308,7 @@ export interface UpdateEmailRequest {
   trigger_type?: TriggerType;
   trigger_value?: number;
   trigger_time?: string;
+  category_id?: number | null;
   filter_criteria?: FilterCriteria;
   enabled_by_default?: boolean;
   scheduled_for?: string;

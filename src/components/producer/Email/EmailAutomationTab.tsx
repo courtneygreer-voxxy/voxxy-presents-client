@@ -8,7 +8,6 @@ import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
-import { CreateEmailDialog } from './CreateEmailDialog';
 import { DebugPanel } from '../DebugPanel';
 
 interface EmailAutomationTabProps {
@@ -32,14 +31,14 @@ type ViewState =
   | { view: 'table' }
   | { view: 'audit-log'; filters: AuditFilters | null }
   | { view: 'sequence-editor' }
-  | { view: 'email-editor'; email: ScheduledEmail; returnTo: 'table' | 'sequence-editor' };
+  | { view: 'email-editor'; email: ScheduledEmail; returnTo: 'table' | 'sequence-editor' }
+  | { view: 'email-editor'; email: null; returnTo: 'table' | 'sequence-editor' };
 
 export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailAutomationTabProps) {
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [eventData, setEventData] = useState<any | null>(null);
 
@@ -234,13 +233,13 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   const handleCreateEmail = async (data: CreateScheduledEmailRequest) => {
     try {
-      await scheduledEmailsApi.create(eventSlug, data);
+      const newEmail = await scheduledEmailsApi.create(eventSlug, data);
       await loadEmails();
       showSuccess('Email created successfully!');
-      setIsCreateDialogOpen(false);
+      return newEmail;
     } catch (err: any) {
       setError(err.message || 'Failed to create email');
-      throw err; // Re-throw so dialog can handle it
+      throw err;
     }
   };
 
@@ -487,14 +486,15 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onResume={handleResume}
         onSendNow={handleSendNow}
         onDelete={handleDelete}
-        onCreateEmail={handleCreateEmail}
+        onCreateEmail={() => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor' })}
         onSaveAsTemplate={() => setIsSaveDialogOpen(true)}
       />
     );
   }
 
-  // Show full-screen email editor
+  // Show full-screen email editor (create or edit mode)
   if (viewState.view === 'email-editor') {
+    const isCreateMode = viewState.email === null;
     return (
       <EmailEditorPage
         email={viewState.email}
@@ -502,6 +502,9 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         eventSlug={eventSlug}
         onBack={() => setViewState({ view: viewState.returnTo === 'sequence-editor' ? 'sequence-editor' : 'table' })}
         onSave={handleSaveEdit}
+        onCreate={isCreateMode ? handleCreateEmail : undefined}
+        mode={isCreateMode ? 'create' : 'edit'}
+        categories={categories}
         isAdmin={isAdmin}
       />
     );
@@ -535,7 +538,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             {emails.length > 0 && (
               <>
                 <button
-                  onClick={() => setIsCreateDialogOpen(true)}
+                  onClick={() => setViewState({ view: 'email-editor', email: null, returnTo: 'table' })}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600 transition-all shadow-lg"
                 >
                   <Plus className="w-4 h-4" />
@@ -734,15 +737,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         eventSlug={eventSlug}
         emailCount={emails.length}
         onSuccess={handleSaveAsTemplate}
-      />
-
-      {/* Create Email Dialog */}
-      <CreateEmailDialog
-        isOpen={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-        onSubmit={handleCreateEmail}
-        categories={categories}
-        showCategorySelector={true}
       />
 
       {/* Admin Debug Panel */}

@@ -1,7 +1,6 @@
 import { useState, useRef, useMemo } from 'react';
 import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Save, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus } from 'lucide-react';
-import type { ScheduledEmail, EmailCategory, CreateScheduledEmailRequest } from '@/types/email';
-import { CreateEmailDialog } from './CreateEmailDialog';
+import type { ScheduledEmail } from '@/types/email';
 
 interface EmailSequenceEditorOverlayProps {
   emails: ScheduledEmail[];
@@ -13,7 +12,7 @@ interface EmailSequenceEditorOverlayProps {
   onResume: (emailId: number) => Promise<void>;
   onSendNow: (emailId: number) => Promise<void>;
   onDelete: (emailId: number) => Promise<void>;
-  onCreateEmail: (data: CreateScheduledEmailRequest) => Promise<void>;
+  onCreateEmail: () => void;
   onSaveAsTemplate?: () => void;
 }
 
@@ -194,7 +193,6 @@ export default function EmailSequenceEditorOverlay({
   onCreateEmail,
   onSaveAsTemplate,
 }: EmailSequenceEditorOverlayProps) {
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   // Group emails by category
   const groupedEmails = useMemo(() => {
     const groups: Record<string, ScheduledEmail[]> = {};
@@ -251,7 +249,7 @@ export default function EmailSequenceEditorOverlay({
           <div className="flex items-center gap-3">
             <p className="text-sm text-white/60">{emails.length} emails</p>
             <button
-              onClick={() => setIsCreateDialogOpen(true)}
+              onClick={onCreateEmail}
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600 transition-all text-xs shadow-lg"
             >
               <Plus className="w-3.5 h-3.5" />
@@ -339,13 +337,6 @@ export default function EmailSequenceEditorOverlay({
         </div>
       </div>
 
-      {/* Create Email Dialog - No category selector in Sequence Editor */}
-      <CreateEmailDialog
-        isOpen={isCreateDialogOpen}
-        onClose={() => setIsCreateDialogOpen(false)}
-        onSubmit={onCreateEmail}
-        showCategorySelector={false}
-      />
     </div>
   );
 }

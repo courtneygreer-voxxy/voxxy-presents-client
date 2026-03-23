@@ -21,13 +21,15 @@ import {
   Clock,
   Tag,
   Users,
-  Globe,
   CheckCircle2,
   AlertCircle,
   Send,
-  Lock
+  Lock,
+  Search,
+  X,
 } from 'lucide-react';
-import type { ScheduledEmail, UpdateEmailRequest, TriggerType } from '@/types/email';
+import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
+import type { Category } from '@/types/category';
 import {
   EMAIL_VARIABLES,
   backendToFrontend,
@@ -35,7 +37,7 @@ import {
   validateEmailContent,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
-import { getEightAmLocalAsUTC, getTimezoneInfo, formatDateWithTimezone } from '@/utils/timezone';
+import { getEightAmLocalAsUTC, formatDateWithTimezone } from '@/utils/timezone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from './RichTextEditor';
@@ -65,6 +67,9 @@ interface EmailEditorPageProps {
   eventSlug: string;
   onBack: () => void;
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
+  onCreate?: (data: CreateScheduledEmailRequest) => Promise<ScheduledEmail>;
+  mode?: 'edit' | 'create';
+  categories?: Category[];
   isAdmin?: boolean;
 }
 
@@ -79,26 +84,42 @@ const editEmailSchema = z.object({
 type EditEmailFormData = z.infer<typeof editEmailSchema>;
 
 const TRIGGER_TYPES = [
-  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event' },
-  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date' },
-  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date' },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline' },
-  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date' },
-  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created' },
-  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline' },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day' },
-  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)' },
-  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin' },
-];
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event', requiredDateField: null },
+  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date', requiredDateField: 'start_date' },
+  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date', requiredDateField: 'start_date' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline', requiredDateField: 'application_deadline' },
+  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date', requiredDateField: 'start_date' },
+  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created', requiredDateField: null },
+  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline', requiredDateField: 'payment_deadline' },
+  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day', requiredDateField: 'payment_deadline' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)', requiredDateField: 'payment_deadline' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin', requiredDateField: null },
+] as const;
+
+// Blast-type triggers: vendor isn't in the system yet, so category targeting doesn't apply
+const BLAST_TRIGGER_TYPES = new Set([
+  'on_invitation_send',
+  'on_application_open',
+  'days_before_deadline',
+  'on_bulletin_post',
+  'on_event_cancel',
+  'on_event_update',
+]);
 
 export function EmailEditorPage({
-  email,
+  email: initialEmail,
   eventData,
   eventSlug,
   onBack,
   onSave,
+  onCreate,
+  mode: initialMode = 'edit',
+  categories = [],
   isAdmin,
 }: EmailEditorPageProps) {
+  const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
+  const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialEmail?.category_id || null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -111,12 +132,12 @@ export function EmailEditorPage({
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
+  const [tagSearch, setTagSearch] = useState('');
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [emailFooter, setEmailFooter] = useState<string>('');
 
   const subjectRef = useRef<HTMLInputElement>(null);
-  const timezoneInfo = getTimezoneInfo();
   const { toast } = useToast();
 
   // Safe field tracking: ref ensures onBlur timeouts don't clobber a newer focus
@@ -160,6 +181,20 @@ export function EmailEditorPage({
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
 
+  // Filter trigger types based on which date fields exist on the event
+  const availableTriggerTypes = TRIGGER_TYPES.filter((type) => {
+    if (!type.requiredDateField) return true; // Always available
+    if (!eventData) return true; // No event data, show all (can't filter)
+
+    const dateFieldMap: Record<string, string[]> = {
+      start_date: ['start_date', 'event_date'],
+      application_deadline: ['application_deadline'],
+      payment_deadline: ['payment_deadline', 'payment_due_date'],
+    };
+    const fields = dateFieldMap[type.requiredDateField] || [type.requiredDateField];
+    return fields.some((field) => eventData[field]);
+  });
+
   // Computed: Check if save should be allowed (extra safety check)
   const canSave = () => {
     // Must have subject and body
@@ -176,11 +211,31 @@ export function EmailEditorPage({
     return check.isValid;
   };
 
+  // Sync email state when prop changes (e.g., parent passes a different email)
+  useEffect(() => {
+    setEmail(initialEmail);
+  }, [initialEmail]);
+
   // Initialize form with email data - CONVERT backend format to frontend
   useEffect(() => {
+    if (mode === 'create') {
+      // Create mode: start with sensible defaults
+      reset({
+        name: '',
+        subject_template: '',
+        body_template: '',
+        trigger_type: 'days_before_event',
+        trigger_value: 1,
+      });
+      setSelectedCategoryId(null);
+      setEmailFooter(STANDARD_EMAIL_FOOTER);
+      return;
+    }
+
     if (!email) return;
 
     console.log('📧 Loading email into editor:', email.name);
+    setSelectedCategoryId(email.category_id || null);
     const convertedSubject = backendToFrontend(email.subject_template || '');
     const convertedBody = backendToFrontend(email.body_template || '');
 
@@ -197,7 +252,7 @@ export function EmailEditorPage({
 
     // Store footer separately
     setEmailFooter(footer);
-  }, [email, reset]);
+  }, [email, reset, mode]);
 
   // Strip HTML tags for validation (TipTap editor produces HTML)
   const stripHtmlForValidation = (html: string): string => {
@@ -325,8 +380,6 @@ export function EmailEditorPage({
   };
 
   const onSubmit = async (data: EditEmailFormData) => {
-    if (!email) return;
-
     // Double-check validation before saving (extra safety)
     const plainSubject = data.subject_template || '';
     const plainBody = stripHtmlForValidation(data.body_template || '');
@@ -360,25 +413,58 @@ export function EmailEditorPage({
 
       const trigger_time = getEightAmLocalAsUTC();
 
-      const updateData: UpdateEmailRequest = {
-        name: data.name,
-        subject_template: convertedSubject,
-        body_template: convertedBody,
-        trigger_type: data.trigger_type as TriggerType,
-        trigger_value: data.trigger_value,
-        trigger_time,
-      };
+      // Determine category_id: null if blast trigger type, otherwise use selection
+      const effectiveCategoryId = BLAST_TRIGGER_TYPES.has(data.trigger_type) ? null : selectedCategoryId;
 
-      await onSave(email.id, updateData);
+      if (mode === 'create' && onCreate) {
+        // CREATE mode: call onCreate, then transition to edit mode
+        const createData: CreateScheduledEmailRequest = {
+          name: data.name,
+          subject_template: convertedSubject,
+          body_template: convertedBody,
+          trigger_type: data.trigger_type as TriggerType,
+          trigger_value: data.trigger_value,
+          trigger_time,
+          category_id: effectiveCategoryId,
+          status: 'scheduled',
+        };
+
+        const newEmail = await onCreate(createData);
+
+        // Transition to edit mode with the newly created email
+        setEmail(newEmail);
+        setMode('edit');
+
+        toast({
+          title: "Email Created Successfully",
+          description: `"${data.name}" has been created. You can now send test emails.`,
+          variant: "default",
+          className: "bg-green-500/10 border-green-500/30 text-green-400",
+        });
+      } else if (email) {
+        // EDIT mode: call onSave with existing email ID
+        const updateData: UpdateEmailRequest = {
+          name: data.name,
+          subject_template: convertedSubject,
+          body_template: convertedBody,
+          trigger_type: data.trigger_type as TriggerType,
+          trigger_value: data.trigger_value,
+          trigger_time,
+          category_id: effectiveCategoryId,
+        };
+
+        await onSave(email.id, updateData);
+
+        toast({
+          title: "Email Saved Successfully",
+          description: `"${data.name}" has been updated.`,
+          variant: "default",
+          className: "bg-green-500/10 border-green-500/30 text-green-400",
+        });
+      }
 
       // Success!
       setSaveSuccess(true);
-      toast({
-        title: "Email Saved Successfully",
-        description: `"${data.name}" has been updated.`,
-        variant: "default",
-        className: "bg-green-500/10 border-green-500/30 text-green-400",
-      });
 
       // Clear success state after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -398,10 +484,12 @@ export function EmailEditorPage({
     }
   };
 
-  if (!email) return null;
+  // In edit mode, we need an email to work with
+  if (mode === 'edit' && !email) return null;
 
+  const isCreateMode = mode === 'create';
   const previewDate = calculatePreviewDate();
-  const canSendNow = email.status === 'scheduled' && email.scheduled_for && new Date(email.scheduled_for) <= new Date();
+  const canSendNow = !isCreateMode && email?.status === 'scheduled' && email?.scheduled_for && new Date(email.scheduled_for) <= new Date();
 
   // HTML-aware variable resolver for live preview
   // Properly handles variables in HTML content without breaking structure
@@ -568,15 +656,17 @@ export function EmailEditorPage({
                 </>
               )}
             </Button>
-            <Button
-              onClick={() => setShowTestEmailDialog(true)}
-              variant="outline"
-              size="sm"
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
-            >
-              <Send className="w-3.5 h-3.5 mr-1.5" />
-              Send Test
-            </Button>
+            {!isCreateMode && (
+              <Button
+                onClick={() => setShowTestEmailDialog(true)}
+                variant="outline"
+                size="sm"
+                className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
+              >
+                <Send className="w-3.5 h-3.5 mr-1.5" />
+                Send Test
+              </Button>
+            )}
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSaving || !canSave()}
@@ -608,7 +698,7 @@ export function EmailEditorPage({
               ) : (
                 <>
                   <Save className="w-3.5 h-3.5 mr-1.5" />
-                  Save Email
+                  {isCreateMode ? 'Create Email' : 'Save Email'}
                 </>
               )}
             </Button>
@@ -892,7 +982,7 @@ export function EmailEditorPage({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                      {TRIGGER_TYPES.map((type) => (
+                      {availableTriggerTypes.map((type) => (
                         <SelectItem key={type.value} value={type.value} className="text-white text-sm">
                           <div>
                             <div className="font-medium text-xs">{type.label}</div>
@@ -916,23 +1006,9 @@ export function EmailEditorPage({
                       min={0}
                       placeholder="e.g., 1"
                     />
+                    <p className="text-[10px] text-white/50 mt-1.5">Sends at 8:00 AM Eastern</p>
                   </div>
                 )}
-
-                {/* Send Time Info */}
-                <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg">
-                  <div className="flex items-start gap-1.5">
-                    <Globe className="w-3 h-3 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-blue-300 text-xs font-medium">
-                        Send Time: {timezoneInfo.eightAmLocal}
-                      </p>
-                      <p className="text-blue-300/60 text-[10px] mt-0.5">
-                        All emails send at 8:00 AM ({timezoneInfo.timezone})
-                      </p>
-                    </div>
-                  </div>
-                </div>
 
                 {previewDate && (
                   <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
@@ -961,14 +1037,40 @@ export function EmailEditorPage({
               )}
             </button>
 
-            {recipientsOpen && (
-              <div className="space-y-1.5">
-                <p className="text-xs text-white">By Category</p>
-                <p className="text-[10px] text-white/60 leading-relaxed">
-                  Category targeting is configured when this template is applied to a specific event.
-                </p>
-              </div>
-            )}
+            {recipientsOpen && (() => {
+              const isCategoryDisabled = BLAST_TRIGGER_TYPES.has(triggerType);
+              return (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-medium text-white/60 uppercase tracking-wide">
+                    Category
+                  </label>
+                  <Select
+                    value={selectedCategoryId?.toString() || 'all'}
+                    onValueChange={(value) => setSelectedCategoryId(value === 'all' ? null : Number(value))}
+                    disabled={isCategoryDisabled}
+                  >
+                    <SelectTrigger className={`bg-white/5 border-white/20 text-white text-sm h-8 ${isCategoryDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                      <SelectItem value="all" className="text-white text-sm">
+                        All Vendors
+                      </SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()} className="text-white text-sm">
+                          {category.icon ? `${category.icon} ${category.name}` : category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {isCategoryDisabled && (
+                    <p className="text-[10px] text-white/40 leading-relaxed">
+                      Category targeting is not available for this email type — recipients may not be vendors yet.
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Available Tags */}
@@ -988,21 +1090,51 @@ export function EmailEditorPage({
               )}
             </button>
 
-            {availableTagsOpen && (
+            {availableTagsOpen && (() => {
+              const filteredVariables = tagSearch
+                ? EMAIL_VARIABLES.filter((v) =>
+                    v.label.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                    v.frontendVar.toLowerCase().includes(tagSearch.toLowerCase())
+                  )
+                : EMAIL_VARIABLES;
+
+              return (
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
-                  {email.email_template_item?.category === 'event_announcements' && (
+                  {email?.email_template_item?.category === 'event_announcements' && (
                     <span className="block mt-1 text-yellow-400/80">
                       Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                     </span>
                   )}
                 </p>
+                {/* Tag Search */}
+                <div className="relative mb-2">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
+                  <input
+                    type="text"
+                    placeholder="Search tags..."
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    className="w-full pl-7 pr-7 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                  />
+                  {tagSearch && (
+                    <button
+                      onClick={() => setTagSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                {tagSearch && (
+                  <p className="text-[10px] text-white/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
+                )}
                 <div className="space-y-0.5">
-                  {EMAIL_VARIABLES.map((variable) => {
+                  {filteredVariables.map((variable) => {
                     // Only gray out category-specific variables for event_announcements
                     // (recipients haven't applied/chosen a category yet)
-                    const isAnnouncementEmail = email.email_template_item?.category === 'event_announcements';
+                    const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
                     const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
 
                     return (
@@ -1037,7 +1169,8 @@ export function EmailEditorPage({
                   })}
                 </div>
               </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       </div>
@@ -1114,6 +1247,7 @@ export function EmailEditorPage({
         <DebugPanel
           title="Email Editor"
           data={{
+            mode,
             email,
             eventData,
             eventSlug,
