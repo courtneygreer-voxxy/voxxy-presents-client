@@ -504,6 +504,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onSave={handleSaveEdit}
         onCreate={isCreateMode ? handleCreateEmail : undefined}
         mode={isCreateMode ? 'create' : 'edit'}
+        categories={categories}
         isAdmin={isAdmin}
       />
     );

@@ -28,6 +28,7 @@ import {
   Lock
 } from 'lucide-react';
 import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
+import type { Category } from '@/types/category';
 import {
   EMAIL_VARIABLES,
   backendToFrontend,
@@ -67,6 +68,7 @@ interface EmailEditorPageProps {
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
   onCreate?: (data: CreateScheduledEmailRequest) => Promise<ScheduledEmail>;
   mode?: 'edit' | 'create';
+  categories?: Category[];
   isAdmin?: boolean;
 }
 
@@ -93,6 +95,16 @@ const TRIGGER_TYPES = [
   { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin' },
 ];
 
+// Blast-type triggers: vendor isn't in the system yet, so category targeting doesn't apply
+const BLAST_TRIGGER_TYPES = new Set([
+  'on_invitation_send',
+  'on_application_open',
+  'days_before_deadline',
+  'on_bulletin_post',
+  'on_event_cancel',
+  'on_event_update',
+]);
+
 export function EmailEditorPage({
   email: initialEmail,
   eventData,
@@ -101,10 +113,12 @@ export function EmailEditorPage({
   onSave,
   onCreate,
   mode: initialMode = 'edit',
+  categories = [],
   isAdmin,
 }: EmailEditorPageProps) {
   const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
   const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialEmail?.category_id || null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -198,6 +212,7 @@ export function EmailEditorPage({
         trigger_type: 'days_before_event',
         trigger_value: 1,
       });
+      setSelectedCategoryId(null);
       setEmailFooter(STANDARD_EMAIL_FOOTER);
       return;
     }
@@ -205,6 +220,7 @@ export function EmailEditorPage({
     if (!email) return;
 
     console.log('📧 Loading email into editor:', email.name);
+    setSelectedCategoryId(email.category_id || null);
     const convertedSubject = backendToFrontend(email.subject_template || '');
     const convertedBody = backendToFrontend(email.body_template || '');
 
@@ -382,6 +398,9 @@ export function EmailEditorPage({
 
       const trigger_time = getEightAmLocalAsUTC();
 
+      // Determine category_id: null if blast trigger type, otherwise use selection
+      const effectiveCategoryId = BLAST_TRIGGER_TYPES.has(data.trigger_type) ? null : selectedCategoryId;
+
       if (mode === 'create' && onCreate) {
         // CREATE mode: call onCreate, then transition to edit mode
         const createData: CreateScheduledEmailRequest = {
@@ -391,6 +410,7 @@ export function EmailEditorPage({
           trigger_type: data.trigger_type as TriggerType,
           trigger_value: data.trigger_value,
           trigger_time,
+          category_id: effectiveCategoryId,
           status: 'scheduled',
         };
 
@@ -415,6 +435,7 @@ export function EmailEditorPage({
           trigger_type: data.trigger_type as TriggerType,
           trigger_value: data.trigger_value,
           trigger_time,
+          category_id: effectiveCategoryId,
         };
 
         await onSave(email.id, updateData);
@@ -1015,14 +1036,40 @@ export function EmailEditorPage({
               )}
             </button>
 
-            {recipientsOpen && (
-              <div className="space-y-1.5">
-                <p className="text-xs text-white">By Category</p>
-                <p className="text-[10px] text-white/60 leading-relaxed">
-                  Category targeting is configured when this template is applied to a specific event.
-                </p>
-              </div>
-            )}
+            {recipientsOpen && (() => {
+              const isCategoryDisabled = BLAST_TRIGGER_TYPES.has(triggerType);
+              return (
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-medium text-white/60 uppercase tracking-wide">
+                    Category
+                  </label>
+                  <Select
+                    value={selectedCategoryId?.toString() || 'all'}
+                    onValueChange={(value) => setSelectedCategoryId(value === 'all' ? null : Number(value))}
+                    disabled={isCategoryDisabled}
+                  >
+                    <SelectTrigger className={`bg-white/5 border-white/20 text-white text-sm h-8 ${isCategoryDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                      <SelectItem value="all" className="text-white text-sm">
+                        All Vendors
+                      </SelectItem>
+                      {categories.map((category) => (
+                        <SelectItem key={category.id} value={category.id.toString()} className="text-white text-sm">
+                          {category.icon ? `${category.icon} ${category.name}` : category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {isCategoryDisabled && (
+                    <p className="text-[10px] text-white/40 leading-relaxed">
+                      Category targeting is not available for this email type — recipients may not be vendors yet.
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
           </div>
 
           {/* Available Tags */}
