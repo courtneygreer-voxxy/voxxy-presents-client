@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle } from 'lucide-react';
-import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
+import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle, Tag } from 'lucide-react';
+import { emailCampaignTemplatesApi, emailTemplateItemsApi, categoriesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
+import type { Category } from '@/types/category';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { CreateCategoryTemplateDialog } from './CreateCategoryTemplateDialog';
 
 interface TemplateLibraryPageProps {
   onNavigateToBuilder?: (templateId?: number) => void;
@@ -19,6 +21,12 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  // Category-specific templates
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const [categoryTemplateDialogOpen, setCategoryTemplateDialogOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
 
   // Preview modal state
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -41,6 +49,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
   useEffect(() => {
     loadTemplates();
+    loadCategories();
   }, []);
 
   const loadTemplates = async () => {
@@ -53,6 +62,21 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
       setError(err.message || 'Failed to load templates');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadCategories = async () => {
+    if (!userProfile?.organization_id) return;
+
+    setLoadingCategories(true);
+    try {
+      const data = await categoriesApi.getAll(userProfile.organization_id);
+      setCategories(data.categories || []);
+    } catch (err: any) {
+      console.error('Failed to load categories:', err);
+      // Don't show error toast, just log it
+    } finally {
+      setLoadingCategories(false);
     }
   };
 
@@ -227,6 +251,36 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
     return <XCircle className="w-4 h-4 text-red-500" />;
   };
 
+  const handleCreateCategoryTemplate = (category: Category) => {
+    setSelectedCategory(category);
+    setCategoryTemplateDialogOpen(true);
+  };
+
+  const handleConfirmCreateCategoryTemplate = async (categoryId: number, sourceTemplateId: number) => {
+    const category = categories.find(c => c.id === categoryId);
+    if (!category) return;
+
+    try {
+      // Clone the source template with the category assigned
+      await emailCampaignTemplatesApi.clone(
+        sourceTemplateId,
+        category.name,  // Name it after the category
+        undefined,      // No description
+        categoryId      // Assign to this category
+      );
+
+      // Reload templates to show the new category template
+      await loadTemplates();
+
+      toast.success('Category template created', {
+        description: `Created template for ${category.name}`,
+      });
+    } catch (err: any) {
+      console.error('Failed to create category template:', err);
+      throw err; // Re-throw so dialog can handle it
+    }
+  };
+
   return (
     <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4">
       <div className="max-w-7xl mx-auto">
@@ -387,6 +441,96 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           </div>
           );
         })()}
+
+        {/* Category-Specific Templates Section */}
+        {!isLoading && !error && categories.length > 0 && (
+          <div className="mt-8">
+            <div className="mb-4">
+              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                <Tag className="w-4 h-4 text-purple-400" />
+                Category-Specific Templates
+              </h2>
+              <p className="text-white/60 text-xs mt-1">
+                Create specialized email sequences for specific vendor categories
+              </p>
+            </div>
+
+            {loadingCategories ? (
+              <div className="flex items-center justify-center py-6">
+                <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+              </div>
+            ) : (
+              <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
+                {categories.map(category => {
+                  const categoryTemplate = templates.find(t => t.category_id === category.id);
+
+                  return (
+                    <div key={category.id} className="flex items-center gap-3 py-3 px-4">
+                      <Tag className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-white font-medium">
+                            {category.icon && `${category.icon} `}{category.name}
+                          </span>
+                        </div>
+                        {categoryTemplate ? (
+                          <div className="flex items-center gap-2 text-[10px] text-white/60 mt-0.5">
+                            <span>{categoryTemplate.email_count || 0} emails</span>
+                            <span className="text-white/20">·</span>
+                            <span className="text-green-400">Template assigned</span>
+                          </div>
+                        ) : (
+                          <div className="text-[10px] text-white/40 mt-0.5">
+                            No template - will use default
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        {categoryTemplate ? (
+                          <>
+                            <button
+                              onClick={() => onNavigateToBuilder?.(categoryTemplate.id)}
+                              className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                              title="Edit template"
+                            >
+                              <Edit className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handlePreview(categoryTemplate)}
+                              className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                              title="Preview emails"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(categoryTemplate)}
+                              className={`p-1.5 rounded transition-all ${
+                                deleteConfirmId === categoryTemplate.id
+                                  ? 'text-red-400 bg-red-500/10'
+                                  : 'text-white/50 hover:text-red-400 hover:bg-white/10'
+                              }`}
+                              title={deleteConfirmId === categoryTemplate.id ? 'Click again to confirm' : 'Delete template'}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => handleCreateCategoryTemplate(category)}
+                            className="px-3 py-1.5 rounded text-xs bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all flex items-center gap-1.5"
+                          >
+                            <Plus className="w-3 h-3" />
+                            Create
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Empty State */}
         {!isLoading && !error && templates.length === 0 && (
@@ -637,6 +781,20 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             </div>
           </div>
         </div>
+      )}
+
+      {/* Create Category Template Dialog */}
+      {categoryTemplateDialogOpen && selectedCategory && (
+        <CreateCategoryTemplateDialog
+          isOpen={categoryTemplateDialogOpen}
+          onClose={() => {
+            setCategoryTemplateDialogOpen(false);
+            setSelectedCategory(null);
+          }}
+          category={selectedCategory}
+          genericTemplates={templates}
+          onCreateTemplate={handleConfirmCreateCategoryTemplate}
+        />
       )}
     </div>
   );

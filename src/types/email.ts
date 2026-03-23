@@ -13,6 +13,7 @@ export interface EmailCampaignTemplate {
   id: number;
   template_type: 'system' | 'user';
   organization_id: number | null;
+  category_id: number | null;  // NULL = generic template, number = category-specific template
   name: string;
   description: string | null;
   is_default: boolean;
@@ -23,6 +24,7 @@ export interface EmailCampaignTemplate {
 
   // Optional: Included when fetching full template with items
   email_template_items?: EmailTemplateItem[];
+  category?: { id: number; name: string; icon: string | null };  // Vendor category for category-specific templates
 }
 
 // ============================================================================
@@ -271,12 +273,14 @@ export type PaymentStatus =
 export interface CreateTemplateRequest {
   name: string;
   description?: string;
+  category_id?: number | null;  // Optional: For category-specific templates
 }
 
 // Update template
 export interface UpdateTemplateRequest {
   name?: string;
   description?: string;
+  category_id?: number | null;
 }
 
 // Create email in template

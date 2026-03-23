@@ -15,6 +15,7 @@ interface User {
   username?: string
   status?: 'active' | 'suspended' | 'banned'
   product_context?: 'mobile' | 'presents' | 'both'
+  organization_id?: number  // For producers: their primary organization
 }
 
 interface SignUpData {

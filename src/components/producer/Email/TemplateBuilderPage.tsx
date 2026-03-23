@@ -244,7 +244,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       const newItem = await emailTemplateItemsApi.create(template.id, {
         name: `New Email`,
         position: emailItems.length + 1,
-        category: cat,
+        email_type: cat,
         subject_template: 'New Email - [eventName]',
         body_template: '<p>Hi [firstName],</p><p>This is a new email for [eventName].</p><p>Edit this email to customize the content.</p>' + STANDARD_EMAIL_FOOTER,
         trigger_type: defaultTriggers[cat] || 'on_application_submit' as TriggerType,

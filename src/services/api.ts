@@ -1102,10 +1102,10 @@ export const emailCampaignTemplatesApi = {
    * Clone template
    * POST /api/v1/presents/email_campaign_templates/:id/clone
    */
-  async clone(id: number, name: string, description?: string) {
+  async clone(id: number, name: string, description?: string, category_id?: number) {
     return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}/clone`, {
       method: 'POST',
-      body: JSON.stringify({ name, description }),
+      body: JSON.stringify({ name, description, category_id }),
     })
   },
 
