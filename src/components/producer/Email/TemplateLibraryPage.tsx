@@ -335,12 +335,14 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           </div>
         )}
 
-        {/* All Sequences */}
+        {/* Generic Sequences (exclude category-specific templates) */}
         {!isLoading && !error && templates.length > 0 && (() => {
-          // Non-admin users see the default template + their own custom sequences
+          // Filter out category-specific templates - they only show in the category section below
+          // Non-admin users see the default template + their own custom sequences (generic only)
+          const genericTemplates = templates.filter(t => !t.category_id);
           const visibleTemplates = isAdmin
-            ? templates
-            : templates.filter(t => t.is_default || t.template_type === 'user');
+            ? genericTemplates
+            : genericTemplates.filter(t => t.is_default || t.template_type === 'user');
 
           if (visibleTemplates.length === 0) return (
             <div className="text-center py-8">
@@ -359,6 +361,15 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
           return (
           <div>
+            <div className="mb-3">
+              <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                <Mail className="w-4 h-4 text-purple-400" />
+                Generic Email Sequences
+              </h2>
+              <p className="text-white/60 text-xs mt-1">
+                These sequences can be used for any event and will be copied across all categories
+              </p>
+            </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
               {visibleTemplates.map(template => {
                 const isDefault = template.is_default;
