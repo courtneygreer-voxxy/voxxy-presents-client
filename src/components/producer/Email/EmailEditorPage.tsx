@@ -118,6 +118,13 @@ export function EmailEditorPage({
   isAdmin,
 }: EmailEditorPageProps) {
   const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
+
+  // Debug: Log categories when component mounts or categories change
+  useEffect(() => {
+    console.log('📧 EmailEditorPage - Categories received:', categories);
+    console.log('   Categories count:', categories.length);
+    console.log('   Mode:', initialMode);
+  }, [categories, initialMode]);
   const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialEmail?.category_id || null);
   const [isSaving, setIsSaving] = useState(false);
@@ -1056,11 +1063,17 @@ export function EmailEditorPage({
                       <SelectItem value="all" className="text-white text-sm">
                         All Vendors
                       </SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category.id} value={category.id.toString()} className="text-white text-sm">
-                          {category.icon ? `${category.icon} ${category.name}` : category.name}
+                      {categories.length > 0 ? (
+                        categories.map((category) => (
+                          <SelectItem key={category.id} value={category.id.toString()} className="text-white text-sm">
+                            {category.icon ? `${category.icon} ${category.name}` : category.name}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem value="none" disabled className="text-white/40 text-sm italic">
+                          No categories available for this event
                         </SelectItem>
-                      ))}
+                      )}
                     </SelectContent>
                   </Select>
                   {isCategoryDisabled && (

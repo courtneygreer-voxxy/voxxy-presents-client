@@ -82,17 +82,25 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   // Load categories (only those used by this event's vendor applications)
   useEffect(() => {
     const loadCategories = async () => {
-      const orgId = eventData?.organization?.id || event?.organization?.id || eventData?.organization_id || event?.organization_id;
+      // Try multiple ways to get organization ID
+      const orgId = eventData?.organization?.id ||
+                    eventData?.organization_id ||
+                    event?.organization?.id ||
+                    event?.organization_id;
+
       if (!orgId) {
-        console.log('⚠️ No organization ID available, categories will not load');
+        console.log('⚠️ No organization ID available yet, skipping category load');
+        console.log('   eventData:', eventData ? 'exists' : 'null');
+        console.log('   event prop:', event ? 'exists' : 'null');
         return;
       }
+
       try {
         console.log('📂 Loading categories for organization:', orgId);
 
         // Load all categories for the organization
         const categoriesResponse = await categoriesApi.getAll(orgId, true);
-        const allCategories = categoriesResponse.categories;
+        const allCategories = categoriesResponse.categories || [];
         console.log('✅ Loaded all categories:', allCategories);
 
         // Load vendor applications for this event to see which categories are actually used
@@ -110,14 +118,20 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         // Filter categories to only show those used by this event
         const eventCategories = allCategories.filter((cat: Category) => usedCategoryIds.has(cat.id));
         console.log('✅ Filtered event-specific categories:', eventCategories);
+        console.log('   Total categories available:', allCategories.length);
+        console.log('   Categories used by event:', eventCategories.length);
 
         setCategories(eventCategories);
       } catch (error) {
         console.error('❌ Failed to load categories:', error);
       }
     };
-    loadCategories();
-  }, [eventSlug, eventData?.organization?.id, event?.organization?.id, eventData?.organization_id, event?.organization_id]);
+
+    // Only load categories if we have event data
+    if (eventData || event) {
+      loadCategories();
+    }
+  }, [eventSlug, eventData, event]);
 
   // Auto-refresh delivery stats every 30 seconds (only on table view)
   useEffect(() => {

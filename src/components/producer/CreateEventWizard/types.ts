@@ -52,6 +52,7 @@ export interface WizardState {
   automaticMessages: {
     messages: unknown[]; // Future email template structure
     email_campaign_template_id?: number; // Selected email sequence template
+    use_category_templates?: boolean; // Use category-specific templates where available (new feature)
   };
 }
 

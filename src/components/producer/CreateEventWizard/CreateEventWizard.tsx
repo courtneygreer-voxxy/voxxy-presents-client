@@ -266,6 +266,29 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
                 },
               });
             }}
+            useCategoryTemplates={wizardState.automaticMessages.use_category_templates}
+            onUseCategoryTemplatesChange={(value) => {
+              updateWizardState({
+                automaticMessages: {
+                  ...wizardState.automaticMessages,
+                  use_category_templates: value,
+                },
+              });
+            }}
+            eventCategories={
+              // Extract unique categories from applications
+              Array.from(
+                new Map(
+                  wizardState.applicationDetails.applications
+                    .filter(app => app.category_id && app.category_name)
+                    .map(app => [app.category_id, {
+                      id: app.category_id!,
+                      name: app.category_name!,
+                      icon: undefined // Icon not available in ApplicationRow
+                    }])
+                ).values()
+              )
+            }
             eventDate={wizardState.eventDetails.event_date}
             applicationDeadline={wizardState.eventDetails.application_deadline}
             paymentDeadline={wizardState.eventDetails.payment_deadline}

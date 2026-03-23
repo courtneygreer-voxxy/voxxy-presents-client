@@ -58,6 +58,30 @@ export function CreateCategoryTemplateDialog({
     setSelectedTemplateId(defaultTemplate.id);
   }
 
+  // Event-wide triggers that will be excluded from category templates
+  const EVENT_WIDE_TRIGGERS = [
+    'on_event_update',
+    'on_event_cancel',
+    'on_bulletin_post',
+    'on_category_change',
+    'on_invitation_send'
+  ];
+
+  // Count category-specific emails (excluding event-wide emails)
+  const getCategorySpecificEmailCount = (template: EmailCampaignTemplate) => {
+    if (!template.email_template_items) return 0;
+
+    return template.email_template_items.filter(item => {
+      // Exclude event announcements
+      if (item.category === 'event_announcements') return false;
+
+      // Exclude event-wide trigger types
+      if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false;
+
+      return true;
+    }).length;
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-lg bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
@@ -129,7 +153,10 @@ export function CreateCategoryTemplateDialog({
                           <p className="text-xs text-white/60 mt-1">{template.description}</p>
                         )}
                         <p className="text-xs text-white/40 mt-1">
-                          {template.email_count || 0} emails
+                          {getCategorySpecificEmailCount(template)} category-specific emails
+                          {template.email_count && template.email_count > getCategorySpecificEmailCount(template) && (
+                            <span className="text-white/30"> ({template.email_count - getCategorySpecificEmailCount(template)} event-wide emails excluded)</span>
+                          )}
                         </p>
                       </div>
                     </div>
@@ -141,9 +168,11 @@ export function CreateCategoryTemplateDialog({
 
           {/* Info Box */}
           <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs text-blue-400">
+            <p className="text-xs text-blue-400 mb-2">
               The template will be cloned and automatically named "<strong>{category.name}</strong>".
-              You can customize the emails after creation.
+            </p>
+            <p className="text-xs text-blue-300/80">
+              <strong>Note:</strong> Event-wide emails (announcements, invitations, bulletins) will be excluded from this category template, as they are sent to all vendors regardless of category.
             </p>
           </div>
 

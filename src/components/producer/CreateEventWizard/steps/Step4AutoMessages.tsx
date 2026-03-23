@@ -9,6 +9,9 @@ import { DebugPanel } from '../../DebugPanel';
 interface Step4AutoMessagesProps {
   selectedTemplateId?: number | null;
   onTemplateSelect?: (templateId: number | null) => void;
+  useCategoryTemplates?: boolean;
+  onUseCategoryTemplatesChange?: (value: boolean) => void;
+  eventCategories?: Array<{ id: number; name: string; icon?: string }>; // Categories from Step 2 applications
   eventDate?: string;
   applicationDeadline?: string;
   paymentDeadline?: string;
@@ -105,6 +108,9 @@ const calculateSendDate = (
 export default function Step4AutoMessages({
   selectedTemplateId = null,
   onTemplateSelect,
+  useCategoryTemplates = false,
+  onUseCategoryTemplatesChange,
+  eventCategories = [],
   eventDate,
   applicationDeadline,
   paymentDeadline,
@@ -116,6 +122,16 @@ export default function Step4AutoMessages({
   const [allTemplates, setAllTemplates] = useState<EmailCampaignTemplate[]>([]);
   const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Check which categories have category-specific templates
+  const categoryTemplatesAvailable = eventCategories.map(cat => {
+    const template = allTemplates.find(t => t.category_id === cat.id);
+    return {
+      category: cat,
+      hasTemplate: !!template,
+      template
+    };
+  });
 
   useEffect(() => {
     fetchTemplates();
@@ -201,7 +217,7 @@ export default function Step4AutoMessages({
               className="flex-1 px-3 py-2 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/15 transition-all"
             >
               <option value="" disabled>Select a sequence...</option>
-              {allTemplates.map((t) => (
+              {allTemplates.filter(t => !t.category_id).map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}{t.is_default ? ' (Default)' : ''}
                 </option>
@@ -213,6 +229,56 @@ export default function Step4AutoMessages({
               </span>
             )}
           </div>
+
+          {/* Category Template Option - Only show if event has categories */}
+          {eventCategories.length > 0 && selectedTemplate && (
+            <div className="mt-6 p-4 rounded-lg bg-white/5 border border-white/10">
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="use-category-templates"
+                    checked={useCategoryTemplates}
+                    onChange={(e) => onUseCategoryTemplatesChange?.(e.target.checked)}
+                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="use-category-templates" className="text-sm font-medium text-white cursor-pointer">
+                      Use category-specific email sequences where available
+                    </label>
+                    <p className="text-xs text-white/50 mt-1">
+                      {categoryTemplatesAvailable.filter(c => c.hasTemplate).length > 0 ? (
+                        <>
+                          Use customized email sequences for specific categories. Categories without templates will use "{selectedTemplate.name}".
+                        </>
+                      ) : (
+                        <>
+                          No category-specific templates available yet. Create them in Email Sequence Library first.
+                        </>
+                      )}
+                    </p>
+
+                    {/* Show which categories have templates */}
+                    {categoryTemplatesAvailable.length > 0 && (
+                      <div className="mt-3 space-y-1.5">
+                        {categoryTemplatesAvailable.map(({ category, hasTemplate, template }) => (
+                          <div key={category.id} className="flex items-center gap-2 text-xs">
+                            <span className={`w-2 h-2 rounded-full ${hasTemplate ? 'bg-green-400' : 'bg-white/20'}`} />
+                            <span className="text-white/70">
+                              {category.icon && `${category.icon} `}{category.name}
+                            </span>
+                            <span className="text-white/40">
+                              {hasTemplate ? `→ "${template?.name}"` : '→ Will use default'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Loading State */}
