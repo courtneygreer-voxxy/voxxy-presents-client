@@ -21,11 +21,12 @@ import {
   Clock,
   Tag,
   Users,
-  Globe,
   CheckCircle2,
   AlertCircle,
   Send,
-  Lock
+  Lock,
+  Search,
+  X,
 } from 'lucide-react';
 import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
 import type { Category } from '@/types/category';
@@ -36,7 +37,7 @@ import {
   validateEmailContent,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
-import { getEightAmLocalAsUTC, getTimezoneInfo, formatDateWithTimezone } from '@/utils/timezone';
+import { getEightAmLocalAsUTC, formatDateWithTimezone } from '@/utils/timezone';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from './RichTextEditor';
@@ -131,12 +132,12 @@ export function EmailEditorPage({
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
+  const [tagSearch, setTagSearch] = useState('');
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [emailFooter, setEmailFooter] = useState<string>('');
 
   const subjectRef = useRef<HTMLInputElement>(null);
-  const timezoneInfo = getTimezoneInfo();
   const { toast } = useToast();
 
   // Safe field tracking: ref ensures onBlur timeouts don't clobber a newer focus
@@ -1005,23 +1006,9 @@ export function EmailEditorPage({
                       min={0}
                       placeholder="e.g., 1"
                     />
+                    <p className="text-[10px] text-white/50 mt-1.5">Sends at 8:00 AM Eastern</p>
                   </div>
                 )}
-
-                {/* Send Time Info */}
-                <div className="p-2.5 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg">
-                  <div className="flex items-start gap-1.5">
-                    <Globe className="w-3 h-3 text-blue-400 mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="text-blue-300 text-xs font-medium">
-                        Send Time: {timezoneInfo.eightAmLocal}
-                      </p>
-                      <p className="text-blue-300/60 text-[10px] mt-0.5">
-                        All emails send at 8:00 AM ({timezoneInfo.timezone})
-                      </p>
-                    </div>
-                  </div>
-                </div>
 
                 {previewDate && (
                   <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
@@ -1103,7 +1090,15 @@ export function EmailEditorPage({
               )}
             </button>
 
-            {availableTagsOpen && (
+            {availableTagsOpen && (() => {
+              const filteredVariables = tagSearch
+                ? EMAIL_VARIABLES.filter((v) =>
+                    v.label.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                    v.frontendVar.toLowerCase().includes(tagSearch.toLowerCase())
+                  )
+                : EMAIL_VARIABLES;
+
+              return (
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
@@ -1113,8 +1108,30 @@ export function EmailEditorPage({
                     </span>
                   )}
                 </p>
+                {/* Tag Search */}
+                <div className="relative mb-2">
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
+                  <input
+                    type="text"
+                    placeholder="Search tags..."
+                    value={tagSearch}
+                    onChange={(e) => setTagSearch(e.target.value)}
+                    className="w-full pl-7 pr-7 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                  />
+                  {tagSearch && (
+                    <button
+                      onClick={() => setTagSearch('')}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+                {tagSearch && (
+                  <p className="text-[10px] text-white/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
+                )}
                 <div className="space-y-0.5">
-                  {EMAIL_VARIABLES.map((variable) => {
+                  {filteredVariables.map((variable) => {
                     // Only gray out category-specific variables for event_announcements
                     // (recipients haven't applied/chosen a category yet)
                     const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
@@ -1152,7 +1169,8 @@ export function EmailEditorPage({
                   })}
                 </div>
               </div>
-            )}
+              );
+            })()}
           </div>
         </div>
       </div>
