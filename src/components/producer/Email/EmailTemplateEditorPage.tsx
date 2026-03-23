@@ -62,32 +62,32 @@ interface EmailTemplateEditorPageProps {
 }
 
 const TRIGGER_TYPES = [
-  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false },
-  { value: 'on_application_submit', label: 'On Application Submit', requiresValue: false },
-  { value: 'on_approval', label: 'On Approval', requiresValue: false },
-  { value: 'on_waitlist', label: 'On Waitlist', requiresValue: false },
-  { value: 'on_rejection', label: 'On Rejection', requiresValue: false },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true },
-  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false },
-  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true },
-  { value: 'on_payment_received', label: 'On Payment Received', requiresValue: false },
-  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true },
-  { value: 'on_event_date', label: 'On Event Date', requiresValue: false },
-  { value: 'days_after_event', label: 'Days After Event', requiresValue: true },
-  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false },
-  { value: 'on_category_change', label: 'On Category Change', requiresValue: false },
-  { value: 'on_event_update', label: 'On Event Update', requiresValue: false },
-  { value: 'on_event_cancel', label: 'On Event Cancel', requiresValue: false },
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, emailType: 'event_announcements' },
+  { value: 'on_application_submit', label: 'On Application Submit', requiresValue: false, emailType: 'application_updates' },
+  { value: 'on_approval', label: 'On Approval', requiresValue: false, emailType: 'application_updates' },
+  { value: 'on_waitlist', label: 'On Waitlist', requiresValue: false, emailType: 'application_updates' },
+  { value: 'on_rejection', label: 'On Rejection', requiresValue: false, emailType: 'application_updates' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, emailType: 'application_updates' },
+  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, emailType: 'payment_reminders' },
+  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, emailType: 'payment_reminders' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, emailType: 'payment_reminders' },
+  { value: 'on_payment_received', label: 'On Payment Received', requiresValue: false, emailType: 'payment_reminders' },
+  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, emailType: 'event_countdown' },
+  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, emailType: 'event_countdown' },
+  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, emailType: 'event_countdown' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, emailType: 'event_announcements' },
+  { value: 'on_category_change', label: 'On Category Change', requiresValue: false, emailType: 'event_updates' },
+  { value: 'on_event_update', label: 'On Event Update', requiresValue: false, emailType: 'event_updates' },
+  { value: 'on_event_cancel', label: 'On Event Cancel', requiresValue: false, emailType: 'event_updates' },
 ];
 
-const CATEGORY_OPTIONS = [
-  { value: 'event_announcements', label: 'Event Announcements' },
-  { value: 'application_updates', label: 'Application Updates' },
-  { value: 'payment_reminders', label: 'Payment Reminders' },
-  { value: 'event_countdown', label: 'Event Countdown' },
-  { value: 'event_updates', label: 'Event Updates' },
-];
+const EMAIL_TYPE_LABELS: Record<string, string> = {
+  event_announcements: 'Event Announcements',
+  application_updates: 'Application Updates',
+  payment_reminders: 'Payment Reminders',
+  event_countdown: 'Event Countdown',
+  event_updates: 'Event Updates',
+};
 
 export function EmailTemplateEditorPage({
   item,
@@ -166,6 +166,16 @@ export function EmailTemplateEditorPage({
   }, [item]);
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === formData.trigger_type);
+
+  // Auto-update email type when trigger changes
+  useEffect(() => {
+    if (selectedTriggerConfig) {
+      setFormData(prev => ({
+        ...prev,
+        category: selectedTriggerConfig.emailType
+      }));
+    }
+  }, [formData.trigger_type]);
 
   // Strip HTML tags for validation
   const stripHtmlForValidation = (html: string): string => {
@@ -476,28 +486,6 @@ export function EmailTemplateEditorPage({
 
               {triggerSettingsOpen && (
                 <div className="space-y-3">
-                  {/* Category */}
-                  <div>
-                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
-                      Category
-                    </label>
-                    <Select
-                      value={formData.category}
-                      onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                    >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                        {CATEGORY_OPTIONS.map(opt => (
-                          <SelectItem key={opt.value} value={opt.value} className="text-white text-sm">
-                            {opt.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
                   {/* Trigger Type */}
                   <div>
                     <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
@@ -518,6 +506,19 @@ export function EmailTemplateEditorPage({
                         ))}
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  {/* Email Type (Auto-determined, Read-only) */}
+                  <div>
+                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                      Email Type
+                    </label>
+                    <div className="px-3 py-2 bg-white/[0.03] border border-white/10 rounded-lg text-white/70 text-sm h-8 flex items-center">
+                      {EMAIL_TYPE_LABELS[formData.category] || formData.category}
+                    </div>
+                    <p className="mt-1 text-[9px] text-white/40">
+                      Auto-set based on trigger selection
+                    </p>
                   </div>
 
                   {/* Trigger Value */}

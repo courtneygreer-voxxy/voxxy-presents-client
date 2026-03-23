@@ -84,17 +84,25 @@ const editEmailSchema = z.object({
 type EditEmailFormData = z.infer<typeof editEmailSchema>;
 
 const TRIGGER_TYPES = [
-  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event', requiredDateField: null },
-  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date', requiredDateField: 'start_date' },
-  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date', requiredDateField: 'start_date' },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline', requiredDateField: 'application_deadline' },
-  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date', requiredDateField: 'start_date' },
-  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created', requiredDateField: null },
-  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline', requiredDateField: 'payment_deadline' },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day', requiredDateField: 'payment_deadline' },
-  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)', requiredDateField: 'payment_deadline' },
-  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin', requiredDateField: null },
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event', requiredDateField: null, emailType: 'event_announcements' },
+  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date', requiredDateField: 'start_date', emailType: 'event_countdown' },
+  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date', requiredDateField: 'start_date', emailType: 'event_countdown' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline', requiredDateField: 'application_deadline', emailType: 'application_updates' },
+  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date', requiredDateField: 'start_date', emailType: 'event_countdown' },
+  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created', requiredDateField: null, emailType: 'event_announcements' },
+  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline', requiredDateField: 'payment_deadline', emailType: 'payment_reminders' },
+  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day', requiredDateField: 'payment_deadline', emailType: 'payment_reminders' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)', requiredDateField: 'payment_deadline', emailType: 'payment_reminders' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin', requiredDateField: null, emailType: 'event_announcements' },
 ] as const;
+
+const EMAIL_TYPE_LABELS: Record<string, string> = {
+  event_announcements: 'Event Announcements',
+  application_updates: 'Application Updates',
+  payment_reminders: 'Payment Reminders',
+  event_countdown: 'Event Countdown',
+  event_updates: 'Event Updates',
+};
 
 // Blast-type triggers: vendor isn't in the system yet, so category targeting doesn't apply
 const BLAST_TRIGGER_TYPES = new Set([
@@ -1001,6 +1009,19 @@ export function EmailEditorPage({
                   </Select>
                 </div>
 
+                {/* Email Type (Auto-determined, Read-only) */}
+                <div>
+                  <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                    Email Type
+                  </label>
+                  <div className="px-3 py-2 bg-white/[0.03] border border-white/10 rounded-lg text-white/70 text-sm h-8 flex items-center">
+                    {EMAIL_TYPE_LABELS[selectedTriggerConfig?.emailType || 'event_announcements'] || 'Event Announcements'}
+                  </div>
+                  <p className="text-[9px] text-white/40 mt-1">
+                    Auto-set based on trigger selection
+                  </p>
+                </div>
+
                 {selectedTriggerConfig?.requiresValue && (
                   <div>
                     <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
@@ -1049,7 +1070,7 @@ export function EmailEditorPage({
               return (
                 <div className="space-y-2">
                   <label className="block text-[10px] font-medium text-white/60 uppercase tracking-wide">
-                    Category
+                    Vendor Category
                   </label>
                   <Select
                     value={selectedCategoryId?.toString() || 'all'}
