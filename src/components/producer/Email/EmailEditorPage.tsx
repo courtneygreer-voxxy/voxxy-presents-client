@@ -27,7 +27,7 @@ import {
   Send,
   Lock
 } from 'lucide-react';
-import type { ScheduledEmail, UpdateEmailRequest, TriggerType } from '@/types/email';
+import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
 import {
   EMAIL_VARIABLES,
   backendToFrontend,
@@ -65,6 +65,8 @@ interface EmailEditorPageProps {
   eventSlug: string;
   onBack: () => void;
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
+  onCreate?: (data: CreateScheduledEmailRequest) => Promise<ScheduledEmail>;
+  mode?: 'edit' | 'create';
   isAdmin?: boolean;
 }
 
@@ -92,13 +94,17 @@ const TRIGGER_TYPES = [
 ];
 
 export function EmailEditorPage({
-  email,
+  email: initialEmail,
   eventData,
   eventSlug,
   onBack,
   onSave,
+  onCreate,
+  mode: initialMode = 'edit',
   isAdmin,
 }: EmailEditorPageProps) {
+  const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
+  const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -176,8 +182,26 @@ export function EmailEditorPage({
     return check.isValid;
   };
 
+  // Sync email state when prop changes (e.g., parent passes a different email)
+  useEffect(() => {
+    setEmail(initialEmail);
+  }, [initialEmail]);
+
   // Initialize form with email data - CONVERT backend format to frontend
   useEffect(() => {
+    if (mode === 'create') {
+      // Create mode: start with sensible defaults
+      reset({
+        name: '',
+        subject_template: '',
+        body_template: '',
+        trigger_type: 'days_before_event',
+        trigger_value: 1,
+      });
+      setEmailFooter(STANDARD_EMAIL_FOOTER);
+      return;
+    }
+
     if (!email) return;
 
     console.log('📧 Loading email into editor:', email.name);
@@ -197,7 +221,7 @@ export function EmailEditorPage({
 
     // Store footer separately
     setEmailFooter(footer);
-  }, [email, reset]);
+  }, [email, reset, mode]);
 
   // Strip HTML tags for validation (TipTap editor produces HTML)
   const stripHtmlForValidation = (html: string): string => {
@@ -325,8 +349,6 @@ export function EmailEditorPage({
   };
 
   const onSubmit = async (data: EditEmailFormData) => {
-    if (!email) return;
-
     // Double-check validation before saving (extra safety)
     const plainSubject = data.subject_template || '';
     const plainBody = stripHtmlForValidation(data.body_template || '');
@@ -360,25 +382,53 @@ export function EmailEditorPage({
 
       const trigger_time = getEightAmLocalAsUTC();
 
-      const updateData: UpdateEmailRequest = {
-        name: data.name,
-        subject_template: convertedSubject,
-        body_template: convertedBody,
-        trigger_type: data.trigger_type as TriggerType,
-        trigger_value: data.trigger_value,
-        trigger_time,
-      };
+      if (mode === 'create' && onCreate) {
+        // CREATE mode: call onCreate, then transition to edit mode
+        const createData: CreateScheduledEmailRequest = {
+          name: data.name,
+          subject_template: convertedSubject,
+          body_template: convertedBody,
+          trigger_type: data.trigger_type as TriggerType,
+          trigger_value: data.trigger_value,
+          trigger_time,
+          status: 'scheduled',
+        };
 
-      await onSave(email.id, updateData);
+        const newEmail = await onCreate(createData);
+
+        // Transition to edit mode with the newly created email
+        setEmail(newEmail);
+        setMode('edit');
+
+        toast({
+          title: "Email Created Successfully",
+          description: `"${data.name}" has been created. You can now send test emails.`,
+          variant: "default",
+          className: "bg-green-500/10 border-green-500/30 text-green-400",
+        });
+      } else if (email) {
+        // EDIT mode: call onSave with existing email ID
+        const updateData: UpdateEmailRequest = {
+          name: data.name,
+          subject_template: convertedSubject,
+          body_template: convertedBody,
+          trigger_type: data.trigger_type as TriggerType,
+          trigger_value: data.trigger_value,
+          trigger_time,
+        };
+
+        await onSave(email.id, updateData);
+
+        toast({
+          title: "Email Saved Successfully",
+          description: `"${data.name}" has been updated.`,
+          variant: "default",
+          className: "bg-green-500/10 border-green-500/30 text-green-400",
+        });
+      }
 
       // Success!
       setSaveSuccess(true);
-      toast({
-        title: "Email Saved Successfully",
-        description: `"${data.name}" has been updated.`,
-        variant: "default",
-        className: "bg-green-500/10 border-green-500/30 text-green-400",
-      });
 
       // Clear success state after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
@@ -398,10 +448,12 @@ export function EmailEditorPage({
     }
   };
 
-  if (!email) return null;
+  // In edit mode, we need an email to work with
+  if (mode === 'edit' && !email) return null;
 
+  const isCreateMode = mode === 'create';
   const previewDate = calculatePreviewDate();
-  const canSendNow = email.status === 'scheduled' && email.scheduled_for && new Date(email.scheduled_for) <= new Date();
+  const canSendNow = !isCreateMode && email?.status === 'scheduled' && email?.scheduled_for && new Date(email.scheduled_for) <= new Date();
 
   // HTML-aware variable resolver for live preview
   // Properly handles variables in HTML content without breaking structure
@@ -568,15 +620,17 @@ export function EmailEditorPage({
                 </>
               )}
             </Button>
-            <Button
-              onClick={() => setShowTestEmailDialog(true)}
-              variant="outline"
-              size="sm"
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
-            >
-              <Send className="w-3.5 h-3.5 mr-1.5" />
-              Send Test
-            </Button>
+            {!isCreateMode && (
+              <Button
+                onClick={() => setShowTestEmailDialog(true)}
+                variant="outline"
+                size="sm"
+                className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
+              >
+                <Send className="w-3.5 h-3.5 mr-1.5" />
+                Send Test
+              </Button>
+            )}
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSaving || !canSave()}
@@ -608,7 +662,7 @@ export function EmailEditorPage({
               ) : (
                 <>
                   <Save className="w-3.5 h-3.5 mr-1.5" />
-                  Save Email
+                  {isCreateMode ? 'Create Email' : 'Save Email'}
                 </>
               )}
             </Button>
@@ -992,7 +1046,7 @@ export function EmailEditorPage({
               <div className="space-y-1">
                 <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
-                  {email.email_template_item?.category === 'event_announcements' && (
+                  {email?.email_template_item?.category === 'event_announcements' && (
                     <span className="block mt-1 text-yellow-400/80">
                       Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                     </span>
@@ -1002,7 +1056,7 @@ export function EmailEditorPage({
                   {EMAIL_VARIABLES.map((variable) => {
                     // Only gray out category-specific variables for event_announcements
                     // (recipients haven't applied/chosen a category yet)
-                    const isAnnouncementEmail = email.email_template_item?.category === 'event_announcements';
+                    const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
                     const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
 
                     return (
@@ -1114,6 +1168,7 @@ export function EmailEditorPage({
         <DebugPanel
           title="Email Editor"
           data={{
+            mode,
             email,
             eventData,
             eventSlug,
