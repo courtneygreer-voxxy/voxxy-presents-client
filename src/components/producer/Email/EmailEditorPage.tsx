@@ -83,17 +83,17 @@ const editEmailSchema = z.object({
 type EditEmailFormData = z.infer<typeof editEmailSchema>;
 
 const TRIGGER_TYPES = [
-  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event' },
-  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date' },
-  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date' },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline' },
-  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date' },
-  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created' },
-  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline' },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day' },
-  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)' },
-  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin' },
-];
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, description: 'Send when vendor is invited to event', requiredDateField: null },
+  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, description: 'Send X days before the event date', requiredDateField: 'start_date' },
+  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, description: 'Send X days after the event date', requiredDateField: 'start_date' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, description: 'Send X days before application deadline', requiredDateField: 'application_deadline' },
+  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, description: 'Send on the event date', requiredDateField: 'start_date' },
+  { value: 'on_application_open', label: 'When Applications Open', requiresValue: false, description: 'Send when event is created', requiredDateField: null },
+  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, description: 'Send X days before payment deadline', requiredDateField: 'payment_deadline' },
+  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, description: 'Send on payment deadline day', requiredDateField: 'payment_deadline' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, description: 'Send X days after payment deadline (for overdue reminders)', requiredDateField: 'payment_deadline' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, description: 'Send when producer posts a bulletin', requiredDateField: null },
+] as const;
 
 // Blast-type triggers: vendor isn't in the system yet, so category targeting doesn't apply
 const BLAST_TRIGGER_TYPES = new Set([
@@ -179,6 +179,20 @@ export function EmailEditorPage({
   const triggerValue = watch('trigger_value');
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
+
+  // Filter trigger types based on which date fields exist on the event
+  const availableTriggerTypes = TRIGGER_TYPES.filter((type) => {
+    if (!type.requiredDateField) return true; // Always available
+    if (!eventData) return true; // No event data, show all (can't filter)
+
+    const dateFieldMap: Record<string, string[]> = {
+      start_date: ['start_date', 'event_date'],
+      application_deadline: ['application_deadline'],
+      payment_deadline: ['payment_deadline', 'payment_due_date'],
+    };
+    const fields = dateFieldMap[type.requiredDateField] || [type.requiredDateField];
+    return fields.some((field) => eventData[field]);
+  });
 
   // Computed: Check if save should be allowed (extra safety check)
   const canSave = () => {
@@ -967,7 +981,7 @@ export function EmailEditorPage({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                      {TRIGGER_TYPES.map((type) => (
+                      {availableTriggerTypes.map((type) => (
                         <SelectItem key={type.value} value={type.value} className="text-white text-sm">
                           <div>
                             <div className="font-medium text-xs">{type.label}</div>
