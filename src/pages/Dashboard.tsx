@@ -372,6 +372,7 @@ export default function ProducerDashboard() {
         application_deadline: wizardState.eventDetails.application_deadline,
         payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
         email_campaign_template_id: templateId || undefined,
+        use_category_templates: wizardState.automaticMessages.use_category_templates || false,
         status: 'draft',
         published: false,
       });
