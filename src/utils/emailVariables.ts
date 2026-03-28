@@ -524,6 +524,42 @@ export function getVariablesByCategory() {
 }
 
 /**
+ * Get variables grouped and alphabetized for UI display
+ * Three groups: Vendor Details, Organization Details, Event Details
+ */
+export interface VariableGroup {
+  label: string;
+  variables: EmailVariable[];
+}
+
+export function getGroupedVariablesForUI(): VariableGroup[] {
+  // Helper to sort alphabetically by label
+  const sortByLabel = (a: EmailVariable, b: EmailVariable) =>
+    a.label.localeCompare(b.label);
+
+  return [
+    {
+      label: 'Vendor Details',
+      variables: EMAIL_VARIABLES
+        .filter(v => v.category === 'vendor')
+        .sort(sortByLabel)
+    },
+    {
+      label: 'Organization Details',
+      variables: EMAIL_VARIABLES
+        .filter(v => v.category === 'organization')
+        .sort(sortByLabel)
+    },
+    {
+      label: 'Event Details',
+      variables: EMAIL_VARIABLES
+        .filter(v => v.category === 'event' || v.category === 'computed')
+        .sort(sortByLabel)
+    }
+  ];
+}
+
+/**
  * Insert variable at cursor position in textarea or input
  */
 export function insertVariableAtCursor(

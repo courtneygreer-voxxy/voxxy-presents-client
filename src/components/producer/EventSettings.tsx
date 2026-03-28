@@ -172,7 +172,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     }
 
     try {
-      await onDelete(event.slug);
+      await onDelete(event.namespaced_slug || event.slug);
       setShowDeleteConfirm(false);
     } catch (err) {
       console.error('Failed to delete event:', err);

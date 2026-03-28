@@ -60,7 +60,7 @@ import {
   htmlToPlainText,
   plainTextToHtml,
   insertVariableAtCursor,
-  getVariablesByCategory,
+  getGroupedVariablesForUI,
   validateEmailContent,
   type ValidationResult,
 } from '@/utils/emailVariables';
@@ -156,8 +156,8 @@ export default function EditScheduledEmailModal({
   const subjectValue = watch('subject_template');
   const bodyValue = watch('body_template');
 
-  // Get variables grouped by category
-  const variablesByCategory = getVariablesByCategory();
+  // Get variables grouped for UI display
+  const variableGroups = getGroupedVariablesForUI();
 
   // Calculate preview scheduled date based on trigger settings
   const calculatePreviewDate = (triggerType: string, triggerValue: number | undefined): Date | null => {
@@ -634,77 +634,34 @@ export default function EditScheduledEmailModal({
                   <span className="text-xs font-medium text-purple-300">Click to insert variables:</span>
                 </div>
 
-                {/* Event Variables */}
-                <div>
-                  <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">Event Info</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {variablesByCategory.event.map((variable) => (
-                      <button
-                        key={variable.frontendVar}
-                        type="button"
-                        onClick={() => handleInsertVariable(variable.frontendVar, 'body')}
-                        className="px-3 py-1.5 text-xs rounded-md bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 transition-colors"
-                        title={`${variable.description} (e.g., ${variable.example})`}
-                      >
-                        {variable.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                {/* Render grouped variables */}
+                {variableGroups.map((group, index) => {
+                  // Different color schemes for each group
+                  const colorClasses = [
+                    'bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border-pink-500/30', // Vendor Details
+                    'bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border-blue-500/30', // Organization Details
+                    'bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/30' // Event Details
+                  ][index] || 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/30';
 
-                {/* Vendor Variables */}
-                <div>
-                  <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">Vendor Info</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {variablesByCategory.vendor.map((variable) => (
-                      <button
-                        key={variable.frontendVar}
-                        type="button"
-                        onClick={() => handleInsertVariable(variable.frontendVar, 'body')}
-                        className="px-3 py-1.5 text-xs rounded-md bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border border-pink-500/30 transition-colors"
-                        title={`${variable.description} (e.g., ${variable.example})`}
-                      >
-                        {variable.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Organization Variables */}
-                <div>
-                  <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">Your Organization</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {variablesByCategory.organization.map((variable) => (
-                      <button
-                        key={variable.frontendVar}
-                        type="button"
-                        onClick={() => handleInsertVariable(variable.frontendVar, 'body')}
-                        className="px-3 py-1.5 text-xs rounded-md bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 transition-colors"
-                        title={`${variable.description} (e.g., ${variable.example})`}
-                      >
-                        {variable.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Computed Variables */}
-                <div>
-                  <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">Links</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {variablesByCategory.computed.map((variable) => (
-                      <button
-                        key={variable.frontendVar}
-                        type="button"
-                        onClick={() => handleInsertVariable(variable.frontendVar, 'body')}
-                        className="px-3 py-1.5 text-xs rounded-md bg-green-500/20 hover:bg-green-500/30 text-green-300 border border-green-500/30 transition-colors"
-                        title={`${variable.description} (e.g., ${variable.example})`}
-                      >
-                        {variable.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                  return (
+                    <div key={group.label}>
+                      <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">{group.label}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {group.variables.map((variable) => (
+                          <button
+                            key={variable.frontendVar}
+                            type="button"
+                            onClick={() => handleInsertVariable(variable.frontendVar, 'body')}
+                            className={`px-3 py-1.5 text-xs rounded-md border transition-colors ${colorClasses}`}
+                            title={`${variable.description} (e.g., ${variable.example})`}
+                          >
+                            {variable.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

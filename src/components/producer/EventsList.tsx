@@ -319,7 +319,7 @@ export default function EventsList({
                     {/* Admin Quick Delete Button - Only in Dev/Staging */}
                     {isAdmin && onDeleteEvent && import.meta.env.MODE !== 'production' && (
                       <button
-                        onClick={() => onDeleteEvent(event.slug)}
+                        onClick={() => onDeleteEvent(event.namespaced_slug || event.slug)}
                         className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white font-medium hover:shadow-lg hover:shadow-red-500/30 transition-smooth whitespace-nowrap"
                         title="Admin Quick Delete - No Confirmation (Dev/Staging Only)"
                       >

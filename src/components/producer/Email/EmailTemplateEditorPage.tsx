@@ -26,6 +26,7 @@ import {
   EMAIL_VARIABLES,
   insertVariableAtCursor,
   validateEmailContent,
+  getGroupedVariablesForUI,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody } from '@/utils/emailFooter';
 import { Button } from '@/components/ui/button';
@@ -120,7 +121,6 @@ export function EmailTemplateEditorPage({
     trigger_type: 'on_application_submit',
     trigger_value: 0,
     trigger_time: '09:00:00',
-    enabled_by_default: true,
     filter_criteria: {} as Record<string, any>,
   });
 
@@ -140,7 +140,6 @@ export function EmailTemplateEditorPage({
         trigger_type: item.trigger_type || 'on_application_submit',
         trigger_value: item.trigger_value || 0,
         trigger_time: item.trigger_time?.substring(11, 19) || '09:00:00',
-        enabled_by_default: item.enabled_by_default !== false,
         filter_criteria: item.filter_criteria || {},
       });
 
@@ -156,7 +155,6 @@ export function EmailTemplateEditorPage({
         trigger_type: 'days_before_event',
         trigger_value: 7,
         trigger_time: '09:00:00',
-        enabled_by_default: true,
         filter_criteria: {},
       });
 
@@ -260,7 +258,7 @@ export function EmailTemplateEditorPage({
           trigger_value: formData.trigger_value,
           trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
           filter_criteria: formData.filter_criteria,
-          enabled_by_default: formData.enabled_by_default,
+          enabled_by_default: true, // Always enabled - manage per-event in Command Center
         };
 
         await onCreate(newItemData);
@@ -276,7 +274,7 @@ export function EmailTemplateEditorPage({
           trigger_type: formData.trigger_type as any,
           trigger_value: formData.trigger_value,
           trigger_time: `2000-01-01T${formData.trigger_time}.000Z`,
-          enabled_by_default: formData.enabled_by_default,
+          enabled_by_default: true, // Always enabled - manage per-event in Command Center
         };
 
         await onSave(updatedItem);
@@ -536,20 +534,6 @@ export function EmailTemplateEditorPage({
                       />
                     </div>
                   )}
-
-                  {/* Enabled by Default */}
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="enabled"
-                      checked={formData.enabled_by_default}
-                      onChange={(e) => setFormData(prev => ({ ...prev, enabled_by_default: e.target.checked }))}
-                      className="rounded border-white/20"
-                    />
-                    <label htmlFor="enabled" className="text-sm text-white/70">
-                      Enabled by default
-                    </label>
-                  </div>
                 </div>
               )}
             </div>
@@ -572,7 +556,7 @@ export function EmailTemplateEditorPage({
               </button>
 
               {availableTagsOpen && (
-                <div className="space-y-1">
+                <div className="space-y-3">
                   <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                     Click a tag to insert it at your cursor position
                     {formData.category === 'event_announcements' && (
@@ -581,40 +565,49 @@ export function EmailTemplateEditorPage({
                       </span>
                     )}
                   </p>
-                  <div className="space-y-0.5">
-                    {EMAIL_VARIABLES.map((variable) => {
-                      const isAnnouncementEmail = formData.category === 'event_announcements';
-                      const isDisabled = (isAnnouncementEmail && !variable.worksInInvitations) || !activeField;
+                  <div className="space-y-3">
+                    {getGroupedVariablesForUI().map((group) => (
+                      <div key={group.label}>
+                        <h4 className="text-[10px] font-semibold text-purple-400 uppercase tracking-wide mb-1.5 px-1">
+                          {group.label}
+                        </h4>
+                        <div className="space-y-0.5">
+                          {group.variables.map((variable) => {
+                            const isAnnouncementEmail = formData.category === 'event_announcements';
+                            const isDisabled = (isAnnouncementEmail && !variable.worksInInvitations) || !activeField;
 
-                      return (
-                        <button
-                          key={variable.frontendVar}
-                          onClick={() => !isDisabled && handleVariableClick(variable.frontendVar)}
-                          onMouseDown={(e) => e.preventDefault()}
-                          disabled={isDisabled}
-                          className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
-                            isDisabled
-                              ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
-                              : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
-                          }`}
-                          title={
-                            isAnnouncementEmail && !variable.worksInInvitations
-                              ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
-                              : variable.description
-                          }
-                        >
-                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
-                          <span className="flex-1 text-left truncate">{variable.label}</span>
-                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
-                            isDisabled
-                              ? 'text-white/30 bg-white/5'
-                              : 'text-purple-400 bg-purple-500/10'
-                          }`}>
-                            {variable.frontendVar.replace('[', '').replace(']', '')}
-                          </span>
-                        </button>
-                      );
-                    })}
+                            return (
+                              <button
+                                key={variable.frontendVar}
+                                onClick={() => !isDisabled && handleVariableClick(variable.frontendVar)}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={isDisabled}
+                                className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
+                                  isDisabled
+                                    ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
+                                    : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                                }`}
+                                title={
+                                  isAnnouncementEmail && !variable.worksInInvitations
+                                    ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
+                                    : variable.description
+                                }
+                              >
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                                <span className="flex-1 text-left truncate">{variable.label}</span>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                                  isDisabled
+                                    ? 'text-white/30 bg-white/5'
+                                    : 'text-purple-400 bg-purple-500/10'
+                                }`}>
+                                  {variable.frontendVar.replace('[', '').replace(']', '')}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

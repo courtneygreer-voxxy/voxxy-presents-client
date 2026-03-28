@@ -35,6 +35,7 @@ import {
   backendToFrontend,
   frontendToBackend,
   validateEmailContent,
+  getGroupedVariablesForUI,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import { getEightAmLocalAsUTC, formatDateWithTimezone } from '@/utils/timezone';
@@ -1130,7 +1131,7 @@ export function EmailEditorPage({
                     v.label.toLowerCase().includes(tagSearch.toLowerCase()) ||
                     v.frontendVar.toLowerCase().includes(tagSearch.toLowerCase())
                   )
-                : EMAIL_VARIABLES;
+                : null;
 
               return (
               <div className="space-y-1">
@@ -1161,47 +1162,96 @@ export function EmailEditorPage({
                     </button>
                   )}
                 </div>
-                {tagSearch && (
+                {tagSearch && filteredVariables && (
                   <p className="text-[10px] text-white/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
                 )}
-                <div className="space-y-0.5">
-                  {filteredVariables.map((variable) => {
-                    // Only gray out category-specific variables for event_announcements
-                    // (recipients haven't applied/chosen a category yet)
-                    const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
-                    const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
 
-                    return (
-                      <button
-                        key={variable.frontendVar}
-                        type="button"
-                        onClick={() => !isDisabled && handleInsertVariable(variable.frontendVar)}
-                        onMouseDown={(e) => e.preventDefault()} // Prevent blur on click
-                        disabled={isDisabled}
-                        className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
-                          isDisabled
-                            ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
-                            : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
-                        }`}
-                        title={
-                          isDisabled
-                            ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
-                            : variable.description
-                        }
-                      >
-                        <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
-                        <span className="flex-1 text-left truncate">{variable.label}</span>
-                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
-                          isDisabled
-                            ? 'text-white/30 bg-white/5'
-                            : 'text-purple-400 bg-purple-500/10'
-                        }`}>
-                          {variable.frontendVar.replace('[', '').replace(']', '')}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* Show flat filtered results when searching */}
+                {filteredVariables ? (
+                  <div className="space-y-0.5">
+                    {filteredVariables.map((variable) => {
+                      const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
+                      const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
+
+                      return (
+                        <button
+                          key={variable.frontendVar}
+                          type="button"
+                          onClick={() => !isDisabled && handleInsertVariable(variable.frontendVar)}
+                          onMouseDown={(e) => e.preventDefault()}
+                          disabled={isDisabled}
+                          className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
+                            isDisabled
+                              ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
+                              : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                          }`}
+                          title={
+                            isDisabled
+                              ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
+                              : variable.description
+                          }
+                        >
+                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                          <span className="flex-1 text-left truncate">{variable.label}</span>
+                          <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                            isDisabled
+                              ? 'text-white/30 bg-white/5'
+                              : 'text-purple-400 bg-purple-500/10'
+                          }`}>
+                            {variable.frontendVar.replace('[', '').replace(']', '')}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  /* Show grouped results when not searching */
+                  <div className="space-y-3">
+                    {getGroupedVariablesForUI().map((group) => (
+                      <div key={group.label}>
+                        <h4 className="text-[10px] font-semibold text-purple-400 uppercase tracking-wide mb-1.5 px-1">
+                          {group.label}
+                        </h4>
+                        <div className="space-y-0.5">
+                          {group.variables.map((variable) => {
+                            const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
+                            const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
+
+                            return (
+                              <button
+                                key={variable.frontendVar}
+                                type="button"
+                                onClick={() => !isDisabled && handleInsertVariable(variable.frontendVar)}
+                                onMouseDown={(e) => e.preventDefault()}
+                                disabled={isDisabled}
+                                className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
+                                  isDisabled
+                                    ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
+                                    : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                                }`}
+                                title={
+                                  isDisabled
+                                    ? `${variable.description} (Not available in announcement emails — recipients haven't applied yet)`
+                                    : variable.description
+                                }
+                              >
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                                <span className="flex-1 text-left truncate">{variable.label}</span>
+                                <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                                  isDisabled
+                                    ? 'text-white/30 bg-white/5'
+                                    : 'text-purple-400 bg-purple-500/10'
+                                }`}>
+                                  {variable.frontendVar.replace('[', '').replace(']', '')}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
               );
             })()}
