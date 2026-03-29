@@ -6,6 +6,7 @@ import { DebugPanel } from './DebugPanel';
 interface Event {
   id: number;
   slug: string;
+  namespaced_slug?: string;
   title: string;
   description?: string;
   dates?: {
