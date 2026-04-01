@@ -347,7 +347,7 @@ export default function ProducerDashboard() {
       if (!templateId) {
         try {
           const templates = await emailCampaignTemplatesApi.getAll();
-          const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'system');
+          const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'generic');
           if (defaultTemplate) {
             templateId = defaultTemplate.id;
           }

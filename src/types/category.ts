@@ -5,6 +5,7 @@ export interface Category {
   description?: string;
   color?: string;
   icon?: string;
+  email_campaign_template_id?: number;
   created_at: string;
   updated_at: string;
   in_use?: boolean;

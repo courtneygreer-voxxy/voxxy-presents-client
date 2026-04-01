@@ -324,8 +324,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   };
 
 
-  const isSystem = template?.template_type === 'system';
-  const canEdit = !isSystem;
+  const isSystemDefault = template?.organization_id === null && template?.is_default;
+  const canEdit = !isSystemDefault;
 
   // If editor is open (create or edit mode), show full-screen editor
   if (isEditorOpen) {
@@ -356,10 +356,10 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             <div className="flex-1">
               <h1 className="text-lg font-bold text-white flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-400" />
-                {template ? (isSystem ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
+                {template ? (isSystemDefault ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
               </h1>
               <p className="text-white/60 text-xs mt-0.5">
-                {isSystem
+                {isSystemDefault
                   ? 'System sequences are read-only. Clone to customize.'
                   : 'Create a reusable email sequence'}
               </p>
@@ -396,7 +396,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
           </div>
 
           {/* System Sequence Warning */}
-          {isSystem && (
+          {isSystemDefault && (
             <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-2">
               <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
               <div>

@@ -137,7 +137,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   };
 
   const getTemplateTypeBadge = (template: EmailCampaignTemplate) => {
-    if (template.template_type === 'system') {
+    if (template.organization_id === null) {
       if (template.is_default) {
         return { label: 'Default', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
       }

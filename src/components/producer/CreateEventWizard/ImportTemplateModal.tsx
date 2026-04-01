@@ -78,7 +78,7 @@ export default function ImportTemplateModal({
 
               {/* System Templates */}
               {templates
-                .filter((t) => t.template_type === 'system')
+                .filter((t) => t.template_type === 'generic' && t.organization_id === null)
                 .map((template) => (
                   <button
                     key={template.id}
@@ -110,7 +110,7 @@ export default function ImportTemplateModal({
                 ))}
 
               {/* User Custom Templates */}
-              {templates.filter((t) => t.template_type === 'user').length > 0 && (
+              {templates.filter((t) => t.organization_id !== null).length > 0 && (
                 <>
                   <div className="pt-4 border-t border-white/10">
                     <h3 className="text-sm font-semibold text-white/70 uppercase tracking-wide mb-3">
@@ -118,7 +118,7 @@ export default function ImportTemplateModal({
                     </h3>
                   </div>
                   {templates
-                    .filter((t) => t.template_type === 'user')
+                    .filter((t) => t.organization_id !== null)
                     .map((template) => (
                       <button
                         key={template.id}
@@ -144,7 +144,7 @@ export default function ImportTemplateModal({
                 </>
               )}
 
-              {templates.filter((t) => t.template_type === 'user').length === 0 && (
+              {templates.filter((t) => t.organization_id !== null).length === 0 && (
                 <p className="text-center text-sm text-white/50 py-4">
                   No custom templates yet. Create one in the Mail tab!
                 </p>

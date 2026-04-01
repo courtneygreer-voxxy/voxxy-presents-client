@@ -162,7 +162,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
     }
 
     // Non-admin users cannot delete system templates
-    if (template.template_type === 'system' && !isAdmin) {
+    if (template.organization_id === null && !isAdmin) {
       toast.error('Cannot delete system sequence', {
         description: 'Only admins can delete system sequences',
       });
@@ -373,8 +373,8 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
               {visibleTemplates.map(template => {
                 const isDefault = template.is_default;
-                const isSystem = template.template_type === 'system';
-                const canDelete = !isDefault && (template.template_type === 'user' || isAdmin);
+                const isSystem = template.organization_id === null;
+                const canDelete = !isDefault && (template.organization_id !== null || isAdmin);
 
                 return (
                   <div

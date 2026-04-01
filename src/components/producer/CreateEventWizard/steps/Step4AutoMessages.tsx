@@ -11,7 +11,7 @@ interface Step4AutoMessagesProps {
   onTemplateSelect?: (templateId: number | null) => void;
   useCategoryTemplates?: boolean;
   onUseCategoryTemplatesChange?: (value: boolean) => void;
-  eventCategories?: Array<{ id: number; name: string; icon?: string }>; // Categories from Step 2 applications
+  eventCategories?: Array<{ id: number; name: string; icon?: string; email_campaign_template_id?: number }>; // Categories from Step 2 applications
   eventDate?: string;
   applicationDeadline?: string;
   paymentDeadline?: string;
@@ -220,7 +220,7 @@ export default function Step4AutoMessages({
               className="flex-1 px-3 py-2 rounded-lg bg-white/10 text-white text-sm border border-white/20 hover:bg-white/15 transition-all"
             >
               <option value="" disabled>Select a sequence...</option>
-              {allTemplates.filter(t => !t.category_id).map((t) => (
+              {allTemplates.filter(t => t.template_type === 'generic').map((t) => (
                 <option key={t.id} value={t.id}>
                   {t.name}{t.is_default ? ' (Default)' : ''}
                 </option>

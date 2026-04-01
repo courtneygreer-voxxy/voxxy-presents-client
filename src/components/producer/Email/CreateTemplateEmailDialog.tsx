@@ -107,8 +107,6 @@ export function CreateTemplateEmailDialog({
         name: data.name,
         subject_template: convertedSubject,
         body_template: convertedBody,
-        email_type: data.email_type as EmailCategory,
-        category_id: null,  // Generic template emails don't target specific vendor categories
         position: data.position,
         trigger_type: data.trigger_type as TriggerType,
         trigger_value: selectedTrigger?.requiresValue ? data.trigger_value : undefined,

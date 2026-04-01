@@ -108,7 +108,7 @@ export default function TemplateSelectorModal({
             <div className="space-y-3">
               {templates.map((template) => {
                 const isSelected = selectedId === template.id;
-                const isSystem = template.template_type === 'system';
+                const isSystem = template.organization_id === null;
 
                 return (
                   <button

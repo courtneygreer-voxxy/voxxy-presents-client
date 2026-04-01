@@ -49,8 +49,8 @@ export function CreateCategoryTemplateDialog({
     onClose();
   };
 
-  // Only show generic templates (no category_id)
-  const availableTemplates = genericTemplates.filter(t => !t.category_id);
+  // Only show generic templates
+  const availableTemplates = genericTemplates.filter(t => t.template_type === 'generic');
   const defaultTemplate = availableTemplates.find(t => t.is_default);
 
   // Auto-select default template if available
