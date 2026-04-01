@@ -49,8 +49,6 @@ interface EmailTemplateEditorPageProps {
   onCreate?: (data: {
     name: string;
     description?: string;
-    email_type: string;
-    category_id?: number | null;
     position: number;
     subject_template: string;
     body_template: string;
@@ -249,8 +247,6 @@ export function EmailTemplateEditorPage({
         const newItemData = {
           name: formData.name,
           description: formData.description,
-          email_type: formData.category, // Use email_type for templates
-          category_id: null, // Template emails don't have vendor category
           position: nextPosition,
           subject_template: formData.subject_template,
           body_template: fullBodyTemplate,

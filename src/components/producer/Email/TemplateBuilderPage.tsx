@@ -234,8 +234,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       const newItem = await emailTemplateItemsApi.create(template.id, {
         name: data.name,
         description: data.description,
-        email_type: data.email_type as EmailCategory,
-        category_id: data.category_id,
         position: data.position,
         subject_template: data.subject_template,
         body_template: data.body_template,

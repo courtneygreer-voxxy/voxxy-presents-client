@@ -335,14 +335,14 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           </div>
         )}
 
-        {/* Generic Sequences (exclude category-specific templates) */}
+        {/* Generic Sequences (event-wide emails only) */}
         {!isLoading && !error && templates.length > 0 && (() => {
-          // Filter out category-specific templates - they only show in the category section below
-          // Non-admin users see the default template + their own custom sequences (generic only)
-          const genericTemplates = templates.filter(t => !t.category_id);
+          // Show only generic templates (event-wide emails)
+          // Category templates are shown in the category section below
+          const genericTemplates = templates.filter(t => t.template_type === 'generic');
           const visibleTemplates = isAdmin
             ? genericTemplates
-            : genericTemplates.filter(t => t.is_default || t.template_type === 'user');
+            : genericTemplates.filter(t => t.is_default);
 
           if (visibleTemplates.length === 0) return (
             <div className="text-center py-8">
@@ -364,10 +364,10 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             <div className="mb-3">
               <h2 className="text-base font-semibold text-white flex items-center gap-2">
                 <Mail className="w-4 h-4 text-purple-400" />
-                Generic Email Sequences
+                Event Templates
               </h2>
               <p className="text-white/60 text-xs mt-1">
-                These sequences can be used for any event and will be copied across all categories
+                Event-wide emails sent to all vendors (invitations, reminders, bulletins, updates)
               </p>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
@@ -453,16 +453,16 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           );
         })()}
 
-        {/* Category-Specific Templates Section */}
+        {/* Category Templates Section */}
         {!isLoading && !error && categories.length > 0 && (
           <div className="mt-8">
             <div className="mb-4">
               <h2 className="text-base font-semibold text-white flex items-center gap-2">
                 <Tag className="w-4 h-4 text-purple-400" />
-                Category-Specific Templates
+                Category Templates
               </h2>
               <p className="text-white/60 text-xs mt-1">
-                Create specialized email sequences for specific vendor categories
+                Category-specific emails for applications, payments, and vendor updates. Auto-assigned to categories.
               </p>
             </div>
 
@@ -473,7 +473,10 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             ) : (
               <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
                 {categories.map(category => {
-                  const categoryTemplate = templates.find(t => t.category_id === category.id);
+                  // Find template by email_campaign_template_id on category
+                  const categoryTemplate = category.email_campaign_template_id
+                    ? templates.find(t => t.id === category.email_campaign_template_id)
+                    : null;
 
                   return (
                     <div key={category.id} className="flex items-center gap-3 py-3 px-4">
@@ -488,11 +491,13 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                           <div className="flex items-center gap-2 text-[10px] text-white/60 mt-0.5">
                             <span>{categoryTemplate.email_count || 0} emails</span>
                             <span className="text-white/20">·</span>
-                            <span className="text-green-400">Template assigned</span>
+                            <span className={categoryTemplate.is_default ? "text-blue-400" : "text-green-400"}>
+                              {categoryTemplate.is_default ? "Default template" : "Custom template"}
+                            </span>
                           </div>
                         ) : (
-                          <div className="text-[10px] text-white/40 mt-0.5">
-                            No template - will use default
+                          <div className="text-[10px] text-yellow-400 mt-0.5">
+                            Loading... (template should auto-assign)
                           </div>
                         )}
                       </div>

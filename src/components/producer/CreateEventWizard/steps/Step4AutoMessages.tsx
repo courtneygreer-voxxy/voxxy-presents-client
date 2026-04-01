@@ -124,8 +124,11 @@ export default function Step4AutoMessages({
   const [loading, setLoading] = useState(true);
 
   // Check which categories have category-specific templates
+  // In new architecture, categories have email_campaign_template_id pointing to their template
   const categoryTemplatesAvailable = eventCategories.map(cat => {
-    const template = allTemplates.find(t => t.category_id === cat.id);
+    const template = cat.email_campaign_template_id
+      ? allTemplates.find(t => t.id === cat.email_campaign_template_id)
+      : null;
     return {
       category: cat,
       hasTemplate: !!template,
@@ -143,7 +146,7 @@ export default function Step4AutoMessages({
       const templates = await emailCampaignTemplatesApi.getAll();
       setAllTemplates(templates);
 
-      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'system');
+      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'generic');
       if (defaultTemplate) {
         const fullTemplate = await emailCampaignTemplatesApi.getById(defaultTemplate.id);
         setSelectedTemplate(fullTemplate);
