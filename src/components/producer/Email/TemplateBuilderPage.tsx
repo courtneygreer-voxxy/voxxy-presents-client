@@ -17,6 +17,7 @@ import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerTy
 
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 
 interface TemplateBuilderPageProps {
   templateId?: number;
@@ -502,6 +503,30 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 </h2>
               </div>
 
+              {/* Email Type Legend */}
+              {emailItems.length > 0 && (
+                <div className="mb-4 p-3 rounded-lg bg-white/[0.02] border border-white/10">
+                  <div className="flex items-center gap-3 text-xs flex-wrap">
+                    <span className="text-white/50 font-medium">Email Types:</span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
+                      Event Announcement
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
+                      Application
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
+                      Payment
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
+                      Event Countdown
+                    </span>
+                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                      Event Update
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {emailItems.length === 0 ? (
                 <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
                   <Mail className="w-8 h-8 text-white/40 mx-auto mb-2" />
@@ -558,10 +583,18 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                           {items.map((item) => (
                             <div key={item.id} className="flex items-center gap-3 py-2.5 px-3">
                               <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                              <span className="text-sm text-white truncate flex-1">{item.name}</span>
-                              <span className="text-[10px] text-white/60 flex-shrink-0 hidden sm:inline">
-                                {item.trigger_type}
-                              </span>
+                              <div className="flex-1 min-w-0">
+                                <div className="text-sm text-white truncate mb-1">{item.name}</div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(item.trigger_type).color}`}>
+                                    {getEmailTypeInfo(item.trigger_type).label}
+                                  </span>
+                                  <span className="text-[10px] text-white/50">{item.trigger_type.replace(/_/g, ' ')}</span>
+                                  {item.trigger_value !== null && item.trigger_value > 0 && (
+                                    <span className="text-[10px] text-white/50">({item.trigger_value} days)</span>
+                                  )}
+                                </div>
+                              </div>
                               {canEdit && (
                                 <div className="flex items-center gap-1 flex-shrink-0">
                                   <button

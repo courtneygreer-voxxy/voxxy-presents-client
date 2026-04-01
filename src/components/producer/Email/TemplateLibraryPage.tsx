@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle, Tag } from 'lucide-react';
+import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle, Tag, Info } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi, categoriesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
 import type { Category } from '@/types/category';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { CreateCategoryTemplateDialog } from './CreateCategoryTemplateDialog';
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 
 interface TemplateLibraryPageProps {
   onNavigateToBuilder?: (templateId?: number) => void;
@@ -46,6 +47,9 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   const [testingLoading, setTestingLoading] = useState(false);
   const [testResults, setTestResults] = useState<Array<{ name: string; status: 'sent' | 'failed'; error?: string }>>([]);
   const [testEmail, setTestEmail] = useState('');
+
+  // Help section state
+  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     loadTemplates();
@@ -298,21 +302,149 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             <div className="flex-1">
               <h1 className="text-lg font-bold text-white flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-400" />
-                Email Sequence Library
+                Email Sequences
               </h1>
               <p className="text-white/60 text-xs mt-0.5">
-                Create and manage reusable email sequences
+                Automated email campaigns for your events
               </p>
             </div>
             <button
-              onClick={() => onNavigateToBuilder?.()}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all flex items-center gap-2"
+              onClick={() => setShowHelp(!showHelp)}
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/80 text-xs font-medium hover:bg-white/10 transition-all flex items-center gap-1.5"
             >
-              <Plus className="w-4 h-4" />
-              New Sequence
+              <Info className="w-3.5 h-3.5" />
+              {showHelp ? 'Hide' : 'Show'} Guide
             </button>
           </div>
         </div>
+
+        {/* Help Section */}
+        {showHelp && !isLoading && (
+          <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.02] p-4">
+            <div className="flex items-start gap-3">
+              <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div className="flex-1 space-y-4">
+                <div>
+                  <h3 className="text-sm font-medium text-white mb-1.5">How Email Sequences Work</h3>
+                  <p className="text-xs text-white/60 leading-relaxed">
+                    These templates automatically generate scheduled emails when you create an event. Edit templates here, manage scheduled emails in Command Center.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Mail className="w-3.5 h-3.5 text-purple-400" />
+                      <span className="font-medium text-white">Event Sequences</span>
+                    </div>
+                    <p className="text-white/60 text-xs mb-2">
+                      Sent to contacts (invitations) and all vendors (bulletins, updates)
+                    </p>
+                    <p className="text-[10px] text-white/50">Choose one template per event</p>
+                  </div>
+
+                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Tag className="w-3.5 h-3.5 text-blue-400" />
+                      <span className="font-medium text-white">Category Sequences</span>
+                    </div>
+                    <p className="text-white/60 text-xs mb-2">
+                      Sent to vendors in each category: applications, payments, countdowns
+                    </p>
+                    <p className="text-[10px] text-white/50">One editable template per category</p>
+                  </div>
+                </div>
+
+                {/* Email Type Key */}
+                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                  <h4 className="text-xs font-semibold text-white mb-2">Email Type Reference</h4>
+                  <p className="text-[10px] text-white/50 mb-3">Emails are classified by when they're triggered:</p>
+
+                  <div className="space-y-3">
+                    {/* Event Announcement */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
+                          Event Announcement
+                        </span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
+                        <div>• <span className="text-white/70 font-mono">on_invitation_send</span> - When invitations are sent to contacts</div>
+                        <div>• <span className="text-white/70 font-mono">on_bulletin_post</span> - When a bulletin is posted to all vendors</div>
+                      </div>
+                    </div>
+
+                    {/* Application */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
+                          Application
+                        </span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
+                        <div>• <span className="text-white/70 font-mono">on_application_submit</span> - When vendor submits application</div>
+                        <div>• <span className="text-white/70 font-mono">on_approval</span> - When application is approved</div>
+                        <div>• <span className="text-white/70 font-mono">on_rejection</span> - When application is rejected</div>
+                        <div>• <span className="text-white/70 font-mono">on_waitlist</span> - When vendor is waitlisted</div>
+                        <div>• <span className="text-white/70 font-mono">days_before_deadline</span> - X days before application deadline</div>
+                        <div>• <span className="text-white/70 font-mono">days_after_deadline</span> - X days after application deadline</div>
+                      </div>
+                    </div>
+
+                    {/* Payment */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
+                          Payment
+                        </span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
+                        <div>• <span className="text-white/70 font-mono">days_before_payment_deadline</span> - X days before payment due</div>
+                        <div>• <span className="text-white/70 font-mono">on_payment_deadline</span> - On payment due date</div>
+                        <div>• <span className="text-white/70 font-mono">days_after_payment_deadline</span> - X days after payment overdue</div>
+                        <div>• <span className="text-white/70 font-mono">on_payment_received</span> - When payment is confirmed</div>
+                      </div>
+                    </div>
+
+                    {/* Event Countdown */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
+                          Event Countdown
+                        </span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
+                        <div>• <span className="text-white/70 font-mono">days_before_event</span> - X days before event date</div>
+                        <div>• <span className="text-white/70 font-mono">on_event_date</span> - On event day</div>
+                        <div>• <span className="text-white/70 font-mono">days_after_event</span> - X days after event (thank you emails)</div>
+                      </div>
+                    </div>
+
+                    {/* Event Update */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                          Event Update
+                        </span>
+                      </div>
+                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
+                        <div>• <span className="text-white/70 font-mono">on_event_update</span> - When event details change</div>
+                        <div>• <span className="text-white/70 font-mono">on_event_cancel</span> - When event is cancelled</div>
+                        <div>• <span className="text-white/70 font-mono">on_category_change</span> - When vendor's category is changed</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                  <p className="text-xs text-blue-300">
+                    <strong>Note:</strong> Templates create the initial emails. Once an event is created, manage individual scheduled emails in the event's Command Center.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Loading State */}
         {isLoading && (
@@ -345,16 +477,18 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             : genericTemplates.filter(t => t.is_default);
 
           if (visibleTemplates.length === 0) return (
-            <div className="text-center py-8">
-              <Mail className="w-10 h-10 text-white/30 mx-auto mb-3" />
-              <h3 className="text-base font-medium text-white mb-1">No Custom Sequences Yet</h3>
-              <p className="text-white/60 text-sm mb-4">Create your first email sequence to get started</p>
+            <div className="text-center py-8 px-4">
+              <Mail className="w-8 h-8 text-white/30 mx-auto mb-3" />
+              <h3 className="text-sm font-medium text-white mb-1">Using Default Event Sequence</h3>
+              <p className="text-white/60 text-xs mb-4 max-w-sm mx-auto">
+                The default sequence handles invitations, reminders, and event communications. Create additional sequences for different messaging approaches.
+              </p>
               <button
                 onClick={() => onNavigateToBuilder?.()}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all inline-flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Create Sequence
+                Create Event Sequence
               </button>
             </div>
           );
@@ -362,13 +496,33 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           return (
           <div>
             <div className="mb-3">
-              <h2 className="text-base font-semibold text-white flex items-center gap-2">
-                <Mail className="w-4 h-4 text-purple-400" />
-                Event Templates
-              </h2>
-              <p className="text-white/60 text-xs mt-1">
-                Event-wide emails sent to all vendors (invitations, reminders, bulletins, updates)
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h2 className="text-base font-semibold text-white flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-purple-400" />
+                    Event Sequences
+                  </h2>
+                </div>
+                <button
+                  onClick={() => onNavigateToBuilder?.()}
+                  className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-xs font-medium hover:from-purple-500 hover:to-blue-500 transition-all flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  New Event Sequence
+                </button>
+              </div>
+              <p className="text-white/60 text-xs mb-2">
+                Sent to contacts (invitations) and all vendors across all categories (bulletins, updates, cancellations).
               </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-white/40 text-[10px]">Email types:</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  Event Announcement
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                  Event Update
+                </span>
+              </div>
             </div>
             <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
               {visibleTemplates.map(template => {
@@ -379,19 +533,12 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                 return (
                   <div
                     key={template.id}
-                    className={`flex items-center gap-3 py-3 px-4 ${
-                      isDefault ? 'bg-yellow-500/[0.03]' : ''
-                    }`}
+                    className="flex items-center gap-3 py-3 px-4"
                   >
                     <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm text-white font-medium truncate">{template.name}</span>
-                        {isDefault && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-300 border border-yellow-500/30 flex-shrink-0">
-                            Default
-                          </span>
-                        )}
                       </div>
                       <div className="flex items-center gap-2 text-[10px] text-white/60 mt-0.5">
                         <span>{template.email_count || 0} emails</span>
@@ -410,13 +557,15 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                       </div>
                     </div>
                     <div className="flex items-center gap-1 flex-shrink-0">
-                      <button
-                        onClick={() => onNavigateToBuilder?.(template.id)}
-                        className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                        title={isSystem ? 'View sequence' : 'Edit sequence'}
-                      >
-                        <Edit className="w-3.5 h-3.5" />
-                      </button>
+                      {!isDefault && (
+                        <button
+                          onClick={() => onNavigateToBuilder?.(template.id)}
+                          className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
+                          title="Edit sequence"
+                        >
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                      )}
                       <button
                         onClick={() => handlePreview(template)}
                         className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
@@ -456,14 +605,26 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         {/* Category Templates Section */}
         {!isLoading && !error && categories.length > 0 && (
           <div className="mt-8">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold text-white flex items-center gap-2">
-                <Tag className="w-4 h-4 text-purple-400" />
-                Category Templates
+            <div className="mb-3">
+              <h2 className="text-base font-semibold text-white flex items-center gap-2 mb-1">
+                <Tag className="w-4 h-4 text-blue-400" />
+                Category Sequences
               </h2>
-              <p className="text-white/60 text-xs mt-1">
-                Category-specific emails for applications, payments, and vendor updates. Auto-assigned to categories.
+              <p className="text-white/60 text-xs mb-2">
+                Sent to vendors in each specific category. Applications, payments, and event countdowns personalized per vendor type.
               </p>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-white/40 text-[10px]">Email types:</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
+                  Application
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
+                  Payment
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
+                  Event Countdown
+                </span>
+              </div>
             </div>
 
             {loadingCategories ? (
@@ -491,13 +652,13 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                           <div className="flex items-center gap-2 text-[10px] text-white/60 mt-0.5">
                             <span>{categoryTemplate.email_count || 0} emails</span>
                             <span className="text-white/20">·</span>
-                            <span className={categoryTemplate.is_default ? "text-blue-400" : "text-green-400"}>
-                              {categoryTemplate.is_default ? "Default template" : "Custom template"}
+                            <span className="text-green-400">
+                              Editable sequence
                             </span>
                           </div>
                         ) : (
                           <div className="text-[10px] text-yellow-400 mt-0.5">
-                            Loading... (template should auto-assign)
+                            Setting up sequence...
                           </div>
                         )}
                       </div>
@@ -507,7 +668,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                             <button
                               onClick={() => onNavigateToBuilder?.(categoryTemplate.id)}
                               className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                              title="Edit template"
+                              title="Edit sequence"
                             >
                               <Edit className="w-3.5 h-3.5" />
                             </button>
@@ -517,17 +678,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                               title="Preview emails"
                             >
                               <Eye className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(categoryTemplate)}
-                              className={`p-1.5 rounded transition-all ${
-                                deleteConfirmId === categoryTemplate.id
-                                  ? 'text-red-400 bg-red-500/10'
-                                  : 'text-white/50 hover:text-red-400 hover:bg-white/10'
-                              }`}
-                              title={deleteConfirmId === categoryTemplate.id ? 'Click again to confirm' : 'Delete template'}
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </>
                         ) : (
@@ -551,15 +701,17 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         {/* Empty State */}
         {!isLoading && !error && templates.length === 0 && (
           <div className="text-center py-8">
-            <Mail className="w-10 h-10 text-white/20 mx-auto mb-3" />
-            <h3 className="text-base font-medium text-white mb-1">No Sequences Found</h3>
-            <p className="text-white/60 text-sm mb-4">Create your first email sequence</p>
+            <Mail className="w-10 h-10 text-white/30 mx-auto mb-3" />
+            <h3 className="text-sm font-medium text-white mb-1">Default Sequences Active</h3>
+            <p className="text-white/60 text-xs mb-4 max-w-sm mx-auto">
+              Default event sequence handles invitations, reminders, and event communications. Create custom sequences for different messaging approaches.
+            </p>
             <button
               onClick={() => onNavigateToBuilder?.()}
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white text-sm font-medium hover:from-purple-500 hover:to-blue-500 transition-all inline-flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              Create Sequence
+              Create Event Sequence
             </button>
           </div>
         )}
@@ -585,6 +737,28 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
               </button>
             </div>
 
+            {/* Email Type Legend */}
+            <div className="px-4 py-3 border-b border-white/10 bg-white/[0.02]">
+              <div className="flex items-center gap-3 text-xs flex-wrap">
+                <span className="text-white/50 font-medium">Email Types:</span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
+                  Event Announcement
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
+                  Application
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
+                  Payment
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
+                  Event Countdown
+                </span>
+                <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
+                  Event Update
+                </span>
+              </div>
+            </div>
+
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4">
               {loadingPreview ? (
@@ -608,13 +782,13 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                         <div className="flex-1">
                           <h3 className="font-medium text-white mb-1">{email.name}</h3>
                           <p className="text-sm text-white/60 mb-2">{email.subject_template}</p>
-                          <div className="flex items-center gap-2 text-xs text-white/50">
-                            <span className="px-2 py-0.5 rounded bg-white/5 border border-white/10">
-                              {email.category}
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(email.trigger_type).color}`}>
+                              {getEmailTypeInfo(email.trigger_type).label}
                             </span>
-                            <span>{email.trigger_type.replace(/_/g, ' ')}</span>
+                            <span className="text-xs text-white/50">{email.trigger_type.replace(/_/g, ' ')}</span>
                             {email.trigger_value !== null && email.trigger_value > 0 && (
-                              <span>({email.trigger_value} days)</span>
+                              <span className="text-xs text-white/50">({email.trigger_value} days)</span>
                             )}
                           </div>
                         </div>
