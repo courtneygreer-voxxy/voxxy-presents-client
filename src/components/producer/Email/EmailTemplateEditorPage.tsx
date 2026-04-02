@@ -67,12 +67,12 @@ const TRIGGER_TYPES = [
   { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, emailType: 'event_announcements', templateType: 'generic' },
   { value: 'on_event_update', label: 'On Event Update', requiresValue: false, emailType: 'event_updates', templateType: 'generic' },
   { value: 'on_event_cancel', label: 'On Event Cancel', requiresValue: false, emailType: 'event_updates', templateType: 'generic' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'generic' },
+  { value: 'days_after_deadline', label: 'Days After Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'generic' },
   { value: 'on_application_submit', label: 'On Application Submit', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
   { value: 'on_approval', label: 'On Approval', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
   { value: 'on_waitlist', label: 'On Waitlist', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
   { value: 'on_rejection', label: 'On Rejection', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'category' },
-  { value: 'days_after_deadline', label: 'Days After Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'category' },
   { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, emailType: 'payment_reminders', templateType: 'category' },
   { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, emailType: 'payment_reminders', templateType: 'category' },
   { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, emailType: 'payment_reminders', templateType: 'category' },
@@ -104,8 +104,26 @@ export function EmailTemplateEditorPage({
   const isCreateMode = item === null;
   const [isSaving, setIsSaving] = useState(false);
 
+  // Value-based triggers that users can create (multiple allowed with different values)
+  const VALUE_BASED_TRIGGER_TYPES = [
+    'days_before_deadline',
+    'days_after_deadline',
+    'days_before_event',
+    'days_after_event',
+    'days_before_payment_deadline',
+    'days_after_payment_deadline',
+  ];
+
   // Filter trigger types based on template type
-  const availableTriggerTypes = TRIGGER_TYPES.filter(trigger => trigger.templateType === templateType);
+  let availableTriggerTypes = TRIGGER_TYPES.filter(trigger => trigger.templateType === templateType);
+
+  // In CREATE mode, only allow value-based triggers (users can't create system emails)
+  // In EDIT mode, allow all triggers (so users can edit existing system emails)
+  if (isCreateMode) {
+    availableTriggerTypes = availableTriggerTypes.filter(trigger =>
+      VALUE_BASED_TRIGGER_TYPES.includes(trigger.value)
+    );
+  }
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [duplicateTriggerWarning, setDuplicateTriggerWarning] = useState<string | null>(null);
@@ -153,8 +171,9 @@ export function EmailTemplateEditorPage({
       setEmailFooter(footer);
     } else {
       // Create mode: Set defaults based on template type
-      const defaultTrigger = templateType === 'generic' ? 'on_invitation_send' : 'on_application_submit';
-      const defaultCategory = templateType === 'generic' ? 'event_announcements' : 'application_updates';
+      // Use value-based triggers so users can create reminder emails
+      const defaultTrigger = templateType === 'generic' ? 'days_before_deadline' : 'days_before_event';
+      const defaultCategory = templateType === 'generic' ? 'application_updates' : 'event_countdown';
 
       setFormData({
         name: '',
@@ -163,7 +182,7 @@ export function EmailTemplateEditorPage({
         subject_template: '',
         body_template: '<p>Hi [firstName],</p><p></p><p>Best regards,</p><p>[organizationName]</p>',
         trigger_type: defaultTrigger,
-        trigger_value: 0,
+        trigger_value: 3, // Default to 3 days
         trigger_time: '09:00:00',
         filter_criteria: {},
       });
@@ -530,6 +549,7 @@ export function EmailTemplateEditorPage({
                     <Select
                       value={formData.trigger_type}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, trigger_type: value }))}
+                      disabled={!isCreateMode && !VALUE_BASED_TRIGGER_TYPES.includes(formData.trigger_type)}
                     >
                       <SelectTrigger className={`bg-white/5 text-white text-sm h-8 ${duplicateTriggerWarning ? 'border-red-500/50' : 'border-white/20'}`}>
                         <SelectValue />
@@ -542,6 +562,17 @@ export function EmailTemplateEditorPage({
                         ))}
                       </SelectContent>
                     </Select>
+                    {isCreateMode && (
+                      <p className="mt-1 text-[9px] text-white/40">
+                        Create custom reminder emails. System emails (invitations, approvals, etc.) come from the default template.
+                      </p>
+                    )}
+                    {!isCreateMode && !VALUE_BASED_TRIGGER_TYPES.includes(formData.trigger_type) && (
+                      <p className="mt-1 text-[9px] text-yellow-400/80 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        System email - trigger type cannot be changed
+                      </p>
+                    )}
                     {duplicateTriggerWarning && (
                       <div className="mt-1.5 flex items-start gap-1.5">
                         <AlertCircle className="w-3 h-3 text-red-400 flex-shrink-0 mt-0.5" />

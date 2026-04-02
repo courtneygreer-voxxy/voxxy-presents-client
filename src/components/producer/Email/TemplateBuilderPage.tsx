@@ -6,11 +6,14 @@ import {
   Plus,
   Trash2,
   Edit,
-
   Loader2,
   AlertCircle,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Info
 } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
@@ -46,6 +49,14 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const [editingItem, setEditingItem] = useState<EmailTemplateItem | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isCreateMode, setIsCreateMode] = useState(false);
+
+  // Selected email for preview
+  const [selectedEmail, setSelectedEmail] = useState<EmailTemplateItem | null>(null);
+
+  // Delete confirmation modal state
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [emailToDelete, setEmailToDelete] = useState<EmailTemplateItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Track locally modified emails (before template is saved)
   const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
@@ -83,7 +94,13 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       setDescription(templateData.description || '');
       setInitialName(templateData.name);
       setInitialDescription(templateData.description || '');
-      setEmailItems(items.sort((a, b) => a.position - b.position));
+      const sortedItems = items.sort((a, b) => a.position - b.position);
+      setEmailItems(sortedItems);
+
+      // Auto-select first email for preview
+      if (sortedItems.length > 0 && !selectedEmail) {
+        setSelectedEmail(sortedItems[0]);
+      }
     } catch (err: any) {
       setError(err.message || 'Failed to load template');
     } finally {
@@ -142,28 +159,31 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   };
 
   const handleSave = async () => {
-    if (!name.trim()) {
-      setError('Sequence name is required');
-      return;
-    }
+    // For non-category templates, validate name
+    if (!isCategoryTemplate) {
+      if (!name.trim()) {
+        setError('Sequence name is required');
+        return;
+      }
 
-    // Check for duplicate name within the same template type
-    // (Event sequences and Category sequences can have the same name)
-    const allTemplates = await emailCampaignTemplatesApi.getAll();
+      // Check for duplicate name within the same template type
+      // (Event sequences and Category sequences can have the same name)
+      const allTemplates = await emailCampaignTemplatesApi.getAll();
 
-    // Determine what template type we're working with
-    const currentTemplateType = createFromDefault ? 'generic' : (template?.template_type || 'generic');
+      // Determine what template type we're working with
+      const currentTemplateType = createFromDefault ? 'generic' : (template?.template_type || 'generic');
 
-    const duplicateName = allTemplates.some(t =>
-      t.name.toLowerCase() === name.trim().toLowerCase() &&
-      t.template_type === currentTemplateType && // Only check within same type
-      t.id !== template?.id
-    );
+      const duplicateName = allTemplates.some(t =>
+        t.name.toLowerCase() === name.trim().toLowerCase() &&
+        t.template_type === currentTemplateType && // Only check within same type
+        t.id !== template?.id
+      );
 
-    if (duplicateName) {
-      const typeLabel = currentTemplateType === 'generic' ? 'event' : 'category';
-      setError(`A ${typeLabel} sequence named "${name.trim()}" already exists. Please choose a different name.`);
-      return;
+      if (duplicateName) {
+        const typeLabel = currentTemplateType === 'generic' ? 'event' : 'category';
+        setError(`A ${typeLabel} sequence named "${name.trim()}" already exists. Please choose a different name.`);
+        return;
+      }
     }
 
     if (createFromDefault && !hasChanges) {
@@ -178,11 +198,19 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     try {
       if (template) {
         // Update existing template
-        await emailCampaignTemplatesApi.update(template.id, {
-          name: name.trim(),
-          description: description.trim() || undefined
-        });
-        setSuccessMessage('Sequence updated successfully');
+        // For category templates, don't update name/description (they're system-managed)
+        if (isCategoryTemplate) {
+          // Category templates: name and description are read-only
+          // Nothing to update at template level (only emails are editable)
+          setSuccessMessage('Sequence saved successfully');
+        } else {
+          // Generic/event and universal templates: can update name and description
+          await emailCampaignTemplatesApi.update(template.id, {
+            name: name.trim(),
+            description: description.trim() || undefined
+          });
+          setSuccessMessage('Sequence updated successfully');
+        }
       } else if (createFromDefault) {
         // Create new sequence by cloning default GENERIC template
         const allTemplates = await emailCampaignTemplatesApi.getAll();
@@ -307,15 +335,31 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     setIsEditorOpen(true);
   };
 
-  const handleDeleteEmail = async (itemId: number) => {
-    if (!template) return;
-    if (!confirm('Delete this email? This cannot be undone.')) return;
+  const handleDeleteEmail = (item: EmailTemplateItem) => {
+    setEmailToDelete(item);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!template || !emailToDelete) return;
+
+    setIsDeleting(true);
 
     try {
-      await emailTemplateItemsApi.delete(template.id, itemId);
-      setEmailItems(emailItems.filter(item => item.id !== itemId));
+      await emailTemplateItemsApi.delete(template.id, emailToDelete.id);
+      setEmailItems(emailItems.filter(item => item.id !== emailToDelete.id));
+
+      // Clear selected email if it's the one being deleted
+      if (selectedEmail?.id === emailToDelete.id) {
+        setSelectedEmail(null);
+      }
+
+      setDeleteModalOpen(false);
+      setEmailToDelete(null);
     } catch (err: any) {
       setError(err.message || 'Failed to delete email');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -369,7 +413,27 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
 
   const isSystemDefault = template?.organization_id === null && template?.is_default;
+  const isCategoryTemplate = template?.template_type === 'category' && !template?.is_universal;
   const canEdit = !isSystemDefault;
+  const canEditNameAndDescription = canEdit && !isCategoryTemplate;
+
+  // Group emails by category for sidebar
+  const groupedEmails = emailItems.reduce((groups, item) => {
+    const category = item.category || 'uncategorized';
+    if (!groups[category]) groups[category] = [];
+    groups[category].push(item);
+    return groups;
+  }, {} as Record<string, EmailTemplateItem[]>);
+
+  // Category labels
+  const categoryLabels: Record<string, string> = {
+    event_announcements: 'Event Announcements',
+    application_updates: 'Application Updates',
+    payment_reminders: 'Payment Reminders',
+    event_countdown: 'Event Countdown',
+    event_updates: 'Event Updates',
+    uncategorized: 'Other',
+  };
 
   // If editor is open (create or edit mode), show full-screen editor
   if (isEditorOpen) {
@@ -407,6 +471,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               <p className="text-white/60 text-xs mt-0.5">
                 {isSystemDefault
                   ? 'System sequences are read-only. Clone to customize.'
+                  : isCategoryTemplate
+                  ? 'Customize email content for this vendor category'
                   : 'Create a reusable email sequence'}
               </p>
             </div>
@@ -414,15 +480,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               <button
                 onClick={() => handleOpenCreateEditor()}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all flex items-center gap-2"
+                title="Add a custom reminder email (days before/after)"
               >
                 <Plus className="w-4 h-4" />
-                New Email
+                Add Reminder
               </button>
             )}
             {canEdit && (
               <button
                 onClick={handleSave}
-                disabled={isSaving || !name.trim() || (createFromDefault && !hasChanges)}
+                disabled={isSaving || (!isCategoryTemplate && !name.trim()) || (createFromDefault && !hasChanges)}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 title={createFromDefault && !hasChanges ? 'Make at least one change to save' : ''}
               >
@@ -441,14 +508,13 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             )}
           </div>
 
-          {/* System Sequence Warning */}
+          {/* System Sequence Info */}
           {isSystemDefault && (
-            <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
+            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="text-yellow-400 text-sm font-medium">Read-Only Sequence</p>
-                <p className="text-yellow-400/80 text-xs mt-0.5">
-                  This is a system sequence and cannot be edited. Use the "Clone" button to create a customizable copy.
+                <p className="text-blue-400 text-xs">
+                  This is a read-only system sequence. Clone it from the Email Sequences page to create a customizable copy.
                 </p>
               </div>
             </div>
@@ -495,87 +561,84 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
         {/* Form */}
         {!isLoading && (
-          <div className="space-y-4">
-            {/* Sequence Details */}
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <h2 className="text-base font-semibold text-white mb-3">Sequence Details</h2>
-
-              <div className="space-y-3">
-                {/* Name */}
-                <div>
-                  <label htmlFor="template-name" className="block text-xs font-medium text-white/60 mb-1">
-                    Sequence Name *
-                  </label>
-                  <input
-                    id="template-name"
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g., Summer Festival Campaign"
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50"
-                    disabled={!canEdit}
-                    maxLength={100}
-                  />
+          <div className="space-y-3">
+            {/* Sequence Details - Compact */}
+            <div className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-white/10 bg-white/[0.02]'}`}>
+              {isCategoryTemplate ? (
+                // Information card for category templates
+                <div className="space-y-1.5">
+                  <div>
+                    <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wide">Category</span>
+                    <p className="text-base font-semibold text-white">{name}</p>
+                  </div>
+                  {description && (
+                    <div>
+                      <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wide">About</span>
+                      <p className="text-sm text-white/70">{description}</p>
+                    </div>
+                  )}
                 </div>
-
-                {/* Description */}
-                <div>
-                  <label htmlFor="template-description" className="block text-xs font-medium text-white/60 mb-1">
-                    Description <span className="text-white/40 font-normal">(Optional)</span>
-                  </label>
-                  <textarea
-                    id="template-description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe when to use this template..."
-                    rows={3}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none disabled:opacity-50"
-                    disabled={!canEdit}
-                    maxLength={500}
-                  />
-                  <p className="mt-1 text-xs text-white/40">
-                    {description.length}/500 characters
-                  </p>
+              ) : isSystemDefault ? (
+                // Information card for system default templates
+                <div className="space-y-1.5">
+                  <div>
+                    <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wide">Sequence Name</span>
+                    <p className="text-base font-semibold text-white">{name}</p>
+                  </div>
+                  {description && (
+                    <div>
+                      <span className="text-[10px] font-semibold text-white/40 uppercase tracking-wide">Description</span>
+                      <p className="text-sm text-white/70">{description}</p>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
+              ) : (
+                // Editable fields for generic/event and universal templates
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Name */}
+                  <div>
+                    <label htmlFor="template-name" className="block text-[10px] font-medium text-white/50 uppercase tracking-wide mb-1">
+                      Sequence Name *
+                    </label>
+                    <input
+                      id="template-name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g., Summer Festival Campaign"
+                      className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50"
+                      disabled={!canEdit}
+                      maxLength={100}
+                    />
+                  </div>
 
-            {/* Email Items */}
-            <div className="p-4 rounded-lg border border-white/10 bg-white/5">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-base font-semibold text-white">
-                  Email Sequence ({emailItems.length})
-                </h2>
-              </div>
-
-              {/* Email Type Legend */}
-              {emailItems.length > 0 && (
-                <div className="mb-4 p-3 rounded-lg bg-white/[0.02] border border-white/10">
-                  <div className="flex items-center gap-3 text-xs flex-wrap">
-                    <span className="text-white/50 font-medium">Email Types:</span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
-                      Event Announcement
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
-                      Application
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
-                      Payment
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
-                      Event Countdown
-                    </span>
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                      Event Update
-                    </span>
+                  {/* Description */}
+                  <div>
+                    <label htmlFor="template-description" className="block text-[10px] font-medium text-white/50 uppercase tracking-wide mb-1">
+                      Description <span className="text-white/40 font-normal">(Optional)</span>
+                    </label>
+                    <input
+                      id="template-description"
+                      type="text"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Describe when to use this template..."
+                      className="w-full px-2 py-1.5 bg-white/5 border border-white/10 rounded text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50"
+                      disabled={!canEdit}
+                      maxLength={500}
+                    />
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Email Sequence - Main View */}
+            <div>
 
               {emailItems.length === 0 ? (
-                <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
-                  <Mail className="w-8 h-8 text-white/40 mx-auto mb-2" />
-                  <p className="text-white/60 text-sm mb-3">No emails in this template</p>
+                <div className="text-center py-12 border-2 border-dashed border-white/10 rounded-lg">
+                  <Mail className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                  <p className="text-white/60 text-sm mb-4">No emails in this sequence yet</p>
                   {canEdit && (
                     <button
                       onClick={() => handleOpenCreateEditor()}
@@ -587,83 +650,405 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   )}
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {Object.entries(
-                    emailItems.reduce((groups, item) => {
-                      const cat = item.category || 'uncategorized';
-                      if (!groups[cat]) groups[cat] = [];
-                      groups[cat].push(item);
-                      return groups;
-                    }, {} as Record<string, EmailTemplateItem[]>)
-                  ).map(([category, items]) => {
-                    const categoryLabels: Record<string, string> = {
-                      event_announcements: 'Event Announcements',
-                      application_updates: 'Application Updates',
-                      payment_reminders: 'Payment Reminders',
-                      art_calls: 'Art Calls',
-                      artist_payment: 'Artist Payment',
-                      vendor_payment: 'Vendor Payment',
-                      artist_countdown: 'Artist Countdown',
-                      vendor_countdown: 'Vendor Countdown',
-                      uncategorized: 'Other',
-                    };
-                    return (
-                      <div key={category}>
-                        <div className="flex items-center gap-2 mb-1.5 px-1">
-                          <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
-                            {categoryLabels[category] || category}
-                          </h3>
-                          <span className="text-[10px] text-white/50 tabular-nums">{items.length}</span>
-                          {canEdit && (
-                            <button
-                              onClick={() => handleOpenCreateEditor(category)}
-                              className="p-1 rounded text-white/60 hover:text-purple-400 hover:bg-white/10 transition-all ml-auto"
-                              title={template ? `Add email to ${categoryLabels[category] || category}` : 'Save sequence first to add emails'}
-                            >
-                              <Plus className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                        <div className="rounded-lg border border-white/10 bg-white/[0.03] divide-y divide-white/5">
-                          {items.map((item) => (
-                            <div key={item.id} className="flex items-center gap-3 py-2.5 px-3">
-                              <Mail className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm text-white truncate mb-1">{item.name}</div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(item.trigger_type).color}`}>
-                                    {getEmailTypeInfo(item.trigger_type).label}
-                                  </span>
-                                  <span className="text-[10px] text-white/50">{item.trigger_type.replace(/_/g, ' ')}</span>
-                                  {item.trigger_value !== null && item.trigger_value > 0 && (
-                                    <span className="text-[10px] text-white/50">({item.trigger_value} days)</span>
-                                  )}
-                                </div>
-                              </div>
-                              {canEdit && (
-                                <div className="flex items-center gap-1 flex-shrink-0">
+                /* Sidebar + Preview Layout */
+                <div className="flex gap-4 h-[calc(100vh-280px)] min-h-[700px]">
+                  {/* Left Sidebar - Email Navigation */}
+                  <div className="w-80 flex-shrink-0 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03]">
+                    <div className="p-3 border-b border-white/10 sticky top-0 bg-black/40 backdrop-blur-sm z-10">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
+                          {emailItems.length} Email{emailItems.length !== 1 ? 's' : ''}
+                        </h3>
+                        {canEdit && (
+                          <button
+                            onClick={() => handleOpenCreateEditor()}
+                            className="p-1 rounded text-purple-400 hover:bg-purple-500/20 transition-all"
+                            title="Add reminder email"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Categorized Email List */}
+                    <div className="p-2 space-y-3">
+                      {Object.entries(groupedEmails).map(([category, items]) => {
+                        // Helper to check if email is a custom reminder (value-based)
+                        const isCustomReminder = (triggerType: string) => {
+                          const customReminderTriggers = [
+                            'days_before_deadline',
+                            'days_after_deadline',
+                            'days_before_payment_deadline',
+                            'days_after_payment_deadline',
+                            'days_before_event',
+                            'days_after_event'
+                          ];
+                          return customReminderTriggers.includes(triggerType);
+                        };
+
+                        return (
+                          <div key={category}>
+                            <div className="px-2 py-1">
+                              <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                                {categoryLabels[category] || category}
+                              </h4>
+                            </div>
+                            <div className="space-y-0.5">
+                              {items.map((item) => {
+                                const isReminder = isCustomReminder(item.trigger_type);
+                                return (
                                   <button
-                                    onClick={() => handleEditEmail(item)}
-                                    className="p-1.5 rounded text-white/60 hover:text-white hover:bg-white/10 transition-all"
-                                    title="Edit email"
+                                    key={item.id}
+                                    onClick={() => setSelectedEmail(item)}
+                                    className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                                      selectedEmail?.id === item.id
+                                        ? 'bg-purple-500/20 border border-purple-500/40'
+                                        : 'hover:bg-white/5 border border-transparent'
+                                    }`}
+                                  >
+                                    <div className="flex items-center justify-between gap-2 mb-1">
+                                      <div className="text-sm text-white font-medium truncate">
+                                        {item.name}
+                                      </div>
+                                      {isReminder ? (
+                                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
+                                          Custom
+                                        </span>
+                                      ) : (
+                                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
+                                          System
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div className="flex items-center gap-1.5">
+                                      <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(item.trigger_type).color}`}>
+                                        {getEmailTypeInfo(item.trigger_type).label}
+                                      </span>
+                                      {item.trigger_value !== null && item.trigger_value > 0 && (
+                                        <span className="text-[9px] text-white/50">
+                                          {item.trigger_value}d
+                                        </span>
+                                      )}
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Right Preview Pane */}
+                  <div className="flex-1 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03]">
+                    {selectedEmail ? (
+                      <div>
+                        {/* Preview Header */}
+                        <div className="p-4 border-b border-white/10 bg-black/20 sticky top-0 z-10 backdrop-blur-sm">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Mail className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                                <h3 className="text-base font-semibold text-white truncate">
+                                  {selectedEmail.name}
+                                </h3>
+                                {(() => {
+                                  const customReminderTriggers = [
+                                    'days_before_deadline',
+                                    'days_after_deadline',
+                                    'days_before_payment_deadline',
+                                    'days_after_payment_deadline',
+                                    'days_before_event',
+                                    'days_after_event'
+                                  ];
+                                  const isReminder = customReminderTriggers.includes(selectedEmail.trigger_type);
+                                  return isReminder ? (
+                                    <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
+                                      Custom Reminder
+                                    </span>
+                                  ) : (
+                                    <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
+                                      System Email
+                                    </span>
+                                  );
+                                })()}
+                              </div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(selectedEmail.trigger_type).color}`}>
+                                  {getEmailTypeInfo(selectedEmail.trigger_type).label}
+                                </span>
+                                <span className="text-xs text-white/60">
+                                  {selectedEmail.trigger_type.replace(/_/g, ' ')}
+                                </span>
+                                {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
+                                  <span className="text-xs text-white/60">
+                                    ({selectedEmail.trigger_value} days)
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            {canEdit && (() => {
+                              const customReminderTriggers = [
+                                'days_before_deadline',
+                                'days_after_deadline',
+                                'days_before_payment_deadline',
+                                'days_after_payment_deadline',
+                                'days_before_event',
+                                'days_after_event'
+                              ];
+                              const isCustomReminder = customReminderTriggers.includes(selectedEmail.trigger_type);
+
+                              return (
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() => handleEditEmail(selectedEmail)}
+                                    className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
                                   >
                                     <Edit className="w-3.5 h-3.5" />
+                                    Edit
                                   </button>
-                                  <button
-                                    onClick={() => handleDeleteEmail(item.id)}
-                                    className="p-1.5 rounded text-white/50 hover:text-red-400 hover:bg-white/10 transition-all"
-                                    title="Delete email"
-                                  >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                  </button>
+                                  {isCustomReminder && (
+                                    <button
+                                      onClick={() => handleDeleteEmail(selectedEmail)}
+                                      className="p-1.5 rounded text-white/50 hover:text-red-400 hover:bg-white/10 transition-all"
+                                      title="Delete email"
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+
+                        {/* System Email or Custom Reminder Info Banner */}
+                        {(() => {
+                          const customReminderTriggers = [
+                            'days_before_deadline',
+                            'days_after_deadline',
+                            'days_before_payment_deadline',
+                            'days_after_payment_deadline',
+                            'days_before_event',
+                            'days_after_event'
+                          ];
+                          const isSystemEmail = !customReminderTriggers.includes(selectedEmail.trigger_type);
+
+                          // Custom Reminder Info
+                          if (!isSystemEmail) {
+                            const getCustomReminderDescription = (triggerType: string) => {
+                              const descriptions: Record<string, { when: string; audience: string }> = {
+                                'days_before_deadline': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the application deadline`,
+                                  audience: 'all invited contacts who haven\'t applied yet'
+                                },
+                                'days_after_deadline': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the application deadline`,
+                                  audience: 'all invited contacts who haven\'t applied yet'
+                                },
+                                'days_before_payment_deadline': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the payment deadline`,
+                                  audience: 'approved vendors who haven\'t paid yet'
+                                },
+                                'days_after_payment_deadline': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the payment deadline`,
+                                  audience: 'approved vendors who haven\'t paid yet'
+                                },
+                                'days_before_event': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the event date`,
+                                  audience: 'all approved vendors'
+                                },
+                                'days_after_event': {
+                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the event date`,
+                                  audience: 'all approved vendors'
+                                },
+                              };
+                              return descriptions[triggerType] || { when: 'based on custom timing', audience: 'the relevant contacts' };
+                            };
+
+                            const description = getCustomReminderDescription(selectedEmail.trigger_type);
+
+                            return (
+                              <div className="mx-6 mt-4 p-4 rounded-lg bg-purple-500/10 border border-purple-500/30">
+                                <div className="flex items-start gap-3">
+                                  <Clock className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                                  <div className="flex-1">
+                                    <h4 className="text-sm font-semibold text-purple-300 mb-1">
+                                      Custom Reminder
+                                    </h4>
+                                    <p className="text-xs text-purple-200/90 leading-relaxed mb-2">
+                                      This is a custom time-based reminder. You can create multiple reminders with different timing (e.g., 3 days before, 1 day before, etc.) to send at strategic moments.
+                                    </p>
+                                    <div className="pt-2 border-t border-purple-400/20">
+                                      <p className="text-xs text-purple-200/80">
+                                        <span className="font-semibold">Sent:</span> {description.when}
+                                      </p>
+                                      <p className="text-xs text-purple-200/80 mt-1">
+                                        <span className="font-semibold">To:</span> {description.audience}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+
+                          // System Email Info
+
+                          // Get trigger-specific description
+                          const getTriggerDescription = (triggerType: string) => {
+                            const descriptions: Record<string, { when: string; audience: string }> = {
+                              // Event-wide (Generic) triggers
+                              'on_invitation_send': {
+                                when: 'immediately when a vendor/artist is invited to your event',
+                                audience: 'all newly invited contacts'
+                              },
+                              'on_bulletin_post': {
+                                when: 'immediately when you post a bulletin update',
+                                audience: 'all vendors across all categories'
+                              },
+                              'on_event_update': {
+                                when: 'immediately when you update event details',
+                                audience: 'all vendors across all categories'
+                              },
+                              'on_event_cancel': {
+                                when: 'immediately when you cancel the event',
+                                audience: 'all vendors across all categories'
+                              },
+                              // Category-specific triggers
+                              'on_application_submit': {
+                                when: 'immediately when a vendor submits their application',
+                                audience: 'the vendor who just applied'
+                              },
+                              'on_approval': {
+                                when: 'immediately when you approve a vendor\'s application',
+                                audience: 'the approved vendor'
+                              },
+                              'on_rejection': {
+                                when: 'immediately when you reject a vendor\'s application',
+                                audience: 'the rejected vendor'
+                              },
+                              'on_waitlist': {
+                                when: 'immediately when you waitlist a vendor\'s application',
+                                audience: 'the waitlisted vendor'
+                              },
+                              'on_payment_received': {
+                                when: 'immediately when a vendor\'s payment is confirmed',
+                                audience: 'the vendor who paid'
+                              },
+                              'on_payment_deadline': {
+                                when: 'on the payment deadline date',
+                                audience: 'approved vendors who haven\'t paid yet'
+                              },
+                              'on_event_date': {
+                                when: 'on the day of the event',
+                                audience: 'all approved vendors'
+                              },
+                              'on_category_change': {
+                                when: 'immediately when you move a vendor to a different category',
+                                audience: 'the vendor whose category changed'
+                              },
+                            };
+
+                            return descriptions[triggerType] || {
+                              when: 'based on the trigger type',
+                              audience: 'the relevant contacts'
+                            };
+                          };
+
+                          const description = getTriggerDescription(selectedEmail.trigger_type);
+
+                          return (
+                            <div className="mx-6 mt-4 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                              <div className="flex items-start gap-3">
+                                <Info className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                                <div className="flex-1">
+                                  <h4 className="text-sm font-semibold text-emerald-300 mb-1">
+                                    System Email
+                                  </h4>
+                                  <p className="text-xs text-emerald-200/90 leading-relaxed mb-2">
+                                    This is a system email that's automatically triggered and can only exist once per sequence. You can customize the content, but you cannot create duplicates.
+                                  </p>
+                                  <div className="pt-2 border-t border-emerald-400/20">
+                                    <p className="text-xs text-emerald-200/80">
+                                      <span className="font-semibold">Sent:</span> {description.when}
+                                    </p>
+                                    <p className="text-xs text-emerald-200/80 mt-1">
+                                      <span className="font-semibold">To:</span> {description.audience}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })()}
+
+                        {/* Email Preview Content */}
+                        <div className="p-6">
+                          {/* Subject */}
+                          <div className="mb-6">
+                            <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+                              Subject
+                            </label>
+                            <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                              <p className="text-sm text-white font-medium">
+                                {selectedEmail.subject_template || '(No subject)'}
+                              </p>
+                            </div>
+                          </div>
+
+                          {/* Body */}
+                          <div>
+                            <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+                              Email Body
+                            </label>
+                            <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                              <div
+                                className="prose prose-sm prose-invert max-w-none"
+                                dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-white/40">(No content)</p>' }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Trigger Details */}
+                          <div className="mt-6 pt-6 border-t border-white/10">
+                            <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-3">
+                              Trigger Settings
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                                <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Type</div>
+                                <div className="text-sm text-white">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
+                              </div>
+                              {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
+                                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                                  <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Days</div>
+                                  <div className="text-sm text-white">{selectedEmail.trigger_value}</div>
+                                </div>
+                              )}
+                              {selectedEmail.trigger_time && (
+                                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
+                                  <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Time</div>
+                                  <div className="text-sm text-white">
+                                    {selectedEmail.trigger_time.substring(11, 16)}
+                                  </div>
                                 </div>
                               )}
                             </div>
-                          ))}
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
+                    ) : (
+                      <div className="h-full flex items-center justify-center p-8">
+                        <div className="text-center">
+                          <Mail className="w-12 h-12 text-white/20 mx-auto mb-3" />
+                          <p className="text-white/40 text-sm">Select an email to preview</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -679,6 +1064,81 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteModalOpen && emailToDelete && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a0f2e] to-[#0f0a1e] border border-red-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white">Delete Email?</h3>
+                <p className="text-sm text-white/60 mt-0.5">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
+              <p className="text-sm text-white/80">
+                You are about to delete:
+              </p>
+              <p className="text-base font-semibold text-white mt-2">
+                "{emailToDelete.name}"
+              </p>
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-white/50">Type:</span>
+                  <span className="text-white/80">
+                    {emailToDelete.trigger_type.replace(/_/g, ' ')}
+                  </span>
+                </div>
+                {emailToDelete.trigger_value !== null && emailToDelete.trigger_value > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-1.5">
+                    <span className="text-white/50">Timing:</span>
+                    <span className="text-white/80">{emailToDelete.trigger_value} day(s)</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setDeleteModalOpen(false);
+                  setEmailToDelete(null);
+                }}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteConfirm}
+                disabled={isDeleting}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-medium hover:from-red-500 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Email
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

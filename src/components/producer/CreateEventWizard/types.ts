@@ -48,11 +48,11 @@ export interface WizardState {
     excludedContactIds: number[]; // Contact IDs to exclude from lists
   };
 
-  // Step 4: Automatic Messages
+  // Step 4: Email Sequences
   automaticMessages: {
     messages: unknown[]; // Future email template structure
-    email_campaign_template_id?: number; // Selected email sequence template
-    use_category_templates?: boolean; // Use category-specific templates where available (new feature)
+    email_campaign_template_id?: number; // Selected event sequence template (for event-wide emails)
+    use_category_templates?: boolean; // Use category-specific templates where available
   };
 }
 

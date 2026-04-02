@@ -11,6 +11,10 @@ interface Step4AutoMessagesProps {
   onTemplateSelect?: (templateId: number | null) => void;
   useCategoryTemplates?: boolean;
   onUseCategoryTemplatesChange?: (value: boolean) => void;
+  useUniversalCategoryTemplate?: boolean;
+  onUseUniversalCategoryTemplateChange?: (value: boolean) => void;
+  universalCategoryTemplateId?: number | null;
+  onUniversalCategoryTemplateIdChange?: (templateId: number | null) => void;
   eventCategories?: Array<{ id: number; name: string; icon?: string; email_campaign_template_id?: number }>; // Categories from Step 2 applications
   eventDate?: string;
   applicationDeadline?: string;
@@ -110,6 +114,10 @@ export default function Step4AutoMessages({
   onTemplateSelect,
   useCategoryTemplates = false,
   onUseCategoryTemplatesChange,
+  useUniversalCategoryTemplate = false,
+  onUseUniversalCategoryTemplateChange,
+  universalCategoryTemplateId = null,
+  onUniversalCategoryTemplateIdChange,
   eventCategories = [],
   eventDate,
   applicationDeadline,
@@ -120,6 +128,7 @@ export default function Step4AutoMessages({
   const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [allTemplates, setAllTemplates] = useState<EmailCampaignTemplate[]>([]);
+  const [universalTemplate, setUniversalTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -145,6 +154,16 @@ export default function Step4AutoMessages({
       setLoading(true);
       const templates = await emailCampaignTemplatesApi.getAll();
       setAllTemplates(templates);
+
+      // Find and set universal template
+      const universal = templates.find((t) => t.template_type === 'category' && t.is_universal === true);
+      if (universal) {
+        setUniversalTemplate(universal);
+        // Initialize universal template ID in parent if not set
+        if (onUniversalCategoryTemplateIdChange && !universalCategoryTemplateId) {
+          onUniversalCategoryTemplateIdChange(universal.id);
+        }
+      }
 
       const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'generic');
       if (defaultTemplate) {
@@ -201,16 +220,16 @@ export default function Step4AutoMessages({
           </div>
 
           <h2 className="text-2xl lg:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400 mb-3">
-            Automatic Messages
+            Email Sequences
           </h2>
 
           <p className="text-white/60 text-base max-w-2xl leading-relaxed mb-6">
-            Review and select automated email sequence for your event
+            Select an Event Sequence for event-wide emails (invitations, updates, cancellations), then choose between Category-Specific or Universal sequences for vendor emails.
           </p>
 
-          {/* Email Sequence Selector */}
+          {/* Event Sequence Selector */}
           <div className="flex items-center gap-3">
-            <p className="text-xs text-white/50 flex-shrink-0">Email Sequence</p>
+            <p className="text-xs text-white/50 flex-shrink-0">Event Sequence</p>
             <select
               value={selectedTemplate?.id || ''}
               onChange={(e) => {
@@ -233,36 +252,36 @@ export default function Step4AutoMessages({
             )}
           </div>
 
-          {/* Category Template Option - Only show if event has categories */}
-          {eventCategories.length > 0 && selectedTemplate && (
+          {/* Category Email Strategy - Only show if event has categories */}
+          {eventCategories.length > 0 && selectedTemplate && universalTemplate && (
             <div className="mt-6 p-4 rounded-lg bg-white/5 border border-white/10">
+              <h3 className="text-sm font-semibold text-white mb-3">Vendor Category Sequences</h3>
+              <p className="text-xs text-white/50 mb-4">
+                Choose between customized sequences per vendor type or a single universal sequence for all vendors
+              </p>
+
               <div className="space-y-3">
-                <div className="flex items-start gap-3">
+                {/* Option 1: Category-Specific */}
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer transition-all">
                   <input
-                    type="checkbox"
-                    id="use-category-templates"
-                    checked={useCategoryTemplates}
-                    onChange={(e) => onUseCategoryTemplatesChange?.(e.target.checked)}
-                    className="mt-1 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                    type="radio"
+                    name="category-strategy"
+                    checked={!useUniversalCategoryTemplate}
+                    onChange={() => {
+                      onUseUniversalCategoryTemplateChange?.(false);
+                      onUseCategoryTemplatesChange?.(true);
+                    }}
+                    className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
                   />
                   <div className="flex-1">
-                    <label htmlFor="use-category-templates" className="text-sm font-medium text-white cursor-pointer">
-                      Use category-specific email sequences where available
-                    </label>
+                    <div className="text-sm font-medium text-white">
+                      Category-Specific Sequences
+                    </div>
                     <p className="text-xs text-white/50 mt-1">
-                      {categoryTemplatesAvailable.filter(c => c.hasTemplate).length > 0 ? (
-                        <>
-                          Use customized email sequences for specific categories. Categories without templates will use "{selectedTemplate.name}".
-                        </>
-                      ) : (
-                        <>
-                          No category-specific templates available yet. Create them in Email Sequence Library first.
-                        </>
-                      )}
+                      Customize content per vendor type (applications, payments, countdowns personalized for each category)
                     </p>
 
-                    {/* Show which categories have templates */}
-                    {categoryTemplatesAvailable.length > 0 && (
+                    {!useUniversalCategoryTemplate && categoryTemplatesAvailable.length > 0 && (
                       <div className="mt-3 space-y-1.5">
                         {categoryTemplatesAvailable.map(({ category, hasTemplate, template }) => (
                           <div key={category.id} className="flex items-center gap-2 text-xs">
@@ -271,14 +290,59 @@ export default function Step4AutoMessages({
                               {category.icon && `${category.icon} `}{category.name}
                             </span>
                             <span className="text-white/40">
-                              {hasTemplate ? `→ "${template?.name}"` : '→ Will use default'}
+                              {hasTemplate ? `→ "${template?.name}"` : '→ Default sequence'}
                             </span>
                           </div>
                         ))}
                       </div>
                     )}
                   </div>
-                </div>
+                </label>
+
+                {/* Option 2: Universal */}
+                <label className="flex items-start gap-3 p-3 rounded-lg border border-white/10 hover:bg-white/5 cursor-pointer transition-all">
+                  <input
+                    type="radio"
+                    name="category-strategy"
+                    checked={useUniversalCategoryTemplate}
+                    onChange={() => {
+                      onUseUniversalCategoryTemplateChange?.(true);
+                      onUseCategoryTemplatesChange?.(false);
+                    }}
+                    className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">Universal Sequence</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-purple-300">
+                        SIMPLER
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/50 mt-1">
+                      Same content for all vendors. Simplifies management when content doesn't need to vary by vendor type.
+                    </p>
+
+                    {useUniversalCategoryTemplate && (
+                      <div className="mt-3 p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <div className="text-xs font-medium text-purple-300 mb-2">
+                          All categories will use: {universalTemplate.name}
+                        </div>
+                        <div className="space-y-1">
+                          {eventCategories.map(category => (
+                            <div key={category.id} className="flex items-center gap-2 text-xs text-white/70">
+                              <span>{category.icon && `${category.icon} `}{category.name}</span>
+                              <span className="text-purple-400">→</span>
+                              <span className="text-purple-300">{universalTemplate.name}</span>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="text-[10px] text-purple-300/70 mt-2">
+                          {universalTemplate.email_count || 0} emails × {eventCategories.length} categories = {(universalTemplate.email_count || 0) * eventCategories.length} total (same content)
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </label>
               </div>
             </div>
           )}
@@ -373,7 +437,7 @@ export default function Step4AutoMessages({
 
       {/* Admin Debug Panel */}
       <DebugPanel
-        title="Step 4: Auto Messages"
+        title="Step 4: Email Sequences"
         data={{
           selectedTemplateId,
           selectedTemplate,

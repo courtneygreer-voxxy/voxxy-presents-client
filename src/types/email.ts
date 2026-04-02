@@ -16,6 +16,7 @@ export interface EmailCampaignTemplate {
   name: string;
   description: string | null;
   is_default: boolean;
+  is_universal: boolean;
   email_count: number;
   events_count: number;
   created_at: string;
@@ -272,6 +273,7 @@ export interface CreateTemplateRequest {
   name: string;
   description?: string;
   template_type?: 'generic' | 'category';
+  is_universal?: boolean;
 }
 
 // Update template
@@ -279,6 +281,7 @@ export interface UpdateTemplateRequest {
   name?: string;
   description?: string;
   template_type?: 'generic' | 'category';
+  is_universal?: boolean;
 }
 
 // Create email in template

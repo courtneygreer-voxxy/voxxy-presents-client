@@ -659,6 +659,8 @@ export const eventsApi = {
     status?: 'draft' | 'published' | 'cancelled' | 'completed'
     email_campaign_template_id?: number
     use_category_templates?: boolean
+    use_universal_category_template?: boolean
+    universal_category_template_id?: number
   }) {
     return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',
@@ -1103,10 +1105,10 @@ export const emailCampaignTemplatesApi = {
    * Clone template
    * POST /api/v1/presents/email_campaign_templates/:id/clone
    */
-  async clone(id: number, name: string, description?: string, category_id?: number) {
+  async clone(id: number, name: string, description?: string, category_id?: number, is_universal?: boolean) {
     return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}/clone`, {
       method: 'POST',
-      body: JSON.stringify({ name, description, category_id }),
+      body: JSON.stringify({ name, description, category_id, is_universal }),
     })
   },
 

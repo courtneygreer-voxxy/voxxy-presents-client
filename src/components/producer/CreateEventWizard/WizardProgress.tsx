@@ -5,7 +5,7 @@ const STEP_LABELS = [
   'Event Details',
   'Application Details',
   'Invite List',
-  'Automatic Messages',
+  'Email Sequences',
 ];
 
 export default function WizardProgress({
