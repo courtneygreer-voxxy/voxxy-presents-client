@@ -95,24 +95,43 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch all templates and find the default one
+      // Fetch all templates and find the default GENERIC template
+      // (We have two defaults now: generic and category)
       const allTemplates = await emailCampaignTemplatesApi.getAll();
-      const defaultTemplate = allTemplates.find(t => t.is_default);
+      const defaultTemplate = allTemplates.find(t => t.is_default && t.template_type === 'generic');
 
       if (!defaultTemplate) {
-        setError('No default sequence found');
+        setError('No default event sequence found');
         setIsLoading(false);
         return;
       }
 
-      // Load the default template's emails
+      // Load the default template's emails (should only be event-wide triggers)
       const items = await emailTemplateItemsApi.getByTemplate(defaultTemplate.id);
 
+      // Generate a unique default name by checking existing templates of the same type
+      const generateUniqueName = (baseName: string, existingTemplates: EmailCampaignTemplate[], templateType: string): string => {
+        // Filter to only templates of the same type
+        const sameTypeTemplates = existingTemplates.filter(t => t.template_type === templateType);
+
+        let counter = 1;
+        let proposedName = baseName;
+
+        while (sameTypeTemplates.some(t => t.name === proposedName)) {
+          counter++;
+          proposedName = `${baseName} ${counter}`;
+        }
+
+        return proposedName;
+      };
+
+      const uniqueName = generateUniqueName('My Event Sequence', allTemplates, 'generic');
+
       // Set up for creating new sequence based on default
-      setName('My Custom Sequence');
-      setDescription('Based on default email sequence');
-      setInitialName('My Custom Sequence');
-      setInitialDescription('Based on default email sequence');
+      setName(uniqueName);
+      setDescription('Based on default event sequence');
+      setInitialName(uniqueName);
+      setInitialDescription('Based on default event sequence');
       setEmailItems(items.sort((a, b) => a.position - b.position));
       setHasChanges(false); // Start with no changes
     } catch (err: any) {
@@ -125,6 +144,25 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const handleSave = async () => {
     if (!name.trim()) {
       setError('Sequence name is required');
+      return;
+    }
+
+    // Check for duplicate name within the same template type
+    // (Event sequences and Category sequences can have the same name)
+    const allTemplates = await emailCampaignTemplatesApi.getAll();
+
+    // Determine what template type we're working with
+    const currentTemplateType = createFromDefault ? 'generic' : (template?.template_type || 'generic');
+
+    const duplicateName = allTemplates.some(t =>
+      t.name.toLowerCase() === name.trim().toLowerCase() &&
+      t.template_type === currentTemplateType && // Only check within same type
+      t.id !== template?.id
+    );
+
+    if (duplicateName) {
+      const typeLabel = currentTemplateType === 'generic' ? 'event' : 'category';
+      setError(`A ${typeLabel} sequence named "${name.trim()}" already exists. Please choose a different name.`);
       return;
     }
 
@@ -146,12 +184,12 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         });
         setSuccessMessage('Sequence updated successfully');
       } else if (createFromDefault) {
-        // Create new sequence by cloning default
+        // Create new sequence by cloning default GENERIC template
         const allTemplates = await emailCampaignTemplatesApi.getAll();
-        const defaultTemplate = allTemplates.find(t => t.is_default);
+        const defaultTemplate = allTemplates.find(t => t.is_default && t.template_type === 'generic');
 
         if (!defaultTemplate) {
-          setError('Default sequence not found');
+          setError('Default event sequence not found');
           setIsSaving(false);
           return;
         }
@@ -217,7 +255,12 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         setSuccessMessage('Sequence created successfully');
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to save sequence');
+      // Check if error has validation errors array (from ApiError)
+      if (err.errors && Array.isArray(err.errors) && err.errors.length > 0) {
+        setError(err.errors.join(', '));
+      } else {
+        setError(err.message || 'Failed to save sequence');
+      }
     } finally {
       setIsSaving(false);
     }
@@ -334,6 +377,8 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       <EmailTemplateEditorPage
         item={editingItem} // null in create mode, EmailTemplateItem in edit mode
         templateId={template?.id || 0}
+        templateType={template?.template_type || 'generic'}
+        existingItems={emailItems} // Pass all existing items for duplicate validation
         nextPosition={emailItems.length + 1}
         onBack={handleCloseEditor}
         onSave={isCreateMode ? undefined : handleSaveEmail}

@@ -95,16 +95,18 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   const handleCloneConfirm = async () => {
     if (!cloneTemplate || !cloneName.trim()) return;
 
-    // Client-side validation: Check for duplicate names
+    // Client-side validation: Check for duplicate names within the same template type
     const trimmedName = cloneName.trim();
     const nameExists = templates.some(
-      t => t.name.toLowerCase() === trimmedName.toLowerCase()
+      t => t.name.toLowerCase() === trimmedName.toLowerCase() &&
+           t.template_type === cloneTemplate.template_type // Only check within same type
     );
 
     if (nameExists) {
-      setCloneError(`A sequence named "${trimmedName}" already exists. Please choose a different name.`);
+      const typeLabel = cloneTemplate.template_type === 'generic' ? 'event' : 'category';
+      setCloneError(`A ${typeLabel} sequence named "${trimmedName}" already exists. Please choose a different name.`);
       toast.error('Duplicate sequence name', {
-        description: `A sequence named "${trimmedName}" already exists. Please choose a different name.`,
+        description: `A ${typeLabel} sequence named "${trimmedName}" already exists. Please choose a different name.`,
         duration: 5000,
       });
       return;

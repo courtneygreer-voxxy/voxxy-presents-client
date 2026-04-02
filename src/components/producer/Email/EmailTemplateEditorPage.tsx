@@ -43,6 +43,8 @@ import { RichTextEditor } from './RichTextEditor';
 interface EmailTemplateEditorPageProps {
   item: EmailTemplateItem | null;
   templateId: number;
+  templateType: 'generic' | 'category'; // Template type to filter available triggers
+  existingItems?: EmailTemplateItem[]; // All existing emails in the sequence for validation
   nextPosition?: number; // Position for new email (create mode)
   onBack: () => void;
   onSave?: (item: EmailTemplateItem) => Promise<void>; // Edit mode
@@ -61,24 +63,25 @@ interface EmailTemplateEditorPageProps {
 }
 
 const TRIGGER_TYPES = [
-  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, emailType: 'event_announcements' },
-  { value: 'on_application_submit', label: 'On Application Submit', requiresValue: false, emailType: 'application_updates' },
-  { value: 'on_approval', label: 'On Approval', requiresValue: false, emailType: 'application_updates' },
-  { value: 'on_waitlist', label: 'On Waitlist', requiresValue: false, emailType: 'application_updates' },
-  { value: 'on_rejection', label: 'On Rejection', requiresValue: false, emailType: 'application_updates' },
-  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, emailType: 'application_updates' },
-  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, emailType: 'payment_reminders' },
-  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, emailType: 'payment_reminders' },
-  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, emailType: 'payment_reminders' },
-  { value: 'on_payment_received', label: 'On Payment Received', requiresValue: false, emailType: 'payment_reminders' },
-  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, emailType: 'event_countdown' },
-  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, emailType: 'event_countdown' },
-  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, emailType: 'event_countdown' },
-  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, emailType: 'event_announcements' },
-  { value: 'on_category_change', label: 'On Category Change', requiresValue: false, emailType: 'event_updates' },
-  { value: 'on_event_update', label: 'On Event Update', requiresValue: false, emailType: 'event_updates' },
-  { value: 'on_event_cancel', label: 'On Event Cancel', requiresValue: false, emailType: 'event_updates' },
-];
+  { value: 'on_invitation_send', label: 'When Invitation Sent', requiresValue: false, emailType: 'event_announcements', templateType: 'generic' },
+  { value: 'on_bulletin_post', label: 'On Bulletin Post', requiresValue: false, emailType: 'event_announcements', templateType: 'generic' },
+  { value: 'on_event_update', label: 'On Event Update', requiresValue: false, emailType: 'event_updates', templateType: 'generic' },
+  { value: 'on_event_cancel', label: 'On Event Cancel', requiresValue: false, emailType: 'event_updates', templateType: 'generic' },
+  { value: 'on_application_submit', label: 'On Application Submit', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
+  { value: 'on_approval', label: 'On Approval', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
+  { value: 'on_waitlist', label: 'On Waitlist', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
+  { value: 'on_rejection', label: 'On Rejection', requiresValue: false, emailType: 'application_updates', templateType: 'category' },
+  { value: 'days_before_deadline', label: 'Days Before Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'category' },
+  { value: 'days_after_deadline', label: 'Days After Application Deadline', requiresValue: true, emailType: 'application_updates', templateType: 'category' },
+  { value: 'days_before_payment_deadline', label: 'Days Before Payment Due', requiresValue: true, emailType: 'payment_reminders', templateType: 'category' },
+  { value: 'on_payment_deadline', label: 'On Payment Deadline', requiresValue: false, emailType: 'payment_reminders', templateType: 'category' },
+  { value: 'days_after_payment_deadline', label: 'Days After Payment Due', requiresValue: true, emailType: 'payment_reminders', templateType: 'category' },
+  { value: 'on_payment_received', label: 'On Payment Received', requiresValue: false, emailType: 'payment_reminders', templateType: 'category' },
+  { value: 'days_before_event', label: 'Days Before Event', requiresValue: true, emailType: 'event_countdown', templateType: 'category' },
+  { value: 'on_event_date', label: 'On Event Date', requiresValue: false, emailType: 'event_countdown', templateType: 'category' },
+  { value: 'days_after_event', label: 'Days After Event', requiresValue: true, emailType: 'event_countdown', templateType: 'category' },
+  { value: 'on_category_change', label: 'On Category Change', requiresValue: false, emailType: 'event_updates', templateType: 'category' },
+] as const;
 
 const EMAIL_TYPE_LABELS: Record<string, string> = {
   event_announcements: 'Event Announcements',
@@ -91,6 +94,8 @@ const EMAIL_TYPE_LABELS: Record<string, string> = {
 export function EmailTemplateEditorPage({
   item,
   templateId,
+  templateType,
+  existingItems = [],
   nextPosition = 1,
   onBack,
   onSave,
@@ -98,8 +103,12 @@ export function EmailTemplateEditorPage({
 }: EmailTemplateEditorPageProps) {
   const isCreateMode = item === null;
   const [isSaving, setIsSaving] = useState(false);
+
+  // Filter trigger types based on template type
+  const availableTriggerTypes = TRIGGER_TYPES.filter(trigger => trigger.templateType === templateType);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [duplicateTriggerWarning, setDuplicateTriggerWarning] = useState<string | null>(null);
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
@@ -143,15 +152,18 @@ export function EmailTemplateEditorPage({
 
       setEmailFooter(footer);
     } else {
-      // Create mode: Set defaults
+      // Create mode: Set defaults based on template type
+      const defaultTrigger = templateType === 'generic' ? 'on_invitation_send' : 'on_application_submit';
+      const defaultCategory = templateType === 'generic' ? 'event_announcements' : 'application_updates';
+
       setFormData({
         name: '',
         description: '',
-        category: 'event_announcements',
+        category: defaultCategory,
         subject_template: '',
         body_template: '<p>Hi [firstName],</p><p></p><p>Best regards,</p><p>[organizationName]</p>',
-        trigger_type: 'days_before_event',
-        trigger_value: 7,
+        trigger_type: defaultTrigger,
+        trigger_value: 0,
         trigger_time: '09:00:00',
         filter_criteria: {},
       });
@@ -163,7 +175,26 @@ export function EmailTemplateEditorPage({
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === formData.trigger_type);
 
-  // Auto-update email type when trigger changes
+  // Check if the selected trigger already exists in the sequence
+  const checkDuplicateTrigger = (triggerType: string): string | null => {
+    const triggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
+
+    // Only check for duplicates if this trigger doesn't require a value
+    // (value-based triggers like "days_before_event" can have multiples with different values)
+    if (!triggerConfig?.requiresValue) {
+      const duplicate = existingItems.find(
+        existingItem => existingItem.trigger_type === triggerType && existingItem.id !== item?.id
+      );
+
+      if (duplicate) {
+        return `This trigger type already exists in the sequence: "${duplicate.name}". Each event-based trigger can only be used once per sequence.`;
+      }
+    }
+
+    return null;
+  };
+
+  // Auto-update email type when trigger changes and check for duplicates
   useEffect(() => {
     if (selectedTriggerConfig) {
       setFormData(prev => ({
@@ -171,6 +202,10 @@ export function EmailTemplateEditorPage({
         category: selectedTriggerConfig.emailType
       }));
     }
+
+    // Check for duplicate triggers and show warning
+    const duplicateError = checkDuplicateTrigger(formData.trigger_type);
+    setDuplicateTriggerWarning(duplicateError);
   }, [formData.trigger_type]);
 
   // Strip HTML tags for validation
@@ -232,6 +267,13 @@ export function EmailTemplateEditorPage({
 
     if (validationErrors.length > 0) {
       setSaveError('Please fix validation errors before saving');
+      return;
+    }
+
+    // Check for duplicate triggers
+    const duplicateError = checkDuplicateTrigger(formData.trigger_type);
+    if (duplicateError) {
+      setSaveError(duplicateError);
       return;
     }
 
@@ -328,7 +370,7 @@ export function EmailTemplateEditorPage({
               </button>
               <Button
                 onClick={handleSave}
-                disabled={isSaving || validationErrors.length > 0}
+                disabled={isSaving || validationErrors.length > 0 || !!duplicateTriggerWarning}
                 className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500"
               >
                 {isSaving && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
@@ -489,17 +531,23 @@ export function EmailTemplateEditorPage({
                       value={formData.trigger_type}
                       onValueChange={(value) => setFormData(prev => ({ ...prev, trigger_type: value }))}
                     >
-                      <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8">
+                      <SelectTrigger className={`bg-white/5 text-white text-sm h-8 ${duplicateTriggerWarning ? 'border-red-500/50' : 'border-white/20'}`}>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                        {TRIGGER_TYPES.map(opt => (
+                        {availableTriggerTypes.map(opt => (
                           <SelectItem key={opt.value} value={opt.value} className="text-white text-sm">
                             {opt.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
+                    {duplicateTriggerWarning && (
+                      <div className="mt-1.5 flex items-start gap-1.5">
+                        <AlertCircle className="w-3 h-3 text-red-400 flex-shrink-0 mt-0.5" />
+                        <p className="text-[9px] text-red-400 leading-tight">{duplicateTriggerWarning}</p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Email Type (Auto-determined, Read-only) */}
