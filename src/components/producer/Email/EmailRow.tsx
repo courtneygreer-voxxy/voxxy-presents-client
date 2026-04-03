@@ -225,7 +225,7 @@ export default function EmailRow({
   };
 
   return (
-    <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
+    <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
         {email.overdue && email.overdue_message && (
@@ -340,23 +340,6 @@ export default function EmailRow({
           title={email.status === 'sent' && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
         >
           {undeliveredCount}
-        </button>
-      </div>
-
-      {/* Unsubscribed Count */}
-      <div className="text-center text-white/60">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (email.status === 'sent' && onViewAuditLog && unsubscribedCount > 0) {
-              onViewAuditLog({ email_name: email.name, status: 'unsubscribed' });
-            }
-          }}
-          disabled={email.status !== 'sent' || !onViewAuditLog || unsubscribedCount === 0}
-          className={`${unsubscribedCount > 0 ? 'text-yellow-400 font-medium' : ''} ${email.status === 'sent' && onViewAuditLog && unsubscribedCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-yellow-300 transition-colors' : ''}`}
-          title={email.status === 'sent' && unsubscribedCount > 0 ? "Click to view unsubscribed emails in audit log" : undefined}
-        >
-          {unsubscribedCount}
         </button>
       </div>
 
@@ -476,7 +459,7 @@ export default function EmailRow({
 
       {/* Error message row (spans full width) */}
       {isFailed && email.error_message && (
-        <div className="col-span-10 -mt-1 mb-1 px-3 py-2 rounded bg-red-500/10 border border-red-500/20">
+        <div className="col-span-9 -mt-1 mb-1 px-3 py-2 rounded bg-red-500/10 border border-red-500/20">
           <p className="text-red-400 text-xs">{email.error_message}</p>
         </div>
       )}

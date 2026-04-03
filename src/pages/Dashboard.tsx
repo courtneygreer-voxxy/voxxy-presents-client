@@ -358,7 +358,7 @@ export default function ProducerDashboard() {
       }
 
       // Step 1: Create the event with all event fields including new ones
-      const newEvent = await eventsApi.create(organization.slug, {
+      const eventPayload = {
         title: wizardState.eventDetails.title,
         description: wizardState.eventDetails.description || undefined,
         event_date: wizardState.eventDetails.event_date,
@@ -373,9 +373,19 @@ export default function ProducerDashboard() {
         payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
         email_campaign_template_id: templateId || undefined,
         use_category_templates: wizardState.automaticMessages.use_category_templates || false,
-        status: 'draft',
+        use_universal_category_template: wizardState.automaticMessages.use_universal_category_template || false,
+        universal_category_template_id: wizardState.automaticMessages.universal_category_template_id || undefined,
+        status: 'draft' as const,
         published: false,
+      };
+
+      console.log('🔍 Event Creation Payload:', {
+        use_universal_category_template: eventPayload.use_universal_category_template,
+        universal_category_template_id: eventPayload.universal_category_template_id,
+        use_category_templates: eventPayload.use_category_templates,
       });
+
+      const newEvent = await eventsApi.create(organization.slug, eventPayload);
 
       // Step 2: Batch create vendor applications with all application fields
       if (wizardState.applicationDetails.applications.length > 0) {

@@ -52,7 +52,9 @@ export interface WizardState {
   automaticMessages: {
     messages: unknown[]; // Future email template structure
     email_campaign_template_id?: number; // Selected event sequence template (for event-wide emails)
-    use_category_templates?: boolean; // Use category-specific templates where available
+    use_category_templates?: boolean; // DEPRECATED - Use category-specific templates where available
+    use_universal_category_template?: boolean; // Use universal template for all categories (simpler option)
+    universal_category_template_id?: number | null; // Selected universal category template ID
   };
 }
 

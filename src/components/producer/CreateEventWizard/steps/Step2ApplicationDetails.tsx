@@ -56,17 +56,17 @@ export default function Step2ApplicationDetails({
   };
 
   // Handle category toggle
-  const toggleCategory = async (categoryId: number) => {
+  const toggleCategory = (categoryId: number) => {
     const isSelected = selectedCategoryIds.includes(categoryId);
     const newSelectedIds = isSelected
       ? selectedCategoryIds.filter(id => id !== categoryId)
       : [...selectedCategoryIds, categoryId];
 
-    await handleCategoryChange(newSelectedIds);
+    handleCategoryChange(newSelectedIds);
   };
 
   // Handle category selection changes
-  const handleCategoryChange = async (categoryIds: number[]) => {
+  const handleCategoryChange = (categoryIds: number[]) => {
     const newApps: ApplicationRow[] = [];
 
     // Keep existing applications for still-selected categories
@@ -75,65 +75,29 @@ export default function Step2ApplicationDetails({
       const category = categories.find(c => c.id === catId);
 
       if (existingApp) {
+        // Keep existing application data
         newApps.push(existingApp);
       } else if (category) {
-        // Try to fetch last application data for this category
-        try {
-          const lastAppData = await categoriesApi.getLastApplication(organizationId, category.id);
+        // Create new application using category defaults (no API call!)
+        const hasDefaults = category.default_booth_price && category.default_booth_price > 0;
+        const installDate = eventDetails.payment_deadline || '';
 
-          if (lastAppData) {
-            // Pre-fill with data from last application
-            // Use payment_deadline for install_date if available (since install date is typically event-specific)
-            const installDate = eventDetails.payment_deadline || '';
-
-            newApps.push({
-              id: crypto.randomUUID(),
-              category_id: category.id,
-              category_name: category.name,
-              name: lastAppData.vendor_application.name,
-              booth_price: lastAppData.vendor_application.booth_price,
-              description: lastAppData.vendor_application.description,
-              install_date: installDate,
-              install_start_time: lastAppData.vendor_application.install_start_time,
-              install_end_time: lastAppData.vendor_application.install_end_time,
-              payment_link: lastAppData.vendor_application.payment_link,
-              application_tags: lastAppData.vendor_application.application_tags,
-              prefilled_from_event: lastAppData.vendor_application.event_name,
-              prefilled_from_event_id: lastAppData.vendor_application.event_id,
-            });
-          } else {
-            // No previous application - create with empty defaults
-            newApps.push({
-              id: crypto.randomUUID(),
-              category_id: category.id,
-              category_name: category.name,
-              name: category.name,
-              booth_price: 0,
-              description: '',
-              install_date: '',
-              install_start_time: '',
-              install_end_time: '',
-              payment_link: '',
-              application_tags: [],
-            });
-          }
-        } catch (error) {
-          console.error(`Failed to fetch last application for category ${category.id}:`, error);
-          // Fall back to empty defaults if API call fails
-          newApps.push({
-            id: crypto.randomUUID(),
-            category_id: category.id,
-            category_name: category.name,
-            name: category.name,
-            booth_price: 0,
-            description: '',
-            install_date: '',
-            install_start_time: '',
-            install_end_time: '',
-            payment_link: '',
-            application_tags: [],
-          });
-        }
+        newApps.push({
+          id: crypto.randomUUID(),
+          category_id: category.id,
+          category_name: category.name,
+          name: category.name,
+          booth_price: category.default_booth_price || 0,
+          description: category.default_description || '',
+          install_date: installDate,
+          install_start_time: category.default_install_start_time || '',
+          install_end_time: category.default_install_end_time || '',
+          payment_link: category.default_payment_link || '',
+          application_tags: category.default_application_tags || [],
+          // Track where pre-filled data came from
+          prefilled_from_event: hasDefaults ? category.last_used_event_name : undefined,
+          prefilled_from_event_id: hasDefaults ? category.last_used_event_id : undefined,
+        });
       }
     }
 
@@ -162,8 +126,8 @@ export default function Step2ApplicationDetails({
       // Add to categories list
       setCategories(prev => [...prev, newCategory]);
 
-      // Auto-select the new category
-      await toggleCategory(newCategory.id);
+      // Auto-select the new category (no longer async)
+      toggleCategory(newCategory.id);
 
       // Reset form
       setNewCategoryName('');

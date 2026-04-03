@@ -2,7 +2,7 @@ import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { ScheduledEmail, AuditFilters } from '@/types/email';
 import EmailRow from './EmailRow';
 
-type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
+type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'status';
 type SortDirection = 'asc' | 'desc';
 
 interface EmailTableProps {
@@ -75,15 +75,14 @@ export default function EmailTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
+        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}
           {col('email_type', 'Email Type')}
-          {col('category', 'Category')}
+          {col('category', 'Audience')}
           {col('recipient_count', 'Recipients', 'justify-center')}
           <div className="flex items-center justify-center" title="Emails that bounced or were dropped by SendGrid">Undelivered</div>
-          <div className="flex items-center justify-center" title="Recipients who unsubscribed from emails">Unsub</div>
           <div className="flex items-center justify-center">Status</div>
           <div className="text-right">Actions</div>
         </div>

@@ -59,7 +59,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | 'all' | 'all_invitations' | 'all_vendors'>('all');
 
   // Sort state
-  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'unsubscribed_count' | 'status';
+  type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'status';
   type SortDirection = 'asc' | 'desc';
   const [sortColumn, setSortColumn] = useState<SortColumn | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -418,10 +418,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           case 'undelivered_count':
             valA = a.undelivered_count ?? 0;
             valB = b.undelivered_count ?? 0;
-            break;
-          case 'unsubscribed_count':
-            valA = a.unsubscribed_count ?? 0;
-            valB = b.unsubscribed_count ?? 0;
             break;
           case 'status':
             valA = a.status.toLowerCase();

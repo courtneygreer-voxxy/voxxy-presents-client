@@ -2733,38 +2733,7 @@ export const categoriesApi = {
       method: 'DELETE',
     });
   },
-
-  /**
-   * Get last application data for a category
-   * GET /api/v1/presents/organizations/:organization_id/categories/:id/last_application
-   */
-  async getLastApplication(organizationId: number, categoryId: number): Promise<{
-    vendor_application: {
-      id: number;
-      name: string;
-      booth_price: number;
-      description: string;
-      install_date: string;
-      install_start_time: string;
-      install_end_time: string;
-      payment_link: string;
-      application_tags: string[];
-      event_name: string;
-      event_id: number;
-    }
-  } | null> {
-    try {
-      return await fetchApi<any>(
-        `/v1/presents/organizations/${organizationId}/categories/${categoryId}/last_application`
-      );
-    } catch (error: any) {
-      // Return null if no previous application found (404)
-      if (error.message?.includes('No previous application found')) {
-        return null;
-      }
-      throw error;
-    }
-  },
+  // Note: getLastApplication removed - categories now include default values directly
 };
 
 export const eventInvitationsApi = {

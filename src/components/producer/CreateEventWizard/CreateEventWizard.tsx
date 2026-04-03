@@ -45,6 +45,9 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
     automaticMessages: {
       messages: [],
       email_campaign_template_id: undefined,
+      use_category_templates: false,
+      use_universal_category_template: false,
+      universal_category_template_id: undefined,
     },
   });
 
@@ -259,21 +262,43 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
           <Step4AutoMessages
             selectedTemplateId={wizardState.automaticMessages.email_campaign_template_id}
             onTemplateSelect={(templateId) => {
-              updateWizardState({
+              setWizardState((prev) => ({
+                ...prev,
                 automaticMessages: {
-                  ...wizardState.automaticMessages,
+                  ...prev.automaticMessages,
                   email_campaign_template_id: templateId || undefined,
                 },
-              });
+              }));
             }}
             useCategoryTemplates={wizardState.automaticMessages.use_category_templates}
             onUseCategoryTemplatesChange={(value) => {
-              updateWizardState({
+              setWizardState((prev) => ({
+                ...prev,
                 automaticMessages: {
-                  ...wizardState.automaticMessages,
+                  ...prev.automaticMessages,
                   use_category_templates: value,
                 },
-              });
+              }));
+            }}
+            useUniversalCategoryTemplate={wizardState.automaticMessages.use_universal_category_template}
+            onUseUniversalCategoryTemplateChange={(value) => {
+              setWizardState((prev) => ({
+                ...prev,
+                automaticMessages: {
+                  ...prev.automaticMessages,
+                  use_universal_category_template: value,
+                },
+              }));
+            }}
+            universalCategoryTemplateId={wizardState.automaticMessages.universal_category_template_id}
+            onUniversalCategoryTemplateIdChange={(templateId) => {
+              setWizardState((prev) => ({
+                ...prev,
+                automaticMessages: {
+                  ...prev.automaticMessages,
+                  universal_category_template_id: templateId,
+                },
+              }));
             }}
             eventCategories={
               // Extract unique categories from applications
