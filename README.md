@@ -167,19 +167,28 @@ src/
 ## 🧪 Key Features
 
 ### Event Management
-- Multi-step event creation wizard
-- Vendor application management
+- **4-step event creation wizard** with:
+  - Step 1: Event details (date, location, deadlines)
+  - Step 2: Category selection with **smart pre-fill** from previous events
+  - Step 3: Contact invitation with **immediate import** and multi-select
+  - Step 4: Email sequence configuration (Universal or Category-Specific)
+- Category-based vendor applications with customizable pricing
+- **Smart category defaults** from organization history
 - Budget tracking and line items
-- Custom vendor categories
-- Application deadline management
+- Custom vendor categories with **email template assignments**
+- Application and payment deadline management
 
 ### Email Automation
 - 40+ pre-built email templates
-- Custom email sequence builder
+- Custom email sequence builder with **visual editor**
+- **Universal Sequence** option (default) - same emails for all vendor categories
+- **Category-Specific Sequences** - custom templates per vendor type
 - Automated trigger-based scheduling
 - Variable interpolation (event, vendor, portal data)
 - SendGrid delivery tracking
 - Email preview with sample data
+- **Email template count** display per category
+- Smart send date calculations based on event dates
 
 ### Vendor Portal
 - Unique token-based access

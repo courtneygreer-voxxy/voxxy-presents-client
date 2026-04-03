@@ -46,7 +46,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       messages: [],
       email_campaign_template_id: undefined,
       use_category_templates: false,
-      use_universal_category_template: false,
+      use_universal_category_template: true,
       universal_category_template_id: undefined,
     },
   });
@@ -309,7 +309,9 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
                     .map(app => [app.category_id, {
                       id: app.category_id!,
                       name: app.category_name!,
-                      icon: undefined // Icon not available in ApplicationRow
+                      icon: app.category_icon,
+                      color: app.category_color,
+                      email_campaign_template_id: app.category_email_campaign_template_id
                     }])
                 ).values()
               )

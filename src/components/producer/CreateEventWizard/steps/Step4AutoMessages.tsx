@@ -15,7 +15,7 @@ interface Step4AutoMessagesProps {
   onUseUniversalCategoryTemplateChange?: (value: boolean) => void;
   universalCategoryTemplateId?: number | null;
   onUniversalCategoryTemplateIdChange?: (templateId: number | null) => void;
-  eventCategories?: Array<{ id: number; name: string; icon?: string; email_campaign_template_id?: number }>; // Categories from Step 2 applications
+  eventCategories?: Array<{ id: number; name: string; icon?: string; color?: string; email_campaign_template_id?: number }>; // Categories from Step 2 applications
   eventDate?: string;
   applicationDeadline?: string;
   paymentDeadline?: string;
@@ -109,6 +109,100 @@ const calculateSendDate = (
   }
 };
 
+// Event-wide trigger types that apply to all vendors (not category-specific)
+const EVENT_WIDE_TRIGGERS = [
+  'on_invitation_send',
+  'on_application_submitted',
+  'on_application_approved',
+  'on_application_rejected',
+  'on_payment_received',
+  'on_vendor_assigned_space',
+  'on_category_change'
+];
+
+// Count category-specific emails (excluding event-wide emails)
+const getCategorySpecificEmailCount = (template: EmailCampaignTemplate | null) => {
+  if (!template?.email_template_items) return 0;
+
+  return template.email_template_items.filter(item => {
+    // Exclude event announcements
+    if (item.category === 'event_announcements') return false;
+
+    // Exclude event-wide trigger types
+    if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false;
+
+    return true;
+  }).length;
+};
+
+/**
+ * Step4AutoMessages - Email sequence configuration
+ *
+ * Fourth and final step of the event creation wizard. Configures automated
+ * email sequences for both event-wide communications and vendor category emails.
+ *
+ * Features:
+ * - **Event-Wide Sequence**: Configure emails sent to ALL vendors (invitations, updates, cancellations)
+ * - **Vendor Category Emails**: Choose between two strategies:
+ *   - **Universal Sequence (DEFAULT)**: Same content for all vendor categories (simpler)
+ *   - **Category-Specific Sequences**: Custom templates per category (advanced)
+ * - **Template Preview**: View complete email sequences with send dates
+ * - **Email Count Display**: Shows accurate count per template/category
+ * - **Send Date Calculations**: Dynamic dates based on event/deadline dates
+ * - **Category Color Coding**: Visual indicators with category colors
+ *
+ * Email Template Types:
+ * 1. Event-Wide (generic template_type):
+ *    - Event invitations
+ *    - Event updates/changes
+ *    - Event cancellation
+ *    - Application deadline reminders
+ *
+ * 2. Vendor Category (category template_type):
+ *    - Application confirmation
+ *    - Approval/rejection notifications
+ *    - Payment reminders
+ *    - Event countdown emails (3 days before, 1 day before, day-of)
+ *
+ * Category Email Strategy Options:
+ * - **Universal Sequence (DEFAULT)**: All categories use same template (use_universal_category_template: true)
+ *   - Simpler management
+ *   - Consistent messaging
+ *   - Recommended for most events
+ *   - Pre-selected by default
+ *
+ * - **Category-Specific**: Each category uses assigned template (use_category_templates: true)
+ *   - Maximum customization
+ *   - Different content per vendor type
+ *   - More complex to manage
+ *
+ * Template Precedence:
+ * 1. If use_universal_category_template → Use universal_category_template_id for ALL categories
+ * 2. If use_category_templates → Use each category's email_campaign_template_id
+ * 3. Else → Fall back to event's default email_campaign_template_id
+ *
+ * Validation:
+ * - No validation required (emails are optional)
+ * - Can create event without configuring sequences
+ * - Sequences can be configured after event creation
+ *
+ * @param {Step4AutoMessagesProps} props - Email configuration props
+ * @param {number | null} props.selectedTemplateId - Currently selected event-wide template ID
+ * @param {Function} props.onTemplateSelect - Callback when event-wide template selected
+ * @param {boolean} props.useCategoryTemplates - Use per-category templates flag
+ * @param {Function} props.onUseCategoryTemplatesChange - Callback for category templates mode
+ * @param {boolean} props.useUniversalCategoryTemplate - Use universal template flag (DEFAULT)
+ * @param {Function} props.onUseUniversalCategoryTemplateChange - Callback for universal mode
+ * @param {number | null} props.universalCategoryTemplateId - Universal template ID
+ * @param {Function} props.onUniversalCategoryTemplateIdChange - Callback for universal template
+ * @param {Array} props.eventCategories - Categories from Step 2 with email template assignments
+ * @param {string} props.eventDate - Event date for send date calculations
+ * @param {string} props.applicationDeadline - Application deadline for reminder calculations
+ * @param {string} props.paymentDeadline - Payment deadline for reminder calculations
+ * @param {boolean} props.isAdmin - Whether user is admin (shows debug panel)
+ *
+ * @returns {JSX.Element} Step 4 email sequence configuration UI
+ */
 export default function Step4AutoMessages({
   selectedTemplateId = null,
   onTemplateSelect,
@@ -306,7 +400,65 @@ export default function Step4AutoMessages({
             </p>
 
             <div className="space-y-2">
-              {/* Option 1: Category-Specific */}
+              {/* Option 1: Universal (DEFAULT) */}
+              <label
+                className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
+                  useUniversalCategoryTemplate
+                    ? 'border-purple-500/50 bg-purple-500/10'
+                    : 'border-white/10 hover:bg-white/5'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="category-strategy"
+                  checked={useUniversalCategoryTemplate}
+                  onChange={() => {
+                    onUseUniversalCategoryTemplateChange?.(true);
+                    onUseCategoryTemplatesChange?.(false);
+                  }}
+                  className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-white">Universal Sequence</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-purple-300">
+                        DEFAULT
+                      </span>
+                      <span className="text-[10px] text-white/40">
+                        ({universalTemplate?.email_count || 0} emails)
+                      </span>
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleOpenSequenceList('category');
+                      }}
+                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 transition-all border border-purple-500/30"
+                    >
+                      <Eye className="w-3 h-3" />
+                      Preview
+                    </button>
+                  </div>
+                  <p className="text-xs text-white/50 mt-1">
+                    Same content for all vendors • Simplifies management when content doesn't need to vary by vendor type
+                  </p>
+
+                  {useUniversalCategoryTemplate && (
+                    <div className="mt-2 p-2 rounded bg-purple-500/10 border border-purple-500/20">
+                      <div className="text-xs text-purple-300 mb-1.5">
+                        {universalTemplate.name}
+                      </div>
+                      <div className="text-[10px] text-purple-200/70">
+                        {universalTemplate?.email_count || 0} emails • Shared by all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </label>
+
+              {/* Option 2: Category-Specific */}
               <label
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   !useUniversalCategoryTemplate
@@ -361,77 +513,29 @@ export default function Step4AutoMessages({
                       <div className="space-y-1">
                         {categoryTemplatesAvailable.map(({ category, hasTemplate, template }) => (
                           <div key={category.id} className="flex items-center gap-1.5 text-[11px]">
-                            <span className={`w-1.5 h-1.5 rounded-full ${hasTemplate ? 'bg-purple-400' : 'bg-white/20'}`} />
-                            <span className="text-white/70">
-                              {category.icon && `${category.icon} `}{category.name}
+                            <span
+                              className="w-1.5 h-1.5 rounded-full"
+                              style={{ backgroundColor: category.color || '#8B5CF6' }}
+                            />
+                            <span
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold text-white"
+                              style={{
+                                backgroundColor: category.color || '#8B5CF6',
+                                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+                              }}
+                            >
+                              {category.icon && <span>{category.icon}</span>}
+                              {category.name}
                             </span>
                             <span className="text-white/30">→</span>
                             <span className="text-purple-300 truncate">
                               {hasTemplate ? template?.name : 'Default'}
                             </span>
                             <span className="text-white/40">
-                              ({template?.email_count || 0})
+                              ({template?.email_count || 0} emails)
                             </span>
                           </div>
                         ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </label>
-
-              {/* Option 2: Universal */}
-              <label
-                className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
-                  useUniversalCategoryTemplate
-                    ? 'border-purple-500/50 bg-purple-500/10'
-                    : 'border-white/10 hover:bg-white/5'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="category-strategy"
-                  checked={useUniversalCategoryTemplate}
-                  onChange={() => {
-                    onUseUniversalCategoryTemplateChange?.(true);
-                    onUseCategoryTemplatesChange?.(false);
-                  }}
-                  className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
-                />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">Universal Sequence</span>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-purple-300">
-                        SIMPLER
-                      </span>
-                      <span className="text-[10px] text-white/40">
-                        ({universalTemplate?.email_count || 0} emails)
-                      </span>
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleOpenSequenceList('category');
-                      }}
-                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 transition-all border border-purple-500/30"
-                    >
-                      <Eye className="w-3 h-3" />
-                      Preview
-                    </button>
-                  </div>
-                  <p className="text-xs text-white/50 mt-1">
-                    Same content for all vendors • Simplifies management when content doesn't need to vary by vendor type
-                  </p>
-
-                  {useUniversalCategoryTemplate && (
-                    <div className="mt-2 p-2 rounded bg-purple-500/10 border border-purple-500/20">
-                      <div className="text-xs text-purple-300 mb-1.5">
-                        {universalTemplate.name}
-                      </div>
-                      <div className="text-[10px] text-purple-200/70">
-                        {universalTemplate.email_count || 0} emails • Shared by all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'}
                       </div>
                     </div>
                   )}
@@ -487,7 +591,7 @@ export default function Step4AutoMessages({
                     ({sequenceListType === 'event'
                       ? emailItems.length
                       : useUniversalCategoryTemplate
-                        ? universalTemplate?.email_count || 0
+                        ? (universalTemplate?.email_count || 0)
                         : (universalTemplate?.email_count || 0) * eventCategories.length} emails)
                   </span>
                 </div>

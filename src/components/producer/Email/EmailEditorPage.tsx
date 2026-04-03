@@ -115,6 +115,16 @@ const BLAST_TRIGGER_TYPES = new Set([
   'on_event_update',
 ]);
 
+// Value-based triggers: custom countdown emails that users CAN create (vs system emails they cannot)
+const VALUE_BASED_TRIGGERS = [
+  'days_before_event',
+  'days_after_event',
+  'days_before_deadline',
+  'days_after_deadline',
+  'days_before_payment_deadline',
+  'days_after_payment_deadline',
+];
+
 export function EmailEditorPage({
   email: initialEmail,
   eventData,
@@ -197,8 +207,15 @@ export function EmailEditorPage({
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
 
-  // Filter trigger types based on which date fields exist on the event
+  // Filter trigger types based on mode and available event date fields
   const availableTriggerTypes = TRIGGER_TYPES.filter((type) => {
+    // In CREATE mode: only show custom countdown triggers (value-based)
+    // System emails (event-based triggers) should NOT be creatable by users
+    if (mode === 'create' && !VALUE_BASED_TRIGGERS.includes(type.value)) {
+      return false;
+    }
+
+    // Filter by required date fields (ensure event has the needed dates)
     if (!type.requiredDateField) return true; // Always available
     if (!eventData) return true; // No event data, show all (can't filter)
 
@@ -993,8 +1010,9 @@ export function EmailEditorPage({
                   <Select
                     value={triggerType}
                     onValueChange={(value) => setValue('trigger_type', value)}
+                    disabled={mode === 'edit'}
                   >
-                    <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8">
+                    <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8 disabled:opacity-50 disabled:cursor-not-allowed">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
@@ -1008,6 +1026,11 @@ export function EmailEditorPage({
                       ))}
                     </SelectContent>
                   </Select>
+                  {mode === 'edit' && (
+                    <p className="text-[9px] text-white/40 mt-1">
+                      Trigger type cannot be changed after creation
+                    </p>
+                  )}
                 </div>
 
                 {/* Email Type (Auto-determined, Read-only) */}
@@ -1031,11 +1054,14 @@ export function EmailEditorPage({
                     <Input
                       type="number"
                       {...register('trigger_value', { valueAsNumber: true })}
-                      className="bg-white/5 border-white/20 text-white text-sm h-8"
+                      className="bg-white/5 border-white/20 text-white text-sm h-8 disabled:opacity-50 disabled:cursor-not-allowed"
                       min={0}
                       placeholder="e.g., 1"
+                      disabled={mode === 'edit'}
                     />
-                    <p className="text-[10px] text-white/50 mt-1.5">Sends at 8:00 AM Eastern</p>
+                    <p className="text-[10px] text-white/50 mt-1.5">
+                      {mode === 'edit' ? 'Trigger timing cannot be changed after creation' : 'Sends at 8:00 AM Eastern'}
+                    </p>
                   </div>
                 )}
 

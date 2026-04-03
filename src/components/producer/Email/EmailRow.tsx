@@ -439,13 +439,14 @@ export default function EmailRow({
                       Retry Failed
                     </button>
                   )}
-                  {!isSent && onDelete && (
+                  {!isSent && !isSystemEmail && onDelete && (
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleAction(() => onDelete(email.id));
                       }}
                       className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors border-t border-white/10"
+                      title="Delete custom email"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                       Delete

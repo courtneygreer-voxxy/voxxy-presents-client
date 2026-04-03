@@ -561,8 +561,15 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                       <Tag className="w-3.5 h-3.5 text-white/60 flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm text-white font-medium">
-                            {category.icon && `${category.icon} `}{category.name}
+                          <span
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold text-white"
+                            style={{
+                              backgroundColor: category.color || '#8B5CF6',
+                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+                            }}
+                          >
+                            {category.icon && <span>{category.icon}</span>}
+                            {category.name}
                           </span>
                         </div>
                         {categoryTemplate ? (

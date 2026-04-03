@@ -8,6 +8,36 @@ import { isDevOrStaging } from '@/config/environments';
 import { useAuth } from '@/contexts/AuthContext';
 import { DebugPanel } from '../../DebugPanel';
 
+/**
+ * Step1EventDetails - Event information and deadlines configuration
+ *
+ * First step of the event creation wizard. Collects basic event information
+ * including dates, location, and important deadlines.
+ *
+ * Features:
+ * - Event name, description, and dates
+ * - Google Places venue autocomplete
+ * - Location autocomplete (auto-fills from venue)
+ * - Optional fields: start/end times, age restriction, ticket link
+ * - Application and payment deadline configuration
+ * - Dev mode prefill for testing
+ *
+ * Validation Rules:
+ * - Event name required (min 3 characters)
+ * - Event date required (must be in future)
+ * - Location required
+ * - Application deadline required (must be before event date)
+ * - End date must be on or after start date (if provided)
+ *
+ * @param {WizardStepProps} props - Wizard state and update functions
+ * @param {WizardState} props.wizardState - Current wizard state
+ * @param {Function} props.updateWizardState - Function to update wizard state
+ * @param {Record<string, string>} props.errors - Validation errors
+ * @param {Function} props.setErrors - Function to set validation errors
+ * @param {boolean} props.isAdmin - Whether user is admin (shows debug panel)
+ *
+ * @returns {JSX.Element} Step 1 form with event details inputs
+ */
 export default function Step1EventDetails({
   wizardState,
   updateWizardState,

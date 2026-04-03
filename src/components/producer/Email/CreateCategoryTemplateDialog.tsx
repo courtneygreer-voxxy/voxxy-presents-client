@@ -88,7 +88,17 @@ export function CreateCategoryTemplateDialog({
         <DialogHeader>
           <DialogTitle className="text-white text-xl flex items-center gap-2">
             <Tag className="w-5 h-5 text-purple-400" />
-            Create Template for {category.icon && `${category.icon} `}{category.name}
+            Create Template for{' '}
+            <span
+              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold text-white"
+              style={{
+                backgroundColor: category.color || '#8B5CF6',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+              }}
+            >
+              {category.icon && <span>{category.icon}</span>}
+              {category.name}
+            </span>
           </DialogTitle>
           <p className="text-white/60 text-sm mt-2">
             Clone an existing template and customize it for this vendor category
@@ -168,8 +178,19 @@ export function CreateCategoryTemplateDialog({
 
           {/* Info Box */}
           <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs text-blue-400 mb-2">
-              The template will be cloned and automatically named "<strong>{category.name}</strong>".
+            <p className="text-xs text-blue-400 mb-2 flex items-center gap-1.5 flex-wrap">
+              The template will be cloned and automatically named "
+              <span
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold text-white"
+                style={{
+                  backgroundColor: category.color || '#8B5CF6',
+                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+                }}
+              >
+                {category.icon && <span className="text-[10px]">{category.icon}</span>}
+                {category.name}
+              </span>
+              ".
             </p>
             <p className="text-xs text-blue-300/80">
               <strong>Note:</strong> Event-wide emails (announcements, invitations, bulletins) will be excluded from this category template, as they are sent to all vendors regardless of category.

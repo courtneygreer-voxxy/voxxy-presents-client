@@ -158,10 +158,25 @@ The platform supports **6 roles** with different capabilities:
 
 ### 1. Event Management (Producers)
 - **4-step event creation wizard:**
-  1. Event Details (title, date, location, application deadline)
-  2. Vendor Application Setup (categories, booth pricing)
-  3. Invite Vendors from Network
-  4. Review & Create (auto-creates vendor application, sends invitations)
+  1. **Event Details** - Title, date, location, application/payment deadlines
+  2. **Application Categories** - Select vendor categories with smart pre-fill:
+     - Choose from organization's saved categories
+     - Auto-populates booth price and details from last event using that category
+     - Visual indicator shows which event data came from ("Pre-filled from [Event Name]")
+     - One-click to clear pre-filled data and start fresh
+     - Configure booth pricing, install times, payment links per category
+  3. **Invite Contacts** - Select who receives invitations:
+     - Choose "Invite All Contacts" or select specific Contact Lists
+     - Immediate import (no modal) with multi-select support
+     - Unsubscribe status warnings with visual indicators
+     - Paginated table view (50 contacts/page)
+  4. **Email Sequences** - Configure automated emails:
+     - **Event-Wide Sequence**: Invitations, updates, cancellations (sent to all vendors)
+     - **Vendor Category Emails**: Choose strategy:
+       - **Universal Sequence** (DEFAULT): Same content for all vendor types
+       - **Category-Specific Sequences**: Custom templates per category
+     - Email count preview per category
+     - Template preview with send date calculations
 - Edit/delete events
 - View vendor applications by event
 - Approve/reject/waitlist vendors via Command Center
@@ -901,30 +916,61 @@ allowed_origins = [
 **Frontend:**
 1. User clicks "Create Event" in ProducerDashboard
 2. CreateEventWizard opens (4 steps)
-3. Step 1: Enters event details (title, date, location, deadline)
-4. Step 2: Sets up vendor application (categories, booth price)
-5. Step 3: Selects vendor contacts from Network to invite
-6. Step 4: Reviews and submits
+3. **Step 1**: Enters event details (title, date, location, application/payment deadlines)
+4. **Step 2**: Selects vendor categories with smart pre-fill:
+   - Categories are fetched from organization's saved categories (NO API call for defaults)
+   - Each category includes: `default_booth_price`, `default_description`, `default_install_start_time`, `default_install_end_time`, `default_payment_link`, `default_application_tags`
+   - Category shows `last_used_event_name` and `last_used_event_id` for "Pre-filled from" indicator
+   - Categories have `email_campaign_template_id` for category-specific email sequences
+   - User can configure pricing, install times, payment links per category
+5. **Step 3**: Selects vendor contacts from Network to invite:
+   - Multi-select contact lists or "Invite All Contacts"
+   - Contacts imported immediately (no modal confirmation)
+   - Unsubscribe status checked and displayed
+6. **Step 4**: Configures email sequences:
+   - Selects event-wide email template (invitations, updates, cancellations)
+   - Chooses vendor category email strategy:
+     - **Universal Sequence** (DEFAULT): `use_universal_category_template: true`, `universal_category_template_id: N`
+     - **Category-Specific**: `use_category_templates: true` (uses each category's `email_campaign_template_id`)
+7. Submits entire wizard at once
 
 **API Calls:**
 ```typescript
-// Step 1-2: Create event
+// All steps submit together on final wizard submission:
 POST /v1/presents/organizations/:org_slug/events
 {
-  title: "Summer Market 2025",
-  event_date: "2025-06-15",
-  application_deadline: "2025-05-30",
-  vendor_application_attributes: {
-    name: "Vendor Application",
-    categories: ["Food", "Art", "Music"],
-    booth_price: 150.00
+  event: {
+    title: "Summer Market 2025",
+    event_date: "2025-06-15",
+    application_deadline: "2025-05-30",
+    payment_deadline: "2025-06-08",
+    email_campaign_template_id: 1,  // Event-wide template
+    use_universal_category_template: true,  // DEFAULT option
+    universal_category_template_id: 3,  // Universal sequence for all categories
+    // OR: use_category_templates: true  // Use each category's email_campaign_template_id
+  },
+  vendor_applications: [
+    {
+      name: "Food Vendor",
+      category_id: 1,
+      booth_price: 350.00,
+      description: "Standard 10x10 booth",
+      install_date: "2025-06-14",
+      install_start_time: "08:00",
+      install_end_time: "10:00",
+      payment_link: "https://...",
+      application_tags: ["Featured", "Premium"]
+    },
+    {
+      name: "Artist Booth",
+      category_id: 2,
+      booth_price: 200.00,
+      // ... (inherited from category defaults)
+    }
+  ],
+  event_invitations: {
+    vendor_contact_ids: [1, 2, 3, 4, 5]
   }
-}
-
-// Step 3: Send invitations
-POST /v1/presents/events/:event_slug/invitations/batch
-{
-  vendor_contact_ids: [1, 2, 3, 4, 5]
 }
 ```
 

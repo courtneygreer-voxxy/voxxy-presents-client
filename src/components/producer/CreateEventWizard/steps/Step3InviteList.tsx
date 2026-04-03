@@ -1,26 +1,78 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Upload, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2, AlertTriangle } from 'lucide-react';
+import { Users, Search, Building2, Mail, Phone, MapPin, Instagram, Edit, Trash2, AlertTriangle } from 'lucide-react';
 import { WizardStepProps } from '../types';
-import { vendorContactsApi, VendorContact } from '@/services/api';
-import ImportContactsModal from '../ImportContactsModal';
+import { vendorContactsApi, contactListsApi, VendorContact, ContactList } from '@/services/api';
 import { DebugPanel } from '../../DebugPanel';
 
 interface Step3InviteListProps extends WizardStepProps {
   organizationId: number;
 }
 
+/**
+ * Step3InviteList - Contact selection for event invitations
+ *
+ * Third step of the event creation wizard. Allows producers to select which
+ * vendor contacts will receive invitations. Features immediate import with
+ * live preview (no modal workflow).
+ *
+ * Features:
+ * - **Immediate Import**: Contacts imported automatically when lists selected
+ * - **Multi-select**: Can select multiple contact lists simultaneously
+ * - **"Invite All Contacts"**: Single option to invite entire contact database
+ * - **Live Preview**: Table view appears immediately with contact details
+ * - **Unsubscribe Filtering**: Shows which contacts won't receive emails
+ * - **Visual Indicators**: Color-coded unsubscribe status badges
+ * - **Search**: Filter contacts by name, email, or business
+ * - **Pagination**: 50 contacts per page with navigation
+ * - **Bulk Actions**: Select multiple contacts to remove
+ * - **Change Selection**: Reset and start over with different lists
+ *
+ * Selection Modes:
+ * 1. Invite All Contacts - Fetches all contacts from organization
+ * 2. Select Contact Lists - Choose one or more saved contact lists
+ * 3. Mixed mode not supported - selecting lists deselects "Invite All"
+ *
+ * Unsubscribe Status:
+ * - 🟢 Active: Contact will receive emails
+ * - 🔴 Global: Unsubscribed at global level (won't receive any emails)
+ * - 🟡 Org: Unsubscribed at organization level (won't receive emails from this org)
+ *
+ * Data Flow:
+ * 1. User selects contact lists → Immediate API fetch
+ * 2. Contacts loaded and de-duplicated by ID
+ * 3. Table view updates automatically
+ * 4. Unsubscribe warnings displayed if applicable
+ * 5. State updates with invited contact IDs
+ *
+ * Validation:
+ * - No validation required (step is optional)
+ * - Can create event without inviting anyone
+ * - Invitations can be sent later from event page
+ *
+ * @param {Step3InviteListProps} props - Wizard state and organization context
+ * @param {WizardState} props.wizardState - Current wizard state
+ * @param {Function} props.updateWizardState - Function to update wizard state
+ * @param {number} props.organizationId - Current organization ID
+ * @param {boolean} props.isAdmin - Whether user is admin (shows debug panel)
+ *
+ * @returns {JSX.Element} Step 3 contact selection UI with immediate import
+ */
 export default function Step3InviteList({
   wizardState,
   updateWizardState,
   organizationId,
   isAdmin,
 }: Step3InviteListProps) {
-  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [contacts, setContacts] = useState<VendorContact[]>([]);
+  const [lists, setLists] = useState<ContactList[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadingLists, setLoadingLists] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedContactIds, setSelectedContactIds] = useState<number[]>([]);
+  const [inviteAllSelected, setInviteAllSelected] = useState(false);
+  const [selectedListIds, setSelectedListIds] = useState<number[]>([]);
+  const [totalContactsCount, setTotalContactsCount] = useState(0);
   const perPage = 50;
 
   // Track which IDs we've already fetched to avoid redundant requests
@@ -32,6 +84,11 @@ export default function Step3InviteList({
   // Stable serialized key for the invited IDs — avoids re-running effect on ref changes
   const invitedIdsKey = JSON.stringify(invitedContactIds);
 
+  // Load contact lists on mount
+  useEffect(() => {
+    fetchLists();
+  }, [organizationId]);
+
   // Load full contact details when we have IDs (and they've actually changed)
   useEffect(() => {
     if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
@@ -41,6 +98,24 @@ export default function Step3InviteList({
       fetchedIdsRef.current = '';
     }
   }, [invitedIdsKey, organizationId]);
+
+  const fetchLists = async () => {
+    try {
+      setLoadingLists(true);
+      const [listsResponse, contactsResponse] = await Promise.all([
+        contactListsApi.getAll(organizationId),
+        vendorContactsApi.getAll(organizationId, { page: 1, per_page: 1 })
+      ]);
+      setLists(listsResponse?.contact_lists || []);
+      setTotalContactsCount(contactsResponse?.meta?.total_count || 0);
+    } catch (err) {
+      console.error('Failed to fetch lists:', err);
+      setLists([]);
+      setTotalContactsCount(0);
+    } finally {
+      setLoadingLists(false);
+    }
+  };
 
   const fetchContactDetails = useCallback(async () => {
     try {
@@ -84,13 +159,133 @@ export default function Step3InviteList({
     }
   }, [organizationId, invitedIdsKey]);
 
-  const handleImport = (contactIds: number[], source: 'all' | 'lists') => {
-    updateWizardState({
-      inviteList: {
-        ...inviteList,
-        invitedContactIds: contactIds,
-      },
-    });
+  // Import contacts immediately when selection changes
+  useEffect(() => {
+    if (invitedContactIds.length === 0) {
+      // Only auto-import if we're in selection mode (not already imported)
+      handleAutoImport();
+    }
+  }, []);
+
+  const handleAutoImport = async (inviteAll?: boolean, listIds?: number[]) => {
+    const shouldInviteAll = inviteAll ?? false;
+    const selectedLists = listIds ?? [];
+
+    if (!shouldInviteAll && selectedLists.length === 0) {
+      // Clear selection
+      updateWizardState({
+        inviteList: {
+          ...inviteList,
+          invitedContactIds: [],
+        },
+      });
+      setContacts([]);
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      let contactIds: number[] = [];
+
+      if (shouldInviteAll) {
+        // Fetch all contacts
+        const firstPage = await vendorContactsApi.getAll(organizationId, {
+          page: 1,
+          per_page: 200,
+        });
+
+        let allContacts: VendorContact[] = firstPage?.vendor_contacts || [];
+        const totalPages = firstPage?.meta?.total_pages || 1;
+
+        if (totalPages > 1) {
+          const remainingPages = Array.from(
+            { length: totalPages - 1 },
+            (_, i) => i + 2
+          );
+          const pageResults = await Promise.all(
+            remainingPages.map((page) =>
+              vendorContactsApi.getAll(organizationId, { page, per_page: 200 })
+            )
+          );
+          for (const result of pageResults) {
+            allContacts = allContacts.concat(result?.vendor_contacts || []);
+          }
+        }
+        contactIds = allContacts.map(c => c.id);
+      } else if (selectedLists.length > 0) {
+        // Fetch contacts from selected lists
+        const listContactPromises = selectedLists.map(async (listId) => {
+          let allContacts: any[] = [];
+          let currentPage = 1;
+          let hasMore = true;
+
+          while (hasMore) {
+            const response = await contactListsApi.getContacts(listId, currentPage, 100);
+            const pageContacts = response.vendor_contacts || [];
+            allContacts = [...allContacts, ...pageContacts];
+
+            const meta = response.meta;
+            if (meta && currentPage < meta.total_pages) {
+              currentPage++;
+            } else {
+              hasMore = false;
+            }
+          }
+          return allContacts;
+        });
+
+        const listContactArrays = await Promise.all(listContactPromises);
+        const allListContacts = listContactArrays.flat();
+
+        // De-duplicate by contact ID
+        const uniqueContactIds = Array.from(
+          new Set(allListContacts.map(contact => contact.id))
+        );
+
+        contactIds = uniqueContactIds;
+      }
+
+      // Update wizard state immediately
+      updateWizardState({
+        inviteList: {
+          ...inviteList,
+          invitedContactIds: contactIds,
+        },
+      });
+    } catch (err) {
+      console.error('Failed to import contacts:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleInviteAll = () => {
+    const newInviteAll = !inviteAllSelected;
+    setInviteAllSelected(newInviteAll);
+
+    if (newInviteAll) {
+      // Deselect all lists when selecting "Invite All"
+      setSelectedListIds([]);
+      handleAutoImport(true, []);
+    } else {
+      // Clear selection
+      handleAutoImport(false, []);
+    }
+  };
+
+  const handleToggleList = (listId: number) => {
+    // Deselect "Invite All" when selecting a list
+    if (inviteAllSelected) {
+      setInviteAllSelected(false);
+    }
+
+    const newSelectedLists = selectedListIds.includes(listId)
+      ? selectedListIds.filter((id) => id !== listId)
+      : [...selectedListIds, listId];
+
+    setSelectedListIds(newSelectedLists);
+    handleAutoImport(false, newSelectedLists);
   };
 
   const handleRemoveContact = (contactId: number) => {
@@ -154,39 +349,92 @@ export default function Step3InviteList({
   );
   const unsubscribedCount = unsubscribedContacts.length;
 
-  // Empty state - no contacts invited yet
+
+  // Selection UI - no contacts invited yet
   if (invitedContactIds.length === 0) {
     return (
       <div className="space-y-6">
         <div className="bg-white/5 rounded-2xl p-6 lg:p-8">
-          <div className="text-center py-16">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Upload className="w-8 h-8 text-white/40" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              No Contacts Invited Yet
-            </h3>
-            <p className="text-white/50 text-sm mb-6 max-w-md mx-auto">
-              Import contacts from your network to send invitations for this event
+          <div className="mb-6">
+            <h2 className="text-xl font-semibold text-white mb-2">Select Contacts to Invite</h2>
+            <p className="text-white/60 text-sm">
+              Choose who will receive invitations for this event
             </p>
-            <button
-              onClick={() => setIsImportModalOpen(true)}
-              className="px-6 py-3 bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-lg transition-all font-medium shadow-lg"
-            >
-              <div className="flex items-center gap-2">
-                <Upload className="w-4 h-4" />
-                Import Contacts
-              </div>
-            </button>
           </div>
-        </div>
 
-        <ImportContactsModal
-          isOpen={isImportModalOpen}
-          onClose={() => setIsImportModalOpen(false)}
-          organizationId={organizationId}
-          onImport={handleImport}
-        />
+          {loadingLists ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {/* Invite All Option */}
+              <label
+                className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                  inviteAllSelected
+                    ? 'bg-purple-500/20 border-purple-500/40'
+                    : 'bg-white/5 border-white/10 hover:bg-white/10'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={inviteAllSelected}
+                  onChange={handleToggleInviteAll}
+                  className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                />
+                <div className="flex-1 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-purple-400" />
+                  <span className="text-sm font-medium text-white">Invite All Contacts</span>
+                </div>
+                <div className="text-xs text-white/60">
+                  ({totalContactsCount})
+                </div>
+              </label>
+
+              {/* Contact Lists */}
+              {lists.map((list) => (
+                <label
+                  key={list.id}
+                  className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
+                    selectedListIds.includes(list.id)
+                      ? 'bg-purple-500/20 border-purple-500/40'
+                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selectedListIds.includes(list.id)}
+                    onChange={() => handleToggleList(list.id)}
+                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  />
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-white">{list.name}</div>
+                  </div>
+                  <div className="text-xs text-white/60">
+                    ({list.contacts_count || 0})
+                  </div>
+                </label>
+              ))}
+
+              {lists.length === 0 && (
+                <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10">
+                  <p className="text-white/50 text-sm">No contact lists available</p>
+                  <p className="text-white/40 text-xs mt-1">Create lists in your Network page</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Loading Indicator */}
+          {loading && (
+            <div className="mt-6 flex items-center justify-center py-8">
+              <div className="flex items-center gap-3">
+                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="text-white/60 text-sm">Loading contacts...</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
@@ -205,11 +453,19 @@ export default function Step3InviteList({
               </p>
             </div>
             <button
-              onClick={() => setIsImportModalOpen(true)}
+              onClick={() => {
+                updateWizardState({
+                  inviteList: {
+                    ...inviteList,
+                    invitedContactIds: [],
+                  },
+                });
+                setContacts([]);
+              }}
               className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2"
             >
-              <Upload className="w-4 h-4" />
-              Import from Network
+              <Users className="w-4 h-4" />
+              Change Selection
             </button>
           </div>
 
@@ -480,13 +736,6 @@ export default function Step3InviteList({
           )}
         </div>
       </div>
-
-      <ImportContactsModal
-        isOpen={isImportModalOpen}
-        onClose={() => setIsImportModalOpen(false)}
-        organizationId={organizationId}
-        onImport={handleImport}
-      />
 
       {/* Admin Debug Panel */}
       <DebugPanel

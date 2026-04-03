@@ -4,6 +4,9 @@ export interface ApplicationRow {
   id: string; // Temporary client-side ID (UUID)
   category_id?: number; // Category ID (linked to organization's categories)
   category_name?: string; // Category name for display
+  category_color?: string; // Category color for display
+  category_icon?: string; // Category icon for display
+  category_email_campaign_template_id?: number; // Category's email template ID
   name: string; // Application title (e.g., "Artist Booth") - kept for backward compatibility
   booth_price: number; // Price for this booth type
   description: string; // Optional description

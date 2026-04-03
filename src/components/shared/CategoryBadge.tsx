@@ -56,6 +56,7 @@ export function CategoryBadge({
       style={{
         backgroundColor: variant === 'default' ? badgeColor : 'transparent',
         borderColor: variant === 'outline' ? badgeColor : undefined,
+        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)',
       }}
       onClick={onClick}
     >

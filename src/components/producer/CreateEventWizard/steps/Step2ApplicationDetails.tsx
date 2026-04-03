@@ -11,6 +11,44 @@ interface Step2Props extends WizardStepProps {
   organizationId: number;
 }
 
+/**
+ * Step2ApplicationDetails - Category selection and booth configuration
+ *
+ * Second step of the event creation wizard. Allows producers to select vendor
+ * categories and configure booth pricing with smart pre-fill from previous events.
+ *
+ * Features:
+ * - Select vendor categories from organization's saved categories
+ * - **Smart Pre-fill**: Auto-populates booth pricing and details from previous events
+ * - Shows "Pre-filled from [Event Name]" indicator when using defaults
+ * - One-click to clear pre-filled data
+ * - Inline category creation without leaving wizard
+ * - Configure booth price, description, install times, payment links per category
+ * - Application deadline and payment deadline configuration
+ * - Dev mode prefill for testing
+ *
+ * Smart Pre-fill Logic:
+ * - Uses category.default_booth_price if available
+ * - Shows category.last_used_event_name as source
+ * - Pre-fills install times, payment links, tags from category defaults
+ * - NO API call needed - uses cached category data from initial fetch
+ *
+ * Validation Rules:
+ * - Application deadline required (must be before event date)
+ * - At least 1 category required
+ * - Each category must have unique name
+ * - Booth price must be greater than $0 per category
+ *
+ * @param {Step2Props} props - Wizard state and organization context
+ * @param {WizardState} props.wizardState - Current wizard state
+ * @param {Function} props.updateWizardState - Function to update wizard state
+ * @param {number} props.organizationId - Current organization ID
+ * @param {Record<string, string>} props.errors - Validation errors
+ * @param {Function} props.setErrors - Function to set validation errors
+ * @param {boolean} props.isAdmin - Whether user is admin (shows debug panel)
+ *
+ * @returns {JSX.Element} Step 2 form with category selection and configuration
+ */
 export default function Step2ApplicationDetails({
   wizardState,
   updateWizardState,
@@ -86,6 +124,9 @@ export default function Step2ApplicationDetails({
           id: crypto.randomUUID(),
           category_id: category.id,
           category_name: category.name,
+          category_color: category.color,
+          category_icon: category.icon,
+          category_email_campaign_template_id: category.email_campaign_template_id,
           name: category.name,
           booth_price: category.default_booth_price || 0,
           description: category.default_description || '',
@@ -478,6 +519,10 @@ export default function Step2ApplicationDetails({
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
+                              <div
+                                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                                style={{ backgroundColor: category.color || '#8B5CF6' }}
+                              />
                               {category.icon && (
                                 <span className="text-lg">{category.icon}</span>
                               )}

@@ -323,8 +323,16 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                         }`}>
                           {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                         </div>
-                        <span className={formData.categories.includes(category.name) ? 'text-white' : 'text-white/70'}>
-                          {category.icon && <span className="mr-1.5">{category.icon}</span>}
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
+                            formData.categories.includes(category.name) ? 'text-white font-semibold' : 'text-white/70 bg-white/5 font-medium'
+                          }`}
+                          style={formData.categories.includes(category.name) ? {
+                            backgroundColor: category.color || '#8B5CF6',
+                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+                          } : undefined}
+                        >
+                          {category.icon && <span>{category.icon}</span>}
                           {category.name}
                         </span>
                       </button>
@@ -339,14 +347,26 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
             {formData.categories.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
-                {formData.categories.map(cat => (
-                  <span key={cat} className="px-2 py-0.5 bg-purple-500/20 text-purple-300 rounded text-xs flex items-center gap-1 border border-purple-500/30">
-                    {cat}
-                    <button type="button" onClick={() => handleCategoryToggle(cat)} className="hover:text-purple-100">
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
+                {formData.categories.map(cat => {
+                  const category = organizationCategories.find(c => c.name === cat);
+                  const categoryColor = category?.color || '#8B5CF6';
+                  return (
+                    <span
+                      key={cat}
+                      className="px-2 py-0.5 rounded text-xs flex items-center gap-1.5 text-white font-semibold"
+                      style={{
+                        backgroundColor: categoryColor,
+                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
+                      }}
+                    >
+                      {category?.icon && <span className="text-[10px]">{category.icon}</span>}
+                      {cat}
+                      <button type="button" onClick={() => handleCategoryToggle(cat)} className="hover:opacity-80">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
