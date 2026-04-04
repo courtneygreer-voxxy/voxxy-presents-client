@@ -392,19 +392,38 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             valB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
             break;
           case 'email_type': {
+            // Map trigger types to email type categories
+            // Must match backend groupings in EmailTemplateItem::EVENT_WIDE_TRIGGERS and CATEGORY_SPECIFIC_TRIGGERS
             const toCat: Record<string, string> = {
-              on_application_open: 'event_announcements', on_invitation_send: 'event_announcements',
-              on_application_submit: 'application_updates', on_approval: 'application_updates',
-              on_rejection: 'application_updates', on_waitlist: 'application_updates',
-              on_payment_received: 'payment_reminders', days_before_payment_deadline: 'payment_reminders',
-              on_payment_deadline: 'payment_reminders',
-              days_before_event: 'event_countdown', on_event_date: 'event_countdown',
-              days_after_event: 'event_updates', on_event_update: 'event_updates',
-              on_event_cancel: 'event_updates', on_category_change: 'event_updates',
+              // Event Announcements - Sent to invitations/contacts (people who haven't applied)
+              on_invitation_send: 'event_announcements',
+              on_application_open: 'event_announcements', // Legacy
+              days_before_deadline: 'event_announcements',
+              days_after_deadline: 'event_announcements',
               on_bulletin_post: 'event_announcements',
+              on_event_update: 'event_announcements',
+              on_event_cancel: 'event_announcements',
+
+              // Application Updates - Sent to registrations (people who already applied)
+              on_application_submit: 'application_updates',
+              on_approval: 'application_updates',
+              on_rejection: 'application_updates',
+              on_waitlist: 'application_updates',
+              on_category_change: 'application_updates',
+
+              // Payment Reminders
+              on_payment_received: 'payment_reminders',
+              days_before_payment_deadline: 'payment_reminders',
+              on_payment_deadline: 'payment_reminders',
+              days_after_payment_deadline: 'payment_reminders',
+
+              // Event Countdown
+              days_before_event: 'event_countdown',
+              on_event_date: 'event_countdown',
+              days_after_event: 'event_countdown',
             };
-            valA = (a.email_template_item?.category ?? toCat[a.trigger_type] ?? 'event_announcements').toLowerCase();
-            valB = (b.email_template_item?.category ?? toCat[b.trigger_type] ?? 'event_announcements').toLowerCase();
+            valA = (a.email_template_item?.email_type ?? toCat[a.trigger_type] ?? 'event_announcements').toLowerCase();
+            valB = (b.email_template_item?.email_type ?? toCat[b.trigger_type] ?? 'event_announcements').toLowerCase();
             break;
           }
           case 'category':

@@ -3,9 +3,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Separator } from '@/components/ui/separator'
 import { Eye, EyeOff, Loader2, Mail, User, Lock, Users, Building2 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/utils/validation'
@@ -13,7 +11,7 @@ import { validateEmail, validatePassword } from '@/utils/validation'
 interface UnifiedSignUpFormProps {
   onSuccess?: () => void
   onSwitchToLogin?: () => void
-  defaultTab?: 'club-owner' | 'venue-owner'
+  defaultTab?: 'venue_owner' | 'vendor'
 }
 
 interface FormData {
@@ -22,7 +20,7 @@ interface FormData {
   password: string
   confirmPassword: string
   acceptTerms: boolean
-  userType: 'club-owner' | 'venue-owner'
+  userType: 'venue_owner' | 'vendor'
 }
 
 interface FormErrors {
@@ -34,12 +32,12 @@ interface FormErrors {
   submit?: string
 }
 
-type UserType = 'club-owner' | 'venue-owner'
+type UserType = 'venue_owner' | 'vendor'
 
 export function UnifiedSignUpForm({
   onSuccess,
   onSwitchToLogin,
-  defaultTab = 'club-owner'
+  defaultTab = 'venue_owner'
 }: UnifiedSignUpFormProps) {
   const { signUp, loading, error, clearError } = useAuth()
   const [activeTab, setActiveTab] = useState<UserType>(defaultTab)
@@ -161,26 +159,26 @@ export function UnifiedSignUpForm({
   }
 
   const getTabContent = (userType: UserType) => {
-    const isClubOwner = userType === 'club-owner'
+    const isProducer = userType === 'venue_owner'
 
     return (
       <div className="space-y-6">
         {/* Tab Description */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-3">
-            {isClubOwner ? (
+            {isProducer ? (
               <Users className="h-5 w-5 text-purple-400" />
             ) : (
               <Building2 className="h-5 w-5 text-purple-400" />
             )}
             <h3 className="text-lg font-semibold text-white">
-              {isClubOwner ? 'Create Club Owner Account' : 'Create Venue Owner Account'}
+              {isProducer ? 'Create Producer Account' : 'Create Vendor Account'}
             </h3>
           </div>
           <p className="text-gray-300 text-sm">
-            {isClubOwner
-              ? 'Start organizing events and building your community'
-              : 'List your venue and connect with event organizers'
+            {isProducer
+              ? 'Start organizing and managing your events'
+              : 'Join as a vendor and connect with event producers'
             }
           </p>
         </div>
@@ -190,14 +188,14 @@ export function UnifiedSignUpForm({
           {/* Display Name Field */}
           <div className="space-y-2">
             <Label htmlFor="displayName" className="text-white">
-              {isClubOwner ? 'Your Name' : 'Your Name'}
+              {isProducer ? 'Your Name' : 'Business/Artist Name'}
             </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 id="displayName"
                 type="text"
-                placeholder={isClubOwner ? "Enter your name" : "Enter your name"}
+                placeholder={isProducer ? "Enter your name" : "Enter your business or artist name"}
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
                 className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
@@ -328,7 +326,7 @@ export function UnifiedSignUpForm({
                 Creating account...
               </>
             ) : (
-              `Create ${isClubOwner ? 'Club Owner' : 'Venue Owner'} Account`
+              `Create ${isProducer ? 'Producer' : 'Vendor'} Account`
             )}
           </Button>
 
@@ -346,58 +344,33 @@ export function UnifiedSignUpForm({
   }
 
   return (
-    <Card className="w-full max-w-md bg-white/15 backdrop-blur-md border border-white/30">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-white">Join Voxxy</CardTitle>
-        <CardDescription className="text-gray-300">
-          Choose your account type to get started
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/10 backdrop-blur-sm">
-            <TabsTrigger
-              value="club-owner"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              Club Owner
-            </TabsTrigger>
-            <TabsTrigger
-              value="venue-owner"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
-            >
-              <Building2 className="h-4 w-4 mr-2" />
-              Venue Owner
-            </TabsTrigger>
-          </TabsList>
+    <div className="w-full">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/10 backdrop-blur-sm">
+          <TabsTrigger
+            value="venue_owner"
+            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+          >
+            <Users className="h-4 w-4 mr-2" />
+            Producer
+          </TabsTrigger>
+          <TabsTrigger
+            value="vendor"
+            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+          >
+            <Building2 className="h-4 w-4 mr-2" />
+            Vendor
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="club-owner" className="mt-0">
-            {getTabContent('club-owner')}
-          </TabsContent>
+        <TabsContent value="venue_owner" className="mt-0">
+          {getTabContent('venue_owner')}
+        </TabsContent>
 
-          <TabsContent value="venue-owner" className="mt-0">
-            {getTabContent('venue-owner')}
-          </TabsContent>
-        </Tabs>
-
-        {/* Switch to Login */}
-        <div className="mt-6">
-          <Separator className="bg-white/20" />
-          <div className="text-center mt-4">
-            <p className="text-gray-300 text-sm">
-              Already have an account?{' '}
-              <button
-                onClick={onSwitchToLogin}
-                className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
-                disabled={isSubmitting}
-              >
-                Sign in here
-              </button>
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        <TabsContent value="vendor" className="mt-0">
+          {getTabContent('vendor')}
+        </TabsContent>
+      </Tabs>
+    </div>
   )
 }

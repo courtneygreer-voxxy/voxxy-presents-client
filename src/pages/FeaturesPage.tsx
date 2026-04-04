@@ -41,11 +41,6 @@ export default function FeaturesPage() {
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="text-center max-w-[800px] mx-auto">
-            <div className="inline-flex items-center gap-2 bg-fuchsia-500/15 border border-fuchsia-400/25 px-4 py-1.5 rounded-full mb-6">
-              <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
-              <span className="text-[13px] font-semibold text-purple-200">Built for Recurring Event Producers</span>
-            </div>
-
             <h1 className="text-[52px] md:text-[56px] font-display font-bold leading-[1.1] text-white mb-5 tracking-tight">
               Everything you need to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">run better events</em>
             </h1>
@@ -65,71 +60,71 @@ export default function FeaturesPage() {
       </section>
 
       {/* Core Features Section */}
-      <section ref={featuresRef} className="py-[100px] px-6 md:px-12">
+      <section ref={featuresRef} className="py-[100px] px-6 md:px-12 bg-white">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">Core Features</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">Built for your workflow</h2>
-            <p className="text-[18px] text-white/60 max-w-[600px]">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Core Features</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Built for your workflow</h2>
+            <p className="text-[18px] text-gray-600 max-w-[600px]">
               Every feature designed to save you time and help you run more events with less stress.
             </p>
           </div>
 
           {/* Feature Block 1 - Automated Communication */}
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-white/10">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
             <div>
-              <div className="w-12 h-12 bg-purple-500/15 rounded-xl flex items-center justify-center mb-5">
-                <Mail className="h-6 w-6 text-purple-400" />
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Mail className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Automated vendor communication</h3>
-              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-gray-900">Automated vendor communication</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop writing the same emails over and over. Application confirmations, approval notices, payment reminders, waitlist updates, and event-day details — all sent automatically from one branded email thread. Vendors always know where they stand.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Automated email sequences for every event stage</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Automated email sequences for every event stage</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Branded emails that feel personal</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Branded emails that feel personal</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Zero manual follow-up required</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Zero manual follow-up required</span>
                 </div>
               </div>
             </div>
             <img
               src="/screenshots/email-automation.png"
               alt="Automated email sequences showing vendor communication workflows"
-              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+              className="rounded-2xl shadow-xl border border-gray-200"
               loading="lazy"
             />
           </div>
 
           {/* Feature Block 2 - Vendor CRM - Reversed */}
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-white/10">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
             <div className="md:order-2">
-              <div className="w-12 h-12 bg-fuchsia-500/15 rounded-xl flex items-center justify-center mb-5">
-                <Users className="h-6 w-6 text-fuchsia-400" />
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Users className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Vendor relationships that compound</h3>
-              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-gray-900">Vendor relationships that compound</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. CSV import for existing lists. Your best vendors are always one search away.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Unified vendor profiles across all events</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Unified vendor profiles across all events</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Performance tracking and ratings</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Performance tracking and ratings</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">CSV import for existing vendor lists</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">CSV import for existing vendor lists</span>
                 </div>
               </div>
             </div>
@@ -137,41 +132,41 @@ export default function FeaturesPage() {
               <img
                 src="/screenshots/vendor-crm.png"
                 alt="Vendor CRM showing contact management and performance tracking"
-                className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+                className="rounded-2xl shadow-xl border border-gray-200"
                 loading="lazy"
               />
             </div>
           </div>
 
           {/* Feature Block 3 - Fast Application Review */}
-          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-white/10">
+          <div className="grid md:grid-cols-2 gap-16 items-center mb-16 pb-16 border-b border-gray-200">
             <div>
-              <div className="w-12 h-12 bg-pink-500/15 rounded-xl flex items-center justify-center mb-5">
-                <Search className="h-6 w-6 text-pink-400" />
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Search className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Fast application review</h3>
-              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-gray-900">Fast application review</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 Stop scrolling through 200 Instagram profiles one by one. Side-by-side portfolio comparison with integrated social profiles. One-click approve, waitlist, or reject. Bulk actions for faster decisions.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Side-by-side application comparison</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Side-by-side application comparison</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Integrated social profiles and portfolios</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Integrated social profiles and portfolios</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Bulk actions for efficiency</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Bulk actions for efficiency</span>
                 </div>
               </div>
             </div>
             <img
               src="/screenshots/application-review.png"
               alt="Application review interface with side-by-side comparison"
-              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+              className="rounded-2xl shadow-xl border border-gray-200"
               loading="lazy"
             />
           </div>
@@ -179,25 +174,25 @@ export default function FeaturesPage() {
           {/* Feature Block 4 - No-Code Automation */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="md:order-2">
-              <div className="w-12 h-12 bg-fuchsia-500/15 rounded-xl flex items-center justify-center mb-5">
-                <Zap className="h-6 w-6 text-fuchsia-400" />
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center mb-5">
+                <Zap className="h-6 w-6 text-voxxy-purple-brand" />
               </div>
-              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-white">Email automation without technical setup</h3>
-              <p className="text-[16px] leading-relaxed text-white/60 mb-5">
+              <h3 className="text-[28px] font-display font-bold leading-tight mb-4 text-gray-900">Email automation without technical setup</h3>
+              <p className="text-[16px] leading-relaxed text-gray-600 mb-5">
                 No Mailgun, no SendGrid, no developer needed. Application confirmations, approvals, rejections, waitlist notifications, payment reminders, and day-of logistics — all automated and customizable.
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Automated email triggers for every action</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Automated email triggers for every action</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Event-specific customization</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Event-specific customization</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="h-5 w-5 text-fuchsia-400 flex-shrink-0" />
-                  <span className="text-[15px] text-white/70">Zero technical setup required</span>
+                  <CheckCircle className="h-5 w-5 text-voxxy-purple-brand flex-shrink-0" />
+                  <span className="text-[15px] text-gray-700">Zero technical setup required</span>
                 </div>
               </div>
             </div>
@@ -205,7 +200,7 @@ export default function FeaturesPage() {
               <img
                 src="/screenshots/email-flows.png"
                 alt="Email automation dashboard showing customizable templates"
-                className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+                className="rounded-2xl shadow-xl border border-gray-200"
                 loading="lazy"
               />
             </div>
@@ -284,11 +279,11 @@ export default function FeaturesPage() {
             Join event producers everywhere who are scaling their recurring events with Voxxy.
           </p>
           <TrackedLink
-            to="/contact"
+            to="/signup"
             className="inline-flex items-center px-8 py-[18px] bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 transition-all text-lg font-semibold rounded-xl shadow-lg shadow-fuchsia-500/25 hover:shadow-xl"
             trackingData={{
               link_text: 'Get Started',
-              destination_page: 'Contact',
+              destination_page: 'Sign Up',
               current_page: 'Features',
               link_position: 'cta_section'
             }}

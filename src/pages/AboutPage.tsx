@@ -18,7 +18,7 @@ export default function AboutPage() {
       <Navigation activePage="about" />
 
       {/* Hero Section */}
-      <section className="relative pt-[140px] pb-20 px-6 md:px-12 min-h-[70vh] flex items-center">
+      <section className="relative pt-[140px] pb-20 px-6 md:px-12">
         <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
@@ -28,9 +28,16 @@ export default function AboutPage() {
               in person
             </em>
           </h1>
-          <p className="text-[18px] leading-relaxed text-white/65 max-w-[700px] mx-auto">
+          <p className="text-[18px] leading-relaxed text-white/65 max-w-[700px] mx-auto mb-0">
             Voxxy exists because we believe the best communities are formed face-to-face — at art markets, pop-ups, and the events that give neighborhoods their identity.
           </p>
+
+          {/* Divider */}
+          <div className="mt-9 flex items-center justify-center">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+          </div>
         </div>
       </section>
 

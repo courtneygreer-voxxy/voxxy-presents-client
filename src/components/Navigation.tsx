@@ -44,11 +44,14 @@ export default function Navigation({ activePage }: NavigationProps) {
             <Link to="/help" className={`text-[14px] font-medium ${getLinkClass('help')}`}>
               Help
             </Link>
+            <Link to="/login" className="text-[14px] font-medium text-gray-300 hover:text-fuchsia-400 transition-colors">
+              Login
+            </Link>
             <Link
-              to="/contact"
+              to="/signup"
               className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-6 py-3 rounded-lg text-[14px] font-semibold hover:from-purple-700 hover:to-fuchsia-600 transition-all hover:-translate-y-0.5"
             >
-              Get Started →
+              Sign Up →
             </Link>
           </div>
 
@@ -95,11 +98,18 @@ export default function Navigation({ activePage }: NavigationProps) {
               Help
             </Link>
             <Link
-              to="/contact"
+              to="/login"
+              className="block text-gray-300 hover:text-fuchsia-400 transition-colors py-2"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
               className="block bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-6 py-3 rounded-lg text-center"
               onClick={() => setMobileMenuOpen(false)}
             >
-              Get Started
+              Sign Up
             </Link>
           </div>
         </div>

@@ -112,16 +112,39 @@ export default function EmailRow({
   };
 
   // Infer category from email name/trigger (fallback only)
+  // Must match backend groupings in EmailTemplateItem::EVENT_WIDE_TRIGGERS and CATEGORY_SPECIFIC_TRIGGERS
   const inferCategory = (): EmailCategory => {
     const name = email.name.toLowerCase();
     const trigger = email.trigger_type;
 
-    // Check triggers first (more reliable than name patterns)
-    if (trigger.includes('payment')) return 'payment_reminders';
-    if (trigger === 'on_invitation_send' || trigger === 'on_application_submit' || trigger === 'on_approval' || trigger === 'on_rejection' || trigger === 'on_waitlist') return 'application_updates';
-    if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') return 'event_countdown';
+    // Event Announcements - Sent to invitations/contacts (people who haven't applied)
+    if (trigger === 'on_invitation_send' ||
+        trigger === 'days_before_deadline' ||
+        trigger === 'days_after_deadline' ||
+        trigger === 'on_bulletin_post' ||
+        trigger === 'on_event_update' ||
+        trigger === 'on_event_cancel') {
+      return 'event_announcements';
+    }
 
-    // Then check name patterns
+    // Application Updates - Sent to registrations (people who already applied)
+    if (trigger === 'on_application_submit' ||
+        trigger === 'on_approval' ||
+        trigger === 'on_rejection' ||
+        trigger === 'on_waitlist' ||
+        trigger === 'on_category_change') {
+      return 'application_updates';
+    }
+
+    // Payment Reminders
+    if (trigger.includes('payment')) return 'payment_reminders';
+
+    // Event Countdown
+    if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') {
+      return 'event_countdown';
+    }
+
+    // Fallback to name patterns
     if (name.includes('payment')) return 'payment_reminders';
     if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
     if (name.includes('days before') || name.includes('day of')) return 'event_countdown';
@@ -130,8 +153,8 @@ export default function EmailRow({
     return 'event_announcements';
   };
 
-  // Use actual category from template item if available, otherwise infer
-  const category = email.email_template_item?.category || inferCategory();
+  // Use actual email_type from template item if available, otherwise infer from trigger
+  const category = email.email_template_item?.email_type || inferCategory();
   const categoryConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['event_announcements'];
   const CategoryIcon = categoryConfig.icon;
 

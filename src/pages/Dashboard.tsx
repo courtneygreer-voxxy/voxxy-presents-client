@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Shield } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -145,6 +145,9 @@ export default function ProducerDashboard() {
   const [creationProgress, setCreationProgress] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  // Ref to prevent race condition when fetching/creating organization
+  const isFetchingOrgRef = useRef(false);
+
   // Admin-specific state
   const [analytics, setAnalytics] = useState<PresentsAnalytics | null>(null);
   const [users, setUsers] = useState<User[]>([]);
@@ -170,7 +173,14 @@ export default function ProducerDashboard() {
     const fetchOrCreateOrganization = async () => {
       if (!userProfile?.id) return;
 
+      // Prevent race condition - only allow one fetch/create at a time
+      if (isFetchingOrgRef.current) {
+        console.log('Organization fetch already in progress, skipping...');
+        return;
+      }
+
       try {
+        isFetchingOrgRef.current = true;
         setLoadingOrg(true);
         setError(null);
 
@@ -213,9 +223,12 @@ export default function ProducerDashboard() {
               errors: createErr?.errors
             });
 
-            // If creation failed due to duplicate, refetch the user's organization
-            if (createErr?.status === 422) {
-              console.log('422 error - organization may already exist. Refetching...');
+            // If creation failed due to duplicate (422 or 500 with unique constraint error)
+            const isDuplicateError = createErr?.status === 422 ||
+              (createErr?.status === 500 && createErr?.message?.includes('duplicate key'));
+
+            if (isDuplicateError) {
+              console.log('Duplicate organization error - organization may already exist. Refetching...');
               const retryResponse = await organizationsApi.getMine();
               console.log('Retry response:', retryResponse);
 
@@ -225,11 +238,13 @@ export default function ProducerDashboard() {
               } else {
                 setError('Organization exists but could not be loaded. Please contact support or try logging out and back in.');
                 setLoadingOrg(false);
+                isFetchingOrgRef.current = false;
                 return;
               }
             } else {
               setError(`Failed to create organization: ${createErr?.message || 'Unknown error'}`);
               setLoadingOrg(false);
+              isFetchingOrgRef.current = false;
               return;
             }
           }
@@ -248,6 +263,7 @@ export default function ProducerDashboard() {
         setError('Failed to load organization data');
       } finally {
         setLoadingOrg(false);
+        isFetchingOrgRef.current = false;
       }
     };
 

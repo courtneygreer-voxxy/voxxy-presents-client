@@ -1222,6 +1222,20 @@ export const emailTemplateItemsApi = {
       }
     )
   },
+
+  /**
+   * Send test email for a single template item
+   * POST /api/v1/presents/email_campaign_templates/:template_id/email_template_items/:id/send_test
+   */
+  async sendTest(templateId: number, id: number, testEmail: string) {
+    return fetchApi<{ message: string; recipient: string; subject: string; email_name: string }>(
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items/${id}/send_test`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ test_email: testEmail }),
+      }
+    )
+  },
 }
 
 // Scheduled Emails API (Event-specific email instances)

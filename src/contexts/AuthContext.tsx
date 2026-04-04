@@ -22,7 +22,7 @@ interface SignUpData {
   email: string
   password: string
   displayName: string
-  userType?: 'club-owner' | 'venue-owner' | 'consumer' | 'producer' | 'vendor'
+  userType?: 'venue_owner' | 'consumer' | 'producer' | 'vendor' | 'guest' | 'club-owner' | 'venue-owner' // Legacy support for club-owner, venue-owner
   role?: User['role']
 }
 
@@ -159,8 +159,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (data.role) {
         role = data.role
       } else if (data.userType) {
-        // Map legacy userType to V3.0 roles
+        // Map userType to roles (with legacy support)
         switch (data.userType) {
+          case 'venue_owner':
+            role = 'venue_owner'
+            break
           case 'club-owner':
             role = 'producer'
             break
@@ -172,6 +175,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
             break
           case 'vendor':
             role = 'vendor'
+            break
+          case 'guest':
+            role = 'guest'
             break
           default:
             role = 'consumer'

@@ -63,6 +63,19 @@ export default function HomePage() {
     window.scrollTo(0, 0)
   }, [])
 
+  // Handle hash navigation to contact form
+  useEffect(() => {
+    if (window.location.hash === '#contact') {
+      // Small delay to ensure page is fully loaded
+      setTimeout(() => {
+        const contactSection = document.getElementById('contact')
+        if (contactSection) {
+          contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    }
+  }, [])
+
   usePageTracking('Home')
 
   const { sectionRef: heroRef } = useSectionTracking({
@@ -150,7 +163,7 @@ export default function HomePage() {
       <Navigation activePage="home" />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative pt-[140px] pb-20 px-6 md:px-12 min-h-[90vh] flex items-center">
+      <section ref={heroRef} className="relative pt-[140px] pb-20 px-6 md:px-12">
         <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/12 via-purple-600/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
@@ -166,9 +179,16 @@ export default function HomePage() {
                 The Operating System for <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Recurring Event Producers</em>
               </h1>
 
-              <p className="text-[18px] leading-relaxed text-white/65 mb-9 max-w-[500px]">
+              <p className="text-[18px] leading-relaxed text-white/65 mb-0 max-w-[500px]">
                 Manage vendor applications, automate communications, and grow your events — all from one platform. Built for art shows, markets, and pop-ups that happen more than once.
               </p>
+
+              {/* Divider */}
+              <div className="mt-9 mb-9 flex items-center justify-start">
+                <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
+                <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
+                <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+              </div>
 
               <div className="flex gap-4 flex-wrap">
                 <TrackedButton
@@ -181,7 +201,7 @@ export default function HomePage() {
                   }}
                   asChild
                 >
-                  <Link to="/contact">
+                  <Link to="/signup">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </TrackedButton>
@@ -228,37 +248,37 @@ export default function HomePage() {
       </section>
 
       {/* Problem Section */}
-      <section ref={problemsRef} className="py-[100px] px-6 md:px-12">
+      <section ref={problemsRef} className="py-[100px] px-6 md:px-12 bg-white">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">The Problem</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">Event coordination is broken</h2>
-            <p className="text-[18px] text-white/60 max-w-[600px]">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Problem</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Event coordination is broken</h2>
+            <p className="text-[18px] text-gray-600 max-w-[600px]">
               The bigger your event calendar grows, the more coordination eats your time — and your margins.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-purple-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-white">5–7 Tools, Zero Visibility</h3>
-              <p className="text-[15px] leading-relaxed text-white/60">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-voxxy-purple-brand/30 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-gray-900">5–7 Tools, Zero Visibility</h3>
+              <p className="text-[15px] leading-relaxed text-gray-600">
                 You're chasing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical details get buried. Deadlines slip.
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-fuchsia-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-white">Hours of Unpaid Coordination</h3>
-              <p className="text-[15px] leading-relaxed text-white/60">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-voxxy-purple-brand/30 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-gray-900">Hours of Unpaid Coordination</h3>
+              <p className="text-[15px] leading-relaxed text-gray-600">
                 Every event eats hours of back-and-forth that doesn't scale. Your calendar grows, but your coordination workflow stays manual.
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-2xl p-8 border border-white/10 hover:border-fuchsia-400/20 hover:-translate-y-1 transition-all">
-              <div className="w-12 h-12 bg-pink-500/15 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
-              <h3 className="text-[20px] font-display font-bold mb-3 text-white">200+ Applications, No Way to Compare</h3>
-              <p className="text-[15px] leading-relaxed text-white/60">
+            <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 hover:border-voxxy-purple-brand/30 hover:-translate-y-1 transition-all">
+              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
+              <h3 className="text-[20px] font-display font-bold mb-3 text-gray-900">200+ Applications, No Way to Compare</h3>
+              <p className="text-[15px] leading-relaxed text-gray-600">
                 You're scrolling social profiles one by one. Great vendors get lost in the pile. By application 80, you're approving on fatigue.
               </p>
             </div>
@@ -339,12 +359,12 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="py-[100px] px-6 md:px-12">
+      <section className="py-[100px] px-6 md:px-12 bg-white">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14 text-center">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">How It Works</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-white mb-4">Live in minutes, not months</h2>
-            <p className="text-[18px] text-white/60 max-w-[600px] mx-auto">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">How It Works</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Live in minutes, not months</h2>
+            <p className="text-[18px] text-gray-600 max-w-[600px] mx-auto">
               No enterprise onboarding. No implementation timeline. You can be running your next event through Voxxy today.
             </p>
           </div>
@@ -352,22 +372,22 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-14 h-14 bg-gradient-to-br from-purple-600 to-fuchsia-500 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">1</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Create your event</h3>
-              <p className="text-[15px] text-white/60 leading-relaxed">
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-gray-900">Create your event</h3>
+              <p className="text-[15px] text-gray-600 leading-relaxed">
                 Set up your event details, application form, and vendor categories. Import existing vendor lists via CSV if you have them.
               </p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">2</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Open applications</h3>
-              <p className="text-[15px] text-white/60 leading-relaxed">
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-gray-900">Open applications</h3>
+              <p className="text-[15px] text-gray-600 leading-relaxed">
                 Share your application link. Vendors apply with portfolios and details. Review and approve with side-by-side comparison tools.
               </p>
             </div>
             <div className="text-center">
               <div className="w-14 h-14 bg-gradient-to-br from-pink-500 to-purple-600 text-white text-2xl font-display font-bold rounded-2xl flex items-center justify-center mx-auto mb-5">3</div>
-              <h3 className="text-[20px] font-display font-bold mb-2.5 text-white">Coordinate and grow</h3>
-              <p className="text-[15px] text-white/60 leading-relaxed">
+              <h3 className="text-[20px] font-display font-bold mb-2.5 text-gray-900">Coordinate and grow</h3>
+              <p className="text-[15px] text-gray-600 leading-relaxed">
                 Automated emails handle the logistics. Vendor CRM tracks relationships across events. Your community grows with every show.
               </p>
             </div>

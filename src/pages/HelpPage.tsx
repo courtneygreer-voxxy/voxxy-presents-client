@@ -60,16 +60,20 @@ export default function HelpPage() {
       <section className="relative pt-[140px] pb-20 px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
         <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
 
-        <div className="container mx-auto max-w-[900px] relative z-10">
-          <div className="mb-4">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-purple-300 mb-4">HELP CENTER</div>
-          </div>
+        <div className="container mx-auto max-w-[900px] text-center relative z-10">
           <h1 className="text-[52px] md:text-[56px] font-display font-bold text-white mb-5 leading-[1.1] tracking-tight">
-            We're here to help
+            We're here to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">help</em>
           </h1>
-          <p className="text-[18px] text-white/65 max-w-[700px] leading-relaxed">
+          <p className="text-[18px] text-white/65 max-w-[700px] mx-auto leading-relaxed mb-0">
             Real humans, fast responses. Whether you need onboarding support or have a quick question, we've got you.
           </p>
+
+          {/* Divider */}
+          <div className="mt-9 flex items-center justify-center">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+          </div>
         </div>
       </section>
 
@@ -147,33 +151,33 @@ export default function HelpPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-[100px] px-6 md:px-12 bg-gray-50">
+      <section className="py-[100px] px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
         <div className="container mx-auto max-w-[900px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">FAQ</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900">Common questions</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-purple-400 mb-4">FAQ</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-white">Common questions</h2>
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all"
+                className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:shadow-md transition-all"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
                 >
-                  <span className="font-semibold text-gray-900 pr-4 text-[16px]">{faq.question}</span>
+                  <span className="font-semibold text-white pr-4 text-[16px]">{faq.question}</span>
                   <ChevronDown
-                    className={`h-5 w-5 text-voxxy-purple-brand flex-shrink-0 transition-transform ${
+                    className={`h-5 w-5 text-purple-400 flex-shrink-0 transition-transform ${
                       openFaq === index ? 'rotate-180' : ''
                     }`}
                   />
                 </button>
                 {openFaq === index && (
                   <div className="px-6 pb-5 pt-2">
-                    <p className="text-[15px] text-gray-600 leading-relaxed">{faq.answer}</p>
+                    <p className="text-[15px] text-gray-300 leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>

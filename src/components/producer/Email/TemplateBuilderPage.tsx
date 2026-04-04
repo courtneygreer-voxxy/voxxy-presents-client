@@ -13,7 +13,8 @@ import {
   CheckCircle2,
   XCircle,
   Clock,
-  Info
+  Info,
+  Send
 } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
@@ -60,6 +61,11 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
   // Track locally modified emails (before template is saved)
   const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
+
+  // Test email dialog state
+  const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [isSendingTest, setIsSendingTest] = useState(false);
 
   useEffect(() => {
     if (templateId) {
@@ -366,6 +372,28 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const handleEditEmail = (item: EmailTemplateItem) => {
     setEditingItem(item);
     setIsEditorOpen(true);
+  };
+
+  const handleSendTest = async () => {
+    if (!template || !selectedEmail || !testEmailAddress) return;
+
+    setIsSendingTest(true);
+
+    try {
+      const result = await emailTemplateItemsApi.sendTest(template.id, selectedEmail.id, testEmailAddress);
+
+      setSuccessMessage(`Test email sent to ${result.recipient}`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+
+      setShowTestEmailDialog(false);
+      setTestEmailAddress('');
+    } catch (error: any) {
+      console.error('Failed to send test email:', error);
+      setError(error?.message || 'Failed to send test email');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setIsSendingTest(false);
+    }
   };
 
   const handleSaveEmail = async (updatedItem: EmailTemplateItem) => {
@@ -803,6 +831,14 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                               return (
                                 <div className="flex items-center gap-2">
                                   <button
+                                    onClick={() => setShowTestEmailDialog(true)}
+                                    className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
+                                    title="Send test email"
+                                  >
+                                    <Send className="w-3.5 h-3.5" />
+                                    Send Test
+                                  </button>
+                                  <button
                                     onClick={() => handleEditEmail(selectedEmail)}
                                     className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
                                   >
@@ -1132,6 +1168,80 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   <>
                     <Trash2 className="w-4 h-4" />
                     Delete Email
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Test Email Dialog */}
+      {showTestEmailDialog && selectedEmail && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a0f2e] to-[#0f0a1e] border border-purple-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
+                <Send className="w-5 h-5 text-green-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white">Send Test Email</h3>
+                <p className="text-sm text-white/60 mt-0.5">
+                  Preview how this email will look
+                </p>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="mb-6">
+              <div className="mb-4 p-3 rounded-lg bg-white/5 border border-white/10">
+                <p className="text-xs text-white/50 mb-1">Sending test for:</p>
+                <p className="text-sm font-semibold text-white">{selectedEmail.name}</p>
+              </div>
+
+              <label className="block text-sm font-medium text-white/80 mb-2">
+                Email Address
+              </label>
+              <input
+                type="email"
+                value={testEmailAddress}
+                onChange={(e) => setTestEmailAddress(e.target.value)}
+                placeholder="you@example.com"
+                className="w-full px-3 py-2.5 rounded-lg bg-white/5 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+                autoFocus
+              />
+              <p className="text-xs text-white/50 mt-2">
+                Test emails use sample data for variables like vendor name, event details, etc.
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setShowTestEmailDialog(false);
+                  setTestEmailAddress('');
+                }}
+                disabled={isSendingTest}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendTest}
+                disabled={isSendingTest || !testEmailAddress.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSendingTest ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Test
                   </>
                 )}
               </button>

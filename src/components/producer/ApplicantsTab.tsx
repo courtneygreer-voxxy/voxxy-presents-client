@@ -19,6 +19,7 @@ import {
   ChevronUp,
   DollarSign,
   ArrowLeftRight,
+  MailX,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { toast } from 'sonner';
@@ -49,6 +50,11 @@ interface Applicant {
   portfolio_images?: string[];
   producer_notes?: string;
   tags?: string[];
+  email_unsubscribed?: boolean;
+  unsubscribe_status?: {
+    is_unsubscribed: boolean;
+    scope: 'global' | 'organization' | 'event' | null;
+  };
 }
 
 interface ApplicantsTabProps {
@@ -171,6 +177,11 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          email_unsubscribed: submission.email_unsubscribed,
+          unsubscribe_status: submission.email_unsubscribed ? {
+            is_unsubscribed: true,
+            scope: submission.unsubscribe_scope || 'event'
+          } : undefined,
         });
       });
 
@@ -196,6 +207,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           existing.tiktok_handle = existing.tiktok_handle || contact.tiktok_handle;
           existing.website = existing.website || contact.website;
           existing.phone = existing.phone || contact.phone;
+          // Merge unsubscribe status - prefer registration data but fall back to contact data
+          existing.unsubscribe_status = existing.unsubscribe_status || contact.unsubscribe_status;
+          existing.email_unsubscribed = existing.email_unsubscribed || contact.unsubscribe_status?.is_unsubscribed;
         } else {
           // Contact was invited but hasn't applied yet
           emailMap.set(email, {
@@ -217,6 +231,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             tags: contact.tags || [],
             location: contact.location,
             created_at: invitation.created_at || new Date().toISOString(),
+            unsubscribe_status: contact.unsubscribe_status,
+            email_unsubscribed: contact.unsubscribe_status?.is_unsubscribed,
           });
         }
       });
@@ -730,6 +746,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           {applicant.is_returning && (
                             <Star className="w-2.5 h-2.5 text-yellow-400 flex-shrink-0" fill="currentColor" />
                           )}
+                          {applicant.email_unsubscribed && (
+                            <MailX className="w-2.5 h-2.5 text-orange-400 flex-shrink-0" />
+                          )}
                         </div>
                         <span
                           className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${statusBadge.color} flex-shrink-0 ml-2`}
@@ -783,7 +802,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               <div className="glass-card p-4 mb-3">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h2 className="text-lg font-bold text-white">{selectedApplicant.contact_name || selectedApplicant.business_name}</h2>
                       {selectedApplicant.is_returning && (
                         <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/30">
@@ -799,6 +818,14 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         }`}>
                           {selectedApplicant.source === 'net_new' ? 'New Applicant' : 'From Contacts'}
                         </span>
+                      )}
+                      {selectedApplicant.email_unsubscribed && selectedApplicant.unsubscribe_status && (
+                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30">
+                          <MailX className="w-3 h-3 text-orange-400" />
+                          <span className="text-[10px] font-medium text-orange-400">
+                            Unsubscribed ({selectedApplicant.unsubscribe_status.scope})
+                          </span>
+                        </div>
                       )}
                     </div>
                     {selectedApplicant.contact_name && selectedApplicant.business_name && (
@@ -1149,13 +1176,30 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           })}
                         </div>
                       ) : (
-                        <div className="py-2">
-                          {selectedApplicant.status === 'invited' ? (
-                            <p className="text-xs text-white/60 italic">
-                              No emails sent yet. Check invitation status in Vendors tab for unsubscribe info.
-                            </p>
+                        <div className="py-3 px-2">
+                          {selectedApplicant.unsubscribe_status?.is_unsubscribed ? (
+                            <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
+                              <MailX className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-xs text-orange-400 font-medium mb-1">
+                                  No Emails Sent (Unsubscribed)
+                                </p>
+                                <p className="text-[10px] text-white/60">
+                                  This vendor unsubscribed from {selectedApplicant.unsubscribe_status.scope} emails.
+                                  No automated messages will be sent.
+                                </p>
+                              </div>
+                            </div>
                           ) : (
-                            <p className="text-xs text-white/40 italic">No email history found</p>
+                            <div className="flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                              <Clock className="w-4 h-4 text-white/40 flex-shrink-0 mt-0.5" />
+                              <div>
+                                <p className="text-xs text-white/60 font-medium mb-1">No Email History</p>
+                                <p className="text-[10px] text-white/40">
+                                  No automated emails have been triggered yet.
+                                </p>
+                              </div>
+                            </div>
                           )}
                         </div>
                       )}

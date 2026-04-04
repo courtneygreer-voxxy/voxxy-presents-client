@@ -38,6 +38,7 @@ const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'))
 
 // Lazy load: Auth Pages (load on-demand)
 const LoginPage = lazy(() => import('./pages/LoginPage'))
+const SignUpPage = lazy(() => import('./pages/SignUpPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
 const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage'))
@@ -70,6 +71,7 @@ function RoleBasedDashboardRedirect() {
 
   console.log('🔀 RoleBasedDashboardRedirect - User profile:', userProfile)
   console.log('🔀 RoleBasedDashboardRedirect - Role:', userProfile?.role)
+  console.log('🔀 RoleBasedDashboardRedirect - Product Context:', userProfile?.product_context)
   console.log('🔀 RoleBasedDashboardRedirect - Loading:', loading, 'Redirecting:', isRedirecting)
 
   if (loading || isRedirecting) {
@@ -81,25 +83,29 @@ function RoleBasedDashboardRedirect() {
     return <Navigate to="/" replace />
   }
 
-  // V3.0: Route to holding screens based on user role
+  // V4.0: Check product_context to filter legacy users
   const role = userProfile.role
+  const productContext = userProfile.product_context
+  const hasPresentsAccess = productContext === 'presents' || productContext === 'both'
 
+  // Legacy users (no Presents access) OR consumers/guests → Pending page
+  if (!hasPresentsAccess || role === 'consumer' || role === 'guest') {
+    console.log('🔒 No Presents access or consumer/guest role, redirecting to pending page')
+    console.log('   - Role:', role, 'Product Context:', productContext)
+    return <Navigate to="/pending" replace />
+  }
+
+  // Users with Presents access - route by role
   // Producer roles (venue_owner = Producer in UI)
   if (role === 'producer' || role === 'venue_owner') {
-    console.log('🟢 Producer detected (role:', role, '), redirecting to dashboard')
+    console.log('🟢 Producer with Presents access, redirecting to dashboard')
     return <Navigate to="/dashboard" replace />
   }
 
   // Vendor roles
   if (role === 'vendor') {
-    console.log('🔵 Vendor detected, redirecting to vendor holding screen')
+    console.log('🔵 Vendor with Presents access, redirecting to vendor pending')
     return <Navigate to="/vendor/pending" replace />
-  }
-
-  // Consumer/Guest roles
-  if (role === 'consumer' || role === 'guest') {
-    console.log('🟣 Consumer/Guest detected (role:', role, '), redirecting to consumer holding screen')
-    return <Navigate to="/pending" replace />
   }
 
   // Admin - route to unified dashboard
@@ -109,7 +115,7 @@ function RoleBasedDashboardRedirect() {
   }
 
   // Unknown role - redirect to home
-  console.log('Unknown role, redirecting to home')
+  console.log('⚠️ Unknown role, redirecting to home')
   return <Navigate to="/" replace />
 }
 
@@ -177,14 +183,20 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* All signup routes redirect to contact page for beta access requests */}
-          <Route path="/auth" element={<Navigate to="/contact" replace />} />
-          <Route path="/sign-up" element={<Navigate to="/contact" replace />} />
-          <Route path="/signup" element={<Navigate to="/contact" replace />} />
-          <Route path="/signup/producer" element={<Navigate to="/contact" replace />} />
-          <Route path="/signup/vendor" element={<Navigate to="/contact" replace />} />
-          <Route path="/signup/club-owner" element={<Navigate to="/contact" replace />} />
-          <Route path="/signup/venue-owner" element={<Navigate to="/contact" replace />} />
+          {/* Unified Sign Up Page */}
+          <Route path="/signup" element={
+            <RedirectIfAuthenticatedV2>
+              <SignUpPage />
+            </RedirectIfAuthenticatedV2>
+          } />
+
+          {/* Legacy signup routes - redirect to unified signup */}
+          <Route path="/auth" element={<Navigate to="/signup" replace />} />
+          <Route path="/sign-up" element={<Navigate to="/signup" replace />} />
+          <Route path="/signup/producer" element={<Navigate to="/signup" replace />} />
+          <Route path="/signup/vendor" element={<Navigate to="/signup" replace />} />
+          <Route path="/signup/club-owner" element={<Navigate to="/signup" replace />} />
+          <Route path="/signup/venue-owner" element={<Navigate to="/signup" replace />} />
 
           {/* Legacy login routes - redirect to unified login */}
           <Route path="/login/producer" element={<Navigate to="/login" replace />} />

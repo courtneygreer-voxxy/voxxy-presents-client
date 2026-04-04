@@ -38,149 +38,156 @@ export default function PricingPage() {
       <Navigation activePage="pricing" />
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4">
+      <section className="relative pt-[140px] pb-20 px-6 md:px-12">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-8 tracking-tight leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-white mb-5 tracking-tight leading-tight">
             Simple,{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Transparent Pricing
             </span>
           </h1>
 
-          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-300 mb-0 max-w-3xl mx-auto leading-relaxed">
             Choose the plan that fits your event schedule
           </p>
+
+          {/* Divider */}
+          <div className="mt-9 flex items-center justify-center">
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+          </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section ref={pricingCardRef} className="py-24 bg-gray-800/30 backdrop-blur-sm border-y border-white/10 relative z-10">
-        <div className="container mx-auto max-w-6xl px-4">
-          <div className="grid md:grid-cols-3 gap-8">
+      <section ref={pricingCardRef} className="py-24 bg-white relative z-10">
+        <div className="container mx-auto max-w-6xl px-6 md:px-12">
+          <div className="grid md:grid-cols-3 gap-8 items-stretch">
             {/* Starter Plan */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-400/30 transition-all duration-300">
+            <Card className="bg-gray-100 border border-gray-300 hover:border-voxxy-purple-brand/40 hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-white mb-2">Starter</CardTitle>
-                <div className="text-4xl font-bold text-white mb-2">$80</div>
-                <CardDescription className="text-gray-300">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Starter</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$80</div>
+                <CardDescription className="text-gray-700">per month</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <p className="text-gray-300 mb-4">Perfect for new producers</p>
-                  <ul className="space-y-3">
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+              <CardContent className="space-y-6 flex-grow flex flex-col">
+                <div className="flex-grow">
+                  <p className="text-gray-700 mb-4 font-medium">Perfect for new producers</p>
+                  <ul className="space-y-3 min-h-[240px]">
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 10 events per year</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>10,000 vendor contacts</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Automated email workflows</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Vendor CRM</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Email support</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
-                  <Link to="/contact">Get Started</Link>
+                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                  <Link to="/signup">Get Started</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Growth Plan */}
-            <Card className="bg-white/5 backdrop-blur-sm border-2 border-purple-400/50 hover:border-purple-400/70 transition-all duration-300 shadow-2xl relative">
+            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-voxxy-purple-brand hover:border-purple-700 hover:shadow-xl transition-all duration-300 shadow-lg relative flex flex-col">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-purple-500 text-white px-4 py-1 text-sm">Most Popular</Badge>
+                <Badge className="bg-voxxy-purple-brand text-white px-4 py-1 text-sm">Most Popular</Badge>
               </div>
               <CardHeader className="text-center pb-6 pt-8">
-                <CardTitle className="text-2xl font-bold text-white mb-2">Growth</CardTitle>
-                <div className="text-4xl font-bold text-white mb-2">$160</div>
-                <CardDescription className="text-gray-300">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Growth</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$160</div>
+                <CardDescription className="text-gray-700">per month</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <p className="text-gray-300 mb-4">For established producers</p>
-                  <ul className="space-y-3">
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+              <CardContent className="space-y-6 flex-grow flex flex-col">
+                <div className="flex-grow">
+                  <p className="text-gray-700 mb-4 font-medium">For established producers</p>
+                  <ul className="space-y-3 min-h-[240px]">
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 50 events per year</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>50,000 vendor contacts</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Advanced email automation</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Vendor CRM with tagging</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Priority email support</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Custom branding</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
-                  <Link to="/contact">Get Started</Link>
+                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                  <Link to="/signup">Get Started</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Enterprise Plan */}
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 hover:border-purple-400/30 transition-all duration-300">
+            <Card className="bg-gray-100 border border-gray-300 hover:border-voxxy-purple-brand/40 hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-white mb-2">Enterprise</CardTitle>
-                <div className="text-4xl font-bold text-white mb-2">$400</div>
-                <CardDescription className="text-gray-300">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Enterprise</CardTitle>
+                <div className="text-4xl font-bold text-gray-900 mb-2">$400</div>
+                <CardDescription className="text-gray-700">per month</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <p className="text-gray-300 mb-4">For large-scale operations</p>
-                  <ul className="space-y-3">
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+              <CardContent className="space-y-6 flex-grow flex flex-col">
+                <div className="flex-grow">
+                  <p className="text-gray-700 mb-4 font-medium">For large-scale operations</p>
+                  <ul className="space-y-3 min-h-[240px]">
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Unlimited events</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Unlimited vendor contacts</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>White-label email automation</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Advanced CRM & analytics</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Dedicated account manager</span>
                     </li>
-                    <li className="flex items-start text-gray-200">
-                      <Check className="h-5 w-5 text-purple-400 mr-3 flex-shrink-0 mt-0.5" />
+                    <li className="flex items-start text-gray-800">
+                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>API access</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white" asChild>
-                  <Link to="/contact">Contact Sales</Link>
+                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                  <Link to="/signup">Contact Sales</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -198,8 +205,8 @@ export default function PricingPage() {
             Join event producers who are scaling their recurring events with Voxxy
           </p>
           <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
-            <Link to="/contact">
-              Request Beta Access
+            <Link to="/signup">
+              Get Started
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
