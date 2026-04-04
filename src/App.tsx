@@ -236,9 +236,6 @@ export default function App() {
           {/* Consumer Holding Screen */}
           <Route path="/pending" element={<BetaPendingPage />} />
 
-          {/* Unified Dashboard - Serves both producers and admins */}
-          <Route path="/dashboard" element={<Dashboard />} />
-
           {/* Legacy producer route - redirect to unified dashboard */}
           <Route path="/producer/pending" element={<Navigate to="/dashboard" replace />} />
 

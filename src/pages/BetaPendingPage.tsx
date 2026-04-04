@@ -17,6 +17,7 @@ export default function BetaPendingPage() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Check if user is an unpaid producer
   const isProducer = userProfile?.role === 'venue_owner' || userProfile?.role === 'producer'
@@ -30,29 +31,47 @@ export default function BetaPendingPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsSubmitting(true)
+    setError(null)
 
     try {
       // Submit contact form for access request
       const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-      const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
+      // Strip /api from URL since /contacts is a legacy endpoint not under /api namespace
+      const contactsUrl = `${API_BASE_URL.replace('/api', '')}/contacts`
+      console.log('📧 Submitting access request to:', contactsUrl)
+      console.log('📧 Form data:', { name: formData.name, email: formData.email })
+
+      const subject = needsPayment
+        ? 'Voxxy Presents - Payment/Subscription Request'
+        : 'Voxxy Presents - Access Request'
+
+      const response = await fetch(contactsUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contact_submission: {
-            type: 'presents_access_request',
+          contact: {
             name: formData.name,
             email: formData.email,
-            description: formData.message,
-            source: 'pending_access_page'
+            subject: subject,
+            message: formData.message
           }
         })
       })
 
+      console.log('📧 Response status:', response.status)
+
       if (response.ok) {
+        console.log('✅ Access request submitted successfully')
         setIsSubmitted(true)
+      } else {
+        // Handle non-OK responses
+        const errorData = await response.json().catch(() => ({ message: 'Failed to submit request' }))
+        console.error('❌ Failed to submit access request:', response.status, errorData)
+        setError(errorData.message || errorData.error || `Failed to submit request (${response.status})`)
       }
     } catch (error) {
-      console.error('Failed to submit access request:', error)
+      console.error('❌ Network error submitting access request:', error)
+      setError('Network error - please check your connection and try again')
     } finally {
       setIsSubmitting(false)
     }
@@ -182,6 +201,12 @@ export default function BetaPendingPage() {
                     className="bg-white border-gray-300 text-gray-900 placeholder:text-gray-400 text-[15px] focus:border-purple-400 transition-all resize-none rounded-lg"
                   />
                 </div>
+
+                {error && (
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-sm text-red-600 font-medium">{error}</p>
+                  </div>
+                )}
 
                 <Button
                   type="submit"

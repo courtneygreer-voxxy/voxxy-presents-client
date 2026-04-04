@@ -396,6 +396,83 @@ export default function SettingsPage({ onBack }: SettingsPageProps) {
               </div>
             </div>
 
+            {/* Account Information (Debug) */}
+            <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 space-y-4">
+              <div>
+                <h2 className="text-base font-semibold text-white mb-0.5">Account Information</h2>
+                <p className="text-xs text-white/60">View your account status and permissions</p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                    <label className="block text-xs text-white/40 mb-1">User ID</label>
+                    <p className="text-sm text-white font-mono">{userProfile?.id || 'N/A'}</p>
+                  </div>
+                  <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                    <label className="block text-xs text-white/40 mb-1">Email</label>
+                    <p className="text-sm text-white font-mono break-all">{userProfile?.email || 'N/A'}</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                    <label className="block text-xs text-white/40 mb-1">Role</label>
+                    <p className={`text-sm font-semibold ${
+                      userProfile?.role === 'admin' ? 'text-purple-400' :
+                      userProfile?.role === 'venue_owner' || userProfile?.role === 'producer' ? 'text-green-400' :
+                      userProfile?.role === 'vendor' ? 'text-blue-400' :
+                      'text-white'
+                    }`}>
+                      {userProfile?.role?.toUpperCase() || 'N/A'}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                    <label className="block text-xs text-white/40 mb-1">Payment Status</label>
+                    <p className={`text-sm font-semibold ${
+                      userProfile?.paid ? 'text-green-400' : 'text-red-400'
+                    }`}>
+                      {userProfile?.paid ? 'PAID' : 'UNPAID'}
+                    </p>
+                  </div>
+
+                  <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                    <label className="block text-xs text-white/40 mb-1">Product Context</label>
+                    <p className="text-sm text-white font-semibold">
+                      {userProfile?.product_context?.toUpperCase() || 'N/A'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="bg-black/20 rounded-lg p-3 border border-white/5">
+                  <label className="block text-xs text-white/40 mb-1">Account Status</label>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {userProfile?.confirmed_at && (
+                      <span className="px-2 py-1 bg-green-500/20 border border-green-400/30 text-green-300 text-xs rounded font-mono">
+                        EMAIL_VERIFIED
+                      </span>
+                    )}
+                    {!userProfile?.confirmed_at && (
+                      <span className="px-2 py-1 bg-yellow-500/20 border border-yellow-400/30 text-yellow-300 text-xs rounded font-mono">
+                        EMAIL_UNVERIFIED
+                      </span>
+                    )}
+                    {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && !userProfile?.paid && (
+                      <span className="px-2 py-1 bg-red-500/20 border border-red-400/30 text-red-300 text-xs rounded font-mono">
+                        PAYMENT_REQUIRED
+                      </span>
+                    )}
+                    {userProfile?.role === 'admin' && (
+                      <span className="px-2 py-1 bg-purple-500/20 border border-purple-400/30 text-purple-300 text-xs rounded font-mono">
+                        ADMIN_ACCESS
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Organization Information */}
             {organization && (
               <div className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 space-y-4">
