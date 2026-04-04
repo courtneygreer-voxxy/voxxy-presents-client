@@ -154,7 +154,7 @@ export default function EmailRow({
   };
 
   // Use actual email_type from template item if available, otherwise infer from trigger
-  const category = email.email_template_item?.email_type || inferCategory();
+  const category: EmailCategory = (email.email_template_item?.email_type || inferCategory()) as EmailCategory;
   const categoryConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['event_announcements'];
   const CategoryIcon = categoryConfig.icon;
 

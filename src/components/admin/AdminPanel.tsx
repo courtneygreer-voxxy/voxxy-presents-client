@@ -9,6 +9,7 @@ interface User {
   role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest';
   status?: 'active' | 'suspended' | 'banned';
   confirmed_at: string | null;
+  paid?: boolean;
   created_at?: string;
   updated_at?: string;
   last_sign_in_at?: string;
@@ -90,6 +91,7 @@ interface AdminPanelProps {
   onLoadAnalytics: () => Promise<void>;
   onExpandUser: (userId: number | null) => void;
   onExpandAnalyticsSection: (section: string | null) => void;
+  onToggleUserPaid: (userId: number) => Promise<void>;
 }
 
 export default function AdminPanel({
@@ -107,6 +109,7 @@ export default function AdminPanel({
   onLoadAnalytics,
   onExpandUser,
   onExpandAnalyticsSection,
+  onToggleUserPaid,
 }: AdminPanelProps) {
 
   // Utility functions
@@ -627,6 +630,41 @@ export default function AdminPanel({
 
                   {expandedUserId === user.id && (
                     <div className="p-4 border-t border-blue-500/30 bg-black/40">
+                      {/* Payment Status Control for Producers */}
+                      {(user.role === 'venue_owner' || user.role === 'producer') && (
+                        <div className="mb-4 pb-4 border-b border-blue-500/20">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-mono text-blue-300">PAYMENT STATUS:</span>
+                              <Badge className={`font-mono text-[10px] ${
+                                user.paid
+                                  ? 'bg-green-500/20 border-green-400/30 text-green-300'
+                                  : 'bg-red-500/20 border-red-400/30 text-red-300'
+                              }`}>
+                                {user.paid ? 'PAID' : 'UNPAID'}
+                              </Badge>
+                            </div>
+                            <Button
+                              onClick={async () => {
+                                try {
+                                  await onToggleUserPaid(user.id);
+                                } catch (error) {
+                                  console.error('Failed to toggle paid status:', error);
+                                }
+                              }}
+                              size="sm"
+                              variant="outline"
+                              className={`font-mono text-[10px] ${
+                                user.paid
+                                  ? 'bg-red-500/10 border-red-400/30 text-red-300 hover:bg-red-500/20'
+                                  : 'bg-green-500/10 border-green-400/30 text-green-300 hover:bg-green-500/20'
+                              }`}
+                            >
+                              {user.paid ? 'MARK UNPAID' : 'MARK PAID'}
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                       <pre className="text-[10px] text-green-300 font-mono overflow-auto max-h-60">
 {JSON.stringify(user, null, 2)}
                       </pre>

@@ -82,6 +82,7 @@ interface User {
   role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest';
   status?: 'active' | 'suspended' | 'banned';
   confirmed_at: string | null;
+  paid?: boolean;
   created_at?: string;
   updated_at?: string;
   last_sign_in_at?: string;
@@ -332,6 +333,17 @@ export default function ProducerDashboard() {
       console.error('Failed to load users:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleToggleUserPaid = async (userId: number) => {
+    if (!isAdmin) return;
+    try {
+      await adminApi.toggleUserPaid(userId);
+      // Reload users to reflect the change
+      await loadUsers();
+    } catch (err) {
+      console.error('Failed to toggle user paid status:', err);
     }
   };
 
@@ -884,6 +896,7 @@ export default function ProducerDashboard() {
                 onLoadAnalytics={loadAnalytics}
                 onExpandUser={setExpandedUserId}
                 onExpandAnalyticsSection={setExpandedAnalyticsSection}
+                onToggleUserPaid={handleToggleUserPaid}
               />
             </div>
           ) : (

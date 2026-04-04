@@ -1762,6 +1762,23 @@ export const adminApi = {
     }
 
     return response.json()
+  },
+
+  async toggleUserPaid(userId: number) {
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/users/${userId}/toggle_paid`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`
+      },
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: 'Failed to toggle paid status' }))
+      throw new ApiError(errorData.error || errorData.message || 'Failed to toggle paid status', response.status)
+    }
+
+    return await response.json()
   }
 }
 

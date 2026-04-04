@@ -36,6 +36,7 @@ export interface EmailTemplateItem {
   name: string;
   description: string | null;
   category: EmailCategory;
+  email_type?: 'event_announcements' | 'application_updates'; // Auto-set based on trigger_type
   position: number; // 1-40
 
   // Email content (with variables like {{event_title}})

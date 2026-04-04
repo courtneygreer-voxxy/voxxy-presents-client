@@ -18,6 +18,11 @@ export default function BetaPendingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
 
+  // Check if user is an unpaid producer
+  const isProducer = userProfile?.role === 'venue_owner' || userProfile?.role === 'producer'
+  const isPaid = userProfile?.paid === true
+  const needsPayment = isProducer && !isPaid
+
   const handleSignOut = async () => {
     await signOut()
   }
@@ -61,10 +66,26 @@ export default function BetaPendingPage() {
       <section className="relative pt-[140px] pb-20 px-6 md:px-12">
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
           <h1 className="text-[52px] md:text-[56px] font-display font-bold text-white mb-5 leading-[1.1] tracking-tight">
-            Welcome to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Voxxy Presents</em>
+            {needsPayment ? (
+              <>
+                <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Payment Required</em>
+              </>
+            ) : (
+              <>
+                Welcome to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Voxxy Presents</em>
+              </>
+            )}
           </h1>
           <p className="text-[18px] text-white/65 max-w-[700px] mx-auto leading-relaxed mb-0">
-            We see you're new here - please use the form below to request full access to Voxxy Presents and we will get back to you in 1-3 business days!
+            {needsPayment ? (
+              <>
+                To access Voxxy Presents, please subscribe to one of our plans. Contact us below to get started with your subscription.
+              </>
+            ) : (
+              <>
+                We see you're new here - please use the form below to request full access to Voxxy Presents and we will get back to you in 1-3 business days!
+              </>
+            )}
           </p>
 
           {/* Divider */}
@@ -107,7 +128,7 @@ export default function BetaPendingPage() {
           ) : (
             <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
               <h2 className="text-[28px] font-display font-bold text-gray-900 mb-6 text-center">
-                Request Full Access
+                {needsPayment ? 'Subscribe to Voxxy Presents' : 'Request Full Access'}
               </h2>
 
               {userProfile && (
@@ -115,6 +136,11 @@ export default function BetaPendingPage() {
                   <p className="text-sm text-gray-700">
                     <strong>Signed in as:</strong> {userProfile.email}
                   </p>
+                  {needsPayment && (
+                    <p className="text-sm text-gray-700 mt-2">
+                      <strong>Account type:</strong> Producer
+                    </p>
+                  )}
                 </div>
               )}
 
@@ -145,7 +171,10 @@ export default function BetaPendingPage() {
                 <div>
                   <Textarea
                     id="message"
-                    placeholder="Tell us about your events and why you'd like access to Voxxy Presents..."
+                    placeholder={needsPayment
+                      ? "Tell us about your organization and which plan you're interested in (Starter, Growth, or Enterprise)..."
+                      : "Tell us about your events and why you'd like access to Voxxy Presents..."
+                    }
                     value={formData.message}
                     onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
                     required
@@ -159,7 +188,7 @@ export default function BetaPendingPage() {
                   disabled={isSubmitting}
                   className="w-full bg-voxxy-purple-brand hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white text-[15px] font-semibold rounded-xl h-12"
                 >
-                  {isSubmitting ? 'Submitting...' : 'Request Access'}
+                  {isSubmitting ? 'Submitting...' : (needsPayment ? 'Contact Sales' : 'Request Access')}
                   {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
                 </Button>
               </form>

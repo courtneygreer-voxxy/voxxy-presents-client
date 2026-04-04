@@ -87,6 +87,9 @@ function RoleBasedDashboardRedirect() {
   const role = userProfile.role
   const productContext = userProfile.product_context
   const hasPresentsAccess = productContext === 'presents' || productContext === 'both'
+  const isProducer = role === 'producer' || role === 'venue_owner'
+  const isAdmin = role === 'admin'
+  const paid = userProfile.paid
 
   // Legacy users (no Presents access) OR consumers/guests → Pending page
   if (!hasPresentsAccess || role === 'consumer' || role === 'guest') {
@@ -95,9 +98,16 @@ function RoleBasedDashboardRedirect() {
     return <Navigate to="/pending" replace />
   }
 
+  // Payment check for producers (admins bypass this check)
+  if (isProducer && !isAdmin && !paid) {
+    console.log('💳 Producer without payment, redirecting to pending page')
+    console.log('   - Role:', role, 'Paid:', paid)
+    return <Navigate to="/pending" replace />
+  }
+
   // Users with Presents access - route by role
   // Producer roles (venue_owner = Producer in UI)
-  if (role === 'producer' || role === 'venue_owner') {
+  if (isProducer) {
     console.log('🟢 Producer with Presents access, redirecting to dashboard')
     return <Navigate to="/dashboard" replace />
   }
