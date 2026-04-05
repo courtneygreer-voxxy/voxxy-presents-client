@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { authApi, ApiError } from '@/services/api'
@@ -463,6 +464,153 @@ export default function BetaPendingPage() {
                           </a>
                         </p>
                       </form>
+
+                      {/* Pricing Tiers Section */}
+                      <div className="mt-12 pt-10 border-t border-white/10">
+                        {/* Header */}
+                        <div className="text-center mb-10">
+                          <div className="flex items-center justify-center gap-2 mb-4">
+                            <Sparkles className="h-6 w-6 text-purple-400" />
+                            <h4 className="text-2xl font-bold text-white">Pilot Program Pricing</h4>
+                          </div>
+                          <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
+                            As a pilot user, you'll get our Enterprise plan at a fraction of the cost. Lock in this exclusive rate for a full year!
+                          </p>
+                        </div>
+
+                        {/* Pricing Cards - Vertical Stack */}
+                        <div className="flex flex-col gap-6 mb-8 max-w-2xl mx-auto">
+                          {/* Starter Plan */}
+                          <Card className="bg-white/5 border border-white/10 flex flex-col">
+                            <CardHeader className="text-center pb-6 pt-6">
+                              <CardTitle className="text-xl font-bold text-white mb-3">Starter</CardTitle>
+                              <div className="text-3xl font-bold text-white mb-2">$80</div>
+                              <CardDescription className="text-gray-400 text-sm">per month</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
+                              <div className="flex-grow">
+                                <p className="text-gray-400 mb-4 font-medium text-sm">Perfect for new producers</p>
+                                <ul className="space-y-3">
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Up to 10 events/year</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>10,000 vendor contacts</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Automated emails</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Email support</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Growth Plan */}
+                          <Card className="bg-white/5 border border-white/10 flex flex-col">
+                            <CardHeader className="text-center pb-6 pt-6">
+                              <CardTitle className="text-xl font-bold text-white mb-3">Growth</CardTitle>
+                              <div className="text-3xl font-bold text-white mb-2">$160</div>
+                              <CardDescription className="text-gray-400 text-sm">per month</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
+                              <div className="flex-grow">
+                                <p className="text-gray-400 mb-4 font-medium text-sm">For established producers</p>
+                                <ul className="space-y-3">
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Up to 50 events/year</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>50,000 vendor contacts</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Advanced automation</span>
+                                  </li>
+                                  <li className="flex items-start text-gray-300 text-sm">
+                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                    <span>Custom branding</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
+
+                          {/* Enterprise Plan - HIGHLIGHTED */}
+                          <Card className="bg-gradient-to-br from-purple-600/20 to-fuchsia-600/20 border-2 border-fuchsia-400 shadow-xl shadow-fuchsia-500/30 flex flex-col relative transform hover:scale-[1.02] transition-transform duration-200">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                              <Badge className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-4 py-1.5 text-sm font-bold shadow-lg">
+                                🎉 PILOT SPECIAL
+                              </Badge>
+                            </div>
+                            <CardHeader className="text-center pb-6 pt-8">
+                              <CardTitle className="text-xl font-bold text-white mb-3">Enterprise</CardTitle>
+                              <div className="flex items-center justify-center gap-3 mb-2">
+                                <span className="text-base text-gray-400 line-through">$400</span>
+                                <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
+                                  $80
+                                </span>
+                              </div>
+                              <CardDescription className="text-fuchsia-300 text-sm font-semibold">
+                                per month - Lock in for 1 year!
+                              </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
+                              <div className="bg-fuchsia-500/10 border border-fuchsia-400/30 rounded-lg p-4">
+                                <p className="text-fuchsia-200 text-sm font-semibold text-center">
+                                  Save $3,840/year as a pilot user!
+                                </p>
+                              </div>
+                              <div className="flex-grow">
+                                <p className="text-fuchsia-200 mb-4 font-medium text-sm">Full enterprise features:</p>
+                                <ul className="space-y-3">
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span><strong>Unlimited events</strong></span>
+                                  </li>
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span><strong>Unlimited contacts</strong></span>
+                                  </li>
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span>White-label automation</span>
+                                  </li>
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span>Advanced CRM & analytics</span>
+                                  </li>
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span>Dedicated account manager</span>
+                                  </li>
+                                  <li className="flex items-start text-white text-sm">
+                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                    <span>API access</span>
+                                  </li>
+                                </ul>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </div>
+
+                        {/* Bottom CTA Message */}
+                        <div className="mt-8 text-center bg-white/5 rounded-lg p-6 border border-fuchsia-400/20 max-w-2xl mx-auto">
+                          <p className="text-base text-gray-300 leading-relaxed">
+                            <strong className="text-fuchsia-300 text-lg">Limited spots available!</strong>
+                            <br />
+                            <span className="text-sm">Request access above to secure your pilot pricing and be among the first to lock in this exclusive rate.</span>
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>

@@ -1,4 +1,4 @@
-import { Shield, Database, Mail, Bug, Key, Building2, BarChart3, TrendingUp, CheckCircle2, XCircle, Clock, Users, Store, Calendar } from 'lucide-react';
+import { Shield, Database, Mail, Bug, Key, Building2, BarChart3, TrendingUp, CheckCircle2, XCircle, Clock, Users, Store, Calendar, DollarSign } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -673,14 +673,14 @@ export default function AdminPanel({
                                   console.error('Failed to toggle paid status:', error);
                                 }
                               }}
-                              size="sm"
-                              variant="outline"
-                              className={`font-mono text-[10px] ${
+                              size="default"
+                              className={`font-semibold text-xs gap-2 ${
                                 user.paid
-                                  ? 'bg-red-500/10 border-red-400/30 text-red-300 hover:bg-red-500/20'
-                                  : 'bg-green-500/10 border-green-400/30 text-green-300 hover:bg-green-500/20'
+                                  ? 'bg-red-600 hover:bg-red-700 text-white border-2 border-red-400'
+                                  : 'bg-green-600 hover:bg-green-700 text-white border-2 border-green-400'
                               }`}
                             >
+                              <DollarSign className="h-4 w-4" />
                               {user.paid ? 'MARK UNPAID' : 'MARK PAID'}
                             </Button>
                           </div>
