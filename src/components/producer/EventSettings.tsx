@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Trash2, FileText, Edit, Link, Copy, ExternalLink, Check, X, Plus } from 'lucide-react';
+import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy } from 'lucide-react';
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
@@ -76,6 +77,13 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const [loadingApps, setLoadingApps] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  const handleCopyLink = (url: string, label: string) => {
+    navigator.clipboard.writeText(url);
+    setCopiedLink(label);
+    setTimeout(() => setCopiedLink(null), 2000);
+  };
 
   // Event details edit state
   const [isEditingDetails, setIsEditingDetails] = useState(false);
@@ -109,10 +117,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
-  // Copy link states
-  const [copiedEventPageLink, setCopiedEventPageLink] = useState(false);
-  const [copiedPortalLink, setCopiedPortalLink] = useState(false);
-  const [copiedApplicationId, setCopiedApplicationId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchApplications();
@@ -253,32 +257,6 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     }
   };
 
-  const copyToClipboard = async (text: string, type: 'eventpage' | 'portal') => {
-    try {
-      await navigator.clipboard.writeText(text);
-      if (type === 'eventpage') {
-        setCopiedEventPageLink(true);
-        setTimeout(() => setCopiedEventPageLink(false), 2000);
-      } else {
-        setCopiedPortalLink(true);
-        setTimeout(() => setCopiedPortalLink(false), 2000);
-      }
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      alert('Failed to copy link to clipboard');
-    }
-  };
-
-  const copyApplicationLinkToClipboard = async (applicationId: number, shareableUrl: string) => {
-    try {
-      await navigator.clipboard.writeText(shareableUrl);
-      setCopiedApplicationId(applicationId);
-      setTimeout(() => setCopiedApplicationId(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
-      alert('Failed to copy link to clipboard');
-    }
-  };
 
   const handleExportInvitesCSV = async () => {
     try {
@@ -426,19 +404,24 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
   return (
     <div className="p-3 md:p-4 max-w-6xl mx-auto space-y-4">
-      {/* Event Details Section */}
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <div className="p-1.5 rounded-lg bg-purple-500/20">
-                <Edit className="w-4 h-4 text-purple-400" />
+      {/* Accordion Sections */}
+      <div className="bg-white/5 backdrop-blur-sm rounded-lg border border-white/10 overflow-hidden">
+        <Accordion type="multiple" defaultValue={['event-details']}>
+          {/* Event Details Section */}
+          <AccordionItem value="event-details" className="border-white/10">
+            <AccordionTrigger className="px-4 hover:no-underline hover:bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-purple-500/20">
+                  <Edit className="w-4 h-4 text-purple-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-white">Event Details</span>
+                  <p className="text-xs text-white/50 font-normal">Manage basic event information</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-lg font-bold text-white">Event Details</h2>
-                <p className="text-white/60 text-xs">Manage basic event information</p>
-              </div>
-            </div>
-
-            <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
               {!isEditingDetails ? (
                 <>
                   <div className="space-y-3">
@@ -610,23 +593,26 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                   </div>
                 </>
               )}
-            </div>
-          </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
 
-      {/* Application Settings Section */}
-      <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-orange-500/20">
-              <FileText className="w-4 h-4 text-orange-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Application Settings</h2>
-              <p className="text-white/60 text-xs">Control which categories are accepting applications</p>
-            </div>
-          </div>
-
-          {/* Category Controls */}
-          <div className="space-y-3">
+          {/* Application Settings Section */}
+          <AccordionItem value="applications" className="border-white/10">
+            <AccordionTrigger className="px-4 hover:no-underline hover:bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-orange-500/20">
+                  <FileText className="w-4 h-4 text-orange-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-white">Application Settings</span>
+                  <p className="text-xs text-white/50 font-normal">Control which categories are accepting applications</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              {/* Category Controls */}
+              <div className="space-y-3">
             <p className="text-white/60 text-xs uppercase tracking-wide font-semibold">Category Controls</p>
 
             {loadingApps ? (
@@ -865,177 +851,137 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                 + Add Category
               </button>
             )}
-          </div>
-        </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
 
-      {/* Event Links Section */}
-      <div>
-          <div className="flex items-center gap-2 mb-3">
-            <div className="p-1.5 rounded-lg bg-blue-500/20">
-              <Link className="w-4 h-4 text-blue-400" />
-            </div>
-            <div>
-              <h2 className="text-lg font-bold text-white">Event Links</h2>
-              <p className="text-white/60 text-xs">Share these links with vendors</p>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            {/* Application Page Link */}
-            <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-sm text-white font-semibold mb-0.5">Application Page</h3>
-                  <p className="text-white/60 text-xs mb-2">
-                    Share this link to the public application page where vendors can apply
-                  </p>
-                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2.5">
-                    <code className="text-purple-400 text-xs flex-1 overflow-x-auto">
-                      {eventPageLink}
-                    </code>
-                  </div>
+          {/* Event Links Section */}
+          <AccordionItem value="links" className="border-white/10 border-b-0">
+            <AccordionTrigger className="px-4 hover:no-underline hover:bg-white/5">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-blue-500/20">
+                  <Link className="w-4 h-4 text-blue-400" />
                 </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyToClipboard(eventPageLink, 'eventpage')}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-all"
-                    title="Copy link"
-                  >
-                    {copiedEventPageLink ? (
-                      <Check className="w-3.5 h-3.5" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-                  <a
-                    href={eventPageLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
-                    title="Open in new tab"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-white">Links & Sharing</span>
+                  <p className="text-xs text-white/50 font-normal">Event page links, portal access, and data export</p>
                 </div>
               </div>
-            </div>
-
-            {/* Portal Link */}
-            <div className="bg-[#1e1536] rounded-xl p-4 border border-purple-500/20">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <h3 className="text-sm text-white font-semibold mb-0.5">Vendor Portal</h3>
-                  <p className="text-white/60 text-xs mb-2">
-                    Share this link with accepted vendors to view event details, payment info, and updates
-                  </p>
-                  <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2.5">
-                    <code className="text-blue-400 text-xs flex-1 overflow-x-auto">
-                      {portalLink}
-                    </code>
-                  </div>
-                  <p className="text-white/40 text-[11px] mt-1.5">
-                    Vendors will need their email address to access (must have applied to the event)
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => copyToClipboard(portalLink, 'portal')}
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-all"
-                    title="Copy link"
-                  >
-                    {copiedPortalLink ? (
-                      <Check className="w-3.5 h-3.5" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5" />
-                    )}
-                  </button>
-                  <a
-                    href={portalLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
-                    title="Open in new tab"
-                  >
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Application Category Links */}
-            {applications.length > 0 && (
-              <div className="mt-4 space-y-3">
-                <div className="flex items-start gap-2">
-                  <div className="p-1.5 rounded-lg bg-indigo-500/20">
-                    <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm text-white font-semibold">Application Category Links</h3>
-                    <p className="text-white/60 text-[11px] mt-0.5">
-                      Share these links with vendors to apply to specific categories
-                    </p>
-                  </div>
-                </div>
-
-                {applications.map((app) => (
-                  <div
-                    key={app.id}
-                    className={`bg-[#1e1536] rounded-xl p-4 border ${
-                      app.status === 'active'
-                        ? 'border-purple-500/20'
-                        : 'border-white/10 opacity-60'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1">
-                        <h4 className="text-sm text-white font-semibold mb-1">{app.name}</h4>
-                        <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2">
-                          <code className="text-[11px] text-indigo-400 flex-1 overflow-x-auto">
-                            {`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
-                          </code>
-                        </div>
-                        {app.status !== 'active' && (
-                          <p className="text-white/40 text-[11px] mt-1.5">
-                            This application is inactive
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => copyApplicationLinkToClipboard(app.id, `${window.location.origin}/events/${event.slug}/apply/${app.id}`)}
-                          disabled={app.status !== 'active'}
-                          className={`flex items-center gap-2 px-2.5 py-1.5 rounded-lg transition-all ${
-                            app.status === 'active'
-                              ? 'bg-indigo-600 hover:bg-indigo-700 text-white'
-                              : 'bg-white/5 text-white/40 cursor-not-allowed'
-                          }`}
-                          title={app.status === 'active' ? 'Copy link' : 'Application is inactive'}
-                        >
-                          {copiedApplicationId === app.id ? (
-                            <Check className="w-3.5 h-3.5" />
-                          ) : (
-                            <Copy className="w-3.5 h-3.5" />
-                          )}
-                        </button>
-                        {app.status === 'active' && (
-                          <a
-                            href={`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all"
-                            title="Open in new tab"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                      </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              <div className="space-y-3">
+                {/* Application Page */}
+                <div className="p-3 rounded-lg bg-[#1e1536] border border-purple-500/20">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-semibold text-white">Application Page</p>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleCopyLink(eventPageLink, 'application')}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-white/60 hover:bg-white/10 transition-colors"
+                      >
+                        {copiedLink === 'application' ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                        {copiedLink === 'application' ? 'Copied!' : 'Copy'}
+                      </button>
+                      <a
+                        href={eventPageLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-purple-300 hover:bg-white/10 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Open
+                      </a>
                     </div>
                   </div>
-                ))}
+                  <p className="text-[11px] text-white/50 break-all font-mono">{eventPageLink}</p>
+                </div>
+
+                {/* Vendor Portal */}
+                <div className="p-3 rounded-lg bg-[#1e1536] border border-purple-500/20">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <p className="text-xs font-semibold text-white">Vendor Portal</p>
+                    <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => handleCopyLink(portalLink, 'portal')}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-white/60 hover:bg-white/10 transition-colors"
+                      >
+                        {copiedLink === 'portal' ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                        {copiedLink === 'portal' ? 'Copied!' : 'Copy'}
+                      </button>
+                      <a
+                        href={portalLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-blue-300 hover:bg-white/10 transition-colors"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Open
+                      </a>
+                    </div>
+                  </div>
+                  <p className="text-[11px] text-white/50 break-all font-mono">{portalLink}</p>
+                </div>
+
+                {/* Category Application Links */}
+                {applications.length > 0 && (
+                  <div>
+                    <p className="text-[10px] text-white/60 uppercase tracking-wide font-semibold mb-2">Category Application Links</p>
+                    <div className="space-y-2">
+                      {applications.map((app) => {
+                        const appUrl = `${window.location.origin}/events/${event.slug}/apply/${app.id}`;
+                        return (
+                          <div
+                            key={app.id}
+                            className={`p-3 rounded-lg bg-[#1e1536] border border-purple-500/20 ${app.status !== 'active' ? 'opacity-50' : ''}`}
+                          >
+                            <div className="flex items-center justify-between mb-1.5">
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs font-semibold text-white">{app.name}</p>
+                                <span className={`text-[10px] font-medium ${app.status === 'active' ? 'text-green-400' : 'text-white/40'}`}>
+                                  {app.status === 'active' ? 'Active' : 'Inactive'}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-1">
+                                <button
+                                  onClick={() => startEditing(app)}
+                                  className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-white/60 hover:bg-white/10 transition-colors"
+                                >
+                                  <Edit className="w-3 h-3" />
+                                  Edit
+                                </button>
+                                {app.status === 'active' && (
+                                  <>
+                                    <button
+                                      onClick={() => handleCopyLink(appUrl, `cat-${app.id}`)}
+                                      className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-white/60 hover:bg-white/10 transition-colors"
+                                    >
+                                      {copiedLink === `cat-${app.id}` ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                                    </button>
+                                    <a
+                                      href={appUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-purple-300 hover:bg-white/10 transition-colors"
+                                    >
+                                      <ExternalLink className="w-3 h-3" />
+                                      Open
+                                    </a>
+                                  </>
+                                )}
+                              </div>
+                            </div>
+                            <p className="text-[11px] text-white/50 break-all font-mono">{appUrl}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div>
 
       {/* Danger Zone */}
       <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">

@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
-import { Search, Filter, UserPlus, Upload, Save, Trash2, X, Check, ChevronDown, Plus } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users } from 'lucide-react';
+import { MapPin, Tags } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
 import ContactsTable from './ContactsTable';
@@ -7,129 +8,13 @@ import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
-import { CategoryFilterBar } from '@/components/shared/CategoryFilterBar';
 import { BulkActionToolbar } from './BulkActionToolbar';
+import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
-type NetworkTab = 'contacts' | 'lists';
+type NetworkTab = 'contacts' | 'lists' | 'categories';
 
 interface NetworkPageProps {
   organizationId: number;
-}
-
-// --- Multi-Select Filter Dropdown ---
-function MultiSelectFilterDropdown({
-  label,
-  options,
-  selected,
-  onChange,
-}: {
-  label: string;
-  options: string[];
-  selected: string[];
-  onChange: (selected: string[]) => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpen(false);
-        setSearch('');
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const filteredOptions = options.filter(opt =>
-    opt.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const handleToggle = (value: string) => {
-    onChange(
-      selected.includes(value)
-        ? selected.filter(v => v !== value)
-        : [...selected, value]
-    );
-  };
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setOpen(!open)}
-        className={`
-          flex items-center gap-1.5 pl-3 pr-2.5 py-2 border rounded-lg text-sm cursor-pointer transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500
-          ${selected.length > 0
-            ? 'bg-purple-500/15 border-purple-500/40 text-purple-200'
-            : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-          }
-        `}
-      >
-        <Filter className="w-3.5 h-3.5 text-white/40 flex-shrink-0" />
-        <span>
-          {selected.length === 0
-            ? `All ${label}`
-            : `${label} (${selected.length})`}
-        </span>
-        <ChevronDown className={`w-3.5 h-3.5 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <div className="absolute z-50 mt-1 w-64 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden">
-          {options.length > 6 && (
-            <div className="p-2 border-b border-white/10">
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={`Search ${label.toLowerCase()}...`}
-                className="w-full px-2.5 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
-                autoFocus
-              />
-            </div>
-          )}
-          <div className="max-h-56 overflow-y-auto p-1">
-            {filteredOptions.length === 0 ? (
-              <p className="px-3 py-2 text-xs text-white/40">No options found</p>
-            ) : (
-              filteredOptions.map(option => (
-                <button
-                  key={option}
-                  onClick={() => handleToggle(option)}
-                  className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-white/80 hover:bg-white/10 rounded transition-colors"
-                >
-                  <div
-                    className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      selected.includes(option)
-                        ? 'bg-purple-500 border-purple-500'
-                        : 'border-white/30'
-                    }`}
-                  >
-                    {selected.includes(option) && (
-                      <Check className="w-3 h-3 text-white" strokeWidth={3} />
-                    )}
-                  </div>
-                  <span className="truncate text-left">{option}</span>
-                </button>
-              ))
-            )}
-          </div>
-          {selected.length > 0 && (
-            <div className="p-2 border-t border-white/10">
-              <button
-                onClick={() => { onChange([]); setOpen(false); }}
-                className="w-full px-2 py-1.5 text-xs text-white/50 hover:text-white hover:bg-white/10 rounded transition-colors"
-              >
-                Clear {label}
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
 }
 
 export default function NetworkPage({ organizationId }: NetworkPageProps) {
@@ -143,16 +28,18 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const [showCSVUploadModal, setShowCSVUploadModal] = useState(false);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
 
-  // Multi-select filter states
-  const [locationFilters, setLocationFilters] = useState<string[]>([]);
-  const [categoryFilters, setCategoryFilters] = useState<string[]>([]);
-  const [tagFilters, setTagFilters] = useState<string[]>([]);
+  // SearchFilterBar state
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // Category objects for visual filter
+  // Category objects
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
 
-  // Filter options from backend (all unique values across entire org)
+  // Category CRUD state
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [categoryFormData, setCategoryFormData] = useState({ name: '', icon: '', color: '#FF6B6B' });
+
+  // Filter options from backend
   const [filterOptions, setFilterOptions] = useState<{
     locations: string[];
     categories: string[];
@@ -162,14 +49,6 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   // Inline save list state
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [listName, setListName] = useState('');
-
-  // Category modal state
-  const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [categoryFormData, setCategoryFormData] = useState({
-    name: '',
-    icon: '',
-    color: '#FF6B6B',
-  });
   const [savingList, setSavingList] = useState(false);
 
   // Pagination states
@@ -184,6 +63,19 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
   // Bulk update state
   const [bulkUpdateLoading, setBulkUpdateLoading] = useState(false);
+
+  // Derive filter arrays from activeFilters
+  const locationFilters = activeFilters.find(f => f.fieldKey === 'location')?.values || [];
+  const categoryFilters = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
+  const tagFilters = activeFilters.find(f => f.fieldKey === 'tags')?.values || [];
+  const hasActiveFilters = locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0;
+
+  // Filter field config for SearchFilterBar
+  const filterFieldConfigs: FilterFieldConfig[] = [
+    { key: 'category', label: 'Category', icon: Tag, options: filterOptions.categories, multi: true },
+    { key: 'location', label: 'Location', icon: MapPin, options: filterOptions.locations, multi: true },
+    { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
+  ];
 
   // Fetch filter options from backend on mount
   useEffect(() => {
@@ -202,7 +94,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     loadFilterOptions();
   }, [organizationId]);
 
-  // Load category objects for visual filter
+  // Load categories
   const loadCategories = async () => {
     try {
       const response = await categoriesApi.getAll(organizationId, true);
@@ -216,27 +108,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     loadCategories();
   }, [organizationId]);
 
-  // Sync categoryFilters with selectedCategoryIds
-  useEffect(() => {
-    const selectedCategoryNames = categories
-      .filter(c => selectedCategoryIds.includes(c.id))
-      .map(c => c.name);
-    setCategoryFilters(selectedCategoryNames);
-  }, [selectedCategoryIds, categories]);
-
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
     fetchContacts(1);
-  }, [organizationId, locationFilters, categoryFilters, tagFilters]);
+  }, [organizationId, locationFilters.join(','), categoryFilters.join(','), tagFilters.join(',')]);
 
   const fetchContacts = async (page: number = currentPage) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Send filters to backend
-      // Location, tags, and categories all support arrays (OR logic - match ANY of the provided values)
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
         location: locationFilters.length > 0 ? locationFilters : undefined,
@@ -256,12 +138,12 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
       // Client-side filtering for multi-select values beyond the first
       if (locationFilters.length > 1) {
-        contactsData = contactsData.filter(c =>
+        contactsData = contactsData.filter((c: VendorContact) =>
           c.location && locationFilters.includes(c.location)
         );
       }
       if (categoryFilters.length > 1) {
-        contactsData = contactsData.filter(c =>
+        contactsData = contactsData.filter((c: VendorContact) =>
           c.categories?.some(cat => categoryFilters.includes(cat))
         );
       }
@@ -283,23 +165,17 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     setSelectedContacts([]);
   };
 
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-  };
-
   const handleSearchSubmit = () => {
     setCurrentPage(1);
     fetchContacts(1);
   };
 
   const handleSelectContact = (contactId: number) => {
-    setSelectedContacts(prev => {
-      if (prev.includes(contactId)) {
-        return prev.filter(id => id !== contactId);
-      } else {
-        return [...prev, contactId];
-      }
-    });
+    setSelectedContacts(prev =>
+      prev.includes(contactId)
+        ? prev.filter(id => id !== contactId)
+        : [...prev, contactId]
+    );
   };
 
   const handleSelectAll = async () => {
@@ -325,9 +201,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   };
 
   const handleDeleteContact = async (contactId: number) => {
-    if (!confirm('Are you sure you want to remove this contact from your network?')) {
-      return;
-    }
+    if (!confirm('Are you sure you want to remove this contact from your network?')) return;
 
     try {
       await vendorContactsApi.delete(contactId);
@@ -340,38 +214,19 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
   const handleBulkDelete = async () => {
     if (selectedContacts.length === 0) return;
-
-    // Confirm deletion
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}? This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
+    if (!confirm(`Are you sure you want to delete ${selectedContacts.length} contact${selectedContacts.length === 1 ? '' : 's'}? This action cannot be undone.`)) return;
 
     try {
       setBulkUpdateLoading(true);
       const result = await vendorContactsApi.bulkDelete(organizationId, selectedContacts);
-
-      // Show success message
       alert(result.message || `Successfully deleted ${result.deleted_count} contacts`);
-
-      // Refresh contacts to show updated list
       await fetchContacts(currentPage);
-
-      // Refresh filter options in case deleted contacts changed available values
       try {
         const options = await vendorContactsApi.getFilterOptions(organizationId);
-        setFilterOptions({
-          locations: options.locations || [],
-          categories: options.categories || [],
-          tags: options.tags || [],
-        });
+        setFilterOptions({ locations: options.locations || [], categories: options.categories || [], tags: options.tags || [] });
       } catch { /* ignore */ }
-
-      // Clear selection
       setSelectedContacts([]);
     } catch (error: any) {
-      console.error('Bulk delete failed:', error);
       alert(`Failed to delete contacts: ${error.message || 'Unknown error'}`);
     } finally {
       setBulkUpdateLoading(false);
@@ -381,39 +236,23 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   const handleBulkCategoryUpdate = async (categoryNames: string[]) => {
     if (selectedContacts.length === 0) return;
 
-    // Check if any selected contacts have existing categories
     const selectedContactObjects = contacts.filter(c => selectedContacts.includes(c.id));
     const hasExistingCategories = selectedContactObjects.some(c => c.categories && c.categories.length > 0);
-
     let categoryMode: 'replace' | 'append' = 'replace';
-
-    // Ask user if they want to replace or add to existing categories
     if (hasExistingCategories) {
-      const userChoice = window.confirm(
-        `Some selected contacts already have categories.\n\n` +
-        `Click "OK" to ADD this category to their existing categories.\n` +
-        `Click "Cancel" to REPLACE their categories with this new category.`
+      const userChoice = confirm(
+        `Some selected contacts already have categories.\n\nClick "OK" to ADD this category to their existing categories.\nClick "Cancel" to REPLACE their categories with this new category.`
       );
       categoryMode = userChoice ? 'append' : 'replace';
     }
 
     try {
       setBulkUpdateLoading(true);
-      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-        categories: categoryNames,
-        category_mode: categoryMode,
-      });
-
-      // Show success message
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, { categories: categoryNames, category_mode: categoryMode });
       alert(result.message || `Successfully updated ${result.updated_count} contacts`);
-
-      // Refresh contacts to show updated categories
       await fetchContacts(currentPage);
-
-      // Clear selection
       setSelectedContacts([]);
     } catch (error: any) {
-      console.error('Bulk update failed:', error);
       alert(`Failed to update contacts: ${error.message || 'Unknown error'}`);
     } finally {
       setBulkUpdateLoading(false);
@@ -425,35 +264,86 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
     try {
       setBulkUpdateLoading(true);
-      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, {
-        location: location,
-      });
-
-      // Show success message
+      const result = await vendorContactsApi.bulkUpdate(organizationId, selectedContacts, { location });
       alert(result.message || `Successfully updated ${result.updated_count} contacts`);
-
-      // Refresh contacts to show updated location
       await fetchContacts(currentPage);
-
-      // Clear selection
       setSelectedContacts([]);
     } catch (error: any) {
-      console.error('Bulk location update failed:', error);
       alert(`Failed to update location: ${error.message || 'Unknown error'}`);
     } finally {
       setBulkUpdateLoading(false);
     }
   };
 
-  const hasActiveFilters = locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0;
-
   const clearAllFilters = () => {
-    setLocationFilters([]);
-    setCategoryFilters([]);
-    setSelectedCategoryIds([]);
-    setTagFilters([]);
+    setActiveFilters([]);
     setShowSaveInput(false);
     setListName('');
+  };
+
+  // Category CRUD functions
+  const openAddCategoryModal = () => {
+    setEditingCategory(null);
+    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    setShowCategoryModal(true);
+  };
+
+  const openEditCategoryModal = (category: Category) => {
+    setEditingCategory(category);
+    setCategoryFormData({ name: category.name, icon: category.icon || '', color: category.color || '#FF6B6B' });
+    setShowCategoryModal(true);
+  };
+
+  const handleSaveCategory = async () => {
+    if (!categoryFormData.name.trim()) {
+      alert('Category name is required');
+      return;
+    }
+    try {
+      if (editingCategory) {
+        await categoriesApi.update(editingCategory.id, {
+          name: categoryFormData.name.trim(),
+          icon: categoryFormData.icon.trim() || undefined,
+          color: categoryFormData.color,
+        });
+      } else {
+        await categoriesApi.create(organizationId, {
+          name: categoryFormData.name.trim(),
+          icon: categoryFormData.icon.trim() || undefined,
+          color: categoryFormData.color,
+        });
+      }
+      await loadCategories();
+      setShowCategoryModal(false);
+      setEditingCategory(null);
+      setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    } catch (error: any) {
+      alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+    }
+  };
+
+  const handleDeleteCategory = async (category: Category) => {
+    if (category.in_use) {
+      const stats = category.usage_stats;
+      const usageDetails = [];
+      if (stats?.applications_count) usageDetails.push(`${stats.applications_count} vendor application(s)`);
+      if (stats?.email_templates_count) usageDetails.push(`${stats.email_templates_count} email template(s)`);
+      if (stats?.scheduled_emails_count) usageDetails.push(`${stats.scheduled_emails_count} scheduled email(s)`);
+      alert(`Cannot delete this category. It is currently being used by:\n\n${usageDetails.join('\n')}\n\nPlease remove these associations first.`);
+      return;
+    }
+    if (!confirm(`Are you sure you want to delete the category "${category.name}"?`)) return;
+    try {
+      await categoriesApi.delete(category.id);
+      await loadCategories();
+    } catch (error: any) {
+      alert(`Failed to delete category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
+    }
+  };
+
+  const handleViewCategory = (category: Category) => {
+    setActiveFilters([{ fieldKey: 'category', values: [category.name] }]);
+    setActiveTab('contacts');
   };
 
   const handleSaveList = async () => {
@@ -479,71 +369,8 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
     }
   };
 
-  // Category management functions
-  const openAddCategoryModal = () => {
-    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
-    setShowCategoryModal(true);
-  };
-
-  const handleSaveCategory = async () => {
-    if (!categoryFormData.name.trim()) {
-      alert('Category name is required');
-      return;
-    }
-
-    try {
-      await categoriesApi.create(organizationId, {
-        name: categoryFormData.name.trim(),
-        icon: categoryFormData.icon.trim() || undefined,
-        color: categoryFormData.color,
-      });
-      alert('Category created successfully!');
-
-      // Refresh categories and filter options
-      await loadCategories();
-      await fetchContacts(currentPage);
-
-      setShowCategoryModal(false);
-      setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
-    } catch (error: any) {
-      console.error('Failed to save category:', error);
-      alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
-    }
-  };
-
-  const removeFilterChip = (type: 'location' | 'category' | 'tag', value: string) => {
-    if (type === 'location') setLocationFilters(prev => prev.filter(v => v !== value));
-    if (type === 'category') {
-      setCategoryFilters(prev => prev.filter(v => v !== value));
-      // Also update selectedCategoryIds
-      const categoryToRemove = categories.find(c => c.name === value);
-      if (categoryToRemove) {
-        setSelectedCategoryIds(prev => prev.filter(id => id !== categoryToRemove.id));
-      }
-    }
-    if (type === 'tag') setTagFilters(prev => prev.filter(v => v !== value));
-  };
-
-  const handleToggleCategory = (categoryId: number) => {
-    setSelectedCategoryIds(prev => {
-      if (prev.includes(categoryId)) {
-        return prev.filter(id => id !== categoryId);
-      } else {
-        return [...prev, categoryId];
-      }
-    });
-  };
-
-  const handleSelectAllCategories = () => {
-    if (selectedCategoryIds.length === categories.length || selectedCategoryIds.length === 0) {
-      setSelectedCategoryIds([]);
-    } else {
-      setSelectedCategoryIds(categories.map(c => c.id));
-    }
-  };
-
   // Loading state
-  if (loading && contacts.length === 0) {
+  if (loading && contacts.length === 0 && activeTab === 'contacts') {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
@@ -555,15 +382,12 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }
 
   // Error state
-  if (error && contacts.length === 0) {
+  if (error && contacts.length === 0 && activeTab === 'contacts') {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <button
-            onClick={() => fetchContacts()}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-          >
+          <button onClick={() => fetchContacts()} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
             Try Again
           </button>
         </div>
@@ -572,7 +396,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
   }
 
   // Empty state (no contacts at all)
-  if (contacts.length === 0 && !searchTerm && !hasActiveFilters) {
+  if (contacts.length === 0 && !searchTerm && !hasActiveFilters && activeTab === 'contacts') {
     return (
       <>
         <div className="flex flex-col items-center justify-center py-12">
@@ -580,52 +404,25 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
               <UserPlus className="w-8 h-8 text-white/40" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              Start Building Your Network
-            </h3>
-            <p className="text-white/50 text-sm mb-6">
-              Add vendors to your network to easily invite them to future events.
-            </p>
+            <h3 className="text-lg font-semibold text-white mb-2">Start Building Your Network</h3>
+            <p className="text-white/50 text-sm mb-6">Add vendors to your network to easily invite them to future events.</p>
             <div className="flex items-center justify-center gap-3">
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-              >
+              <button onClick={() => setShowAddModal(true)} className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all">
                 Add Your First Contact
               </button>
-              <button
-                onClick={() => setShowCSVUploadModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all border border-white/20"
-              >
+              <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all border border-white/20">
                 <Upload className="w-4 h-4" />
                 Import CSV
               </button>
             </div>
-            <p className="text-white/40 text-xs mt-3">
-              You can also add vendors from your event submissions
-            </p>
           </div>
         </div>
 
         {showAddModal && (
-          <AddContactModal
-            organizationId={organizationId}
-            onClose={() => setShowAddModal(false)}
-            onSuccess={(newContact) => {
-              setContacts(prev => [newContact, ...prev]);
-              setShowAddModal(false);
-            }}
-          />
+          <AddContactModal organizationId={organizationId} onClose={() => setShowAddModal(false)} onSuccess={(newContact) => { setContacts(prev => [newContact, ...prev]); setShowAddModal(false); }} />
         )}
-
         {showCSVUploadModal && (
-          <CSVUploadModal
-            open={showCSVUploadModal}
-            onClose={() => setShowCSVUploadModal(false)}
-            onSuccess={() => {
-              fetchContacts();
-            }}
-          />
+          <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
         )}
       </>
     );
@@ -637,22 +434,14 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-white mb-1">Network</h2>
-          <p className="text-sm text-white/60">
-            Manage your professional contacts and relationships
-          </p>
+          <p className="text-sm text-white/60">Manage your professional contacts and relationships</p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => setShowCSVUploadModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20"
-          >
+          <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20">
             <Upload className="w-4 h-4" />
             <span className="hidden sm:inline">Import CSV</span>
           </button>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
-          >
+          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
             <UserPlus className="w-4 h-4" />
             Add Contact
           </button>
@@ -661,198 +450,82 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
       {/* Tabs */}
       <div className="flex items-center gap-2 border-b border-white/10">
-        <button
-          onClick={() => setActiveTab('contacts')}
-          className={`
-            px-4 py-2.5 text-sm font-medium transition-all relative
-            ${activeTab === 'contacts'
-              ? 'text-white'
-              : 'text-white/60 hover:text-white'
-            }
-          `}
-        >
-          All Contacts
-          {activeTab === 'contacts' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab('lists')}
-          className={`
-            flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative
-            ${activeTab === 'lists'
-              ? 'text-white'
-              : 'text-white/60 hover:text-white'
-            }
-          `}
-        >
-          <Filter className="w-4 h-4" />
-          Lists
-          {activeTab === 'lists' && (
-            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
-          )}
-        </button>
+        {([
+          { id: 'contacts' as NetworkTab, label: 'All Contacts' },
+          { id: 'lists' as NetworkTab, label: 'Lists', icon: Filter },
+          { id: 'categories' as NetworkTab, label: 'Categories', icon: Tag },
+        ]).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative ${
+              activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
+            }`}
+          >
+            {tab.icon && <tab.icon className="w-4 h-4" />}
+            {tab.label}
+            {activeTab === tab.id && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
+            )}
+          </button>
+        ))}
       </div>
 
-      {/* Tab Content */}
+      {/* Contacts Tab */}
       {activeTab === 'contacts' && (
         <>
-          {/* Visual Category Filter */}
-          {categories.length > 0 && (
-            <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-              <div className="mb-3 flex items-start justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-white">Filter by Vendor Category</h3>
-                  <p className="text-xs text-white/50 mt-0.5">
-                    Select categories to filter your network contacts
-                  </p>
-                </div>
-                <button
-                  onClick={openAddCategoryModal}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg bg-purple-600 hover:bg-purple-700 text-white font-medium transition-all whitespace-nowrap"
-                >
-                  <Plus className="w-3.5 h-3.5" />
-                  New Category
-                </button>
-              </div>
-              <CategoryFilterBar
-                categories={categories}
-                selectedCategoryIds={selectedCategoryIds}
-                onToggleCategory={handleToggleCategory}
-                onSelectAll={handleSelectAllCategories}
-              />
-            </div>
-          )}
+          {/* Search & Filter Bar */}
+          <SearchFilterBar
+            searchPlaceholder="Search contacts..."
+            searchValue={searchTerm}
+            onSearchChange={setSearchTerm}
+            onSearchSubmit={handleSearchSubmit}
+            filterFields={filterFieldConfigs}
+            activeFilters={activeFilters}
+            onFiltersChange={setActiveFilters}
+          />
 
-          {/* Multi-select filter dropdowns */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <MultiSelectFilterDropdown
-              label="Locations"
-              options={filterOptions.locations}
-              selected={locationFilters}
-              onChange={setLocationFilters}
-            />
-            <MultiSelectFilterDropdown
-              label="Tags"
-              options={filterOptions.tags}
-              selected={tagFilters}
-              onChange={setTagFilters}
-            />
-
-            {/* Clear Filters + Save as List */}
-            {hasActiveFilters && (
-              <>
-                <button
-                  onClick={clearAllFilters}
-                  className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs rounded-lg transition-colors border border-white/10"
-                >
-                  Clear Filters
-                </button>
-
-                {!showSaveInput ? (
-                  <button
-                    onClick={() => setShowSaveInput(true)}
-                    className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/30"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    Save as List
-                  </button>
-                ) : (
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="text"
-                      value={listName}
-                      onChange={(e) => setListName(e.target.value)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
-                      placeholder="List name..."
-                      className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
-                      autoFocus
-                    />
-                    <button
-                      onClick={handleSaveList}
-                      disabled={savingList || !listName.trim()}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-500 disabled:opacity-50 transition-colors"
-                    >
-                      <Save className="w-3 h-3" />
-                      {savingList ? 'Saving...' : 'Save'}
-                    </button>
-                    <button
-                      onClick={() => { setShowSaveInput(false); setListName(''); }}
-                      className="p-1.5 text-white/40 hover:text-white transition-colors"
-                    >
-                      <X className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          {/* Active filter chips */}
+          {/* Save as List (when filters active) */}
           {hasActiveFilters && (
-            <div className="flex flex-wrap gap-1.5">
-              {locationFilters.map(loc => (
-                <span key={`loc-${loc}`} className="inline-flex items-center gap-1 px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-full border border-purple-500/30">
-                  {loc}
-                  <button onClick={() => removeFilterChip('location', loc)} className="hover:text-white transition-colors">
-                    <X className="w-3 h-3" />
+            <div className="flex items-center gap-2">
+              {!showSaveInput ? (
+                <button
+                  onClick={() => setShowSaveInput(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/30"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  Save as List
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={listName}
+                    onChange={(e) => setListName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
+                    placeholder="List name..."
+                    className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
+                    autoFocus
+                  />
+                  <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-500 disabled:opacity-50 transition-colors">
+                    <Save className="w-3 h-3" />
+                    {savingList ? 'Saving...' : 'Save'}
                   </button>
-                </span>
-              ))}
-              {categoryFilters.map(cat => (
-                <span key={`cat-${cat}`} className="inline-flex items-center gap-1 px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full border border-blue-500/30">
-                  {cat}
-                  <button onClick={() => removeFilterChip('category', cat)} className="hover:text-white transition-colors">
-                    <X className="w-3 h-3" />
+                  <button onClick={() => { setShowSaveInput(false); setListName(''); }} className="p-1.5 text-white/40 hover:text-white transition-colors">
+                    <X className="w-3.5 h-3.5" />
                   </button>
-                </span>
-              ))}
-              {tagFilters.map(tag => (
-                <span key={`tag-${tag}`} className="inline-flex items-center gap-1 px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-500/30">
-                  {tag}
-                  <button onClick={() => removeFilterChip('tag', tag)} className="hover:text-white transition-colors">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                </div>
+              )}
             </div>
           )}
 
-          {/* Search & Actions bar */}
-          <div className="flex items-center gap-2">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
-                placeholder="Search contacts..."
-                className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              />
-            </div>
-            <button
-              onClick={handleSearchSubmit}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white/90 text-sm rounded-lg transition-colors flex items-center gap-2"
-            >
-              <Search className="w-4 h-4" />
-              Search
-            </button>
-          </div>
-          {/* No results message */}
+          {/* No results */}
           {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
             <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
               <p className="text-white/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
               </p>
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  clearAllFilters();
-                  fetchContacts(1);
-                }}
-                className="mt-3 text-purple-400 hover:text-purple-300 text-sm underline"
-              >
+              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-purple-400 hover:text-purple-300 text-sm underline">
                 Clear all filters
               </button>
             </div>
@@ -885,121 +558,150 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
           {/* Modals */}
           {showAddModal && (
-            <AddContactModal
-              organizationId={organizationId}
-              onClose={() => setShowAddModal(false)}
-              onSuccess={(newContact) => {
-                setContacts(prev => [newContact, ...prev]);
-                setShowAddModal(false);
-              }}
-            />
+            <AddContactModal organizationId={organizationId} onClose={() => setShowAddModal(false)} onSuccess={(newContact) => { setContacts(prev => [newContact, ...prev]); setShowAddModal(false); }} />
           )}
-
           {editingContact && (
-            <EditContactModal
-              organizationId={organizationId}
-              contact={editingContact}
-              onClose={() => setEditingContact(null)}
-              onSuccess={(updatedContact) => {
-                setContacts(prev =>
-                  prev.map(c => (c.id === updatedContact.id ? updatedContact : c))
-                );
-                setEditingContact(null);
-              }}
-            />
+            <EditContactModal organizationId={organizationId} contact={editingContact} onClose={() => setEditingContact(null)} onSuccess={(updatedContact) => { setContacts(prev => prev.map(c => (c.id === updatedContact.id ? updatedContact : c))); setEditingContact(null); }} />
           )}
-
           {showCSVUploadModal && (
-            <CSVUploadModal
-              open={showCSVUploadModal}
-              onClose={() => setShowCSVUploadModal(false)}
-              onSuccess={() => {
-                fetchContacts();
-              }}
-            />
+            <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
           )}
         </>
       )}
 
-      {/* Lists Tab Content */}
+      {/* Lists Tab */}
       {activeTab === 'lists' && (
         <ListsManagement
           organizationId={organizationId}
           onViewList={(filters) => {
-            setLocationFilters(filters.locations || []);
-            setCategoryFilters(filters.categories || []);
-            setTagFilters(filters.tags || []);
+            const newFilters: ActiveFilter[] = [];
+            if (filters.locations?.length) newFilters.push({ fieldKey: 'location', values: filters.locations });
+            if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
+            if (filters.tags?.length) newFilters.push({ fieldKey: 'tags', values: filters.tags });
+            setActiveFilters(newFilters);
             setActiveTab('contacts');
           }}
         />
       )}
 
-      {/* Category Add Modal */}
+      {/* Categories Tab */}
+      {activeTab === 'categories' && (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-white/60">Manage vendor categories for organizing contacts</p>
+            <button
+              onClick={openAddCategoryModal}
+              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+            >
+              <Plus className="w-4 h-4" />
+              Add Category
+            </button>
+          </div>
+
+          {categories.length === 0 ? (
+            <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
+              <Tag className="w-12 h-12 text-white/20 mx-auto mb-3" />
+              <p className="text-white/60 text-sm">No categories yet</p>
+              <p className="text-white/40 text-xs mt-1">Create your first category to organize your vendors</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {categories.map((category) => (
+                <div
+                  key={category.id}
+                  className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                >
+                  <div className="flex items-center gap-3">
+                    {category.icon && <span className="text-2xl">{category.icon}</span>}
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm text-white font-medium">{category.name}</h3>
+                        {category.color && (
+                          <div
+                            className="w-4 h-4 rounded border border-white/20"
+                            style={{ backgroundColor: category.color }}
+                          />
+                        )}
+                      </div>
+                      {category.usage_stats && (
+                        <p className="text-xs text-white/60 mt-0.5">
+                          {category.usage_stats.applications_count || 0} vendor{category.usage_stats.applications_count !== 1 ? 's' : ''}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => handleViewCategory(category)}
+                      className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                      title="View contacts in this category"
+                    >
+                      <Users className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openEditCategoryModal(category)}
+                      className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                      title="Edit category"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDeleteCategory(category)}
+                      className="p-2 rounded-lg hover:bg-red-500/20 text-white/60 hover:text-red-400 transition-all"
+                      title="Delete category"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Category Add/Edit Modal */}
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-gray-900 rounded-lg border border-white/10 w-full max-w-md">
-            {/* Modal Header */}
             <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-base font-semibold text-white">Add New Category</h3>
+              <h3 className="text-base font-semibold text-white">
+                {editingCategory ? 'Edit Category' : 'Add Category'}
+              </h3>
               <button
-                onClick={() => {
-                  setShowCategoryModal(false);
-                  setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
-                }}
+                onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
                 className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
-
-            {/* Modal Body */}
             <div className="p-4 space-y-4">
-              {/* Category Name */}
               <div>
-                <label htmlFor="categoryName" className="block text-xs text-white/60 mb-1">
-                  Category Name <span className="text-red-400">*</span>
-                </label>
+                <label className="block text-xs text-white/60 mb-1">Category Name <span className="text-red-400">*</span></label>
                 <input
-                  id="categoryName"
                   type="text"
                   value={categoryFormData.name}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   autoFocus
                 />
-                <p className="text-xs text-white/40 mt-1">
-                  Reserved names: "All", "All Vendors", "All Invitations"
-                </p>
               </div>
-
-              {/* Icon (Emoji) */}
               <div>
-                <label htmlFor="categoryIcon" className="block text-xs text-white/60 mb-1">
-                  Icon (Emoji) - Optional
-                </label>
+                <label className="block text-xs text-white/60 mb-1">Icon (Emoji) - Optional</label>
                 <input
-                  id="categoryIcon"
                   type="text"
                   value={categoryFormData.icon}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
                   placeholder="🍕 or 🎨 or 🎤"
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all"
+                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   maxLength={2}
                 />
-                <p className="text-xs text-white/40 mt-1">
-                  Paste an emoji to represent this category
-                </p>
               </div>
-
-              {/* Color Picker */}
               <div>
-                <label htmlFor="categoryColor" className="block text-xs text-white/60 mb-1">
-                  Color
-                </label>
+                <label className="block text-xs text-white/60 mb-1">Color</label>
                 <div className="flex items-center gap-3">
                   <input
-                    id="categoryColor"
                     type="color"
                     value={categoryFormData.color}
                     onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
@@ -1009,46 +711,28 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
                     type="text"
                     value={categoryFormData.color}
                     onChange={(e) => {
-                      const value = e.target.value;
-                      if (/^#[0-9A-Fa-f]{0,6}$/.test(value)) {
-                        setCategoryFormData(prev => ({ ...prev, color: value }));
+                      if (/^#[0-9A-Fa-f]{0,6}$/.test(e.target.value)) {
+                        setCategoryFormData(prev => ({ ...prev, color: e.target.value }));
                       }
                     }}
                     placeholder="#FF6B6B"
-                    className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-white/15 transition-all flex-1"
+                    className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                     maxLength={7}
                   />
                 </div>
-                <p className="text-xs text-white/40 mt-1">
-                  Choose a color to identify this category
-                </p>
               </div>
-
-              {/* Preview */}
               <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                 <p className="text-xs text-white/60 mb-2">Preview:</p>
                 <div className="flex items-center gap-2">
-                  {categoryFormData.icon && (
-                    <span className="text-2xl">{categoryFormData.icon}</span>
-                  )}
-                  <span className="text-sm text-white font-medium">
-                    {categoryFormData.name || 'Category Name'}
-                  </span>
-                  <div
-                    className="w-4 h-4 rounded border border-white/20"
-                    style={{ backgroundColor: categoryFormData.color }}
-                  />
+                  {categoryFormData.icon && <span className="text-2xl">{categoryFormData.icon}</span>}
+                  <span className="text-sm text-white font-medium">{categoryFormData.name || 'Category Name'}</span>
+                  <div className="w-4 h-4 rounded border border-white/20" style={{ backgroundColor: categoryFormData.color }} />
                 </div>
               </div>
             </div>
-
-            {/* Modal Footer */}
             <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
               <button
-                onClick={() => {
-                  setShowCategoryModal(false);
-                  setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
-                }}
+                onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
                 className="px-4 py-2 text-sm rounded-lg border border-white/20 text-white hover:bg-white/10 transition-all"
               >
                 Cancel
@@ -1058,7 +742,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
                 disabled={!categoryFormData.name.trim()}
                 className="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white font-medium transition-all"
               >
-                Add Category
+                {editingCategory ? 'Save Changes' : 'Add Category'}
               </button>
             </div>
           </div>

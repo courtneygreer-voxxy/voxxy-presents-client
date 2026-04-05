@@ -15,6 +15,8 @@ import { TemplateManager } from '@/components/producer/Email';
 import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmationDialog';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import AdminPanel from '@/components/admin/AdminPanel';
+import { GuidebookModal } from '@/components/shared/GuidebookModal';
+import { HelpIcon } from '@/components/shared/HelpIcon';
 
 type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
@@ -161,6 +163,7 @@ export default function ProducerDashboard() {
   const { userProfile, isAuthenticated, loading: authLoading, signOut, isAdmin } = useAuth();
   const navigate = useNavigate();
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
+  const [guidebookOpen, setGuidebookOpen] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -272,6 +275,21 @@ export default function ProducerDashboard() {
       fetchOrCreateOrganization();
     }
   }, [userProfile]);
+
+  // Auto-trigger guidebook on first visit
+  useEffect(() => {
+    if (!loadingOrg && !loadingEvents && organization) {
+      try {
+        if (localStorage.getItem('voxxy_guidebook_seen') !== 'true') {
+          const timer = setTimeout(() => {
+            setGuidebookOpen(true);
+            localStorage.setItem('voxxy_guidebook_seen', 'true');
+          }, 500);
+          return () => clearTimeout(timer);
+        }
+      } catch { /* localStorage not available */ }
+    }
+  }, [loadingOrg, loadingEvents, organization]);
 
   // Load admin data when admin tab is active
   useEffect(() => {
@@ -779,6 +797,7 @@ export default function ProducerDashboard() {
             return (
               <button
                 key={item.id}
+                data-onboarding={`nav-${item.id}`}
                 onClick={() => {
                   setActiveNav(item.id);
                   setIsMobileMenuOpen(false);
@@ -862,9 +881,9 @@ export default function ProducerDashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto">
+        <main className="flex-1 overflow-auto" data-onboarding="events-content">
           {activeNav === 'settings' ? (
-            <SettingsPage onBack={() => setActiveNav('events')} />
+            <SettingsPage onBack={() => setActiveNav('events')} onStartGuide={() => setGuidebookOpen(true)} />
           ) : activeNav === 'events' ? (
             renderEventsContent()
           ) : activeNav === 'network' ? (
@@ -921,6 +940,14 @@ export default function ProducerDashboard() {
         type={dialogProps.type}
         isLoading={dialogProps.isLoading}
       />
+
+      {/* Guidebook Modal */}
+      <GuidebookModal open={guidebookOpen} onClose={() => setGuidebookOpen(false)} />
+
+      {/* Help button to open guidebook */}
+      {!guidebookOpen && (
+        <HelpIcon onClick={() => setGuidebookOpen(true)} label="Open guide" />
+      )}
     </div>
   );
 }

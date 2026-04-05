@@ -118,7 +118,8 @@ export default function Step2ApplicationDetails({
       } else if (category) {
         // Create new application using category defaults (no API call!)
         const hasDefaults = category.default_booth_price && category.default_booth_price > 0;
-        const installDate = eventDetails.payment_deadline || '';
+        // Default install_date to event date (installs typically happen day-of)
+        const installDateDefault = eventDetails.event_date || '';
 
         newApps.push({
           id: crypto.randomUUID(),
@@ -130,7 +131,7 @@ export default function Step2ApplicationDetails({
           name: category.name,
           booth_price: category.default_booth_price || 0,
           description: category.default_description || '',
-          install_date: installDate,
+          install_date: installDateDefault,
           install_start_time: category.default_install_start_time || '',
           install_end_time: category.default_install_end_time || '',
           payment_link: category.default_payment_link || '',

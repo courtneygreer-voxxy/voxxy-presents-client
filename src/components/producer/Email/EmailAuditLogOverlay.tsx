@@ -6,12 +6,16 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { ArrowLeft, FileSearch, Download, Loader2 } from 'lucide-react';
+import { ArrowLeft, FileSearch, Download, Loader2, CalendarIcon } from 'lucide-react';
+import { format } from 'date-fns';
+import type { DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import type { AuditEntry, AuditFilters, ScheduledEmail, EmailDelivery, EmailCategory } from '@/types/email';
 import { scheduledEmailsApi, emailDeliveriesApi } from '@/services/api';
 import { EmailAuditTable, type SortColumn } from './EmailAuditTable';
-import { EmailAuditFilters } from './EmailAuditFilters';
+import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 import { ContactSupportDialog } from './ContactSupportDialog';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -53,6 +57,18 @@ export function EmailAuditLogOverlay({
   // Get user info for support form
   const { userProfile } = useAuth();
 
+  // SearchFilterBar state
+  const [activeSearchFilters, setActiveSearchFilters] = useState<ActiveFilter[]>(() => {
+    const initial: ActiveFilter[] = [];
+    if (initialFilters?.email_name) initial.push({ fieldKey: 'email_name', values: [initialFilters.email_name] });
+    if (initialFilters?.category) initial.push({ fieldKey: 'category', values: [initialFilters.category] });
+    if (initialFilters?.status) initial.push({ fieldKey: 'status', values: [initialFilters.status] });
+    return initial;
+  });
+
+  // Date range calendar state
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   // Sorting state
   const [sortColumn, setSortColumn] = useState<SortColumn | null>('sent_at');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
@@ -66,6 +82,47 @@ export function EmailAuditLogOverlay({
       setSortColumn(column);
       setSortDirection('asc');
     }
+  };
+
+  // --- SearchFilterBar field configs (derived from loaded audit data) ---
+  const emailNames = useMemo(() => Array.from(new Set(auditEntries.map(e => e.email_name))).sort(), [auditEntries]);
+  const categoryList = useMemo(() => Array.from(new Set(auditEntries.map(e => e.category))).sort(), [auditEntries]);
+  const statusList = useMemo(() => ['delivered', 'undelivered', 'pending', 'sent', 'unsubscribed'], []);
+
+  const filterFieldConfigs: FilterFieldConfig[] = useMemo(() => [
+    { key: 'email_name', label: 'Email Name', options: emailNames, multi: false },
+    { key: 'category', label: 'Category', options: categoryList, multi: false },
+    { key: 'status', label: 'Status', options: statusList, multi: false },
+  ], [emailNames, categoryList, statusList]);
+
+  // --- Date range helpers (preserved from EmailAuditFilters) ---
+  const dateRange: DateRange | undefined =
+    filters.date_from || filters.date_to
+      ? {
+          from: filters.date_from ? new Date(filters.date_from + 'T00:00:00') : undefined,
+          to: filters.date_to ? new Date(filters.date_to + 'T00:00:00') : undefined,
+        }
+      : undefined;
+
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    setFilters(prev => ({
+      ...prev,
+      date_from: range?.from ? format(range.from, 'yyyy-MM-dd') : undefined,
+      date_to: range?.to ? format(range.to, 'yyyy-MM-dd') : undefined,
+    }));
+  };
+
+  const dateRangeLabel = () => {
+    if (filters.date_from && filters.date_to) {
+      return `${format(new Date(filters.date_from + 'T00:00:00'), 'MMM d, yyyy')} – ${format(new Date(filters.date_to + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    if (filters.date_from) {
+      return `From ${format(new Date(filters.date_from + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    if (filters.date_to) {
+      return `Until ${format(new Date(filters.date_to + 'T00:00:00'), 'MMM d, yyyy')}`;
+    }
+    return 'All Dates';
   };
 
   // Fetch and transform data
@@ -276,9 +333,9 @@ export function EmailAuditLogOverlay({
   const totalPages = Math.ceil(filteredAndSortedEntries.length / itemsPerPage);
 
   return (
-    <div className="fixed inset-0 bg-background z-50 flex flex-col">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
       {/* Header */}
-      <div className="border-b bg-background sticky top-0 z-10 shadow-lg">
+      <div className="border-b border-white/10 bg-[#0f0a1e]/80 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Left: Back button and title */}
@@ -333,10 +390,60 @@ export function EmailAuditLogOverlay({
         {/* Filter Bar */}
         {!isLoading && !error && auditEntries.length > 0 && (
           <div className="mb-4">
-            <EmailAuditFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              entries={auditEntries}
+            <SearchFilterBar
+              searchPlaceholder="Search by recipient name or email..."
+              searchValue={filters.search || ''}
+              onSearchChange={(value) => setFilters(prev => ({ ...prev, search: value || undefined }))}
+              filterFields={filterFieldConfigs}
+              activeFilters={activeSearchFilters}
+              onFiltersChange={(newFilters) => {
+                setActiveSearchFilters(newFilters);
+                const emailName = newFilters.find(f => f.fieldKey === 'email_name')?.values[0];
+                const category = newFilters.find(f => f.fieldKey === 'category')?.values[0];
+                const status = newFilters.find(f => f.fieldKey === 'status')?.values[0];
+                setFilters(prev => ({
+                  ...prev,
+                  email_name: emailName || undefined,
+                  category: category || undefined,
+                  status: (status as any) || undefined,
+                }));
+              }}
+              extraFilters={
+                <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                      filters.date_from || filters.date_to
+                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+                        : 'bg-white/5 text-white/60 hover:text-white border border-white/10 hover:bg-white/10'
+                    }`}>
+                      <CalendarIcon className="w-3.5 h-3.5" />
+                      <span>{dateRangeLabel()}</span>
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 bg-background border-white/10" align="start">
+                    <Calendar
+                      mode="range"
+                      selected={dateRange}
+                      onSelect={handleDateRangeChange}
+                      numberOfMonths={2}
+                      defaultMonth={dateRange?.from || new Date()}
+                    />
+                    {(filters.date_from || filters.date_to) && (
+                      <div className="border-t border-white/10 p-2 flex justify-end">
+                        <button
+                          onClick={() => {
+                            handleDateRangeChange(undefined);
+                            setCalendarOpen(false);
+                          }}
+                          className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition-colors"
+                        >
+                          Clear dates
+                        </button>
+                      </div>
+                    )}
+                  </PopoverContent>
+                </Popover>
+              }
             />
           </div>
         )}

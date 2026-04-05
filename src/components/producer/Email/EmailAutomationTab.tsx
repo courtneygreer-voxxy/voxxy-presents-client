@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, Search, Filter, FileSearch, Mail, Plus } from 'lucide-react';
+import { RefreshCw, AlertCircle, CheckCircle, Loader2, Sparkles, FileSearch, Mail, Plus } from 'lucide-react';
 import { scheduledEmailsApi, eventsApi, categoriesApi, vendorApplicationsApi } from '@/services/api';
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory, CreateScheduledEmailRequest } from '@/types/email';
 import type { Category } from '@/types/category';
@@ -9,6 +9,7 @@ import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
 import { DebugPanel } from '../DebugPanel';
+import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -39,6 +40,9 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+
+  // Event must be published before "Send Now" is allowed
+  const isEventLive = event?.published === true || event?.status?.status === 'published';
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [eventData, setEventData] = useState<any | null>(null);
 
@@ -52,11 +56,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Search and filter state
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<FilterType>('all');
+  const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
 
-  // Category filter state
+  // Category data (fetched from API)
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | 'all' | 'all_invitations' | 'all_vendors'>('all');
 
   // Sort state
   type SortColumn = 'name' | 'subject' | 'scheduled_for' | 'email_type' | 'category' | 'recipient_count' | 'undelivered_count' | 'status';
@@ -297,17 +300,51 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     setTimeout(() => setSuccessMessage(null), 5000);
   };
 
+  // Filter field configs for SearchFilterBar
+  const statusOptions = FILTER_OPTIONS.filter(o => o.value !== 'all').map(o => o.label);
+
+  const categoryOptions = [
+    'All Invitations',
+    'All Vendors',
+    ...categories.map(c => c.icon ? `${c.icon} ${c.name}` : c.name),
+  ];
+
+  const filterFieldConfigs: FilterFieldConfig[] = [
+    { key: 'status', label: 'Status', options: statusOptions, multi: false },
+    { key: 'category', label: 'Category', options: categoryOptions, multi: false },
+  ];
+
+  // Derive filter values from activeFilters for backward compatibility
+  const statusFilterFromBar = activeFilters.find(f => f.fieldKey === 'status')?.values[0];
+  const categoryFilterFromBar = activeFilters.find(f => f.fieldKey === 'category')?.values[0];
+
+  // Map status label back to FilterType value
+  const derivedStatusFilter: FilterType = statusFilterFromBar
+    ? (FILTER_OPTIONS.find(o => o.label === statusFilterFromBar)?.value ?? 'all')
+    : 'all';
+
+  // Map category label back to selectedCategoryId value
+  const derivedCategoryId: number | 'all' | 'all_invitations' | 'all_vendors' = (() => {
+    if (!categoryFilterFromBar) return 'all';
+    if (categoryFilterFromBar === 'All Invitations') return 'all_invitations';
+    if (categoryFilterFromBar === 'All Vendors') return 'all_vendors';
+    const matchedCategory = categories.find(c =>
+      (c.icon ? `${c.icon} ${c.name}` : c.name) === categoryFilterFromBar
+    );
+    return matchedCategory ? matchedCategory.id : 'all';
+  })();
+
   // Filter and search emails
   const filteredEmails = useMemo(() => {
     let result = emails;
 
     // Filter by status
-    if (statusFilter !== 'all') {
-      result = result.filter(email => email.status === statusFilter);
+    if (derivedStatusFilter !== 'all') {
+      result = result.filter(email => email.status === derivedStatusFilter);
     }
 
     // Filter by vendor category
-    if (selectedCategoryId !== 'all') {
+    if (derivedCategoryId !== 'all') {
       result = result.filter(email => {
         // Helper function to infer email type using same logic as EmailRow.tsx
         const inferCategory = (): EmailCategory => {
@@ -331,19 +368,19 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         const emailCategory = email.email_template_item?.category || inferCategory();
 
         // Filter by "All Invitations" - show only application emails without specific category
-        if (selectedCategoryId === 'all_invitations') {
+        if (derivedCategoryId === 'all_invitations') {
           return !email.category_id && emailCategory === 'application_updates';
         }
 
         // Filter by "All Vendors" - show only announcement emails without specific category
-        if (selectedCategoryId === 'all_vendors') {
+        if (derivedCategoryId === 'all_vendors') {
           return !email.category_id && emailCategory !== 'application_updates';
         }
 
         // Filter by specific vendor category
-        if (typeof selectedCategoryId === 'number') {
+        if (typeof derivedCategoryId === 'number') {
           // Include emails that have a matching category_id
-          if (email.category_id && email.category_id === selectedCategoryId) {
+          if (email.category_id && email.category_id === derivedCategoryId) {
             return true;
           }
           // For emails without a category_id (All Invitations / All Vendors)
@@ -480,7 +517,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
     });
-  }, [emails, searchQuery, statusFilter, selectedCategoryId, sortColumn, sortDirection]);
+  }, [emails, searchQuery, derivedStatusFilter, derivedCategoryId, sortColumn, sortDirection]);
 
   // Calculate statistics
   const stats = {
@@ -513,7 +550,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onEditEmail={(email) => setViewState({ view: 'email-editor', email, returnTo: 'sequence-editor' })}
         onPause={handlePause}
         onResume={handleResume}
-        onSendNow={handleSendNow}
+        onSendNow={isEventLive ? handleSendNow : undefined}
         onDelete={handleDelete}
         onCreateEmail={() => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor' })}
         onSaveAsTemplate={() => setIsSaveDialogOpen(true)}
@@ -668,72 +705,23 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       ) : (
         <div className="space-y-6">
           {/* Search and Filters */}
-          <div className="flex flex-col sm:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
-              <input
-                type="text"
-                placeholder="Search emails..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-white/60" />
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as FilterType)}
-                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer [&>option]:bg-gray-900 [&>option]:text-white"
-              >
-                {FILTER_OPTIONS.map(option => (
-                  <option key={option.value} value={option.value} className="bg-gray-900 text-white">
-                    {option.label}
-                    {option.value !== 'all' && ` (${stats[option.value as keyof typeof stats] || 0})`}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Category Filter */}
-            <div className="flex items-center gap-2">
-              <select
-                value={selectedCategoryId}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  if (value === 'all' || value === 'all_invitations' || value === 'all_vendors') {
-                    setSelectedCategoryId(value);
-                  } else {
-                    setSelectedCategoryId(Number(value));
-                  }
-                }}
-                className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer [&>option]:bg-gray-900 [&>option]:text-white"
-              >
-                <option value="all" className="bg-gray-900 text-white">All Categories ({categories.length})</option>
-                <option value="all_invitations" className="bg-gray-900 text-white italic text-white/80">All Invitations</option>
-                <option value="all_vendors" className="bg-gray-900 text-white italic text-white/80">All Vendors</option>
-                <optgroup label="Vendor Categories" className="bg-gray-900 text-white/60">
-                  {categories.map(category => (
-                    <option key={category.id} value={category.id} className="bg-gray-900 text-white">
-                      {category.icon ? `${category.icon} ${category.name}` : category.name}
-                    </option>
-                  ))}
-                </optgroup>
-              </select>
-            </div>
-          </div>
+          <SearchFilterBar
+            searchPlaceholder="Search emails..."
+            searchValue={searchQuery}
+            onSearchChange={setSearchQuery}
+            filterFields={filterFieldConfigs}
+            activeFilters={activeFilters}
+            onFiltersChange={setActiveFilters}
+          />
 
           {/* Results count */}
           <div className="flex items-center justify-between">
             <p className="text-sm text-white/60">
               Showing {filteredEmails.length} of {emails.length} emails
             </p>
-            {searchQuery && (
+            {(searchQuery || activeFilters.length > 0) && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => { setSearchQuery(''); setActiveFilters([]); }}
                 className="text-sm text-purple-400 hover:text-purple-300"
               >
                 Clear search
@@ -748,7 +736,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             onEdit={(email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })}
             onPause={handlePause}
             onResume={handleResume}
-            onSendNow={handleSendNow}
+            onSendNow={isEventLive ? handleSendNow : undefined}
             onRetryFailed={handleRetryFailed}
             onDelete={handleDelete}
             onViewAuditLog={(filters) => setViewState({ view: 'audit-log', filters })}

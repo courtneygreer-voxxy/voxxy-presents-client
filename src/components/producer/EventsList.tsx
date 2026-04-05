@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Edit2, Plus, Search, SlidersHorizontal, Eye, EyeOff, Trash2 } from 'lucide-react';
+import { Calendar, Plus, Eye, EyeOff, Trash2, Search } from 'lucide-react';
 import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
 
@@ -51,7 +51,7 @@ export default function EventsList({
   loading = false,
 }: EventsListProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'live' | 'draft' | 'past'>('all');
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [sortBy, setSortBy] = useState<'date' | 'status' | 'name'>('date');
 
@@ -100,12 +100,12 @@ export default function EventsList({
       // Status filter
       const badge = getStatusBadge(event);
 
-      // Hide past events by default unless showPastEvents is true
-      if (!showPastEvents && badge.value === 'past') {
+      // Hide past events by default unless showPastEvents is true or 'Past' is explicitly filtered
+      if (!showPastEvents && badge.value === 'past' && statusFilter !== 'Past') {
         return false;
       }
 
-      if (statusFilter !== 'all' && badge.value !== statusFilter) {
+      if (statusFilter && badge.label !== statusFilter) {
         return false;
       }
 
@@ -160,76 +160,43 @@ export default function EventsList({
 
       {/* Search and Filters */}
       <div className="mb-4 space-y-2">
-        {/* Search Bar */}
+        {/* Search bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
           <input
             type="text"
+            placeholder="Search events..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search events by name, location, or description..."
-            className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           />
         </div>
 
-        {/* Filters Row */}
+        {/* Status pills + Sort + Past toggle */}
         <div className="flex items-center gap-2 flex-wrap">
-          {/* Status Filter */}
-          <div className="flex items-center gap-1 bg-white/5 rounded-lg border border-white/10 p-1">
+          {['Live', 'Draft', 'Past'].map(status => (
             <button
-              onClick={() => setStatusFilter('all')}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                statusFilter === 'all'
+              key={status}
+              onClick={() => setStatusFilter(statusFilter === status ? null : status)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                statusFilter === status
                   ? 'bg-purple-600 text-white'
-                  : 'text-white/60 hover:text-white'
+                  : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
               }`}
             >
-              All
+              {status}
             </button>
-            <button
-              onClick={() => setStatusFilter('live')}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                statusFilter === 'live'
-                  ? 'bg-green-600 text-white'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Live
-            </button>
-            <button
-              onClick={() => setStatusFilter('draft')}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                statusFilter === 'draft'
-                  ? 'bg-purple-600 text-white'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Draft
-            </button>
-            <button
-              onClick={() => setStatusFilter('past')}
-              className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
-                statusFilter === 'past'
-                  ? 'bg-gray-600 text-white'
-                  : 'text-white/60 hover:text-white'
-              }`}
-            >
-              Past
-            </button>
-          </div>
-
-          {/* Sort Dropdown */}
+          ))}
+          <div className="w-px h-5 bg-white/10 mx-1" />
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => setSortBy(e.target.value as 'date' | 'status' | 'name')}
             className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
           >
             <option value="date">Sort by Date</option>
             <option value="name">Sort by Name</option>
             <option value="status">Sort by Status</option>
           </select>
-
-          {/* Toggle Past Events */}
           <button
             onClick={() => setShowPastEvents(!showPastEvents)}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
@@ -249,11 +216,11 @@ export default function EventsList({
         {filteredAndSortedEvents.length === 0 ? (
           <div className="text-center py-8 text-white/40">
             <p className="text-xs">No events found</p>
-            {(searchTerm || statusFilter !== 'all') && (
+            {(searchTerm || statusFilter) && (
               <button
                 onClick={() => {
                   setSearchTerm('');
-                  setStatusFilter('all');
+                  setStatusFilter(null);
                 }}
                 className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
               >
