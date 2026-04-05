@@ -362,111 +362,10 @@ export default function BetaPendingPage() {
                 )}
               </div>
 
-              {/* Payment Section */}
+              {/* Pricing Tiers Section - Always visible when payment needed */}
               {needsPayment && (
-                <div className="space-y-4 pt-6">
-                  <div className="flex items-center gap-2">
-                    {isSubmitted ? (
-                      <>
-                        <CheckCircle className="h-6 w-6 text-green-400" />
-                        <h3 className="text-lg font-semibold text-white">Payment Request Sent</h3>
-                        <span className="ml-auto text-sm text-green-400 font-medium">✓ Complete</span>
-                      </>
-                    ) : (
-                      <>
-                        <Mail className="h-6 w-6 text-fuchsia-400" />
-                        <h3 className="text-lg font-semibold text-white">Request Paid Access</h3>
-                        <span className="ml-auto text-sm text-yellow-400 font-medium">Step 2 of 2</span>
-                      </>
-                    )}
-                  </div>
-                  <Separator className="bg-white/10" />
-
-                  {!isEmailVerified ? (
-                    <div className="bg-white/5 border border-white/10 rounded-lg p-6 text-center opacity-60">
-                      <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                      <p className="text-gray-300 text-sm">
-                        Please verify your email first to unlock this step
-                      </p>
-                    </div>
-                  ) : isSubmitted ? (
-                    <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-white/10 rounded-2xl p-8 text-center">
-                      <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="h-8 w-8 text-green-300" />
-                      </div>
-                      <h4 className="text-xl font-bold text-white mb-4">Thanks for reaching out!</h4>
-                      <p className="text-white/70 mb-6">
-                        We'll be in touch within 1-3 business days to get you started with your paid account.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="bg-[#2d1b4e]/50 backdrop-blur-sm border border-fuchsia-400/10 rounded-2xl p-6">
-                      <div className="mb-4 space-y-2">
-                        <p className="text-[15px] text-white/70 leading-relaxed">
-                          Please request access for your paid account below. We'll be in touch within 1-3 business days to get you started! We're currently working hands-on with a small group of pilot users to perfect the platform.
-                        </p>
-                      </div>
-
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Name and Email Row */}
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <Input
-                            id="name"
-                            placeholder="Your name"
-                            value={formData.name}
-                            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                            required
-                            className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
-                          />
-                          <Input
-                            id="email"
-                            type="email"
-                            placeholder="Email address"
-                            value={formData.email}
-                            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                            required
-                            className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
-                          />
-                        </div>
-
-                        {/* Message */}
-                        <Textarea
-                          id="message"
-                          placeholder="Tell us about your organization and events. How many events do you run per year?"
-                          value={formData.message}
-                          onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                          required
-                          rows={4}
-                          className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all resize-none rounded-lg"
-                        />
-
-                        {error && (
-                          <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4">
-                            <p className="text-red-300 text-sm">{error}</p>
-                          </div>
-                        )}
-
-                        {/* Submit Button */}
-                        <button
-                          type="submit"
-                          disabled={isSubmitting}
-                          className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg shadow-fuchsia-500/20 hover:shadow-xl"
-                        >
-                          {isSubmitting ? 'Sending...' : 'Request Paid Access'}
-                          {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
-                        </button>
-
-                        {/* Bottom Email Link */}
-                        <p className="text-center text-[13px] text-white/50">
-                          Or email us directly at{' '}
-                          <a href="mailto:team@voxxypresents.com" className="text-fuchsia-400 hover:text-fuchsia-300">
-                            team@voxxypresents.com
-                          </a>
-                        </p>
-                      </form>
-
-                      {/* Pricing Tiers Section */}
-                      <div className="mt-12 pt-10 border-t border-white/10">
+                <div className="space-y-6 pt-6">
+                  <div className="mt-6 pt-6 border-t border-white/10">
                         {/* Header */}
                         <div className="text-center mb-10">
                           <div className="flex items-center justify-center gap-2 mb-4">
@@ -478,141 +377,240 @@ export default function BetaPendingPage() {
                           </p>
                         </div>
 
-                        {/* Pricing Cards - Vertical Stack */}
-                        <div className="flex flex-col gap-6 mb-8 max-w-2xl mx-auto">
+                        {/* Pricing Cards - Vertical Stack with 2-Column Layout */}
+                        <div className="flex flex-col gap-6 mb-8 max-w-4xl mx-auto">
+                          {/* Enterprise Plan - HIGHLIGHTED (SHOWN FIRST) */}
+                          <Card className="bg-gradient-to-br from-purple-600/20 to-fuchsia-600/20 border-2 border-fuchsia-400 shadow-xl shadow-fuchsia-500/30 relative transform hover:scale-[1.02] transition-transform duration-200">
+                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
+                              <Badge className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-4 py-1.5 text-sm font-bold shadow-lg">
+                                🎉 PILOT SPECIAL
+                              </Badge>
+                            </div>
+                            <CardContent className="p-6 pt-10">
+                              <div className="grid md:grid-cols-2 gap-6 items-start">
+                                {/* Left: Pricing */}
+                                <div className="text-center md:text-left md:border-r md:border-fuchsia-400/30 md:pr-6">
+                                  <CardTitle className="text-2xl font-bold text-white mb-3">Enterprise</CardTitle>
+                                  <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
+                                    <span className="text-lg text-gray-400 line-through">$400</span>
+                                    <span className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
+                                      $80
+                                    </span>
+                                  </div>
+                                  <CardDescription className="text-fuchsia-300 text-sm font-semibold mb-4">
+                                    per month - Lock in for 1 year!
+                                  </CardDescription>
+                                  <div className="bg-fuchsia-500/10 border border-fuchsia-400/30 rounded-lg p-3 mb-3">
+                                    <p className="text-fuchsia-200 text-sm font-semibold text-center">
+                                      Save $3,840/year!
+                                    </p>
+                                  </div>
+                                  <p className="text-fuchsia-200 text-sm italic">Full enterprise features</p>
+                                </div>
+
+                                {/* Right: Features */}
+                                <div>
+                                  <ul className="space-y-3">
+                                    <li className="flex items-start text-white text-sm">
+                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                      <span><strong>Unlimited events</strong></span>
+                                    </li>
+                                    <li className="flex items-start text-white text-sm">
+                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                      <span><strong>Unlimited contacts</strong></span>
+                                    </li>
+                                    <li className="flex items-start text-white text-sm">
+                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                      <span>White-label automation</span>
+                                    </li>
+                                    <li className="flex items-start text-white text-sm">
+                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                      <span>Advanced CRM & analytics</span>
+                                    </li>
+                                    <li className="flex items-start text-white text-sm">
+                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
+                                      <span>Dedicated account manager</span>
+                                    </li>
+                                  </ul>
+                                </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+
                           {/* Starter Plan */}
-                          <Card className="bg-white/5 border border-white/10 flex flex-col">
-                            <CardHeader className="text-center pb-6 pt-6">
-                              <CardTitle className="text-xl font-bold text-white mb-3">Starter</CardTitle>
-                              <div className="text-3xl font-bold text-white mb-2">$80</div>
-                              <CardDescription className="text-gray-400 text-sm">per month</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
-                              <div className="flex-grow">
-                                <p className="text-gray-400 mb-4 font-medium text-sm">Perfect for new producers</p>
-                                <ul className="space-y-3">
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Up to 10 events/year</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>10,000 vendor contacts</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Automated emails</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Email support</span>
-                                  </li>
-                                </ul>
+                          <Card className="bg-white/5 border border-white/10">
+                            <CardContent className="p-6">
+                              <div className="grid md:grid-cols-2 gap-6 items-center">
+                                {/* Left: Pricing */}
+                                <div className="text-center md:text-left md:border-r md:border-white/10 md:pr-6">
+                                  <CardTitle className="text-2xl font-bold text-white mb-2">Starter</CardTitle>
+                                  <div className="text-4xl font-bold text-white mb-2">$80</div>
+                                  <CardDescription className="text-gray-400 text-sm mb-3">per month</CardDescription>
+                                  <p className="text-gray-400 text-sm italic">Perfect for new producers</p>
+                                </div>
+
+                                {/* Right: Features */}
+                                <div>
+                                  <ul className="space-y-3">
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Up to 10 events/year</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>10,000 vendor contacts</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Automated emails</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Email support</span>
+                                    </li>
+                                  </ul>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
 
                           {/* Growth Plan */}
-                          <Card className="bg-white/5 border border-white/10 flex flex-col">
-                            <CardHeader className="text-center pb-6 pt-6">
-                              <CardTitle className="text-xl font-bold text-white mb-3">Growth</CardTitle>
-                              <div className="text-3xl font-bold text-white mb-2">$160</div>
-                              <CardDescription className="text-gray-400 text-sm">per month</CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
-                              <div className="flex-grow">
-                                <p className="text-gray-400 mb-4 font-medium text-sm">For established producers</p>
-                                <ul className="space-y-3">
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Up to 50 events/year</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>50,000 vendor contacts</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Advanced automation</span>
-                                  </li>
-                                  <li className="flex items-start text-gray-300 text-sm">
-                                    <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                    <span>Custom branding</span>
-                                  </li>
-                                </ul>
+                          <Card className="bg-white/5 border border-white/10">
+                            <CardContent className="p-6">
+                              <div className="grid md:grid-cols-2 gap-6 items-center">
+                                {/* Left: Pricing */}
+                                <div className="text-center md:text-left md:border-r md:border-white/10 md:pr-6">
+                                  <CardTitle className="text-2xl font-bold text-white mb-2">Growth</CardTitle>
+                                  <div className="text-4xl font-bold text-white mb-2">$160</div>
+                                  <CardDescription className="text-gray-400 text-sm mb-3">per month</CardDescription>
+                                  <p className="text-gray-400 text-sm italic">For established producers</p>
+                                </div>
+
+                                {/* Right: Features */}
+                                <div>
+                                  <ul className="space-y-3">
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Up to 50 events/year</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>50,000 vendor contacts</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Advanced automation</span>
+                                    </li>
+                                    <li className="flex items-start text-gray-300 text-sm">
+                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                                      <span>Custom branding</span>
+                                    </li>
+                                  </ul>
+                                </div>
                               </div>
                             </CardContent>
                           </Card>
-
-                          {/* Enterprise Plan - HIGHLIGHTED */}
-                          <Card className="bg-gradient-to-br from-purple-600/20 to-fuchsia-600/20 border-2 border-fuchsia-400 shadow-xl shadow-fuchsia-500/30 flex flex-col relative transform hover:scale-[1.02] transition-transform duration-200">
-                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                              <Badge className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-4 py-1.5 text-sm font-bold shadow-lg">
-                                🎉 PILOT SPECIAL
-                              </Badge>
-                            </div>
-                            <CardHeader className="text-center pb-6 pt-8">
-                              <CardTitle className="text-xl font-bold text-white mb-3">Enterprise</CardTitle>
-                              <div className="flex items-center justify-center gap-3 mb-2">
-                                <span className="text-base text-gray-400 line-through">$400</span>
-                                <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
-                                  $80
-                                </span>
-                              </div>
-                              <CardDescription className="text-fuchsia-300 text-sm font-semibold">
-                                per month - Lock in for 1 year!
-                              </CardDescription>
-                            </CardHeader>
-                            <CardContent className="space-y-4 flex-grow flex flex-col px-6 pb-6">
-                              <div className="bg-fuchsia-500/10 border border-fuchsia-400/30 rounded-lg p-4">
-                                <p className="text-fuchsia-200 text-sm font-semibold text-center">
-                                  Save $3,840/year as a pilot user!
-                                </p>
-                              </div>
-                              <div className="flex-grow">
-                                <p className="text-fuchsia-200 mb-4 font-medium text-sm">Full enterprise features:</p>
-                                <ul className="space-y-3">
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span><strong>Unlimited events</strong></span>
-                                  </li>
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span><strong>Unlimited contacts</strong></span>
-                                  </li>
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span>White-label automation</span>
-                                  </li>
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span>Advanced CRM & analytics</span>
-                                  </li>
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span>Dedicated account manager</span>
-                                  </li>
-                                  <li className="flex items-start text-white text-sm">
-                                    <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                    <span>API access</span>
-                                  </li>
-                                </ul>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-
-                        {/* Bottom CTA Message */}
-                        <div className="mt-8 text-center bg-white/5 rounded-lg p-6 border border-fuchsia-400/20 max-w-2xl mx-auto">
-                          <p className="text-base text-gray-300 leading-relaxed">
-                            <strong className="text-fuchsia-300 text-lg">Limited spots available!</strong>
-                            <br />
-                            <span className="text-sm">Request access above to secure your pilot pricing and be among the first to lock in this exclusive rate.</span>
-                          </p>
                         </div>
                       </div>
-                    </div>
-                  )}
+
+                  {/* Request Access Form + CTA */}
+                  <div className="mt-8 bg-white/5 rounded-lg border border-fuchsia-400/20 max-w-4xl mx-auto overflow-hidden">
+                    {!isEmailVerified ? (
+                      <div className="p-8 text-center">
+                        <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                        <h4 className="text-xl font-bold text-white mb-3">Email Verification Required</h4>
+                        <p className="text-gray-300 text-sm">
+                          Please verify your email first (Step 1 above) to request paid access.
+                        </p>
+                      </div>
+                    ) : isSubmitted ? (
+                      <div className="p-8 text-center">
+                        <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <CheckCircle className="h-8 w-8 text-green-300" />
+                        </div>
+                        <h4 className="text-xl font-bold text-white mb-4">Request Sent Successfully!</h4>
+                        <p className="text-white/70 mb-4">
+                          We'll be in touch within 1-3 business days to get you started with your paid account.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="p-8">
+                        {/* CTA Header */}
+                        <div className="text-center mb-6">
+                          <p className="text-xl text-white font-bold mb-2">
+                            <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
+                              Limited spots available!
+                            </strong>
+                          </p>
+                          <p className="text-sm text-gray-300 leading-relaxed text-left">
+                            We're currently working hands-on with a small group of pilot users to perfect the platform. Request access below to secure your pilot pricing and be among the first to lock in this exclusive rate.
+                          </p>
+                        </div>
+
+                        <Separator className="bg-white/10 mb-6" />
+
+                        {/* Form */}
+                        <form onSubmit={handleSubmit} className="space-y-4">
+
+                          {/* Name and Email Row */}
+                          <div className="grid md:grid-cols-2 gap-4">
+                            <Input
+                              id="name"
+                              placeholder="Your name"
+                              value={formData.name}
+                              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                              required
+                              className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
+                            />
+                            <Input
+                              id="email"
+                              type="email"
+                              placeholder="Email address"
+                              value={formData.email}
+                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+                              required
+                              className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
+                            />
+                          </div>
+
+                          {/* Message */}
+                          <Textarea
+                            id="message"
+                            placeholder="Tell us about your organization and events. How many events do you run per year?"
+                            value={formData.message}
+                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+                            required
+                            rows={4}
+                            className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all resize-none rounded-lg"
+                          />
+
+                          {error && (
+                            <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4">
+                              <p className="text-red-300 text-sm">{error}</p>
+                            </div>
+                          )}
+
+                          {/* Submit Button */}
+                          <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg shadow-fuchsia-500/20 hover:shadow-xl"
+                          >
+                            {isSubmitting ? 'Sending Request...' : 'Request Pilot Access'}
+                            {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
+                          </button>
+
+                          {/* Bottom Email Link */}
+                          <p className="text-center text-[13px] text-white/50">
+                            Or email us directly at{' '}
+                            <a href="mailto:team@voxxypresents.com" className="text-fuchsia-400 hover:text-fuchsia-300">
+                              team@voxxypresents.com
+                            </a>
+                          </p>
+                        </form>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
