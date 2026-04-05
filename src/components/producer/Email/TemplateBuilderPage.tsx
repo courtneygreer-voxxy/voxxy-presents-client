@@ -480,7 +480,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4">
+    <div className="bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] p-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="mb-4">

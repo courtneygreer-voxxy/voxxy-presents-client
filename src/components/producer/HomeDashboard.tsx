@@ -12,7 +12,8 @@ import {
   Clock,
   AlertCircle,
   Edit2,
-  Copy,
+  ExternalLink,
+  ChevronDown,
   Globe,
   MessageSquare,
   Building,
@@ -90,8 +91,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   const [bulletins, setBulletins] = useState<Bulletin[]>([]);
   const [vendorApplications, setVendorApplications] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [copiedLink, setCopiedLink] = useState<'application' | 'vendor' | null>(null);
-  const [copiedApplicationId, setCopiedApplicationId] = useState<number | null>(null);
+  const [categoryLinksExpanded, setCategoryLinksExpanded] = useState(false);
   const [isCreateBulletinModalOpen, setIsCreateBulletinModalOpen] = useState(false);
   const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
   const [showAllBulletins, setShowAllBulletins] = useState(false);
@@ -240,41 +240,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     return formatDate(dateString);
   };
 
-  const handleCopyLink = (linkType: 'application' | 'vendor') => {
-    const baseUrl = window.location.origin;
-    let link: string;
-
-    if (linkType === 'application') {
-      link = `${baseUrl}/events/${event.namespaced_slug || event.slug}`;
-    } else {
-      // Use token-based portal URL (primary) or fallback to slug-based (legacy)
-      link = event.event_portal?.access_token
-        ? `${baseUrl}/portal/${event.event_portal.access_token}`
-        : `${baseUrl}/portal/${event.namespaced_slug || event.slug}`;
-    }
-
-    navigator.clipboard.writeText(link)
-      .then(() => {
-        setCopiedLink(linkType);
-        setTimeout(() => setCopiedLink(null), 2000);
-      })
-      .catch((err) => {
-        console.error('Failed to copy link to clipboard:', err);
-        alert('Failed to copy link to clipboard');
-      });
-  };
-
-  const handleCopyApplicationLink = (applicationId: number, shareableUrl: string) => {
-    navigator.clipboard.writeText(shareableUrl)
-      .then(() => {
-        setCopiedApplicationId(applicationId);
-        setTimeout(() => setCopiedApplicationId(null), 2000);
-      })
-      .catch((err) => {
-        console.error('Failed to copy application link to clipboard:', err);
-        alert('Failed to copy link to clipboard');
-      });
-  };
+  const applicationPageUrl = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`;
+  const vendorPortalUrl = `${window.location.origin}/portal/${event.namespaced_slug || event.slug}`;
 
   const handleCreateBulletin = async (data: CreateBulletinRequest) => {
     try {
@@ -748,78 +715,70 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           </div>
 
           {/* Quick Links */}
-          <div className="mt-4 pt-3 border-t border-white/10 space-y-2">
-            <button
-              onClick={() => handleCopyLink('application')}
-              className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg transition-smooth text-xs text-white ${
-                copiedLink === 'application'
-                  ? 'bg-green-500/20 border border-green-500/30'
-                  : 'bg-white/5 hover:bg-white/10'
-              }`}
+          <div className="mt-4 pt-3 border-t border-white/10 space-y-1.5">
+            <a
+              href={applicationPageUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white group"
             >
               <div className="flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 text-purple-400" />
-                <span>{copiedLink === 'application' ? 'Copied!' : 'Application Page'}</span>
+                <span>Application Page</span>
               </div>
-              {copiedLink === 'application' ? (
-                <CheckCircle className="w-3 h-3 text-green-400" />
-              ) : (
-                <Copy className="w-3 h-3 text-white/60" />
-              )}
-            </button>
+              <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60" />
+            </a>
 
-            <button
-              onClick={() => handleCopyLink('vendor')}
-              className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg transition-smooth text-xs text-white ${
-                copiedLink === 'vendor'
-                  ? 'bg-green-500/20 border border-green-500/30'
-                  : 'bg-white/5 hover:bg-white/10'
-              }`}
+            <a
+              href={vendorPortalUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white group"
             >
               <div className="flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 text-purple-400" />
-                <span>{copiedLink === 'vendor' ? 'Copied!' : 'Vendor Portal'}</span>
+                <span>Vendor Portal</span>
               </div>
-              {copiedLink === 'vendor' ? (
-                <CheckCircle className="w-3 h-3 text-green-400" />
-              ) : (
-                <Copy className="w-3 h-3 text-white/60" />
-              )}
-            </button>
+              <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60" />
+            </a>
+
+            {/* Category Application Links - collapsible */}
+            {vendorApplications.length > 0 && (
+              <div>
+                <button
+                  onClick={() => setCategoryLinksExpanded(!categoryLinksExpanded)}
+                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white"
+                >
+                  <div className="flex items-center gap-2">
+                    <FileText className="w-3.5 h-3.5 text-blue-400" />
+                    <span>Category Links</span>
+                    <span className="text-[10px] text-white/40">({vendorApplications.filter(a => a.status === 'active').length})</span>
+                  </div>
+                  <ChevronDown className={`w-3 h-3 text-white/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`} />
+                </button>
+                {categoryLinksExpanded && (
+                  <div className="mt-1 ml-4 space-y-1">
+                    {vendorApplications.map((app) => (
+                      <a
+                        key={app.id}
+                        href={`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-smooth text-xs text-white group ${
+                          app.status === 'active'
+                            ? 'hover:bg-white/10'
+                            : 'opacity-40 pointer-events-none'
+                        }`}
+                      >
+                        <span className="truncate">{app.name}</span>
+                        <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60 flex-shrink-0" />
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-
-          {/* Application Category Links */}
-          {vendorApplications.length > 0 && (
-            <div className="mt-4 pt-3 border-t border-white/10">
-              <p className="text-[10px] text-white/60 uppercase tracking-wide mb-2">Category Application Links</p>
-              <div className="space-y-2">
-                {vendorApplications.map((app) => (
-                  <button
-                    key={app.id}
-                    onClick={() => handleCopyApplicationLink(app.id, `${window.location.origin}/events/${event.slug}/apply/${app.id}`)}
-                    className={`w-full flex items-center justify-between px-2.5 py-2 rounded-lg transition-smooth text-xs text-white ${
-                      copiedApplicationId === app.id
-                        ? 'bg-green-500/20 border border-green-500/30'
-                        : app.status === 'active'
-                        ? 'bg-white/5 hover:bg-white/10'
-                        : 'bg-white/5 opacity-50'
-                    }`}
-                    disabled={app.status !== 'active'}
-                  >
-                    <div className="flex items-center gap-2 overflow-hidden">
-                      <FileText className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                      <span className="truncate">{copiedApplicationId === app.id ? 'Copied!' : app.name}</span>
-                    </div>
-                    {copiedApplicationId === app.id ? (
-                      <CheckCircle className="w-3 h-3 text-green-400 flex-shrink-0" />
-                    ) : (
-                      <Copy className="w-3 h-3 text-white/60 flex-shrink-0" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -841,7 +800,6 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           scheduledEmails,
           bulletins,
           loading,
-          copiedLink,
         }}
         isAdmin={isAdmin}
       />

@@ -71,6 +71,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null);
   const [isUpdatingCategory, setIsUpdatingCategory] = useState(false);
@@ -607,13 +608,20 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     // Status filter
     if (statusFilter !== 'all' && applicant.status !== statusFilter) return false;
 
+    // Category filter
+    if (categoryFilter !== 'all' && applicant.vendor_category !== categoryFilter) return false;
+
     return true;
   });
 
-  const hasActiveFilters = statusFilter !== 'all' || searchQuery.trim() !== '';
+  // Derive unique categories from applicants
+  const uniqueCategories = [...new Set(applicants.map(a => a.vendor_category).filter(Boolean))].sort();
+
+  const hasActiveFilters = statusFilter !== 'all' || categoryFilter !== 'all' || searchQuery.trim() !== '';
 
   const clearFilters = () => {
     setStatusFilter('all');
+    setCategoryFilter('all');
     setSearchQuery('');
   };
 
@@ -667,7 +675,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               <h2 className="text-sm font-bold text-white">Vendors & Applicants</h2>
               <p className="text-[10px] text-white/60">
                 {filteredApplicants.length} total
-                {statusFilter !== 'all' && ` • Filtered by ${statusFilter}`}
+                {statusFilter !== 'all' && ` • ${statusFilter}`}
+                {categoryFilter !== 'all' && ` • ${categoryFilter}`}
               </p>
             </div>
 
@@ -683,12 +692,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               />
             </div>
 
-            {/* Status Filter */}
-            <div className="flex items-center gap-2">
+            {/* Status & Category Filters */}
+            <div className="space-y-1.5">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="flex-1 px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
               >
                 <option value="all">All Status</option>
                 <option value="invited">Invited (No Application)</option>
@@ -699,12 +708,24 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 <option value="rejected">Declined</option>
                 <option value="cancelled">Cancelled</option>
               </select>
+              {uniqueCategories.length > 0 && (
+                <select
+                  value={categoryFilter}
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                >
+                  <option value="all">All Categories</option>
+                  {uniqueCategories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              )}
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="px-2 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
+                  className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
                 >
-                  Clear
+                  Clear filters
                 </button>
               )}
             </div>

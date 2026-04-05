@@ -660,7 +660,7 @@ export function EmailEditorPage({
       {/* Left Side - Main Content */}
       <div className={`${showPreview ? 'w-1/2' : 'flex-1'} flex flex-col border-r border-white/10 transition-all duration-300`}>
         {/* Top Bar */}
-        <div className="border-b border-white/10 px-12 py-3 flex items-center justify-between backdrop-blur-sm bg-black/20 min-h-[60px]">
+        <div className="border-b border-white/10 px-8 py-2.5 flex items-center justify-between backdrop-blur-sm bg-black/20 min-h-[52px]">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
@@ -739,8 +739,8 @@ export function EmailEditorPage({
         </div>
 
         {/* Content Area */}
-        <div className="flex-1 overflow-y-auto px-12 py-6">
-          <div className="max-w-3xl mx-auto">
+        <div className="flex-1 overflow-y-auto px-4 py-2">
+          <div className="max-w-4xl mx-auto">
             {/* Validation Errors */}
             {validationErrors.length > 0 && (
               <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg">

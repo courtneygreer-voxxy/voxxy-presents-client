@@ -437,18 +437,6 @@ export default function EmailRow({
                       Pause
                     </button>
                   )}
-                  {isPaused && onResume && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAction(() => onResume(email.id));
-                      }}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
-                    >
-                      <Play className="w-3.5 h-3.5" />
-                      Resume
-                    </button>
-                  )}
                   {isSent && undeliveredCount > 0 && onRetryFailed && (
                     <button
                       onClick={(e) => {

@@ -11,7 +11,7 @@ interface EmailSequenceEditorOverlayProps {
   onEditEmail: (email: ScheduledEmail) => void;
   onPause: (emailId: number) => Promise<void>;
   onResume: (emailId: number) => Promise<void>;
-  onSendNow: (emailId: number) => Promise<void>;
+  onSendNow?: (emailId: number) => Promise<void>;
   onDelete: (emailId: number) => Promise<void>;
   onCreateEmail: () => void;
   onSaveAsTemplate?: () => void;
@@ -122,7 +122,7 @@ function SequenceRowMenu({
   email: ScheduledEmail;
   onPause: (id: number) => Promise<void>;
   onResume: (id: number) => Promise<void>;
-  onSendNow: (id: number) => Promise<void>;
+  onSendNow?: (id: number) => Promise<void>;
   onDelete: (id: number) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
@@ -155,7 +155,7 @@ function SequenceRowMenu({
               top: `${btnRef.current.getBoundingClientRect().bottom + 4}px`,
             }}
           >
-            {(isScheduled || isPaused) && (
+            {(isScheduled || isPaused) && onSendNow && (
               <button
                 onClick={() => { setOpen(false); onSendNow(email.id); }}
                 className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"

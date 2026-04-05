@@ -138,7 +138,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
       <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
         <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3">
