@@ -104,21 +104,21 @@ src/
 ├── contexts/                        # React Context
 │   └── AuthContext.tsx              # Authentication state & methods
 │
-├── pages/                           # Route pages (33 files)
+├── pages/                           # Route pages
 │   ├── HomePage.tsx                 # Landing page
-│   ├── LoginPage.tsx, ForgotPasswordPage.tsx, ResetPasswordPage.tsx
-│   ├── EmailVerificationPage.tsx
+│   ├── LoginPage.tsx, SignUpPage.tsx  # Unified auth pages
+│   ├── ForgotPasswordPage.tsx, ResetPasswordPage.tsx
+│   ├── BetaPendingPage.tsx          # Unified account setup hub (verification + payment)
 │   ├── PublicEventDetailPage.tsx    # Public event view
 │   ├── VendorApplicationForm.tsx    # Vendor application form
 │   ├── ApplicationConfirmationPage.tsx, ApplicationTrackingPage.tsx
 │   ├── ShortLinkRedirectPage.tsx    # Short URL handling
-│   ├── ProducerDashboard.tsx        # Producer main dashboard
+│   ├── Dashboard.tsx                # Unified producer/admin dashboard
 │   ├── VendorDashboard.tsx          # Vendor dashboard
-│   ├── AdminDashboard.tsx           # Admin dashboard
-│   ├── BetaPendingPage.tsx          # Holding screen
+│   ├── PaymentOnboardingPage.tsx    # Producer payment setup
+│   ├── PaymentSuccessPage.tsx, PaymentCanceledPage.tsx
 │   ├── FeaturesPage.tsx, PricingPage.tsx, HelpPage.tsx
-│   ├── ContactPage.tsx              # Contact/beta request form
-│   └── Policy and info pages
+│   └── Legal pages (legal/ subfolder)
 │
 ├── services/                        # API integration
 │   ├── api.ts                       # Main API service (40KB)

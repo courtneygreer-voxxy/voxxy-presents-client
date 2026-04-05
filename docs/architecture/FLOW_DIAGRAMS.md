@@ -250,15 +250,18 @@ PUBLIC ROUTES (No Auth Required)
 
 AUTH ROUTES (Redirect if authenticated)
 ├─ /login                     → LoginPage (Unified)
+├─ /signup                    → SignUpPage (Unified - Producer/Vendor)
 ├─ /forgot-password           → ForgotPasswordPage
 ├─ /reset-password            → ResetPasswordPage
-└─ /verify-email              → EmailVerificationPage
+└─ /verify-email              → Redirects to /pending (Consolidated)
 
-DASHBOARD ROUTES (Role-based redirect)
-├─ /pending                   → BetaPendingPage (Consumer)
-├─ /producer/pending          → ProducerDashboard
+DASHBOARD ROUTES (Role-based redirect & protected)
+├─ /pending                   → BetaPendingPage (Unified account setup hub with email verification & payment request)
+├─ /dashboard                 → ProtectedDashboard (Verified & paid producers/admins only)
 ├─ /vendor/pending            → VendorDashboard
-└─ /admin/dashboard           → AdminDashboard (Admin only)
+├─ /payment/onboarding        → PaymentOnboardingPage (Producer payment setup)
+├─ /payment/success           → PaymentSuccessPage
+└─ /payment/canceled          → PaymentCanceledPage
 
 CATCH-ALL
 └─ /                          → Redirect to home

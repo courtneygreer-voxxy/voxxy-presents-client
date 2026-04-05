@@ -15,11 +15,8 @@ const FeaturesPage = lazy(() => import('./pages/FeaturesPage'))
 const PricingPage = lazy(() => import('./pages/PricingPage'))
 const HelpPage = lazy(() => import('./pages/HelpPage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
-// Old legal pages (deprecated, kept for potential legacy references)
-const OldPrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage'))
-const OldTermsOfServicePage = lazy(() => import('./pages/TermsOfServicePage'))
 
-// New legal hub pages
+// Legal hub pages
 const TermsOfServicePage = lazy(() => import('./pages/legal/TermsOfServicePage'))
 const PrivacyPolicyPage = lazy(() => import('./pages/legal/PrivacyPolicyPage'))
 const AcceptableUsePage = lazy(() => import('./pages/legal/AcceptableUsePage'))
@@ -41,10 +38,14 @@ const LoginPage = lazy(() => import('./pages/LoginPage'))
 const SignUpPage = lazy(() => import('./pages/SignUpPage'))
 const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'))
 const ResetPasswordPage = lazy(() => import('./pages/ResetPasswordPage'))
-const EmailVerificationPage = lazy(() => import('./pages/EmailVerificationPage'))
 
 // Lazy load: Holding Screens (load on-demand)
 const BetaPendingPage = lazy(() => import('./pages/BetaPendingPage'))
+
+// Lazy load: Payment Pages (load on-demand)
+const PaymentOnboardingPage = lazy(() => import('./pages/PaymentOnboardingPage'))
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
+const PaymentCanceledPage = lazy(() => import('./pages/PaymentCanceledPage'))
 
 // Lazy load: Dashboards (load on-demand)
 const Dashboard = lazy(() => import('./pages/Dashboard'))
@@ -57,6 +58,48 @@ const TemplateManager = lazy(() => import('./components/producer/Email/TemplateM
 
 // Debug Panel (keep eager for development)
 import { DebugPanel } from './components/debug/DebugPanel'
+
+// Protected Dashboard - ensures user is verified and paid before showing dashboard
+function ProtectedDashboard() {
+  const { userProfile, loading } = useAuth()
+
+  if (loading) {
+    return <LoadingTransition message="Loading your dashboard..." />
+  }
+
+  if (!userProfile) {
+    console.log('🔒 No user profile, redirecting to home')
+    return <Navigate to="/" replace />
+  }
+
+  const role = userProfile.role
+  const isAdmin = role === 'admin'
+  const isProducer = role === 'producer' || role === 'venue_owner'
+  const isEmailVerified = userProfile.confirmed_at !== null && userProfile.confirmed_at !== undefined
+  const isPaid = userProfile.paid === true
+
+  // Admins always have access
+  if (isAdmin) {
+    console.log('🟣 Admin accessing dashboard')
+    return <Dashboard />
+  }
+
+  // Check email verification for non-admins
+  if (!isEmailVerified) {
+    console.log('🔒 Email not verified, redirecting to pending')
+    return <Navigate to="/pending" replace />
+  }
+
+  // Check payment for producers
+  if (isProducer && !isPaid) {
+    console.log('🔒 Producer without payment, redirecting to pending')
+    return <Navigate to="/pending" replace />
+  }
+
+  // All checks passed, render dashboard
+  console.log('✅ All checks passed, rendering dashboard')
+  return <Dashboard />
+}
 
 // Role-based redirect component - routes authenticated users to their holding screen
 function RoleBasedDashboardRedirect() {
@@ -90,18 +133,27 @@ function RoleBasedDashboardRedirect() {
   const isProducer = role === 'producer' || role === 'venue_owner'
   const isAdmin = role === 'admin'
   const paid = userProfile.paid
+  const isEmailVerified = userProfile.confirmed_at !== null && userProfile.confirmed_at !== undefined
+
+  // Email verification OR Payment check for producers (admins bypass these checks)
+  // Redirect to pending page which serves as account setup hub
+  if (!isAdmin) {
+    if (!isEmailVerified) {
+      console.log('📧 Email not verified, redirecting to pending page')
+      console.log('   - Email:', userProfile.email, 'Confirmed At:', userProfile.confirmed_at)
+      return <Navigate to="/pending" replace />
+    }
+    if (isProducer && !paid) {
+      console.log('💳 Producer without payment, redirecting to payment onboarding')
+      console.log('   - Role:', role, 'Paid:', paid)
+      return <Navigate to="/payment/onboarding" replace />
+    }
+  }
 
   // Legacy users (no Presents access) OR consumers/guests → Pending page
   if (!hasPresentsAccess || role === 'consumer' || role === 'guest') {
     console.log('🔒 No Presents access or consumer/guest role, redirecting to pending page')
     console.log('   - Role:', role, 'Product Context:', productContext)
-    return <Navigate to="/pending" replace />
-  }
-
-  // Payment check for producers (admins bypass this check)
-  if (isProducer && !isAdmin && !paid) {
-    console.log('💳 Producer without payment, redirecting to pending page')
-    console.log('   - Role:', role, 'Paid:', paid)
     return <Navigate to="/pending" replace />
   }
 
@@ -226,15 +278,20 @@ export default function App() {
             </RedirectIfAuthenticatedV2>
           } />
 
-          {/* Email Verification */}
-          <Route path="/verify-email" element={<EmailVerificationPage />} />
+          {/* Email Verification - Redirect to pending page (consolidated account setup hub) */}
+          <Route path="/verify-email" element={<Navigate to="/pending" replace />} />
 
           {/* ==========================================
               DASHBOARDS & HOLDING SCREENS (Role-based)
               ========================================== */}
 
-          {/* Consumer Holding Screen */}
+          {/* Unified Account Setup Hub - Email verification & payment request */}
           <Route path="/pending" element={<BetaPendingPage />} />
+
+          {/* Payment Flow */}
+          <Route path="/payment/onboarding" element={<PaymentOnboardingPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/payment/canceled" element={<PaymentCanceledPage />} />
 
           {/* Legacy producer route - redirect to unified dashboard */}
           <Route path="/producer/pending" element={<Navigate to="/dashboard" replace />} />
@@ -269,8 +326,8 @@ export default function App() {
           {/* Legacy /profile route - redirect to role-based holding screen */}
           <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
 
-          {/* Any authenticated user accessing root is redirected */}
-          <Route path="/dashboard" element={<RoleBasedDashboardRedirect />} />
+          {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
+          <Route path="/dashboard" element={<ProtectedDashboard />} />
 
           {/* 404 - Redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />

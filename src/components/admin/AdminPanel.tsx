@@ -2,6 +2,26 @@ import { Shield, Database, Mail, Bug, Key, Building2, BarChart3, TrendingUp, Che
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
+interface OrganizationSubscription {
+  id: number;
+  name: string;
+  slug: string;
+  verified: boolean;
+  active: boolean;
+  subscription: {
+    status: string | null;
+    subscribed: boolean;
+    subscription_active: boolean;
+    requires_payment: boolean;
+    display_status: string;
+    plan: string | null;
+    stripe_customer_id: string | null;
+    stripe_subscription_id: string | null;
+    current_period_end: string | null;
+    trial_ends_at: string | null;
+  };
+}
+
 interface User {
   id: number;
   email: string;
@@ -16,7 +36,7 @@ interface User {
   sign_in_count?: number;
   current_sign_in_ip?: string;
   events_count?: number;
-  organizations?: any[];
+  organizations?: OrganizationSubscription[];
   events?: any[];
   vendor_applications?: any[];
   registrations?: any[];
@@ -632,10 +652,11 @@ export default function AdminPanel({
                     <div className="p-4 border-t border-blue-500/30 bg-black/40">
                       {/* Payment Status Control for Producers */}
                       {(user.role === 'venue_owner' || user.role === 'producer') && (
-                        <div className="mb-4 pb-4 border-b border-blue-500/20">
+                        <div className="mb-4 pb-4 border-b border-blue-500/20 space-y-4">
+                          {/* User-level payment status */}
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-mono text-blue-300">PAYMENT STATUS:</span>
+                              <span className="text-xs font-mono text-blue-300">USER PAYMENT STATUS:</span>
                               <Badge className={`font-mono text-[10px] ${
                                 user.paid
                                   ? 'bg-green-500/20 border-green-400/30 text-green-300'
@@ -663,8 +684,93 @@ export default function AdminPanel({
                               {user.paid ? 'MARK UNPAID' : 'MARK PAID'}
                             </Button>
                           </div>
+
+                          {/* Organization subscription details */}
+                          {user.organizations && user.organizations.length > 0 && (
+                            <div className="space-y-3">
+                              <div className="text-xs font-mono text-blue-300 flex items-center gap-2">
+                                <Building2 className="h-3 w-3" />
+                                ORGANIZATION SUBSCRIPTION DATA:
+                              </div>
+                              {user.organizations.map((org: OrganizationSubscription) => (
+                                <div key={org.id} className="bg-black/60 border border-cyan-500/30 rounded p-3 space-y-2">
+                                  <div className="font-mono text-xs text-white font-bold mb-2">
+                                    {org.name} (#{org.id})
+                                  </div>
+                                  <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
+                                    <div>
+                                      <span className="text-cyan-400/60">subscription_status:</span>
+                                      <span className={`ml-2 font-bold ${
+                                        org.subscription.status === 'active' ? 'text-green-300' :
+                                        org.subscription.status === 'past_due' ? 'text-yellow-300' :
+                                        org.subscription.status === 'canceled' ? 'text-red-300' :
+                                        'text-gray-300'
+                                      }`}>
+                                        {org.subscription.status || 'inactive'}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-cyan-400/60">display_status:</span>
+                                      <span className="ml-2 text-white font-bold">
+                                        {org.subscription.display_status}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-cyan-400/60">subscribed:</span>
+                                      <span className={`ml-2 font-bold ${
+                                        org.subscription.subscribed ? 'text-green-300' : 'text-red-300'
+                                      }`}>
+                                        {org.subscription.subscribed ? 'TRUE' : 'FALSE'}
+                                      </span>
+                                    </div>
+                                    <div>
+                                      <span className="text-cyan-400/60">requires_payment:</span>
+                                      <span className={`ml-2 font-bold ${
+                                        org.subscription.requires_payment ? 'text-red-300' : 'text-green-300'
+                                      }`}>
+                                        {org.subscription.requires_payment ? 'TRUE' : 'FALSE'}
+                                      </span>
+                                    </div>
+                                    {org.subscription.plan && (
+                                      <div className="col-span-2">
+                                        <span className="text-cyan-400/60">plan:</span>
+                                        <span className="ml-2 text-purple-300 font-bold">
+                                          {org.subscription.plan}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {org.subscription.stripe_customer_id && (
+                                      <div className="col-span-2">
+                                        <span className="text-cyan-400/60">stripe_customer_id:</span>
+                                        <span className="ml-2 text-yellow-300 font-bold break-all">
+                                          {org.subscription.stripe_customer_id}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {org.subscription.stripe_subscription_id && (
+                                      <div className="col-span-2">
+                                        <span className="text-cyan-400/60">stripe_subscription_id:</span>
+                                        <span className="ml-2 text-yellow-300 font-bold break-all">
+                                          {org.subscription.stripe_subscription_id}
+                                        </span>
+                                      </div>
+                                    )}
+                                    {org.subscription.current_period_end && (
+                                      <div className="col-span-2">
+                                        <span className="text-cyan-400/60">current_period_end:</span>
+                                        <span className="ml-2 text-cyan-300">
+                                          {new Date(org.subscription.current_period_end).toLocaleString()}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       )}
+                      <div className="text-xs font-mono text-green-400/60 mb-2">FULL JSON DATA:</div>
                       <pre className="text-[10px] text-green-300 font-mono overflow-auto max-h-60">
 {JSON.stringify(user, null, 2)}
                       </pre>

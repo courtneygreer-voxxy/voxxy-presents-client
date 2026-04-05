@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { validateEmail, validatePassword } from '@/utils/validation'
 
 interface UnifiedSignUpFormProps {
-  onSuccess?: () => void
+  onSuccess?: (email: string) => void
   onSwitchToLogin?: () => void
   defaultTab?: 'venue_owner' | 'vendor'
 }
@@ -149,7 +149,7 @@ export function UnifiedSignUpForm({
         userType: formData.userType
       })
 
-      onSuccess?.()
+      onSuccess?.(formData.email.trim())
     } catch (err) {
       console.error('Signup error:', err)
       setErrors(prev => ({ ...prev, submit: 'Failed to create account. Please try again.' }))

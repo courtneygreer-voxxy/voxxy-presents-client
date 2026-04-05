@@ -18,10 +18,10 @@ export default function SignUpPage() {
   // Track page views
   usePageTracking('Sign Up')
 
-  const handleSignUpSuccess = () => {
-    // After successful signup, redirect to login with success message
-    navigate('/login', {
-      state: { message: 'Account created successfully! Please sign in.' }
+  const handleSignUpSuccess = (email: string) => {
+    // After successful signup, redirect to pending/account setup page
+    navigate('/pending', {
+      state: { message: 'Account created successfully! Please check your email for a verification code.' }
     })
   }
 
