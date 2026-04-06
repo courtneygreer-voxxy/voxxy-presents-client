@@ -163,7 +163,7 @@ export default function HomePage() {
       <Navigation activePage="home" />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative pt-[140px] pb-20 px-6 md:px-12">
+      <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 pt-32 pb-20">
         <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/12 via-purple-600/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
@@ -179,16 +179,9 @@ export default function HomePage() {
                 The Operating System for <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Recurring Event Producers</em>
               </h1>
 
-              <p className="text-[18px] leading-relaxed text-white/65 mb-0 max-w-[500px]">
+              <p className="text-[18px] leading-relaxed text-white/65 mb-9 max-w-[500px]">
                 Manage vendor applications, automate communications, and grow your events — all from one platform. Built for art shows, markets, and pop-ups that happen more than once.
               </p>
-
-              {/* Divider */}
-              <div className="mt-9 mb-9 flex items-center justify-start">
-                <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
-                <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
-                <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
-              </div>
 
               <div className="flex gap-4 flex-wrap">
                 <TrackedButton

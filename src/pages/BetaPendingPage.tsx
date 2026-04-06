@@ -1,29 +1,23 @@
 import React, { useState, useEffect } from 'react'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles } from "lucide-react"
+import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles, DollarSign, Calendar, Users, BarChart3, Zap, CreditCard } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
 import { authApi, ApiError } from '@/services/api'
 import { Separator } from "@/components/ui/separator"
+import { stripeService } from '@/services/stripeService'
 
 export default function BetaPendingPage() {
   const navigate = useNavigate()
   const { userProfile, signOut, refreshUserProfile } = useAuth()
 
-  // Contact form state
-  const [formData, setFormData] = useState({
-    name: userProfile?.name || '',
-    email: userProfile?.email || '',
-    message: ''
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  // Payment state
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const [paymentError, setPaymentError] = useState<string | null>(null)
 
   // Email verification state
   const [verificationCode, setVerificationCode] = useState('')
@@ -38,16 +32,12 @@ export default function BetaPendingPage() {
   const needsPayment = isProducer && !isPaid
   const isEmailVerified = userProfile?.confirmed_at !== null && userProfile?.confirmed_at !== undefined
 
-  // Prefill form data when userProfile loads (handles page refresh)
+  // Redirect to dashboard if already paid
   useEffect(() => {
-    if (userProfile && !formData.email && !formData.name) {
-      setFormData(prev => ({
-        ...prev,
-        name: userProfile.name || '',
-        email: userProfile.email || ''
-      }))
+    if (isEmailVerified && isPaid) {
+      navigate('/dashboard')
     }
-  }, [userProfile])
+  }, [isEmailVerified, isPaid, navigate])
 
   const handleSignOut = async () => {
     await signOut()
@@ -110,54 +100,54 @@ export default function BetaPendingPage() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
-    setError(null)
+  const handleStartPayment = async () => {
+    setIsProcessingPayment(true)
+    setPaymentError(null)
 
     try {
-      // Submit contact form for access request
-      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001'
-      // Strip /api from URL since /contacts is a legacy endpoint not under /api namespace
-      const contactsUrl = `${API_BASE_URL.replace('/api', '')}/contacts`
-      console.log('📧 Submitting access request to:', contactsUrl)
-      console.log('📧 Form data:', { name: formData.name, email: formData.email })
-
-      const subject = needsPayment
-        ? 'Voxxy Presents - Payment/Subscription Request'
-        : 'Voxxy Presents - Access Request'
-
-      const response = await fetch(contactsUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contact: {
-            name: formData.name,
-            email: formData.email,
-            subject: subject,
-            message: formData.message
-          }
-        })
-      })
-
-      console.log('📧 Response status:', response.status)
-
-      if (response.ok) {
-        console.log('✅ Access request submitted successfully')
-        setIsSubmitted(true)
-      } else {
-        // Handle non-OK responses
-        const errorData = await response.json().catch(() => ({ message: 'Failed to submit request' }))
-        console.error('❌ Failed to submit access request:', response.status, errorData)
-        setError(errorData.message || errorData.error || `Failed to submit request (${response.status})`)
-      }
+      console.log('💳 Starting Stripe checkout flow...')
+      await stripeService.redirectToCheckout()
+      // User will be redirected to Stripe checkout page
     } catch (error) {
-      console.error('❌ Network error submitting access request:', error)
-      setError('Network error - please check your connection and try again')
-    } finally {
-      setIsSubmitting(false)
+      console.error('❌ Failed to start payment:', error)
+      setPaymentError('Failed to start payment process. Please try again.')
+      setIsProcessingPayment(false)
     }
   }
+
+  // Features list matching PaymentOnboardingPage
+  const features = [
+    {
+      icon: Calendar,
+      title: "Unlimited Events",
+      description: "Create and manage as many events as you need"
+    },
+    {
+      icon: Users,
+      title: "Vendor Management",
+      description: "Accept and manage vendor applications with ease"
+    },
+    {
+      icon: Mail,
+      title: "Automated Email Campaigns",
+      description: "Send targeted emails to vendors and attendees"
+    },
+    {
+      icon: BarChart3,
+      title: "Analytics & Reporting",
+      description: "Track registrations, payments, and engagement"
+    },
+    {
+      icon: Zap,
+      title: "Payment Integration",
+      description: "Sync with Eventbrite and track vendor payments"
+    },
+    {
+      icon: CreditCard,
+      title: "Custom Branding",
+      description: "Customize your event pages and application forms"
+    }
+  ]
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
@@ -265,7 +255,7 @@ export default function BetaPendingPage() {
                   <>
 
                     {/* Display User Email */}
-                    <div className="bg-pink-500/10 border border-pink-400/30 rounded-lg p-4">
+                    <div className="bg-pink-500/10 border-2 border-pink-400 rounded-lg p-4">
                       <p className="text-sm text-gray-200 text-center">
                         <strong>Verification code sent to:</strong>
                       </p>
@@ -354,7 +344,7 @@ export default function BetaPendingPage() {
                     </div>
                   </>
                 ) : (
-                  <div className="bg-green-500/10 border border-green-400/20 rounded-lg p-4 text-center">
+                  <div className="bg-green-500/10 border-2 border-green-400 rounded-lg p-4 text-center">
                     <p className="text-green-300 text-sm">
                       Your email has been verified. You can now proceed with payment.
                     </p>
@@ -366,250 +356,119 @@ export default function BetaPendingPage() {
               {needsPayment && (
                 <div className="space-y-6 pt-6">
                   <div className="mt-6 pt-6 border-t border-white/10">
-                        {/* Header */}
-                        <div className="text-center mb-10">
-                          <div className="flex items-center justify-center gap-2 mb-4">
-                            <Sparkles className="h-6 w-6 text-purple-400" />
-                            <h4 className="text-2xl font-bold text-white">Pilot Program Pricing</h4>
+                    {/* Header */}
+                    <div className="text-center mb-8">
+                      <div className="flex items-center justify-center gap-2 mb-4">
+                        <Sparkles className="h-6 w-6 text-purple-400" />
+                        <h4 className="text-2xl font-bold text-white">Start Your Producer Account</h4>
+                      </div>
+                      <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
+                        Get instant access to all producer features with our $80/month plan
+                      </p>
+                    </div>
+
+                    {/* Main Payment Card */}
+                    <Card className="bg-white/10 backdrop-blur-md border-2 border-purple-400 shadow-2xl max-w-4xl mx-auto">
+                      <CardHeader className="text-center pb-6 space-y-4">
+                        <div className="flex justify-center mb-4">
+                          <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-4">
+                            <DollarSign className="h-12 w-12 text-white" />
                           </div>
-                          <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
-                            As a pilot user, you'll get our Enterprise plan at a fraction of the cost. Lock in this exclusive rate for a full year!
-                          </p>
                         </div>
+                        <CardTitle className="text-3xl font-bold text-white">
+                          Producer Monthly Plan
+                        </CardTitle>
+                        <div className="flex items-baseline justify-center gap-2 pt-4">
+                          <span className="text-6xl font-bold text-white">$80</span>
+                          <span className="text-xl text-gray-300">/month</span>
+                        </div>
+                        <CardDescription className="text-gray-300 text-lg pt-2">
+                          Everything you need to manage successful events
+                        </CardDescription>
+                      </CardHeader>
 
-                        {/* Pricing Cards - Vertical Stack with 2-Column Layout */}
-                        <div className="flex flex-col gap-6 mb-8 max-w-4xl mx-auto">
-                          {/* Enterprise Plan - HIGHLIGHTED (SHOWN FIRST) */}
-                          <Card className="bg-gradient-to-br from-purple-600/20 to-fuchsia-600/20 border-2 border-fuchsia-400 shadow-xl shadow-fuchsia-500/30 relative transform hover:scale-[1.02] transition-transform duration-200">
-                            <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                              <Badge className="bg-gradient-to-r from-purple-600 to-fuchsia-500 text-white px-4 py-1.5 text-sm font-bold shadow-lg">
-                                🎉 PILOT SPECIAL
-                              </Badge>
+                      <CardContent className="space-y-6">
+                        {/* Features Grid */}
+                        <div className="grid md:grid-cols-2 gap-4 py-6">
+                          {features.map((feature, index) => (
+                            <div
+                              key={index}
+                              className="flex items-start gap-3 p-4 bg-white/5 rounded-lg border border-white/30 hover:bg-white/10 hover:border-white/50 transition-colors"
+                            >
+                              <div className="bg-purple-500/20 rounded-full p-2 flex-shrink-0">
+                                <feature.icon className="h-5 w-5 text-purple-300" />
+                              </div>
+                              <div>
+                                <h5 className="text-white font-semibold text-sm mb-1">
+                                  {feature.title}
+                                </h5>
+                                <p className="text-gray-400 text-xs">
+                                  {feature.description}
+                                </p>
+                              </div>
                             </div>
-                            <CardContent className="p-6 pt-10">
-                              <div className="grid md:grid-cols-2 gap-6 items-start">
-                                {/* Left: Pricing */}
-                                <div className="text-center md:text-left md:border-r md:border-fuchsia-400/30 md:pr-6">
-                                  <CardTitle className="text-2xl font-bold text-white mb-3">Enterprise</CardTitle>
-                                  <div className="flex items-center justify-center md:justify-start gap-3 mb-3">
-                                    <span className="text-lg text-gray-400 line-through">$400</span>
-                                    <span className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
-                                      $80
-                                    </span>
-                                  </div>
-                                  <CardDescription className="text-fuchsia-300 text-sm font-semibold mb-4">
-                                    per month - Lock in for 1 year!
-                                  </CardDescription>
-                                  <div className="bg-fuchsia-500/10 border border-fuchsia-400/30 rounded-lg p-3 mb-3">
-                                    <p className="text-fuchsia-200 text-sm font-semibold text-center">
-                                      Save $3,840/year!
-                                    </p>
-                                  </div>
-                                  <p className="text-fuchsia-200 text-sm italic">Full enterprise features</p>
-                                </div>
-
-                                {/* Right: Features */}
-                                <div>
-                                  <ul className="space-y-3">
-                                    <li className="flex items-start text-white text-sm">
-                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                      <span><strong>Unlimited events</strong></span>
-                                    </li>
-                                    <li className="flex items-start text-white text-sm">
-                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                      <span><strong>Unlimited contacts</strong></span>
-                                    </li>
-                                    <li className="flex items-start text-white text-sm">
-                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                      <span>White-label automation</span>
-                                    </li>
-                                    <li className="flex items-start text-white text-sm">
-                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                      <span>Advanced CRM & analytics</span>
-                                    </li>
-                                    <li className="flex items-start text-white text-sm">
-                                      <Check className="h-5 w-5 text-fuchsia-400 mr-3 flex-shrink-0 mt-0.5" />
-                                      <span>Dedicated account manager</span>
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Starter Plan */}
-                          <Card className="bg-white/5 border border-white/10">
-                            <CardContent className="p-6">
-                              <div className="grid md:grid-cols-2 gap-6 items-center">
-                                {/* Left: Pricing */}
-                                <div className="text-center md:text-left md:border-r md:border-white/10 md:pr-6">
-                                  <CardTitle className="text-2xl font-bold text-white mb-2">Starter</CardTitle>
-                                  <div className="text-4xl font-bold text-white mb-2">$80</div>
-                                  <CardDescription className="text-gray-400 text-sm mb-3">per month</CardDescription>
-                                  <p className="text-gray-400 text-sm italic">Perfect for new producers</p>
-                                </div>
-
-                                {/* Right: Features */}
-                                <div>
-                                  <ul className="space-y-3">
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Up to 10 events/year</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>10,000 vendor contacts</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Automated emails</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Email support</span>
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-
-                          {/* Growth Plan */}
-                          <Card className="bg-white/5 border border-white/10">
-                            <CardContent className="p-6">
-                              <div className="grid md:grid-cols-2 gap-6 items-center">
-                                {/* Left: Pricing */}
-                                <div className="text-center md:text-left md:border-r md:border-white/10 md:pr-6">
-                                  <CardTitle className="text-2xl font-bold text-white mb-2">Growth</CardTitle>
-                                  <div className="text-4xl font-bold text-white mb-2">$160</div>
-                                  <CardDescription className="text-gray-400 text-sm mb-3">per month</CardDescription>
-                                  <p className="text-gray-400 text-sm italic">For established producers</p>
-                                </div>
-
-                                {/* Right: Features */}
-                                <div>
-                                  <ul className="space-y-3">
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Up to 50 events/year</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>50,000 vendor contacts</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Advanced automation</span>
-                                    </li>
-                                    <li className="flex items-start text-gray-300 text-sm">
-                                      <Check className="h-4 w-4 text-purple-400 mr-3 flex-shrink-0 mt-1" />
-                                      <span>Custom branding</span>
-                                    </li>
-                                  </ul>
-                                </div>
-                              </div>
-                            </CardContent>
-                          </Card>
-                        </div>
-                      </div>
-
-                  {/* Request Access Form + CTA */}
-                  <div className="mt-8 bg-white/5 rounded-lg border border-fuchsia-400/20 max-w-4xl mx-auto overflow-hidden">
-                    {!isEmailVerified ? (
-                      <div className="p-8 text-center">
-                        <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                        <h4 className="text-xl font-bold text-white mb-3">Email Verification Required</h4>
-                        <p className="text-gray-300 text-sm">
-                          Please verify your email first (Step 1 above) to request paid access.
-                        </p>
-                      </div>
-                    ) : isSubmitted ? (
-                      <div className="p-8 text-center">
-                        <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
-                          <CheckCircle className="h-8 w-8 text-green-300" />
-                        </div>
-                        <h4 className="text-xl font-bold text-white mb-4">Request Sent Successfully!</h4>
-                        <p className="text-white/70 mb-4">
-                          We'll be in touch within 1-3 business days to get you started with your paid account.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="p-8">
-                        {/* CTA Header */}
-                        <div className="text-center mb-6">
-                          <p className="text-xl text-white font-bold mb-2">
-                            <strong className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-fuchsia-300">
-                              Limited spots available!
-                            </strong>
-                          </p>
-                          <p className="text-sm text-gray-300 leading-relaxed text-left">
-                            We're currently working hands-on with a small group of pilot users to perfect the platform. Request access below to secure your pilot pricing and be among the first to lock in this exclusive rate.
-                          </p>
+                          ))}
                         </div>
 
-                        <Separator className="bg-white/10 mb-6" />
+                        <Separator className="bg-white/10" />
 
-                        {/* Form */}
-                        <form onSubmit={handleSubmit} className="space-y-4">
-
-                          {/* Name and Email Row */}
-                          <div className="grid md:grid-cols-2 gap-4">
-                            <Input
-                              id="name"
-                              placeholder="Your name"
-                              value={formData.name}
-                              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                              required
-                              className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
-                            />
-                            <Input
-                              id="email"
-                              type="email"
-                              placeholder="Email address"
-                              value={formData.email}
-                              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-                              required
-                              className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 h-12 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all rounded-lg"
-                            />
-                          </div>
-
-                          {/* Message */}
-                          <Textarea
-                            id="message"
-                            placeholder="Tell us about your organization and events. How many events do you run per year?"
-                            value={formData.message}
-                            onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
-                            required
-                            rows={4}
-                            className="bg-[#1a0a2e]/80 border-white/10 text-white placeholder:text-white/40 text-[15px] focus:bg-[#1a0a2e] focus:border-purple-400/50 transition-all resize-none rounded-lg"
-                          />
-
-                          {error && (
-                            <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-4">
-                              <p className="text-red-300 text-sm">{error}</p>
+                        {/* Payment CTA Section */}
+                        <div className="space-y-4 pt-4">
+                          {!isEmailVerified ? (
+                            <div className="text-center p-6 bg-yellow-500/10 border-2 border-yellow-400 rounded-lg">
+                              <AlertCircle className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
+                              <h5 className="text-white font-semibold mb-2">Email Verification Required</h5>
+                              <p className="text-gray-300 text-sm">
+                                Please verify your email first (Step 1 above) to start payment
+                              </p>
                             </div>
+                          ) : isPaid ? (
+                            <div className="text-center p-6 bg-green-500/10 border-2 border-green-400 rounded-lg">
+                              <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
+                              <h5 className="text-white font-semibold text-lg mb-2">Payment Complete!</h5>
+                              <p className="text-gray-300 text-sm mb-4">
+                                Your producer account is active. Redirecting to dashboard...
+                              </p>
+                            </div>
+                          ) : (
+                            <>
+                              {paymentError && (
+                                <Alert className="bg-red-500/10 border-red-400/30">
+                                  <AlertCircle className="h-4 w-4 text-red-400" />
+                                  <AlertDescription className="text-red-300 text-sm">
+                                    {paymentError}
+                                  </AlertDescription>
+                                </Alert>
+                              )}
+
+                              <Button
+                                onClick={handleStartPayment}
+                                disabled={isProcessingPayment}
+                                size="lg"
+                                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl transition-all"
+                              >
+                                {isProcessingPayment ? (
+                                  <>
+                                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                    Starting Secure Checkout...
+                                  </>
+                                ) : (
+                                  <>
+                                    <DollarSign className="mr-2 h-5 w-5" />
+                                    Start Your Producer Account ($80/mo)
+                                    <ArrowRight className="ml-2 h-5 w-5" />
+                                  </>
+                                )}
+                              </Button>
+
+                              <p className="text-center text-sm text-gray-400">
+                                Secure payment powered by Stripe • Cancel anytime
+                              </p>
+                            </>
                           )}
-
-                          {/* Submit Button */}
-                          <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className="w-full inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-500 disabled:cursor-not-allowed text-white transition-all text-[15px] font-semibold rounded-xl shadow-lg shadow-fuchsia-500/20 hover:shadow-xl"
-                          >
-                            {isSubmitting ? 'Sending Request...' : 'Request Pilot Access'}
-                            {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
-                          </button>
-
-                          {/* Bottom Email Link */}
-                          <p className="text-center text-[13px] text-white/50">
-                            Or email us directly at{' '}
-                            <a href="mailto:team@voxxypresents.com" className="text-fuchsia-400 hover:text-fuchsia-300">
-                              team@voxxypresents.com
-                            </a>
-                          </p>
-                        </form>
-                      </div>
-                    )}
+                        </div>
+                      </CardContent>
+                    </Card>
                   </div>
                 </div>
               )}

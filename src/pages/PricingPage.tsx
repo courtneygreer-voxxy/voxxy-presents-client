@@ -65,7 +65,7 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-6xl px-6 md:px-12">
           <div className="grid md:grid-cols-3 gap-8 items-stretch">
             {/* Starter Plan */}
-            <Card className="bg-gray-100 border border-gray-300 hover:border-voxxy-purple-brand/40 hover:shadow-lg transition-all duration-300 flex flex-col">
+            <Card className="pricing-card bg-gray-100 !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Starter</CardTitle>
                 <div className="text-4xl font-bold text-gray-900 mb-2">$80</div>
@@ -104,7 +104,7 @@ export default function PricingPage() {
             </Card>
 
             {/* Growth Plan */}
-            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-2 border-voxxy-purple-brand hover:border-purple-700 hover:shadow-xl transition-all duration-300 shadow-lg relative flex flex-col">
+            <Card className="pricing-card bg-gradient-to-br from-purple-50 to-pink-50 !border-2 !border-voxxy-purple-brand hover:shadow-xl transition-all duration-300 shadow-lg relative flex flex-col">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <Badge className="bg-voxxy-purple-brand text-white px-4 py-1 text-sm">Most Popular</Badge>
               </div>
@@ -150,7 +150,7 @@ export default function PricingPage() {
             </Card>
 
             {/* Enterprise Plan */}
-            <Card className="bg-gray-100 border border-gray-300 hover:border-voxxy-purple-brand/40 hover:shadow-lg transition-all duration-300 flex flex-col">
+            <Card className="pricing-card bg-gray-100 !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
                 <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Enterprise</CardTitle>
                 <div className="text-4xl font-bold text-gray-900 mb-2">$400</div>

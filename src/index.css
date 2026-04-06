@@ -18,6 +18,11 @@
     @apply border-white/20;
   }
 
+  /* Pricing card override - removes glass-card hover border */
+  .pricing-card:hover {
+    border-color: #d946ef !important; /* fuchsia-500 */
+  }
+
   /* Gradient text utility */
   .gradient-text {
     background: linear-gradient(to right, #c084fc, #f472b6);
