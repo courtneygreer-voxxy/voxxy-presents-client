@@ -98,7 +98,7 @@ export const stripeService = {
    * Returns a URL to redirect the user to Stripe's billing portal
    */
   createBillingPortalSession: async (): Promise<BillingPortalResponse> => {
-    const returnUrl = `${window.location.origin}/settings/billing`;
+    const returnUrl = `${window.location.origin}/dashboard`;
 
     const response = await fetchWithAuth(
       `${API_BASE_URL}/v1/presents/stripe/billing_portal?return_url=${encodeURIComponent(returnUrl)}`

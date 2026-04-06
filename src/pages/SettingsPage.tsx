@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authApi, organizationsApi } from '@/services/api';
-import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle } from 'lucide-react';
+import { stripeService } from '@/services/stripeService';
+import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, ExternalLink, Loader2 } from 'lucide-react';
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -99,6 +100,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
 
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
+  const [isLoadingBilling, setIsLoadingBilling] = useState(false);
 
   const handleSaveChanges = async () => {
     if (!userProfile?.id) {
@@ -147,6 +149,19 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
       setShowDeleteWarning(false);
     } catch (error) {
       console.error('Failed to delete account:', error);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    setIsLoadingBilling(true);
+    try {
+      const { url } = await stripeService.createBillingPortalSession();
+      window.open(url, '_blank');
+      setIsLoadingBilling(false);
+    } catch (error) {
+      console.error('Failed to open billing portal:', error);
+      alert('Failed to open billing portal. Please try again or contact support.');
+      setIsLoadingBilling(false);
     }
   };
 
@@ -311,6 +326,48 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                   )}
                 </div>
               </div>
+
+              {/* Billing Management - Only for paid producers */}
+              {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && userProfile?.paid && (
+                <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-lg p-4 border border-purple-400/30">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-3 flex-1">
+                      <div className="bg-purple-500/20 rounded-lg p-2">
+                        <CreditCard className="w-4 h-4 text-purple-300" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-white mb-1">Subscription Active</h4>
+                        <p className="text-xs text-white/70 mb-3">
+                          You have an active Producer Monthly subscription ($80/month)
+                        </p>
+                        <button
+                          onClick={handleManageBilling}
+                          disabled={isLoadingBilling}
+                          className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium bg-purple-600 hover:bg-purple-500 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                        >
+                          {isLoadingBilling ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              Opening...
+                            </>
+                          ) : (
+                            <>
+                              <CreditCard className="w-3.5 h-3.5" />
+                              Manage Billing
+                              <ExternalLink className="w-3 h-3" />
+                            </>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/10">
+                    <p className="text-[10px] text-white/50">
+                      Update payment method, view invoices, or cancel subscription
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
