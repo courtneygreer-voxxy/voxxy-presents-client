@@ -279,16 +279,16 @@ export default function FeaturesPage() {
             Join event producers everywhere who are scaling their recurring events with Voxxy.
           </p>
           <TrackedLink
-            to="/signup"
+            to="/#contact"
             className="inline-flex items-center px-8 py-[18px] bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 text-white hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 transition-all text-lg font-semibold rounded-xl shadow-lg shadow-fuchsia-500/25 hover:shadow-xl"
             trackingData={{
-              link_text: 'Get Started',
-              destination_page: 'Sign Up',
+              link_text: 'Request Access',
+              destination_page: 'Contact',
               current_page: 'Features',
               link_position: 'cta_section'
             }}
           >
-            Get Started <ArrowRight className="ml-2 h-5 w-5" />
+            Request Access <ArrowRight className="ml-2 h-5 w-5" />
           </TrackedLink>
         </div>
       </section>

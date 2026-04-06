@@ -98,7 +98,7 @@ export default function PricingPage() {
                   </ul>
                 </div>
                 <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
-                  <Link to="/signup">Get Started</Link>
+                  <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -144,7 +144,7 @@ export default function PricingPage() {
                   </ul>
                 </div>
                 <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
-                  <Link to="/signup">Get Started</Link>
+                  <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -180,14 +180,10 @@ export default function PricingPage() {
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Dedicated account manager</span>
                     </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>API access</span>
-                    </li>
                   </ul>
                 </div>
                 <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
-                  <Link to="/signup">Contact Sales</Link>
+                  <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
             </Card>
@@ -205,8 +201,8 @@ export default function PricingPage() {
             Join event producers who are scaling their recurring events with Voxxy
           </p>
           <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
-            <Link to="/signup">
-              Get Started
+            <Link to="/#contact">
+              Request Access
               <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>

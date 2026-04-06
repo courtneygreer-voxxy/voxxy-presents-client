@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { usePageTracking } from "@/hooks/usePageTracking"
@@ -59,22 +59,41 @@ interface ContactFormData {
 export default function HomePage() {
   const { isAuthenticated, isProducer } = useAuth()
 
-  useEffect(() => {
-    window.scrollTo(0, 0)
-  }, [])
+  // Helper function to scroll to contact section
+  const scrollToContact = useCallback(() => {
+    const contactSection = document.getElementById('contact')
+    if (contactSection) {
+      const navHeight = 100 // Account for fixed navigation height
+      const elementPosition = contactSection.getBoundingClientRect().top + window.pageYOffset
+      const offsetPosition = elementPosition - navHeight
 
-  // Handle hash navigation to contact form
-  useEffect(() => {
-    if (window.location.hash === '#contact') {
-      // Small delay to ensure page is fully loaded
-      setTimeout(() => {
-        const contactSection = document.getElementById('contact')
-        if (contactSection) {
-          contactSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
     }
   }, [])
+
+  // Handle initial scroll position - either to top or to contact section
+  useEffect(() => {
+    if (window.location.hash === '#contact') {
+      setTimeout(scrollToContact, 100)
+    } else {
+      window.scrollTo(0, 0)
+    }
+  }, [scrollToContact])
+
+  // Listen for hash changes (when clicking anchor links on same page)
+  useEffect(() => {
+    const handleHashChange = () => {
+      if (window.location.hash === '#contact') {
+        scrollToContact()
+      }
+    }
+
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [scrollToContact])
 
   usePageTracking('Home')
 
@@ -187,16 +206,16 @@ export default function HomePage() {
                 <TrackedButton
                   className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-purple-600 via-fuchsia-500 to-pink-500 hover:from-purple-700 hover:via-fuchsia-600 hover:to-pink-600 text-white text-[16px] font-semibold rounded-xl transition-all shadow-lg shadow-fuchsia-500/25 hover:shadow-xl hover:-translate-y-0.5"
                   trackingData={{
-                    button_text: 'Get Started',
+                    button_text: 'Request Access',
                     button_location: 'hero',
                     page_name: 'Home',
                     is_primary_cta: true
                   }}
                   asChild
                 >
-                  <Link to="/signup">
-                    Get Started <ArrowRight className="ml-2 h-5 w-5" />
-                  </Link>
+                  <a href="#contact">
+                    Request Access <ArrowRight className="ml-2 h-5 w-5" />
+                  </a>
                 </TrackedButton>
                 <TrackedButton
                   className="inline-flex items-center px-8 py-4 bg-white/10 hover:bg-white/15 border border-white/15 hover:border-fuchsia-400/30 text-white text-[16px] font-medium rounded-xl transition-all"
