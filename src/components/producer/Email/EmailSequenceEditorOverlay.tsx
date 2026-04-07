@@ -1,7 +1,9 @@
 import { useState, useRef, useMemo } from 'react';
-import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Save, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, Clock, Info } from 'lucide-react';
+import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import type { ScheduledEmail } from '@/types/email';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
+import { scheduledEmailsApi } from '@/services/api';
 
 interface EmailSequenceEditorOverlayProps {
   emails: ScheduledEmail[];
@@ -14,7 +16,6 @@ interface EmailSequenceEditorOverlayProps {
   onSendNow?: (emailId: number) => Promise<void>;
   onDelete: (emailId: number) => Promise<void>;
   onCreateEmail: () => void;
-  onSaveAsTemplate?: () => void;
 }
 
 // Category display order and labels
@@ -210,23 +211,56 @@ export default function EmailSequenceEditorOverlay({
   onSendNow,
   onDelete,
   onCreateEmail,
-  onSaveAsTemplate,
 }: EmailSequenceEditorOverlayProps) {
   const [selectedEmail, setSelectedEmail] = useState<ScheduledEmail | null>(emails[0] || null);
 
-  // Group emails by category
+  // Test email dialog state
+  const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
+  const [testEmailAddress, setTestEmailAddress] = useState('');
+  const [isSendingTest, setIsSendingTest] = useState(false);
+  const [testEmailError, setTestEmailError] = useState<string | null>(null);
+  const [testEmailSuccess, setTestEmailSuccess] = useState<string | null>(null);
+
+  // Handler for sending test email
+  const handleSendTest = async () => {
+    if (!selectedEmail || !testEmailAddress) return;
+
+    setIsSendingTest(true);
+    setTestEmailError(null);
+
+    try {
+      const result = await scheduledEmailsApi.sendTest(eventSlug, selectedEmail.id, testEmailAddress);
+      setTestEmailSuccess(`Test email sent to ${result.recipient}`);
+      setTimeout(() => setTestEmailSuccess(null), 5000);
+      setShowTestEmailDialog(false);
+      setTestEmailAddress('');
+    } catch (error: any) {
+      console.error('Failed to send test email:', error);
+      setTestEmailError(error?.message || 'Failed to send test email');
+      setTimeout(() => setTestEmailError(null), 5000);
+    } finally {
+      setIsSendingTest(false);
+    }
+  };
+
+  // Group emails by system vs reminders
   const groupedEmails = useMemo(() => {
-    const groups: Record<string, ScheduledEmail[]> = {};
+    const groups: Record<'system' | 'reminders', ScheduledEmail[]> = {
+      system: [],
+      reminders: [],
+    };
 
     for (const email of emails) {
-      const rawCategory = email.email_template_item?.category || inferCategory(email);
-      const normalizedCategory = CATEGORY_MAP[rawCategory] || 'event_announcements';
-      if (!groups[normalizedCategory]) groups[normalizedCategory] = [];
-      groups[normalizedCategory].push(email);
+      const isReminder = isCustomCountdown(email.trigger_type);
+      if (isReminder) {
+        groups.reminders.push(email);
+      } else {
+        groups.system.push(email);
+      }
     }
 
     // Sort emails within each group by position, then by name
-    for (const key of Object.keys(groups)) {
+    for (const key of Object.keys(groups) as Array<'system' | 'reminders'>) {
       groups[key].sort((a, b) => {
         const posA = a.email_template_item?.position ?? 999;
         const posB = b.email_template_item?.position ?? 999;
@@ -238,13 +272,10 @@ export default function EmailSequenceEditorOverlay({
     return groups;
   }, [emails]);
 
-  // Category labels
-  const categoryLabels: Record<string, string> = {
-    event_announcements: 'Event Announcements',
-    application_updates: 'Application Updates',
-    payment_reminders: 'Payment Reminders',
-    event_countdown: 'Event Countdown',
-    event_updates: 'Event Updates',
+  // Group labels
+  const groupLabels: Record<'system' | 'reminders', string> = {
+    system: 'System',
+    reminders: 'Reminders',
   };
 
   const isSent = selectedEmail?.status === 'sent';
@@ -279,15 +310,6 @@ export default function EmailSequenceEditorOverlay({
               <Plus className="w-4 h-4" />
               Add Reminder
             </button>
-            {onSaveAsTemplate && (
-              <button
-                onClick={onSaveAsTemplate}
-                className="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all flex items-center gap-2"
-              >
-                <Save className="w-4 h-4" />
-                Save as Template
-              </button>
-            )}
           </div>
         </div>
 
@@ -325,62 +347,58 @@ export default function EmailSequenceEditorOverlay({
                 </div>
               </div>
 
-              {/* Categorized Email List */}
+              {/* Grouped Email List - System then Reminders */}
               <div className="p-2 space-y-3">
-                {Object.entries(groupedEmails).map(([category, items]) => (
-                  <div key={category}>
-                    <div className="px-2 py-1">
-                      <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-                        {categoryLabels[category] || category}
-                      </h4>
-                    </div>
-                    <div className="space-y-0.5">
-                      {items.map((email) => {
-                        const isCustom = isCustomCountdown(email.trigger_type);
-                        const status = getStatusBadge(email.status);
-                        return (
-                          <button
-                            key={email.id}
-                            onClick={() => setSelectedEmail(email)}
-                            className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                              selectedEmail?.id === email.id
-                                ? 'bg-purple-500/20 border border-purple-500/40'
-                                : 'hover:bg-white/5 border border-transparent'
-                            }`}
-                          >
-                            <div className="flex items-center justify-between gap-2 mb-1">
-                              <div className="text-sm text-white font-medium truncate">
-                                {email.name}
+                {(['system', 'reminders'] as const).map((groupKey) => {
+                  const items = groupedEmails[groupKey];
+                  if (items.length === 0) return null;
+
+                  return (
+                    <div key={groupKey}>
+                      <div className="px-2 py-1">
+                        <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                          {groupLabels[groupKey]}
+                        </h4>
+                      </div>
+                      <div className="space-y-0.5">
+                        {items.map((email) => {
+                          const isCustom = isCustomCountdown(email.trigger_type);
+                          const status = getStatusBadge(email.status);
+                          return (
+                            <button
+                              key={email.id}
+                              onClick={() => setSelectedEmail(email)}
+                              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+                                selectedEmail?.id === email.id
+                                  ? 'bg-purple-500/20 border border-purple-500/40'
+                                  : 'hover:bg-white/5 border border-transparent'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2 mb-1">
+                                <div className="text-sm text-white font-medium truncate">
+                                  {email.name}
+                                </div>
                               </div>
-                              {isCustom ? (
-                                <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
-                                  Custom
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(email.trigger_type).color}`}>
+                                  {getEmailTypeInfo(email.trigger_type).label}
                                 </span>
-                              ) : (
-                                <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
-                                  System
+                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium border ${status.className}`}>
+                                  {status.label}
                                 </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(email.trigger_type).color}`}>
-                                {getEmailTypeInfo(email.trigger_type).label}
-                              </span>
-                              <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium border ${status.className}`}>
-                                {status.label}
-                              </span>
-                              {email.category?.name && (
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/5 text-white/70 border border-white/20">
-                                  {email.category.name}
-                                </span>
-                              )}
-                            </div>
-                          </button>
-                        );
-                      })}
+                                {email.category?.name && (
+                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/5 text-white/70 border border-white/20">
+                                    {email.category.name}
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
 
@@ -398,13 +416,53 @@ export default function EmailSequenceEditorOverlay({
                             {selectedEmail.name}
                           </h3>
                           {isCustomEmail ? (
-                            <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
-                              Custom Reminder
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
+                                Reminder
+                              </span>
+                              <Tooltip.Provider delayDuration={200}>
+                                <Tooltip.Root>
+                                  <Tooltip.Trigger asChild>
+                                    <button className="text-purple-300 hover:text-purple-200 transition-colors">
+                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    </button>
+                                  </Tooltip.Trigger>
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content
+                                      className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                                      sideOffset={5}
+                                    >
+                                      This is a time-based reminder that was added to this event's sequence.
+                                      <Tooltip.Arrow className="fill-gray-900" />
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
+                                </Tooltip.Root>
+                              </Tooltip.Provider>
+                            </div>
                           ) : (
-                            <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
-                              System Email
-                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
+                                System
+                              </span>
+                              <Tooltip.Provider delayDuration={200}>
+                                <Tooltip.Root>
+                                  <Tooltip.Trigger asChild>
+                                    <button className="text-emerald-300 hover:text-emerald-200 transition-colors">
+                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    </button>
+                                  </Tooltip.Trigger>
+                                  <Tooltip.Portal>
+                                    <Tooltip.Content
+                                      className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
+                                      sideOffset={5}
+                                    >
+                                      This is a core system email that's automatically triggered by vendor actions or event milestones.
+                                      <Tooltip.Arrow className="fill-gray-900" />
+                                    </Tooltip.Content>
+                                  </Tooltip.Portal>
+                                </Tooltip.Root>
+                              </Tooltip.Provider>
+                            </div>
                           )}
                         </div>
                         <div className="flex items-center gap-2 flex-wrap">
@@ -422,6 +480,14 @@ export default function EmailSequenceEditorOverlay({
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => setShowTestEmailDialog(true)}
+                          className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
+                          title="Send test email"
+                        >
+                          <Send className="w-3.5 h-3.5" />
+                          Send Test
+                        </button>
                         <button
                           onClick={() => onEditEmail(selectedEmail)}
                           className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
@@ -441,39 +507,6 @@ export default function EmailSequenceEditorOverlay({
                       </div>
                     </div>
                   </div>
-
-                  {/* System Email or Custom Reminder Info Banner */}
-                  {isCustomEmail ? (
-                    // Custom Reminder Info
-                    <div className="mx-6 mt-4 p-4 rounded-lg bg-purple-500/10 border border-purple-500/30">
-                      <div className="flex items-start gap-3">
-                        <Clock className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <h4 className="text-sm font-semibold text-purple-300 mb-1">
-                            Custom Reminder
-                          </h4>
-                          <p className="text-xs text-purple-200/90 leading-relaxed">
-                            This is a custom time-based reminder that was added to this event's sequence.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    // System Email Info
-                    <div className="mx-6 mt-4 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
-                      <div className="flex items-start gap-3">
-                        <Info className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                        <div className="flex-1">
-                          <h4 className="text-sm font-semibold text-emerald-300 mb-1">
-                            System Email
-                          </h4>
-                          <p className="text-xs text-emerald-200/90 leading-relaxed">
-                            This is a core system email that's automatically triggered by vendor actions or event milestones.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  )}
 
                   {/* Email Preview Content */}
                   <div className="p-6">
@@ -575,6 +608,97 @@ export default function EmailSequenceEditorOverlay({
           </div>
         )}
       </div>
+
+      {/* Test Email Dialog */}
+      {showTestEmailDialog && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl border border-white/10 shadow-2xl max-w-md w-full">
+            {/* Header */}
+            <div className="flex items-center justify-between p-4 border-b border-white/10">
+              <div className="flex items-center gap-2">
+                <Send className="w-5 h-5 text-green-400" />
+                <h3 className="text-lg font-semibold text-white">Send Test Email</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setShowTestEmailDialog(false);
+                  setTestEmailAddress('');
+                  setTestEmailError(null);
+                }}
+                className="text-white/60 hover:text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-4 space-y-4">
+              {testEmailSuccess && (
+                <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
+                  <p className="text-green-400 text-sm">{testEmailSuccess}</p>
+                </div>
+              )}
+
+              {testEmailError && (
+                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20">
+                  <p className="text-red-400 text-sm">{testEmailError}</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-white/80 mb-2">
+                  Test Email Address
+                </label>
+                <input
+                  type="email"
+                  value={testEmailAddress}
+                  onChange={(e) => setTestEmailAddress(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  autoFocus
+                />
+              </div>
+
+              <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20">
+                <p className="text-blue-400 text-xs">
+                  This will send a preview of "{selectedEmail?.name}" with all variables populated with sample data.
+                </p>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center gap-3 p-4 border-t border-white/10">
+              <button
+                onClick={() => {
+                  setShowTestEmailDialog(false);
+                  setTestEmailAddress('');
+                  setTestEmailError(null);
+                }}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSendTest}
+                disabled={isSendingTest || !testEmailAddress.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isSendingTest ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    Send Test
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

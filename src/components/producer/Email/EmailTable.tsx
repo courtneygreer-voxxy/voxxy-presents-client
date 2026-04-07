@@ -1,4 +1,6 @@
-import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronUp, ChevronDown, ChevronsUpDown, HelpCircle } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, AuditFilters } from '@/types/email';
 import EmailRow from './EmailRow';
 
@@ -27,6 +29,19 @@ function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; s
     : <ChevronDown className="w-3 h-3 text-purple-400" />;
 }
 
+// Check if email is a custom reminder (value-based trigger)
+function isCustomReminder(triggerType: string): boolean {
+  const reminderTriggers = [
+    'days_before_deadline',
+    'days_after_deadline',
+    'days_before_payment_deadline',
+    'days_after_payment_deadline',
+    'days_before_event',
+    'days_after_event'
+  ];
+  return reminderTriggers.includes(triggerType);
+}
+
 export default function EmailTable({
   emails,
   eventSlug,
@@ -41,6 +56,9 @@ export default function EmailTable({
   sortDirection,
   onSort,
 }: EmailTableProps) {
+  const [isSystemCollapsed, setIsSystemCollapsed] = useState(false);
+  const [isRemindersCollapsed, setIsRemindersCollapsed] = useState(false);
+
   if (emails.length === 0) {
     return (
       <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
@@ -71,6 +89,10 @@ export default function EmailTable({
     );
   };
 
+  // Group emails into system and reminders
+  const systemEmails = emails.filter(email => !isCustomReminder(email.trigger_type));
+  const reminderEmails = emails.filter(email => isCustomReminder(email.trigger_type));
+
   return (
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header */}
@@ -90,20 +112,117 @@ export default function EmailTable({
 
       {/* Table Body */}
       <div>
-        {emails.map((email) => (
-          <EmailRow
-            key={`${email.id}-${email.scheduled_for}`}
-            email={email}
-            eventSlug={eventSlug}
-            onEdit={onEdit}
-            onPause={onPause}
-            onResume={onResume}
-            onSendNow={onSendNow}
-            onRetryFailed={onRetryFailed}
-            onDelete={onDelete}
-            onViewAuditLog={onViewAuditLog}
-          />
-        ))}
+        {/* System Emails Section */}
+        {systemEmails.length > 0 && (
+          <>
+            <button
+              onClick={() => setIsSystemCollapsed(!isSystemCollapsed)}
+              className="w-full bg-emerald-500/10 hover:bg-emerald-500/15 border-b border-emerald-500/30 px-4 py-2 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {isSystemCollapsed ? (
+                  <ChevronDown className="w-4 h-4 text-emerald-300" />
+                ) : (
+                  <ChevronUp className="w-4 h-4 text-emerald-300" />
+                )}
+                <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                  System ({systemEmails.length})
+                </h3>
+                <Tooltip.Provider delayDuration={200}>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div
+                        className="text-emerald-300 hover:text-emerald-200 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
+                        sideOffset={5}
+                      >
+                        Core system emails that are automatically triggered by vendor actions or event milestones.
+                        <Tooltip.Arrow className="fill-gray-900" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </div>
+            </button>
+            {!isSystemCollapsed && systemEmails.map((email) => (
+              <EmailRow
+                key={`${email.id}-${email.scheduled_for}`}
+                email={email}
+                eventSlug={eventSlug}
+                onEdit={onEdit}
+                onPause={onPause}
+                onResume={onResume}
+                onSendNow={onSendNow}
+                onRetryFailed={onRetryFailed}
+                onDelete={onDelete}
+                onViewAuditLog={onViewAuditLog}
+              />
+            ))}
+          </>
+        )}
+
+        {/* Reminders Section */}
+        {reminderEmails.length > 0 && (
+          <>
+            <button
+              onClick={() => setIsRemindersCollapsed(!isRemindersCollapsed)}
+              className="w-full bg-purple-500/10 hover:bg-purple-500/15 border-b border-purple-500/30 px-4 py-2 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                {isRemindersCollapsed ? (
+                  <ChevronDown className="w-4 h-4 text-purple-300" />
+                ) : (
+                  <ChevronUp className="w-4 h-4 text-purple-300" />
+                )}
+                <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+                  Reminders ({reminderEmails.length})
+                </h3>
+                <Tooltip.Provider delayDuration={200}>
+                  <Tooltip.Root>
+                    <Tooltip.Trigger asChild>
+                      <div
+                        className="text-purple-300 hover:text-purple-200 transition-colors"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <HelpCircle className="w-3.5 h-3.5" />
+                      </div>
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content
+                        className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                        sideOffset={5}
+                      >
+                        Time-based reminders that were added to this event's sequence.
+                        <Tooltip.Arrow className="fill-gray-900" />
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </Tooltip.Provider>
+              </div>
+            </button>
+            {!isRemindersCollapsed && reminderEmails.map((email) => (
+              <EmailRow
+                key={`${email.id}-${email.scheduled_for}`}
+                email={email}
+                eventSlug={eventSlug}
+                onEdit={onEdit}
+                onPause={onPause}
+                onResume={onResume}
+                onSendNow={onSendNow}
+                onRetryFailed={onRetryFailed}
+                onDelete={onDelete}
+                onViewAuditLog={onViewAuditLog}
+              />
+            ))}
+          </>
+        )}
       </div>
     </div>
   );

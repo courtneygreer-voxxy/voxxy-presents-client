@@ -6,6 +6,7 @@ import { ScheduledEmail, EmailCategory, AuditFilters, DeliveryStatus, TRIGGER_TY
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 
 interface EmailRowProps {
   email: ScheduledEmail;
@@ -18,70 +19,6 @@ interface EmailRowProps {
   onDelete?: (emailId: number) => Promise<void>;
   onViewAuditLog?: (filters: AuditFilters) => void;
 }
-
-// Category configuration
-const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: string }> = {
-  pre_application: {
-    label: 'Announcement',
-    icon: Megaphone,
-    color: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-  },
-  application: {
-    label: 'Application',
-    icon: FileText,
-    color: 'bg-pink-500/20 text-pink-300 border-pink-500/30'
-  },
-  payment: {
-    label: 'Payment',
-    icon: CreditCard,
-    color: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-  },
-  pre_event: {
-    label: 'Pre-Event',
-    icon: Calendar,
-    color: 'bg-green-500/20 text-green-300 border-green-500/30'
-  },
-  event_day: {
-    label: 'Event Day',
-    icon: PartyPopper,
-    color: 'bg-orange-500/20 text-orange-300 border-orange-500/30'
-  },
-  post_event: {
-    label: 'Post-Event',
-    icon: MessageSquare,
-    color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30'
-  },
-  system: {
-    label: 'System',
-    icon: Settings2,
-    color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
-  },
-  event_announcements: {
-    label: 'Announcement',
-    icon: Megaphone,
-    color: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-  },
-  application_updates: {
-    label: 'Application',
-    icon: FileText,
-    color: 'bg-pink-500/20 text-pink-300 border-pink-500/30'
-  },
-  payment_reminders: {
-    label: 'Payment',
-    icon: CreditCard,
-    color: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
-  },
-  event_countdown: {
-    label: 'Event Countdown',
-    icon: Calendar,
-    color: 'bg-green-500/20 text-green-300 border-green-500/30'
-  },
-  event_updates: {
-    label: 'Event Updates',
-    icon: Settings2,
-    color: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
-  }
-};
 
 export default function EmailRow({
   email,
@@ -111,52 +48,37 @@ export default function EmailRow({
     }
   };
 
-  // Infer category from email name/trigger (fallback only)
-  // Must match backend groupings in EmailTemplateItem::EVENT_WIDE_TRIGGERS and CATEGORY_SPECIFIC_TRIGGERS
-  const inferCategory = (): EmailCategory => {
-    const name = email.name.toLowerCase();
-    const trigger = email.trigger_type;
+  // Get email type info from trigger type using the correct utility
+  const emailTypeInfo = getEmailTypeInfo(email.trigger_type);
 
-    // Event Announcements - Sent to invitations/contacts (people who haven't applied)
-    if (trigger === 'on_invitation_send' ||
-        trigger === 'days_before_deadline' ||
-        trigger === 'days_after_deadline' ||
-        trigger === 'on_bulletin_post' ||
-        trigger === 'on_event_update' ||
-        trigger === 'on_event_cancel') {
-      return 'event_announcements';
-    }
-
-    // Application Updates - Sent to registrations (people who already applied)
-    if (trigger === 'on_application_submit' ||
-        trigger === 'on_approval' ||
-        trigger === 'on_rejection' ||
-        trigger === 'on_waitlist' ||
-        trigger === 'on_category_change') {
-      return 'application_updates';
-    }
-
-    // Payment Reminders
-    if (trigger.includes('payment')) return 'payment_reminders';
-
-    // Event Countdown
-    if (trigger === 'days_before_event' || trigger === 'on_event_date' || trigger === 'days_after_event') {
-      return 'event_countdown';
-    }
-
-    // Fallback to name patterns
-    if (name.includes('payment')) return 'payment_reminders';
-    if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) return 'application_updates';
-    if (name.includes('days before') || name.includes('day of')) return 'event_countdown';
-    if (name.includes('announcement') || name.includes('immediate')) return 'event_announcements';
-
-    return 'event_announcements';
+  // Map email type labels to icons
+  const getIconForEmailType = (label: string) => {
+    if (label.includes('Announcement')) return Megaphone;
+    if (label.includes('Application')) return FileText;
+    if (label.includes('Payment')) return CreditCard;
+    if (label.includes('Countdown')) return Calendar;
+    return Settings2; // Default for "Other"
   };
 
-  // Use actual email_type from template item if available, otherwise infer from trigger
-  const category: EmailCategory = (email.email_template_item?.email_type || inferCategory()) as EmailCategory;
-  const categoryConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['event_announcements'];
-  const CategoryIcon = categoryConfig.icon;
+  const CategoryIcon = getIconForEmailType(emailTypeInfo.label);
+
+  // For audience display logic, infer category from trigger
+  const getAudienceCategory = (): string => {
+    const trigger = email.trigger_type;
+    if (trigger === 'on_invitation_send' || trigger === 'days_before_deadline' ||
+        trigger === 'days_after_deadline' || trigger === 'on_bulletin_post' ||
+        trigger === 'on_event_update' || trigger === 'on_event_cancel') {
+      return 'event_announcements';
+    }
+    if (trigger === 'on_application_submit' || trigger === 'on_approval' ||
+        trigger === 'on_rejection' || trigger === 'on_waitlist' ||
+        trigger === 'on_category_change' || trigger === 'on_application_open') {
+      return 'application_updates';
+    }
+    return 'other';
+  };
+
+  const audienceCategory = getAudienceCategory();
 
   const scheduledDate = email.scheduled_for ? new Date(email.scheduled_for) : null;
   const isPast = scheduledDate && scheduledDate < new Date();
@@ -320,15 +242,15 @@ export default function EmailRow({
 
       {/* Email Type Badge */}
       <div>
-        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border ${categoryConfig.color}`}>
+        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium border ${emailTypeInfo.color}`}>
           <CategoryIcon className="w-3 h-3" />
-          {categoryConfig.label}
+          {emailTypeInfo.label}
         </span>
       </div>
 
       {/* Vendor Category */}
       <div className="text-white/60 text-[11px] truncate">
-        {email.category?.name || (category === 'application_updates' ? 'All Invitations' : 'All Vendors')}
+        {email.category?.name || (audienceCategory === 'application_updates' ? 'All Invitations' : 'All Vendors')}
       </div>
 
       {/* Recipients Count */}

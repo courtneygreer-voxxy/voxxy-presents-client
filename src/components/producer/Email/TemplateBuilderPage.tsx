@@ -12,10 +12,10 @@ import {
   ChevronUp,
   CheckCircle2,
   XCircle,
-  Clock,
-  Info,
-  Send
+  Send,
+  HelpCircle
 } from 'lucide-react';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
 
@@ -445,22 +445,31 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const canEdit = !isSystemDefault;
   const canEditNameAndDescription = canEdit && !isCategoryTemplate;
 
-  // Group emails by category for sidebar
-  const groupedEmails = emailItems.reduce((groups, item) => {
-    const category = item.category || 'uncategorized';
-    if (!groups[category]) groups[category] = [];
-    groups[category].push(item);
-    return groups;
-  }, {} as Record<string, EmailTemplateItem[]>);
+  // Helper to check if email is a reminder (value-based trigger)
+  const isCustomReminder = (triggerType: string) => {
+    const customReminderTriggers = [
+      'days_before_deadline',
+      'days_after_deadline',
+      'days_before_payment_deadline',
+      'days_after_payment_deadline',
+      'days_before_event',
+      'days_after_event'
+    ];
+    return customReminderTriggers.includes(triggerType);
+  };
 
-  // Category labels
-  const categoryLabels: Record<string, string> = {
-    event_announcements: 'Event Announcements',
-    application_updates: 'Application Updates',
-    payment_reminders: 'Payment Reminders',
-    event_countdown: 'Event Countdown',
-    event_updates: 'Event Updates',
-    uncategorized: 'Other',
+  // Group emails by system vs reminders for sidebar
+  const groupedEmails = emailItems.reduce((groups, item) => {
+    const groupKey = isCustomReminder(item.trigger_type) ? 'reminders' : 'system';
+    if (!groups[groupKey]) groups[groupKey] = [];
+    groups[groupKey].push(item);
+    return groups;
+  }, {} as Record<'system' | 'reminders', EmailTemplateItem[]>);
+
+  // Group labels
+  const groupLabels: Record<'system' | 'reminders', string> = {
+    system: 'System',
+    reminders: 'Reminders',
   };
 
   // If editor is open (create or edit mode), show full-screen editor
@@ -699,32 +708,21 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       </div>
                     </div>
 
-                    {/* Categorized Email List */}
+                    {/* Grouped Email List - System then Reminders */}
                     <div className="p-2 space-y-3">
-                      {Object.entries(groupedEmails).map(([category, items]) => {
-                        // Helper to check if email is a custom reminder (value-based)
-                        const isCustomReminder = (triggerType: string) => {
-                          const customReminderTriggers = [
-                            'days_before_deadline',
-                            'days_after_deadline',
-                            'days_before_payment_deadline',
-                            'days_after_payment_deadline',
-                            'days_before_event',
-                            'days_after_event'
-                          ];
-                          return customReminderTriggers.includes(triggerType);
-                        };
+                      {(['system', 'reminders'] as const).map((groupKey) => {
+                        const items = groupedEmails[groupKey];
+                        if (!items || items.length === 0) return null;
 
                         return (
-                          <div key={category}>
+                          <div key={groupKey}>
                             <div className="px-2 py-1">
                               <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
-                                {categoryLabels[category] || category}
+                                {groupLabels[groupKey]}
                               </h4>
                             </div>
                             <div className="space-y-0.5">
                               {items.map((item) => {
-                                const isReminder = isCustomReminder(item.trigger_type);
                                 return (
                                   <button
                                     key={item.id}
@@ -739,15 +737,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                       <div className="text-sm text-white font-medium truncate">
                                         {item.name}
                                       </div>
-                                      {isReminder ? (
-                                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
-                                          Custom
-                                        </span>
-                                      ) : (
-                                        <span className="flex-shrink-0 px-1.5 py-0.5 rounded text-[8px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
-                                          System
-                                        </span>
-                                      )}
                                     </div>
                                     <div className="flex items-center gap-1.5">
                                       <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(item.trigger_type).color}`}>
@@ -783,23 +772,55 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                   {selectedEmail.name}
                                 </h3>
                                 {(() => {
-                                  const customReminderTriggers = [
-                                    'days_before_deadline',
-                                    'days_after_deadline',
-                                    'days_before_payment_deadline',
-                                    'days_after_payment_deadline',
-                                    'days_before_event',
-                                    'days_after_event'
-                                  ];
-                                  const isReminder = customReminderTriggers.includes(selectedEmail.trigger_type);
+                                  const isReminder = isCustomReminder(selectedEmail.trigger_type);
                                   return isReminder ? (
-                                    <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
-                                      Custom Reminder
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
+                                        Reminder
+                                      </span>
+                                      <Tooltip.Provider delayDuration={200}>
+                                        <Tooltip.Root>
+                                          <Tooltip.Trigger asChild>
+                                            <button className="text-purple-300 hover:text-purple-200 transition-colors">
+                                              <HelpCircle className="w-3.5 h-3.5" />
+                                            </button>
+                                          </Tooltip.Trigger>
+                                          <Tooltip.Portal>
+                                            <Tooltip.Content
+                                              className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                                              sideOffset={5}
+                                            >
+                                              This is a time-based reminder that was added to this event's sequence.
+                                              <Tooltip.Arrow className="fill-gray-900" />
+                                            </Tooltip.Content>
+                                          </Tooltip.Portal>
+                                        </Tooltip.Root>
+                                      </Tooltip.Provider>
+                                    </div>
                                   ) : (
-                                    <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
-                                      System Email
-                                    </span>
+                                    <div className="flex items-center gap-1">
+                                      <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
+                                        System
+                                      </span>
+                                      <Tooltip.Provider delayDuration={200}>
+                                        <Tooltip.Root>
+                                          <Tooltip.Trigger asChild>
+                                            <button className="text-emerald-300 hover:text-emerald-200 transition-colors">
+                                              <HelpCircle className="w-3.5 h-3.5" />
+                                            </button>
+                                          </Tooltip.Trigger>
+                                          <Tooltip.Portal>
+                                            <Tooltip.Content
+                                              className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
+                                              sideOffset={5}
+                                            >
+                                              This is a core system email that's automatically triggered by vendor actions or event milestones.
+                                              <Tooltip.Arrow className="fill-gray-900" />
+                                            </Tooltip.Content>
+                                          </Tooltip.Portal>
+                                        </Tooltip.Root>
+                                      </Tooltip.Provider>
+                                    </div>
                                   );
                                 })()}
                               </div>
@@ -818,15 +839,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                               </div>
                             </div>
                             {canEdit && (() => {
-                              const customReminderTriggers = [
-                                'days_before_deadline',
-                                'days_after_deadline',
-                                'days_before_payment_deadline',
-                                'days_after_payment_deadline',
-                                'days_before_event',
-                                'days_after_event'
-                              ];
-                              const isCustomReminder = customReminderTriggers.includes(selectedEmail.trigger_type);
+                              const isReminderEmail = isCustomReminder(selectedEmail.trigger_type);
 
                               return (
                                 <div className="flex items-center gap-2">
@@ -845,7 +858,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                     <Edit className="w-3.5 h-3.5" />
                                     Edit
                                   </button>
-                                  {isCustomReminder && (
+                                  {isReminderEmail && (
                                     <button
                                       onClick={() => handleDeleteEmail(selectedEmail)}
                                       className="p-1.5 rounded text-white/50 hover:text-red-400 hover:bg-white/10 transition-all"
@@ -859,167 +872,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                             })()}
                           </div>
                         </div>
-
-                        {/* System Email or Custom Reminder Info Banner */}
-                        {(() => {
-                          const customReminderTriggers = [
-                            'days_before_deadline',
-                            'days_after_deadline',
-                            'days_before_payment_deadline',
-                            'days_after_payment_deadline',
-                            'days_before_event',
-                            'days_after_event'
-                          ];
-                          const isSystemEmail = !customReminderTriggers.includes(selectedEmail.trigger_type);
-
-                          // Custom Reminder Info
-                          if (!isSystemEmail) {
-                            const getCustomReminderDescription = (triggerType: string) => {
-                              const descriptions: Record<string, { when: string; audience: string }> = {
-                                'days_before_deadline': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the application deadline`,
-                                  audience: 'all invited contacts who haven\'t applied yet'
-                                },
-                                'days_after_deadline': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the application deadline`,
-                                  audience: 'all invited contacts who haven\'t applied yet'
-                                },
-                                'days_before_payment_deadline': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the payment deadline`,
-                                  audience: 'approved vendors who haven\'t paid yet'
-                                },
-                                'days_after_payment_deadline': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the payment deadline`,
-                                  audience: 'approved vendors who haven\'t paid yet'
-                                },
-                                'days_before_event': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) before the event date`,
-                                  audience: 'all approved vendors'
-                                },
-                                'days_after_event': {
-                                  when: `${selectedEmail.trigger_value || 'X'} day(s) after the event date`,
-                                  audience: 'all approved vendors'
-                                },
-                              };
-                              return descriptions[triggerType] || { when: 'based on custom timing', audience: 'the relevant contacts' };
-                            };
-
-                            const description = getCustomReminderDescription(selectedEmail.trigger_type);
-
-                            return (
-                              <div className="mx-6 mt-4 p-4 rounded-lg bg-purple-500/10 border border-purple-500/30">
-                                <div className="flex items-start gap-3">
-                                  <Clock className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                                  <div className="flex-1">
-                                    <h4 className="text-sm font-semibold text-purple-300 mb-1">
-                                      Custom Reminder
-                                    </h4>
-                                    <p className="text-xs text-purple-200/90 leading-relaxed mb-2">
-                                      This is a custom time-based reminder. You can create multiple reminders with different timing (e.g., 3 days before, 1 day before, etc.) to send at strategic moments.
-                                    </p>
-                                    <div className="pt-2 border-t border-purple-400/20">
-                                      <p className="text-xs text-purple-200/80">
-                                        <span className="font-semibold">Sent:</span> {description.when}
-                                      </p>
-                                      <p className="text-xs text-purple-200/80 mt-1">
-                                        <span className="font-semibold">To:</span> {description.audience}
-                                      </p>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            );
-                          }
-
-                          // System Email Info
-
-                          // Get trigger-specific description
-                          const getTriggerDescription = (triggerType: string) => {
-                            const descriptions: Record<string, { when: string; audience: string }> = {
-                              // Event-wide (Generic) triggers
-                              'on_invitation_send': {
-                                when: 'immediately when a vendor/artist is invited to your event',
-                                audience: 'all newly invited contacts'
-                              },
-                              'on_bulletin_post': {
-                                when: 'immediately when you post a bulletin update',
-                                audience: 'all vendors across all categories'
-                              },
-                              'on_event_update': {
-                                when: 'immediately when you update event details',
-                                audience: 'all vendors across all categories'
-                              },
-                              'on_event_cancel': {
-                                when: 'immediately when you cancel the event',
-                                audience: 'all vendors across all categories'
-                              },
-                              // Category-specific triggers
-                              'on_application_submit': {
-                                when: 'immediately when a vendor submits their application',
-                                audience: 'the vendor who just applied'
-                              },
-                              'on_approval': {
-                                when: 'immediately when you approve a vendor\'s application',
-                                audience: 'the approved vendor'
-                              },
-                              'on_rejection': {
-                                when: 'immediately when you reject a vendor\'s application',
-                                audience: 'the rejected vendor'
-                              },
-                              'on_waitlist': {
-                                when: 'immediately when you waitlist a vendor\'s application',
-                                audience: 'the waitlisted vendor'
-                              },
-                              'on_payment_received': {
-                                when: 'immediately when a vendor\'s payment is confirmed',
-                                audience: 'the vendor who paid'
-                              },
-                              'on_payment_deadline': {
-                                when: 'on the payment deadline date',
-                                audience: 'approved vendors who haven\'t paid yet'
-                              },
-                              'on_event_date': {
-                                when: 'on the day of the event',
-                                audience: 'all approved vendors'
-                              },
-                              'on_category_change': {
-                                when: 'immediately when you move a vendor to a different category',
-                                audience: 'the vendor whose category changed'
-                              },
-                            };
-
-                            return descriptions[triggerType] || {
-                              when: 'based on the trigger type',
-                              audience: 'the relevant contacts'
-                            };
-                          };
-
-                          const description = getTriggerDescription(selectedEmail.trigger_type);
-
-                          return (
-                            <div className="mx-6 mt-4 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
-                              <div className="flex items-start gap-3">
-                                <Info className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                                <div className="flex-1">
-                                  <h4 className="text-sm font-semibold text-emerald-300 mb-1">
-                                    System Email
-                                  </h4>
-                                  <p className="text-xs text-emerald-200/90 leading-relaxed mb-2">
-                                    This is a system email that's automatically triggered and can only exist once per sequence. You can customize the content, but you cannot create duplicates.
-                                  </p>
-                                  <div className="pt-2 border-t border-emerald-400/20">
-                                    <p className="text-xs text-emerald-200/80">
-                                      <span className="font-semibold">Sent:</span> {description.when}
-                                    </p>
-                                    <p className="text-xs text-emerald-200/80 mt-1">
-                                      <span className="font-semibold">To:</span> {description.audience}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })()}
 
                         {/* Email Preview Content */}
                         <div className="p-6">

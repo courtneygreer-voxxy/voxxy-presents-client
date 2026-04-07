@@ -4,7 +4,6 @@ import { scheduledEmailsApi, eventsApi, categoriesApi, vendorApplicationsApi } f
 import type { ScheduledEmail, UpdateEmailRequest, ScheduledEmailStatus, AuditFilters, EmailCategory, CreateScheduledEmailRequest } from '@/types/email';
 import type { Category } from '@/types/category';
 import EmailTable from './EmailTable';
-import SaveAsTemplateDialog from './SaveAsTemplateDialog';
 import { EmailEditorPage } from './EmailEditorPage';
 import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
@@ -39,7 +38,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
 
   // Event must be published before "Send Now" is allowed
   const isEventLive = event?.published === true || event?.status?.status === 'published';
@@ -276,10 +274,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleSaveAsTemplate = (templateId: number) => {
-    showSuccess('Template saved successfully! You can now reuse it for other events.');
   };
 
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
@@ -553,7 +547,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onSendNow={isEventLive ? handleSendNow : undefined}
         onDelete={handleDelete}
         onCreateEmail={() => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor' })}
-        onSaveAsTemplate={() => setIsSaveDialogOpen(true)}
       />
     );
   }
@@ -746,15 +739,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           />
         </div>
       )}
-
-      {/* Save as Template Dialog */}
-      <SaveAsTemplateDialog
-        isOpen={isSaveDialogOpen}
-        onClose={() => setIsSaveDialogOpen(false)}
-        eventSlug={eventSlug}
-        emailCount={emails.length}
-        onSuccess={handleSaveAsTemplate}
-      />
 
       {/* Admin Debug Panel */}
       <DebugPanel
