@@ -425,7 +425,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           const genericTemplates = templates.filter(t => t.template_type === 'generic');
           const visibleTemplates = isAdmin
             ? genericTemplates
-            : genericTemplates.filter(t => t.is_default);
+            : genericTemplates.filter(t => t.is_default || t.organization_id !== null);
 
           if (visibleTemplates.length === 0) return (
             <div className="text-center py-8 px-4">
