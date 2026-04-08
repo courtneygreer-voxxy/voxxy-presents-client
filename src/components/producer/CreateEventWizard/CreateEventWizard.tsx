@@ -69,6 +69,12 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       newErrors.title = 'Event name is required';
     } else if (eventDetails.title.trim().length < 3) {
       newErrors.title = 'Event name must be at least 3 characters';
+    } else {
+      // Count alphanumeric characters to ensure valid slug generation
+      const alphanumericCount = (eventDetails.title.match(/[a-zA-Z0-9]/g) || []).length;
+      if (alphanumericCount < 3) {
+        newErrors.title = 'Event name must contain at least 3 letters or numbers';
+      }
     }
 
     // Event date (required)
