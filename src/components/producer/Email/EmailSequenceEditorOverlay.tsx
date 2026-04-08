@@ -1,6 +1,7 @@
 import { useState, useRef, useMemo } from 'react';
 import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { Button } from '@/components/ui/button';
 import type { ScheduledEmail } from '@/types/email';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 import { scheduledEmailsApi } from '@/services/api';
@@ -112,19 +113,36 @@ function isCustomCountdown(triggerType: string): boolean {
   return customReminderTriggers.includes(triggerType);
 }
 
+/** Get audience label for an email (All Invitations, All Vendors, or specific category) */
+function getAudienceLabel(email: ScheduledEmail): string {
+  // If email has a specific category, show it
+  if (email.category?.name) {
+    return email.category.name;
+  }
+
+  // No category - determine if it's "All Invitations" or "All Vendors"
+  const emailCategory = inferCategory(email);
+
+  // Application updates (approval, rejection, etc.) go to "All Invitations"
+  if (emailCategory === 'application_updates') {
+    return 'All Invitations';
+  }
+
+  // Everything else without a category goes to "All Vendors"
+  return 'All Vendors';
+}
+
 // Inline action menu for each row
 function SequenceRowMenu({
   email,
   onPause,
   onResume,
   onSendNow,
-  onDelete,
 }: {
   email: ScheduledEmail;
   onPause: (id: number) => Promise<void>;
   onResume: (id: number) => Promise<void>;
   onSendNow?: (id: number) => Promise<void>;
-  onDelete: (id: number) => Promise<void>;
 }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -132,7 +150,6 @@ function SequenceRowMenu({
   const isSent = email.status === 'sent';
   const isScheduled = email.status === 'scheduled';
   const isPaused = email.status === 'paused';
-  const isSystemEmail = !isCustomCountdown(email.trigger_type);
 
   // No actions for sent emails
   if (isSent) return null;
@@ -178,19 +195,6 @@ function SequenceRowMenu({
                 className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
               >
                 <Play className="w-3.5 h-3.5" /> Resume
-              </button>
-            )}
-            {!isSystemEmail && (
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  if (confirm('Delete this email? This cannot be undone.')) {
-                    onDelete(email.id);
-                  }
-                }}
-                className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 border-t border-white/10"
-              >
-                <Trash2 className="w-3.5 h-3.5" /> Delete
               </button>
             )}
           </div>
@@ -282,54 +286,71 @@ export default function EmailSequenceEditorOverlay({
   const isCustomEmail = selectedEmail ? isCustomCountdown(selectedEmail.trigger_type) : false;
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4 h-full">
-      <div className="max-w-5xl mx-auto h-full flex flex-col">
-        {/* Header */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            <button
-              onClick={onBack}
-              className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white flex items-center gap-2">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
+      {/* Header */}
+      <div className="border-b border-white/10 bg-[#0f0a1e]/80 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
+        <div className="px-6 py-3">
+          <div className="flex items-center justify-between">
+            {/* Left: Back button and title */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onBack}
+                className="gap-1.5 text-xs"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to Mail
+              </Button>
+              <div className="h-5 w-px bg-border" />
+              <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-400" />
-                Email Sequence Editor
-              </h1>
-              {eventData?.title && (
-                <p className="text-white/60 text-xs mt-0.5">{eventData.title}</p>
-              )}
+                <div>
+                  <h1 className="text-base font-semibold">Email Sequence Editor</h1>
+                  {eventData?.title && (
+                    <p className="text-xs text-muted-foreground">{eventData.title}</p>
+                  )}
+                </div>
+              </div>
             </div>
-            <button
-              onClick={onCreateEmail}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all flex items-center gap-2"
-              title="Add a custom reminder email (days before/after)"
-            >
-              <Plus className="w-4 h-4" />
-              Add Reminder
-            </button>
-          </div>
-        </div>
 
-        {/* Main Content - Sidebar + Preview */}
-        {emails.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="text-center py-16 bg-white/5 rounded-lg border border-white/10 w-full max-w-2xl">
-              <Mail className="w-12 h-12 text-white/40 mx-auto mb-3" />
-              <p className="text-white/60 mb-4">No emails in sequence</p>
-              <button
+            {/* Right: Action buttons */}
+            <div className="flex items-center gap-2">
+              {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
+              {/* <Button
+                variant="outline"
+                size="sm"
                 onClick={onCreateEmail}
-                className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
+                className="gap-2"
               >
                 <Plus className="w-4 h-4" />
-                Add First Email
-              </button>
+                Add Reminder
+              </Button> */}
             </div>
           </div>
-        ) : (
-          <div className="flex-1 flex gap-4 min-h-0 overflow-hidden">
+        </div>
+      </div>
+
+      {/* Main Content - Sidebar + Preview */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full px-6 py-4">
+          {emails.length === 0 ? (
+            <div className="h-full flex items-center justify-center">
+              <div className="text-center py-16 bg-white/5 rounded-lg border border-white/10 w-full max-w-2xl">
+                <Mail className="w-12 h-12 text-white/40 mx-auto mb-3" />
+                <p className="text-white/60 mb-4">No emails in sequence</p>
+                {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
+                {/* <button
+                  onClick={onCreateEmail}
+                  className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add First Email
+                </button> */}
+              </div>
+            </div>
+          ) : (
+            <div className="h-full flex gap-4 min-h-0 overflow-hidden">
             {/* Left Sidebar - Email Navigation */}
             <div className="w-80 flex-shrink-0 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03]">
               <div className="p-3 border-b border-white/10 sticky top-0 bg-black/40 backdrop-blur-sm z-10">
@@ -337,13 +358,14 @@ export default function EmailSequenceEditorOverlay({
                   <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
                     {emails.length} Email{emails.length !== 1 ? 's' : ''}
                   </h3>
-                  <button
+                  {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
+                  {/* <button
                     onClick={onCreateEmail}
                     className="p-1 rounded text-purple-400 hover:bg-purple-500/20 transition-all"
                     title="Add reminder email"
                   >
                     <Plus className="w-4 h-4" />
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
@@ -386,11 +408,9 @@ export default function EmailSequenceEditorOverlay({
                                 <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium border ${status.className}`}>
                                   {status.label}
                                 </span>
-                                {email.category?.name && (
-                                  <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-white/5 text-white/70 border border-white/20">
-                                    {email.category.name}
-                                  </span>
-                                )}
+                                <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                                  {getAudienceLabel(email)}
+                                </span>
                               </div>
                             </button>
                           );
@@ -472,11 +492,9 @@ export default function EmailSequenceEditorOverlay({
                           <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getStatusBadge(selectedEmail.status).className}`}>
                             {getStatusBadge(selectedEmail.status).label}
                           </span>
-                          {selectedEmail.category?.name && (
-                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-white/5 text-white/70 border border-white/20">
-                              Audience: {selectedEmail.category.name}
-                            </span>
-                          )}
+                          <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                            Audience: {getAudienceLabel(selectedEmail)}
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
@@ -495,13 +513,26 @@ export default function EmailSequenceEditorOverlay({
                           {isSent ? <Eye className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
                           {isSent ? 'View' : 'Edit'}
                         </button>
+                        {!isSent && isCustomCountdown(selectedEmail.trigger_type) && (
+                          <button
+                            onClick={() => {
+                              if (confirm('Delete this email? This cannot be undone.')) {
+                                onDelete(selectedEmail.id);
+                              }
+                            }}
+                            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all text-sm flex items-center gap-1.5"
+                            title="Delete email"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                            Delete
+                          </button>
+                        )}
                         {!isSent && (
                           <SequenceRowMenu
                             email={selectedEmail}
                             onPause={onPause}
                             onResume={onResume}
                             onSendNow={onSendNow}
-                            onDelete={onDelete}
                           />
                         )}
                       </div>
@@ -606,7 +637,8 @@ export default function EmailSequenceEditorOverlay({
               )}
             </div>
           </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Test Email Dialog */}

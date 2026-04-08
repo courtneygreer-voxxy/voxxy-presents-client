@@ -16,9 +16,11 @@ import {
   HelpCircle
 } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import { Button } from '@/components/ui/button';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory, TriggerType } from '@/types/email';
-
+import { useAuth } from '@/contexts/AuthContext';
+import { toast } from 'sonner';
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
@@ -30,6 +32,9 @@ interface TemplateBuilderPageProps {
 }
 
 export default function TemplateBuilderPage({ templateId, createFromDefault, onBack }: TemplateBuilderPageProps) {
+  const { userProfile } = useAuth();
+  const isAdmin = userProfile?.role === 'admin';
+
   const [template, setTemplate] = useState<EmailCampaignTemplate | null>(null);
   const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
   const [isLoading, setIsLoading] = useState(!!templateId || !!createFromDefault);
@@ -54,10 +59,14 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   // Selected email for preview
   const [selectedEmail, setSelectedEmail] = useState<EmailTemplateItem | null>(null);
 
-  // Delete confirmation modal state
+  // Delete confirmation modal state (for individual emails)
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [emailToDelete, setEmailToDelete] = useState<EmailTemplateItem | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+
+  // Delete template confirmation modal state
+  const [deleteTemplateModalOpen, setDeleteTemplateModalOpen] = useState(false);
+  const [isDeletingTemplate, setIsDeletingTemplate] = useState(false);
 
   // Track locally modified emails (before template is saved)
   const [modifiedEmails, setModifiedEmails] = useState<Map<number, EmailTemplateItem>>(new Map());
@@ -369,6 +378,30 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
     }
   };
 
+  const handleDeleteTemplate = async () => {
+    if (!template) return;
+
+    setIsDeletingTemplate(true);
+
+    try {
+      await emailCampaignTemplatesApi.delete(template.id);
+      setDeleteTemplateModalOpen(false);
+      toast.success('Sequence deleted', {
+        description: `"${template.name}" has been removed`,
+      });
+      setTimeout(() => {
+        if (onBack) onBack();
+      }, 500);
+    } catch (err: any) {
+      toast.error('Failed to delete sequence', {
+        description: err.message || 'An error occurred while deleting',
+      });
+      setDeleteTemplateModalOpen(false);
+    } finally {
+      setIsDeletingTemplate(false);
+    }
+  };
+
   const handleEditEmail = (item: EmailTemplateItem) => {
     setEditingItem(item);
     setIsEditorOpen(true);
@@ -444,6 +477,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const isCategoryTemplate = template?.template_type === 'category' && !template?.is_universal;
   const canEdit = !isSystemDefault;
   const canEditNameAndDescription = canEdit && !isCategoryTemplate;
+  const canDelete = template && !template.is_default && (template.organization_id !== null || isAdmin);
 
   // Helper to check if email is a reminder (value-based trigger)
   const isCustomReminder = (triggerType: string) => {
@@ -489,90 +523,119 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   }
 
   return (
-    <div className="bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] p-4">
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            <button
-              onClick={onBack}
-              className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </button>
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white flex items-center gap-2">
+    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
+      {/* Header */}
+      <div className="border-b border-white/10 bg-[#0f0a1e]/80 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
+        <div className="px-6 py-3">
+          <div className="flex items-center justify-between">
+            {/* Left: Back button and title */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onBack}
+                className="gap-1.5 text-xs"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back
+              </Button>
+              <div className="h-5 w-px bg-border" />
+              <div className="flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-400" />
-                {template ? (isSystemDefault ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
-              </h1>
-              <p className="text-white/60 text-xs mt-0.5">
-                {isSystemDefault
-                  ? 'System sequences are read-only. Clone to customize.'
-                  : isCategoryTemplate
-                  ? 'Customize email content for this vendor category'
-                  : 'Create a reusable email sequence'}
+                <div>
+                  <h1 className="text-base font-semibold">
+                    {template ? (isSystemDefault ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
+                  </h1>
+                  <p className="text-xs text-muted-foreground">
+                    {isSystemDefault
+                      ? 'System sequences are read-only. Clone to customize.'
+                      : isCategoryTemplate
+                      ? 'Customize email content for this vendor category'
+                      : 'Create a reusable email sequence'}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Action buttons */}
+            <div className="flex items-center gap-2">
+              {canEdit && template && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleOpenCreateEditor()}
+                  className="gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Reminder
+                </Button>
+              )}
+              {canDelete && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setDeleteTemplateModalOpen(true)}
+                  className="gap-2 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Delete Sequence
+                </Button>
+              )}
+              {canEdit && (
+                <Button
+                  size="sm"
+                  onClick={handleSave}
+                  disabled={isSaving || (!isCategoryTemplate && !name.trim()) || (createFromDefault && !hasChanges)}
+                  className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white gap-2"
+                  title={createFromDefault && !hasChanges ? 'Make at least one change to save' : ''}
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Save Sequence
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div className="flex-1 overflow-auto px-6 py-4">
+        {/* System Sequence Info */}
+        {isSystemDefault && (
+          <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-blue-400 text-xs">
+                This is a read-only system sequence. Clone it from the Email Sequences page to create a customizable copy.
               </p>
             </div>
-            {canEdit && template && (
-              <button
-                onClick={() => handleOpenCreateEditor()}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all flex items-center gap-2"
-                title="Add a custom reminder email (days before/after)"
-              >
-                <Plus className="w-4 h-4" />
-                Add Reminder
-              </button>
-            )}
-            {canEdit && (
-              <button
-                onClick={handleSave}
-                disabled={isSaving || (!isCategoryTemplate && !name.trim()) || (createFromDefault && !hasChanges)}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                title={createFromDefault && !hasChanges ? 'Make at least one change to save' : ''}
-              >
-                {isSaving ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-4 h-4" />
-                    Save Sequence
-                  </>
-                )}
-              </button>
-            )}
           </div>
+        )}
 
-          {/* System Sequence Info */}
-          {isSystemDefault && (
-            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-blue-400 text-xs">
-                  This is a read-only system sequence. Clone it from the Email Sequences page to create a customizable copy.
-                </p>
-              </div>
+        {/* Creating New Sequence Info */}
+        {createFromDefault && !template && (
+          <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-blue-400 text-sm font-medium">Creating New Sequence</p>
+              <p className="text-blue-400/80 text-xs mt-0.5">
+                You can edit emails now and your changes will be automatically saved when you save the sequence.
+                {modifiedEmails.size > 0 && (
+                  <span className="font-medium"> ({modifiedEmails.size} email{modifiedEmails.size !== 1 ? 's' : ''} modified)</span>
+                )}
+              </p>
             </div>
-          )}
-
-          {/* Creating New Sequence Info */}
-          {createFromDefault && !template && (
-            <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
-              <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-blue-400 text-sm font-medium">Creating New Sequence</p>
-                <p className="text-blue-400/80 text-xs mt-0.5">
-                  You can edit emails now and your changes will be automatically saved when you save the sequence.
-                  {modifiedEmails.size > 0 && (
-                    <span className="font-medium"> ({modifiedEmails.size} email{modifiedEmails.size !== 1 ? 's' : ''} modified)</span>
-                  )}
-                </p>
-              </div>
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Loading State */}
         {isLoading && (
@@ -598,7 +661,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
         {/* Form */}
         {!isLoading && (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {/* Sequence Details - Compact */}
             <div className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-white/10 bg-white/[0.02]'}`}>
               {isCategoryTemplate ? (
@@ -688,7 +751,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 </div>
               ) : (
                 /* Sidebar + Preview Layout */
-                <div className="flex gap-4 h-[calc(100vh-280px)] min-h-[700px]">
+                <div className="flex gap-4 h-[calc(100vh-300px)] min-h-[600px]">
                   {/* Left Sidebar - Email Navigation */}
                   <div className="w-80 flex-shrink-0 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03]">
                     <div className="p-3 border-b border-white/10 sticky top-0 bg-black/40 backdrop-blur-sm z-10">
@@ -1020,6 +1083,76 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   <>
                     <Trash2 className="w-4 h-4" />
                     Delete Email
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Template Confirmation Modal */}
+      {deleteTemplateModalOpen && template && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-gradient-to-br from-[#1a0f2e] to-[#0f0a1e] border border-red-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            {/* Header */}
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
+                <AlertCircle className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-lg font-bold text-white">Delete Sequence?</h3>
+                <p className="text-sm text-white/60 mt-0.5">
+                  This action cannot be undone
+                </p>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
+              <p className="text-sm text-white/80">
+                You are about to delete this email sequence:
+              </p>
+              <p className="text-base font-semibold text-white mt-2">
+                "{template.name}"
+              </p>
+              <div className="mt-3 pt-3 border-t border-white/10">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-white/50">Type:</span>
+                  <span className="text-white/80 capitalize">
+                    {template.template_type === 'generic' ? 'Event Sequence' : 'Category Sequence'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs mt-1.5">
+                  <span className="text-white/50">Emails:</span>
+                  <span className="text-white/80">{emailItems.length}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setDeleteTemplateModalOpen(false)}
+                disabled={isDeletingTemplate}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteTemplate}
+                disabled={isDeletingTemplate}
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-medium hover:from-red-500 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {isDeletingTemplate ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    Delete Sequence
                   </>
                 )}
               </button>

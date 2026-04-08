@@ -562,6 +562,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onBack={() => setViewState({ view: viewState.returnTo === 'sequence-editor' ? 'sequence-editor' : 'table' })}
         onSave={handleSaveEdit}
         onCreate={isCreateMode ? handleCreateEmail : undefined}
+        onDelete={handleDelete}
         mode={isCreateMode ? 'create' : 'edit'}
         categories={categories}
         isAdmin={isAdmin}
@@ -596,13 +597,14 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
           <div className="flex items-center gap-3">
             {emails.length > 0 && (
               <>
-                <button
+                {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
+                {/* <button
                   onClick={() => setViewState({ view: 'email-editor', email: null, returnTo: 'table' })}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600 transition-all shadow-lg"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">New Reminder</span>
-                </button>
+                </button> */}
                 <button
                   onClick={() => setViewState({ view: 'sequence-editor' })}
                   className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"

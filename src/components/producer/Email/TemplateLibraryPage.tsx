@@ -21,9 +21,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [templateToDelete, setTemplateToDelete] = useState<EmailCampaignTemplate | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   // Category-specific templates
   const [categories, setCategories] = useState<Category[]>([]);
@@ -149,49 +146,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
     }
   };
 
-  const handleDelete = (template: EmailCampaignTemplate) => {
-    // Protect default template from deletion
-    if (template.is_default) {
-      toast.error('Cannot delete default sequence', {
-        description: 'The default sequence is protected and cannot be deleted',
-      });
-      return;
-    }
-
-    // Non-admin users cannot delete system templates
-    if (template.organization_id === null && !isAdmin) {
-      toast.error('Cannot delete system sequence', {
-        description: 'Only admins can delete system sequences',
-      });
-      return;
-    }
-
-    // Open confirmation modal
-    setTemplateToDelete(template);
-    setDeleteModalOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!templateToDelete) return;
-
-    setIsDeleting(true);
-
-    try {
-      await emailCampaignTemplatesApi.delete(templateToDelete.id);
-      await loadTemplates();
-      setDeleteModalOpen(false);
-      setTemplateToDelete(null);
-      toast.success('Sequence deleted', {
-        description: `"${templateToDelete.name}" has been removed`,
-      });
-    } catch (err: any) {
-      toast.error('Failed to delete sequence', {
-        description: err.message || 'An error occurred while deleting',
-      });
-    } finally {
-      setIsDeleting(false);
-    }
-  };
 
   const handleCreateCategoryTemplate = (category: Category) => {
     setSelectedCategory(category);
@@ -470,7 +424,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
               {visibleTemplates.map(template => {
                 const isDefault = template.is_default;
                 const isSystem = template.organization_id === null;
-                const canDelete = !isDefault && (template.organization_id !== null || isAdmin);
 
                 return (
                   <div
@@ -513,15 +466,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
-                      {canDelete && (
-                        <button
-                          onClick={() => handleDelete(template)}
-                          className="p-1.5 rounded transition-all text-white/50 hover:text-red-400 hover:bg-white/10"
-                          title="Delete sequence"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      )}
                     </div>
                   </div>
                 );
@@ -785,86 +729,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         />
       )}
 
-      {/* Delete Confirmation Modal */}
-      {deleteModalOpen && templateToDelete && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-[#1a0f2e] to-[#0f0a1e] border border-red-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
-            {/* Header */}
-            <div className="flex items-start gap-3 mb-4">
-              <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
-                <AlertCircle className="w-5 h-5 text-red-400" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-bold text-white">Delete Sequence?</h3>
-                <p className="text-sm text-white/60 mt-0.5">
-                  This action cannot be undone
-                </p>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="mb-6 p-4 rounded-lg bg-white/5 border border-white/10">
-              <p className="text-sm text-white/80">
-                You are about to delete:
-              </p>
-              <p className="text-base font-semibold text-white mt-2">
-                "{templateToDelete.name}"
-              </p>
-              <div className="mt-3 pt-3 border-t border-white/10">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/50">Type:</span>
-                  <span className="text-white/80 capitalize">
-                    {templateToDelete.template_type === 'generic' ? 'Event Sequence' : 'Category Sequence'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-1.5">
-                  <span className="text-white/50">Emails:</span>
-                  <span className="text-white/80">{templateToDelete.email_count || 0}</span>
-                </div>
-                {templateToDelete.events_count > 0 && (
-                  <div className="mt-3 p-2 rounded bg-yellow-500/10 border border-yellow-500/20">
-                    <p className="text-xs text-yellow-400 flex items-center gap-1.5">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      <span>This sequence is used by {templateToDelete.events_count} event{templateToDelete.events_count !== 1 ? 's' : ''}</span>
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  setDeleteModalOpen(false);
-                  setTemplateToDelete(null);
-                }}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteConfirm}
-                disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-red-600 to-red-700 text-white font-medium hover:from-red-500 hover:to-red-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-              >
-                {isDeleting ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                    Deleting...
-                  </>
-                ) : (
-                  <>
-                    <Trash2 className="w-4 h-4" />
-                    Delete Sequence
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

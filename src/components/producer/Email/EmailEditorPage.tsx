@@ -27,6 +27,7 @@ import {
   Lock,
   Search,
   X,
+  Trash2,
 } from 'lucide-react';
 import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
 import type { Category } from '@/types/category';
@@ -69,6 +70,7 @@ interface EmailEditorPageProps {
   onBack: () => void;
   onSave: (emailId: number, data: UpdateEmailRequest) => Promise<void>;
   onCreate?: (data: CreateScheduledEmailRequest) => Promise<ScheduledEmail>;
+  onDelete?: (emailId: number) => Promise<void>;
   mode?: 'edit' | 'create';
   categories?: Category[];
   isAdmin?: boolean;
@@ -132,6 +134,7 @@ export function EmailEditorPage({
   onBack,
   onSave,
   onCreate,
+  onDelete,
   mode: initialMode = 'edit',
   categories = [],
   isAdmin,
@@ -700,6 +703,22 @@ export function EmailEditorPage({
                 Send Test
               </Button>
             )}
+            {!isCreateMode && email && onDelete && VALUE_BASED_TRIGGERS.includes(triggerType as any) && (
+              <Button
+                onClick={async () => {
+                  if (confirm('Delete this email? This cannot be undone.')) {
+                    await onDelete(email.id);
+                    onBack();
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="bg-white/5 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 h-9"
+              >
+                <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                Delete
+              </Button>
+            )}
             <Button
               onClick={handleSubmit(onSubmit)}
               disabled={isSaving || !canSave()}
@@ -1075,7 +1094,7 @@ export function EmailEditorPage({
             )}
           </div>
 
-          {/* Recipients */}
+          {/* Audience (Read-Only) */}
           <div>
             <button
               onClick={() => setRecipientsOpen(!recipientsOpen)}
@@ -1083,7 +1102,7 @@ export function EmailEditorPage({
             >
               <div className="flex items-center gap-1.5 text-white font-medium text-sm">
                 <Users className="w-3.5 h-3.5 text-purple-400" />
-                <span>Recipients</span>
+                <span>Audience</span>
               </div>
               {recipientsOpen ? (
                 <ChevronDown className="w-3.5 h-3.5 text-white/60" />
@@ -1094,41 +1113,52 @@ export function EmailEditorPage({
 
             {recipientsOpen && (() => {
               const isCategoryDisabled = BLAST_TRIGGER_TYPES.has(triggerType);
+
+              // Determine audience label
+              let audienceLabel = 'All Vendors';
+              let audienceDescription = 'This email will be sent to all approved vendors.';
+
+              if (isCategoryDisabled) {
+                // Blast emails go to invitations/contacts
+                const emailType = selectedTriggerConfig?.emailType;
+                if (emailType === 'application_updates') {
+                  audienceLabel = 'All Invitations';
+                  audienceDescription = 'This email will be sent to all vendors who have applied.';
+                } else {
+                  audienceLabel = 'All Vendors';
+                  audienceDescription = 'This email will be sent to all invited contacts and approved vendors.';
+                }
+              } else if (selectedCategoryId) {
+                // Specific category
+                const selectedCategory = categories.find(c => c.id === selectedCategoryId);
+                if (selectedCategory) {
+                  audienceLabel = selectedCategory.icon
+                    ? `${selectedCategory.icon} ${selectedCategory.name}`
+                    : selectedCategory.name;
+                  audienceDescription = `This email will be sent to all vendors in the ${selectedCategory.name} category.`;
+                }
+              }
+
               return (
                 <div className="space-y-2">
                   <label className="block text-[10px] font-medium text-white/60 uppercase tracking-wide">
-                    Vendor Category
+                    Email Recipients
                   </label>
-                  <Select
-                    value={selectedCategoryId?.toString() || 'all'}
-                    onValueChange={(value) => setSelectedCategoryId(value === 'all' ? null : Number(value))}
-                    disabled={isCategoryDisabled}
-                  >
-                    <SelectTrigger className={`bg-white/5 border-white/20 text-white text-sm h-8 ${isCategoryDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
-                      <SelectItem value="all" className="text-white text-sm">
-                        All Vendors
-                      </SelectItem>
-                      {categories.length > 0 ? (
-                        categories.map((category) => (
-                          <SelectItem key={category.id} value={category.id.toString()} className="text-white text-sm">
-                            {category.icon ? `${category.icon} ${category.name}` : category.name}
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <SelectItem value="none" disabled className="text-white/40 text-sm italic">
-                          No categories available for this event
-                        </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                  {isCategoryDisabled && (
-                    <p className="text-[10px] text-white/40 leading-relaxed">
-                      Category targeting is not available for this email type — recipients may not be vendors yet.
+
+                  {/* Read-only audience display */}
+                  <div className="px-3 py-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
+                      <span className="text-sm text-white font-medium">{audienceLabel}</span>
+                    </div>
+                    <p className="text-[10px] text-blue-300/70 leading-relaxed">
+                      {audienceDescription}
                     </p>
-                  )}
+                  </div>
+
+                  <p className="text-[10px] text-white/40 leading-relaxed">
+                    The audience is automatically determined by the email's trigger type and cannot be changed.
+                  </p>
                 </div>
               );
             })()}
