@@ -1,6 +1,6 @@
 # Email System Documentation - Index
 
-**Last Updated:** March 8, 2026
+**Last Updated:** April 8, 2026
 **Version:** 2.0 (Centralized System)
 
 ---
@@ -178,9 +178,20 @@ docs/
 
 ---
 
-## 🆕 Recent Updates (March 2026)
+## 🆕 Recent Updates
 
-### Variable System Overhaul
+### April 2026: Webhook Tracking Fix ⭐ **LATEST**
+**Documents Updated:**
+- EMAIL_SYSTEM_GUIDE.md
+
+**Changes:**
+- ✅ Fixed registration email tracking (Application Received, Approval, etc.)
+- ✅ Added Tier 2.25 lenient webhook fallback for registration emails
+- ✅ Registration emails now show "delivered" status (was stuck at "sent")
+- ✅ 5-tier webhook fallback system documented
+- 📚 **Backend Details:** See `voxxy-rails/docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
+
+### March 2026: Variable System Overhaul
 **Documents Updated:**
 - EMAIL_SYSTEM_GUIDE.md
 - EMAIL_VARIABLES_REFERENCE.md
@@ -295,7 +306,7 @@ docs/
 
 ---
 
-**Last Updated:** March 8, 2026
+**Last Updated:** April 8, 2026
 
 **Documentation maintained by:** Voxxy Presents Engineering Team
 

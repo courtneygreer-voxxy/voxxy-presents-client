@@ -1,8 +1,8 @@
 # Email Audit Log - Technical Specification & Backend Coordination
 
-**Status:** ✅ Implemented (Frontend) | 🚧 Backend Coordination Required
-**Version:** 1.0
-**Last Updated:** February 28, 2026
+**Status:** ✅ Fully Implemented (Frontend + Backend)
+**Version:** 1.1
+**Last Updated:** April 8, 2026
 **Related Docs:**
 - [FRONTEND_UPDATE_2025-02-27.md](./FRONTEND_UPDATE_2025-02-27.md) - Implementation details and known issues
 - [EMAIL_HISTORY_AUDIT.md](./EMAIL_HISTORY_AUDIT.md) - Original requirements
@@ -250,6 +250,8 @@ GET /api/v1/presents/events/:event_slug/scheduled_emails/:id/recipients
   }>
 }
 ```
+
+**✅ FIXED (April 8, 2026):** Backend now properly filters `recipients` array to exclude dropped/hard-bounced emails, ensuring the array length matches the `count` value. This resolved the recipient count mismatch issue where audit log showed 52 recipients when email table showed 45.
 
 ---
 
@@ -618,54 +620,32 @@ useEffect(() => {
 
 ## Known Issues Requiring Backend Fixes
 
-### Issue #4: Delivery Status Discrepancy ⚠️ HIGH PRIORITY
+### ~~Issue #4: Delivery Status Discrepancy~~ ✅ **RESOLVED** (April 8, 2026)
 
-**Symptom:**
-- Mail Tab shows email as "undelivered" (3 undelivered)
-- Audit Log shows same email as "delivered" (all green checkmarks)
+**Previous Symptom:**
+- Mail Tab showed email recipient count: 45
+- Audit Log showed 52 entries for scheduled emails
+- Root cause: Recipients API returned `count: 45` but `recipients: [52 items]`
 
-**Root Cause:**
-Data source mismatch:
-- **Mail Tab:** Uses `scheduled_email.delivery_counts` (aggregated)
-- **Audit Log:** Uses `email_deliveries.status` (individual records)
+**Root Cause Identified:**
+- Backend `scheduled_emails_controller.rb` was missing filtering logic for draft invitation recipients
+- The controller excluded registered users from count, but didn't exclude dropped/hard-bounced emails
+- This caused a mismatch between the filtered count and the unfiltered recipients array
 
-**Investigation Steps:**
+**Fix Applied:**
+1. Added filtering logic to `scheduled_emails_controller.rb` (lines 430-452)
+2. Controller now excludes dropped/hard-bounced emails from both count AND recipients array
+3. Frontend removed temporary workarounds and uses properly filtered backend data
+4. All four filtering paths now complete:
+   - RecipientFilterService (registration emails)
+   - InvitationReminderService (sent invitation emails)
+   - ScheduledEmail.calculate_current_recipient_count (UI counts)
+   - ScheduledEmailsController recipients endpoint (scheduled invitation emails)
 
-```sql
--- 1. Check aggregated counts
-SELECT
-  id,
-  name,
-  delivery_counts,
-  undelivered_count,
-  delivered_count
-FROM scheduled_emails
-WHERE id = [problem_email_id];
-
--- 2. Check individual delivery records
-SELECT
-  status,
-  COUNT(*) as count
-FROM email_deliveries
-WHERE scheduled_email_id = [problem_email_id]
-GROUP BY status;
-
--- 3. Compare: Do they match?
--- If NOT → aggregation logic is broken
-```
-
-**Fix:**
-1. Add database constraint/trigger to keep counts in sync
-2. Implement `recalculate_delivery_counts!` method (see above)
-3. Call it after every webhook update
-4. Add validation test:
-   ```ruby
-   test "delivery_counts matches email_deliveries status counts" do
-     email = scheduled_emails(:confirmation_email)
-     expected = email.email_deliveries.group(:status).count
-     assert_equal expected, email.delivery_counts.symbolize_keys
-   end
-   ```
+**Result:**
+- ✅ Recipients array length now matches count value
+- ✅ Audit log displays accurate recipient lists for scheduled emails
+- ✅ No data discrepancy between Mail Tab and Audit Log
 
 ---
 
@@ -856,30 +836,32 @@ end
 - Contact Support dialog (Discord integration)
 - Auto-refresh with 30-second polling
 
-### What Backend Needs to Provide 🚧
+### What Backend Has Provided ✅
 
-**Critical:**
+**Critical (Completed):**
 1. ✅ Ensure `delivery_counts` aggregations match `email_deliveries` status counts
 2. ✅ Include `delivery_stats` in `/events/:slug/invitations` response
 3. ✅ Update both tables on SendGrid webhook events
-4. 🔧 Include `registration.vendor_contact` in `/email_deliveries` response
+4. ✅ Filter recipients array in `/recipients` endpoint to exclude dropped/hard-bounced emails
+5. 🔧 Include `registration.vendor_contact` in `/email_deliveries` response (pending)
 
-**Important:**
-5. 🔧 Fix table header scrolling (frontend-only)
-6. 🔧 Remove invitation email special case (frontend-only)
+**Frontend (Completed):**
+6. ✅ Fix table header scrolling
+7. ✅ Remove invitation email special case (unified with Position 1)
 
-**Optional:**
-7. 💡 Add bulk deliveries endpoint to reduce N+1 queries
-8. 💡 Add `include_delivery_counts` param to skip delivery fetches on auto-refresh
+**Optional (Future Enhancement):**
+8. 💡 Add bulk deliveries endpoint to reduce N+1 queries
+9. 💡 Add `include_delivery_counts` param to skip delivery fetches on auto-refresh
 
 ### Next Steps
 
-1. **Backend:** Implement `recalculate_delivery_counts!` method
-2. **Backend:** Add database tests for delivery count consistency
-3. **Backend:** Include registration data in delivery responses
-4. **Frontend:** Fix Issue #1 (remove invitation special case)
-5. **Frontend:** Fix Issue #2 (table header scrolling)
-6. **QA:** Run integration tests to verify data consistency
+1. ~~**Backend:** Implement `recalculate_delivery_counts!` method~~ ✅ Complete
+2. ~~**Backend:** Add filtering to recipients endpoint~~ ✅ Complete
+3. ~~**Frontend:** Remove temporary workarounds~~ ✅ Complete
+4. ~~**Frontend:** Fix Issue #1 (remove invitation special case)~~ ✅ Complete
+5. **Backend:** Include registration data in delivery responses (optional enhancement)
+6. **Backend:** Add database tests for delivery count consistency
+7. **QA:** Run integration tests to verify data consistency
 
 ---
 

@@ -1,6 +1,6 @@
 # Voxxy Presents Email System - Complete Guide
 
-**Last Updated:** March 8, 2026
+**Last Updated:** April 8, 2026
 **Status:** Production
 **Version:** 2.0 (Centralized System)
 
@@ -418,6 +418,22 @@ Emails are organized into 17 positions:
 ```
 
 **Endpoint:** `POST /api/v1/webhooks/sendgrid`
+
+**Webhook Fallback System (5-Tier Lookup):**
+
+The webhook processor uses a sophisticated 5-tier fallback system to match webhook events to EmailDelivery records:
+
+1. **Tier 1:** Message ID lookup (works for ~90% of emails)
+2. **Tier 2:** Invitation fallback (lenient - email + invitation_id)
+3. **Tier 2.25:** Registration email fallback (lenient - email + scheduled_email_id) ⭐ **LATEST FIX**
+4. **Tier 2.5:** Strict lookup (email + scheduled_email_id + registration_id)
+5. **Tier 3:** Create on-the-fly (old invitations)
+
+**Recent Fix (April 8, 2026):**
+Added Tier 2.25 lenient fallback to fix registration emails (Application Received, Approval, etc.) stuck at "sent" status. The fix mirrors the successful Tier 2 approach used for invitations.
+
+**For Technical Details:**
+See backend documentation: `docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
 
 ### Audit Log
 

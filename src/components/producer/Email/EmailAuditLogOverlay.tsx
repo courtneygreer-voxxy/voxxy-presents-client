@@ -186,6 +186,7 @@ export function EmailAuditLogOverlay({
               console.log(`📅 [Audit Log] Fetched ${recipientsData.count} recipients for scheduled email: ${email.name}`);
 
               // Transform each recipient into an audit entry with 'scheduled' status
+              // Backend now properly filters the recipients array to match the count
               for (const recipient of recipientsData.recipients) {
                 entries.push({
                   id: `scheduled-${email.id}-${recipient.email}`,
