@@ -5,14 +5,14 @@ import { CheckCircle, Mail } from 'lucide-react';
 export default function ApplicationConfirmationPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const [ticketCode, setTicketCode] = useState('');
+  const [applicationCode, setApplicationCode] = useState('');
   const [eventSlug, setEventSlug] = useState('');
 
   useEffect(() => {
-    const code = searchParams.get('ticket_code');
+    const code = searchParams.get('application_code');
     const event = searchParams.get('event');
 
-    if (code) setTicketCode(code);
+    if (code) setApplicationCode(code);
     if (event) setEventSlug(event);
   }, [searchParams]);
 
@@ -34,12 +34,12 @@ export default function ApplicationConfirmationPage() {
             Thank you for applying! Your application has been received and is being reviewed by the event organizers.
           </p>
 
-          {/* Ticket Code */}
-          {ticketCode && (
+          {/* Application Code */}
+          {applicationCode && (
             <div className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 mb-8">
-              <p className="text-sm text-white/60 mb-2">Your Application ID</p>
+              <p className="text-sm text-white/60 mb-2">Your Application Code</p>
               <p className="text-2xl font-mono font-bold text-purple-300 tracking-wider">
-                {ticketCode}
+                {applicationCode}
               </p>
               <p className="text-xs text-white/40 mt-2">
                 Save this code to track your application status

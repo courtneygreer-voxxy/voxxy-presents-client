@@ -149,8 +149,10 @@ export function EmailAuditLogOverlay({
         // Position 1 invitation deliveries are now linked via scheduled_email_id,
         // so they'll be fetched via the API like all other scheduled emails
         for (const email of scheduledEmails) {
-          // Handle sent emails - fetch actual delivery records
-          if (email.status === 'sent' && email.sent_at) {
+          // Handle sent/active emails - fetch actual delivery records
+          // 'sent' = one-time emails (e.g., Invitation to Apply)
+          // 'active' = event-triggered emails sent multiple times (e.g., Application Received, Approved)
+          if ((email.status === 'sent' || email.status === 'active') && email.sent_at) {
             try {
               const deliveries = await emailDeliveriesApi.getByScheduledEmail(event.slug, email.id);
               console.log(`📬 [Audit Log] Fetched ${deliveries.length} deliveries for email: ${email.name}`);
