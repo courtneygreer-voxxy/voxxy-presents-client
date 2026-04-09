@@ -78,6 +78,23 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
    - Quick start instructions
    - Basic setup
 
+### Email System Documentation
+
+#### 9. **email-system/ Directory** - COMPLETE EMAIL SYSTEM GUIDE
+   - **START HERE:** [email-system/EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md)
+   - Producer guide for email editor
+   - Complete variable reference (48 variables)
+   - System architecture and technical specs
+   - Deliverability tracking (100% coverage as of April 9, 2026)
+   - Email Audit Log documentation
+   - **Use this for all email-related work**
+
+**Quick Links:**
+   - Producer Guide: [email-system/EMAIL_EDITOR_GUIDE.md](./email-system/EMAIL_EDITOR_GUIDE.md)
+   - Developer Guide: [email-system/EMAIL_SYSTEM_GUIDE.md](./email-system/EMAIL_SYSTEM_GUIDE.md)
+   - Variables Reference: [email-system/EMAIL_VARIABLES_REFERENCE.md](./email-system/EMAIL_VARIABLES_REFERENCE.md)
+   - Latest Fix (April 9, 2026): [email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md](./email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md)
+
 ---
 
 ## Quick Navigation by Topic
@@ -204,7 +221,14 @@ Documentation/
 ├── ROLE_MAPPING.md                  ← Role definitions
 ├── ROLE_SWITCH_DEBUG.md            ← Debug guide
 ├── PRODUCER_FLOW_STATUS.md         ← Producer features
-└── DOCUMENTATION_INDEX.md           ← This file
+├── DOCUMENTATION_INDEX.md           ← This file
+└── email-system/                    ← EMAIL SYSTEM DOCS
+    ├── EMAIL_DOCUMENTATION_INDEX.md ← Email system start here
+    ├── EMAIL_SYSTEM_GUIDE.md        ← Technical guide
+    ├── EMAIL_EDITOR_GUIDE.md        ← Producer guide
+    ├── EMAIL_VARIABLES_REFERENCE.md ← Variable reference
+    ├── AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md
+    └── ... (complete email documentation)
 
 Source Code Structure/
 ├── src/

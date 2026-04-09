@@ -1,6 +1,6 @@
 # Voxxy Presents Email System - Complete Guide
 
-**Last Updated:** April 8, 2026
+**Last Updated:** April 9, 2026
 **Status:** Production
 **Version:** 2.0 (Centralized System)
 
@@ -421,19 +421,42 @@ Emails are organized into 17 positions:
 
 **Webhook Fallback System (5-Tier Lookup):**
 
-The webhook processor uses a sophisticated 5-tier fallback system to match webhook events to EmailDelivery records:
+The webhook processor uses a sophisticated 5-tier fallback system to match webhook events to EmailDelivery records.
 
-1. **Tier 1:** Message ID lookup (works for ~90% of emails)
-2. **Tier 2:** Invitation fallback (lenient - email + invitation_id)
-3. **Tier 2.25:** Registration email fallback (lenient - email + scheduled_email_id) ⭐ **LATEST FIX**
-4. **Tier 2.5:** Strict lookup (email + scheduled_email_id + registration_id)
+**CRITICAL:** Tier order matters! More specific lookups run first.
+
+**Correct Execution Order (April 9, 2026):**
+1. **Tier 1:** Message ID lookup (exact match, works after first webhook)
+2. **Tier 2.25:** Scheduled email lookup (email + scheduled_email_id from `custom_args`) ⭐ **MORE SPECIFIC**
+3. **Tier 2:** Invitation fallback (email + invitation exists) **LESS SPECIFIC**
+4. **Tier 2.5:** Strict registration lookup (email + scheduled_email_id + registration_id)
 5. **Tier 3:** Create on-the-fly (old invitations)
 
-**Recent Fix (April 8, 2026):**
-Added Tier 2.25 lenient fallback to fix registration emails (Application Received, Approval, etc.) stuck at "sent" status. The fix mirrors the successful Tier 2 approach used for invitations.
+**Recent Fixes:**
 
-**For Technical Details:**
-See backend documentation: `docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
+**April 9, 2026 - CRITICAL Deliverability Fix:**
+- ✅ **Fixed custom_args extraction:** Webhook processor now checks `custom_args` BEFORE `unique_args`
+  - SendGrid Web API sends `custom_args`, not `unique_args`
+  - Updated all 6 locations in webhook processor
+- ✅ **Fixed tier ordering:** Tier 2.25 now runs BEFORE Tier 2
+  - Prevents registration emails from matching invitation records
+  - Tier 2.25 is more specific (checks scheduled_email_id), Tier 2 is less specific (only checks email)
+- 🎯 **Result:** 100% deliverability tracking achieved for ALL email types
+
+**April 9, 2026 - Audit Log Fix:**
+- ✅ **Fixed frontend audit log:** Now shows transactional emails (`status: 'active'`)
+  - Frontend was only fetching `status === 'sent'` emails
+  - Excluded all transactional emails (Application Received, Approved, etc.)
+  - Fixed: Now fetches both `'sent'` AND `'active'` emails
+  - See: `docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md`
+
+**April 8, 2026:**
+- ✅ Added Tier 2.25 lenient fallback for registration emails
+
+**For Complete Technical Details:**
+- Backend webhook fix: `voxxy-rails/docs/email/WEBHOOK_CUSTOM_ARGS_FIX_APRIL_2026.md`
+- Frontend audit fix: `docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md`
+- Tier 2.25 context: `voxxy-rails/docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
 
 ### Audit Log
 
@@ -441,10 +464,24 @@ See backend documentation: `docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.
 
 **Features:**
 - Shows all email deliveries for the event
-- Filters by invitation vs registration emails
-- Shows delivery status with color coding
+- Filters by email name (invitations + transactional emails)
+- Shows delivery status with color coding (sent, delivered, bounced, dropped)
 - Displays recipient, subject, sent time
-- Links to email details
+- Supports both one-time (`status: 'sent'`) and recurring (`status: 'active'`) emails
+
+**Email Status Types:**
+- **`status: 'sent'`** - One-time scheduled emails (e.g., "Invitation to Apply")
+  - Status changes: scheduled → sent
+  - Sent once per schedule
+- **`status: 'active'`** - Event-triggered transactional emails (e.g., "Application Received", "Application Approved")
+  - Status stays: active (ready to send again)
+  - Sent multiple times (every time event triggers)
+  - Each send creates an EmailDelivery record
+
+**Recent Fix (April 9, 2026):**
+Frontend audit log now fetches BOTH `status === 'sent'` AND `status === 'active'` emails. Previously only showed scheduled emails, excluded all transactional emails.
+
+**File:** `src/components/producer/Email/EmailAuditLogOverlay.tsx:153`
 
 ---
 

@@ -1,6 +1,6 @@
 # Email System Documentation - Index
 
-**Last Updated:** April 8, 2026
+**Last Updated:** April 9, 2026
 **Version:** 2.0 (Centralized System)
 
 ---
@@ -180,16 +180,38 @@ docs/
 
 ## 🆕 Recent Updates
 
-### April 2026: Webhook Tracking Fix ⭐ **LATEST**
+### April 9, 2026: Complete Deliverability Fix ⭐ **LATEST**
+**Documents Updated:**
+- EMAIL_SYSTEM_GUIDE.md (webhook system, audit log)
+- AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md (new)
+
+**Critical Fixes:**
+- ✅ **Webhook custom_args fix:** Processor now checks `custom_args` instead of `unique_args`
+  - SendGrid Web API sends `custom_args`, not `unique_args`
+  - Updated all 6 locations in backend webhook processor
+- ✅ **Tier ordering fix:** Tier 2.25 now runs BEFORE Tier 2
+  - Prevents registration emails from matching invitation records
+  - More specific lookups run first
+- ✅ **Audit log frontend fix:** Now shows transactional emails (`status: 'active'`)
+  - Previously only fetched `status === 'sent'` emails
+  - All 9 transactional emails now visible in audit log
+- 🎯 **Result:** 100% deliverability tracking achieved for ALL email types
+
+**Backend Documentation:**
+- `voxxy-rails/docs/email/WEBHOOK_CUSTOM_ARGS_FIX_APRIL_2026.md` - Complete fix details
+- `voxxy-rails/docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md` - Tier 2.25 context
+
+**Frontend Documentation:**
+- `docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md` - Audit log fix
+
+### April 8, 2026: Webhook Tracking Fix
 **Documents Updated:**
 - EMAIL_SYSTEM_GUIDE.md
 
 **Changes:**
-- ✅ Fixed registration email tracking (Application Received, Approval, etc.)
 - ✅ Added Tier 2.25 lenient webhook fallback for registration emails
 - ✅ Registration emails now show "delivered" status (was stuck at "sent")
 - ✅ 5-tier webhook fallback system documented
-- 📚 **Backend Details:** See `voxxy-rails/docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md`
 
 ### March 2026: Variable System Overhaul
 **Documents Updated:**
@@ -306,8 +328,10 @@ docs/
 
 ---
 
-**Last Updated:** April 8, 2026
+**Last Updated:** April 9, 2026
 
 **Documentation maintained by:** Voxxy Presents Engineering Team
+
+**Status:** ✅ All docs updated with April 9 deliverability fixes (100% tracking achieved)
 
 **END OF INDEX**
