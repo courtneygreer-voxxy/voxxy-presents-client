@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
-import { CategorySelector } from '@/components/shared/CategorySelector';
 import { bulletinsApi } from '@/services/api';
 import { toast } from 'sonner';
 import type { Bulletin, CreateBulletinRequest, EmailAudienceCriteria, RecipientPreview } from '@/types/bulletin';
@@ -321,11 +320,10 @@ export function CreateBulletinModal({
                     {/* Category Selector */}
                     <div>
                       <label className="text-xs text-white/60 mb-2 block">Categories (leave empty for all)</label>
-                      <CategorySelector
-                        eventSlug={eventSlug}
-                        selected={selectedCategories}
-                        onChange={setSelectedCategories}
-                        multiSelect
+                      <Input
+                        placeholder="Enter category names (comma-separated)"
+                        value={selectedCategories.join(', ')}
+                        onChange={(e) => setSelectedCategories(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                       />
                     </div>
                   </div>

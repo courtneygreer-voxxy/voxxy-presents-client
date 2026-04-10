@@ -118,7 +118,7 @@ export function CreateTemplateEmailDialog({
       reset();
       onClose();
     } catch (error) {
-      logger.error('Failed to create template email', { templateId, error });
+      logger.error('Failed to create template email', { error });
     } finally {
       setIsSubmitting(false);
     }
