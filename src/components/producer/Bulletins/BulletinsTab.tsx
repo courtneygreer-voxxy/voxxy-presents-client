@@ -153,12 +153,15 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       />
 
       {/* Create/Edit Modal */}
-      <CreateBulletinModal
-        isOpen={isCreateModalOpen}
-        onClose={handleCloseModal}
-        onSubmit={editingBulletin ? handleUpdate : handleCreate}
-        editBulletin={editingBulletin}
-      />
+      {eventSlug && (
+        <CreateBulletinModal
+          isOpen={isCreateModalOpen}
+          onClose={handleCloseModal}
+          onSubmit={editingBulletin ? handleUpdate : handleCreate}
+          editBulletin={editingBulletin}
+          eventSlug={eventSlug}
+        />
+      )}
     </div>
   );
 }

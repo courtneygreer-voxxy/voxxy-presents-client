@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import EventEmailPreviewModal from '@/components/shared/EventEmailPreviewModal';
 import type { ScheduledEmail } from '@/types/email';
 import { eventsApi } from '@/services/api';
+import { logger } from '@/utils/logger';
 
 interface EmailPreviewModalProps {
   isOpen: boolean;
@@ -58,7 +59,7 @@ export default function EmailPreviewModal({
 
       setCategories(categoryOptions);
     } catch (err) {
-      console.error('Failed to load event categories:', err);
+      logger.error('Failed to load event categories', { eventSlug, error: err });
       // Fallback to empty array - will use default categories in EventEmailPreviewModal
       setCategories([]);
     }

@@ -787,6 +787,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         isOpen={isCreateBulletinModalOpen}
         onClose={() => setIsCreateBulletinModalOpen(false)}
         onSubmit={handleCreateBulletin}
+        eventSlug={eventSlug}
       />
 
       {/* Admin Debug Panel */}

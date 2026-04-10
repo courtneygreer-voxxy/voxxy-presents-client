@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import type { ScheduledEmail, DeliveryStatus } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
 import { backendToFrontend } from '@/utils/emailVariables';
+import { logger } from '@/utils/logger';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,7 +51,7 @@ export default function ScheduledEmailCard({
     try {
       await action();
     } catch (error) {
-      console.error('Action failed:', error);
+      logger.error('Email card action failed', { emailId: email.id, error });
     } finally {
       setIsProcessing(false);
     }
@@ -63,16 +64,10 @@ export default function ScheduledEmailCard({
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
 
-  // Debug: Log when component receives new scheduled_for value
-  if (scheduledDate) {
-    console.log(`🗓️  Card rendering "${email.name}" with date:`, email.scheduled_for, '→', scheduledDate.toLocaleString());
-  }
-
   // Determine if card should be clickable (all scheduled emails are now editable)
   const isClickable = onEdit && !isSent;
 
   const handleCardClick = () => {
-    console.log('Card clicked!', { email: email.name, isClickable, onEdit: !!onEdit, isSent });
     if (isClickable && onEdit) {
       onEdit(email);
     }

@@ -48,6 +48,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
+import { logger } from '@/utils/logger';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { X, Save, Loader2, Calendar, Clock, Type, AlignLeft, Sparkles, Globe, Lock } from 'lucide-react';
@@ -163,13 +164,6 @@ export default function EditScheduledEmailModal({
   const calculatePreviewDate = (triggerType: string, triggerValue: number | undefined): Date | null => {
     if (!eventData) return null;
 
-    console.log('📅 Calculating preview for trigger:', triggerType, 'value:', triggerValue);
-    console.log('📅 Event data available:', {
-      event_date: eventData.dates?.start,
-      application_deadline: eventData.application_deadline,
-      payment_deadline: eventData.payment_deadline,
-    });
-
     try {
       let baseDate: Date;
       const triggerTime = getEightAmLocalAsUTC(); // Always 8:00 AM local
@@ -181,7 +175,6 @@ export default function EditScheduledEmailModal({
         case 'on_event_date':
           // Event date is nested in dates.start
           if (!eventData.dates?.start) {
-            console.warn('⚠️ Event date not available:', eventData.dates);
             return null;
           }
           baseDate = parseISO(eventData.dates.start);
@@ -190,7 +183,6 @@ export default function EditScheduledEmailModal({
         case 'days_before_deadline':
         case 'on_application_open':
           if (!eventData.application_deadline) {
-            console.warn('⚠️ Application deadline not available');
             return null;
           }
           baseDate = parseISO(eventData.application_deadline);
@@ -200,7 +192,6 @@ export default function EditScheduledEmailModal({
         case 'on_payment_deadline':
         case 'days_after_payment_deadline':
           if (!eventData.payment_deadline) {
-            console.warn('⚠️ Payment deadline not available');
             return null;
           }
           baseDate = parseISO(eventData.payment_deadline);
@@ -243,7 +234,7 @@ export default function EditScheduledEmailModal({
       // Set time to 8:00 AM local (already handled by timezone utils)
       return scheduledDate;
     } catch (error) {
-      console.error('Error calculating preview date:', error);
+      logger.error('Error calculating preview date', { error });
       return null;
     }
   };
@@ -259,11 +250,9 @@ export default function EditScheduledEmailModal({
         const now = new Date();
         if (previewDate < now) {
           setDateError('Cannot schedule email for a past date. Please adjust your trigger settings.');
-          console.warn('⚠️ Scheduled date is in the past:', previewDate);
         } else {
           setDateError(null);
         }
-        console.log('📅 Preview scheduled date:', formatDateWithTimezone(previewDate));
       }
     }
   }, [selectedTriggerType, selectedTriggerValue, eventData, isOpen]);
@@ -273,21 +262,12 @@ export default function EditScheduledEmailModal({
     if (isOpen && (subjectValue || bodyValue)) {
       const validation = validateEmailContent(subjectValue || '', bodyValue || '');
       setValidationErrors(validation.errors);
-
-      if (!validation.isValid) {
-        console.warn('⚠️ Validation errors:', validation.errors);
-      }
     }
   }, [subjectValue, bodyValue, isOpen]);
 
   // Reset form when email changes - CONVERT backend format to frontend format
   useEffect(() => {
     if (email && isOpen) {
-      console.log('📧 Loading email into form:', email.name);
-      console.log('   📥 Backend Subject (HTML + {{vars}}):', email.subject_template);
-      console.log('   📥 Backend Body (HTML + {{vars}}):', email.body_template?.substring(0, 150));
-      console.log('   🌍 Timezone:', timezoneInfo.timezone, '(' + timezoneInfo.eightAmLocal + ')');
-
       // Step 1: Convert {{mustache}} → [bracket] variables (but keep HTML)
       const htmlWithBrackets = backendToFrontend(email.body_template || '');
 
@@ -300,10 +280,6 @@ export default function EditScheduledEmailModal({
 
       // Subject is just text, no HTML conversion needed
       const frontendSubject = backendToFrontend(email.subject_template || '');
-
-      console.log('   📤 Frontend Subject (Plain + [vars]):', frontendSubject);
-      console.log('   📤 Frontend Body Content (Plain + [vars]):', plainContent?.substring(0, 150));
-      console.log('   🔒 Frontend Footer (Plain + [vars]):', plainFooter?.substring(0, 100));
 
       // Reset form with converted values (content only, footer separated)
       // Note: trigger_time is NOT in the form - it's set automatically on save
@@ -320,8 +296,6 @@ export default function EditScheduledEmailModal({
 
       setError(null);
       setActiveField(null);
-
-      console.log('✅ Form reset complete - User sees plain text with [variables], footer locked');
     }
   }, [email, isOpen, reset]);
 
@@ -344,11 +318,6 @@ export default function EditScheduledEmailModal({
     setError(null);
 
     try {
-      console.log('💾 Saving email...');
-      console.log('   📤 Frontend Subject (Plain + [vars]):', data.subject_template);
-      console.log('   📤 Frontend Body Content (Plain + [vars]):', data.body_template?.substring(0, 150));
-      console.log('   🔒 Frontend Footer (Plain + [vars]):', emailFooter?.substring(0, 100));
-
       // Step 1: Convert plain text content and footer to HTML
       const htmlContent = plainTextToHtml(data.body_template);
       const htmlFooter = plainTextToHtml(emailFooter);
@@ -366,11 +335,6 @@ export default function EditScheduledEmailModal({
       // Automatically set trigger_time to 8:00 AM in user's local timezone (converted to UTC)
       const triggerTimeUtc = getEightAmLocalAsUTC();
 
-      console.log('   📥 Backend Subject (Plain + [vars]):', backendSubject);
-      console.log('   📥 Backend Body (HTML + [vars] + footer):', fullHtmlBody?.substring(0, 150));
-      console.log('   🕐 Trigger Time (8 AM local → UTC):', triggerTimeUtc);
-      console.log('   🌍 User Timezone:', timezoneInfo.timezone, '(' + timezoneInfo.eightAmLocal + ')');
-
       const updateData: UpdateEmailRequest = {
         name: data.name,
         subject_template: backendSubject,  // Plain text with [eventName] format
@@ -380,11 +344,11 @@ export default function EditScheduledEmailModal({
         trigger_time: triggerTimeUtc,      // Automatically set to 8:00 AM local (in UTC)
       };
 
-      console.log('✅ Sending to backend...');
       await onSave(email.id, updateData);
+      logger.info('Email updated successfully', { emailId: email.id, name: data.name });
       onClose();
     } catch (err: any) {
-      console.error('❌ Save failed:', err);
+      logger.error('Failed to save email', { emailId: email.id, error: err });
       setError(err.message || 'Failed to update email');
     } finally {
       setIsSaving(false);

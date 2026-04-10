@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Mail, Building2, User, Loader2, Users, Info } from 'lucide-react';
 import { scheduledEmailsApi, eventInvitationsApi } from '@/services/api';
+import { logger } from '@/utils/logger';
 import {
   Dialog,
   DialogContent,
@@ -80,7 +81,7 @@ export default function RecipientsModal({
         setRecipientsData(data);
       }
     } catch (err) {
-      console.error('Error fetching recipients:', err);
+      logger.error('Failed to fetch recipients', { eventSlug, emailId, error: err });
       setError(err instanceof Error ? err.message : 'Failed to load recipients');
     } finally {
       setLoading(false);

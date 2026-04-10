@@ -22,6 +22,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { logger } from '@/utils/logger';
 import type { AuditEntry } from '@/types/email';
 
 interface ContactSupportDialogProps {
@@ -159,7 +160,7 @@ export function ContactSupportDialog({
         handleOpenChange(false);
       }, 2000);
     } catch (err: any) {
-      console.error('Failed to submit support request:', err);
+      logger.error('Failed to submit support request', { error: err });
       setSubmitError(err.message || 'Failed to submit request. Please try again.');
     } finally {
       setIsSubmitting(false);

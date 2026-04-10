@@ -40,6 +40,7 @@ import {
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import { getEightAmLocalAsUTC, formatDateWithTimezone } from '@/utils/timezone';
+import { logger } from '@/utils/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { RichTextEditor } from './RichTextEditor';
@@ -140,13 +141,6 @@ export function EmailEditorPage({
   isAdmin,
 }: EmailEditorPageProps) {
   const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
-
-  // Debug: Log categories when component mounts or categories change
-  useEffect(() => {
-    console.log('📧 EmailEditorPage - Categories received:', categories);
-    console.log('   Categories count:', categories.length);
-    console.log('   Mode:', initialMode);
-  }, [categories, initialMode]);
   const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialEmail?.category_id || null);
   const [isSaving, setIsSaving] = useState(false);
@@ -270,7 +264,6 @@ export function EmailEditorPage({
 
     if (!email) return;
 
-    console.log('📧 Loading email into editor:', email.name);
     setSelectedCategoryId(email.category_id || null);
     const convertedSubject = backendToFrontend(email.subject_template || '');
     const convertedBody = backendToFrontend(email.body_template || '');
@@ -404,7 +397,7 @@ export function EmailEditorPage({
       setShowTestEmailDialog(false);
       setTestEmailAddress('');
     } catch (error: any) {
-      console.error('Failed to send test email:', error);
+      logger.error('Failed to send test email', { emailId: email?.id, error });
       toast({
         title: "Failed to Send Test Email",
         description: error?.message || 'An error occurred while sending the test email.',
@@ -422,7 +415,7 @@ export function EmailEditorPage({
     const finalValidation = validateEmailContent(plainSubject, plainBody);
 
     if (!finalValidation.isValid || validationErrors.length > 0) {
-      console.error('🚫 BLOCKED SAVE - Validation errors:', {
+      logger.error('Email validation failed - blocked save', {
         unknownVariables: finalValidation.unknownVariables,
         unclosedBrackets: finalValidation.unclosedBrackets,
         validationErrors
@@ -506,7 +499,7 @@ export function EmailEditorPage({
       setTimeout(() => setSaveSuccess(false), 3000);
 
     } catch (error: any) {
-      console.error('Failed to save email:', error);
+      logger.error('Failed to save email', { emailId: email?.id, mode, error });
       const errorMessage = error?.message || 'An unexpected error occurred while saving.';
       setSaveError(errorMessage);
 

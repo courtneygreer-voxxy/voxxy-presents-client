@@ -9,6 +9,18 @@ export interface BulletinAuthor {
   role: string;
 }
 
+export interface EmailAudienceCriteria {
+  include_all?: boolean;
+  statuses?: string[];
+  vendor_categories?: string[];
+}
+
+export interface RecipientPreview {
+  total: number;
+  by_category: Record<string, number>;
+  by_status: Record<string, number>;
+}
+
 export interface Bulletin {
   id: number;
   event_id: number;
@@ -17,6 +29,7 @@ export interface Bulletin {
   bulletin_type: BulletinType;
   pinned: boolean;
   send_email_notification: boolean;
+  email_audience_criteria?: EmailAudienceCriteria;
   view_count: number;
   read_count: number;
   read_by_current_user: boolean;
@@ -31,6 +44,7 @@ export interface CreateBulletinRequest {
   bulletin_type?: BulletinType;
   pinned?: boolean;
   send_email_notification?: boolean;
+  email_audience_criteria?: EmailAudienceCriteria;
 }
 
 export interface UpdateBulletinRequest {

@@ -24,6 +24,7 @@ import { toast } from 'sonner';
 import { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
 import { STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
+import { logger } from '@/utils/logger';
 
 interface TemplateBuilderPageProps {
   templateId?: number;
@@ -250,7 +251,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
         // If there are locally modified emails, apply those changes to the cloned items
         if (modifiedEmails.size > 0) {
-          console.log(`Persisting ${modifiedEmails.size} locally modified emails...`);
+          logger.info('Persisting locally modified emails to cloned template', { count: modifiedEmails.size });
 
           // Create a map of position -> modified email for quick lookup
           const modifiedByPosition = new Map<number, EmailTemplateItem>();
@@ -264,7 +265,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
           for (const clonedItem of sortedClonedItems) {
             const modifiedVersion = modifiedByPosition.get(clonedItem.position);
             if (modifiedVersion) {
-              console.log(`Updating email at position ${clonedItem.position}: ${clonedItem.name}`);
               await emailTemplateItemsApi.update(newTemplate.id, clonedItem.id, {
                 name: modifiedVersion.name,
                 description: modifiedVersion.description ?? undefined,
@@ -421,7 +421,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       setShowTestEmailDialog(false);
       setTestEmailAddress('');
     } catch (error: any) {
-      console.error('Failed to send test email:', error);
+      logger.error('Failed to send test email', { templateId: template?.id, error });
       setError(error?.message || 'Failed to send test email');
       setTimeout(() => setError(null), 5000);
     } finally {

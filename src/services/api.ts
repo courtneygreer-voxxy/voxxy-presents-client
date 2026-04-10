@@ -3056,6 +3056,34 @@ export const bulletinsApi = {
       body: JSON.stringify({ email }),
     })
   },
+
+  /**
+   * Preview recipient count for bulletin email blast
+   * GET /api/v1/presents/events/:eventSlug/bulletins/preview_recipients
+   */
+  async previewRecipients(eventSlug: string, criteria: import('@/types/bulletin').EmailAudienceCriteria) {
+    const params = new URLSearchParams();
+
+    if (criteria.include_all) {
+      params.append('email_audience_criteria[include_all]', 'true');
+    }
+
+    if (criteria.statuses && criteria.statuses.length > 0) {
+      criteria.statuses.forEach(status => {
+        params.append('email_audience_criteria[statuses][]', status);
+      });
+    }
+
+    if (criteria.vendor_categories && criteria.vendor_categories.length > 0) {
+      criteria.vendor_categories.forEach(category => {
+        params.append('email_audience_criteria[vendor_categories][]', category);
+      });
+    }
+
+    return fetchApi<import('@/types/bulletin').RecipientPreview>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins/preview_recipients?${params.toString()}`
+    );
+  },
 }
 
 /**

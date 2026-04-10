@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { CreateCategoryTemplateDialog } from './CreateCategoryTemplateDialog';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
+import { logger } from '@/utils/logger';
 
 interface TemplateLibraryPageProps {
   onNavigateToBuilder?: (templateId?: number) => void;
@@ -65,7 +66,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
       const data = await categoriesApi.getAll(userProfile.organization_id);
       setCategories(data.categories || []);
     } catch (err: any) {
-      console.error('Failed to load categories:', err);
+      logger.error('Failed to load categories', { organizationId: userProfile.organization_id, error: err });
       // Don't show error toast, just log it
     } finally {
       setLoadingCategories(false);
@@ -172,7 +173,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         description: `Created template for ${category.name}`,
       });
     } catch (err: any) {
-      console.error('Failed to create category template:', err);
+      logger.error('Failed to create category template', { categoryId: category.id, error: err });
       throw err; // Re-throw so dialog can handle it
     }
   };

@@ -7,6 +7,7 @@ import DeliveryStatusBadge from './DeliveryStatusBadge';
 import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
+import { logger } from '@/utils/logger';
 
 interface EmailRowProps {
   email: ScheduledEmail;
@@ -42,7 +43,7 @@ export default function EmailRow({
     try {
       await action();
     } catch (error) {
-      console.error('Action failed:', error);
+      logger.error('Email row action failed', { emailId: email.id, error });
     } finally {
       setIsProcessing(false);
     }

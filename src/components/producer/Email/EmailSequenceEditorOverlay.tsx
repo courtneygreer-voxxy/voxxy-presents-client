@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import type { ScheduledEmail } from '@/types/email';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 import { scheduledEmailsApi } from '@/services/api';
+import { logger } from '@/utils/logger';
 
 interface EmailSequenceEditorOverlayProps {
   emails: ScheduledEmail[];
@@ -239,7 +240,7 @@ export default function EmailSequenceEditorOverlay({
       setShowTestEmailDialog(false);
       setTestEmailAddress('');
     } catch (error: any) {
-      console.error('Failed to send test email:', error);
+      logger.error('Failed to send test email', { eventSlug, emailId: selectedEmail.id, error });
       setTestEmailError(error?.message || 'Failed to send test email');
       setTimeout(() => setTestEmailError(null), 5000);
     } finally {

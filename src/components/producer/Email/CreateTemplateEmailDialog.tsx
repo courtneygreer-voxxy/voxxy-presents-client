@@ -10,6 +10,7 @@ import { RichTextEditor } from './RichTextEditor';
 import type { EmailCategory, TriggerType, CreateEmailTemplateItemRequest } from '@/types/email';
 import { joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import { frontendToBackend } from '@/utils/emailVariables';
+import { logger } from '@/utils/logger';
 
 const createTemplateEmailSchema = z.object({
   name: z.string().min(1, 'Email name is required'),
@@ -117,7 +118,7 @@ export function CreateTemplateEmailDialog({
       reset();
       onClose();
     } catch (error) {
-      console.error('Failed to create template email:', error);
+      logger.error('Failed to create template email', { templateId, error });
     } finally {
       setIsSubmitting(false);
     }

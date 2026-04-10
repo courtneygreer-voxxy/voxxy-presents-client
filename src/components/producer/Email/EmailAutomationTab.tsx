@@ -9,6 +9,7 @@ import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
 import { DebugPanel } from '../DebugPanel';
 import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
+import { logger } from '@/utils/logger';
 
 interface EmailAutomationTabProps {
   eventSlug: string;
@@ -90,23 +91,16 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                     event?.organization_id;
 
       if (!orgId) {
-        console.log('⚠️ No organization ID available yet, skipping category load');
-        console.log('   eventData:', eventData ? 'exists' : 'null');
-        console.log('   event prop:', event ? 'exists' : 'null');
         return;
       }
 
       try {
-        console.log('📂 Loading categories for organization:', orgId);
-
         // Load all categories for the organization
         const categoriesResponse = await categoriesApi.getAll(orgId, true);
         const allCategories = categoriesResponse.categories || [];
-        console.log('✅ Loaded all categories:', allCategories);
 
         // Load vendor applications for this event to see which categories are actually used
         const vendorApplications = await vendorApplicationsApi.getByEvent(eventSlug);
-        console.log('✅ Loaded vendor applications:', vendorApplications);
 
         // Extract unique category_ids from vendor applications
         const usedCategoryIds = new Set(
@@ -114,17 +108,13 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             .map((app: any) => app.category_id)
             .filter((id: number | null) => id !== null)
         );
-        console.log('📋 Categories used by this event:', Array.from(usedCategoryIds));
 
         // Filter categories to only show those used by this event
         const eventCategories = allCategories.filter((cat: Category) => usedCategoryIds.has(cat.id));
-        console.log('✅ Filtered event-specific categories:', eventCategories);
-        console.log('   Total categories available:', allCategories.length);
-        console.log('   Categories used by event:', eventCategories.length);
 
         setCategories(eventCategories);
       } catch (error) {
-        console.error('❌ Failed to load categories:', error);
+        logger.error('Failed to load categories', { organizationId: orgId, error });
       }
     };
 
@@ -153,22 +143,17 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     }
     setError(null);
     try {
-      console.log('📧 Loading emails for event:', eventSlug);
-
       // Fetch event data (for preview calculations)
       const eventDataResponse = await eventsApi.getById(eventSlug);
       setEventData(eventDataResponse);
-      console.log('📅 Fetched event data:', eventDataResponse.title);
 
       // Fetch scheduled emails
       const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
-      console.log('✅ Fetched', scheduledEmailsData.length, 'scheduled emails');
-      console.log('   Position 1 (Initial Invitation) is now a real scheduled email from database');
 
       setEmails(scheduledEmailsData);
       setLastRefreshTime(new Date());
     } catch (err: any) {
-      console.error('❌ Failed to load emails:', err);
+      logger.error('Failed to load emails', { eventSlug, error: err });
       if (!silent) {
         setError(err.message || 'Failed to load scheduled emails');
       }
@@ -278,8 +263,6 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   const handleSaveEdit = async (emailId: number, data: UpdateEmailRequest) => {
     const updated = await scheduledEmailsApi.update(eventSlug, emailId, data);
-    console.log('📧 Updated email received from server:', updated);
-    console.log('   New scheduled_for:', updated.scheduled_for);
 
     // Force a fresh reload of emails to ensure UI updates
     setIsLoading(true);

@@ -18,6 +18,7 @@ import { EmailAuditTable, type SortColumn } from './EmailAuditTable';
 import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 import { ContactSupportDialog } from './ContactSupportDialog';
 import { useAuth } from '@/hooks/useAuth';
+import { logger } from '@/utils/logger';
 
 /** Infer lifecycle category from email name/trigger (matches Mail tab grouping) */
 function inferCategory(email: ScheduledEmail): EmailCategory {
@@ -132,15 +133,8 @@ export function EmailAuditLogOverlay({
       setError(null);
 
       try {
-        console.log('📧 [Audit Log] Fetching scheduled emails for event:', event.slug);
-
         // 1. Fetch all scheduled emails (including Position 1 - Initial Invitation)
         const scheduledEmails = await scheduledEmailsApi.getByEvent(event.slug);
-        console.log('✅ [Audit Log] Fetched', scheduledEmails.length, 'scheduled emails');
-        // Debug: log email_template_item data to diagnose category values
-        for (const email of scheduledEmails) {
-          console.log(`🔍 [Audit Log] Email "${email.name}" → template_item:`, email.email_template_item, '→ category:', email.email_template_item?.category);
-        }
 
         // 2. Build audit entries array
         const entries: AuditEntry[] = [];
@@ -155,7 +149,6 @@ export function EmailAuditLogOverlay({
           if ((email.status === 'sent' || email.status === 'active') && email.sent_at) {
             try {
               const deliveries = await emailDeliveriesApi.getByScheduledEmail(event.slug, email.id);
-              console.log(`📬 [Audit Log] Fetched ${deliveries.length} deliveries for email: ${email.name}`);
 
               // Transform each delivery into an audit entry
               for (const delivery of deliveries) {
@@ -177,7 +170,7 @@ export function EmailAuditLogOverlay({
                 });
               }
             } catch (err: any) {
-              console.error(`❌ [Audit Log] Failed to fetch deliveries for email ${email.id}:`, err);
+              logger.error('Failed to fetch deliveries for email', { emailId: email.id, error: err });
               // Continue with other emails
             }
           }
@@ -185,7 +178,6 @@ export function EmailAuditLogOverlay({
           else if (email.status === 'scheduled' || email.status === 'paused') {
             try {
               const recipientsData = await scheduledEmailsApi.getRecipients(event.slug, email.id);
-              console.log(`📅 [Audit Log] Fetched ${recipientsData.count} recipients for scheduled email: ${email.name}`);
 
               // Transform each recipient into an audit entry with 'scheduled' status
               // Backend now properly filters the recipients array to match the count
@@ -209,16 +201,15 @@ export function EmailAuditLogOverlay({
                 });
               }
             } catch (err: any) {
-              console.error(`❌ [Audit Log] Failed to fetch recipients for scheduled email ${email.id}:`, err);
+              logger.error('Failed to fetch recipients for scheduled email', { emailId: email.id, error: err });
               // Continue with other emails
             }
           }
         }
 
-        console.log('✅ [Audit Log] Built', entries.length, 'audit entries');
         setAuditEntries(entries);
       } catch (err: any) {
-        console.error('❌ [Audit Log] Failed to fetch audit data:', err);
+        logger.error('Failed to fetch audit data', { eventSlug: event.slug, error: err });
         setError(err.message || 'Failed to load email audit log');
       } finally {
         setIsLoading(false);
@@ -240,10 +231,7 @@ export function EmailAuditLogOverlay({
 
     // Apply filters
     if (filters.email_name) {
-      console.log('🔍 [Audit Log] Filtering by email_name:', filters.email_name);
-      console.log('📊 [Audit Log] Available email names:', [...new Set(auditEntries.map(e => e.email_name))]);
       result = result.filter(entry => entry.email_name === filters.email_name);
-      console.log('✅ [Audit Log] Filtered results:', result.length, 'entries');
     }
 
     if (filters.category) {
@@ -370,7 +358,6 @@ export function EmailAuditLogOverlay({
               size="sm"
               onClick={() => {
                 // TODO: Implement CSV export
-                console.log('Export to CSV');
               }}
               className="gap-2"
             >
