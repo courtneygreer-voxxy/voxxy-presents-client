@@ -188,14 +188,19 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
       );
       setScheduledEmails(upcomingEmails.slice(0, 4));
 
-      // Set bulletins (all, sorted newest first)
+      // Set bulletins (pinned first, then sorted newest first)
       const bulletinsArray = Array.isArray(bulletinsRes) ? bulletinsRes : ('bulletins' in bulletinsRes ? bulletinsRes.bulletins : []);
-      bulletinsArray.sort((a: Bulletin, b: Bulletin) =>
-        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-      );
+      bulletinsArray.sort((a: Bulletin, b: Bulletin) => {
+        // Pinned bulletins come first
+        if (a.pinned !== b.pinned) {
+          return a.pinned ? -1 : 1;
+        }
+        // Then sort by created_at (newest first)
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      });
       setBulletins(bulletinsArray);
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
+      console.error('Failed to fetch dashboard data:', err); // Keep for now - affects many parts of dashboard
     } finally {
       setLoading(false);
     }

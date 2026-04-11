@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { Bulletin, CreateBulletinRequest, UpdateBulletinRequest } from '../../../types/bulletin';
 import { bulletinsApi } from '../../../services/api';
@@ -100,6 +100,19 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
     setEditingBulletin(undefined);
   };
 
+  // Sort bulletins: pinned first, then by created_at (newest first)
+  // This ensures correct display even if backend doesn't sort properly
+  const sortedBulletins = useMemo(() => {
+    return [...bulletins].sort((a, b) => {
+      // First, sort by pinned status (pinned = true comes first)
+      if (a.pinned !== b.pinned) {
+        return a.pinned ? -1 : 1;
+      }
+      // Then sort by created_at (newest first)
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [bulletins]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -146,7 +159,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
 
       {/* Bulletins List */}
       <BulletinsList
-        bulletins={bulletins}
+        bulletins={sortedBulletins}
         onEdit={handleEdit}
         onDelete={handleDelete}
         onTogglePin={handleTogglePin}
