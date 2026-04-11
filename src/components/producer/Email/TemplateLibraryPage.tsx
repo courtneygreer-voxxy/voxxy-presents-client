@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle, Tag, Info } from 'lucide-react';
+import { Mail, Plus, Copy, Trash2, Edit, Loader2, ArrowLeft, Eye, Send, CheckCircle2, XCircle, AlertCircle, Tag } from 'lucide-react';
 import { emailCampaignTemplatesApi, emailTemplateItemsApi, categoriesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem } from '@/types/email';
 import type { Category } from '@/types/category';
@@ -36,9 +36,6 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   const [cloneDescription, setCloneDescription] = useState('');
   const [isCloning, setIsCloning] = useState(false);
   const [cloneError, setCloneError] = useState<string | null>(null);
-
-  // Help section state
-  const [showHelp, setShowHelp] = useState(false);
 
   useEffect(() => {
     loadTemplates();
@@ -179,178 +176,8 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
   };
 
   return (
-    <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 p-4">
+    <div className="px-3 md:px-4">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-4">
-          <div className="flex items-center gap-3 mb-2">
-            {onBack && (
-              <button
-                onClick={onBack}
-                className="p-1.5 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 transition-all text-white"
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </button>
-            )}
-            <div className="flex-1">
-              <h1 className="text-lg font-bold text-white flex items-center gap-2">
-                <Mail className="w-5 h-5 text-purple-400" />
-                Email Sequences
-              </h1>
-              <p className="text-white/60 text-xs mt-0.5">
-                When creating an event, you select an Event Sequence for event-wide emails (invitations, updates, cancellations), then choose between Category-Specific Sequences (customized per vendor type) or a Universal Sequence (same content for all vendors).
-              </p>
-            </div>
-            <button
-              onClick={() => setShowHelp(!showHelp)}
-              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white/80 text-xs font-medium hover:bg-white/10 transition-all flex items-center gap-1.5"
-            >
-              <Info className="w-3.5 h-3.5" />
-              {showHelp ? 'Hide' : 'Show'} Guide
-            </button>
-          </div>
-        </div>
-
-        {/* Help Section */}
-        {showHelp && !isLoading && (
-          <div className="mb-6 rounded-lg border border-white/10 bg-white/[0.02] p-4">
-            <div className="flex items-start gap-3">
-              <Info className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-              <div className="flex-1 space-y-4">
-                <div>
-                  <h3 className="text-sm font-medium text-white mb-1.5">How Email Sequences Work</h3>
-                  <p className="text-xs text-white/60 leading-relaxed">
-                    These templates automatically generate scheduled emails when you create an event. You'll select an Event Sequence for event-wide emails, then choose either Category-Specific Sequences (customized per vendor type) or a Universal Sequence (same content for all vendors). Edit templates here, manage scheduled emails in Command Center.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Mail className="w-3.5 h-3.5 text-purple-400" />
-                      <span className="font-medium text-white">Event Sequences</span>
-                    </div>
-                    <p className="text-white/60 text-xs mb-2">
-                      Sent to contacts (invitations) and all vendors (bulletins, updates)
-                    </p>
-                    <p className="text-[10px] text-white/50">Choose one template per event</p>
-                  </div>
-
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Tag className="w-3.5 h-3.5 text-blue-400" />
-                      <span className="font-medium text-white">Category Sequences</span>
-                    </div>
-                    <p className="text-white/60 text-xs mb-2">
-                      Sent to vendors in each category: applications, payments, countdowns
-                    </p>
-                    <p className="text-[10px] text-white/50">Customize content per vendor type</p>
-                  </div>
-
-                  <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                    <div className="flex items-center gap-2 mb-1.5">
-                      <Mail className="w-3.5 h-3.5 text-purple-400" />
-                      <span className="font-medium text-white">Universal Sequence</span>
-                    </div>
-                    <p className="text-white/60 text-xs mb-2">
-                      Alternative to category sequences - same content for all vendors
-                    </p>
-                    <p className="text-[10px] text-white/50">Simpler option, less customization</p>
-                  </div>
-                </div>
-
-                {/* Email Type Key */}
-                <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                  <h4 className="text-xs font-semibold text-white mb-2">Email Type Reference</h4>
-                  <p className="text-[10px] text-white/50 mb-3">Emails are classified by when they're triggered:</p>
-
-                  <div className="space-y-3">
-                    {/* Event Announcement */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-purple-500/20 text-purple-300 border-purple-500/30">
-                          Event Announcement
-                        </span>
-                      </div>
-                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
-                        <div>• <span className="text-white/70 font-mono">on_invitation_send</span> - When invitations are sent to contacts</div>
-                        <div>• <span className="text-white/70 font-mono">on_bulletin_post</span> - When a bulletin is posted to all vendors</div>
-                        <div>• <span className="text-white/70 font-mono">days_before_deadline</span> - Reminder to contacts before application deadline</div>
-                        <div>• <span className="text-white/70 font-mono">days_after_deadline</span> - Follow-up to contacts after deadline</div>
-                      </div>
-                    </div>
-
-                    {/* Application */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-pink-500/20 text-pink-300 border-pink-500/30">
-                          Application
-                        </span>
-                      </div>
-                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
-                        <div>• <span className="text-white/70 font-mono">on_application_submit</span> - When vendor submits application</div>
-                        <div>• <span className="text-white/70 font-mono">on_approval</span> - When application is approved</div>
-                        <div>• <span className="text-white/70 font-mono">on_rejection</span> - When application is rejected</div>
-                        <div>• <span className="text-white/70 font-mono">on_waitlist</span> - When vendor is waitlisted</div>
-                        <div>• <span className="text-white/70 font-mono">days_before_deadline</span> - X days before application deadline</div>
-                        <div>• <span className="text-white/70 font-mono">days_after_deadline</span> - X days after application deadline</div>
-                      </div>
-                    </div>
-
-                    {/* Payment */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-blue-500/20 text-blue-300 border-blue-500/30">
-                          Payment
-                        </span>
-                      </div>
-                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
-                        <div>• <span className="text-white/70 font-mono">days_before_payment_deadline</span> - X days before payment due</div>
-                        <div>• <span className="text-white/70 font-mono">on_payment_deadline</span> - On payment due date</div>
-                        <div>• <span className="text-white/70 font-mono">days_after_payment_deadline</span> - X days after payment overdue</div>
-                        <div>• <span className="text-white/70 font-mono">on_payment_received</span> - When payment is confirmed</div>
-                      </div>
-                    </div>
-
-                    {/* Event Countdown */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-green-500/20 text-green-300 border-green-500/30">
-                          Event Countdown
-                        </span>
-                      </div>
-                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
-                        <div>• <span className="text-white/70 font-mono">days_before_event</span> - X days before event date</div>
-                        <div>• <span className="text-white/70 font-mono">on_event_date</span> - On event day</div>
-                        <div>• <span className="text-white/70 font-mono">days_after_event</span> - X days after event (thank you emails)</div>
-                      </div>
-                    </div>
-
-                    {/* Event Update */}
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium border bg-yellow-500/20 text-yellow-300 border-yellow-500/30">
-                          Event Update
-                        </span>
-                      </div>
-                      <div className="pl-3 space-y-0.5 text-[10px] text-white/50">
-                        <div>• <span className="text-white/70 font-mono">on_event_update</span> - When event details change</div>
-                        <div>• <span className="text-white/70 font-mono">on_event_cancel</span> - When event is cancelled</div>
-                        <div>• <span className="text-white/70 font-mono">on_category_change</span> - When vendor's category is changed</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-                  <p className="text-xs text-blue-300">
-                    <strong>Note:</strong> Templates create the initial emails. Once an event is created, manage individual scheduled emails in the event's Command Center.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Loading State */}
         {isLoading && (

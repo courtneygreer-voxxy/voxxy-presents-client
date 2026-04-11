@@ -27,9 +27,14 @@ export function BulletinsList({
     );
   }
 
-  // Separate pinned and regular bulletins
-  const pinnedBulletins = bulletins.filter(b => b.pinned);
-  const regularBulletins = bulletins.filter(b => !b.pinned);
+  // Separate pinned and regular bulletins, sorting each by created_at (newest first)
+  const pinnedBulletins = bulletins
+    .filter(b => b.pinned)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+  const regularBulletins = bulletins
+    .filter(b => !b.pinned)
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
   return (
     <div className="space-y-4">

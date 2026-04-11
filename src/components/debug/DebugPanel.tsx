@@ -57,7 +57,7 @@ export function DebugPanel() {
 
   if (!isVisible) {
     return (
-      <div className="fixed top-4 right-4 z-[9999]">
+      <div className="fixed bottom-4 right-4 z-[9999]">
         <Button
           onClick={() => setIsVisible(true)}
           size="sm"
@@ -171,9 +171,9 @@ export function DebugPanel() {
   }
 
   return (
-    <div className="fixed top-4 right-4 z-[9999] max-w-sm">
-      <Card className="border-2 border-red-500/50 bg-slate-900/95 backdrop-blur-sm shadow-2xl">
-        <CardHeader className="pb-2">
+    <div className="fixed bottom-4 right-4 z-[9999] max-w-sm max-h-[calc(100vh-2rem)] flex flex-col">
+      <Card className="border-2 border-red-500/50 bg-slate-900/95 backdrop-blur-sm shadow-2xl flex flex-col max-h-full">
+        <CardHeader className="pb-2 flex-shrink-0">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-bold text-red-400 flex items-center gap-2">
               <Shield className="h-4 w-4" />
@@ -200,7 +200,7 @@ export function DebugPanel() {
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-3 text-xs">
+        <CardContent className="space-y-3 text-xs overflow-y-auto flex-1">
           {/* Auth State */}
           <div className="space-y-2">
             <div className="font-semibold text-gray-300">🔐 Auth State</div>

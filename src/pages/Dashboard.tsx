@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Shield } from 'lucide-react';
+import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Shield, ArrowLeft, Info, ClipboardList, Plus, Search, Eye, EyeOff, Filter, Tag, Upload, UserPlus, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi, adminApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
@@ -16,7 +16,6 @@ import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmation
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { GuidebookModal } from '@/components/shared/GuidebookModal';
-import { HelpIcon } from '@/components/shared/HelpIcon';
 
 type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
@@ -135,6 +134,8 @@ interface PresentsAnalytics {
   }>;
 }
 
+type CommandCenterTab = 'details' | 'applicants' | 'emails' | 'settings';
+
 export default function ProducerDashboard() {
   const [activeNav, setActiveNav] = useState<NavItem>('events');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -142,6 +143,20 @@ export default function ProducerDashboard() {
   const [organization, setOrganization] = useState<Organization | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [commandCenterTab, setCommandCenterTab] = useState<CommandCenterTab>('details');
+
+  // Events page controls state
+  const [eventsSearchTerm, setEventsSearchTerm] = useState('');
+  const [eventsStatusFilter, setEventsStatusFilter] = useState<string | null>(null);
+  const [eventsShowPast, setEventsShowPast] = useState(false);
+  const [eventsSortBy, setEventsSortBy] = useState<'date' | 'status' | 'name'>('date');
+
+  // Network page controls state
+  type NetworkTab = 'contacts' | 'lists' | 'categories';
+  const [networkTab, setNetworkTab] = useState<NetworkTab>('contacts');
+  const [networkShowAddModal, setNetworkShowAddModal] = useState(false);
+  const [networkShowCSVModal, setNetworkShowCSVModal] = useState(false);
+
   const [loadingOrg, setLoadingOrg] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(false);
   const [loadingCommandCenter, setLoadingCommandCenter] = useState(false);
@@ -625,6 +640,25 @@ export default function ProducerDashboard() {
     { id: 'settings' as NavItem, label: 'Settings', icon: Settings },
   ];
 
+  // Get page title for header based on current navigation context
+  const getPageTitle = (): string => {
+    if (activeNav === 'admin') return 'Admin Panel';
+    if (activeNav === 'network') return 'Network';
+    if (activeNav === 'email-templates') return 'Email Templates';
+    if (activeNav === 'settings') return 'Settings';
+
+    if (activeNav === 'events') {
+      if (eventsView === 'create') return 'Create Event';
+      if (eventsView === 'edit') return 'Edit Event';
+      if (eventsView === 'command-center' && selectedEvent) {
+        return selectedEvent.title;
+      }
+      return 'Events';
+    }
+
+    return 'Dashboard';
+  };
+
   // Render events content based on current view
   const renderEventsContent = () => {
     if (loadingOrg || loadingEvents) {
@@ -708,15 +742,19 @@ export default function ProducerDashboard() {
           <CommandCenter
             event={selectedEvent}
             organizationId={organization.id}
+            activeTab={commandCenterTab}
+            onTabChange={setCommandCenterTab}
             onBack={() => {
               setEventsView('list');
               setSelectedEvent(null);
+              setCommandCenterTab('details'); // Reset to default tab when leaving
             }}
             onUpdateEvent={handleUpdateEvent}
             onDeleteEvent={async (eventSlug: string) => {
               await handleDeleteEvent(eventSlug);
               setEventsView('list');
               setSelectedEvent(null);
+              setCommandCenterTab('details'); // Reset to default tab
             }}
             onRefreshEvent={handleRefreshEvent}
           />
@@ -727,6 +765,10 @@ export default function ProducerDashboard() {
     return (
       <EventsList
         events={events}
+        searchTerm={eventsSearchTerm}
+        statusFilter={eventsStatusFilter}
+        showPastEvents={eventsShowPast}
+        sortBy={eventsSortBy}
         onCreateEvent={() => setEventsView('create')}
         onEditEvent={(slug) => {
           const event = events.find(e => e.slug === slug);
@@ -790,37 +832,88 @@ export default function ProducerDashboard() {
 
         {/* Navigation */}
         <nav className="flex-1 p-2 space-y-0.5">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = activeNav === item.id;
-
-            return (
+          {eventsView === 'command-center' ? (
+            // Command Center Mode - Show Back button + Command Center tabs
+            <>
               <button
-                key={item.id}
-                data-onboarding={`nav-${item.id}`}
                 onClick={() => {
-                  setActiveNav(item.id);
+                  setEventsView('list');
+                  setSelectedEvent(null);
+                  setCommandCenterTab('details');
                   setIsMobileMenuOpen(false);
-                  // Reset to appropriate events view when clicking Events nav
-                  if (item.id === 'events' && (eventsView === 'create' || eventsView === 'command-center' || eventsView === 'edit')) {
-                    setEventsView(events.length > 0 ? 'list' : 'empty');
-                    setSelectedEvent(null);
-                  }
                 }}
-                className={`
-                  w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
-                  text-xs font-medium transition-smooth
-                  ${isActive
-                    ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
-                    : 'text-white/70 hover:text-white hover:bg-white/5'
-                  }
-                `}
+                className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-white/30 text-white hover:bg-white/5 hover:border-white/50 mb-2"
               >
-                <Icon className="w-3.5 h-3.5" />
-                {item.label}
+                <ArrowLeft className="w-3.5 h-3.5" />
+                Back to Events
               </button>
-            );
-          })}
+
+              {/* Command Center Tabs */}
+              {[
+                { id: 'details' as CommandCenterTab, label: 'Home', icon: Info },
+                { id: 'applicants' as CommandCenterTab, label: 'Vendors', icon: ClipboardList },
+                { id: 'emails' as CommandCenterTab, label: 'Mail', icon: Mail },
+                { id: 'settings' as CommandCenterTab, label: 'Settings', icon: Settings },
+              ].map((tab) => {
+                const Icon = tab.icon;
+                const isActive = commandCenterTab === tab.id;
+
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setCommandCenterTab(tab.id);
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`
+                      w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
+                      text-xs font-medium transition-smooth
+                      ${isActive
+                        ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
+                        : 'text-white/70 hover:text-white hover:bg-white/5'
+                      }
+                    `}
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {tab.label}
+                  </button>
+                );
+              })}
+            </>
+          ) : (
+            // Normal Navigation
+            navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeNav === item.id;
+
+              return (
+                <button
+                  key={item.id}
+                  data-onboarding={`nav-${item.id}`}
+                  onClick={() => {
+                    setActiveNav(item.id);
+                    setIsMobileMenuOpen(false);
+                    // Reset to appropriate events view when clicking Events nav
+                    if (item.id === 'events' && eventsView !== 'list' && eventsView !== 'empty') {
+                      setEventsView(events.length > 0 ? 'list' : 'empty');
+                      setSelectedEvent(null);
+                    }
+                  }}
+                  className={`
+                    w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
+                    text-xs font-medium transition-smooth
+                    ${isActive
+                      ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
+                      : 'text-white/70 hover:text-white hover:bg-white/5'
+                    }
+                  `}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  {item.label}
+                </button>
+              );
+            })
+          )}
         </nav>
 
         {/* Sidebar Footer - Organization & User Profile */}
@@ -866,30 +959,169 @@ export default function ProducerDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="h-10 bg-[#0f0820] border-b border-white/10 flex items-center px-3">
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMobileMenuOpen(true)}
-            className="lg:hidden text-white/70 hover:text-white mr-2"
-          >
-            <Menu className="w-4 h-4" />
-          </button>
+        <header className="bg-[#0f0820] border-b border-white/10 pt-3">
+          {/* Top row - Always visible */}
+          <div className="flex items-center justify-between px-3 pb-3">
+            <div className="flex items-center gap-3">
+              {/* Mobile Menu Button */}
+              <button
+                onClick={() => setIsMobileMenuOpen(true)}
+                className="lg:hidden text-white/70 hover:text-white"
+              >
+                <Menu className="w-4 h-4" />
+              </button>
 
-          <h2 className="text-xs text-white font-medium">
-            {userProfile?.name || 'Producer Dashboard'}
-          </h2>
+              {/* Title Section */}
+              {eventsView === 'command-center' && selectedEvent ? (
+                <div>
+                  <h2 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                    Command Center
+                  </h2>
+                  <p className="text-xs text-white/60 mt-0.5">{selectedEvent.title}</p>
+                </div>
+              ) : (
+                <h2 className="text-sm text-white font-semibold">
+                  {getPageTitle()}
+                </h2>
+              )}
+            </div>
+
+            {/* Action Buttons - Right Side */}
+            <div className="flex items-center gap-2">
+              {/* Events List - Create New Event Button */}
+              {activeNav === 'events' && eventsView === 'list' && (
+                <button
+                  onClick={() => setEventsView('create')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Create New Event</span>
+                  <span className="sm:hidden">New</span>
+                </button>
+              )}
+
+              {/* Help/Guide Button - Always visible */}
+              <button
+                onClick={() => setGuidebookOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium rounded-full shadow-lg shadow-purple-500/25 transition-all hover:scale-105"
+                title="Open guide"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Guide</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Events List Controls - Search & Filters (shown only on events list view) */}
+          {activeNav === 'events' && eventsView === 'list' && (
+            <div className="px-3 pb-3 space-y-2">
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={eventsSearchTerm}
+                  onChange={(e) => setEventsSearchTerm(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                />
+              </div>
+
+              {/* Filter Pills & Controls */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Status Filter Buttons */}
+                {['Live', 'Draft', 'Past'].map(status => (
+                  <button
+                    key={status}
+                    onClick={() => setEventsStatusFilter(eventsStatusFilter === status ? null : status)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                      eventsStatusFilter === status
+                        ? 'bg-purple-600 text-white'
+                        : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+                    }`}
+                  >
+                    {status}
+                  </button>
+                ))}
+
+                {/* Divider */}
+                <div className="w-px h-5 bg-white/10 mx-1" />
+
+                {/* Sort Dropdown */}
+                <select
+                  value={eventsSortBy}
+                  onChange={(e) => setEventsSortBy(e.target.value as 'date' | 'status' | 'name')}
+                  className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="date">Sort by Date</option>
+                  <option value="name">Sort by Name</option>
+                  <option value="status">Sort by Status</option>
+                </select>
+
+                {/* Show Past Toggle */}
+                <button
+                  onClick={() => setEventsShowPast(!eventsShowPast)}
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    eventsShowPast
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+                  }`}
+                >
+                  {eventsShowPast ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  {eventsShowPast ? 'Hide Past' : 'Show Past'}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Network Page Controls - Tabs (shown only on network page) */}
+          {activeNav === 'network' && (
+            <div className="flex items-center gap-2 border-b border-white/10 px-3">
+              {([
+                { id: 'contacts' as NetworkTab, label: 'All Contacts' },
+                { id: 'lists' as NetworkTab, label: 'Lists', icon: Filter },
+                { id: 'categories' as NetworkTab, label: 'Categories', icon: Tag },
+              ]).map(tab => {
+                const Icon = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setNetworkTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium transition-all relative ${
+                      networkTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
+                    }`}
+                  >
+                    {Icon && <Icon className="w-3.5 h-3.5" />}
+                    {tab.label}
+                    {networkTab === tab.id && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto" data-onboarding="events-content">
+        <main className="flex-1 overflow-auto pt-2" data-onboarding="events-content">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} onStartGuide={() => setGuidebookOpen(true)} />
           ) : activeNav === 'events' ? (
             renderEventsContent()
           ) : activeNav === 'network' ? (
-            <div className="p-3 md:p-4">
+            <div className="px-3 md:px-4">
               {organization ? (
-                <NetworkPage organizationId={organization.id} />
+                <NetworkPage
+                  organizationId={organization.id}
+                  activeTab={networkTab}
+                  showAddModal={networkShowAddModal}
+                  setShowAddModal={setNetworkShowAddModal}
+                  showCSVUploadModal={networkShowCSVModal}
+                  setShowCSVUploadModal={setNetworkShowCSVModal}
+                  onTabChange={setNetworkTab}
+                />
               ) : (
                 <div className="flex items-center justify-center py-8">
                   <p className="text-xs text-white/60">Loading organization...</p>
@@ -943,11 +1175,6 @@ export default function ProducerDashboard() {
 
       {/* Guidebook Modal */}
       <GuidebookModal open={guidebookOpen} onClose={() => setGuidebookOpen(false)} />
-
-      {/* Help button to open guidebook */}
-      {!guidebookOpen && (
-        <HelpIcon onClick={() => setGuidebookOpen(true)} label="Open guide" />
-      )}
     </div>
   );
 }

@@ -296,7 +296,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   }
 
   return (
-    <div className="p-3 md:p-4">
+    <div className="px-3 md:px-4">
       {/* Main Grid: Left Column (Stats/Emails/Bulletins) + Right Column (Event Details) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Column - Vendor Stats (when live) or Go Live Card (when not live), then Emails & Bulletins */}

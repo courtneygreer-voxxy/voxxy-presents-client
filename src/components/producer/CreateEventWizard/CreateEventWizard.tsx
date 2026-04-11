@@ -334,7 +334,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
+    <div className="max-w-4xl mx-auto px-4 pt-2">
       {/* Back Button */}
       <button
         onClick={onCancel}

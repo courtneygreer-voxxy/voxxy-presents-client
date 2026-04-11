@@ -566,7 +566,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   }
 
   return (
-    <div className="p-3 md:p-4">
+    <div className="px-3 md:px-4">
       {/* Header with Stats */}
       <div className="mb-8">
         <div className="flex items-start justify-between mb-6">

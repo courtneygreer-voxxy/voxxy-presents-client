@@ -33,6 +33,10 @@ interface Event {
 
 interface EventsListProps {
   events: Event[];
+  searchTerm: string;
+  statusFilter: string | null;
+  showPastEvents: boolean;
+  sortBy: 'date' | 'status' | 'name';
   onCreateEvent: () => void;
   onEditEvent: (eventSlug: string) => void;
   onCommandCenter: (eventSlug: string) => void;
@@ -43,6 +47,10 @@ interface EventsListProps {
 
 export default function EventsList({
   events,
+  searchTerm,
+  statusFilter,
+  showPastEvents,
+  sortBy,
   onCreateEvent,
   onEditEvent,
   onCommandCenter,
@@ -50,10 +58,6 @@ export default function EventsList({
   isAdmin = false,
   loading = false,
 }: EventsListProps) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const [showPastEvents, setShowPastEvents] = useState(false);
-  const [sortBy, setSortBy] = useState<'date' | 'status' | 'name'>('date');
 
   const getStatusBadge = (event: Event) => {
     // Determine badge based on event date and is_live status
@@ -138,95 +142,14 @@ export default function EventsList({
   }
 
   return (
-    <div className="p-3 md:p-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div>
-          <h1 className="text-lg font-bold text-white mb-0.5">Events</h1>
-          <p className="text-[10px] text-white/60">
-            {filteredAndSortedEvents.length} {filteredAndSortedEvents.length === 1 ? 'event' : 'events'}
-            {!showPastEvents && ' (past events hidden)'}
-          </p>
-        </div>
-        <button
-          onClick={onCreateEvent}
-          className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
-        >
-          <Plus className="w-3.5 h-3.5" />
-          <span className="hidden sm:inline">Create New Event</span>
-          <span className="sm:hidden">New</span>
-        </button>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="mb-4 space-y-2">
-        {/* Search bar */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
-          />
-        </div>
-
-        {/* Status pills + Sort + Past toggle */}
-        <div className="flex items-center gap-2 flex-wrap">
-          {['Live', 'Draft', 'Past'].map(status => (
-            <button
-              key={status}
-              onClick={() => setStatusFilter(statusFilter === status ? null : status)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
-                statusFilter === status
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
-              }`}
-            >
-              {status}
-            </button>
-          ))}
-          <div className="w-px h-5 bg-white/10 mx-1" />
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as 'date' | 'status' | 'name')}
-            className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-          >
-            <option value="date">Sort by Date</option>
-            <option value="name">Sort by Name</option>
-            <option value="status">Sort by Status</option>
-          </select>
-          <button
-            onClick={() => setShowPastEvents(!showPastEvents)}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-              showPastEvents
-                ? 'bg-blue-600 text-white'
-                : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
-            }`}
-          >
-            {showPastEvents ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
-            {showPastEvents ? 'Hide Past' : 'Show Past'}
-          </button>
-        </div>
-      </div>
+    <div className="px-3 md:px-4">
+      {/* Header section removed - now in Dashboard.tsx header */}
 
       {/* Events List */}
       <div className="space-y-2.5">
         {filteredAndSortedEvents.length === 0 ? (
           <div className="text-center py-8 text-white/40">
-            <p className="text-xs">No events found</p>
-            {(searchTerm || statusFilter) && (
-              <button
-                onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter(null);
-                }}
-                className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
-              >
-                Clear filters
-              </button>
-            )}
+            <p className="text-xs">No events found{(searchTerm || statusFilter) && ' - try adjusting your filters'}</p>
           </div>
         ) : (
           filteredAndSortedEvents.map((event) => {

@@ -6,6 +6,7 @@ import { CreateBulletinModal } from './CreateBulletinModal';
 import { BulletinsList } from './BulletinsList';
 import { Button } from '../../ui/button';
 import { Plus, Megaphone } from 'lucide-react';
+import { logger } from '@/utils/logger';
 
 interface BulletinsTabProps {
   eventSlug?: string;
@@ -35,7 +36,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       const response = await bulletinsApi.getByEvent(eventSlug);
       setBulletins(response.bulletins);
     } catch (err) {
-      console.error('Failed to fetch bulletins:', err);
+      logger.error('Failed to fetch bulletins', { eventSlug, error: err });
       setError('Failed to load bulletins. Please try again.');
     } finally {
       setIsLoading(false);
@@ -50,7 +51,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       await fetchBulletins();
       setIsCreateModalOpen(false);
     } catch (err) {
-      console.error('Failed to create bulletin:', err);
+      logger.error('Failed to create bulletin', { eventSlug, error: err });
       throw err;
     }
   };
@@ -64,7 +65,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       setIsCreateModalOpen(false);
       setEditingBulletin(undefined);
     } catch (err) {
-      console.error('Failed to update bulletin:', err);
+      logger.error('Failed to update bulletin', { bulletinId: editingBulletin.id, error: err });
       throw err;
     }
   };
@@ -74,7 +75,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       await bulletinsApi.delete(id);
       await fetchBulletins();
     } catch (err) {
-      console.error('Failed to delete bulletin:', err);
+      logger.error('Failed to delete bulletin', { bulletinId: id, error: err });
       alert('Failed to delete bulletin. Please try again.');
     }
   };
@@ -84,7 +85,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       await bulletinsApi.togglePin(id);
       await fetchBulletins();
     } catch (err) {
-      console.error('Failed to toggle pin:', err);
+      logger.error('Failed to toggle pin', { bulletinId: id, error: err });
       alert('Failed to update bulletin. Please try again.');
     }
   };

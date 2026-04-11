@@ -128,7 +128,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
+    <div className="max-w-3xl mx-auto px-4 pt-2">
       {/* Back Button */}
       <button
         onClick={onCancel}

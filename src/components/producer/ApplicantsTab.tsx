@@ -15,8 +15,6 @@ import {
   AlertCircle,
   MapPin,
   Calendar,
-  ChevronDown,
-  ChevronUp,
   DollarSign,
   ArrowLeftRight,
   MailX,
@@ -78,7 +76,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   const [availableCategories, setAvailableCategories] = useState<string[]>([]);
 
   // Email history state
-  const [emailHistoryExpanded, setEmailHistoryExpanded] = useState(false);
   const [emailHistoryData, setEmailHistoryData] = useState<any[]>([]);
   const [loadingEmailHistory, setLoadingEmailHistory] = useState(false);
 
@@ -466,63 +463,54 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
   };
 
-  // Handle email history toggle
-  const handleToggleEmailHistory = async () => {
-    if (!selectedApplicant) return;
-
-    // If already expanded, collapse it
-    if (emailHistoryExpanded) {
-      setEmailHistoryExpanded(false);
-      return;
-    }
-
-    // Expand and fetch data if we don't have it
-    setEmailHistoryExpanded(true);
-
-    if (emailHistoryData.length > 0) return; // Already have data
-
-    try {
-      setLoadingEmailHistory(true);
-      let allHistory: any[] = [];
-
-      // Fetch registration emails if registrationId exists
-      if (selectedApplicant.registrationId) {
-        const registrationHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-        allHistory = [...(registrationHistory || [])];
-      }
-
-      // Fetch invitation emails if invitationId exists
-      if (selectedApplicant.invitationId) {
-        const invitationHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
-        allHistory = [...allHistory, ...(invitationHistory || [])];
-      }
-
-      // If no emails fetched, throw error
-      if (allHistory.length === 0 && !selectedApplicant.registrationId && !selectedApplicant.invitationId) {
-        throw new Error('No registration or invitation ID available');
-      }
-
-      // Sort by date (most recent first)
-      allHistory.sort((a, b) => {
-        const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
-        const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
-        return dateB - dateA;
-      });
-
-      setEmailHistoryData(allHistory);
-    } catch (err: any) {
-      console.error('Failed to fetch email history:', err);
-      setEmailHistoryData([]);
-    } finally {
-      setLoadingEmailHistory(false);
-    }
-  };
-
-  // Reset email history when selected applicant changes
+  // Fetch email history when applicant changes
   useEffect(() => {
-    setEmailHistoryExpanded(false);
-    setEmailHistoryData([]);
-  }, [selectedApplicant?.id]);
+    const fetchEmailHistory = async () => {
+      if (!selectedApplicant) {
+        setEmailHistoryData([]);
+        return;
+      }
+
+      // Only fetch if applicant has registration or invitation
+      if (!selectedApplicant.registrationId && !selectedApplicant.invitationId) {
+        setEmailHistoryData([]);
+        return;
+      }
+
+      try {
+        setLoadingEmailHistory(true);
+        let allHistory: any[] = [];
+
+        // Fetch registration emails if registrationId exists
+        if (selectedApplicant.registrationId) {
+          const registrationHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+          allHistory = [...(registrationHistory || [])];
+        }
+
+        // Fetch invitation emails if invitationId exists
+        if (selectedApplicant.invitationId) {
+          const invitationHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+          allHistory = [...allHistory, ...(invitationHistory || [])];
+        }
+
+        // Sort by date (most recent first)
+        allHistory.sort((a, b) => {
+          const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+          const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+          return dateB - dateA;
+        });
+
+        setEmailHistoryData(allHistory);
+      } catch (err: any) {
+        console.error('Failed to fetch email history:', err);
+        setEmailHistoryData([]);
+      } finally {
+        setLoadingEmailHistory(false);
+      }
+    };
+
+    fetchEmailHistory();
+  }, [selectedApplicant, eventSlug]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -664,15 +652,15 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   }
 
   return (
-    <div className="h-full flex flex-col p-3 md:p-4">
+    <div className="h-full flex flex-col">
       {/* Two-Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Applicant List */}
         <div className="w-80 border-r border-white/10 flex flex-col">
           {/* List Header */}
-          <div className="p-3 border-b border-white/10">
+          <div className="px-3 md:px-4 pb-3 border-b border-white/10">
             <div className="mb-2">
-              <h2 className="text-sm font-bold text-white">Vendors & Applicants</h2>
+              <h2 className="text-2xl font-bold text-white">Vendors & Applicants</h2>
               <p className="text-[10px] text-white/60">
                 {filteredApplicants.length} total
                 {statusFilter !== 'all' && ` • ${statusFilter}`}
@@ -741,7 +729,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 </p>
               </div>
             ) : (
-              <div className="p-2 space-y-1">
+              <div className="py-2 px-3 md:px-4 space-y-1">
                 {filteredApplicants.map((applicant) => {
                   const statusBadge = getStatusBadge(applicant.status);
                   const StatusIcon = statusBadge.icon;
@@ -818,7 +806,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               </div>
             </div>
           ) : (
-            <div className="p-4">
+            <div className="px-3 md:px-4 pb-4">
               {/* Detail Header */}
               <div className="glass-card p-4 mb-3">
                 <div className="flex items-start justify-between mb-4">
@@ -1118,129 +1106,100 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               {/* Email History */}
               {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
                 <div className="glass-card p-4">
-                  <button
-                    onClick={handleToggleEmailHistory}
-                    className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth -m-2 mb-0"
-                  >
-                    <h3 className="text-sm font-semibold text-white">Email History</h3>
-                    {emailHistoryExpanded ? (
-                      <ChevronUp className="w-4 h-4 text-white/60" />
-                    ) : (
-                      <ChevronDown className="w-4 h-4 text-white/60" />
-                    )}
-                  </button>
+                  <h3 className="text-sm font-semibold text-white mb-3">Email History</h3>
 
-                  {emailHistoryExpanded && (
-                    <div className="mt-3">
-                      {loadingEmailHistory ? (
-                        <div className="flex items-center justify-center py-4">
-                          <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-                        </div>
-                      ) : emailHistoryData.length > 0 ? (
-                        <div className="divide-y divide-white/5">
-                          {emailHistoryData.map((delivery: any) => {
-                            const deliveryStatus = delivery.status;
-                            const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
-                            const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
+                  {loadingEmailHistory ? (
+                    <div className="flex items-center justify-center py-4">
+                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                    </div>
+                  ) : emailHistoryData.length > 0 ? (
+                    <div className="divide-y divide-white/5">
+                      {emailHistoryData.map((delivery: any) => {
+                        const deliveryStatus = delivery.status;
+                        const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
+                        const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
-                            let statusColor = 'text-white/40';
-                            if (deliveryStatus === 'delivered') statusColor = 'text-green-400';
-                            else if (deliveryStatus === 'bounced') statusColor = 'text-red-400';
-                            else if (deliveryStatus === 'dropped') statusColor = 'text-orange-400';
-                            else if (deliveryStatus === 'unsubscribed') statusColor = 'text-yellow-400';
+                        let statusColor = 'text-white/40';
+                        if (deliveryStatus === 'delivered') statusColor = 'text-green-400';
+                        else if (deliveryStatus === 'bounced') statusColor = 'text-red-400';
+                        else if (deliveryStatus === 'dropped') statusColor = 'text-orange-400';
+                        else if (deliveryStatus === 'unsubscribed') statusColor = 'text-yellow-400';
 
-                            return (
-                              <div key={delivery.id} className="flex items-center gap-2 py-1.5">
-                                <Mail className="w-3 h-3 text-white/30 flex-shrink-0" />
-                                <span className="text-[10px] text-white/70 truncate flex-1">{emailSubject}</span>
-                                <span className="text-[10px] text-white/40 tabular-nums flex-shrink-0">
-                                  {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
-                                    month: 'short',
-                                    day: 'numeric',
-                                  }) : '—'}
-                                </span>
-                                <span className={`text-[10px] font-medium ${statusColor} flex-shrink-0 w-16 text-right`}>
-                                  {deliveryStatus}
-                                </span>
-                                {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        await emailDeliveriesApi.retry(delivery.id);
-                                        toast.success('Email queued for retry');
-                                        let refreshedHistory: any[] = [];
-                                        if (selectedApplicant.registrationId) {
-                                          const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-                                          refreshedHistory = [...(regHistory || [])];
-                                        }
-                                        if (selectedApplicant.invitationId) {
-                                          const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
-                                          refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
-                                        }
-                                        refreshedHistory.sort((a, b) => {
-                                          const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
-                                          const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
-                                          return dateB - dateA;
-                                        });
-                                        setEmailHistoryData(refreshedHistory);
-                                      } catch (err: any) {
-                                        toast.error(`Failed to retry: ${err.message}`);
-                                      }
-                                    }}
-                                    className="text-[10px] text-purple-400 hover:text-purple-300 flex-shrink-0"
-                                  >
-                                    Retry
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })}
+                        return (
+                          <div key={delivery.id} className="flex items-center gap-2 py-1.5">
+                            <Mail className="w-3 h-3 text-white/30 flex-shrink-0" />
+                            <span className="text-[10px] text-white/70 truncate flex-1">{emailSubject}</span>
+                            <span className="text-[10px] text-white/40 tabular-nums flex-shrink-0">
+                              {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
+                                month: 'short',
+                                day: 'numeric',
+                              }) : '—'}
+                            </span>
+                            <span className={`text-[10px] font-medium ${statusColor} flex-shrink-0 w-16 text-right`}>
+                              {deliveryStatus}
+                            </span>
+                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await emailDeliveriesApi.retry(delivery.id);
+                                    toast.success('Email queued for retry');
+                                    let refreshedHistory: any[] = [];
+                                    if (selectedApplicant.registrationId) {
+                                      const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+                                      refreshedHistory = [...(regHistory || [])];
+                                    }
+                                    if (selectedApplicant.invitationId) {
+                                      const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+                                      refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
+                                    }
+                                    refreshedHistory.sort((a, b) => {
+                                      const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+                                      const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+                                      return dateB - dateA;
+                                    });
+                                    setEmailHistoryData(refreshedHistory);
+                                  } catch (err: any) {
+                                    toast.error(`Failed to retry: ${err.message}`);
+                                  }
+                                }}
+                                className="text-[10px] text-purple-400 hover:text-purple-300 flex-shrink-0"
+                              >
+                                Retry
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="py-3 px-2">
+                      {selectedApplicant.unsubscribe_status?.is_unsubscribed ? (
+                        <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
+                          <MailX className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-orange-400 font-medium mb-1">
+                              No Emails Sent (Unsubscribed)
+                            </p>
+                            <p className="text-[10px] text-white/60">
+                              This vendor unsubscribed from {selectedApplicant.unsubscribe_status.scope} emails.
+                              No automated messages will be sent.
+                            </p>
+                          </div>
                         </div>
                       ) : (
-                        <div className="py-3 px-2">
-                          {selectedApplicant.unsubscribe_status?.is_unsubscribed ? (
-                            <div className="flex items-start gap-2 p-3 rounded-lg bg-orange-500/5 border border-orange-500/20">
-                              <MailX className="w-4 h-4 text-orange-400 flex-shrink-0 mt-0.5" />
-                              <div>
-                                <p className="text-xs text-orange-400 font-medium mb-1">
-                                  No Emails Sent (Unsubscribed)
-                                </p>
-                                <p className="text-[10px] text-white/60">
-                                  This vendor unsubscribed from {selectedApplicant.unsubscribe_status.scope} emails.
-                                  No automated messages will be sent.
-                                </p>
-                              </div>
-                            </div>
-                          ) : (
-                            <div className="flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                              <Clock className="w-4 h-4 text-white/40 flex-shrink-0 mt-0.5" />
-                              <div>
-                                <p className="text-xs text-white/60 font-medium mb-1">No Email History</p>
-                                <p className="text-[10px] text-white/40">
-                                  No automated emails have been triggered yet.
-                                </p>
-                              </div>
-                            </div>
-                          )}
+                        <div className="flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
+                          <Clock className="w-4 h-4 text-white/40 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-xs text-white/60 font-medium mb-1">No Email History</p>
+                            <p className="text-[10px] text-white/40">
+                              No automated emails have been triggered yet.
+                            </p>
+                          </div>
                         </div>
                       )}
                     </div>
                   )}
-                </div>
-              )}
-
-              {/* Invited but not applied message */}
-              {selectedApplicant.status === 'invited' && (
-                <div className="glass-card p-3 border border-slate-500/30">
-                  <div className="flex items-start gap-2">
-                    <Mail className="w-4 h-4 text-slate-400 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs text-white/80 font-medium mb-1">Invited - Awaiting Application</p>
-                      <p className="text-[10px] text-white/60">
-                        This vendor was invited but hasn't submitted an application yet. Actions will be available once they apply.
-                      </p>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>

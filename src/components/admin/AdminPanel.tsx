@@ -186,17 +186,8 @@ export default function AdminPanel({
       <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
         {/* Header Section - Terminal Style */}
         <div className="bg-black/40 backdrop-blur-sm border-2 border-purple-500/50 rounded-lg p-4 lg:p-6 shadow-lg shadow-purple-500/20">
-          <div className="flex items-center gap-3 lg:gap-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-purple-500/20 border border-purple-400/50 rounded flex items-center justify-center flex-shrink-0 animate-pulse">
-              <Shield className="h-5 w-5 lg:h-6 lg:w-6 text-purple-300" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-xl lg:text-2xl font-bold text-purple-300 font-mono flex items-center gap-2">
-                <span className="text-green-400">{'>'}</span>
-                <span>ADMIN_DASHBOARD</span>
-              </h1>
-              <p className="text-xs lg:text-sm text-purple-400/60 font-mono">system.root.admin.view</p>
-            </div>
+          {/* Header removed - now in Dashboard.tsx header */}
+          <div className="flex items-center justify-end gap-3 lg:gap-4">
             <Button
               onClick={() => {
                 onLoadUsers();

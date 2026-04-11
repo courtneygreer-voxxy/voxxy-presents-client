@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check } from 'lucide-react';
 import { MapPin, Tags } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
@@ -9,23 +9,149 @@ import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
 import { BulkActionToolbar } from './BulkActionToolbar';
-import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
+import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
 type NetworkTab = 'contacts' | 'lists' | 'categories';
 
-interface NetworkPageProps {
-  organizationId: number;
+// Filter Dropdown Component
+function FilterDropdownButton({
+  field,
+  selectedValues,
+  onChange,
+}: {
+  field: FilterFieldConfig;
+  selectedValues: string[];
+  onChange: (values: string[]) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+        setSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const filtered = field.options.filter(opt =>
+    opt.toLowerCase().includes(search.toLowerCase())
+  );
+
+  const handleToggle = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter(v => v !== value));
+    } else {
+      onChange([...selectedValues, value]);
+    }
+  };
+
+  const Icon = field.icon;
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        onClick={() => setOpen(!open)}
+        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+          selectedValues.length > 0
+            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
+            : 'bg-white/5 text-white/60 hover:text-white border border-white/10 hover:bg-white/10'
+        }`}
+      >
+        {Icon && <Icon className="w-3.5 h-3.5" />}
+        <span>{field.label}</span>
+        {selectedValues.length > 0 && (
+          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-white text-[10px] font-bold rounded-full">
+            {selectedValues.length}
+          </span>
+        )}
+        <ChevronDown className={`w-3 h-3 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+
+      {open && (
+        <div className="absolute z-50 mt-1 w-56 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden">
+          {field.options.length > 5 && (
+            <div className="p-2 border-b border-white/10">
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={`Search ${field.label.toLowerCase()}...`}
+                className="w-full px-2.5 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                autoFocus
+              />
+            </div>
+          )}
+          <div className="max-h-48 overflow-y-auto p-1">
+            {filtered.length === 0 ? (
+              <p className="px-3 py-2 text-xs text-white/40">No options found</p>
+            ) : (
+              filtered.map(option => (
+                <button
+                  key={option}
+                  onClick={() => handleToggle(option)}
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 rounded transition-colors"
+                >
+                  <div
+                    className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                      selectedValues.includes(option)
+                        ? 'bg-purple-500 border-purple-500'
+                        : 'border-white/30'
+                    }`}
+                  >
+                    {selectedValues.includes(option) && (
+                      <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                    )}
+                  </div>
+                  <span className="truncate text-left">{option}</span>
+                </button>
+              ))
+            )}
+          </div>
+          {selectedValues.length > 0 && (
+            <div className="p-1.5 border-t border-white/10">
+              <button
+                onClick={() => onChange([])}
+                className="w-full text-xs text-white/40 hover:text-white py-1 transition-colors"
+              >
+                Clear {field.label.toLowerCase()}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default function NetworkPage({ organizationId }: NetworkPageProps) {
-  const [activeTab, setActiveTab] = useState<NetworkTab>('contacts');
+interface NetworkPageProps {
+  organizationId: number;
+  activeTab: NetworkTab;
+  showAddModal: boolean;
+  setShowAddModal: (show: boolean) => void;
+  showCSVUploadModal: boolean;
+  setShowCSVUploadModal: (show: boolean) => void;
+  onTabChange?: (tab: NetworkTab) => void;
+}
+
+export default function NetworkPage({
+  organizationId,
+  activeTab,
+  showAddModal,
+  setShowAddModal,
+  showCSVUploadModal,
+  setShowCSVUploadModal,
+  onTabChange
+}: NetworkPageProps) {
   const [contacts, setContacts] = useState<VendorContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showCSVUploadModal, setShowCSVUploadModal] = useState(false);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
 
   // SearchFilterBar state
@@ -343,7 +469,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
   const handleViewCategory = (category: Category) => {
     setActiveFilters([{ fieldKey: 'category', values: [category.name] }]);
-    setActiveTab('contacts');
+    onTabChange?.('contacts');
   };
 
   const handleSaveList = async () => {
@@ -361,7 +487,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
       });
       setListName('');
       setShowSaveInput(false);
-      setActiveTab('lists');
+      onTabChange?.('lists');
     } catch (err: any) {
       alert(err.message || 'Failed to save list');
     } finally {
@@ -430,60 +556,83 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-bold text-white mb-1">Network</h2>
-          <p className="text-sm text-white/60">Manage your professional contacts and relationships</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-semibold rounded-lg transition-all border border-white/20">
-            <Upload className="w-4 h-4" />
-            <span className="hidden sm:inline">Import CSV</span>
-          </button>
-          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all">
-            <UserPlus className="w-4 h-4" />
-            Add Contact
-          </button>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex items-center gap-2 border-b border-white/10">
-        {([
-          { id: 'contacts' as NetworkTab, label: 'All Contacts' },
-          { id: 'lists' as NetworkTab, label: 'Lists', icon: Filter },
-          { id: 'categories' as NetworkTab, label: 'Categories', icon: Tag },
-        ]).map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all relative ${
-              activeTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
-            }`}
-          >
-            {tab.icon && <tab.icon className="w-4 h-4" />}
-            {tab.label}
-            {activeTab === tab.id && (
-              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
-            )}
-          </button>
-        ))}
-      </div>
+      {/* Header and tabs removed - now in Dashboard.tsx header */}
 
       {/* Contacts Tab */}
       {activeTab === 'contacts' && (
         <>
-          {/* Search & Filter Bar */}
-          <SearchFilterBar
-            searchPlaceholder="Search contacts..."
-            searchValue={searchTerm}
-            onSearchChange={setSearchTerm}
-            onSearchSubmit={handleSearchSubmit}
-            filterFields={filterFieldConfigs}
-            activeFilters={activeFilters}
-            onFiltersChange={setActiveFilters}
-          />
+          {/* Search & Filter Bar with Action Buttons */}
+          <div className="space-y-2">
+            {/* Search Row with Action Buttons */}
+            <div className="flex items-center gap-2">
+              {/* Search Input */}
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
+                  placeholder="Search contacts..."
+                  className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                />
+              </div>
+
+              {/* Import CSV & Add Contact Buttons */}
+              <button
+                onClick={() => setShowCSVUploadModal(true)}
+                className="flex items-center gap-2 px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition-all border border-white/20 whitespace-nowrap"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Import CSV</span>
+              </button>
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Add Contact</span>
+                <span className="sm:hidden">Add</span>
+              </button>
+            </div>
+
+            {/* Filter Dropdowns Row */}
+            {(filterFieldConfigs.length > 0) && (
+              <div className="flex items-center gap-2 flex-wrap">
+                {filterFieldConfigs.map(field => {
+                  const selectedValues = activeFilters.find(f => f.fieldKey === field.key)?.values || [];
+                  return (
+                    <FilterDropdownButton
+                      key={field.key}
+                      field={field}
+                      selectedValues={selectedValues}
+                      onChange={(values) => {
+                        const existing = activeFilters.find(f => f.fieldKey === field.key);
+                        if (existing) {
+                          if (values.length === 0) {
+                            setActiveFilters(activeFilters.filter(f => f.fieldKey !== field.key));
+                          } else {
+                            setActiveFilters(activeFilters.map(f => f.fieldKey === field.key ? { ...f, values } : f));
+                          }
+                        } else if (values.length > 0) {
+                          setActiveFilters([...activeFilters, { fieldKey: field.key, values }]);
+                        }
+                      }}
+                    />
+                  );
+                })}
+                {activeFilters.filter(f => f.values.length > 0).length > 0 && (
+                  <button
+                    onClick={() => setActiveFilters([])}
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-white/40 hover:text-white transition-colors"
+                  >
+                    <X className="w-3 h-3" />
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Save as List (when filters active) */}
           {hasActiveFilters && (
@@ -579,7 +728,7 @@ export default function NetworkPage({ organizationId }: NetworkPageProps) {
             if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
             if (filters.tags?.length) newFilters.push({ fieldKey: 'tags', values: filters.tags });
             setActiveFilters(newFilters);
-            setActiveTab('contacts');
+            onTabChange?.('contacts');
           }}
         />
       )}
