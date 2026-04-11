@@ -33,7 +33,7 @@ type ViewState =
   | { view: 'audit-log'; filters: AuditFilters | null }
   | { view: 'sequence-editor' }
   | { view: 'email-editor'; email: ScheduledEmail; returnTo: 'table' | 'sequence-editor' }
-  | { view: 'email-editor'; email: null; returnTo: 'table' | 'sequence-editor' };
+  | { view: 'email-editor'; email: null; returnTo: 'table' | 'sequence-editor'; sequenceContext?: { categoryId: number | null } };
 
 export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailAutomationTabProps) {
   const [emails, setEmails] = useState<ScheduledEmail[]>([]);
@@ -529,7 +529,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         onResume={handleResume}
         onSendNow={isEventLive ? handleSendNow : undefined}
         onDelete={handleDelete}
-        onCreateEmail={() => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor' })}
+        onCreateEmail={(categoryId) => setViewState({ view: 'email-editor', email: null, returnTo: 'sequence-editor', sequenceContext: { categoryId } })}
       />
     );
   }
@@ -549,6 +549,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         mode={isCreateMode ? 'create' : 'edit'}
         categories={categories}
         isAdmin={isAdmin}
+        sequenceContext={isCreateMode ? viewState.sequenceContext : undefined}
       />
     );
   }

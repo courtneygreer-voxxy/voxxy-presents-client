@@ -8,6 +8,7 @@ import { Switch } from '@/components/ui/switch';
 import { useAuth } from '@/contexts/AuthContext';
 import { bulletinsApi } from '@/services/api';
 import { toast } from 'sonner';
+import { logger } from '@/utils/logger';
 import type { Bulletin, CreateBulletinRequest, EmailAudienceCriteria, RecipientPreview } from '@/types/bulletin';
 
 interface CreateBulletinModalProps {
@@ -34,9 +35,7 @@ export function CreateBulletinModal({
   const [error, setError] = useState<string | null>(null);
 
   // Audience selection state
-  const [audienceType, setAudienceType] = useState<'approved' | 'all' | 'custom'>('approved');
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(['approved', 'confirmed']);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [audienceType, setAudienceType] = useState<'approved' | 'all'>('approved');
   const [recipientPreview, setRecipientPreview] = useState<RecipientPreview | null>(null);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [loadingPreview, setLoadingPreview] = useState(false);
@@ -45,29 +44,15 @@ export function CreateBulletinModal({
   const buildAudienceCriteria = (): EmailAudienceCriteria => {
     if (audienceType === 'all') {
       return { include_all: true };
-    } else if (audienceType === 'custom') {
-      return {
-        statuses: selectedStatuses.length > 0 ? selectedStatuses : undefined,
-        vendor_categories: selectedCategories.length > 0 ? selectedCategories : undefined
-      };
     } else {
-      // 'approved' - default behavior
+      // 'approved' - default behavior (approved + confirmed vendors)
       return { statuses: ['approved', 'confirmed'] };
     }
   };
 
   // Fetch recipient preview whenever audience selection changes
   useEffect(() => {
-    console.log('🔍 [Bulletin Preview] useEffect triggered', {
-      sendEmail,
-      eventSlug,
-      audienceType,
-      selectedStatuses,
-      selectedCategories
-    });
-
     if (!sendEmail || !eventSlug) {
-      console.log('❌ [Bulletin Preview] Skipping fetch:', { sendEmail, eventSlug });
       return;
     }
 
@@ -75,19 +60,17 @@ export function CreateBulletinModal({
       try {
         setLoadingPreview(true);
         const criteria = buildAudienceCriteria();
-        console.log('📤 [Bulletin Preview] Fetching with criteria:', criteria);
         const preview = await bulletinsApi.previewRecipients(eventSlug, criteria);
-        console.log('📥 [Bulletin Preview] Received preview:', preview);
         setRecipientPreview(preview);
       } catch (err) {
-        console.error('❌ [Bulletin Preview] Failed to fetch:', err);
+        logger.error('Failed to fetch bulletin recipient preview', { eventSlug, error: err });
       } finally {
         setLoadingPreview(false);
       }
     };
 
     fetchPreview();
-  }, [sendEmail, audienceType, selectedStatuses, selectedCategories, eventSlug]);
+  }, [sendEmail, audienceType, eventSlug]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -127,7 +110,7 @@ export function CreateBulletinModal({
         toast.success('Bulletin posted successfully');
       }
     } catch (err) {
-      console.error('Failed to create bulletin:', err);
+      logger.error('Failed to create bulletin', { eventSlug, error: err });
       setError(err instanceof Error ? err.message : 'Failed to create bulletin');
     } finally {
       setIsSubmitting(false);
@@ -141,21 +124,12 @@ export function CreateBulletinModal({
     setPinned(false);
     setSendEmail(false);
     setAudienceType('approved');
-    setSelectedStatuses(['approved', 'confirmed']);
-    setSelectedCategories([]);
     setRecipientPreview(null);
     setError(null);
     setShowConfirmModal(false);
     onClose();
   };
 
-  const toggleStatus = (status: string) => {
-    if (selectedStatuses.includes(status)) {
-      setSelectedStatuses(selectedStatuses.filter(s => s !== status));
-    } else {
-      setSelectedStatuses([...selectedStatuses, status]);
-    }
-  };
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -283,51 +257,7 @@ export function CreateBulletinModal({
                   >
                     All Vendors
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => setAudienceType('custom')}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      audienceType === 'custom'
-                        ? 'bg-purple-600 text-white border-2 border-purple-400'
-                        : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
-                    }`}
-                  >
-                    Custom
-                  </button>
                 </div>
-
-                {/* Custom Audience Options */}
-                {audienceType === 'custom' && (
-                  <div className="space-y-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                    {/* Status Checkboxes */}
-                    <div>
-                      <label className="text-xs text-white/60 mb-2 block">Vendor Status</label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {['pending', 'approved', 'confirmed', 'rejected', 'waitlist'].map(status => (
-                          <label key={status} className="flex items-center gap-2 text-sm text-white/80 hover:text-white cursor-pointer">
-                            <input
-                              type="checkbox"
-                              checked={selectedStatuses.includes(status)}
-                              onChange={() => toggleStatus(status)}
-                              className="rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
-                            />
-                            <span className="capitalize">{status}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Category Selector */}
-                    <div>
-                      <label className="text-xs text-white/60 mb-2 block">Categories (leave empty for all)</label>
-                      <Input
-                        placeholder="Enter category names (comma-separated)"
-                        value={selectedCategories.join(', ')}
-                        onChange={(e) => setSelectedCategories(e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
-                      />
-                    </div>
-                  </div>
-                )}
 
                 {/* Recipient Preview */}
                 {loadingPreview ? (

@@ -480,13 +480,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const canDelete = template && !template.is_default && (template.organization_id !== null || isAdmin);
 
   // Helper to check if email is a reminder (value-based trigger)
+  // These are time-based reminders (not event-triggered) that can be edited/deleted
   const isCustomReminder = (triggerType: string) => {
     const customReminderTriggers = [
       'days_before_deadline',
       'days_after_deadline',
       'days_before_payment_deadline',
+      'on_payment_deadline',  // Time-based, not event-triggered
       'days_after_payment_deadline',
       'days_before_event',
+      'on_event_date',  // Time-based, not event-triggered
       'days_after_event'
     ];
     return customReminderTriggers.includes(triggerType);

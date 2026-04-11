@@ -105,12 +105,15 @@ export function EmailTemplateEditorPage({
   const [isSaving, setIsSaving] = useState(false);
 
   // Value-based triggers that users can create (multiple allowed with different values)
+  // These are time-based reminders (not event-triggered) that can be edited/deleted
   const VALUE_BASED_TRIGGER_TYPES = [
     'days_before_deadline',
     'days_after_deadline',
     'days_before_event',
+    'on_event_date',  // Time-based, not event-triggered
     'days_after_event',
     'days_before_payment_deadline',
+    'on_payment_deadline',  // Time-based, not event-triggered
     'days_after_payment_deadline',
   ];
 

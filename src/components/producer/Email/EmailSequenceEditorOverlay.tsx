@@ -17,7 +17,7 @@ interface EmailSequenceEditorOverlayProps {
   onResume: (emailId: number) => Promise<void>;
   onSendNow?: (emailId: number) => Promise<void>;
   onDelete: (emailId: number) => Promise<void>;
-  onCreateEmail: () => void;
+  onCreateEmail: (categoryId: number | null) => void;
 }
 
 // Category display order and labels
@@ -102,13 +102,16 @@ function getStatusBadge(status: string) {
 }
 
 // Check if email is a custom countdown (value-based trigger)
+// These are time-based reminders that can be edited/deleted (not core system emails)
 function isCustomCountdown(triggerType: string): boolean {
   const customReminderTriggers = [
     'days_before_deadline',
     'days_after_deadline',
     'days_before_payment_deadline',
+    'on_payment_deadline',  // Time-based, not event-triggered
     'days_after_payment_deadline',
     'days_before_event',
+    'on_event_date',  // Time-based, not event-triggered
     'days_after_event'
   ];
   return customReminderTriggers.includes(triggerType);
@@ -321,7 +324,7 @@ export default function EmailSequenceEditorOverlay({
               {/* <Button
                 variant="outline"
                 size="sm"
-                onClick={onCreateEmail}
+                onClick={() => onCreateEmail(selectedEmail?.category_id || null)}
                 className="gap-2"
               >
                 <Plus className="w-4 h-4" />
@@ -342,7 +345,7 @@ export default function EmailSequenceEditorOverlay({
                 <p className="text-white/60 mb-4">No emails in sequence</p>
                 {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                 {/* <button
-                  onClick={onCreateEmail}
+                  onClick={() => onCreateEmail(null)}
                   className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
@@ -361,7 +364,7 @@ export default function EmailSequenceEditorOverlay({
                   </h3>
                   {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                   {/* <button
-                    onClick={onCreateEmail}
+                    onClick={() => onCreateEmail(selectedEmail?.category_id || null)}
                     className="p-1 rounded text-purple-400 hover:bg-purple-500/20 transition-all"
                     title="Add reminder email"
                   >

@@ -75,6 +75,7 @@ interface EmailEditorPageProps {
   mode?: 'edit' | 'create';
   categories?: Category[];
   isAdmin?: boolean;
+  sequenceContext?: { categoryId: number | null };
 }
 
 const editEmailSchema = z.object({
@@ -119,12 +120,15 @@ const BLAST_TRIGGER_TYPES = new Set([
 ]);
 
 // Value-based triggers: custom countdown emails that users CAN create (vs system emails they cannot)
+// These are time-based reminders (not event-triggered) that can be edited/deleted
 const VALUE_BASED_TRIGGERS = [
   'days_before_event',
+  'on_event_date',  // Time-based, not event-triggered
   'days_after_event',
   'days_before_deadline',
   'days_after_deadline',
   'days_before_payment_deadline',
+  'on_payment_deadline',  // Time-based, not event-triggered
   'days_after_payment_deadline',
 ];
 
@@ -139,10 +143,13 @@ export function EmailEditorPage({
   mode: initialMode = 'edit',
   categories = [],
   isAdmin,
+  sequenceContext,
 }: EmailEditorPageProps) {
   const [email, setEmail] = useState<ScheduledEmail | null>(initialEmail);
   const [mode, setMode] = useState<'edit' | 'create'>(initialMode);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(initialEmail?.category_id || null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    initialEmail?.category_id ?? sequenceContext?.categoryId ?? null
+  );
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -257,7 +264,8 @@ export function EmailEditorPage({
         trigger_type: 'days_before_event',
         trigger_value: 1,
       });
-      setSelectedCategoryId(null);
+      // Initialize category from sequence context (if creating from a sequence)
+      setSelectedCategoryId(sequenceContext?.categoryId ?? null);
       setEmailFooter(STANDARD_EMAIL_FOOTER);
       return;
     }
@@ -408,6 +416,37 @@ export function EmailEditorPage({
     }
   };
 
+  // Build filter_criteria based on category and trigger type (matches ScheduledEmailGenerator pattern)
+  const buildFilterCriteria = (
+    triggerType: string,
+    categoryId: number | null,
+    categories: Category[]
+  ): Record<string, any> => {
+    const filter_criteria: Record<string, any> = {};
+
+    // Add category filter if category-specific (matches template email pattern)
+    if (categoryId) {
+      const category = categories.find(c => c.id === categoryId);
+      if (category) {
+        filter_criteria["vendor_categories"] = [category.name];
+      }
+    }
+
+    // Add trigger-specific filters (targets specific vendor statuses)
+    // Payment triggers: target approved vendors with pending/overdue payments
+    if (triggerType.includes('payment')) {
+      filter_criteria["statuses"] = ["approved"];
+      filter_criteria["payment_status"] = ["pending", "overdue"];
+    }
+    // Event countdown triggers: target approved/confirmed vendors
+    else if (['days_before_event', 'on_event_date', 'days_after_event'].includes(triggerType)) {
+      filter_criteria["statuses"] = ["approved", "confirmed"];
+    }
+    // Application/approval triggers: no additional status filters (all registrations in category)
+
+    return filter_criteria;
+  };
+
   const onSubmit = async (data: EditEmailFormData) => {
     // Double-check validation before saving (extra safety)
     const plainSubject = data.subject_template || '';
@@ -445,6 +484,9 @@ export function EmailEditorPage({
       // Determine category_id: null if blast trigger type, otherwise use selection
       const effectiveCategoryId = BLAST_TRIGGER_TYPES.has(data.trigger_type) ? null : selectedCategoryId;
 
+      // Build filter_criteria based on category and trigger type (ensures correct recipient count)
+      const filter_criteria = buildFilterCriteria(data.trigger_type, effectiveCategoryId, categories);
+
       if (mode === 'create' && onCreate) {
         // CREATE mode: call onCreate, then transition to edit mode
         const createData: CreateScheduledEmailRequest = {
@@ -456,6 +498,7 @@ export function EmailEditorPage({
           trigger_time,
           category_id: effectiveCategoryId,
           status: 'scheduled',
+          filter_criteria,
         };
 
         const newEmail = await onCreate(createData);
@@ -480,6 +523,7 @@ export function EmailEditorPage({
           trigger_value: data.trigger_value,
           trigger_time,
           category_id: effectiveCategoryId,
+          filter_criteria,
         };
 
         await onSave(email.id, updateData);
