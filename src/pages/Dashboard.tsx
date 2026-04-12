@@ -610,6 +610,10 @@ export default function ProducerDashboard() {
     try {
       const updatedEvent = await eventsApi.getById(selectedEvent.slug);
       setSelectedEvent(updatedEvent);
+      // Update the events array cache to prevent stale data when navigating back
+      setEvents(prevEvents =>
+        prevEvents.map(e => e.slug === updatedEvent.slug ? updatedEvent : e)
+      );
     } catch (err) {
       console.error('Failed to refetch event:', err);
       // Fallback: refresh entire events list
