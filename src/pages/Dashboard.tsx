@@ -291,20 +291,27 @@ export default function ProducerDashboard() {
     }
   }, [userProfile]);
 
-  // Auto-trigger guidebook on first visit
+  // Auto-trigger guidebook on first visit OR for new users with no events
   useEffect(() => {
     if (!loadingOrg && !loadingEvents && organization) {
       try {
-        if (localStorage.getItem('voxxy_guidebook_seen') !== 'true') {
+        const hasSeenGuide = localStorage.getItem('voxxy_guidebook_seen') === 'true';
+        const isNewUser = events.length === 0;
+
+        // Show guide if:
+        // 1. Never seen before, OR
+        // 2. New user with no events (just finished payment)
+        if (!hasSeenGuide || isNewUser) {
           const timer = setTimeout(() => {
             setGuidebookOpen(true);
             localStorage.setItem('voxxy_guidebook_seen', 'true');
+            console.log('🎯 Opening guidebook for user (newUser:', isNewUser, ', seenBefore:', hasSeenGuide, ')');
           }, 500);
           return () => clearTimeout(timer);
         }
       } catch { /* localStorage not available */ }
     }
-  }, [loadingOrg, loadingEvents, organization]);
+  }, [loadingOrg, loadingEvents, organization, events.length]);
 
   // Load admin data when admin tab is active
   useEffect(() => {
