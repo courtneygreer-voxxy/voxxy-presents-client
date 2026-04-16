@@ -8,6 +8,7 @@ import { toast } from 'sonner';
 import { CreateCategoryTemplateDialog } from './CreateCategoryTemplateDialog';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 import { logger } from '@/utils/logger';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface TemplateLibraryPageProps {
   onNavigateToBuilder?: (templateId?: number) => void;
@@ -335,10 +336,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                         <div className="flex items-center gap-2">
                           <span
                             className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-sm font-semibold text-foreground"
-                            style={{
-                              backgroundColor: category.color || '#8B5CF6',
-                              textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                            }}
+                            style={getCategoryBadgeStyle(category.color)}
                           >
                             {category.icon && <span>{category.icon}</span>}
                             {category.name}

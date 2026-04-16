@@ -1,4 +1,5 @@
 import { Category } from '@/types/category';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CategoryBadgeProps {
   category: Category | null;
@@ -54,9 +55,8 @@ export function CategoryBadge({
         ${className}
       `}
       style={{
-        backgroundColor: variant === 'default' ? badgeColor : 'transparent',
+        ...(variant === 'default' ? getCategoryBadgeStyle(badgeColor) : { color: badgeColor }),
         borderColor: variant === 'outline' ? badgeColor : undefined,
-        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)',
       }}
       onClick={onClick}
     >

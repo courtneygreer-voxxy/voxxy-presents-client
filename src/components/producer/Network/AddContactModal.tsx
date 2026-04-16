@@ -4,6 +4,7 @@ import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api'
 import type { Category } from '@/types/category';
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
 import SuccessMessage from '@/components/ui/SuccessMessage';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface AddContactModalProps {
   organizationId: number;
@@ -351,10 +352,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                           className={`inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
                             formData.categories.includes(category.name) ? 'text-foreground font-semibold' : 'text-foreground/70 bg-background/5 font-medium'
                           }`}
-                          style={formData.categories.includes(category.name) ? {
-                            backgroundColor: category.color || '#8B5CF6',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                          } : undefined}
+                          style={formData.categories.includes(category.name) ? getCategoryBadgeStyle(category.color) : undefined}
                         >
                           {category.icon && <span>{category.icon}</span>}
                           {category.name}
@@ -378,10 +376,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                     <span
                       key={cat}
                       className="px-2 py-0.5 rounded text-xs flex items-center gap-1.5 text-foreground font-semibold"
-                      style={{
-                        backgroundColor: categoryColor,
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                      }}
+                      style={getCategoryBadgeStyle(categoryColor)}
                     >
                       {category?.icon && <span className="text-[10px]">{category.icon}</span>}
                       {cat}

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import type { Category } from '@/types/category';
 import type { EmailCampaignTemplate } from '@/types/email';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CreateCategoryTemplateDialogProps {
   isOpen: boolean;
@@ -91,10 +92,7 @@ export function CreateCategoryTemplateDialog({
             Create Template for{' '}
             <span
               className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold text-foreground"
-              style={{
-                backgroundColor: category.color || '#8B5CF6',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-              }}
+              style={getCategoryBadgeStyle(category.color)}
             >
               {category.icon && <span>{category.icon}</span>}
               {category.name}
@@ -182,10 +180,7 @@ export function CreateCategoryTemplateDialog({
               The template will be cloned and automatically named "
               <span
                 className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold text-foreground"
-                style={{
-                  backgroundColor: category.color || '#8B5CF6',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                }}
+                style={getCategoryBadgeStyle(category.color)}
               >
                 {category.icon && <span className="text-[10px]">{category.icon}</span>}
                 {category.name}

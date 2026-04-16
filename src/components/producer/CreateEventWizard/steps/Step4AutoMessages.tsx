@@ -5,6 +5,7 @@ import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
 import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 import { DebugPanel } from '../../DebugPanel';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface Step4AutoMessagesProps {
   selectedTemplateId?: number | null;
@@ -519,10 +520,7 @@ export default function Step4AutoMessages({
                             />
                             <span
                               className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold text-foreground"
-                              style={{
-                                backgroundColor: category.color || '#8B5CF6',
-                                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                              }}
+                              style={getCategoryBadgeStyle(category.color)}
                             >
                               {category.icon && <span>{category.icon}</span>}
                               {category.name}
