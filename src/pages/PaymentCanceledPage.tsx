@@ -94,7 +94,7 @@ export default function PaymentCanceledPage() {
                 <Button
                   onClick={handleGoBack}
                   variant="outline"
-                  className="w-full bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15"
+                  className="w-full bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border"
                   size="lg"
                 >
                   <ArrowLeft className="mr-2 h-5 w-5" />

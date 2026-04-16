@@ -197,7 +197,7 @@ export default function EmailRow({
         )}
         <div className="flex-1 min-w-0">
           <div
-            className={`font-medium truncate ${email.overdue ? 'text-red-400' : 'text-foreground'} ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+            className={`truncate font-medium ${email.overdue ? 'text-red-600 dark:text-red-400' : 'text-foreground'} ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
             onClick={(e) => {
               if (onEdit) {
                 e.stopPropagation();
@@ -212,7 +212,7 @@ export default function EmailRow({
 
       {/* Subject */}
       <div
-        className={`text-foreground/70 truncate ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+        className={`truncate text-foreground/75 ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
         title={backendToFrontend(email.subject_template || '')}
         onClick={(e) => {
           if (onEdit) {
@@ -225,20 +225,20 @@ export default function EmailRow({
       </div>
 
       {/* Scheduled Date/Time or Trigger */}
-      <div className="text-foreground/60">
+      <div className="text-muted-foreground">
         {isSystemEmail ? (
           // Show trigger type for system/trigger emails (event-based)
-          <span className="text-foreground/50 text-[11px]">
+          <span className="text-[11px] text-muted-foreground">
             {TRIGGER_TYPES.find(t => t.value === email.trigger_type)?.label || 'Event-triggered'}
           </span>
         ) : scheduledDate ? (
           // Show date/time for scheduled emails (time-based)
           <div className="flex flex-col">
             <span className="text-[11px]">{format(scheduledDate, 'MMM d, yyyy')}</span>
-            <span className="text-[10px] text-foreground/40">{format(scheduledDate, 'h:mm a')}</span>
+            <span className="text-[10px] text-foreground/55 dark:text-foreground/40">{format(scheduledDate, 'h:mm a')}</span>
           </div>
         ) : (
-          <span className="text-foreground/40 text-[11px]">Event-triggered</span>
+          <span className="text-[11px] text-foreground/55 dark:text-foreground/40">Event-triggered</span>
         )}
       </div>
 
@@ -251,7 +251,7 @@ export default function EmailRow({
       </div>
 
       {/* Vendor Category */}
-      <div className="text-foreground/60 text-[11px] truncate">
+      <div className="truncate text-[11px] text-muted-foreground">
         {email.category?.name || (audienceCategory === 'application_updates' ? 'All Invitations' : 'All Vendors')}
       </div>
 
@@ -265,7 +265,7 @@ export default function EmailRow({
               onViewAuditLog({ email_name: email.name });
             }
           }}
-          className="flex items-center gap-1 text-foreground/60 hover:text-foreground hover:bg-background/10 px-2 py-1 rounded transition-colors cursor-pointer"
+          className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-muted-foreground transition-colors hover:bg-background/10 hover:text-foreground"
           title="Click to view audit log for this email"
         >
           <Users className="w-3 h-3" />
@@ -274,7 +274,7 @@ export default function EmailRow({
       </div>
 
       {/* Undelivered Count */}
-      <div className="text-center text-foreground/60">
+      <div className="text-center text-muted-foreground">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -283,7 +283,7 @@ export default function EmailRow({
             }
           }}
           disabled={email.status !== 'sent' || !onViewAuditLog || undeliveredCount === 0}
-          className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${email.status === 'sent' && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-background/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
+          className={`${undeliveredCount > 0 ? 'font-medium text-red-600 dark:text-red-400' : ''} ${email.status === 'sent' && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer rounded px-2 py-1 transition-colors hover:bg-background/10 hover:text-red-700 dark:hover:text-red-300' : ''}`}
           title={email.status === 'sent' && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
         >
           {undeliveredCount}

@@ -577,7 +577,7 @@ export default function Step4AutoMessages({
 
       {/* Sequence Email List Modal */}
       {isSequenceListModalOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="voxxy-gradient-panel border border-border rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
             <div className="p-4 border-b border-border">

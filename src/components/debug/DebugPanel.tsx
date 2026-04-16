@@ -172,10 +172,10 @@ export function DebugPanel() {
 
   return (
     <div className="fixed bottom-4 right-4 z-[9999] max-w-sm max-h-[calc(100vh-2rem)] flex flex-col">
-      <Card className="border-2 border-red-500/50 bg-slate-900/95 backdrop-blur-sm shadow-2xl flex flex-col max-h-full">
+      <Card className="voxxy-modal-surface flex max-h-full flex-col border-2 border-red-500/50">
         <CardHeader className="pb-2 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-sm font-bold text-red-400 flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-sm font-bold text-red-700 dark:text-red-400">
               <Shield className="h-4 w-4" />
               DEBUG PANEL
             </CardTitle>
@@ -184,7 +184,7 @@ export function DebugPanel() {
                 onClick={() => setIsExpanded(!isExpanded)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0 text-muted-foreground border-border hover:bg-slate-800"
+                className="h-6 w-6 border-border p-0 text-muted-foreground hover:bg-background/10"
               >
                 {isExpanded ? '−' : '+'}
               </Button>
@@ -192,7 +192,7 @@ export function DebugPanel() {
                 onClick={() => setIsVisible(false)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0 text-muted-foreground border-border hover:bg-slate-800"
+                className="h-6 w-6 border-border p-0 text-muted-foreground hover:bg-background/10"
               >
                 <EyeOff className="h-3 w-3" />
               </Button>
@@ -216,8 +216,8 @@ export function DebugPanel() {
 
           {/* Current Role & Role Switcher */}
           {userProfile && (
-            <div className="space-y-2 border-2 border-yellow-500/50 rounded p-2 bg-yellow-900/20">
-              <div className="font-semibold text-yellow-300 flex items-center gap-2">
+            <div className="space-y-2 rounded border-2 border-yellow-500/50 bg-yellow-500/10 p-2">
+              <div className="flex items-center gap-2 font-semibold text-amber-800 dark:text-yellow-300">
                 <UserCog className="h-4 w-4" />
                 🎭 CURRENT ROLE
               </div>
@@ -228,7 +228,7 @@ export function DebugPanel() {
               </div>
 
               <div className="pt-2 space-y-2">
-                <div className="font-semibold text-yellow-300 text-center">Switch Role (Testing)</div>
+                <div className="text-center font-semibold text-amber-800 dark:text-yellow-300">Switch Role (Testing)</div>
                 <div className="grid grid-cols-2 gap-1">
                   <Button
                     onClick={() => handleRoleSwitch('venue_owner')}
@@ -360,7 +360,7 @@ export function DebugPanel() {
               <div><strong className="text-gray-100">Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
               <div><strong className="text-gray-100">⚠️ Current User:</strong> {currentUser?.email || 'N/A'}</div>
               {localStorage.getItem('voxxy_admin_session') === 'true' && currentUser?.email !== 'team@voxxypresents.com' && (
-                <div className="text-red-400 font-bold">🔥 SPLIT BRAIN: Admin localStorage but different user!</div>
+                <div className="font-bold text-red-700 dark:text-red-400">🔥 SPLIT BRAIN: Admin localStorage but different user!</div>
               )}
             </div>
           </div>
@@ -392,7 +392,7 @@ export function DebugPanel() {
                 onClick={() => window.location.reload()}
                 size="sm"
                 variant="outline"
-                className="flex-1 h-8 text-xs text-gray-200 border-border hover:bg-slate-800"
+                className="h-8 flex-1 border-border text-xs text-foreground hover:bg-background/10"
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Reload
@@ -410,7 +410,7 @@ export function DebugPanel() {
                 }}
                 size="sm"
                 variant="outline"
-                className="w-full h-8 text-xs border-red-500/50 text-red-400 hover:bg-red-900/30"
+                className="h-8 w-full border-red-500/50 text-xs text-red-700 hover:bg-red-500/10 dark:text-red-400 dark:hover:bg-red-900/30"
               >
                 Clear Admin Session
               </Button>

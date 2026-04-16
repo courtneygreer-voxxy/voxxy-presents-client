@@ -11,12 +11,23 @@ import {
 export type Theme = 'light' | 'dark'
 
 const STORAGE_KEY = 'voxxy-theme'
+const DASHBOARD_STORAGE_KEY = 'voxxy-dashboard-theme'
+const DEFAULT_THEME: Theme = 'dark'
+let externalSetTheme: ((theme: Theme) => void) | null = null
+
+function isTheme(value: string | null): value is Theme {
+  return value === 'light' || value === 'dark'
+}
 
 function readStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark'
-  const raw = window.localStorage.getItem(STORAGE_KEY)
-  if (raw === 'light' || raw === 'dark') return raw
-  return 'dark'
+  if (typeof window === 'undefined') return DEFAULT_THEME
+  const activeTheme = window.localStorage.getItem(STORAGE_KEY)
+  if (isTheme(activeTheme)) return activeTheme
+
+  const dashboardTheme = window.localStorage.getItem(DASHBOARD_STORAGE_KEY)
+  if (isTheme(dashboardTheme)) return dashboardTheme
+
+  return DEFAULT_THEME
 }
 
 function applyThemeToDocument(theme: Theme) {
@@ -26,6 +37,52 @@ function applyThemeToDocument(theme: Theme) {
   } else {
     root.classList.remove('dark')
   }
+}
+
+function persistActiveTheme(theme: Theme) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(STORAGE_KEY, theme)
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+function persistDashboardTheme(theme: Theme) {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.setItem(DASHBOARD_STORAGE_KEY, theme)
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
+function applyTheme(theme: Theme) {
+  if (externalSetTheme) {
+    externalSetTheme(theme)
+    return
+  }
+
+  persistActiveTheme(theme)
+  if (typeof document !== 'undefined') {
+    applyThemeToDocument(theme)
+  }
+}
+
+export function resetThemePreference() {
+  if (typeof window === 'undefined') return
+  try {
+    window.localStorage.removeItem(STORAGE_KEY)
+  } catch {
+    // ignore quota / private mode
+  }
+  applyTheme(DEFAULT_THEME)
+}
+
+export function restoreDashboardThemePreference() {
+  if (typeof window === 'undefined') return
+  const storedTheme = window.localStorage.getItem(DASHBOARD_STORAGE_KEY)
+  applyTheme(isTheme(storedTheme) ? storedTheme : DEFAULT_THEME)
 }
 
 type ThemeContextValue = {
@@ -39,15 +96,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readStoredTheme)
 
   useLayoutEffect(() => {
-    applyThemeToDocument(theme)
-    try {
-      window.localStorage.setItem(STORAGE_KEY, theme)
-    } catch {
-      // ignore quota / private mode
+    externalSetTheme = setThemeState
+    return () => {
+      externalSetTheme = null
     }
+  }, [])
+
+  useLayoutEffect(() => {
+    applyThemeToDocument(theme)
+    persistActiveTheme(theme)
   }, [theme])
 
   const setTheme = useCallback((next: Theme) => {
+    persistDashboardTheme(next)
     setThemeState(next)
   }, [])
 

@@ -433,7 +433,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-purple-100"
+                      className="hover:text-violet-800 dark:hover:text-purple-100"
                     >
                       <X className="w-3 h-3" />
                     </button>

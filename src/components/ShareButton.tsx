@@ -86,7 +86,7 @@ export function ShareButton({
           Share
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-64 p-3 bg-background/15 backdrop-blur-md border-border text-foreground shadow-2xl shadow-black/50" align="end">
+      <PopoverContent className="voxxy-auth-card w-64 p-3 text-foreground" align="end">
         <div className="space-y-2">
           <h4 className="font-medium text-sm text-foreground">Share this page</h4>
           

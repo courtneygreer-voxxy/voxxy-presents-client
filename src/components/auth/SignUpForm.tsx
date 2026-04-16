@@ -136,7 +136,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-background/15 backdrop-blur-md border-border text-foreground shadow-2xl shadow-black/50">
+    <Card className="voxxy-auth-card mx-auto w-full max-w-md text-foreground">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
         <CardDescription className="text-center">
@@ -168,7 +168,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 id="displayName"
                 type="text"
                 placeholder="Enter your display name"
-                className="pl-10"
+                className="voxxy-input-frost pl-10"
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
                 onBlur={() => {
@@ -193,7 +193,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="pl-10"
+                className="voxxy-input-frost pl-10"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 onBlur={() => {
@@ -219,7 +219,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Create a password"
-                className="pl-10 pr-10"
+                className="voxxy-input-frost pl-10 pr-10"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 onBlur={() => {
@@ -257,7 +257,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your password"
-                className="pl-10 pr-10"
+                className="voxxy-input-frost pl-10 pr-10"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                 onBlur={() => {
@@ -295,11 +295,11 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
               />
               <Label htmlFor="acceptTerms" className="text-sm leading-5">
                 I agree to the{' '}
-                <a href="/legal/terms" className="text-primary underline hover:no-underline">
+                <a href="/legal/terms" className="voxxy-auth-link underline hover:no-underline">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/legal/privacy" className="text-primary underline hover:no-underline">
+                <a href="/legal/privacy" className="voxxy-auth-link underline hover:no-underline">
                   Privacy Policy
                 </a>
               </Label>
@@ -334,7 +334,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
             Already have an account?{' '}
             <button
               type="button"
-              className="text-primary underline hover:no-underline font-medium"
+              className="voxxy-auth-link font-medium underline hover:no-underline"
               onClick={onSwitchToLogin}
               disabled={isSubmitting || loading}
             >

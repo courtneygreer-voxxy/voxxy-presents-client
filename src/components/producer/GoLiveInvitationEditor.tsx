@@ -63,16 +63,16 @@ function ListDropdown({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 pl-3 pr-2.5 py-2 border rounded-lg text-sm transition-colors whitespace-nowrap ${
           selectedListIds.length > 0
-            ? 'bg-purple-500/15 border-purple-500/40 text-purple-200'
+            ? 'border-purple-500/40 bg-purple-500/15 text-violet-800 dark:text-purple-200'
             : 'bg-background/5 border-border text-foreground hover:bg-background/10'
         }`}
       >
-        <Filter className="w-3.5 h-3.5 text-foreground/40" />
+        <Filter className="h-3.5 w-3.5 text-muted-foreground" />
         {selectedListIds.length === 0
           ? 'Select Lists'
           : `${selectedListIds.length} list${selectedListIds.length > 1 ? 's' : ''}`}
         <ChevronDown
-          className={`w-3.5 h-3.5 text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-3.5 w-3.5 text-muted-foreground transition-transform ${open ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -83,7 +83,7 @@ function ListDropdown({
               <div className="w-5 h-5 border-2 border-border border-t-primary rounded-full animate-spin mx-auto" />
             </div>
           ) : lists.length === 0 ? (
-            <p className="px-3 py-4 text-xs text-foreground/40 text-center">
+            <p className="px-3 py-4 text-center text-xs text-muted-foreground">
               No saved lists yet. Create lists in the Network tab.
             </p>
           ) : (
@@ -109,7 +109,7 @@ function ListDropdown({
                     </div>
                     <div className="flex-1 text-left min-w-0">
                       <span className="truncate block">{list.name}</span>
-                      <span className="text-xs text-foreground/40">
+                      <span className="text-xs text-muted-foreground">
                         {list.contacts_count} contact{list.contacts_count !== 1 ? 's' : ''}
                       </span>
                     </div>
@@ -124,7 +124,7 @@ function ListDropdown({
                       onListsChange([]);
                       setOpen(false);
                     }}
-                    className="w-full px-2 py-1.5 text-xs text-foreground/50 hover:text-foreground hover:bg-background/10 rounded transition-colors"
+                    className="w-full rounded px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-background/10 hover:text-foreground"
                   >
                     Clear Lists
                   </button>
@@ -467,13 +467,13 @@ export default function GoLiveInvitationEditor({
         />
 
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search contacts..."
-            className="w-full pl-9 pr-4 py-2 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-500 transition-all"
+            className="voxxy-input-frost w-full rounded-lg py-2 pl-9 pr-4 text-sm transition-all"
           />
         </div>
 
@@ -491,29 +491,29 @@ export default function GoLiveInvitationEditor({
       <div className="px-5 py-2 border-b border-border flex items-center justify-between flex-shrink-0 text-xs">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Users className="w-3.5 h-3.5 text-purple-400" />
+            <Users className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
             <span className="text-foreground">
               <span className="font-medium">{invitedContactIds.length}</span>
-              <span className="text-foreground/50"> selected out of </span>
+              <span className="text-muted-foreground"> selected out of </span>
               <span className="font-medium">{contacts.length}</span>
             </span>
           </div>
 
           {selectedListIds.length > 0 && (
-            <span className="text-foreground/40">
+            <span className="text-muted-foreground">
               Showing {filteredContacts.length} from {selectedListIds.length} list{selectedListIds.length !== 1 ? 's' : ''}
             </span>
           )}
 
           {unsubscribedCount > 0 && (
-            <span className="flex items-center gap-1 text-yellow-400">
+            <span className="flex items-center gap-1 text-amber-700 dark:text-yellow-400">
               <AlertTriangle className="w-3 h-3" />
               {unsubscribedCount} unsubscribed
             </span>
           )}
 
           {loadingListContacts && (
-            <span className="flex items-center gap-1 text-foreground/40">
+            <span className="flex items-center gap-1 text-muted-foreground">
               <div className="w-3 h-3 border border-border border-t-primary rounded-full animate-spin" />
               Loading...
             </span>
@@ -525,7 +525,7 @@ export default function GoLiveInvitationEditor({
             <button
               type="button"
               onClick={handleClearAll}
-              className="text-purple-400 hover:text-purple-300 transition-colors"
+              className="voxxy-auth-link transition-colors"
             >
               Clear all
             </button>
@@ -551,7 +551,7 @@ export default function GoLiveInvitationEditor({
               value={newEmailData.name}
               onChange={(e) => setNewEmailData((prev) => ({ ...prev, name: e.target.value }))}
               placeholder="Contact name..."
-              className="flex-1 px-3 py-1.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="voxxy-input-frost flex-1 rounded-lg px-3 py-1.5 text-sm"
               autoFocus
             />
             <input
@@ -559,7 +559,7 @@ export default function GoLiveInvitationEditor({
               value={newEmailData.email}
               onChange={(e) => setNewEmailData((prev) => ({ ...prev, email: e.target.value }))}
               placeholder="email@example.com"
-              className="flex-1 px-3 py-1.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="voxxy-input-frost flex-1 rounded-lg px-3 py-1.5 text-sm"
               onKeyDown={(e) => e.key === 'Enter' && handleAddNewEmail()}
             />
             <select
@@ -586,7 +586,7 @@ export default function GoLiveInvitationEditor({
                 setShowAddEmailRow(false);
                 setAddEmailError(null);
               }}
-              className="p-1.5 text-foreground/40 hover:text-foreground transition-colors"
+              className="p-1.5 text-muted-foreground transition-colors hover:text-foreground"
             >
               <X className="w-4 h-4" />
             </button>
@@ -599,8 +599,8 @@ export default function GoLiveInvitationEditor({
       <div className="flex-1 overflow-hidden flex flex-col min-h-0">
         <div className="bg-background/5 border-t border-border overflow-hidden flex-1 flex flex-col">
           {/* Table header */}
-          <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border flex-shrink-0">
-            <div className="grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-[10px] font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
+          <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40 flex-shrink-0">
+            <div className="grid grid-cols-[36px,1fr,1fr,1.5fr,80px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
               <div className="flex items-center justify-center">
                 <input
                   type="checkbox"

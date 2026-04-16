@@ -864,7 +864,7 @@ export function EmailEditorPage({
               </label>
               <Input
                 {...register('name')}
-                className="h-9 border-border bg-card/80 text-foreground placeholder:text-foreground/40 dark:bg-background/5 text-sm"
+                className="h-9 border-border bg-card/80 text-sm text-foreground placeholder:text-muted-foreground dark:bg-background/5"
                 placeholder="e.g., Day Before Event Reminder"
               />
             </div>
@@ -888,7 +888,7 @@ export function EmailEditorPage({
                 }}
                 onFocus={() => focusField('subject')}
                 onBlur={() => blurField('subject')}
-                className="h-9 border-border bg-card/80 text-foreground placeholder:text-foreground/40 dark:bg-background/5 text-sm"
+                className="h-9 border-border bg-card/80 text-sm text-foreground placeholder:text-muted-foreground dark:bg-background/5"
                 placeholder="e.g., Reminder: [eventName] is Tomorrow!"
               />
             </div>
@@ -993,7 +993,7 @@ export function EmailEditorPage({
                       }}
                     />
                   ) : (
-                    <p className="text-foreground/40 text-sm italic">
+                    <p className="text-sm italic text-muted-foreground">
                       Email body will appear here as you type...
                     </p>
                   )}
@@ -1047,7 +1047,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Clock className="w-3.5 h-3.5 text-purple-400" />
+                <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
                 <span>Trigger Settings</span>
               </div>
               {triggerSettingsOpen ? (
@@ -1076,14 +1076,14 @@ export function EmailEditorPage({
                         <SelectItem key={type.value} value={type.value} className="text-foreground text-sm">
                           <div>
                             <div className="font-medium text-xs">{type.label}</div>
-                            <div className="text-[10px] text-foreground/50">{type.description}</div>
+                            <div className="text-[10px] text-muted-foreground">{type.description}</div>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {mode === 'edit' && (
-                    <p className="text-[9px] text-foreground/40 mt-1">
+                    <p className="mt-1 text-[9px] text-muted-foreground">
                       Trigger type cannot be changed after creation
                     </p>
                   )}
@@ -1097,7 +1097,7 @@ export function EmailEditorPage({
                   <div className="flex h-8 items-center rounded-lg border border-border bg-muted/60 px-3 py-2 text-sm text-foreground/70 dark:bg-background/10">
                     {EMAIL_TYPE_LABELS[selectedTriggerConfig?.emailType || 'event_announcements'] || 'Event Announcements'}
                   </div>
-                  <p className="text-[9px] text-foreground/40 mt-1">
+                  <p className="mt-1 text-[9px] text-muted-foreground">
                     Auto-set based on trigger selection
                   </p>
                 </div>
@@ -1115,7 +1115,7 @@ export function EmailEditorPage({
                       placeholder="e.g., 1"
                       disabled={mode === 'edit'}
                     />
-                    <p className="text-[10px] text-foreground/50 mt-1.5">
+                    <p className="mt-1.5 text-[10px] text-muted-foreground">
                       {mode === 'edit' ? 'Trigger timing cannot be changed after creation' : 'Sends at 8:00 AM Eastern'}
                     </p>
                   </div>
@@ -1123,7 +1123,7 @@ export function EmailEditorPage({
 
                 {previewDate && (
                   <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
-                    <p className="text-[10px] text-purple-400/80 mb-0.5 uppercase tracking-wide font-semibold">Scheduled for:</p>
+                    <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-purple-400/80">Scheduled for:</p>
                     <p className="text-xs text-foreground font-medium">{previewDate}</p>
                   </div>
                 )}
@@ -1138,7 +1138,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Users className="w-3.5 h-3.5 text-purple-400" />
+                <Users className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
                 <span>Audience</span>
               </div>
               {recipientsOpen ? (
@@ -1188,12 +1188,12 @@ export function EmailEditorPage({
                       <Users className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                       <span className="text-sm text-foreground font-medium">{audienceLabel}</span>
                     </div>
-                    <p className="text-[10px] text-blue-300/70 leading-relaxed">
+                    <p className="text-[10px] leading-relaxed text-blue-800 dark:text-blue-300/70">
                       {audienceDescription}
                     </p>
                   </div>
 
-                  <p className="text-[10px] text-foreground/40 leading-relaxed">
+                  <p className="text-[10px] leading-relaxed text-muted-foreground">
                     The audience is automatically determined by the email's trigger type and cannot be changed.
                   </p>
                 </div>
@@ -1208,7 +1208,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Tag className="w-3.5 h-3.5 text-purple-400" />
+                <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
                 <span>Available tags</span>
               </div>
               {availableTagsOpen ? (
@@ -1228,35 +1228,35 @@ export function EmailEditorPage({
 
               return (
               <div className="space-y-1">
-                <p className="text-[10px] text-foreground/60 mb-2 leading-relaxed">
+                <p className="mb-2 text-[10px] leading-relaxed text-muted-foreground">
                   Click a tag to insert it at your cursor position
                   {email?.email_template_item?.category === 'event_announcements' && (
-                    <span className="block mt-1 text-yellow-400/80">
+                    <span className="mt-1 block text-amber-700 dark:text-yellow-400/80">
                       Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                     </span>
                   )}
                 </p>
                 {/* Tag Search */}
                 <div className="relative mb-2">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/40" />
+                  <Search className="absolute left-2 top-1/2 h-3 w-3 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     placeholder="Search tags..."
                     value={tagSearch}
                     onChange={(e) => setTagSearch(e.target.value)}
-                    className="w-full pl-7 pr-7 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                    className="w-full rounded border border-border bg-background/5 py-1.5 pl-7 pr-7 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50"
                   />
                   {tagSearch && (
                     <button
                       onClick={() => setTagSearch('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   )}
                 </div>
                 {tagSearch && filteredVariables && (
-                  <p className="text-[10px] text-foreground/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
+                  <p className="mb-1 text-[10px] text-muted-foreground">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
                 )}
 
                 {/* Show flat filtered results when searching */}
@@ -1275,7 +1275,7 @@ export function EmailEditorPage({
                           disabled={isDisabled}
                           className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                             isDisabled
-                              ? 'opacity-40 cursor-not-allowed border-border bg-background/5 text-foreground/40'
+                              ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
                               : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
                           }`}
                           title={
@@ -1284,11 +1284,11 @@ export function EmailEditorPage({
                               : variable.description
                           }
                         >
-                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
                           <span className="flex-1 text-left truncate">{variable.label}</span>
                           <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                             isDisabled
-                              ? 'text-foreground/30 bg-background/5'
+                              ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
                               : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
                           }`}>
                             {variable.frontendVar.replace('[', '').replace(']', '')}
@@ -1319,7 +1319,7 @@ export function EmailEditorPage({
                                 disabled={isDisabled}
                                 className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                                   isDisabled
-                                    ? 'opacity-40 cursor-not-allowed border-border bg-background/5 text-foreground/40'
+                                    ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
                                     : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
                                 }`}
                                 title={
@@ -1328,11 +1328,11 @@ export function EmailEditorPage({
                                     : variable.description
                                 }
                               >
-                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
                                 <span className="flex-1 text-left truncate">{variable.label}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                                   isDisabled
-                                    ? 'text-foreground/30 bg-background/5'
+                                    ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
                                     : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
                                 }`}>
                                   {variable.frontendVar.replace('[', '').replace(']', '')}
@@ -1376,7 +1376,7 @@ export function EmailEditorPage({
                 placeholder="you@example.com"
                 value={testEmailAddress}
                 onChange={(e) => setTestEmailAddress(e.target.value)}
-                className="bg-background/5 border-border text-foreground placeholder:text-foreground/40"
+                className="bg-background/5 border-border text-foreground placeholder:text-muted-foreground"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();

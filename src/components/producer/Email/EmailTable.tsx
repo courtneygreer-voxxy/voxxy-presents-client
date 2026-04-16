@@ -23,10 +23,10 @@ interface EmailTableProps {
 }
 
 function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; sortColumn?: SortColumn | null; sortDirection?: SortDirection }) {
-  if (sortColumn !== column) return <ChevronsUpDown className="w-3 h-3 opacity-40" />;
+  if (sortColumn !== column) return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />;
   return sortDirection === 'asc'
-    ? <ChevronUp className="w-3 h-3 text-purple-400" />
-    : <ChevronDown className="w-3 h-3 text-purple-400" />;
+    ? <ChevronUp className="h-3 w-3 text-violet-700 dark:text-purple-400" />
+    : <ChevronDown className="h-3 w-3 text-violet-700 dark:text-purple-400" />;
 }
 
 // Check if email is a custom reminder (value-based trigger)
@@ -96,8 +96,8 @@ export default function EmailTable({
   return (
     <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
       {/* Table Header */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
-        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
+      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
+        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}
@@ -121,18 +121,18 @@ export default function EmailTable({
             >
               <div className="flex items-center gap-2">
                 {isSystemCollapsed ? (
-                  <ChevronDown className="w-4 h-4 text-emerald-300" />
+                  <ChevronDown className="h-4 w-4 text-emerald-700 dark:text-emerald-300" />
                 ) : (
-                  <ChevronUp className="w-4 h-4 text-emerald-300" />
+                  <ChevronUp className="h-4 w-4 text-emerald-700 dark:text-emerald-300" />
                 )}
-                <h3 className="text-xs font-bold text-emerald-300 uppercase tracking-wider">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
                   System ({systemEmails.length})
                 </h3>
                 <Tooltip.Provider delayDuration={200}>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <div
-                        className="text-emerald-300 hover:text-emerald-200 transition-colors"
+                        className="text-emerald-700 transition-colors hover:text-emerald-900 dark:text-emerald-300 dark:hover:text-emerald-200"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
@@ -177,18 +177,18 @@ export default function EmailTable({
             >
               <div className="flex items-center gap-2">
                 {isRemindersCollapsed ? (
-                  <ChevronDown className="w-4 h-4 text-purple-300" />
+                  <ChevronDown className="h-4 w-4 text-violet-700 dark:text-purple-300" />
                 ) : (
-                  <ChevronUp className="w-4 h-4 text-purple-300" />
+                  <ChevronUp className="h-4 w-4 text-violet-700 dark:text-purple-300" />
                 )}
-                <h3 className="text-xs font-bold text-purple-300 uppercase tracking-wider">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700 dark:text-purple-300">
                   Reminders ({reminderEmails.length})
                 </h3>
                 <Tooltip.Provider delayDuration={200}>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <div
-                        className="text-purple-300 hover:text-purple-200 transition-colors"
+                        className="text-violet-700 transition-colors hover:text-violet-900 dark:text-purple-300 dark:hover:text-purple-200"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <HelpCircle className="w-3.5 h-3.5" />

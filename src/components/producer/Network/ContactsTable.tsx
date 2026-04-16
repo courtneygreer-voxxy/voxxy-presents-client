@@ -33,8 +33,8 @@ export default function ContactsTable({
   return (
     <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
       {/* Table Header - Condensed view for all screen sizes */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
-        <div className="grid grid-cols-[28px,1fr,140px,120px,130px,100px,80px,1fr,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
+      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
+        <div className="grid grid-cols-[28px,1fr,140px,120px,130px,100px,80px,1fr,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
@@ -59,7 +59,7 @@ export default function ContactsTable({
       <div>
         {contacts.length === 0 ? (
           <div className="px-4 py-12 text-center">
-            <p className="text-foreground/50 text-sm">No contacts found</p>
+            <p className="text-sm text-muted-foreground">No contacts found</p>
           </div>
         ) : (
           contacts.map((contact) => (

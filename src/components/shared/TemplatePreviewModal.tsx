@@ -48,7 +48,7 @@ export default function TemplatePreviewModal({
       <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="h-5 w-5 text-violet-700 dark:text-purple-400" />
             <span>Email Template Preview</span>
           </DialogTitle>
         </DialogHeader>
@@ -58,7 +58,7 @@ export default function TemplatePreviewModal({
           <div className="bg-background/5 rounded-lg p-4 border border-border">
             <h3 className="text-foreground font-medium">{template.name}</h3>
             {template.description && (
-              <p className="text-foreground/60 text-sm mt-1">{template.description}</p>
+              <p className="mt-1 text-sm text-muted-foreground">{template.description}</p>
             )}
           </div>
 
@@ -79,7 +79,7 @@ export default function TemplatePreviewModal({
             </label>
             <div className="bg-background/5 rounded-lg p-6 border border-border max-h-96 overflow-y-auto">
               <div
-                className="text-foreground/90 text-sm leading-relaxed prose prose-invert prose-sm max-w-none [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_li]:mb-1 [&_h3]:text-foreground [&_h3]:font-semibold [&_h3]:mt-4 [&_h3]:mb-2 [&_h4]:text-foreground/90 [&_h4]:font-semibold [&_h4]:mt-3 [&_h4]:mb-1 [&_a]:text-purple-400 [&_a]:underline [&_strong]:text-foreground [&_hr]:border-border"
+                className="prose prose-sm max-w-none text-sm leading-relaxed text-foreground/90 dark:prose-invert [&_a]:text-violet-700 [&_a]:underline [&_a]:hover:text-violet-800 dark:[&_a]:text-purple-400 dark:[&_a]:hover:text-purple-300 [&_h3]:mt-4 [&_h3]:mb-2 [&_h3]:font-semibold [&_h3]:text-foreground [&_h4]:mt-3 [&_h4]:mb-1 [&_h4]:font-semibold [&_h4]:text-foreground/90 [&_hr]:border-border [&_li]:mb-1 [&_ol]:list-decimal [&_ol]:pl-5 [&_strong]:text-foreground [&_ul]:list-disc [&_ul]:pl-5"
                 dangerouslySetInnerHTML={{ __html: displayBody }}
               />
             </div>

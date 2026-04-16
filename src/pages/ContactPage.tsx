@@ -139,63 +139,63 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
       <Navigation activePage="contact" />
 
       {/* Hero Section */}
       <section className="relative py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-violet-950 dark:text-purple-300 text-sm font-medium rounded-full">
+            <div className="inline-flex items-center rounded-full border border-purple-400/30 bg-purple-500/20 px-4 py-2 text-sm font-medium text-purple-200 backdrop-blur-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Join the Pilot Program
             </div>
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-8 tracking-tight leading-tight">
+          <h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
             Request{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Pilot Access
             </span>
           </h1>
 
-          <p className="text-xl text-muted-foreground mb-12 max-w-3xl mx-auto leading-relaxed">
+          <p className="mx-auto mb-12 max-w-3xl text-xl leading-relaxed text-white/65">
             Limited spots available - be part of building the future of event coordination
           </p>
         </div>
       </section>
 
       {/* Pilot Program Benefits */}
-      <section className="py-24 bg-muted/30 backdrop-blur-sm border-y border-border relative z-10">
+      <section className="relative z-10 border-y border-slate-200 bg-[#faf9fc] py-24">
         <div className="container mx-auto max-w-4xl px-4">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-12 text-center">What You Get with the Pilot Program:</h2>
+          <h2 className="mb-12 text-center text-3xl font-bold text-slate-950 md:text-4xl">What You Get with the Pilot Program:</h2>
           <div className="grid md:grid-cols-2 gap-6">
             <div className="flex items-start space-x-3">
-              <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
+              <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">Full Platform Access</h3>
-                <p className="text-gray-200">All Voxxy Presents features at $15/month</p>
+                <h3 className="mb-1 text-lg font-semibold text-slate-950">Full Platform Access</h3>
+                <p className="text-slate-600">All Voxxy Presents features at $15/month</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
+              <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">Vendor Coordination Tools</h3>
-                <p className="text-gray-200">Vendor CRM & automated email workflows</p>
+                <h3 className="mb-1 text-lg font-semibold text-slate-950">Vendor Coordination Tools</h3>
+                <p className="text-slate-600">Vendor CRM & automated email workflows</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
+              <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">Locked-In Pricing</h3>
-                <p className="text-gray-200">Your rate stays at $15/month for years 1-2</p>
+                <h3 className="mb-1 text-lg font-semibold text-slate-950">Locked-In Pricing</h3>
+                <p className="text-slate-600">Your rate stays at $15/month for years 1-2</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">
-              <CheckCircle className="h-6 w-6 text-purple-400 flex-shrink-0 mt-1" />
+              <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">Shape the Product</h3>
-                <p className="text-gray-200">Direct influence on features and roadmap</p>
+                <h3 className="mb-1 text-lg font-semibold text-slate-950">Shape the Product</h3>
+                <p className="text-slate-600">Direct influence on features and roadmap</p>
               </div>
             </div>
           </div>
@@ -206,24 +206,24 @@ export default function ContactPage() {
       <section className="py-24 relative z-10">
         <div className="container mx-auto max-w-2xl px-4">
           {isSubmitted ? (
-            <Card className="bg-background/5 backdrop-blur-sm border border-border">
+            <Card className="marketing-card border border-slate-200">
               <CardContent className="pt-12 pb-12 text-center">
                 <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
                   <CheckCircle className="h-8 w-8 text-green-300" />
                 </div>
-                <h2 className="text-2xl font-bold text-foreground mb-4">Thanks for your interest!</h2>
-                <p className="text-gray-200 mb-6">
+                <h2 className="mb-4 text-2xl font-bold text-slate-950">Thanks for your interest!</h2>
+                <p className="mb-6 text-slate-600">
                   We'll review your application and get back to you within 2-3 business days.
                 </p>
-                <Button className="voxxy-btn-solid" asChild>
+                <Button className="border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 text-white hover:-translate-y-0.5 hover:brightness-105" asChild>
                   <Link to="/">Return to Home</Link>
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <Card className="bg-background/5 backdrop-blur-sm border border-border shadow-2xl">
+            <Card className="marketing-card border border-slate-200 shadow-2xl">
               <CardHeader className="text-center pb-8">
-                <CardTitle className="text-3xl font-bold text-foreground mb-3">Request Pilot Access</CardTitle>
+                <CardTitle className="mb-3 text-3xl font-bold text-slate-950">Request Pilot Access</CardTitle>
                 <CardDescription className="text-lg">
                   Tell us about yourself and we'll get you set up
                 </CardDescription>
@@ -236,7 +236,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     required
-                    className="bg-background/10 border-border text-foreground placeholder:text-muted-foreground h-12 text-base focus:bg-background/15 focus:border-purple-400/50 transition-all"
+                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
                   />
 
                   <Input
@@ -246,7 +246,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     required
-                    className="bg-background/10 border-border text-foreground placeholder:text-muted-foreground h-12 text-base focus:bg-background/15 focus:border-purple-400/50 transition-all"
+                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
                   />
 
                   <Textarea
@@ -256,7 +256,7 @@ export default function ContactPage() {
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     required
                     rows={6}
-                    className="bg-background/10 border-border text-foreground placeholder:text-muted-foreground text-base focus:bg-background/15 focus:border-purple-400/50 transition-all resize-none"
+                    className="resize-none border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
                   />
 
                   {submissionError && (
@@ -268,7 +268,7 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full voxxy-btn-cta-pink h-12 text-base font-semibold shadow-md hover:shadow-lg dark:shadow-lg dark:hover:shadow-xl transition-all"
+                    className="h-12 w-full border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
                   >
                     {isSubmitting ? 'Submitting...' : 'Request Pilot Access'}
                     {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
@@ -281,44 +281,44 @@ export default function ContactPage() {
       </section>
 
       {/* Vendor Coming Soon */}
-      <section className="py-24 bg-gradient-to-r from-blue-600/20 to-purple-600/20 backdrop-blur-sm border-y border-border relative z-10">
+      <section className="relative z-10 border-y border-white/10 bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-24">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="flex justify-center mb-6">
-            <div className="inline-flex items-center px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 text-blue-950 dark:text-blue-300 text-sm font-medium rounded-full">
+            <div className="inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/20 px-4 py-2 text-sm font-medium text-blue-200 backdrop-blur-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Coming Soon
             </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
+          <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">
             Are You a Vendor?
           </h2>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto leading-relaxed">
+          <p className="mx-auto mb-8 max-w-2xl text-xl leading-relaxed text-white/70">
             Voxxy vendor sign up is coming soon. We're building the platform to make your life easier.
           </p>
 
           {/* Feature Preview */}
           <div className="max-w-3xl mx-auto mb-10">
-            <p className="text-lg text-gray-200 mb-6 font-semibold">Here's what you can look forward to:</p>
+            <p className="mb-6 text-lg font-semibold text-white/80">Here's what you can look forward to:</p>
             <div className="grid md:grid-cols-2 gap-4 text-left">
-              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4">
+              <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
-                <h3 className="text-foreground font-medium mb-1">Easy Application</h3>
-                <p className="text-muted-foreground text-sm">One-click sign-up for events in your area</p>
+                <h3 className="mb-1 font-medium text-white">Easy Application</h3>
+                <p className="text-sm text-white/65">One-click sign-up for events in your area</p>
               </div>
-              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4">
+              <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
-                <h3 className="text-foreground font-medium mb-1">Visibility to Markets</h3>
-                <p className="text-muted-foreground text-sm">See upcoming markets and events near you</p>
+                <h3 className="mb-1 font-medium text-white">Visibility to Markets</h3>
+                <p className="text-sm text-white/65">See upcoming markets and events near you</p>
               </div>
-              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4">
+              <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
-                <h3 className="text-foreground font-medium mb-1">Centralized Messaging</h3>
-                <p className="text-muted-foreground text-sm">All event communication in one hub - no emails or texts</p>
+                <h3 className="mb-1 font-medium text-white">Centralized Messaging</h3>
+                <p className="text-sm text-white/65">All event communication in one hub - no emails or texts</p>
               </div>
-              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4">
+              <div className="rounded-lg border border-white/10 bg-white/6 p-4 backdrop-blur-sm">
                 <CheckCircle className="h-5 w-5 text-blue-400 mb-2" />
-                <h3 className="text-foreground font-medium mb-1">Simple Coordination</h3>
-                <p className="text-muted-foreground text-sm">Everything you need for each event in one place</p>
+                <h3 className="mb-1 font-medium text-white">Simple Coordination</h3>
+                <p className="text-sm text-white/65">Everything you need for each event in one place</p>
               </div>
             </div>
           </div>

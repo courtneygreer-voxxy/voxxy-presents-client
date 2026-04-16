@@ -71,10 +71,10 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
   // Success state
   if (isSuccess) {
     return (
-      <Card className="w-full max-w-md mx-auto bg-background/15 backdrop-blur-md border border-border">
+      <Card className="voxxy-auth-card mx-auto w-full max-w-md">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <CheckCircle className="h-12 w-12 text-green-400" />
+            <CheckCircle className="h-12 w-12 text-green-700 dark:text-green-400" />
           </div>
           <CardTitle className="text-2xl font-bold text-center text-foreground">Check Your Email</CardTitle>
           <CardDescription className="text-center">
@@ -106,7 +106,7 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
 
   // Form state
   return (
-    <Card className="w-full max-w-md mx-auto bg-background/15 backdrop-blur-md border border-border">
+    <Card className="voxxy-auth-card mx-auto w-full max-w-md">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center text-foreground">Reset Password</CardTitle>
         <CardDescription className="text-center">
@@ -117,7 +117,7 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
         {/* Display auth errors */}
         {error && (
           <Alert variant="destructive" className="bg-red-400/10 border-red-400/30">
-            <AlertDescription className="text-red-300">{error}</AlertDescription>
+            <AlertDescription className="text-red-700 dark:text-red-300">{error}</AlertDescription>
           </Alert>
         )}
 
@@ -131,7 +131,7 @@ export function PasswordResetForm({ onSuccess, onBackToLogin }: PasswordResetFor
                 id="email"
                 type="email"
                 placeholder="Enter your email address"
-                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                className="voxxy-input-frost pl-10"
                 value={email}
                 onChange={(e) => handleEmailChange(e.target.value)}
                 onBlur={() => {

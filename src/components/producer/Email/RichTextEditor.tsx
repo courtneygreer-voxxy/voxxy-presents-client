@@ -75,7 +75,7 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-purple-400 underline hover:text-purple-300',
+          class: 'text-violet-700 underline hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300',
           rel: 'noopener noreferrer',
           target: '_blank',
         },
@@ -84,7 +84,7 @@ export function RichTextEditor({
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none focus:outline-none min-h-[400px] px-3 py-2 text-foreground',
+        class: 'prose prose-sm max-w-none min-h-[400px] px-3 py-2 text-foreground focus:outline-none dark:prose-invert',
         placeholder,
       },
     },
@@ -337,7 +337,7 @@ export function RichTextEditor({
             <div className="p-4 space-y-4">
               <div>
                 <p className="text-sm font-semibold text-foreground">Insert Link</p>
-                <p className="text-xs text-foreground/50 mt-0.5">Add a clickable link to your email</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Add a clickable link to your email</p>
               </div>
 
               {/* Display Text */}
@@ -396,7 +396,7 @@ export function RichTextEditor({
                     >
                       <div>
                         <span className="text-sm font-medium text-foreground block">{option.label}</span>
-                        <span className="text-[10px] text-foreground/40">{option.defaultText}</span>
+                        <span className="text-[10px] text-muted-foreground">{option.defaultText}</span>
                       </div>
                       {selectedSystemLink === option.variable && (
                         <div className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />

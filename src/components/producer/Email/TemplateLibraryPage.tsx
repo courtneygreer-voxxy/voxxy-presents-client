@@ -308,10 +308,10 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
           <div className="mt-8">
             <div className="mb-3">
               <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-1">
-                <Tag className="w-4 h-4 text-blue-400" />
+                <Tag className="h-4 w-4 text-blue-700 dark:text-blue-400" />
                 Category Sequences
               </h2>
-              <p className="text-foreground/60 text-xs">
+              <p className="text-xs text-muted-foreground">
                 Sent to vendors in each specific category. Applications, payments, and event countdowns personalized per vendor type.
               </p>
             </div>
@@ -330,7 +330,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
                   return (
                     <div key={category.id} className="flex items-center gap-3 py-3 px-4">
-                      <Tag className="w-3.5 h-3.5 text-foreground/60 flex-shrink-0" />
+                      <Tag className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span
@@ -345,15 +345,15 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                           </span>
                         </div>
                         {categoryTemplate ? (
-                          <div className="flex items-center gap-2 text-[10px] text-foreground/60 mt-0.5">
+                          <div className="mt-0.5 flex items-center gap-2 text-[10px] text-muted-foreground">
                             <span>{categoryTemplate.email_count || 0} emails</span>
                             <span className="text-foreground/20">·</span>
-                            <span className="text-green-400">
+                            <span className="text-green-700 dark:text-green-400">
                               Editable sequence
                             </span>
                           </div>
                         ) : (
-                          <div className="text-[10px] text-yellow-400 mt-0.5">
+                          <div className="mt-0.5 text-[10px] text-amber-700 dark:text-yellow-400">
                             Setting up sequence...
                           </div>
                         )}
@@ -459,7 +459,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
       {/* Preview Modal */}
       {/* Clone Modal */}
       {cloneModalOpen && cloneTemplate && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="bg-card text-card-foreground rounded-lg border border-border shadow-2xl w-full max-w-md">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">

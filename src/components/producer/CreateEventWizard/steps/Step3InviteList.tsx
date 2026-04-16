@@ -471,7 +471,7 @@ export default function Step3InviteList({
 
           {/* Info Banner */}
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
-            <p className="text-sm text-blue-300">
+            <p className="text-sm text-blue-800 dark:text-blue-300">
               <strong>Note:</strong> Select who's invited - you can edit this list later before going live
             </p>
           </div>
@@ -480,12 +480,12 @@ export default function Step3InviteList({
           {unsubscribedCount > 0 && (
             <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-700 dark:text-yellow-400" />
                 <div>
-                  <p className="text-sm text-yellow-300">
+                  <p className="text-sm text-amber-800 dark:text-yellow-300">
                     <strong>Warning:</strong> {unsubscribedCount} {unsubscribedCount === 1 ? 'contact is' : 'contacts are'} unsubscribed and won't receive invitations
                   </p>
-                  <p className="text-xs text-yellow-300/70 mt-1">
+                  <p className="mt-1 text-xs text-amber-700 dark:text-yellow-300/70">
                     Unsubscribed contacts are highlighted below. They opted out at the global or organization level.
                   </p>
                 </div>
@@ -496,7 +496,7 @@ export default function Step3InviteList({
           {/* Search Bar and Actions */}
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 value={searchTerm}
@@ -505,7 +505,7 @@ export default function Step3InviteList({
                   setCurrentPage(1); // Reset to first page on search
                 }}
                 placeholder="Search by name, email, or phone..."
-                className="w-full pl-9 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="voxxy-input-frost w-full rounded-lg py-2.5 pl-9 pr-4 text-sm"
               />
             </div>
             {selectedContactIds.length > 0 && (
@@ -526,15 +526,15 @@ export default function Step3InviteList({
             </div>
           ) : paginatedContacts.length === 0 ? (
             <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
-              <p className="text-foreground/50 text-sm">No contacts match your search</p>
+              <p className="text-sm text-muted-foreground">No contacts match your search</p>
             </div>
           ) : (
             <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
               {/* Table with horizontal scroll */}
               <div className="overflow-x-auto">
                 {/* Table Header */}
-                <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
-                  <div className="grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide min-w-[1700px]">
+                <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
+                  <div className="grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"

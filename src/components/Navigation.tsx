@@ -11,18 +11,18 @@ export default function Navigation({ activePage }: NavigationProps) {
 
   const getLinkClass = (page: string) => {
     return activePage === page
-      ? "text-violet-800 font-medium dark:text-fuchsia-400"
-      : "text-muted-foreground hover:text-violet-700 dark:hover:text-fuchsia-400 transition-colors"
+      ? "font-medium text-white"
+      : "text-white/70 hover:text-fuchsia-300 transition-colors"
   }
 
   const getMobileLinkClass = (page: string) => {
     return activePage === page
-      ? "block text-violet-800 font-medium dark:text-fuchsia-400 transition-colors py-2"
-      : "block text-muted-foreground hover:text-violet-700 dark:hover:text-fuchsia-400 transition-colors py-2"
+      ? "block py-2 font-medium text-white transition-colors"
+      : "block py-2 text-white/70 hover:text-fuchsia-300 transition-colors"
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 px-6 md:px-12 py-1 voxxy-nav-surface border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-[linear-gradient(90deg,rgba(37,18,57,0.96),rgba(49,23,72,0.96))] px-6 py-1 backdrop-blur-xl md:px-12">
       <div className="container mx-auto max-w-[1200px]">
         <div className="flex items-center justify-between">
           {/* Logo */}
@@ -46,7 +46,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/#contact"
-              className="voxxy-btn-cta-pink px-6 py-3 rounded-lg text-[14px] font-semibold transition-all hover:-translate-y-0.5"
+              className="rounded-lg border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-6 py-3 text-[14px] font-semibold text-white shadow-[0_10px_30px_rgba(217,70,239,0.22)] transition-all hover:-translate-y-0.5 hover:brightness-105"
             >
               Contact Us
             </Link>
@@ -54,7 +54,7 @@ export default function Navigation({ activePage }: NavigationProps) {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden p-2 text-foreground"
+            className="p-2 text-white md:hidden"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -64,7 +64,7 @@ export default function Navigation({ activePage }: NavigationProps) {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="absolute top-full left-0 right-0 voxxy-nav-surface border-b border-border md:hidden">
+        <div className="absolute left-0 right-0 top-full border-b border-white/10 bg-[linear-gradient(180deg,rgba(37,18,57,0.98),rgba(24,11,39,0.98))] md:hidden">
           <div className="container mx-auto px-6 py-4 space-y-4">
             <Link
               to="/features"
@@ -96,7 +96,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/#contact"
-              className="block voxxy-btn-cta-pink px-6 py-3 rounded-lg text-center"
+              className="block rounded-lg border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-6 py-3 text-center font-semibold text-white shadow-[0_10px_30px_rgba(217,70,239,0.22)]"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact Us

@@ -131,7 +131,7 @@ export default function PaymentSuccessPage() {
               <div className="text-center space-y-4 pt-4">
                 {isRefreshing ? (
                   <div className="flex flex-col items-center gap-3 py-4">
-                    <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
+                    <Loader2 className="h-8 w-8 text-green-400 animate-spin" />
                     <p className="text-foreground/80 dark:text-muted-foreground text-sm">
                       Setting up your account...
                     </p>

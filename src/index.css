@@ -195,6 +195,24 @@
     @apply border-foreground/20 dark:border-purple-400/35;
   }
 
+  .marketing-card {
+    background-image: none !important;
+    background-color: #ffffff !important;
+    border-color: rgb(226 232 240) !important;
+    box-shadow: 0 10px 30px rgb(15 23 42 / 0.08) !important;
+    backdrop-filter: none !important;
+    color: rgb(15 23 42) !important;
+  }
+
+  .marketing-card-accent {
+    background-image: linear-gradient(to bottom right, rgb(250 245 255), rgb(253 242 248)) !important;
+    background-color: rgb(250 245 255) !important;
+    border-color: rgb(217 70 239 / 0.42) !important;
+    box-shadow: 0 16px 40px rgb(217 70 239 / 0.12) !important;
+    backdrop-filter: none !important;
+    color: rgb(15 23 42) !important;
+  }
+
   .voxxy-gradient-hero-split {
     background-image: linear-gradient(to bottom right, hsl(270 52% 92%), hsl(330 58% 92%), hsl(217 52% 92%));
   }
@@ -306,6 +324,45 @@
     background-color: #0f0b1f;
   }
 
+  .voxxy-auth-card {
+    @apply border border-border;
+    background-color: hsl(var(--card) / 0.9);
+    backdrop-filter: blur(20px);
+    box-shadow: 0 24px 48px hsl(260 30% 15% / 0.12);
+  }
+  .dark .voxxy-auth-card {
+    background-color: rgb(21 16 40 / 0.84);
+    border-color: rgb(168 85 247 / 0.22);
+    box-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
+  }
+
+  .voxxy-auth-hero-copy {
+    color: hsl(270 28% 28%);
+  }
+  .dark .voxxy-auth-hero-copy {
+    color: hsl(270 100% 93%);
+  }
+
+  .voxxy-auth-accent {
+    color: hsl(270 65% 36%);
+  }
+  .dark .voxxy-auth-accent {
+    color: hsl(270 95% 80%);
+  }
+
+  .voxxy-auth-link {
+    color: hsl(270 65% 36%);
+  }
+  .voxxy-auth-link:hover {
+    color: hsl(270 72% 28%);
+  }
+  .dark .voxxy-auth-link {
+    color: hsl(270 95% 80%);
+  }
+  .dark .voxxy-auth-link:hover {
+    color: hsl(270 100% 88%);
+  }
+
   .voxxy-footer-surface {
     @apply bg-background;
   }
@@ -337,6 +394,14 @@
     background-color: rgb(21 16 40 / 0.96);
     border-color: rgb(168 85 247 / 0.22);
     box-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
+  }
+
+  .voxxy-overlay-scrim {
+    background-color: hsl(255 20% 35% / 0.2);
+    backdrop-filter: blur(6px);
+  }
+  .dark .voxxy-overlay-scrim {
+    background-color: rgb(0 0 0 / 0.72);
   }
 
   .voxxy-select-surface {

@@ -469,7 +469,7 @@ export function EmailTemplateEditorPage({
                 placeholder="Email subject..."
                 className="border-border bg-card/80 text-foreground dark:bg-background/5"
               />
-              <p className="mt-1 text-xs text-foreground/40">
+              <p className="mt-1 text-xs text-muted-foreground">
                 Click a variable in the sidebar to insert it
               </p>
             </div>
@@ -515,7 +515,7 @@ export function EmailTemplateEditorPage({
                   </div>
                 </div>
               </div>
-              <p className="mt-2 text-xs text-foreground/40">
+              <p className="mt-2 text-xs text-muted-foreground">
                 The footer contains the unsubscribe link required by email regulations and cannot be edited.
               </p>
             </div>
@@ -523,7 +523,7 @@ export function EmailTemplateEditorPage({
         </div>
 
         {/* Right Panel - Settings & Variables */}
-        <div className="w-80 border-l border-border bg-gradient-to-b from-black/40 to-black/20 backdrop-blur-sm overflow-y-auto">
+        <div className="voxxy-editor-sidebar w-80 overflow-y-auto border-l border-border">
           <div className="p-4 space-y-4">
             {/* Trigger Settings */}
             <div>
@@ -532,7 +532,7 @@ export function EmailTemplateEditorPage({
                 className="flex items-center justify-between w-full mb-2"
               >
                 <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                  <Clock className="w-3.5 h-3.5 text-purple-400" />
+                  <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
                   <span>Trigger Settings</span>
                 </div>
                 {triggerSettingsOpen ? (
@@ -566,12 +566,12 @@ export function EmailTemplateEditorPage({
                       </SelectContent>
                     </Select>
                     {isCreateMode && (
-                      <p className="mt-1 text-[9px] text-foreground/40">
+                      <p className="mt-1 text-[9px] text-muted-foreground">
                         Create custom reminder emails. System emails (invitations, approvals, etc.) come from the default template.
                       </p>
                     )}
                     {!isCreateMode && !VALUE_BASED_TRIGGER_TYPES.includes(formData.trigger_type) && (
-                      <p className="mt-1 text-[9px] text-yellow-400/80 flex items-center gap-1">
+                      <p className="mt-1 flex items-center gap-1 text-[9px] text-amber-700 dark:text-yellow-400/80">
                         <AlertCircle className="w-3 h-3" />
                         System email - trigger type cannot be changed
                       </p>
@@ -592,7 +592,7 @@ export function EmailTemplateEditorPage({
                     <div className="flex h-8 items-center rounded-lg border border-border bg-muted/60 px-3 py-2 text-sm text-foreground/70 dark:bg-background/10">
                       {EMAIL_TYPE_LABELS[formData.category] || formData.category}
                     </div>
-                    <p className="mt-1 text-[9px] text-foreground/40">
+                    <p className="mt-1 text-[9px] text-muted-foreground">
                       Auto-set based on trigger selection
                     </p>
                   </div>
@@ -623,7 +623,7 @@ export function EmailTemplateEditorPage({
                 className="flex items-center justify-between w-full mb-2"
               >
                 <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                  <Tag className="w-3.5 h-3.5 text-purple-400" />
+                  <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
                   <span>Available tags</span>
                 </div>
                 {availableTagsOpen ? (
@@ -635,10 +635,10 @@ export function EmailTemplateEditorPage({
 
               {availableTagsOpen && (
                 <div className="space-y-3">
-                  <p className="text-[10px] text-foreground/60 mb-2 leading-relaxed">
+                  <p className="mb-2 text-[10px] leading-relaxed text-muted-foreground">
                     Click a tag to insert it at your cursor position
                     {formData.category === 'event_announcements' && (
-                      <span className="block mt-1 text-yellow-400/80">
+                      <span className="mt-1 block text-amber-700 dark:text-yellow-400/80">
                         Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                       </span>
                     )}
@@ -662,7 +662,7 @@ export function EmailTemplateEditorPage({
                                 disabled={isDisabled}
                                 className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                                   isDisabled
-                                    ? 'opacity-40 cursor-not-allowed border-border bg-background/5 text-foreground/40'
+                                    ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
                                     : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
                                 }`}
                                 title={
@@ -671,11 +671,11 @@ export function EmailTemplateEditorPage({
                                     : variable.description
                                 }
                               >
-                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
                                 <span className="flex-1 text-left truncate">{variable.label}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                                   isDisabled
-                                    ? 'text-foreground/30 bg-background/5'
+                                    ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
                                     : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
                                 }`}>
                                   {variable.frontendVar.replace('[', '').replace(']', '')}
@@ -698,13 +698,13 @@ export function EmailTemplateEditorPage({
           <div className="voxxy-editor-sidebar w-96 overflow-y-auto border-l border-border">
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Eye className="w-4 h-4 text-purple-400" />
+                <Eye className="h-4 w-4 text-violet-700 dark:text-purple-400" />
                 <h3 className="text-sm font-medium text-foreground">Live Preview</h3>
               </div>
 
               {/* Preview Subject */}
               <div className="mb-3">
-                <p className="text-xs text-foreground/40 mb-1">Subject:</p>
+                <p className="mb-1 text-xs text-muted-foreground">Subject:</p>
                 <div className="rounded-lg border border-border bg-card/80 p-3 dark:bg-background/5">
                   <p className="text-sm text-foreground">{formData.subject_template || '(No subject)'}</p>
                 </div>
@@ -712,7 +712,7 @@ export function EmailTemplateEditorPage({
 
               {/* Preview Body */}
               <div>
-                <p className="text-xs text-foreground/40 mb-1">Body:</p>
+                <p className="mb-1 text-xs text-muted-foreground">Body:</p>
                 <div className="rounded-lg border border-purple-500/20 bg-card/80 p-4 dark:bg-background/5">
                   <div
                           className="email-preview-content prose prose-sm max-w-none dark:prose-invert"

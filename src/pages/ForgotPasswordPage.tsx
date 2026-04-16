@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
         <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <Mail className="h-20 w-20 mb-6" />
           <h1 className="text-4xl font-bold mb-4">Password Reset</h1>
-          <p className="text-xl text-center text-purple-100 max-w-md">
+          <p className="voxxy-auth-hero-copy max-w-md text-center text-xl">
             {!emailSent
               ? "No worries! We'll send you reset instructions."
               : "Check your email for the reset link"
@@ -113,14 +113,14 @@ export default function ForgotPasswordPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Mail className="h-16 w-16 mx-auto text-pink-400 mb-4" />
+              <Mail className="voxxy-auth-accent mx-auto mb-4 h-16 w-16" />
               <h1 className="text-3xl font-bold text-foreground">Reset Password</h1>
             </div>
 
-            <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="voxxy-auth-card w-full">
               <CardHeader className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <Mail className="h-6 w-6 text-pink-400" />
+                  <Mail className="voxxy-auth-accent h-6 w-6" />
                   <CardTitle className="text-2xl font-bold text-foreground">
                     {!emailSent ? 'Forgot Your Password?' : 'Check Your Email!'}
                   </CardTitle>
@@ -160,7 +160,7 @@ export default function ForgotPasswordPage() {
                               setEmail(e.target.value)
                               if (error) setError('')
                             }}
-                            className="pl-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                            className="voxxy-input-frost pl-10"
                             disabled={loading}
                             autoFocus
                           />
@@ -191,7 +191,7 @@ export default function ForgotPasswordPage() {
                       </p>
                       <button
                         onClick={() => navigate('/login/club-owner')}
-                        className="text-pink-400 hover:text-pink-300 text-sm font-medium transition-colors"
+                        className="voxxy-auth-link text-sm font-medium transition-colors"
                         disabled={loading}
                       >
                         <ArrowLeft className="h-3 w-3 inline mr-1" />
@@ -236,7 +236,7 @@ export default function ForgotPasswordPage() {
                       </p>
                       <button
                         onClick={handleTryDifferentEmail}
-                        className="text-pink-400 hover:text-pink-300 text-sm font-medium transition-colors"
+                        className="voxxy-auth-link text-sm font-medium transition-colors"
                         disabled={loading}
                       >
                         Try Different Email

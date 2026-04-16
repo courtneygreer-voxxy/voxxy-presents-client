@@ -144,7 +144,7 @@ export default function EmailTemplateItemEditor({
   if (!isOpen || !item) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
       <div className="bg-card text-card-foreground rounded-lg border border-border shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">

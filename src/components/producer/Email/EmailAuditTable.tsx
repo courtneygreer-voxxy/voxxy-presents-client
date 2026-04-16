@@ -147,8 +147,8 @@ export function EmailAuditTable({
   return (
     <div className="bg-background/5 rounded-lg border border-border overflow-hidden overflow-x-auto">
       {/* Table Header */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
-        <div className={`grid ${gridCols} gap-2 px-4 py-2 items-center text-[10px] font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide min-w-[800px]`}>
+      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
+        <div className={`grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70`}>
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email')}
@@ -172,14 +172,14 @@ export function EmailAuditTable({
               {entry.sent_at
                 ? format(new Date(entry.sent_at), 'MMM d, h:mm a')
                 : entry.scheduled_for
-                  ? <span className="text-blue-300">{format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}</span>
-                  : <span className="text-foreground/40">--</span>
+                  ? <span className="text-blue-700 dark:text-blue-300">{format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}</span>
+                  : <span className="text-muted-foreground">--</span>
               }
             </div>
 
             {/* Recipient Name */}
             <div className="text-[11px] text-foreground/80 truncate" title={entry.recipient_name || 'Unknown'}>
-              {entry.recipient_name || <span className="text-foreground/40">Unknown</span>}
+              {entry.recipient_name || <span className="text-muted-foreground">Unknown</span>}
             </div>
 
             {/* Email Address */}
@@ -206,13 +206,13 @@ export function EmailAuditTable({
             <div className="min-w-0">
               {(entry.bounce_reason || entry.drop_reason) ? (
                 <span
-                  className="text-[11px] text-red-400/80 truncate block cursor-help"
+                  className="block cursor-help truncate text-[11px] text-red-700 dark:text-red-400/80"
                   title={entry.bounce_reason || entry.drop_reason || ''}
                 >
                   {entry.bounce_reason || entry.drop_reason}
                 </span>
               ) : (
-                <span className="text-[11px] text-foreground/30">-</span>
+                <span className="text-[11px] text-muted-foreground">-</span>
               )}
             </div>
 
@@ -225,7 +225,7 @@ export function EmailAuditTable({
                       className="p-1 hover:bg-background/10 rounded transition-colors"
                       title="Actions"
                     >
-                      <MoreVertical className="w-3.5 h-3.5 text-foreground/40 hover:text-foreground/70" />
+                      <MoreVertical className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground/70" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-[140px]">
@@ -239,7 +239,7 @@ export function EmailAuditTable({
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <span className="text-foreground/10">-</span>
+                <span className="text-muted-foreground/60">-</span>
               )}
             </div>
           </div>

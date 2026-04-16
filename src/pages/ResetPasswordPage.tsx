@@ -102,7 +102,7 @@ export default function ResetPasswordPage() {
         <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <Lock className="h-20 w-20 mb-6" />
           <h1 className="text-4xl font-bold mb-4">Reset Password</h1>
-          <p className="text-xl text-center text-purple-100 max-w-md">
+          <p className="voxxy-auth-hero-copy max-w-md text-center text-xl">
             {!success
               ? "Create a new secure password for your Voxxy account"
               : "Your password has been reset successfully!"
@@ -125,14 +125,14 @@ export default function ResetPasswordPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Lock className="h-16 w-16 mx-auto text-pink-400 mb-4" />
+              <Lock className="voxxy-auth-accent mx-auto mb-4 h-16 w-16" />
               <h1 className="text-3xl font-bold text-foreground">Reset Password</h1>
             </div>
 
-            <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="voxxy-auth-card w-full">
               <CardHeader className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <Lock className="h-6 w-6 text-pink-400" />
+                  <Lock className="voxxy-auth-accent h-6 w-6" />
                   <CardTitle className="text-2xl font-bold text-foreground">
                     {!success ? 'Reset Your Password' : 'Password Reset Successful!'}
                   </CardTitle>
@@ -165,7 +165,7 @@ export default function ResetPasswordPage() {
                             <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                             <div>
                               <div className="text-foreground font-medium mb-2">Password Requirements:</div>
-                              <ul className="text-red-400 text-sm space-y-1">
+                                <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
                                 {passwordErrors.map((err, index) => (
                                   <li key={index}>• {err}</li>
                                 ))}
@@ -188,7 +188,7 @@ export default function ResetPasswordPage() {
                             placeholder="Enter your new password"
                             value={password}
                             onChange={(e) => handleInputChange('password', e.target.value)}
-                            className="pl-10 pr-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                            className="voxxy-input-frost pl-10 pr-10"
                             disabled={loading || !token}
                             autoFocus
                           />
@@ -214,7 +214,7 @@ export default function ResetPasswordPage() {
                             placeholder="Confirm your new password"
                             value={confirmPassword}
                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                            className="pl-10 pr-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                            className="voxxy-input-frost pl-10 pr-10"
                             disabled={loading || !token}
                           />
                           <button
@@ -252,7 +252,7 @@ export default function ResetPasswordPage() {
                       </p>
                       <button
                         onClick={() => navigate('/forgot-password')}
-                        className="text-pink-400 hover:text-pink-300 text-sm font-medium transition-colors"
+                        className="voxxy-auth-link text-sm font-medium transition-colors"
                         disabled={loading}
                       >
                         Request New Reset Link

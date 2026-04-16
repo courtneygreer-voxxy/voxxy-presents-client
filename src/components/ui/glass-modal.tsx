@@ -58,9 +58,7 @@ export function GlassModal({
       </DialogTrigger>
       <DialogContent className={cn(
         // Base glass morphism styles
-        "bg-background/15 backdrop-blur-md border-border text-foreground",
-        // Enhanced backdrop for better contrast
-        "shadow-2xl shadow-black/50",
+        "voxxy-auth-card text-foreground",
         // Responsive sizing
         sizeClasses[size],
         // Scrolling for large content
@@ -91,7 +89,7 @@ export function GlassModal({
 export function GlassCard({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
     <div className={cn(
-      "bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4",
+      "rounded-lg border border-border bg-card/80 p-4 backdrop-blur-sm dark:bg-background/5",
       className
     )}>
       {children}
@@ -102,7 +100,7 @@ export function GlassCard({ children, className }: { children: React.ReactNode, 
 /**
  * Glass morphism input styling classes
  */
-export const glassInputClasses = "bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400 focus:ring-purple-400/20"
+export const glassInputClasses = "voxxy-input-frost"
 
 /**
  * Glass morphism button styling classes

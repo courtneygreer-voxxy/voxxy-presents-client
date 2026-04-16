@@ -90,7 +90,7 @@ export default function PaymentOnboardingPage() {
 
           {/* Welcome Header */}
           <div className="text-center space-y-4">
-            <Badge className="bg-purple-500/20 border border-purple-400/30 text-violet-950 dark:text-purple-300 px-4 py-2 text-sm font-medium">
+            <Badge className="border border-purple-400/30 bg-purple-500/20 px-4 py-2 text-sm font-medium text-violet-950 dark:text-purple-300">
               <Sparkles className="h-4 w-4 mr-2" />
               Producer Account Setup
             </Badge>
@@ -135,7 +135,7 @@ export default function PaymentOnboardingPage() {
                     key={index}
                     className="flex items-start gap-3 bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 hover:bg-background/10 transition-colors"
                   >
-                    <div className="bg-purple-500/20 rounded-lg p-2 flex-shrink-0">
+                    <div className="rounded-lg bg-purple-500/20 p-2 flex-shrink-0">
                       <feature.icon className="h-5 w-5 text-purple-300" />
                     </div>
                     <div className="flex-1 min-w-0">

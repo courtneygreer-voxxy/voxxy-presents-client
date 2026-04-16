@@ -113,7 +113,7 @@ export function OnboardingGuide({
   return (
     <div className="fixed inset-0 z-[9999]" role="dialog" aria-label="Onboarding guide">
       {/* Dark overlay backdrop - no click-to-dismiss */}
-      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+      <div className="voxxy-overlay-scrim absolute inset-0 pointer-events-none" />
 
       {/* Spotlight ring on target */}
       {targetRect && (

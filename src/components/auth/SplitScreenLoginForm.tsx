@@ -169,7 +169,7 @@ export function SplitScreenLoginForm({
         <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 text-center">
           <div className="mb-8">
             <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Users className="h-10 w-10 text-purple-300" />
+              <Users className="h-10 w-10 text-violet-700 dark:text-purple-300" />
             </div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Club Owners</h2>
             <p className="text-muted-foreground text-lg">Create unforgettable events</p>
@@ -179,7 +179,7 @@ export function SplitScreenLoginForm({
             <div className="space-y-4 mb-8 animate-in fade-in-50 duration-300">
               {clubFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 text-foreground/90">
-                  <feature.icon className="h-5 w-5 text-purple-300 flex-shrink-0" />
+                  <feature.icon className="h-5 w-5 flex-shrink-0 text-violet-700 dark:text-purple-300" />
                   <span>{feature.text}</span>
                 </div>
               ))}
@@ -213,7 +213,7 @@ export function SplitScreenLoginForm({
         <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 text-center">
           <div className="mb-8">
             <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Building2 className="h-10 w-10 text-blue-300" />
+              <Building2 className="h-10 w-10 text-blue-700 dark:text-blue-300" />
             </div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Venue Owners</h2>
             <p className="text-muted-foreground text-lg">Monetize your space</p>
@@ -223,7 +223,7 @@ export function SplitScreenLoginForm({
             <div className="space-y-4 mb-8 animate-in fade-in-50 duration-300">
               {venueFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 text-foreground/90">
-                  <feature.icon className="h-5 w-5 text-blue-300 flex-shrink-0" />
+                  <feature.icon className="h-5 w-5 flex-shrink-0 text-blue-700 dark:text-blue-300" />
                   <span>{feature.text}</span>
                 </div>
               ))}
@@ -241,17 +241,17 @@ export function SplitScreenLoginForm({
       {/* Login Form Overlay */}
       {activeType && (
         <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-          <Card className="w-full max-w-md bg-background/15 backdrop-blur-xl border border-border pointer-events-auto animate-in fade-in-50 zoom-in-95 duration-300">
+          <Card className="voxxy-auth-card pointer-events-auto w-full max-w-md animate-in fade-in-50 zoom-in-95 duration-300">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
                 {activeType === 'club-owner' ? (
                   <>
-                    <Users className="h-6 w-6 text-purple-300" />
+                    <Users className="h-6 w-6 text-violet-700 dark:text-purple-300" />
                     Club Owner Login
                   </>
                 ) : (
                   <>
-                    <Building2 className="h-6 w-6 text-blue-300" />
+                    <Building2 className="h-6 w-6 text-blue-700 dark:text-blue-300" />
                     Venue Owner Login
                   </>
                 )}
@@ -276,7 +276,7 @@ export function SplitScreenLoginForm({
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={(e) => handleInputChange('email', e.target.value)}
-                      className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                      className="voxxy-input-frost pl-10"
                       disabled={isSubmitting}
                     />
                   </div>
@@ -292,7 +292,7 @@ export function SplitScreenLoginForm({
                     <button
                       type="button"
                       onClick={onForgotPassword}
-                      className="text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                      className="voxxy-auth-link text-sm transition-colors"
                       disabled={isSubmitting}
                     >
                       Forgot password?
@@ -306,7 +306,7 @@ export function SplitScreenLoginForm({
                       placeholder="Enter your password"
                       value={formData.password}
                       onChange={(e) => handleInputChange('password', e.target.value)}
-                      className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                      className="voxxy-input-frost pl-10 pr-10"
                       disabled={isSubmitting}
                     />
                     <button
@@ -346,7 +346,7 @@ export function SplitScreenLoginForm({
                 {/* Error Display */}
                 {(error || errors.submit) && (
                   <Alert className="bg-red-400/10 border-red-400/30">
-                    <AlertDescription className="text-red-300">
+                    <AlertDescription className="text-red-700 dark:text-red-300">
                       {error || errors.submit}
                     </AlertDescription>
                   </Alert>
@@ -361,7 +361,7 @@ export function SplitScreenLoginForm({
                     Don't have an account?{' '}
                     <button
                       onClick={onSwitchToSignUp}
-                      className="text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                      className="voxxy-auth-link font-medium transition-colors"
                       disabled={isSubmitting}
                     >
                       Sign up here
@@ -375,7 +375,7 @@ export function SplitScreenLoginForm({
       )}
 
       {/* Footer with Home Link */}
-      <div className="absolute bottom-0 left-0 right-0 z-50 bg-gradient-to-t from-black/50 to-transparent backdrop-blur-sm border-t border-border py-4">
+      <div className="absolute bottom-0 left-0 right-0 z-50 border-t border-border bg-gradient-to-t from-background/90 via-background/60 to-transparent py-4 backdrop-blur-sm dark:from-black/50 dark:via-black/20 dark:to-transparent">
         <div className="container mx-auto px-4 flex justify-center">
           <Button
             onClick={() => navigate('/')}

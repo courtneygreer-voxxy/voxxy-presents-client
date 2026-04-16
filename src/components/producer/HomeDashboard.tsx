@@ -481,7 +481,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             </div>
 
             {bulletins.length === 0 ? (
-              <p className="text-xs text-foreground/40 py-4 text-center">
+              <p className="py-4 text-center text-xs text-muted-foreground">
                 Post updates for your vendors
               </p>
             ) : (
@@ -489,7 +489,11 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {(showAllBulletins ? bulletins : bulletins.slice(0, 3)).map((bulletin) => (
                   <div
                     key={bulletin.id}
-                    className={`p-3 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border transition-smooth ${
+                    className={`p-3 rounded-lg border transition-smooth ${
+                      bulletin.pinned
+                        ? 'bg-card/90 dark:bg-background/10'
+                        : 'bg-card/75 dark:bg-background/5'
+                    } ${
                       bulletin.pinned ? 'border-purple-500/50' : 'border-border'
                     }`}
                   >
@@ -511,7 +515,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                             <Pin className="h-3 w-3 shrink-0 fill-purple-700 text-purple-700 dark:fill-purple-400 dark:text-purple-400" />
                           )}
                         </div>
-                        <p className="text-[10px] text-foreground/60">
+                        <p className="text-[10px] text-muted-foreground">
                           {bulletin.author.name} · {formatTimeAgo(bulletin.created_at)}
                         </p>
                       </div>
@@ -523,7 +527,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                     </p>
 
                     {/* Footer Stats */}
-                    <div className="flex items-center gap-3 text-[10px] text-foreground/40 pt-2 border-t border-border">
+                    <div className="flex items-center gap-3 border-t border-border pt-2 text-[10px] text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Eye className="w-3 h-3" />
                         <span>{bulletin.view_count}</span>
@@ -574,8 +578,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Event Status</p>
-                <p className={`text-xs font-medium ${isLive ? 'text-green-400' : 'text-yellow-400'}`}>
+                <p className="text-[10px] text-muted-foreground">Event Status</p>
+                <p className={`text-xs font-medium ${isLive ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-yellow-400'}`}>
                   {isLive ? 'Live' : 'Draft'}
                 </p>
               </div>
@@ -583,25 +587,25 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
             {/* Description */}
             <div className="flex items-start gap-2">
-              <FileText className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <FileText className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Description</p>
+                <p className="text-[10px] text-muted-foreground">Description</p>
                 <p className="text-xs text-foreground">{event.description || 'N/A'}</p>
               </div>
             </div>
 
             {/* Event Date & Time */}
             <div className="flex items-start gap-2">
-              <Clock className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <Clock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Event Date</p>
+                <p className="text-[10px] text-muted-foreground">Event Date</p>
                 <p className="text-xs text-foreground">
                   {formatDate(event.event_date)}
                   {event.start_time && ` • ${formatTime(event.start_time)}`}
                   {event.end_time && ` - ${formatTime(event.end_time)}`}
                 </p>
                 {event.event_end_date && event.event_end_date !== event.event_date && (
-                  <p className="text-xs text-foreground/60 mt-0.5">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     Ends: {formatDate(event.event_end_date)}
                   </p>
                 )}
@@ -610,37 +614,37 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
             {/* Venue */}
             <div className="flex items-start gap-2">
-              <Building className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <Building className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Venue</p>
+                <p className="text-[10px] text-muted-foreground">Venue</p>
                 <p className="text-xs text-foreground">{event.venue || 'N/A'}</p>
               </div>
             </div>
 
             {/* Location */}
             <div className="flex items-start gap-2">
-              <MapPin className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Location</p>
+                <p className="text-[10px] text-muted-foreground">Location</p>
                 <p className="text-xs text-foreground">{event.location || 'N/A'}</p>
               </div>
             </div>
 
             {/* Age Restriction */}
             <div className="flex items-start gap-2">
-              <Shield className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <Shield className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-foreground/60">Age Restriction</p>
+                <p className="text-[10px] text-muted-foreground">Age Restriction</p>
                 <p className="text-xs text-foreground">{event.age_restriction || 'N/A'}</p>
               </div>
             </div>
 
             {/* Ticket Link */}
             <div className="flex items-start gap-2">
-              <Ticket className="w-3.5 h-3.5 text-foreground/60 mt-0.5 flex-shrink-0" />
+              <Ticket className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] text-foreground/60">Ticket Link</p>
+                  <p className="text-[10px] text-muted-foreground">Ticket Link</p>
                   {!isEditingTicketLink && (
                     <button
                       onClick={handleStartEditTicketLink}
