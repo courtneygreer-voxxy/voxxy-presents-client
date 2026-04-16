@@ -59,7 +59,7 @@ function FilterDropdownButton({
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
             ? 'bg-purple-500/20 text-violet-950 border border-purple-500/40 dark:text-purple-300 dark:border-purple-500/30'
-            : 'bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground border border-border hover:bg-background/10'
+            : 'bg-card/80 text-foreground dark:bg-background/10 dark:text-foreground/70 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-background/15'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
@@ -73,7 +73,7 @@ function FilterDropdownButton({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-56 bg-muted border border-border rounded-lg shadow-xl overflow-hidden">
+        <div className="voxxy-select-surface absolute z-50 mt-1 w-56 overflow-hidden rounded-lg shadow-xl">
           {field.options.length > 5 && (
             <div className="p-2 border-b border-border">
               <input
@@ -81,7 +81,7 @@ function FilterDropdownButton({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full px-2.5 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/40 dark:bg-background/10"
                 autoFocus
               />
             </div>
@@ -94,7 +94,7 @@ function FilterDropdownButton({
                 <button
                   key={option}
                   onClick={() => handleToggle(option)}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-foreground/90 dark:text-foreground/80 hover:bg-background/10 rounded transition-colors"
+                  className="w-full flex items-center gap-2.5 rounded px-3 py-1.5 text-xs text-foreground/90 dark:text-foreground/80 transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
                 >
                   <div
                     className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
@@ -527,7 +527,7 @@ export default function NetworkPage({
       <>
         <div className="flex flex-col items-center justify-center py-12">
           <div className="text-center max-w-md">
-            <div className="w-16 h-16 bg-background/5 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
               <UserPlus className="w-8 h-8 text-foreground/40" />
             </div>
             <h3 className="text-lg font-semibold text-foreground mb-2">Start Building Your Network</h3>
@@ -574,7 +574,7 @@ export default function NetworkPage({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                  className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                className="w-full rounded-lg border border-border bg-card/80 py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
                 />
               </div>
 
@@ -653,7 +653,7 @@ export default function NetworkPage({
                     onChange={(e) => setListName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
                     placeholder="List name..."
-                    className="px-3 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
+                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-background/10"
                     autoFocus
                   />
                   <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors">
@@ -670,7 +670,7 @@ export default function NetworkPage({
 
           {/* No results */}
           {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
-            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+            <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
               </p>
@@ -748,7 +748,7 @@ export default function NetworkPage({
           </div>
 
           {categories.length === 0 ? (
-            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+            <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <Tag className="w-12 h-12 text-foreground/20 mx-auto mb-3" />
               <p className="text-foreground/60 text-sm">No categories yet</p>
               <p className="text-foreground/40 text-xs mt-1">Create your first category to organize your vendors</p>
@@ -758,7 +758,7 @@ export default function NetworkPage({
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-background/5 border border-border hover:bg-background/10 transition-all group"
+                  className="group flex items-center justify-between rounded-lg border border-border bg-card/80 p-4 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                 >
                   <div className="flex items-center gap-3">
                     {category.icon && <span className="text-2xl">{category.icon}</span>}
@@ -812,7 +812,7 @@ export default function NetworkPage({
       {/* Category Add/Edit Modal */}
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-muted rounded-lg border border-border w-full max-w-md">
+          <div className="w-full max-w-md rounded-lg border border-border bg-card shadow-xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-base font-semibold text-foreground">
                 {editingCategory ? 'Edit Category' : 'Add Category'}
@@ -832,7 +832,7 @@ export default function NetworkPage({
                   value={categoryFormData.name}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
-                  className="w-full px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
                   autoFocus
                 />
               </div>
@@ -843,7 +843,7 @@ export default function NetworkPage({
                   value={categoryFormData.icon}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
                   placeholder="🍕 or 🎨 or 🎤"
-                  className="w-full px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
                   maxLength={2}
                 />
               </div>
@@ -854,7 +854,7 @@ export default function NetworkPage({
                     type="color"
                     value={categoryFormData.color}
                     onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-16 h-10 rounded-lg cursor-pointer bg-background/10 border border-border"
+                    className="h-10 w-16 cursor-pointer rounded-lg border border-border bg-card/80 dark:bg-background/10"
                   />
                   <input
                     type="text"
@@ -865,12 +865,12 @@ export default function NetworkPage({
                       }
                     }}
                     placeholder="#FF6B6B"
-                    className="flex-1 px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    className="flex-1 rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
                     maxLength={7}
                   />
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-background/5 border border-border">
+              <div className="voxxy-surface-subtle rounded-lg p-3">
                 <p className="text-xs text-foreground/60 mb-2">Preview:</p>
                 <div className="flex items-center gap-2">
                   {categoryFormData.icon && <span className="text-2xl">{categoryFormData.icon}</span>}

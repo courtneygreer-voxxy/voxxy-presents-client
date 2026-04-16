@@ -172,7 +172,7 @@ export default function EmailRow({
   };
 
   return (
-    <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-background/5 transition-colors border-b border-border last:border-0 items-center text-xs">
+    <div className="voxxy-table-row voxxy-table-row-hover grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-1.5 text-xs last:border-0">
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
         {email.overdue && email.overdue_message && (

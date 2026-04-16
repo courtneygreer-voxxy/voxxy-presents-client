@@ -37,7 +37,7 @@ export default function ContactRow({
   const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
 
   return (
-    <div className="hover:bg-background/5 transition-colors border-b border-border last:border-0">
+    <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
       {/* Condensed Layout - All screen sizes */}
       <div>
         {/* Main Row - Clickable to expand */}
@@ -197,7 +197,7 @@ export default function ContactRow({
                   className="fixed inset-0 z-[100]"
                   onClick={() => setShowMenu(false)}
                 />
-                <div className="fixed z-[101] bg-muted border border-border rounded-lg shadow-xl py-1 min-w-[120px]"
+                <div className="fixed z-[101] min-w-[120px] rounded-lg border border-border bg-card/95 py-1 shadow-xl dark:bg-[rgba(44,32,70,0.96)]"
                   style={{
                     right: '20px',
                     top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`
@@ -209,7 +209,7 @@ export default function ContactRow({
                       setShowMenu(false);
                       onEdit();
                     }}
-                    className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
+                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                     Edit

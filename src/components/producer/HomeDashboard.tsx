@@ -301,8 +301,18 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     );
   }
 
+  const commandPanelClass = 'glass-card rounded-2xl shadow-sm';
+  const commandRowClass = 'voxxy-surface-subtle flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10';
+  const commandInsetClass = 'voxxy-surface-subtle rounded-xl';
+  const sideLinkClass = 'voxxy-surface-subtle w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10 group';
+
   return (
     <div className="px-3 md:px-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold text-foreground">Command Center</h2>
+        <p className="mt-1 text-sm text-foreground/65">{event.title}</p>
+      </div>
+
       {/* Main Grid: Left Column (Stats/Emails/Bulletins) + Right Column (Event Details) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Column - Vendor Stats (when live) or Go Live Card (when not live), then Emails & Bulletins */}
@@ -311,7 +321,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             /* Vendor Stats Cards - 4 in a row when LIVE */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Applied */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-purple-500/20">
                     <ClipboardList className="w-4 h-4 text-purple-700 dark:text-purple-400" />
@@ -334,7 +344,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* New / Unreviewed */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-yellow-500/20">
                     <Eye className="w-4 h-4 text-yellow-400" />
@@ -357,7 +367,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* Approved & Paid */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-green-500/20">
                     <CheckCircle className="w-4 h-4 text-green-400" />
@@ -380,7 +390,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* Missing Payments */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-red-500/20">
                     <DollarSign className="w-4 h-4 text-red-400" />
@@ -412,7 +422,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           )}
 
           {/* Upcoming Emails */}
-          <div className="glass-card p-3">
+          <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-purple-700 dark:text-purple-400" />
@@ -433,7 +443,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {scheduledEmails.map((email) => (
                   <div
                     key={email.id}
-                    className="flex items-center justify-between p-2 rounded-lg bg-background/5 hover:bg-background/10 transition-smooth"
+                    className={commandRowClass}
                   >
                     <div className="flex-1">
                       <p className="text-xs font-medium text-foreground">{email.name}</p>
@@ -454,7 +464,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           </div>
 
           {/* Bulletin Board */}
-          <div className="glass-card p-3">
+          <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Megaphone className="w-4 h-4 text-purple-700 dark:text-purple-400" />
@@ -489,12 +499,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {(showAllBulletins ? bulletins : bulletins.slice(0, 3)).map((bulletin) => (
                   <div
                     key={bulletin.id}
-                    className={`p-3 rounded-lg border transition-smooth ${
+                    className={`rounded-xl border p-3 transition-smooth ${
                       bulletin.pinned
-                        ? 'bg-card/90 dark:bg-background/10'
-                        : 'bg-card/75 dark:bg-background/5'
+                        ? 'voxxy-surface-subtle border-purple-500/40 dark:border-purple-400/24'
+                        : 'voxxy-surface-subtle'
                     } ${
-                      bulletin.pinned ? 'border-purple-500/50' : 'border-border'
+                      bulletin.pinned ? 'dark:border-purple-400/28' : ''
                     }`}
                   >
                     {/* Header */}
@@ -545,7 +555,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         </div>
 
         {/* Right Column - Event Details */}
-        <div className="glass-card p-3">
+        <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-purple-700 dark:text-purple-400" />
@@ -663,7 +673,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       value={editedTicketLink}
                       onChange={(e) => setEditedTicketLink(e.target.value)}
                       placeholder="https://..."
-                      className="w-full px-2 py-1 text-xs bg-background/5 border border-border rounded text-foreground placeholder:text-muted-foreground focus:ring-1 focus:ring-purple-500 focus:border-transparent"
+                      className="voxxy-input-frost w-full rounded-lg px-2 py-1 text-xs focus:border-transparent focus:ring-1 focus:ring-purple-500"
                     />
                     {ticketLinkError && (
                       <p className="text-[10px] text-red-400">{ticketLinkError}</p>
@@ -678,7 +688,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       </button>
                       <button
                         onClick={handleCancelEditTicketLink}
-                        className="flex-1 px-2 py-1 text-[10px] bg-background/10 text-foreground rounded hover:bg-background/20 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 rounded px-2 py-1 text-[10px] text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10 flex items-center justify-center gap-1"
                       >
                         <X className="w-2.5 h-2.5" />
                         Cancel
@@ -724,12 +734,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           </div>
 
           {/* Quick Links */}
-          <div className="mt-4 pt-3 border-t border-border space-y-1.5">
+          <div className="mt-4 space-y-2 border-t border-border pt-3">
             <a
               href={applicationPageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-background/5 hover:bg-background/10 transition-smooth text-xs text-foreground group"
+              className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
@@ -742,7 +752,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               href={vendorPortalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-background/5 hover:bg-background/10 transition-smooth text-xs text-foreground group"
+              className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
                 <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
@@ -753,10 +763,10 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
             {/* Category Application Links - collapsible */}
             {vendorApplications.length > 0 && (
-              <div>
+              <div className={commandInsetClass}>
                 <button
                   onClick={() => setCategoryLinksExpanded(!categoryLinksExpanded)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-background/5 hover:bg-background/10 transition-smooth text-xs text-foreground"
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10"
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5 text-blue-400" />
@@ -766,16 +776,16 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <ChevronDown className={`w-3 h-3 text-foreground/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`} />
                 </button>
                 {categoryLinksExpanded && (
-                  <div className="mt-1 ml-4 space-y-1">
+                  <div className="space-y-1 border-t border-border px-2 pb-2 pt-1">
                     {vendorApplications.map((app) => (
                       <a
                         key={app.id}
                         href={`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-smooth text-xs text-foreground group ${
+                        className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 transition-smooth text-xs text-foreground group ${
                           app.status === 'active'
-                            ? 'hover:bg-background/10'
+                            ? 'hover:bg-accent/50 dark:hover:bg-background/10'
                             : 'opacity-40 pointer-events-none'
                         }`}
                       >

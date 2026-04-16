@@ -31,10 +31,10 @@ export default function ContactsTable({
   const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
 
   return (
-    <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+    <div className="voxxy-table-shell">
       {/* Table Header - Condensed view for all screen sizes */}
-      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
-        <div className="grid grid-cols-[28px,1fr,140px,120px,130px,100px,80px,1fr,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
+      <div className="voxxy-table-header">
+        <div className="voxxy-table-header-row grid grid-cols-[28px,1fr,140px,120px,130px,100px,80px,1fr,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"

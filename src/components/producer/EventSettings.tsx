@@ -5,6 +5,7 @@ import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
+import { cn } from '@/lib/utils';
 
 interface Event {
   id: number;
@@ -384,7 +385,26 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const eventPageLink = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`;
   const portalLink = `${window.location.origin}/portal/${event.namespaced_slug || event.slug}`;
 
-  const inputClasses = "w-full px-3 py-2 bg-background/5 border border-border rounded-lg text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-purple-500";
+  const inputClasses = cn(
+    'voxxy-input-frost w-full rounded-lg px-3 py-2 text-sm',
+    'focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40'
+  );
+
+  const sectionShell = cn(
+    'glass-card rounded-2xl overflow-hidden shadow-sm'
+  );
+
+  const innerGlassWell = cn(
+    'voxxy-surface-subtle rounded-xl p-4 shadow-sm'
+  );
+
+  const compactWell = cn(
+    'voxxy-surface-subtle rounded-lg p-3'
+  );
+
+  const triggerHoverClass = 'px-4 hover:no-underline hover:bg-accent/40 dark:hover:bg-background/10';
+  const subtleButtonClass = 'flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-accent/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed';
+  const utilityActionClass = 'flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors hover:bg-accent/60 dark:hover:bg-background/10';
 
   // Show create form
   if (currentView === 'create_app') {
@@ -405,11 +425,11 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   return (
     <div className="px-3 md:px-4 max-w-6xl mx-auto space-y-4">
       {/* Accordion Sections */}
-      <div className="bg-background/5 backdrop-blur-sm rounded-lg border border-border overflow-hidden">
+      <div className={sectionShell}>
         <Accordion type="multiple" defaultValue={['event-details']}>
           {/* Event Details Section */}
           <AccordionItem value="event-details" className="border-border">
-            <AccordionTrigger className="px-4 hover:no-underline hover:bg-background/5">
+            <AccordionTrigger className={triggerHoverClass}>
               <div className="flex items-center gap-3">
                 <div className="p-1.5 rounded-lg bg-purple-500/20">
                   <Edit className="w-4 h-4 text-purple-400" />
@@ -421,7 +441,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               </div>
             </AccordionTrigger>
             <AccordionContent className="px-4">
-              <div className="voxxy-gradient-panel rounded-xl p-4 border border-purple-500/20">
+              <div className={innerGlassWell}>
               {!isEditingDetails ? (
                 <>
                   <div className="space-y-3">
@@ -585,7 +605,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                     <button
                       onClick={handleCancelEditDetails}
                       disabled={isSaving}
-                      className="flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className={subtleButtonClass}
                     >
                       <X className="w-3.5 h-3.5" />
                       Cancel
@@ -599,7 +619,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
           {/* Application Settings Section */}
           <AccordionItem value="applications" className="border-border">
-            <AccordionTrigger className="px-4 hover:no-underline hover:bg-background/5">
+            <AccordionTrigger className={triggerHoverClass}>
               <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-orange-500/20 p-1.5">
                   <FileText className="h-4 w-4 text-orange-800 dark:text-orange-400" />
@@ -620,7 +640,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                 <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
               </div>
             ) : applications.length === 0 ? (
-              <div className="voxxy-gradient-panel rounded-xl p-6 border border-purple-500/20 text-center">
+              <div className={`${innerGlassWell} text-center`}>
                 <FileText className="w-10 h-10 text-foreground/40 mx-auto mb-2" />
                 <p className="text-foreground/60 text-sm mb-3">No application categories created yet</p>
                 <button
@@ -634,7 +654,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               applications.map((app) => (
                 <div
                   key={app.id}
-                  className="voxxy-gradient-panel rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all"
+                  className={cn(innerGlassWell, 'hover:border-purple-500/35 transition-all')}
                 >
                   {/* Category Row */}
                   <div className="flex items-center justify-between p-4">
@@ -846,7 +866,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             {applications.length > 0 && (
               <button
                 onClick={() => setCurrentView('create_app')}
-                className="w-full px-4 py-2.5 text-sm rounded-lg border-2 border-dashed border-border text-foreground/60 hover:border-purple-500/40 hover:text-foreground transition-all"
+                className="w-full rounded-lg border-2 border-dashed border-border px-4 py-2.5 text-sm text-foreground/60 transition-all hover:border-purple-500/40 hover:text-foreground dark:border-violet-400/16 dark:hover:border-violet-400/28"
               >
                 + Add Category
               </button>
@@ -857,7 +877,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
           {/* Event Links Section */}
           <AccordionItem value="links" className="border-border border-b-0">
-            <AccordionTrigger className="px-4 hover:no-underline hover:bg-background/5">
+            <AccordionTrigger className={triggerHoverClass}>
               <div className="flex items-center gap-3">
                 <div className="rounded-lg bg-blue-500/20 p-1.5">
                   <Link className="h-4 w-4 text-blue-700 dark:text-blue-400" />
@@ -871,13 +891,13 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             <AccordionContent className="px-4">
               <div className="space-y-3">
                 {/* Application Page */}
-                <div className="p-3 rounded-lg voxxy-gradient-panel border border-purple-500/20">
+                <div className={compactWell}>
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-xs font-semibold text-foreground">Application Page</p>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyLink(eventPageLink, 'application')}
-                        className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 dark:hover:bg-background/10"
+                        className={`${utilityActionClass} text-muted-foreground`}
                       >
                         {copiedLink === 'application' ? <Check className="h-3 w-3 text-emerald-700 dark:text-green-400" /> : <Copy className="h-3 w-3" />}
                         {copiedLink === 'application' ? 'Copied!' : 'Copy'}
@@ -886,7 +906,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         href={eventPageLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-purple-700 transition-colors hover:bg-muted/60 dark:text-purple-300 dark:hover:bg-background/10"
+                        className={`${utilityActionClass} text-purple-700 dark:text-purple-300`}
                       >
                         <ExternalLink className="h-3 w-3" />
                         Open
@@ -897,13 +917,13 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                 </div>
 
                 {/* Vendor Portal */}
-                <div className="p-3 rounded-lg voxxy-gradient-panel border border-purple-500/20">
+                <div className={compactWell}>
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-xs font-semibold text-foreground">Vendor Portal</p>
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleCopyLink(portalLink, 'portal')}
-                        className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 dark:hover:bg-background/10"
+                        className={`${utilityActionClass} text-muted-foreground`}
                       >
                         {copiedLink === 'portal' ? <Check className="h-3 w-3 text-emerald-700 dark:text-green-400" /> : <Copy className="h-3 w-3" />}
                         {copiedLink === 'portal' ? 'Copied!' : 'Copy'}
@@ -912,7 +932,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         href={portalLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-blue-700 transition-colors hover:bg-muted/60 dark:text-blue-300 dark:hover:bg-background/10"
+                        className={`${utilityActionClass} text-blue-700 dark:text-blue-300`}
                       >
                         <ExternalLink className="h-3 w-3" />
                         Open
@@ -932,7 +952,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         return (
                           <div
                             key={app.id}
-                            className={`p-3 rounded-lg voxxy-gradient-panel border border-purple-500/20 ${app.status !== 'active' ? 'opacity-50' : ''}`}
+                            className={`${compactWell} ${app.status !== 'active' ? 'opacity-50' : ''}`}
                           >
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">
@@ -944,7 +964,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                               <div className="flex items-center gap-1">
                                 <button
                                   onClick={() => startEditing(app)}
-                                  className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 dark:hover:bg-background/10"
+                                  className={`${utilityActionClass} text-muted-foreground`}
                                 >
                                   <Edit className="h-3 w-3" />
                                   Edit
@@ -953,7 +973,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                                   <>
                                     <button
                                       onClick={() => handleCopyLink(appUrl, `cat-${app.id}`)}
-                                      className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-muted-foreground transition-colors hover:bg-muted/60 dark:hover:bg-background/10"
+                                      className={`${utilityActionClass} text-muted-foreground`}
                                     >
                                       {copiedLink === `cat-${app.id}` ? <Check className="h-3 w-3 text-emerald-700 dark:text-green-400" /> : <Copy className="h-3 w-3" />}
                                     </button>
@@ -961,7 +981,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                                       href={appUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="flex items-center gap-1 rounded px-2 py-1 text-[11px] text-purple-700 transition-colors hover:bg-muted/60 dark:text-purple-300 dark:hover:bg-background/10"
+                                      className={`${utilityActionClass} text-purple-700 dark:text-purple-300`}
                                     >
                                       <ExternalLink className="h-3 w-3" />
                                       Open
@@ -1011,7 +1031,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                 </button>
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
+                  className={subtleButtonClass}
                 >
                   Cancel
                 </button>

@@ -94,10 +94,10 @@ export default function EmailTable({
   const reminderEmails = emails.filter(email => isCustomReminder(email.trigger_type));
 
   return (
-    <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+    <div className="voxxy-table-shell">
       {/* Table Header */}
-      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
-        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
+      <div className="voxxy-table-header">
+        <div className="voxxy-table-header-row grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-2 text-xs font-semibold uppercase tracking-wide">
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}

@@ -316,7 +316,7 @@ export default function Step4AutoMessages({
 
   return (
     <div className="space-y-4">
-      <div className="bg-background/5 rounded-2xl p-5 lg:p-6 border border-border">
+      <div className="glass-card rounded-2xl p-5 lg:p-6">
         {/* Header */}
         <div className="mb-4">
           <h2 className="text-xl font-bold text-foreground mb-1">
@@ -328,7 +328,7 @@ export default function Step4AutoMessages({
         </div>
 
         {/* Event Sequence Selector */}
-        <div className="mb-4 p-4 rounded-lg bg-background/5 border border-border">
+        <div className="voxxy-surface-subtle mb-4 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-foreground mb-2">Event-Wide Sequence</h3>
           <p className="text-xs text-foreground/50 mb-3">
             Emails sent to all vendors (invitations, updates, cancellations, deadlines)
@@ -343,7 +343,7 @@ export default function Step4AutoMessages({
                   className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                     selectedTemplate?.id === template.id
                       ? 'border-blue-500/50 bg-blue-500/10'
-                      : 'border-border hover:bg-background/5'
+                      : 'border-border hover:bg-accent/40 dark:hover:bg-background/10'
                   }`}
                 >
                   <input
@@ -380,8 +380,8 @@ export default function Step4AutoMessages({
                     )}
 
                     {selectedTemplate?.id === template.id && (
-                      <div className="mt-2 p-2 rounded bg-blue-500/10 border border-blue-500/20">
-                        <div className="text-xs text-blue-300">
+                      <div className="mt-2 rounded border border-blue-300/60 bg-blue-50 p-2 dark:border-blue-500/20 dark:bg-blue-500/10">
+                        <div className="text-xs text-blue-900 dark:text-blue-300">
                           {emailItems.length} emails • Sent to all vendors
                         </div>
                       </div>
@@ -394,7 +394,7 @@ export default function Step4AutoMessages({
 
         {/* Category Email Strategy - Only show if event has categories */}
         {eventCategories.length > 0 && selectedTemplate && universalTemplate && (
-          <div className="mb-4 p-4 rounded-lg bg-background/5 border border-border">
+          <div className="voxxy-surface-subtle mb-4 rounded-lg p-4">
             <h3 className="text-sm font-semibold text-foreground mb-2">Vendor Category Sequences</h3>
             <p className="text-xs text-foreground/50 mb-3">
               Vendor emails during application, payment, and countdown phases
@@ -406,7 +406,7 @@ export default function Step4AutoMessages({
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   useUniversalCategoryTemplate
                     ? 'border-purple-500/50 bg-purple-500/10'
-                    : 'border-border hover:bg-background/5'
+                    : 'border-border hover:bg-accent/40 dark:hover:bg-background/10'
                 }`}
               >
                 <input
@@ -436,7 +436,7 @@ export default function Step4AutoMessages({
                         e.stopPropagation();
                         handleOpenSequenceList('category');
                       }}
-                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 transition-all border border-purple-500/30"
+                      className="flex items-center gap-1 rounded border border-purple-500/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-purple-500/10 hover:text-violet-950 dark:text-purple-300 dark:hover:text-purple-200"
                     >
                       <Eye className="w-3 h-3" />
                       Preview
@@ -447,11 +447,11 @@ export default function Step4AutoMessages({
                   </p>
 
                   {useUniversalCategoryTemplate && (
-                    <div className="mt-2 p-2 rounded bg-purple-500/10 border border-purple-500/20">
-                      <div className="text-xs text-purple-300 mb-1.5">
+                    <div className="mt-2 rounded border border-purple-300/50 bg-violet-50 p-2 dark:border-purple-500/20 dark:bg-purple-500/10">
+                      <div className="mb-1.5 text-xs text-violet-950 dark:text-purple-300">
                         {universalTemplate.name}
                       </div>
-                      <div className="text-[10px] text-purple-200/70">
+                      <div className="text-[10px] text-violet-800/75 dark:text-purple-200/70">
                         {universalTemplate?.email_count || 0} emails • Shared by all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'}
                       </div>
                     </div>
@@ -464,7 +464,7 @@ export default function Step4AutoMessages({
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   !useUniversalCategoryTemplate
                     ? 'border-purple-500/50 bg-purple-500/10'
-                    : 'border-border hover:bg-background/5'
+                    : 'border-border hover:bg-accent/40 dark:hover:bg-background/10'
                 }`}
               >
                 <input
@@ -499,7 +499,7 @@ export default function Step4AutoMessages({
                         e.stopPropagation();
                         handleOpenSequenceList('category');
                       }}
-                      className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-purple-300 hover:text-purple-200 hover:bg-purple-500/10 transition-all border border-purple-500/30"
+                      className="flex items-center gap-1 rounded border border-purple-500/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-purple-500/10 hover:text-violet-950 dark:text-purple-300 dark:hover:text-purple-200"
                     >
                       <Eye className="w-3 h-3" />
                       Preview
@@ -526,7 +526,7 @@ export default function Step4AutoMessages({
                               {category.name}
                             </span>
                             <span className="text-foreground/30">→</span>
-                            <span className="text-purple-300 truncate">
+                            <span className="truncate text-violet-900 dark:text-purple-300">
                               {hasTemplate ? template?.name : 'Default'}
                             </span>
                             <span className="text-foreground/40">
@@ -550,7 +550,7 @@ export default function Step4AutoMessages({
           </div>
         ) : !selectedTemplate ? (
           /* No Template Selected */
-          <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+          <div className="voxxy-surface-subtle text-center rounded-lg py-12">
             <p className="text-foreground/50 text-sm">No template selected. Select an Event Sequence above to continue.</p>
           </div>
         ) : null}
@@ -622,7 +622,7 @@ export default function Step4AutoMessages({
                       return (
                         <div
                           key={email.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
+                          className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                         >
                           <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                           <Mail className="w-3.5 h-3.5 text-blue-400/60 flex-shrink-0" />
@@ -653,7 +653,7 @@ export default function Step4AutoMessages({
                   {useUniversalCategoryTemplate ? (
                     // Universal template - show once
                     <div>
-                      <div className="text-xs text-purple-300 font-medium mb-2 px-1">
+                      <div className="mb-2 px-1 text-xs font-medium text-violet-900 dark:text-purple-300">
                         {universalTemplate?.name} (sent to all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'})
                       </div>
                       <div className="space-y-1">
@@ -670,7 +670,7 @@ export default function Step4AutoMessages({
                             return (
                               <div
                                 key={email.id}
-                                className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
+                                className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                               >
                                 <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                                 <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />
@@ -705,7 +705,7 @@ export default function Step4AutoMessages({
 
                       return (
                         <div key={cat.id}>
-                          <div className="text-xs text-purple-300 font-medium mb-2 px-1 flex items-center gap-2">
+                          <div className="mb-2 flex items-center gap-2 px-1 text-xs font-medium text-violet-900 dark:text-purple-300">
                             <span>{cat.icon && `${cat.icon} `}{cat.name}</span>
                             <span className="text-foreground/30">→</span>
                             <span className="text-foreground/50">{template?.name || 'Default'}</span>
@@ -724,7 +724,7 @@ export default function Step4AutoMessages({
                                 return (
                                   <div
                                     key={email.id}
-                                    className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
+                                    className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                                   >
                                     <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                                     <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />

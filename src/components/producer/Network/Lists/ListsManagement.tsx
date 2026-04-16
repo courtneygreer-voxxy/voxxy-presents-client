@@ -122,7 +122,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-background/5 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
             <Filter className="w-8 h-8 text-foreground/40" />
           </div>
           <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -131,7 +131,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
           <p className="text-foreground/50 text-sm mb-4">
             Use the filters on the All Contacts tab to find the contacts you need, then save the filter combination as a reusable list.
           </p>
-          <div className="bg-background/5 rounded-lg p-4 border border-border text-left">
+          <div className="voxxy-surface-subtle rounded-lg p-4 text-left">
             <p className="text-foreground/70 text-xs font-medium mb-2">How it works:</p>
             <ol className="text-foreground/50 text-xs space-y-1.5 list-decimal list-inside">
               <li>Go to the All Contacts tab</li>
@@ -156,24 +156,24 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
       </div>
 
       {/* Lists Table */}
-      <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+      <div className="voxxy-table-shell">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-border bg-background/5">
+            <tr className="voxxy-table-header">
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Name</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Name</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Filters</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Filters</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Contacts</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Contacts</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Last Used</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Last Used</span>
               </th>
               <th className="px-4 py-3 text-right">
-                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Actions</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Actions</span>
               </th>
             </tr>
           </thead>
@@ -181,7 +181,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
             {lists.map(list => (
               <tr
                 key={list.id}
-                className="border-b border-border hover:bg-background/5 transition-colors group"
+                className="voxxy-table-row voxxy-table-row-hover group"
               >
                 {/* Name */}
                 <td className="px-4 py-3">
@@ -265,7 +265,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                           onViewList(list.filters);
                         }
                       }}
-                      className="p-1.5 hover:bg-background/10 rounded text-foreground/60 hover:text-foreground transition-colors"
+                      className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
                       title="View filtered contacts"
                       disabled={!list.filters}
                     >
@@ -273,7 +273,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                     </button>
                     <button
                       onClick={() => handleStartEdit(list)}
-                      className="p-1.5 hover:bg-background/10 rounded text-foreground/60 hover:text-foreground transition-colors"
+                      className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
                       title="Edit list"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
@@ -296,7 +296,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
       {/* Edit List Modal */}
       {editingId !== null && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-card text-card-foreground rounded-xl w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
             <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Edit List</h2>

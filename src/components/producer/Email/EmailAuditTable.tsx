@@ -145,10 +145,10 @@ export function EmailAuditTable({
   const gridCols = 'grid-cols-[100px_minmax(60px,0.8fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]';
 
   return (
-    <div className="bg-background/5 rounded-lg border border-border overflow-hidden overflow-x-auto">
+    <div className="voxxy-table-shell overflow-x-auto">
       {/* Table Header */}
-      <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
-        <div className={`grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70`}>
+      <div className="voxxy-table-header">
+        <div className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide`}>
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email')}
@@ -165,7 +165,7 @@ export function EmailAuditTable({
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className={`grid ${gridCols} gap-2 px-4 py-1.5 items-center border-b border-border hover:bg-background/5 transition-colors min-w-[800px]`}
+            className={`voxxy-table-row voxxy-table-row-hover grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-1.5`}
           >
             {/* Date Sent */}
             <div className="text-[11px] text-foreground/80">

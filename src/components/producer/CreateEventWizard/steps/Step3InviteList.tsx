@@ -525,16 +525,16 @@ export default function Step3InviteList({
               <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
             </div>
           ) : paginatedContacts.length === 0 ? (
-            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+            <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-sm text-muted-foreground">No contacts match your search</p>
             </div>
           ) : (
-            <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+            <div className="voxxy-table-shell">
               {/* Table with horizontal scroll */}
               <div className="overflow-x-auto">
                 {/* Table Header */}
-                <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40">
-                  <div className="grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
+                <div className="voxxy-table-header">
+                  <div className="voxxy-table-header-row grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -573,7 +573,7 @@ export default function Step3InviteList({
                     return (
                       <div
                         key={contact.id}
-                        className={`grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center border-b border-border hover:bg-background/5 transition-colors text-[11px] min-w-[1700px] ${bgClass}`}
+                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">

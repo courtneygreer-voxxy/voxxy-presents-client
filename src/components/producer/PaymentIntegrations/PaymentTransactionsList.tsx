@@ -182,31 +182,31 @@ export default function PaymentTransactionsList({
           </p>
         </div>
       ) : (
-        <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+        <div className="voxxy-table-shell">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-background/5 border-b border-border">
+              <thead className="voxxy-table-header">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                  <th className="voxxy-table-header-row px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Payer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                  <th className="voxxy-table-header-row px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                  <th className="voxxy-table-header-row px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                  <th className="voxxy-table-header-row px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Matched Vendor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
+                  <th className="voxxy-table-header-row px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
                     Date
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/10">
+              <tbody>
                 {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-background/5">
+                  <tr key={transaction.id} className="voxxy-table-row voxxy-table-row-hover">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
                         <p className="text-sm font-medium text-foreground">

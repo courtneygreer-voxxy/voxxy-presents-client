@@ -249,7 +249,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                 Sent to contacts (invitations, application reminders) and all vendors across all categories (bulletins, updates, cancellations).
               </p>
             </div>
-            <div className="rounded-lg border border-border bg-background/[0.03] divide-y divide-border">
+            <div className="voxxy-table-shell divide-y divide-border dark:divide-white/6">
               {visibleTemplates.map(template => {
                 const isDefault = template.is_default;
                 const isSystem = template.organization_id === null;
@@ -257,7 +257,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                 return (
                   <div
                     key={template.id}
-                    className="flex items-center gap-3 py-3 px-4"
+                    className="voxxy-table-row voxxy-table-row-hover flex items-center gap-3 px-4 py-3 last:border-0"
                   >
                     <Mail className="w-3.5 h-3.5 text-foreground/60 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
@@ -283,14 +283,14 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                     <div className="flex items-center gap-1 flex-shrink-0">
                       <button
                         onClick={() => onNavigateToBuilder?.(template.id)}
-                        className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-background/10 transition-all"
+                        className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-accent/60 dark:hover:bg-white/5 transition-all"
                         title={isDefault ? "View sequence" : "Edit sequence"}
                       >
                         {isDefault ? <Eye className="w-3.5 h-3.5" /> : <Edit className="w-3.5 h-3.5" />}
                       </button>
                       <button
                         onClick={() => handleClone(template)}
-                        className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-background/10 transition-all"
+                        className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-accent/60 dark:hover:bg-white/5 transition-all"
                         title="Clone sequence"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -322,7 +322,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                 <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
               </div>
             ) : (
-              <div className="rounded-lg border border-border bg-background/[0.03] divide-y divide-border">
+              <div className="voxxy-table-shell divide-y divide-border dark:divide-white/6">
                 {categories.map(category => {
                   // Find template by email_campaign_template_id on category
                   const categoryTemplate = category.email_campaign_template_id
@@ -330,7 +330,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                     : null;
 
                   return (
-                    <div key={category.id} className="flex items-center gap-3 py-3 px-4">
+                    <div key={category.id} className="voxxy-table-row voxxy-table-row-hover flex items-center gap-3 px-4 py-3 last:border-0">
                       <Tag className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
@@ -360,7 +360,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                         {categoryTemplate ? (
                           <button
                             onClick={() => onNavigateToBuilder?.(categoryTemplate.id)}
-                            className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-background/10 transition-all"
+                            className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-accent/60 dark:hover:bg-white/5 transition-all"
                             title="Edit sequence"
                           >
                             <Edit className="w-3.5 h-3.5" />
@@ -404,8 +404,8 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                 </p>
               </div>
 
-              <div className="rounded-lg border border-border bg-background/[0.03]">
-                <div className="flex items-center gap-3 py-3 px-4">
+              <div className="voxxy-table-shell">
+                <div className="voxxy-table-row voxxy-table-row-hover flex items-center gap-3 px-4 py-3 last:border-0">
                   <Mail className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -423,7 +423,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => onNavigateToBuilder?.(universalTemplate.id)}
-                      className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-background/10 transition-all"
+                      className="p-1.5 rounded text-foreground/60 hover:text-foreground hover:bg-accent/60 dark:hover:bg-white/5 transition-all"
                       title="Edit sequence"
                     >
                       <Edit className="w-3.5 h-3.5" />

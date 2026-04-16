@@ -76,6 +76,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
+  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-purple-500/25 hover:bg-purple-500/10 focus-visible:border-purple-500/45 focus-visible:bg-purple-500/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:hover:border-purple-400/20 dark:hover:bg-purple-500/12 dark:focus-visible:border-purple-400/35 dark:focus-visible:bg-purple-500/18 dark:focus-visible:ring-purple-400/25';
+  const activeNavItemClass = 'border border-purple-500/45 bg-purple-500/18 shadow-sm dark:border-purple-400/28 dark:bg-purple-500/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
+  const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/40';
 
   useEffect(() => {
     if (templateId) {
@@ -709,7 +712,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g., Summer Festival Campaign"
-                      className="w-full rounded border border-border bg-background/5 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50"
+                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50 dark:bg-background/10"
                       disabled={!canEdit}
                       maxLength={100}
                     />
@@ -726,7 +729,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Describe when to use this template..."
-                      className="w-full rounded border border-border bg-background/5 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50"
+                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50 dark:bg-background/10"
                       disabled={!canEdit}
                       maxLength={500}
                     />
@@ -793,11 +796,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                   <button
                                     key={item.id}
                                     onClick={() => setSelectedEmail(item)}
-                                    className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                                      selectedEmail?.id === item.id
-                                        ? 'bg-purple-500/20 border border-purple-500/40'
-                                        : 'hover:bg-background/5 border border-transparent'
-                                    }`}
+                                    className={`${navItemClass} ${selectedEmail?.id === item.id ? activeNavItemClass : ''}`}
                                   >
                                     <div className="flex items-center justify-between gap-2 mb-1">
                                       <div className="text-sm text-foreground font-medium truncate">
@@ -946,7 +945,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/60 dark:text-foreground/50">
                               Subject
                             </label>
-                            <div className="p-3 rounded-lg bg-background/5 border border-border">
+                            <div className="voxxy-surface-subtle rounded-lg p-3">
                               <p className="text-sm text-foreground font-medium">
                                 {selectedEmail.subject_template || '(No subject)'}
                               </p>
@@ -958,7 +957,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                             <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/60 dark:text-foreground/50">
                               Email Body
                             </label>
-                            <div className="p-4 rounded-lg bg-background/5 border border-border">
+                            <div className="voxxy-surface-subtle rounded-lg p-4">
                               <div
                                 className="prose prose-sm max-w-none dark:prose-invert"
                                 dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-muted-foreground">(No content)</p>' }}
@@ -972,18 +971,18 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                               Trigger Settings
                             </label>
                             <div className="grid grid-cols-2 gap-3">
-                              <div className="p-3 rounded-lg bg-background/5 border border-border">
+                              <div className="voxxy-surface-subtle rounded-lg p-3">
                                 <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Type</div>
                                 <div className="text-sm text-foreground">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
                               </div>
                               {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
-                                <div className="p-3 rounded-lg bg-background/5 border border-border">
+                                <div className="voxxy-surface-subtle rounded-lg p-3">
                                   <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Days</div>
                                   <div className="text-sm text-foreground">{selectedEmail.trigger_value}</div>
                                 </div>
                               )}
                               {selectedEmail.trigger_time && (
-                                <div className="p-3 rounded-lg bg-background/5 border border-border">
+                                <div className="voxxy-surface-subtle rounded-lg p-3">
                                   <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Time</div>
                                   <div className="text-sm text-foreground">
                                     {selectedEmail.trigger_time.substring(11, 16)}
@@ -1022,7 +1021,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && emailToDelete && (
         <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="voxxy-gradient-panel border border-red-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-xl border border-red-500/30 p-6 shadow-2xl">
             {/* Header */}
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -1037,7 +1036,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             </div>
 
             {/* Body */}
-            <div className="mb-6 p-4 rounded-lg bg-background/5 border border-border">
+              <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
               <p className="text-sm text-foreground/80">
                 You are about to delete:
               </p>
@@ -1068,7 +1067,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   setEmailToDelete(null);
                 }}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-400/12 dark:hover:bg-background/10"
               >
                 Cancel
               </button>
@@ -1097,7 +1096,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       {/* Delete Template Confirmation Modal */}
       {deleteTemplateModalOpen && template && (
         <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="voxxy-gradient-panel border border-red-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-xl border border-red-500/30 p-6 shadow-2xl">
             {/* Header */}
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -1112,7 +1111,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
             </div>
 
             {/* Body */}
-            <div className="mb-6 p-4 rounded-lg bg-background/5 border border-border">
+              <div className="voxxy-surface-subtle mb-6 rounded-lg p-4">
               <p className="text-sm text-foreground/80">
                 You are about to delete this email sequence:
               </p>
@@ -1138,7 +1137,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               <button
                 onClick={() => setDeleteTemplateModalOpen(false)}
                 disabled={isDeletingTemplate}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-400/12 dark:hover:bg-background/10"
               >
                 Cancel
               </button>
@@ -1167,7 +1166,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       {/* Test Email Dialog */}
       {showTestEmailDialog && selectedEmail && (
         <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="voxxy-gradient-panel border border-purple-500/30 rounded-xl max-w-md w-full p-6 shadow-2xl">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-xl border border-purple-500/30 p-6 shadow-2xl">
             {/* Header */}
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">
@@ -1183,7 +1182,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
             {/* Body */}
             <div className="mb-6">
-              <div className="mb-4 p-3 rounded-lg bg-background/5 border border-border">
+              <div className="voxxy-surface-subtle mb-4 rounded-lg p-3">
                 <p className="text-xs text-foreground/50 mb-1">Sending test for:</p>
                 <p className="text-sm font-semibold text-foreground">{selectedEmail.name}</p>
               </div>
@@ -1196,7 +1195,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                 value={testEmailAddress}
                 onChange={(e) => setTestEmailAddress(e.target.value)}
                 placeholder="you@example.com"
-                className="w-full px-3 py-2.5 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/40"
+                className={modalInputClass}
                 autoFocus
               />
               <p className="text-xs text-foreground/50 mt-2">
@@ -1212,7 +1211,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   setTestEmailAddress('');
                 }}
                 disabled={isSendingTest}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 disabled:cursor-not-allowed disabled:opacity-50 dark:border-violet-400/12 dark:hover:bg-background/10"
               >
                 Cancel
               </button>

@@ -190,6 +190,11 @@
     @apply voxxy-gradient-card-deep backdrop-blur-[12px] border border-border rounded-lg;
     transition: var(--transition-smooth);
   }
+  .dark .glass-card {
+    background-image: linear-gradient(to bottom, rgb(58 40 92 / 0.9), rgb(38 26 64 / 0.92));
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 20px 40px rgb(3 2 10 / 0.28);
+  }
 
   .glass-card:hover {
     @apply border-foreground/20 dark:border-purple-400/35;
@@ -381,7 +386,9 @@
     @apply bg-background border border-border;
   }
   .dark .voxxy-input-well {
-    background-color: #181028;
+    background-color: rgb(49 36 77 / 0.78);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
   }
 
   .voxxy-modal-surface {
@@ -391,9 +398,9 @@
     box-shadow: 0 24px 48px hsl(260 30% 15% / 0.12);
   }
   .dark .voxxy-modal-surface {
-    background-color: rgb(21 16 40 / 0.96);
-    border-color: rgb(168 85 247 / 0.22);
-    box-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
+    background-color: rgb(31 22 52 / 0.95);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04), 0 28px 56px rgb(0 0 0 / 0.46);
   }
 
   .voxxy-overlay-scrim {
@@ -408,15 +415,17 @@
     @apply bg-popover border border-border;
   }
   .dark .voxxy-select-surface {
-    background-color: #221838;
-    border-color: rgb(168 85 247 / 0.22);
+    background-color: rgb(39 28 63 / 0.96);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 18px 36px rgb(2 2 8 / 0.24);
   }
 
   .voxxy-surface-subtle {
     @apply bg-muted/50 border border-border;
   }
   .dark .voxxy-surface-subtle {
-    background-color: #14102a;
+    background-color: rgb(42 30 69 / 0.72);
+    border-color: rgb(255 255 255 / 0.07);
   }
 
   .voxxy-editor-chrome {
@@ -425,7 +434,8 @@
     backdrop-filter: blur(12px);
   }
   .dark .voxxy-editor-chrome {
-    background: linear-gradient(to right, rgb(21 16 40 / 0.78), rgb(34 26 56 / 0.74));
+    background: linear-gradient(to right, rgb(46 32 74 / 0.86), rgb(33 24 56 / 0.88));
+    border-color: rgb(255 255 255 / 0.06);
   }
 
   .voxxy-editor-sidebar {
@@ -433,7 +443,8 @@
     backdrop-filter: blur(12px);
   }
   .dark .voxxy-editor-sidebar {
-    background: linear-gradient(to bottom, rgb(21 16 40 / 0.82), rgb(34 26 56 / 0.72));
+    background: linear-gradient(to bottom, rgb(41 29 68 / 0.84), rgb(28 21 49 / 0.84));
+    border-color: rgb(255 255 255 / 0.06);
   }
 
   .voxxy-contact-shell {
@@ -451,14 +462,65 @@
     background-color: hsl(var(--background) / 0.9);
   }
   .dark .voxxy-input-frost {
-    background-color: rgb(26 10 46 / 0.8);
+    background-color: rgb(50 36 78 / 0.82);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03);
   }
   .voxxy-input-frost:focus {
     @apply bg-background outline-none;
     border-color: hsl(270 91% 65% / 0.5);
   }
   .dark .voxxy-input-frost:focus {
-    background-color: #1a0a2e;
+    background-color: rgb(60 44 92 / 0.9);
+  }
+
+  .voxxy-table-shell {
+    @apply overflow-hidden rounded-xl border border-border bg-card/85 shadow-sm;
+  }
+  .dark .voxxy-table-shell {
+    background-color: rgb(46 33 74 / 0.78);
+    border-color: rgb(255 255 255 / 0.08);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.03), 0 18px 36px rgb(2 2 8 / 0.22);
+  }
+
+  .voxxy-table-header {
+    @apply border-b border-border bg-gradient-to-r from-violet-100/90 to-blue-100/80;
+  }
+  .dark .voxxy-table-header {
+    background-image: linear-gradient(to right, rgb(108 82 156 / 0.55), rgb(78 96 154 / 0.46));
+    border-color: rgb(255 255 255 / 0.08);
+  }
+
+  .voxxy-table-header-row {
+    @apply text-foreground/80;
+  }
+  .dark .voxxy-table-header-row {
+    color: hsl(var(--foreground) / 0.76);
+  }
+
+  .voxxy-table-row {
+    @apply border-b border-border transition-colors;
+  }
+  .dark .voxxy-table-row {
+    border-color: rgb(255 255 255 / 0.06);
+  }
+
+  .voxxy-table-row-hover {
+    @apply hover:bg-accent/50;
+  }
+  .dark .voxxy-table-row-hover {
+    background-color: transparent;
+  }
+  .dark .voxxy-table-row-hover:hover {
+    background-color: rgb(255 255 255 / 0.05);
+  }
+
+  .voxxy-table-inline-field {
+    @apply rounded-lg border border-border bg-card/80 text-foreground;
+  }
+  .dark .voxxy-table-inline-field {
+    background-color: rgb(56 41 88 / 0.76);
+    border-color: rgb(255 255 255 / 0.08);
   }
 
   .voxxy-application-highlight {

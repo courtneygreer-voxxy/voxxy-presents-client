@@ -172,7 +172,7 @@ function SequenceRowMenu({
         <>
           <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
           <div
-            className="fixed z-[101] bg-muted border border-border rounded-lg shadow-xl py-1 min-w-[140px]"
+            className="fixed z-[101] voxxy-select-surface min-w-[140px] rounded-lg py-1 shadow-xl"
             style={{
               right: `${window.innerWidth - btnRef.current.getBoundingClientRect().right}px`,
               top: `${btnRef.current.getBoundingClientRect().bottom + 4}px`,
@@ -289,6 +289,10 @@ export default function EmailSequenceEditorOverlay({
 
   const isSent = selectedEmail?.status === 'sent';
   const isCustomEmail = selectedEmail ? isCustomCountdown(selectedEmail.trigger_type) : false;
+  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-purple-500/25 hover:bg-purple-500/10 focus-visible:border-purple-500/45 focus-visible:bg-purple-500/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:hover:border-purple-400/20 dark:hover:bg-purple-500/12 dark:focus-visible:border-purple-400/35 dark:focus-visible:bg-purple-500/18 dark:focus-visible:ring-purple-400/25';
+  const activeNavItemClass = 'border border-purple-500/45 bg-purple-500/18 shadow-sm dark:border-purple-400/28 dark:bg-purple-500/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
+  const detailWellClass = 'voxxy-surface-subtle rounded-lg p-3';
+  const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500/50';
 
   return (
     <div className="fixed inset-0 voxxy-gradient-editor z-50 flex flex-col">
@@ -341,7 +345,7 @@ export default function EmailSequenceEditorOverlay({
         <div className="h-full px-6 py-4">
           {emails.length === 0 ? (
             <div className="h-full flex items-center justify-center">
-              <div className="text-center py-16 bg-background/5 rounded-lg border border-border w-full max-w-2xl">
+              <div className="voxxy-surface-subtle w-full max-w-2xl rounded-lg py-16 text-center">
                 <Mail className="mx-auto mb-3 h-12 w-12 text-muted-foreground" />
                 <p className="text-foreground/60 mb-4">No emails in sequence</p>
                 {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
@@ -395,11 +399,7 @@ export default function EmailSequenceEditorOverlay({
                             <button
                               key={email.id}
                               onClick={() => setSelectedEmail(email)}
-                              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
-                                selectedEmail?.id === email.id
-                                  ? 'bg-purple-500/20 border border-purple-500/40'
-                                  : 'hover:bg-background/5 border border-transparent'
-                              }`}
+                              className={`${navItemClass} ${selectedEmail?.id === email.id ? activeNavItemClass : ''}`}
                             >
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <div className="text-sm text-foreground font-medium truncate">
@@ -557,7 +557,7 @@ export default function EmailSequenceEditorOverlay({
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/60 dark:text-foreground/50">
                         Subject
                       </label>
-                      <div className="p-3 rounded-lg bg-background/5 border border-border">
+                      <div className={detailWellClass}>
                         <p className="text-sm text-foreground font-medium">
                           {selectedEmail.subject_template || '(No subject)'}
                         </p>
@@ -569,7 +569,7 @@ export default function EmailSequenceEditorOverlay({
                       <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-foreground/60 dark:text-foreground/50">
                         Email Body
                       </label>
-                      <div className="p-4 rounded-lg bg-background/5 border border-border">
+                      <div className="voxxy-surface-subtle rounded-lg p-4">
                         <div
                           className="prose prose-sm max-w-none dark:prose-invert"
                           dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-muted-foreground">(No content)</p>' }}
@@ -584,7 +584,7 @@ export default function EmailSequenceEditorOverlay({
                           Delivery Stats
                         </label>
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                          <div className={detailWellClass}>
                             <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Recipients</div>
                             <div className="text-lg font-bold text-foreground">{selectedEmail.recipient_count || 0}</div>
                           </div>
@@ -610,18 +610,18 @@ export default function EmailSequenceEditorOverlay({
                         Trigger Settings
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 rounded-lg bg-background/5 border border-border">
+                        <div className={detailWellClass}>
                           <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Type</div>
                           <div className="text-sm text-foreground">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
                         </div>
                         {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
-                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                          <div className={detailWellClass}>
                             <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Days</div>
                             <div className="text-sm text-foreground">{selectedEmail.trigger_value}</div>
                           </div>
                         )}
                         {selectedEmail.scheduled_for && (
-                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                          <div className={detailWellClass}>
                             <div className="mb-1 text-[10px] uppercase tracking-wide text-muted-foreground">Scheduled For</div>
                             <div className="text-sm text-foreground">
                               {new Date(selectedEmail.scheduled_for).toLocaleString('en-US', {
@@ -655,7 +655,7 @@ export default function EmailSequenceEditorOverlay({
       {/* Test Email Dialog */}
       {showTestEmailDialog && (
         <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="bg-card text-card-foreground rounded-xl border border-border shadow-2xl max-w-md w-full">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-xl text-card-foreground shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-2">
@@ -697,7 +697,7 @@ export default function EmailSequenceEditorOverlay({
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full rounded-lg border border-border bg-background/5 px-3 py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  className={modalInputClass}
                   autoFocus
                 />
               </div>
@@ -717,7 +717,7 @@ export default function EmailSequenceEditorOverlay({
                   setTestEmailAddress('');
                   setTestEmailError(null);
                 }}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
+                className="flex-1 rounded-lg border border-border px-4 py-2.5 text-foreground transition-all hover:bg-accent/60 dark:border-violet-400/12 dark:hover:bg-background/10"
               >
                 Cancel
               </button>

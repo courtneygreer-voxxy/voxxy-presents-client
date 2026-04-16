@@ -597,10 +597,10 @@ export default function GoLiveInvitationEditor({
 
       {/* ── Contacts table ── */}
       <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="bg-background/5 border-t border-border overflow-hidden flex-1 flex flex-col">
+        <div className="voxxy-table-shell border-t-0 rounded-none flex-1 flex flex-col">
           {/* Table header */}
-          <div className="border-b border-border bg-gradient-to-r from-violet-200/80 to-blue-200/70 dark:from-purple-900/40 dark:to-blue-900/40 flex-shrink-0">
-            <div className="grid grid-cols-[36px,1fr,1fr,1.5fr,80px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide text-foreground/80 dark:text-foreground/70">
+          <div className="voxxy-table-header flex-shrink-0">
+            <div className="voxxy-table-header-row grid grid-cols-[36px,1fr,1fr,1.5fr,80px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide">
               <div className="flex items-center justify-center">
                 <input
                   type="checkbox"
@@ -661,12 +661,12 @@ export default function GoLiveInvitationEditor({
                   <div
                     key={contact.id}
                     onClick={() => handleToggleContact(contact.id)}
-                    className={`grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-xs border-b border-border last:border-0 cursor-pointer transition-colors ${
+                    className={`voxxy-table-row grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-xs last:border-0 cursor-pointer ${
                       isSelected
                         ? 'bg-purple-500/10 hover:bg-purple-500/15'
                         : isUnsubscribed
                           ? 'bg-red-500/5 hover:bg-red-500/10'
-                          : 'hover:bg-background/5'
+                          : 'voxxy-table-row-hover'
                     }`}
                   >
                     {/* Checkbox */}
