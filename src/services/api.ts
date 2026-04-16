@@ -503,6 +503,39 @@ export const authApi = {
 
     return data
   },
+
+  /**
+   * Delete current user's account
+   * DELETE /users/:id (legacy endpoint)
+   */
+  async deleteAccount() {
+    // Get current user to get their ID
+    const user = await authApi.getCurrentUser()
+
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users/${user.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    })
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: 'Failed to delete account' }))
+      throw new ApiError(
+        data.error || 'Failed to delete account',
+        response.status,
+        data.errors
+      )
+    }
+
+    const data = await response.json()
+
+    // Clear auth token after successful deletion
+    clearAuthToken()
+
+    return data
+  },
 }
 
 // Organizations API (Voxxy Presents)

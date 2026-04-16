@@ -20,6 +20,14 @@ export default function PaymentSuccessPage() {
       try {
         await refreshUserProfile()
         setIsRefreshing(false)
+
+        // Clear guidebook flag so it shows for new paying users
+        try {
+          localStorage.removeItem('voxxy_guidebook_seen')
+          console.log('✅ Cleared guidebook flag for new user onboarding')
+        } catch {
+          // localStorage not available
+        }
       } catch (error) {
         console.error('Failed to refresh profile:', error)
         setIsRefreshing(false)
