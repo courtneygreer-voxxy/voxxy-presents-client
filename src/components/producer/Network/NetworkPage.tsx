@@ -58,53 +58,53 @@ function FilterDropdownButton({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
-            ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-            : 'bg-white/5 text-white/60 hover:text-white border border-white/10 hover:bg-white/10'
+            ? 'bg-purple-500/20 text-violet-950 border border-purple-500/40 dark:text-purple-300 dark:border-purple-500/30'
+            : 'bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground border border-border hover:bg-background/10'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
         <span>{field.label}</span>
         {selectedValues.length > 0 && (
-          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-white text-[10px] font-bold rounded-full">
+          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-primary-foreground text-[10px] font-bold rounded-full">
             {selectedValues.length}
           </span>
         )}
-        <ChevronDown className={`w-3 h-3 text-white/40 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-3 h-3 text-foreground/65 dark:text-foreground/40 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-1 w-56 bg-gray-900 border border-white/20 rounded-lg shadow-xl overflow-hidden">
+        <div className="absolute z-50 mt-1 w-56 bg-muted border border-border rounded-lg shadow-xl overflow-hidden">
           {field.options.length > 5 && (
-            <div className="p-2 border-b border-white/10">
+            <div className="p-2 border-b border-border">
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full px-2.5 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full px-2.5 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500"
                 autoFocus
               />
             </div>
           )}
           <div className="max-h-48 overflow-y-auto p-1">
             {filtered.length === 0 ? (
-              <p className="px-3 py-2 text-xs text-white/40">No options found</p>
+              <p className="px-3 py-2 text-xs text-foreground/75 dark:text-muted-foreground">No options found</p>
             ) : (
               filtered.map(option => (
                 <button
                   key={option}
                   onClick={() => handleToggle(option)}
-                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-white/80 hover:bg-white/10 rounded transition-colors"
+                  className="w-full flex items-center gap-2.5 px-3 py-1.5 text-xs text-foreground/90 dark:text-foreground/80 hover:bg-background/10 rounded transition-colors"
                 >
                   <div
                     className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       selectedValues.includes(option)
                         ? 'bg-purple-500 border-purple-500'
-                        : 'border-white/30'
+                        : 'border-border'
                     }`}
                   >
                     {selectedValues.includes(option) && (
-                      <Check className="w-2.5 h-2.5 text-white" strokeWidth={3} />
+                      <Check className="w-2.5 h-2.5 text-foreground" strokeWidth={3} />
                     )}
                   </div>
                   <span className="truncate text-left">{option}</span>
@@ -113,10 +113,10 @@ function FilterDropdownButton({
             )}
           </div>
           {selectedValues.length > 0 && (
-            <div className="p-1.5 border-t border-white/10">
+            <div className="p-1.5 border-t border-border">
               <button
                 onClick={() => onChange([])}
-                className="w-full text-xs text-white/40 hover:text-white py-1 transition-colors"
+                className="w-full text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground py-1 transition-colors"
               >
                 Clear {field.label.toLowerCase()}
               </button>
@@ -500,8 +500,8 @@ export default function NetworkPage({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-white/60">Loading your network...</p>
+          <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+          <p className="text-foreground/60">Loading your network...</p>
         </div>
       </div>
     );
@@ -513,7 +513,7 @@ export default function NetworkPage({
       <div className="flex items-center justify-center py-12">
         <div className="text-center">
           <p className="text-red-400 mb-4">{error}</p>
-          <button onClick={() => fetchContacts()} className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors">
+          <button onClick={() => fetchContacts()} className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors">
             Try Again
           </button>
         </div>
@@ -527,16 +527,16 @@ export default function NetworkPage({
       <>
         <div className="flex flex-col items-center justify-center py-12">
           <div className="text-center max-w-md">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-              <UserPlus className="w-8 h-8 text-white/40" />
+            <div className="w-16 h-16 bg-background/5 rounded-full flex items-center justify-center mx-auto mb-4">
+              <UserPlus className="w-8 h-8 text-foreground/40" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">Start Building Your Network</h3>
-            <p className="text-white/50 text-sm mb-6">Add vendors to your network to easily invite them to future events.</p>
+            <h3 className="text-lg font-semibold text-foreground mb-2">Start Building Your Network</h3>
+            <p className="text-foreground/50 text-sm mb-6">Add vendors to your network to easily invite them to future events.</p>
             <div className="flex items-center justify-center gap-3">
-              <button onClick={() => setShowAddModal(true)} className="px-5 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all">
+              <button onClick={() => setShowAddModal(true)} className="px-5 py-2.5 voxxy-btn-cta text-sm font-medium rounded-lg hover:shadow-lg hover:scale-105 transition-all">
                 Add Your First Contact
               </button>
-              <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all border border-white/20">
+              <button onClick={() => setShowCSVUploadModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-sm font-medium rounded-lg transition-all border border-border">
                 <Upload className="w-4 h-4" />
                 Import CSV
               </button>
@@ -567,28 +567,28 @@ export default function NetworkPage({
             <div className="flex items-center gap-2">
               {/* Search Input */}
               <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/65 dark:text-foreground/40" />
                 <input
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                  className="w-full pl-10 pr-3 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+                  className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
                 />
               </div>
 
               {/* Import CSV & Add Contact Buttons */}
               <button
                 onClick={() => setShowCSVUploadModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white text-xs font-semibold rounded-lg transition-all border border-white/20 whitespace-nowrap"
+                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Import CSV</span>
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
+                className="flex items-center gap-2 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
               >
                 <UserPlus className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Add Contact</span>
@@ -624,7 +624,7 @@ export default function NetworkPage({
                 {activeFilters.filter(f => f.values.length > 0).length > 0 && (
                   <button
                     onClick={() => setActiveFilters([])}
-                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-white/40 hover:text-white transition-colors"
+                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <X className="w-3 h-3" />
                     Clear all
@@ -640,7 +640,7 @@ export default function NetworkPage({
               {!showSaveInput ? (
                 <button
                   onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/30"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 hover:text-violet-900 dark:text-purple-300 dark:hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/40 dark:border-purple-500/30"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save as List
@@ -653,14 +653,14 @@ export default function NetworkPage({
                     onChange={(e) => setListName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
                     placeholder="List name..."
-                    className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
+                    className="px-3 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
                     autoFocus
                   />
-                  <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 bg-purple-600 text-white text-xs font-medium rounded-lg hover:bg-purple-500 disabled:opacity-50 transition-colors">
+                  <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors">
                     <Save className="w-3 h-3" />
                     {savingList ? 'Saving...' : 'Save'}
                   </button>
-                  <button onClick={() => { setShowSaveInput(false); setListName(''); }} className="p-1.5 text-white/40 hover:text-white transition-colors">
+                  <button onClick={() => { setShowSaveInput(false); setListName(''); }} className="p-1.5 text-foreground/65 dark:text-foreground/40 hover:text-foreground transition-colors">
                     <X className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -670,11 +670,11 @@ export default function NetworkPage({
 
           {/* No results */}
           {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
-            <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-white/50 text-sm">
+            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+              <p className="text-foreground/80 dark:text-foreground/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
               </p>
-              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-purple-400 hover:text-purple-300 text-sm underline">
+              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm underline">
                 Clear all filters
               </button>
             </div>
@@ -737,10 +737,10 @@ export default function NetworkPage({
       {activeTab === 'categories' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-white/60">Manage vendor categories for organizing contacts</p>
+            <p className="text-sm text-foreground/60">Manage vendor categories for organizing contacts</p>
             <button
               onClick={openAddCategoryModal}
-              className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-purple-600 to-blue-500 text-white text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+              className="flex items-center gap-2 px-4 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
             >
               <Plus className="w-4 h-4" />
               Add Category
@@ -748,32 +748,32 @@ export default function NetworkPage({
           </div>
 
           {categories.length === 0 ? (
-            <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-              <Tag className="w-12 h-12 text-white/20 mx-auto mb-3" />
-              <p className="text-white/60 text-sm">No categories yet</p>
-              <p className="text-white/40 text-xs mt-1">Create your first category to organize your vendors</p>
+            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+              <Tag className="w-12 h-12 text-foreground/20 mx-auto mb-3" />
+              <p className="text-foreground/60 text-sm">No categories yet</p>
+              <p className="text-foreground/40 text-xs mt-1">Create your first category to organize your vendors</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {categories.map((category) => (
                 <div
                   key={category.id}
-                  className="flex items-center justify-between p-4 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all group"
+                  className="flex items-center justify-between p-4 rounded-lg bg-background/5 border border-border hover:bg-background/10 transition-all group"
                 >
                   <div className="flex items-center gap-3">
                     {category.icon && <span className="text-2xl">{category.icon}</span>}
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm text-white font-medium">{category.name}</h3>
+                        <h3 className="text-sm text-foreground font-medium">{category.name}</h3>
                         {category.color && (
                           <div
-                            className="w-4 h-4 rounded border border-white/20"
+                            className="w-4 h-4 rounded border border-border"
                             style={{ backgroundColor: category.color }}
                           />
                         )}
                       </div>
                       {category.usage_stats && (
-                        <p className="text-xs text-white/60 mt-0.5">
+                        <p className="text-xs text-foreground/60 mt-0.5">
                           {category.usage_stats.applications_count || 0} vendor{category.usage_stats.applications_count !== 1 ? 's' : ''}
                         </p>
                       )}
@@ -782,21 +782,21 @@ export default function NetworkPage({
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
                       onClick={() => handleViewCategory(category)}
-                      className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                      className="p-2 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
                       title="View contacts in this category"
                     >
                       <Users className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => openEditCategoryModal(category)}
-                      className="p-2 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                      className="p-2 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
                       title="Edit category"
                     >
                       <Edit2 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={() => handleDeleteCategory(category)}
-                      className="p-2 rounded-lg hover:bg-red-500/20 text-white/60 hover:text-red-400 transition-all"
+                      className="p-2 rounded-lg hover:bg-red-500/20 text-foreground/60 hover:text-red-400 transition-all"
                       title="Delete category"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -812,49 +812,49 @@ export default function NetworkPage({
       {/* Category Add/Edit Modal */}
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gray-900 rounded-lg border border-white/10 w-full max-w-md">
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
-              <h3 className="text-base font-semibold text-white">
+          <div className="bg-muted rounded-lg border border-border w-full max-w-md">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="text-base font-semibold text-foreground">
                 {editingCategory ? 'Edit Category' : 'Add Category'}
               </h3>
               <button
                 onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
-                className="p-1 rounded-lg hover:bg-white/10 text-white/60 hover:text-white transition-all"
+                className="p-1 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-4 space-y-4">
               <div>
-                <label className="block text-xs text-white/60 mb-1">Category Name <span className="text-red-400">*</span></label>
+                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Category Name <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={categoryFormData.name}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs text-white/60 mb-1">Icon (Emoji) - Optional</label>
+                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Icon (Emoji) - Optional</label>
                 <input
                   type="text"
                   value={categoryFormData.icon}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
                   placeholder="🍕 or 🎨 or 🎤"
-                  className="w-full px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                   maxLength={2}
                 />
               </div>
               <div>
-                <label className="block text-xs text-white/60 mb-1">Color</label>
+                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Color</label>
                 <div className="flex items-center gap-3">
                   <input
                     type="color"
                     value={categoryFormData.color}
                     onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-16 h-10 rounded-lg cursor-pointer bg-white/10 border border-white/10"
+                    className="w-16 h-10 rounded-lg cursor-pointer bg-background/10 border border-border"
                   />
                   <input
                     type="text"
@@ -865,31 +865,31 @@ export default function NetworkPage({
                       }
                     }}
                     placeholder="#FF6B6B"
-                    className="flex-1 px-3 py-2 rounded-lg bg-white/10 border border-white/10 text-white text-sm placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    className="flex-1 px-3 py-2 rounded-lg bg-background/10 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                     maxLength={7}
                   />
                 </div>
               </div>
-              <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                <p className="text-xs text-white/60 mb-2">Preview:</p>
+              <div className="p-3 rounded-lg bg-background/5 border border-border">
+                <p className="text-xs text-foreground/60 mb-2">Preview:</p>
                 <div className="flex items-center gap-2">
                   {categoryFormData.icon && <span className="text-2xl">{categoryFormData.icon}</span>}
-                  <span className="text-sm text-white font-medium">{categoryFormData.name || 'Category Name'}</span>
-                  <div className="w-4 h-4 rounded border border-white/20" style={{ backgroundColor: categoryFormData.color }} />
+                  <span className="text-sm text-foreground font-medium">{categoryFormData.name || 'Category Name'}</span>
+                  <div className="w-4 h-4 rounded border border-border" style={{ backgroundColor: categoryFormData.color }} />
                 </div>
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-white/10">
+            <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
               <button
                 onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
-                className="px-4 py-2 text-sm rounded-lg border border-white/20 text-white hover:bg-white/10 transition-all"
+                className="px-4 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-background/10 transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveCategory}
                 disabled={!categoryFormData.name.trim()}
-                className="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white font-medium transition-all"
+                className="px-4 py-2 text-sm rounded-lg voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
               >
                 {editingCategory ? 'Save Changes' : 'Add Category'}
               </button>

@@ -59,13 +59,13 @@ export default function Pagination({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div className="bg-white/5 border-t border-white/10 px-4 py-3">
+    <div className="bg-background/5 border-t border-border px-4 py-3">
       <div className="flex items-center justify-between">
         {/* Left: Item count */}
-        <div className="text-sm text-white/60">
-          Showing <span className="font-medium text-white">{startItem}</span> to{' '}
-          <span className="font-medium text-white">{endItem}</span> of{' '}
-          <span className="font-medium text-white">{totalCount}</span> contacts
+        <div className="text-sm text-foreground/60">
+          Showing <span className="font-medium text-foreground">{startItem}</span> to{' '}
+          <span className="font-medium text-foreground">{endItem}</span> of{' '}
+          <span className="font-medium text-foreground">{totalCount}</span> contacts
         </div>
 
         {/* Center/Right: Page controls */}
@@ -79,8 +79,8 @@ export default function Pagination({
                 flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                 ${
                   currentPage === 1
-                    ? 'text-white/30 cursor-not-allowed'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'text-foreground/30 cursor-not-allowed'
+                    : 'text-foreground/70 hover:text-foreground hover:bg-background/10'
                 }
               `}
             >
@@ -95,7 +95,7 @@ export default function Pagination({
                   return (
                     <span
                       key={`ellipsis-${index}`}
-                      className="px-2 py-1 text-white/40"
+                      className="px-2 py-1 text-foreground/40"
                     >
                       ...
                     </span>
@@ -113,8 +113,8 @@ export default function Pagination({
                       min-w-[36px] h-9 px-3 rounded-lg text-sm font-medium transition-all
                       ${
                         isActive
-                          ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
-                          : 'text-white/70 hover:text-white hover:bg-white/10'
+                          ? 'voxxy-btn-cta shadow-lg'
+                          : 'text-foreground/70 hover:text-foreground hover:bg-background/10'
                       }
                     `}
                   >
@@ -132,8 +132,8 @@ export default function Pagination({
                 flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors
                 ${
                   currentPage === totalPages
-                    ? 'text-white/30 cursor-not-allowed'
-                    : 'text-white/70 hover:text-white hover:bg-white/10'
+                    ? 'text-foreground/30 cursor-not-allowed'
+                    : 'text-foreground/70 hover:text-foreground hover:bg-background/10'
                 }
               `}
             >

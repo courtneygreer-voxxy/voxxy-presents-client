@@ -315,21 +315,21 @@ export default function Step4AutoMessages({
 
   return (
     <div className="space-y-4">
-      <div className="bg-white/5 rounded-2xl p-5 lg:p-6 border border-white/10">
+      <div className="bg-background/5 rounded-2xl p-5 lg:p-6 border border-border">
         {/* Header */}
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-white mb-1">
+          <h2 className="text-xl font-bold text-foreground mb-1">
             Email Sequences
           </h2>
-          <p className="text-sm text-white/60">
+          <p className="text-sm text-foreground/60">
             Configure automated emails for your event and vendor communications.
           </p>
         </div>
 
         {/* Event Sequence Selector */}
-        <div className="mb-4 p-4 rounded-lg bg-white/5 border border-white/10">
-          <h3 className="text-sm font-semibold text-white mb-2">Event-Wide Sequence</h3>
-          <p className="text-xs text-white/50 mb-3">
+        <div className="mb-4 p-4 rounded-lg bg-background/5 border border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-2">Event-Wide Sequence</h3>
+          <p className="text-xs text-foreground/50 mb-3">
             Emails sent to all vendors (invitations, updates, cancellations, deadlines)
           </p>
 
@@ -342,7 +342,7 @@ export default function Step4AutoMessages({
                   className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                     selectedTemplate?.id === template.id
                       ? 'border-blue-500/50 bg-blue-500/10'
-                      : 'border-white/10 hover:bg-white/5'
+                      : 'border-border hover:bg-background/5'
                   }`}
                 >
                   <input
@@ -350,14 +350,14 @@ export default function Step4AutoMessages({
                     name="event-sequence"
                     checked={selectedTemplate?.id === template.id}
                     onChange={() => handleTemplateChange(template.id)}
-                    className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
+                    className="mt-0.5 w-4 h-4 border-border bg-background/10 text-blue-600 focus:ring-blue-500 focus:ring-offset-0"
                   />
                   <div className="flex-1">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-white">{template.name}</span>
+                        <span className="text-sm font-medium text-foreground">{template.name}</span>
                         {template.is_default && (
-                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-500/20 text-blue-300">
+                          <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-blue-500/20 text-blue-950 dark:text-blue-300">
                             DEFAULT
                           </span>
                         )}
@@ -368,14 +368,14 @@ export default function Step4AutoMessages({
                           e.stopPropagation();
                           handleOpenSequenceList('event');
                         }}
-                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-blue-300 hover:text-blue-200 hover:bg-blue-500/10 transition-all border border-blue-500/30"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-blue-950 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-500/10 transition-all border border-blue-500/30"
                       >
                         <Eye className="w-3 h-3" />
                         Preview
                       </button>
                     </div>
                     {template.description && (
-                      <p className="text-xs text-white/50 mt-1">{template.description}</p>
+                      <p className="text-xs text-foreground/50 mt-1">{template.description}</p>
                     )}
 
                     {selectedTemplate?.id === template.id && (
@@ -393,9 +393,9 @@ export default function Step4AutoMessages({
 
         {/* Category Email Strategy - Only show if event has categories */}
         {eventCategories.length > 0 && selectedTemplate && universalTemplate && (
-          <div className="mb-4 p-4 rounded-lg bg-white/5 border border-white/10">
-            <h3 className="text-sm font-semibold text-white mb-2">Vendor Category Sequences</h3>
-            <p className="text-xs text-white/50 mb-3">
+          <div className="mb-4 p-4 rounded-lg bg-background/5 border border-border">
+            <h3 className="text-sm font-semibold text-foreground mb-2">Vendor Category Sequences</h3>
+            <p className="text-xs text-foreground/50 mb-3">
               Vendor emails during application, payment, and countdown phases
             </p>
 
@@ -405,7 +405,7 @@ export default function Step4AutoMessages({
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   useUniversalCategoryTemplate
                     ? 'border-purple-500/50 bg-purple-500/10'
-                    : 'border-white/10 hover:bg-white/5'
+                    : 'border-border hover:bg-background/5'
                 }`}
               >
                 <input
@@ -416,16 +416,16 @@ export default function Step4AutoMessages({
                     onUseUniversalCategoryTemplateChange?.(true);
                     onUseCategoryTemplatesChange?.(false);
                   }}
-                  className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">Universal Sequence</span>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-purple-300">
+                      <span className="text-sm font-medium text-foreground">Universal Sequence</span>
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-300">
                         DEFAULT
                       </span>
-                      <span className="text-[10px] text-white/40">
+                      <span className="text-[10px] text-foreground/40">
                         ({universalTemplate?.email_count || 0} emails)
                       </span>
                     </div>
@@ -441,7 +441,7 @@ export default function Step4AutoMessages({
                       Preview
                     </button>
                   </div>
-                  <p className="text-xs text-white/50 mt-1">
+                  <p className="text-xs text-foreground/50 mt-1">
                     Same content for all vendors • Simplifies management when content doesn't need to vary by vendor type
                   </p>
 
@@ -463,7 +463,7 @@ export default function Step4AutoMessages({
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   !useUniversalCategoryTemplate
                     ? 'border-purple-500/50 bg-purple-500/10'
-                    : 'border-white/10 hover:bg-white/5'
+                    : 'border-border hover:bg-background/5'
                 }`}
               >
                 <input
@@ -474,15 +474,15 @@ export default function Step4AutoMessages({
                     onUseUniversalCategoryTemplateChange?.(false);
                     onUseCategoryTemplatesChange?.(true);
                   }}
-                  className="mt-0.5 w-4 h-4 border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium text-foreground">
                         Category-Specific Sequences
                       </span>
-                      <span className="text-[10px] text-white/40">
+                      <span className="text-[10px] text-foreground/40">
                         ({(() => {
                           // Calculate total emails across all categories
                           const totalEmails = categoryTemplatesAvailable.reduce((sum, { template }) => {
@@ -504,7 +504,7 @@ export default function Step4AutoMessages({
                       Preview
                     </button>
                   </div>
-                  <p className="text-xs text-white/50 mt-1">
+                  <p className="text-xs text-foreground/50 mt-1">
                     Customize content per vendor type (each category uses its own template)
                   </p>
 
@@ -518,7 +518,7 @@ export default function Step4AutoMessages({
                               style={{ backgroundColor: category.color || '#8B5CF6' }}
                             />
                             <span
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold text-white"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold text-foreground"
                               style={{
                                 backgroundColor: category.color || '#8B5CF6',
                                 textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
@@ -527,11 +527,11 @@ export default function Step4AutoMessages({
                               {category.icon && <span>{category.icon}</span>}
                               {category.name}
                             </span>
-                            <span className="text-white/30">→</span>
+                            <span className="text-foreground/30">→</span>
                             <span className="text-purple-300 truncate">
                               {hasTemplate ? template?.name : 'Default'}
                             </span>
-                            <span className="text-white/40">
+                            <span className="text-foreground/40">
                               ({template?.email_count || 0} emails)
                             </span>
                           </div>
@@ -548,12 +548,12 @@ export default function Step4AutoMessages({
         {/* Loading State */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
           </div>
         ) : !selectedTemplate ? (
           /* No Template Selected */
-          <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-            <p className="text-white/50 text-sm">No template selected. Select an Event Sequence above to continue.</p>
+          <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+            <p className="text-foreground/50 text-sm">No template selected. Select an Event Sequence above to continue.</p>
           </div>
         ) : null}
       </div>
@@ -578,16 +578,16 @@ export default function Step4AutoMessages({
       {/* Sequence Email List Modal */}
       {isSequenceListModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-[#1a0f2e] to-[#0f0a1e] border border-white/10 rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
+          <div className="voxxy-gradient-panel border border-border rounded-xl max-w-2xl w-full max-h-[80vh] overflow-hidden flex flex-col">
             {/* Modal Header */}
-            <div className="p-4 border-b border-white/10">
+            <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${sequenceListType === 'event' ? 'bg-blue-400' : 'bg-purple-400'}`} />
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-foreground">
                     {sequenceListType === 'event' ? 'Event-Wide Emails' : 'Vendor Category Emails'}
                   </h3>
-                  <span className="text-sm text-white/40">
+                  <span className="text-sm text-foreground/40">
                     ({sequenceListType === 'event'
                       ? emailItems.length
                       : useUniversalCategoryTemplate
@@ -597,7 +597,7 @@ export default function Step4AutoMessages({
                 </div>
                 <button
                   onClick={() => setIsSequenceListModalOpen(false)}
-                  className="text-white/60 hover:text-white transition-colors"
+                  className="text-foreground/60 hover:text-foreground transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -624,13 +624,13 @@ export default function Step4AutoMessages({
                       return (
                         <div
                           key={email.id}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+                          className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
                         >
-                          <span className="text-xs text-white/40 font-mono w-6">{index + 1}.</span>
+                          <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                           <Mail className="w-3.5 h-3.5 text-blue-400/60 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <div className="text-sm text-white font-medium">{email.name}</div>
-                            <div className="text-xs text-white/50 mt-0.5">
+                            <div className="text-sm text-foreground font-medium">{email.name}</div>
+                            <div className="text-xs text-foreground/50 mt-0.5">
                               {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
                               {sendDate && ` • ${sendDate}`}
                             </div>
@@ -640,7 +640,7 @@ export default function Step4AutoMessages({
                               handlePreviewEmail(email);
                               setIsSequenceListModalOpen(false);
                             }}
-                            className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                            className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
                             title="Preview email"
                           >
                             <Eye className="w-3.5 h-3.5" />
@@ -672,13 +672,13 @@ export default function Step4AutoMessages({
                             return (
                               <div
                                 key={email.id}
-                                className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+                                className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
                               >
-                                <span className="text-xs text-white/40 font-mono w-6">{index + 1}.</span>
+                                <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                                 <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-sm text-white font-medium">{email.name}</div>
-                                  <div className="text-xs text-white/50 mt-0.5">
+                                  <div className="text-sm text-foreground font-medium">{email.name}</div>
+                                  <div className="text-xs text-foreground/50 mt-0.5">
                                     {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
                                     {sendDate && ` • ${sendDate}`}
                                   </div>
@@ -688,7 +688,7 @@ export default function Step4AutoMessages({
                                     handlePreviewEmail(email);
                                     setIsSequenceListModalOpen(false);
                                   }}
-                                  className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                                  className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
                                   title="Preview email"
                                 >
                                   <Eye className="w-3.5 h-3.5" />
@@ -709,8 +709,8 @@ export default function Step4AutoMessages({
                         <div key={cat.id}>
                           <div className="text-xs text-purple-300 font-medium mb-2 px-1 flex items-center gap-2">
                             <span>{cat.icon && `${cat.icon} `}{cat.name}</span>
-                            <span className="text-white/30">→</span>
-                            <span className="text-white/50">{template?.name || 'Default'}</span>
+                            <span className="text-foreground/30">→</span>
+                            <span className="text-foreground/50">{template?.name || 'Default'}</span>
                           </div>
                           <div className="space-y-1">
                             {template?.email_template_items
@@ -726,13 +726,13 @@ export default function Step4AutoMessages({
                                 return (
                                   <div
                                     key={email.id}
-                                    className="flex items-center gap-3 p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all border border-white/10"
+                                    className="flex items-center gap-3 p-3 rounded-lg bg-background/5 hover:bg-background/10 transition-all border border-border"
                                   >
-                                    <span className="text-xs text-white/40 font-mono w-6">{index + 1}.</span>
+                                    <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
                                     <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                      <div className="text-sm text-white font-medium">{email.name}</div>
-                                      <div className="text-xs text-white/50 mt-0.5">
+                                      <div className="text-sm text-foreground font-medium">{email.name}</div>
+                                      <div className="text-xs text-foreground/50 mt-0.5">
                                         {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
                                         {sendDate && ` • ${sendDate}`}
                                       </div>
@@ -742,7 +742,7 @@ export default function Step4AutoMessages({
                                         handlePreviewEmail(email);
                                         setIsSequenceListModalOpen(false);
                                       }}
-                                      className="p-1.5 rounded text-white/40 hover:text-white hover:bg-white/10 transition-all flex-shrink-0"
+                                      className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
                                       title="Preview email"
                                     >
                                       <Eye className="w-3.5 h-3.5" />
@@ -760,10 +760,10 @@ export default function Step4AutoMessages({
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 border-t border-white/10">
+            <div className="p-4 border-t border-border">
               <button
                 onClick={() => setIsSequenceListModalOpen(false)}
-                className="w-full px-4 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-white transition-all"
+                className="w-full px-4 py-2 rounded-lg bg-background/10 hover:bg-background/15 text-foreground transition-all"
               >
                 Close
               </button>

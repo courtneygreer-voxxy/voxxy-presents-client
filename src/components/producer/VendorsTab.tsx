@@ -101,11 +101,11 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
   const getPaymentBadge = (status?: string) => {
     switch (status) {
       case 'paid':
-        return { label: 'Paid', color: 'bg-green-500/20 text-green-400' };
+        return { label: 'Paid', color: 'bg-green-500/20 text-emerald-900 dark:text-green-400' };
       case 'pending':
-        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400' };
+        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400' };
       default:
-        return { label: 'Pending', color: 'bg-gray-500/20 text-gray-400' };
+        return { label: 'Pending', color: 'bg-muted/20 text-muted-foreground' };
     }
   };
 
@@ -192,7 +192,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={fetchVendors}
-            className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+            className="px-4 py-2 rounded-lg voxxy-btn-solid transition-colors"
           >
             Retry
           </button>
@@ -206,25 +206,25 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
       {/* Header */}
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
-          <h2 className="text-2xl font-bold text-white">Event Vendors</h2>
-          <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm font-semibold">
+          <h2 className="text-2xl font-bold text-foreground">Event Vendors</h2>
+          <span className="px-3 py-1 rounded-full bg-green-500/20 text-emerald-900 dark:text-green-400 text-sm font-semibold">
             {vendors.length}
           </span>
         </div>
-        <p className="text-white/60">Approved vendors participating in your event</p>
+        <p className="text-foreground/60">Approved vendors participating in your event</p>
       </div>
 
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
           <input
             type="text"
             placeholder="Search vendors..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="w-full pl-10 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           />
         </div>
 
@@ -233,7 +233,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="px-4 py-2 rounded-lg bg-background/5 text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           >
             <option value="all">Category: All</option>
             {categories.filter(c => c !== 'all').map((category) => (
@@ -244,7 +244,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
           <select
             value={paymentFilter}
             onChange={(e) => setPaymentFilter(e.target.value)}
-            className="px-4 py-2 rounded-lg bg-white/5 text-white text-sm border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="px-4 py-2 rounded-lg bg-background/5 text-foreground text-sm border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           >
             <option value="all">Payment: All</option>
             <option value="paid">Paid</option>
@@ -256,20 +256,20 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
       {/* Vendors Table */}
       {filteredAndSortedVendors.length === 0 ? (
         <div className="text-center py-20">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 mb-4">
-            <Building2 className="w-8 h-8 text-white/40" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background/5 mb-4">
+            <Building2 className="w-8 h-8 text-foreground/40" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">No Approved Vendors</h3>
-          <p className="text-white/60">
+          <h3 className="text-xl font-semibold text-foreground mb-2">No Approved Vendors</h3>
+          <p className="text-foreground/60">
             {searchQuery || categoryFilter !== 'all' || paymentFilter !== 'all'
               ? 'Try adjusting your filters or search query.'
               : 'Approved vendors will appear here.'}
           </p>
         </div>
       ) : (
-        <div className="bg-[#1e1536] rounded-xl border border-purple-500/20 overflow-hidden">
+        <div className="glass-card overflow-hidden rounded-xl border border-purple-500/20">
           {/* Table Header */}
-          <div className="grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 bg-white/5 border-b border-white/10">
+          <div className="grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 bg-background/5 border-b border-border">
             <div className="flex items-center justify-center">
               <input
                 type="checkbox"
@@ -281,45 +281,45 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                     setSelectedVendors(new Set());
                   }
                 }}
-                className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
               />
             </div>
             <button
               onClick={() => handleSort('business_name')}
-              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+              className="flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors text-left"
             >
               Name
               <ArrowUpDown className="w-3 h-3" />
             </button>
             <button
               onClick={() => handleSort('category')}
-              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+              className="flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors text-left"
             >
               Category
               <ArrowUpDown className="w-3 h-3" />
             </button>
             <button
               onClick={() => handleSort('email')}
-              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+              className="flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors text-left"
             >
               Email
               <ArrowUpDown className="w-3 h-3" />
             </button>
             <button
               onClick={() => handleSort('phone')}
-              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+              className="flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors text-left"
             >
               Phone
               <ArrowUpDown className="w-3 h-3" />
             </button>
             <button
               onClick={() => handleSort('payment')}
-              className="flex items-center gap-2 text-sm font-semibold text-white/80 hover:text-white transition-colors text-left"
+              className="flex items-center gap-2 text-sm font-semibold text-foreground/80 hover:text-foreground transition-colors text-left"
             >
               Payment
               <ArrowUpDown className="w-3 h-3" />
             </button>
-            <div className="text-sm font-semibold text-white/80"></div>
+            <div className="text-sm font-semibold text-foreground/80"></div>
           </div>
 
           {/* Table Body */}
@@ -333,7 +333,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                 <div key={vendor.id}>
                   {/* Main Row */}
                   <div
-                    className={`grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 border-b border-white/10 hover:bg-white/5 transition-colors ${isSelected ? 'bg-purple-500/10' : ''}`}
+                    className={`grid grid-cols-[40px_2fr_1.5fr_2fr_1.5fr_1fr_40px] gap-4 px-6 py-4 border-b border-border hover:bg-background/5 transition-colors ${isSelected ? 'bg-purple-500/10' : ''}`}
                   >
                     {/* Checkbox */}
                     <div className="flex items-center justify-center">
@@ -349,7 +349,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           }
                           setSelectedVendors(newSelected);
                         }}
-                        className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+                        className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
                       />
                     </div>
 
@@ -357,23 +357,23 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                     <div className="flex items-center gap-2">
                       <Building2 className="w-4 h-4 text-purple-400 flex-shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-white font-medium truncate">{vendor.contact_name || vendor.business_name}</p>
+                        <p className="text-foreground font-medium truncate">{vendor.contact_name || vendor.business_name}</p>
                         {vendor.business_name && vendor.contact_name && (
-                          <p className="text-white/60 text-xs truncate">{vendor.business_name}</p>
+                          <p className="text-foreground/60 text-xs truncate">{vendor.business_name}</p>
                         )}
                       </div>
                     </div>
 
                     {/* Category */}
                     <div>
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-400">
                         {vendor.vendor_category}
                       </span>
                     </div>
 
                     {/* Email */}
                     <div className="flex items-center gap-2 min-w-0">
-                      <Mail className="w-4 h-4 text-white/40 flex-shrink-0" />
+                      <Mail className="w-4 h-4 text-foreground/40 flex-shrink-0" />
                       <a
                         href={`mailto:${vendor.email}`}
                         className="text-purple-400 hover:text-purple-300 text-sm truncate"
@@ -386,7 +386,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                     <div className="flex items-center gap-2 min-w-0">
                       {vendor.phone ? (
                         <>
-                          <Phone className="w-4 h-4 text-white/40 flex-shrink-0" />
+                          <Phone className="w-4 h-4 text-foreground/40 flex-shrink-0" />
                           <a
                             href={`tel:${vendor.phone}`}
                             className="text-purple-400 hover:text-purple-300 text-sm truncate"
@@ -395,7 +395,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           </a>
                         </>
                       ) : (
-                        <span className="text-white/40 text-sm">—</span>
+                        <span className="text-foreground/40 text-sm">—</span>
                       )}
                     </div>
 
@@ -418,7 +418,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           }
                           setExpandedRows(newExpanded);
                         }}
-                        className="text-white/60 hover:text-purple-400 transition-colors p-1 hover:bg-white/5 rounded"
+                        className="text-foreground/60 hover:text-purple-400 transition-colors p-1 hover:bg-background/5 rounded"
                       >
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4" />
@@ -431,21 +431,21 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
 
                   {/* Expanded Details */}
                   {isExpanded && (
-                    <div className="px-6 py-4 bg-white/5 border-b border-white/10">
+                    <div className="px-6 py-4 bg-background/5 border-b border-border">
                       <div className="grid grid-cols-2 gap-6 pl-14">
                         {/* Left Column */}
                         <div className="space-y-3">
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Business Name
                             </p>
-                            <p className="text-sm text-white">
+                            <p className="text-sm text-foreground">
                               {vendor.business_name || '—'}
                             </p>
                           </div>
 
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Email
                             </p>
                             <a
@@ -457,7 +457,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           </div>
 
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Phone
                             </p>
                             {vendor.phone ? (
@@ -468,15 +468,15 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                 {vendor.phone}
                               </a>
                             ) : (
-                              <p className="text-sm text-white/40">—</p>
+                              <p className="text-sm text-foreground/40">—</p>
                             )}
                           </div>
 
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Category
                             </p>
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-400">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-400">
                               {vendor.vendor_category}
                             </span>
                           </div>
@@ -485,7 +485,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                         {/* Right Column */}
                         <div className="space-y-3">
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Payment Status
                             </p>
                             <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${paymentBadge.color}`}>
@@ -494,10 +494,10 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           </div>
 
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-1">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
                               Accepted Date
                             </p>
-                            <p className="text-sm text-white">
+                            <p className="text-sm text-foreground">
                               {new Date(vendor.created_at).toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'long',
@@ -507,7 +507,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           </div>
 
                           <div>
-                            <p className="text-xs font-semibold text-white/60 uppercase tracking-wider mb-2">
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2">
                               Social Links
                             </p>
                             <div className="flex flex-wrap gap-3">
@@ -516,7 +516,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                   href={vendor.instagram_handle}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  className="flex items-center gap-2 text-foreground/60 hover:text-purple-400 transition-colors"
                                   title="Instagram"
                                 >
                                   <Instagram className="w-4 h-4" />
@@ -528,7 +528,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                   href={vendor.tiktok_handle}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  className="flex items-center gap-2 text-foreground/60 hover:text-purple-400 transition-colors"
                                   title="TikTok"
                                 >
                                   <Music className="w-4 h-4" />
@@ -540,7 +540,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                   href={vendor.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  className="flex items-center gap-2 text-foreground/60 hover:text-purple-400 transition-colors"
                                   title="Website"
                                 >
                                   <Globe className="w-4 h-4" />
@@ -552,7 +552,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                   href={vendor.portfolio}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-white/60 hover:text-purple-400 transition-colors"
+                                  className="flex items-center gap-2 text-foreground/60 hover:text-purple-400 transition-colors"
                                   title="Portfolio"
                                 >
                                   <Star className="w-4 h-4" />
@@ -560,7 +560,7 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                                 </a>
                               )}
                               {!vendor.instagram_handle && !vendor.tiktok_handle && !vendor.website && !vendor.portfolio && (
-                                <span className="text-sm text-white/40">No links available</span>
+                                <span className="text-sm text-foreground/40">No links available</span>
                               )}
                             </div>
                           </div>

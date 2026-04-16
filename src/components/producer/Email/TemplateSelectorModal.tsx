@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/dialog';
 import { emailCampaignTemplatesApi } from '@/services/api';
 import type { EmailCampaignTemplate } from '@/types/email';
+import { Badge } from '@/components/ui/badge';
 
 interface TemplateSelectorModalProps {
   isOpen: boolean;
@@ -88,7 +89,7 @@ export default function TemplateSelectorModal({
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-              <p className="text-white/60">Loading templates...</p>
+              <p className="text-foreground/60">Loading templates...</p>
             </div>
           ) : error ? (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
@@ -102,7 +103,7 @@ export default function TemplateSelectorModal({
             </div>
           ) : templates.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-white/60">No templates available</p>
+              <p className="text-foreground/60">No templates available</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -117,32 +118,32 @@ export default function TemplateSelectorModal({
                     className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                       isSelected
                         ? 'border-purple-500 bg-purple-500/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/[0.07]'
+                        : 'border-border bg-background/5 hover:border-border hover:bg-background/[0.07]'
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-white">
+                          <h3 className="font-medium text-foreground">
                             {template.name}
                           </h3>
                           {template.is_default && (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-500/20 text-blue-400">
+                            <Badge variant="tintBlue" className="px-2 py-0.5 text-xs font-medium">
                               Default
-                            </span>
+                            </Badge>
                           )}
                           {!isSystem && (
-                            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-purple-500/20 text-purple-400">
+                            <Badge variant="tintPurple" className="px-2 py-0.5 text-xs font-medium">
                               Custom
-                            </span>
+                            </Badge>
                           )}
                         </div>
                         {template.description && (
-                          <p className="text-sm text-white/60 mb-2 line-clamp-2">
+                          <p className="text-sm text-foreground/60 mb-2 line-clamp-2">
                             {template.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-4 text-xs text-white/50">
+                        <div className="flex items-center gap-4 text-xs text-foreground/50">
                           <span>{template.email_count} emails</span>
                           {template.events_count > 0 && (
                             <span>Used in {template.events_count} events</span>
@@ -152,9 +153,9 @@ export default function TemplateSelectorModal({
                       <div className={`flex-shrink-0 ml-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         isSelected
                           ? 'border-purple-500 bg-purple-500'
-                          : 'border-white/20'
+                          : 'border-border'
                       }`}>
-                        {isSelected && <Check className="w-3 h-3 text-white" />}
+                        {isSelected && <Check className="w-3 h-3 text-foreground" />}
                       </div>
                     </div>
                   </button>
@@ -167,14 +168,14 @@ export default function TemplateSelectorModal({
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <button
             onClick={handleSkip}
-            className="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+            className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
           >
             Skip for Now
           </button>
           <button
             onClick={handleConfirm}
             disabled={!selectedId}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
+            className="px-4 py-2 rounded-lg voxxy-btn-cta font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center"
           >
             Continue
             <ChevronRight className="w-4 h-4" />

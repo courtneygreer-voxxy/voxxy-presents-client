@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/admin-dark-theme.css'
 import App from './App.tsx'
+import { ThemeProvider } from '@/contexts/ThemeContext'
 import { validateEnv } from './utils/validateEnv'
 import { initializeErrorMonitoring } from './utils/errorMonitoring'
 
@@ -14,6 +15,8 @@ initializeErrorMonitoring()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 )

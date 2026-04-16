@@ -128,7 +128,7 @@ export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowD
             <Button
               onClick={handleSubmit}
               disabled={!selectedOption || isSubmitting}
-              className="flex-1 bg-purple-600 hover:bg-purple-700"
+              className="flex-1 voxxy-btn-solid"
             >
               {isSubmitting ? 'Submitting...' : 'Submit'}
             </Button>

@@ -115,7 +115,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
+    <Card className="w-full max-w-md mx-auto bg-background/15 backdrop-blur-md border-border text-foreground shadow-2xl shadow-black/50">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
         <CardDescription className="text-center">
@@ -213,7 +213,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
             <input
               id="rememberMe"
               type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
               checked={formData.rememberMe}
               onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
               disabled={isSubmitting || loading}
@@ -226,7 +226,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full voxxy-btn-solid"
             disabled={isSubmitting || loading}
             size="lg"
           >

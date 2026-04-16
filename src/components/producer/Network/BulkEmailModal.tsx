@@ -90,12 +90,12 @@ export default function BulkEmailModal({
   if (showSuccess) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div className="bg-gray-900 rounded-xl max-w-md w-full p-8 text-center">
+        <div className="bg-muted rounded-xl max-w-md w-full p-8 text-center">
           <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <CheckCircle2 className="w-8 h-8 text-green-400" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">Emails Sent!</h3>
-          <p className="text-white/60">
+          <h3 className="text-2xl font-bold text-foreground mb-2">Emails Sent!</h3>
+          <p className="text-foreground/60">
             Successfully sent email to {selectedContacts.length} {selectedContacts.length === 1 ? 'contact' : 'contacts'}
           </p>
         </div>
@@ -105,16 +105,16 @@ export default function BulkEmailModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-900 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-muted rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-gray-900 border-b border-white/10 p-6 flex items-center justify-between">
+        <div className="sticky top-0 bg-muted border-b border-border p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
               <Mail className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-white">Send Email</h2>
-              <p className="text-white/60 text-sm mt-0.5">
+              <h2 className="text-2xl font-bold text-foreground">Send Email</h2>
+              <p className="text-foreground/60 text-sm mt-0.5">
                 {selectedContacts.length} {selectedContacts.length === 1 ? 'recipient' : 'recipients'}
               </p>
             </div>
@@ -122,7 +122,7 @@ export default function BulkEmailModal({
           <button
             onClick={onClose}
             disabled={isSending}
-            className="text-white/60 hover:text-white transition-colors disabled:opacity-50"
+            className="text-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
           >
             <X className="w-6 h-6" />
           </button>
@@ -132,27 +132,27 @@ export default function BulkEmailModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Recipients Section */}
           <div>
-            <label className="block text-white/90 font-medium mb-3 flex items-center gap-2">
+            <label className="block text-foreground/90 font-medium mb-3 flex items-center gap-2">
               <Users className="w-4 h-4" />
               Recipients
             </label>
-            <div className="bg-white/5 rounded-lg border border-white/10 p-4 max-h-48 overflow-y-auto">
+            <div className="bg-background/5 rounded-lg border border-border p-4 max-h-48 overflow-y-auto">
               <div className="space-y-2">
                 {selectedContacts.map((contact) => (
                   <div
                     key={contact.id}
-                    className="flex items-center justify-between py-2 px-3 bg-white/5 rounded-lg"
+                    className="flex items-center justify-between py-2 px-3 bg-background/5 rounded-lg"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {contact.contact_name}
                       </p>
-                      <p className="text-xs text-white/60 truncate">
+                      <p className="text-xs text-foreground/60 truncate">
                         {contact.email}
                       </p>
                     </div>
                     {contact.business_name && (
-                      <span className="text-xs text-white/40 ml-2">
+                      <span className="text-xs text-foreground/40 ml-2">
                         {contact.business_name}
                       </span>
                     )}
@@ -167,7 +167,7 @@ export default function BulkEmailModal({
 
           {/* Subject */}
           <div>
-            <label htmlFor="subject" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="subject" className="block text-foreground/90 font-medium mb-2">
               Subject *
             </label>
             <input
@@ -177,9 +177,9 @@ export default function BulkEmailModal({
               onChange={(e) => handleChange('subject', e.target.value)}
               placeholder="Invitation: Summer Art Market"
               disabled={isSending}
-              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                errors.subject ? 'border-red-500' : 'border-white/10'
-              } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50`}
+              className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                errors.subject ? 'border-red-500' : 'border-border'
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50`}
             />
             {errors.subject && (
               <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
@@ -188,7 +188,7 @@ export default function BulkEmailModal({
 
           {/* Message */}
           <div>
-            <label htmlFor="message" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="message" className="block text-foreground/90 font-medium mb-2">
               Message *
             </label>
             <textarea
@@ -198,14 +198,14 @@ export default function BulkEmailModal({
               placeholder="Hi there,&#10;&#10;We're hosting our Summer Art Market on June 15th and would love to have you join us as a vendor!&#10;&#10;Please let me know if you're interested.&#10;&#10;Best regards"
               rows={10}
               disabled={isSending}
-              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                errors.message ? 'border-red-500' : 'border-white/10'
-              } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none disabled:opacity-50`}
+              className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                errors.message ? 'border-red-500' : 'border-border'
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none disabled:opacity-50`}
             />
             {errors.message && (
               <p className="mt-1 text-sm text-red-400">{errors.message}</p>
             )}
-            <p className="mt-2 text-xs text-white/40">
+            <p className="mt-2 text-xs text-foreground/40">
               Tip: Personalize your message to increase engagement
             </p>
           </div>
@@ -238,18 +238,18 @@ export default function BulkEmailModal({
               type="button"
               onClick={onClose}
               disabled={isSending}
-              className="flex-1 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-6 py-3 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSending}
-              className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+              className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
             >
               {isSending ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                   Sending...
                 </>
               ) : (

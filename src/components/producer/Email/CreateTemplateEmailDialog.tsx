@@ -131,10 +131,10 @@ export function CreateTemplateEmailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl">Add Email to Template</DialogTitle>
-          <p className="text-white/60 text-sm">
+          <DialogTitle className="text-foreground text-xl">Add Email to Template</DialogTitle>
+          <p className="text-foreground/60 text-sm">
             Create a generic email that will be copied to all vendor categories during event creation
           </p>
         </DialogHeader>
@@ -142,49 +142,49 @@ export function CreateTemplateEmailDialog({
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4 mt-4">
           {/* Email Name */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1.5">Email Name</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Name</label>
             <Input
               {...register('name')}
               placeholder="e.g., 3 Days Before Event Reminder"
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+              className="bg-background/5 border-border text-foreground placeholder:text-foreground/40"
             />
             {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name.message}</p>}
           </div>
 
           {/* Email Category */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1.5">Email Category</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Category</label>
             <Select
               value={emailType}
               onValueChange={(value) => setValue('email_type', value)}
             >
-              <SelectTrigger className="bg-white/5 border-white/20 text-white">
+              <SelectTrigger className="bg-background/5 border-border text-foreground">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+              <SelectContent className="voxxy-select-surface">
                 {EMAIL_CATEGORIES.map(cat => (
-                  <SelectItem key={cat.value} value={cat.value} className="text-white">
+                  <SelectItem key={cat.value} value={cat.value} className="text-foreground">
                     {cat.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {selectedCategory && (
-              <p className="text-xs text-white/50 mt-1">{selectedCategory.description}</p>
+              <p className="text-xs text-foreground/50 mt-1">{selectedCategory.description}</p>
             )}
             {errors.email_type && <p className="text-red-400 text-xs mt-1">{errors.email_type.message}</p>}
           </div>
 
           {/* Subject */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1.5">Subject Line</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Subject Line</label>
             <Input
               {...register('subject_template')}
               placeholder="e.g., Don't forget: [eventName] is in 3 days!"
-              className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+              className="bg-background/5 border-border text-foreground placeholder:text-foreground/40"
             />
             {errors.subject_template && <p className="text-red-400 text-xs mt-1">{errors.subject_template.message}</p>}
-            <p className="text-xs text-white/50 mt-1">
+            <p className="text-xs text-foreground/50 mt-1">
               Use variables like [eventName], [eventDate], [firstName]
             </p>
           </div>
@@ -192,7 +192,7 @@ export function CreateTemplateEmailDialog({
           {/* Trigger Type */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-1.5">When to Send</label>
+              <label className="block text-sm font-medium text-foreground/80 mb-1.5">When to Send</label>
               <Select
                 value={triggerType}
                 onValueChange={(value) => {
@@ -204,12 +204,12 @@ export function CreateTemplateEmailDialog({
                   }
                 }}
               >
-                <SelectTrigger className="bg-white/5 border-white/20 text-white">
+                <SelectTrigger className="bg-background/5 border-border text-foreground">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                <SelectContent className="voxxy-select-surface">
                   {TIME_BASED_TRIGGERS.map(type => (
-                    <SelectItem key={type.value} value={type.value} className="text-white">
+                    <SelectItem key={type.value} value={type.value} className="text-foreground">
                       {type.label}
                     </SelectItem>
                   ))}
@@ -219,12 +219,12 @@ export function CreateTemplateEmailDialog({
 
             {selectedTrigger?.requiresValue && (
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-1.5">Number of Days</label>
+                <label className="block text-sm font-medium text-foreground/80 mb-1.5">Number of Days</label>
                 <Input
                   type="number"
                   {...register('trigger_value', { valueAsNumber: true })}
                   min={0}
-                  className="bg-white/5 border-white/20 text-white"
+                  className="bg-background/5 border-border text-foreground"
                 />
               </div>
             )}
@@ -232,15 +232,15 @@ export function CreateTemplateEmailDialog({
 
           {/* Position */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1.5">Position in Sequence</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Position in Sequence</label>
             <Input
               type="number"
               {...register('position', { valueAsNumber: true })}
               min={1}
               max={40}
-              className="bg-white/5 border-white/20 text-white"
+              className="bg-background/5 border-border text-foreground"
             />
-            <p className="text-xs text-white/50 mt-1">
+            <p className="text-xs text-foreground/50 mt-1">
               Order in the email sequence (1-40). Default: {nextPosition}
             </p>
             {errors.position && <p className="text-red-400 text-xs mt-1">{errors.position.message}</p>}
@@ -248,33 +248,33 @@ export function CreateTemplateEmailDialog({
 
           {/* Body */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-1.5">Email Body</label>
+            <label className="block text-sm font-medium text-foreground/80 mb-1.5">Email Body</label>
             <RichTextEditor
               content={watch('body_template') || ''}
               onChange={(html) => setValue('body_template', html, { shouldValidate: true })}
               placeholder="Write your email message... The unsubscribe footer will be added automatically."
             />
             {errors.body_template && <p className="text-red-400 text-xs mt-1">{errors.body_template.message}</p>}
-            <p className="text-xs text-white/50 mt-1">
+            <p className="text-xs text-foreground/50 mt-1">
               This is a generic template - it will be copied for each vendor category when an event is created
             </p>
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+              className="bg-background/5 border-border text-foreground hover:bg-background/10"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white"
+              className="voxxy-btn-cta"
             >
               {isSubmitting ? 'Adding...' : 'Add to Template'}
             </Button>

@@ -14,7 +14,7 @@ export default function CookiePolicyPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -22,12 +22,12 @@ export default function CookiePolicyPage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Cookie Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground">Cookie Policy</h1>
           <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+        <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This Cookie Policy explains exactly what cookies and similar technologies we use, why we use them, and how you can control them. We believe in opt-in tracking — no analytics cookies run until you say yes.
           </p>
@@ -46,7 +46,7 @@ export default function CookiePolicyPage() {
 
         {/* Section 1 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">1. What Are Cookies?</h2>
+          <h2 className="text-2xl font-bold text-foreground">1. What Are Cookies?</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -57,9 +57,9 @@ export default function CookiePolicyPage() {
 
         {/* Section 2 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">2. Our Consent-First Approach</h2>
+          <h2 className="text-2xl font-bold text-foreground">2. Our Consent-First Approach</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We don't track you until you say it's okay. When you visit our site, you'll see a consent banner. Only strictly necessary cookies run before you opt in.
             </p>
@@ -80,9 +80,9 @@ export default function CookiePolicyPage() {
 
         {/* Section 3 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">3. Cookies We Use</h2>
+          <h2 className="text-2xl font-bold text-foreground">3. Cookies We Use</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Here's a transparent breakdown of every cookie and tracking technology we use, organized by purpose.
             </p>
@@ -90,35 +90,35 @@ export default function CookiePolicyPage() {
 
           <div className="space-y-6 text-gray-700 leading-relaxed">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Category 1: Strictly Necessary</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Category 1: Strictly Necessary</h3>
               <p className="mb-4">
                 These cookies are essential for the Services to function. They cannot be switched off. They are usually set in response to actions you take, such as logging in or setting your privacy preferences.
               </p>
 
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead className="bg-gray-50">
+                <table className="w-full border-collapse border border-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Cookie Name</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Purpose</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Duration</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Cookie Name</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Purpose</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Duration</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">session_token</td>
-                      <td className="border border-gray-300 px-4 py-2">Keeps you logged in and authenticates your session</td>
-                      <td className="border border-gray-300 px-4 py-2">Session (expires when you close your browser)</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">session_token</td>
+                      <td className="border border-border px-4 py-2">Keeps you logged in and authenticates your session</td>
+                      <td className="border border-border px-4 py-2">Session (expires when you close your browser)</td>
                     </tr>
-                    <tr className="bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">csrf_token</td>
-                      <td className="border border-gray-300 px-4 py-2">Protects against cross-site request forgery attacks</td>
-                      <td className="border border-gray-300 px-4 py-2">Session</td>
+                    <tr className="bg-muted">
+                      <td className="border border-border px-4 py-2 font-mono text-sm">csrf_token</td>
+                      <td className="border border-border px-4 py-2">Protects against cross-site request forgery attacks</td>
+                      <td className="border border-border px-4 py-2">Session</td>
                     </tr>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">cookie_consent</td>
-                      <td className="border border-gray-300 px-4 py-2">Stores your cookie consent preferences</td>
-                      <td className="border border-gray-300 px-4 py-2">1 year</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">cookie_consent</td>
+                      <td className="border border-border px-4 py-2">Stores your cookie consent preferences</td>
+                      <td className="border border-border px-4 py-2">1 year</td>
                     </tr>
                   </tbody>
                 </table>
@@ -126,41 +126,41 @@ export default function CookiePolicyPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Category 2: Analytics & Performance (Requires Consent)</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Category 2: Analytics & Performance (Requires Consent)</h3>
               <p className="mb-4">
                 These cookies help us understand how you use the Services so we can improve them. They are only activated after you opt in through the cookie consent banner.
               </p>
 
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead className="bg-gray-50">
+                <table className="w-full border-collapse border border-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Service</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Purpose</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Cookie/Identifier</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Service</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Purpose</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Cookie/Identifier</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2">
+                      <td className="border border-border px-4 py-2">
                         <strong>Mixpanel</strong>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2">Product analytics and user behavior tracking. Helps us understand which features are used and how we can improve them.</td>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">mp_*</td>
+                      <td className="border border-border px-4 py-2">Product analytics and user behavior tracking. Helps us understand which features are used and how we can improve them.</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">mp_*</td>
                     </tr>
-                    <tr className="bg-gray-50">
-                      <td className="border border-gray-300 px-4 py-2">
+                    <tr className="bg-muted">
+                      <td className="border border-border px-4 py-2">
                         <strong>Sentry</strong>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2">Error monitoring and performance tracking. Captures technical errors so we can fix bugs and improve reliability.</td>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">sentry-sc</td>
+                      <td className="border border-border px-4 py-2">Error monitoring and performance tracking. Captures technical errors so we can fix bugs and improve reliability.</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">sentry-sc</td>
                     </tr>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2">
+                      <td className="border border-border px-4 py-2">
                         <strong>Cloudflare</strong>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2">Content delivery, security, and analytics. Protects our site from malicious traffic and improves load times.</td>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">__cf_bm, __cfruid</td>
+                      <td className="border border-border px-4 py-2">Content delivery, security, and analytics. Protects our site from malicious traffic and improves load times.</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">__cf_bm, __cfruid</td>
                     </tr>
                   </tbody>
                 </table>
@@ -168,27 +168,27 @@ export default function CookiePolicyPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Category 3: Payment Processing</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Category 3: Payment Processing</h3>
               <p className="mb-4">
                 These cookies are set by our payment processor, Stripe, when you interact with payment features. They are necessary for secure payment processing and fraud prevention.
               </p>
 
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300">
-                  <thead className="bg-gray-50">
+                <table className="w-full border-collapse border border-border">
+                  <thead className="bg-muted">
                     <tr>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Service</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Purpose</th>
-                      <th className="border border-gray-300 px-4 py-2 text-left font-semibold">Cookie/Identifier</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Service</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Purpose</th>
+                      <th className="border border-border px-4 py-2 text-left font-semibold">Cookie/Identifier</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td className="border border-gray-300 px-4 py-2">
+                      <td className="border border-border px-4 py-2">
                         <strong>Stripe</strong>
                       </td>
-                      <td className="border border-gray-300 px-4 py-2">Secure payment processing and fraud detection. Stripe sets these cookies to verify payment information and protect against fraudulent transactions.</td>
-                      <td className="border border-gray-300 px-4 py-2 font-mono text-sm">__stripe_*</td>
+                      <td className="border border-border px-4 py-2">Secure payment processing and fraud detection. Stripe sets these cookies to verify payment information and protect against fraudulent transactions.</td>
+                      <td className="border border-border px-4 py-2 font-mono text-sm">__stripe_*</td>
                     </tr>
                   </tbody>
                 </table>
@@ -199,7 +199,7 @@ export default function CookiePolicyPage() {
 
         {/* Section 4 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">4. Other Tracking Technologies</h2>
+          <h2 className="text-2xl font-bold text-foreground">4. Other Tracking Technologies</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -213,9 +213,9 @@ export default function CookiePolicyPage() {
 
         {/* Section 5 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">5. What We Don't Do</h2>
+          <h2 className="text-2xl font-bold text-foreground">5. What We Don't Do</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We keep things simple. No ad tracking, no retargeting, no selling your browsing data.
             </p>
@@ -240,7 +240,7 @@ export default function CookiePolicyPage() {
 
         {/* Section 6 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">6. Your Choices</h2>
+          <h2 className="text-2xl font-bold text-foreground">6. Your Choices</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -260,7 +260,7 @@ export default function CookiePolicyPage() {
 
         {/* Section 7 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">7. Updates to This Cookie Policy</h2>
+          <h2 className="text-2xl font-bold text-foreground">7. Updates to This Cookie Policy</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -271,7 +271,7 @@ export default function CookiePolicyPage() {
 
         {/* Section 8 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">8. Contact Us</h2>
+          <h2 className="text-2xl font-bold text-foreground">8. Contact Us</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>

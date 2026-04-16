@@ -34,20 +34,20 @@ export default function PricingPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       <Navigation activePage="pricing" />
 
       {/* Hero Section */}
       <section className="relative pt-[140px] pb-20 px-6 md:px-12">
         <div className="container mx-auto max-w-4xl text-center">
-          <h1 className="text-5xl md:text-6xl font-bold text-white mb-5 tracking-tight leading-tight">
+          <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-5 tracking-tight leading-tight">
             Simple,{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
               Transparent Pricing
             </span>
           </h1>
 
-          <p className="text-xl text-gray-300 mb-0 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground mb-0 max-w-3xl mx-auto leading-relaxed">
             Choose the plan that fits your event schedule
           </p>
 
@@ -61,15 +61,15 @@ export default function PricingPage() {
       </section>
 
       {/* Pricing Cards */}
-      <section ref={pricingCardRef} className="py-24 bg-white relative z-10">
+      <section ref={pricingCardRef} className="py-24 bg-background relative z-10">
         <div className="container mx-auto max-w-6xl px-6 md:px-12">
           <div className="grid md:grid-cols-3 gap-8 items-stretch">
             {/* Starter Plan */}
-            <Card className="pricing-card bg-gray-100 !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
+            <Card className="pricing-card bg-muted !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Starter</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$80</div>
-                <CardDescription className="text-gray-700">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-foreground mb-2">Starter</CardTitle>
+                <div className="text-4xl font-bold text-foreground mb-2">$80</div>
+                <CardDescription className="text-foreground/88 dark:text-gray-300">per month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
@@ -97,7 +97,7 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                <Button className="w-full voxxy-btn-solid" asChild>
                   <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
@@ -106,12 +106,12 @@ export default function PricingPage() {
             {/* Growth Plan */}
             <Card className="pricing-card bg-gradient-to-br from-purple-50 to-pink-50 !border-2 !border-voxxy-purple-brand hover:shadow-xl transition-all duration-300 shadow-lg relative flex flex-col">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-voxxy-purple-brand text-white px-4 py-1 text-sm">Most Popular</Badge>
+                <Badge className="bg-violet-200 text-foreground border border-violet-300 dark:bg-voxxy-purple-brand dark:border-transparent dark:text-primary-foreground px-4 py-1 text-sm">Most Popular</Badge>
               </div>
               <CardHeader className="text-center pb-6 pt-8">
-                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Growth</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$160</div>
-                <CardDescription className="text-gray-700">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-foreground mb-2">Growth</CardTitle>
+                <div className="text-4xl font-bold text-foreground mb-2">$160</div>
+                <CardDescription className="text-foreground/88 dark:text-gray-300">per month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
@@ -143,18 +143,18 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                <Button className="w-full voxxy-btn-solid" asChild>
                   <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
             </Card>
 
             {/* Enterprise Plan */}
-            <Card className="pricing-card bg-gray-100 !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
+            <Card className="pricing-card bg-muted !border-2 !border-voxxy-purple-brand hover:shadow-lg transition-all duration-300 flex flex-col">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="text-2xl font-bold text-gray-900 mb-2">Enterprise</CardTitle>
-                <div className="text-4xl font-bold text-gray-900 mb-2">$400</div>
-                <CardDescription className="text-gray-700">per month</CardDescription>
+                <CardTitle className="text-2xl font-bold text-foreground mb-2">Enterprise</CardTitle>
+                <div className="text-4xl font-bold text-foreground mb-2">$400</div>
+                <CardDescription className="text-foreground/88 dark:text-gray-300">per month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
@@ -182,7 +182,7 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full bg-voxxy-purple-brand hover:bg-purple-700 text-white" asChild>
+                <Button className="w-full voxxy-btn-solid" asChild>
                   <Link to="/#contact">Request Access</Link>
                 </Button>
               </CardContent>
@@ -192,15 +192,15 @@ export default function PricingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 backdrop-blur-sm border-y border-white/10 relative z-10">
+      <section className="py-24 bg-gradient-to-r from-primary/10 to-blue-500/10 backdrop-blur-sm border-y border-border relative z-10">
         <div className="container mx-auto max-w-4xl px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-xl text-muted-foreground mb-10 max-w-2xl mx-auto leading-relaxed">
             Join event producers who are scaling their recurring events with Voxxy
           </p>
-          <Button size="lg" className="bg-white text-purple-600 hover:bg-gray-100 shadow-lg hover:shadow-xl font-semibold" asChild>
+          <Button size="lg" className="bg-background text-purple-600 hover:bg-muted shadow-lg hover:shadow-xl font-semibold" asChild>
             <Link to="/#contact">
               Request Access
               <ArrowRight className="ml-2 h-5 w-5" />

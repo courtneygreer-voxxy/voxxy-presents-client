@@ -330,17 +330,17 @@ export default function VendorEventPortalPage() {
   // Authentication Form
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
               <h1 className="text-3xl font-bold mb-2">Event Portal Access</h1>
-              <p className="text-gray-400">
+              <p className="text-muted-foreground">
                 Enter your email to view event details
               </p>
             </div>
 
-            <form onSubmit={handleAccessPortal} className="bg-gray-800 rounded-lg p-6 shadow-xl">
+            <form onSubmit={handleAccessPortal} className="bg-muted rounded-lg p-6 shadow-xl">
               <div className="space-y-4">
                 <div>
                   <label htmlFor="email" className="block text-sm font-medium mb-2">
@@ -352,11 +352,11 @@ export default function VendorEventPortalPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.email@example.com"
-                    className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-white placeholder-gray-400"
+                    className="w-full px-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-foreground placeholder:text-muted-foreground"
                     required
                     autoFocus
                   />
-                  <p className="text-xs text-gray-400 mt-2">
+                  <p className="text-xs text-muted-foreground mt-2">
                     Use the email you provided when you applied to this event
                   </p>
                 </div>
@@ -371,7 +371,7 @@ export default function VendorEventPortalPage() {
                 <button
                   type="submit"
                   disabled={verifying}
-                  className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                  className="w-full voxxy-btn-solid disabled:bg-muted disabled:cursor-not-allowed font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
                 >
                   {verifying ? (
                     <>
@@ -385,7 +385,7 @@ export default function VendorEventPortalPage() {
               </div>
             </form>
 
-            <div className="mt-6 text-center text-sm text-gray-400">
+            <div className="mt-6 text-center text-sm text-muted-foreground">
               <p>
                 This portal is only accessible to vendors who have applied to this event.
               </p>
@@ -399,10 +399,10 @@ export default function VendorEventPortalPage() {
   // Loading state
   if (loading || !portalData) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-purple-500" />
-          <p className="text-gray-400">Loading event details...</p>
+          <p className="text-muted-foreground">Loading event details...</p>
         </div>
       </div>
     );
@@ -411,17 +411,17 @@ export default function VendorEventPortalPage() {
   // Error state
   if (dataError) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white flex items-center justify-center">
+      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black flex items-center justify-center">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
           <h2 className="text-2xl font-bold mb-2">Error Loading Portal</h2>
-          <p className="text-gray-400 mb-6">{dataError}</p>
+          <p className="text-muted-foreground mb-6">{dataError}</p>
           <button
             onClick={() => {
               clearPortalSession();
               setIsAuthenticated(false);
             }}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors"
+            className="voxxy-btn-solid font-semibold py-2 px-6 rounded-lg transition-colors"
           >
             Back to Login
           </button>
@@ -434,7 +434,7 @@ export default function VendorEventPortalPage() {
 
   // Portal Dashboard
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black">
       <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16 py-8">
         {/* Producer Preview Banner */}
         {isProducerPreview && (
@@ -456,14 +456,14 @@ export default function VendorEventPortalPage() {
                   clearPortalSession();
                   setIsAuthenticated(false);
                 }}
-                className="text-xs md:text-sm text-gray-400 hover:text-white transition-colors"
+                className="text-xs md:text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Sign Out
               </button>
             )}
           </div>
           {event.organization && (
-            <div className="flex items-center gap-2 text-gray-400 text-sm">
+            <div className="flex items-center gap-2 text-muted-foreground text-sm">
               <Building2 className="h-4 w-4" />
               <span>Presented by {event.organization.name}</span>
             </div>
@@ -471,11 +471,11 @@ export default function VendorEventPortalPage() {
         </div>
 
         {/* Event Details Section */}
-        <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-6 shadow-xl">
+        <div className="bg-muted rounded-lg p-4 md:p-6 mb-6 shadow-xl">
           <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Event Details</h2>
 
           {event.description && (
-            <p className="text-sm md:text-base text-gray-300 mb-4 md:mb-6 leading-relaxed">{event.description}</p>
+            <p className="text-sm md:text-base text-muted-foreground mb-4 md:mb-6 leading-relaxed">{event.description}</p>
           )}
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
@@ -484,8 +484,8 @@ export default function VendorEventPortalPage() {
                 <MapPin className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Location</p>
-                  <p className="text-gray-300">{event.venue}</p>
-                  <p className="text-sm text-gray-400">{event.location}</p>
+                  <p className="text-muted-foreground">{event.venue}</p>
+                  <p className="text-sm text-muted-foreground">{event.location}</p>
                 </div>
               </div>
             )}
@@ -495,7 +495,7 @@ export default function VendorEventPortalPage() {
                 <Users className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Age Restriction</p>
-                  <p className="text-gray-300">{event.age_restriction}</p>
+                  <p className="text-muted-foreground">{event.age_restriction}</p>
                 </div>
               </div>
             )}
@@ -505,7 +505,7 @@ export default function VendorEventPortalPage() {
                 <DollarSign className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Payment Deadline</p>
-                  <p className="text-gray-300">{formatDate(event.payment_deadline)}</p>
+                  <p className="text-muted-foreground">{formatDate(event.payment_deadline)}</p>
                 </div>
               </div>
             )}
@@ -530,10 +530,10 @@ export default function VendorEventPortalPage() {
         </div>
 
         {/* Producer Updates Section */}
-        <div className="bg-gray-800 rounded-lg p-4 md:p-6 mb-6 shadow-xl">
+        <div className="bg-muted rounded-lg p-4 md:p-6 mb-6 shadow-xl">
           <div className="flex items-center gap-2 md:gap-3 mb-4 md:mb-6">
-            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg bg-purple-600 flex items-center justify-center">
-              <Megaphone className="w-4 h-4 md:w-5 md:h-5 text-white" />
+            <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg voxxy-accent-tile flex items-center justify-center">
+              <Megaphone className="w-4 h-4 md:w-5 md:h-5 text-foreground" />
             </div>
             <h2 className="text-xl md:text-2xl font-bold">Producer Updates</h2>
           </div>
@@ -553,32 +553,32 @@ export default function VendorEventPortalPage() {
                 return (
                   <div
                     key={bulletin.id}
-                    className={`bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] rounded-lg p-4 md:p-6 border ${
-                      bulletin.pinned ? 'border-purple-500' : 'border-gray-700'
+                    className={`voxxy-gradient-card-deep rounded-lg p-4 md:p-6 border ${
+                      bulletin.pinned ? 'border-purple-500' : 'border-border'
                     }`}
                   >
                     {/* Header */}
                     <div className="flex items-start gap-2 md:gap-3 mb-3 md:mb-4">
                       {/* Author Avatar */}
-                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-purple-600 flex items-center justify-center text-white text-xs md:text-sm font-medium flex-shrink-0">
+                      <div className="w-8 h-8 md:w-10 md:h-10 rounded-full voxxy-accent-tile flex items-center justify-center text-xs md:text-sm font-medium flex-shrink-0">
                         {getInitials(bulletin.author.name)}
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm md:text-base text-white font-semibold">{bulletin.subject}</h3>
+                          <h3 className="text-sm md:text-base text-foreground font-semibold">{bulletin.subject}</h3>
                           {bulletin.pinned && (
                             <Pin className="w-3 h-3 md:w-4 md:h-4 text-purple-400 fill-purple-400 flex-shrink-0" />
                           )}
                         </div>
-                        <p className="text-gray-400 text-xs md:text-sm">
+                        <p className="text-muted-foreground text-xs md:text-sm">
                           {bulletin.author.name} · {formatDistanceToNow(new Date(bulletin.created_at), { addSuffix: true })}
                         </p>
                       </div>
                     </div>
 
                     {/* Body */}
-                    <div className="text-sm md:text-base text-gray-300 whitespace-pre-wrap">
+                    <div className="text-sm md:text-base text-muted-foreground whitespace-pre-wrap">
                       {bulletin.body}
                     </div>
                   </div>
@@ -586,7 +586,7 @@ export default function VendorEventPortalPage() {
               })}
             </div>
           ) : (
-            <p className="text-gray-400 text-center py-6 md:py-8 text-sm md:text-base">
+            <p className="text-muted-foreground text-center py-6 md:py-8 text-sm md:text-base">
               No updates at this time. Check back later for announcements from the event producer.
             </p>
           )}
@@ -594,12 +594,12 @@ export default function VendorEventPortalPage() {
 
         {/* Vendor Categories Section */}
         {vendor_categories.length > 0 && (
-          <div className="bg-gray-800 rounded-lg p-4 md:p-6 shadow-xl">
+          <div className="bg-muted rounded-lg p-4 md:p-6 shadow-xl">
             <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4">Vendor Categories & Pricing</h2>
 
             <div className="space-y-3 md:space-y-4">
               {vendor_categories.map((category) => (
-                <div key={category.id} className="bg-gray-700 rounded-lg p-3 md:p-4 border border-gray-600">
+                <div key={category.id} className="bg-muted rounded-lg p-3 md:p-4 border border-border">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-3 gap-3">
                     <div className="flex-1">
                       <h3 className="text-lg md:text-xl font-semibold">{category.name}</h3>
@@ -608,7 +608,7 @@ export default function VendorEventPortalPage() {
                           {category.categories.map((cat, idx) => (
                             <span
                               key={idx}
-                              className="px-2 py-0.5 md:py-1 bg-gray-600 text-xs rounded-full text-gray-300"
+                              className="px-2 py-0.5 md:py-1 bg-muted text-xs rounded-full text-muted-foreground"
                             >
                               {cat}
                             </span>
@@ -626,7 +626,7 @@ export default function VendorEventPortalPage() {
                             href={category.payment_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 mt-0 md:mt-2 text-xs md:text-sm bg-purple-600 hover:bg-purple-700 px-3 py-1.5 rounded transition-colors"
+                            className="inline-flex items-center gap-1 mt-0 md:mt-2 text-xs md:text-sm voxxy-btn-solid px-3 py-1.5 rounded transition-colors"
                           >
                             Pay Now
                             <ExternalLink className="h-3 w-3" />
@@ -637,7 +637,7 @@ export default function VendorEventPortalPage() {
                   </div>
 
                   {category.description && (
-                    <p className="text-gray-300 text-xs md:text-sm mb-3">{category.description}</p>
+                    <p className="text-muted-foreground text-xs md:text-sm mb-3">{category.description}</p>
                   )}
                 </div>
               ))}

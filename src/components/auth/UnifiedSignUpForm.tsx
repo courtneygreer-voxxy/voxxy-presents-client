@@ -171,11 +171,11 @@ export function UnifiedSignUpForm({
             ) : (
               <Building2 className="h-5 w-5 text-purple-400" />
             )}
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {isProducer ? 'Create Producer Account' : 'Create Vendor Account'}
             </h3>
           </div>
-          <p className="text-gray-300 text-sm">
+          <p className="text-muted-foreground text-sm">
             {isProducer
               ? 'Start organizing and managing your events'
               : 'Join as a vendor and connect with event producers'
@@ -187,18 +187,18 @@ export function UnifiedSignUpForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Display Name Field */}
           <div className="space-y-2">
-            <Label htmlFor="displayName" className="text-white">
+            <Label htmlFor="displayName" className="text-foreground">
               {isProducer ? 'Your Name' : 'Business/Artist Name'}
             </Label>
             <div className="relative">
-              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="displayName"
                 type="text"
                 placeholder={isProducer ? "Enter your name" : "Enter your business or artist name"}
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
             </div>
@@ -209,16 +209,16 @@ export function UnifiedSignUpForm({
 
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white">Email</Label>
+            <Label htmlFor="email" className="text-foreground">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
             </div>
@@ -229,22 +229,22 @@ export function UnifiedSignUpForm({
 
           {/* Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-white">Password</Label>
+            <Label htmlFor="password" className="text-foreground">Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -261,22 +261,22 @@ export function UnifiedSignUpForm({
 
           {/* Confirm Password Field */}
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="text-white">Confirm Password</Label>
+            <Label htmlFor="confirmPassword" className="text-foreground">Confirm Password</Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 disabled={isSubmitting}
               >
                 {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -295,10 +295,10 @@ export function UnifiedSignUpForm({
                 type="checkbox"
                 checked={formData.acceptTerms}
                 onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                className="w-4 h-4 mt-1 text-purple-600 bg-white/10 border-white/20 rounded focus:ring-purple-500 focus:ring-2"
+                className="w-4 h-4 mt-1 text-purple-600 bg-background/10 border-border rounded focus:ring-purple-500 focus:ring-2"
                 disabled={isSubmitting}
               />
-              <Label htmlFor="acceptTerms" className="text-gray-300 text-sm leading-relaxed">
+              <Label htmlFor="acceptTerms" className="text-foreground/90 dark:text-muted-foreground text-sm leading-relaxed">
                 I agree to the{' '}
                 <a href="/legal/terms" className="text-purple-400 hover:text-purple-300 underline">
                   Terms of Service
@@ -318,7 +318,7 @@ export function UnifiedSignUpForm({
           <Button
             type="submit"
             disabled={isSubmitting || loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full voxxy-btn-solid"
           >
             {isSubmitting || loading ? (
               <>
@@ -346,17 +346,17 @@ export function UnifiedSignUpForm({
   return (
     <div className="w-full">
       <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/10 backdrop-blur-sm">
+        <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
           <TabsTrigger
             value="venue_owner"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Users className="h-4 w-4 mr-2" />
             Producer
           </TabsTrigger>
           <TabsTrigger
             value="vendor"
-            className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Building2 className="h-4 w-4 mr-2" />
             Vendor

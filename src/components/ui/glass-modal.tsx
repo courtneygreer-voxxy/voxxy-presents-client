@@ -58,7 +58,7 @@ export function GlassModal({
       </DialogTrigger>
       <DialogContent className={cn(
         // Base glass morphism styles
-        "bg-white/15 backdrop-blur-md border-white/30 text-white",
+        "bg-background/15 backdrop-blur-md border-border text-foreground",
         // Enhanced backdrop for better contrast
         "shadow-2xl shadow-black/50",
         // Responsive sizing
@@ -70,7 +70,7 @@ export function GlassModal({
       )}>
         {title && (
           <DialogHeader className="space-y-3">
-            <DialogTitle className="text-2xl font-bold text-center text-white flex items-center justify-center gap-2">
+            <DialogTitle className="text-2xl font-bold text-center text-foreground flex items-center justify-center gap-2">
               {icon}
               {title}
             </DialogTitle>
@@ -91,7 +91,7 @@ export function GlassModal({
 export function GlassCard({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
     <div className={cn(
-      "bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4",
+      "bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4",
       className
     )}>
       {children}
@@ -102,13 +102,13 @@ export function GlassCard({ children, className }: { children: React.ReactNode, 
 /**
  * Glass morphism input styling classes
  */
-export const glassInputClasses = "bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-purple-400/20"
+export const glassInputClasses = "bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400 focus:ring-purple-400/20"
 
 /**
  * Glass morphism button styling classes
  */
 export const glassButtonClasses = {
-  primary: "bg-purple-600 hover:bg-purple-700 text-white",
-  secondary: "bg-white/10 border-white/20 text-white hover:bg-white/20",
-  outline: "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30"
+  primary: "voxxy-btn-solid",
+  secondary: "bg-background/10 border-border text-foreground hover:bg-background/20",
+  outline: "bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border"
 }

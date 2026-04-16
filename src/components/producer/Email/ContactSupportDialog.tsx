@@ -182,10 +182,10 @@ export function ContactSupportDialog({
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-500/10 border border-green-500/20 mb-4">
               <Send className="w-8 h-8 text-green-400" />
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               Request Sent!
             </h3>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-foreground/60">
               We've received your support request and will respond shortly.
             </p>
           </div>
@@ -194,7 +194,7 @@ export function ContactSupportDialog({
             <div className="space-y-4 py-4">
               {/* Name */}
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-white/80 mb-1.5">
+                <label htmlFor="name" className="block text-sm font-medium text-foreground/80 mb-1.5">
                   Your Name
                 </label>
                 <Input
@@ -202,13 +202,13 @@ export function ContactSupportDialog({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
-                  className="bg-white/5 border-white/10"
+                  className="bg-background/5 border-border"
                 />
               </div>
 
               {/* Message */}
               <div>
-                <label htmlFor="message" className="block text-sm font-medium text-white/80 mb-1.5">
+                <label htmlFor="message" className="block text-sm font-medium text-foreground/80 mb-1.5">
                   Message <span className="text-red-400">*</span>
                 </label>
                 <Textarea
@@ -217,13 +217,13 @@ export function ContactSupportDialog({
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Describe the issue you're experiencing..."
                   rows={5}
-                  className="bg-white/5 border-white/10 resize-none"
+                  className="bg-background/5 border-border resize-none"
                   required
                 />
               </div>
 
               {/* Callback checkbox */}
-              <div className="flex items-start space-x-3 p-3 bg-white/5 border border-white/10 rounded-lg">
+              <div className="flex items-start space-x-3 p-3 bg-background/5 border border-border rounded-lg">
                 <Checkbox
                   id="callback"
                   checked={wantCallback}
@@ -232,11 +232,11 @@ export function ContactSupportDialog({
                 <div className="flex-1">
                   <label
                     htmlFor="callback"
-                    className="text-sm font-medium text-white/80 cursor-pointer"
+                    className="text-sm font-medium text-foreground/80 cursor-pointer"
                   >
                     I want Voxxy to reach out to me
                   </label>
-                  <p className="text-xs text-white/60 mt-0.5">
+                  <p className="text-xs text-foreground/60 mt-0.5">
                     We'll contact you at {userEmail || 'your registered email'} to help resolve this issue.
                   </p>
                 </div>
@@ -252,11 +252,11 @@ export function ContactSupportDialog({
 
               {/* Context preview */}
               {entry && (
-                <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-                  <p className="text-xs font-medium text-white/60 mb-2">
+                <div className="p-3 bg-background/5 border border-border rounded-lg">
+                  <p className="text-xs font-medium text-foreground/60 mb-2">
                     Context that will be included:
                   </p>
-                  <div className="text-xs text-white/50 space-y-1">
+                  <div className="text-xs text-foreground/50 space-y-1">
                     <div><span className="font-medium">Email:</span> {entry.email_name}</div>
                     <div><span className="font-medium">Recipient:</span> {entry.recipient_email}</div>
                     <div><span className="font-medium">Status:</span> {entry.status}</div>

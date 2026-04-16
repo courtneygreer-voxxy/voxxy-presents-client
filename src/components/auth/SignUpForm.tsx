@@ -136,7 +136,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
+    <Card className="w-full max-w-md mx-auto bg-background/15 backdrop-blur-md border-border text-foreground shadow-2xl shadow-black/50">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
         <CardDescription className="text-center">
@@ -288,7 +288,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
               <input
                 id="acceptTerms"
                 type="checkbox"
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                className="mt-1 h-4 w-4 rounded border-border text-primary focus:ring-primary"
                 checked={formData.acceptTerms}
                 onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
                 disabled={isSubmitting || loading}
@@ -312,7 +312,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full voxxy-btn-solid"
             disabled={isSubmitting || loading}
             size="lg"
           >

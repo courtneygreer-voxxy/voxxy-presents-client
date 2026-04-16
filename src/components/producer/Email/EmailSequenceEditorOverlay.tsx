@@ -2,6 +2,7 @@ import { useState, useRef, useMemo } from 'react';
 import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Button } from '@/components/ui/button';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import type { ScheduledEmail } from '@/types/email';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 import { scheduledEmailsApi } from '@/services/api';
@@ -85,19 +86,19 @@ function inferCategory(email: ScheduledEmail): string {
 function getStatusBadge(status: string) {
   switch (status) {
     case 'sent':
-      return { label: 'Sent', className: 'bg-green-500/20 text-green-400 border-green-500/30' };
+      return { label: 'Sent', variant: 'tintGreen' as BadgeVariant };
     case 'scheduled':
-      return { label: 'Scheduled', className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
+      return { label: 'Scheduled', variant: 'tintBlue' as BadgeVariant };
     case 'paused':
-      return { label: 'Paused', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
+      return { label: 'Paused', variant: 'tintYellow' as BadgeVariant };
     case 'active':
-      return { label: 'Active', className: 'bg-green-500/20 text-green-400 border-green-500/30' };
+      return { label: 'Active', variant: 'tintGreen' as BadgeVariant };
     case 'failed':
-      return { label: 'Failed', className: 'bg-red-500/20 text-red-400 border-red-500/30' };
+      return { label: 'Failed', variant: 'tintRed' as BadgeVariant };
     case 'cancelled':
-      return { label: 'Cancelled', className: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
+      return { label: 'Cancelled', variant: 'tintMuted' as BadgeVariant };
     default:
-      return { label: status, className: 'bg-gray-500/20 text-gray-400 border-gray-500/30' };
+      return { label: status, variant: 'tintMuted' as BadgeVariant };
   }
 }
 
@@ -163,7 +164,7 @@ function SequenceRowMenu({
       <button
         ref={btnRef}
         onClick={() => setOpen(!open)}
-        className="p-1.5 rounded text-white/50 hover:text-white hover:bg-white/10 transition-all"
+        className="p-1.5 rounded text-foreground/50 hover:text-foreground hover:bg-background/10 transition-all"
       >
         <MoreVertical className="w-3.5 h-3.5" />
       </button>
@@ -171,7 +172,7 @@ function SequenceRowMenu({
         <>
           <div className="fixed inset-0 z-[100]" onClick={() => setOpen(false)} />
           <div
-            className="fixed z-[101] bg-gray-900 border border-white/20 rounded-lg shadow-xl py-1 min-w-[140px]"
+            className="fixed z-[101] bg-muted border border-border rounded-lg shadow-xl py-1 min-w-[140px]"
             style={{
               right: `${window.innerWidth - btnRef.current.getBoundingClientRect().right}px`,
               top: `${btnRef.current.getBoundingClientRect().bottom + 4}px`,
@@ -180,7 +181,7 @@ function SequenceRowMenu({
             {(isScheduled || isPaused) && onSendNow && (
               <button
                 onClick={() => { setOpen(false); onSendNow(email.id); }}
-                className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2"
               >
                 <Play className="w-3.5 h-3.5" /> Send Now
               </button>
@@ -188,7 +189,7 @@ function SequenceRowMenu({
             {isScheduled && (
               <button
                 onClick={() => { setOpen(false); onPause(email.id); }}
-                className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2"
               >
                 <Pause className="w-3.5 h-3.5" /> Pause
               </button>
@@ -196,7 +197,7 @@ function SequenceRowMenu({
             {isPaused && (
               <button
                 onClick={() => { setOpen(false); onResume(email.id); }}
-                className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2"
+                className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2"
               >
                 <Play className="w-3.5 h-3.5" /> Resume
               </button>
@@ -290,9 +291,9 @@ export default function EmailSequenceEditorOverlay({
   const isCustomEmail = selectedEmail ? isCustomCountdown(selectedEmail.trigger_type) : false;
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
-      {/* Header */}
-      <div className="border-b border-white/10 bg-[#0f0a1e]/80 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
+    <div className="fixed inset-0 voxxy-gradient-editor z-50 flex flex-col">
+      {/* Header — semantic surface in light; dark bar only in dark theme */}
+      <div className="voxxy-nav-surface border-b border-border sticky top-0 z-10 shadow-sm dark:shadow-lg">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Left: Back button and title */}
@@ -301,16 +302,16 @@ export default function EmailSequenceEditorOverlay({
                 variant="ghost"
                 size="sm"
                 onClick={onBack}
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-xs text-foreground hover:bg-foreground/5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Mail
               </Button>
               <div className="h-5 w-px bg-border" />
               <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 text-purple-400" />
+                <Mail className="w-5 h-5 shrink-0 text-purple-700 dark:text-purple-400" />
                 <div>
-                  <h1 className="text-base font-semibold">Email Sequence Editor</h1>
+                  <h1 className="text-base font-semibold text-foreground">Email Sequence Editor</h1>
                   {eventData?.title && (
                     <p className="text-xs text-muted-foreground">{eventData.title}</p>
                   )}
@@ -340,13 +341,13 @@ export default function EmailSequenceEditorOverlay({
         <div className="h-full px-6 py-4">
           {emails.length === 0 ? (
             <div className="h-full flex items-center justify-center">
-              <div className="text-center py-16 bg-white/5 rounded-lg border border-white/10 w-full max-w-2xl">
-                <Mail className="w-12 h-12 text-white/40 mx-auto mb-3" />
-                <p className="text-white/60 mb-4">No emails in sequence</p>
+              <div className="text-center py-16 bg-background/5 rounded-lg border border-border w-full max-w-2xl">
+                <Mail className="w-12 h-12 text-foreground/40 mx-auto mb-3" />
+                <p className="text-foreground/60 mb-4">No emails in sequence</p>
                 {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                 {/* <button
                   onClick={() => onCreateEmail(null)}
-                  className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-violet-950 dark:text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   Add First Email
@@ -356,10 +357,10 @@ export default function EmailSequenceEditorOverlay({
           ) : (
             <div className="h-full flex gap-4 min-h-0 overflow-hidden">
             {/* Left Sidebar - Email Navigation */}
-            <div className="w-80 flex-shrink-0 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03]">
-              <div className="p-3 border-b border-white/10 sticky top-0 bg-black/40 backdrop-blur-sm z-10">
+            <div className="w-80 flex-shrink-0 overflow-y-auto rounded-lg border border-border bg-background/[0.03]">
+              <div className="sticky top-0 z-10 border-b border-border bg-muted/90 p-3 backdrop-blur-sm dark:bg-black/40">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-semibold text-white/80 uppercase tracking-wide">
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-foreground">
                     {emails.length} Email{emails.length !== 1 ? 's' : ''}
                   </h3>
                   {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
@@ -382,14 +383,14 @@ export default function EmailSequenceEditorOverlay({
                   return (
                     <div key={groupKey}>
                       <div className="px-2 py-1">
-                        <h4 className="text-[10px] font-bold text-white/50 uppercase tracking-wider">
+                        <h4 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           {groupLabels[groupKey]}
                         </h4>
                       </div>
                       <div className="space-y-0.5">
                         {items.map((email) => {
                           const isCustom = isCustomCountdown(email.trigger_type);
-                          const status = getStatusBadge(email.status);
+                          const emailStatusBadge = getStatusBadge(email.status);
                           return (
                             <button
                               key={email.id}
@@ -397,11 +398,11 @@ export default function EmailSequenceEditorOverlay({
                               className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
                                 selectedEmail?.id === email.id
                                   ? 'bg-purple-500/20 border border-purple-500/40'
-                                  : 'hover:bg-white/5 border border-transparent'
+                                  : 'hover:bg-background/5 border border-transparent'
                               }`}
                             >
                               <div className="flex items-center justify-between gap-2 mb-1">
-                                <div className="text-sm text-white font-medium truncate">
+                                <div className="text-sm text-foreground font-medium truncate">
                                   {email.name}
                                 </div>
                               </div>
@@ -409,12 +410,12 @@ export default function EmailSequenceEditorOverlay({
                                 <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${getEmailTypeInfo(email.trigger_type).color}`}>
                                   {getEmailTypeInfo(email.trigger_type).label}
                                 </span>
-                                <span className={`px-1.5 py-0.5 rounded text-[9px] font-medium border ${status.className}`}>
-                                  {status.label}
-                                </span>
-                                <span className="px-1.5 py-0.5 rounded text-[9px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                                <Badge variant={emailStatusBadge.variant} className="rounded px-1.5 py-0.5 text-[9px] font-medium">
+                                  {emailStatusBadge.label}
+                                </Badge>
+                                <Badge variant="tintBlueSoft" className="rounded px-1.5 py-0.5 text-[9px] font-medium">
                                   {getAudienceLabel(email)}
-                                </span>
+                                </Badge>
                               </div>
                             </button>
                           );
@@ -427,33 +428,36 @@ export default function EmailSequenceEditorOverlay({
             </div>
 
             {/* Right Preview Pane */}
-            <div className="flex-1 overflow-y-auto rounded-lg border border-white/10 bg-white/[0.03] min-w-0">
+            <div className="flex-1 overflow-y-auto rounded-lg border border-border bg-background/[0.03] min-w-0">
               {selectedEmail ? (
                 <div>
                   {/* Preview Header */}
-                  <div className="p-4 border-b border-white/10 bg-black/20 sticky top-0 z-10 backdrop-blur-sm">
+                  <div className="sticky top-0 z-10 border-b border-border bg-muted/70 p-4 backdrop-blur-sm dark:bg-black/20">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Mail className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                          <h3 className="text-base font-semibold text-white truncate">
+                          <Mail className="h-4 w-4 shrink-0 text-purple-700 dark:text-purple-400" />
+                          <h3 className="text-base font-semibold text-foreground truncate">
                             {selectedEmail.name}
                           </h3>
                           {isCustomEmail ? (
                             <div className="flex items-center gap-1">
-                              <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-purple-500/30 text-purple-200 border border-purple-400/40 uppercase tracking-wide">
+                              <Badge variant="tintPurple" className="rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide">
                                 Reminder
-                              </span>
+                              </Badge>
                               <Tooltip.Provider delayDuration={200}>
                                 <Tooltip.Root>
                                   <Tooltip.Trigger asChild>
-                                    <button className="text-purple-300 hover:text-purple-200 transition-colors">
-                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    <button
+                                      type="button"
+                                      className="text-purple-700 transition-colors hover:text-purple-900 dark:text-purple-300 dark:hover:text-purple-200"
+                                    >
+                                      <HelpCircle className="h-3.5 w-3.5" />
                                     </button>
                                   </Tooltip.Trigger>
                                   <Tooltip.Portal>
                                     <Tooltip.Content
-                                      className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                                      className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
                                       sideOffset={5}
                                     >
                                       This is a time-based reminder that was added to this event's sequence.
@@ -465,19 +469,22 @@ export default function EmailSequenceEditorOverlay({
                             </div>
                           ) : (
                             <div className="flex items-center gap-1">
-                              <span className="flex-shrink-0 px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 uppercase tracking-wide">
+                              <Badge variant="tintGreen" className="rounded px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide">
                                 System
-                              </span>
+                              </Badge>
                               <Tooltip.Provider delayDuration={200}>
                                 <Tooltip.Root>
                                   <Tooltip.Trigger asChild>
-                                    <button className="text-emerald-300 hover:text-emerald-200 transition-colors">
-                                      <HelpCircle className="w-3.5 h-3.5" />
+                                    <button
+                                      type="button"
+                                      className="text-emerald-800 transition-colors hover:text-emerald-950 dark:text-emerald-300 dark:hover:text-emerald-200"
+                                    >
+                                      <HelpCircle className="h-3.5 w-3.5" />
                                     </button>
                                   </Tooltip.Trigger>
                                   <Tooltip.Portal>
                                     <Tooltip.Content
-                                      className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
+                                      className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
                                       sideOffset={5}
                                     >
                                       This is a core system email that's automatically triggered by vendor actions or event milestones.
@@ -493,18 +500,18 @@ export default function EmailSequenceEditorOverlay({
                           <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getEmailTypeInfo(selectedEmail.trigger_type).color}`}>
                             {getEmailTypeInfo(selectedEmail.trigger_type).label}
                           </span>
-                          <span className={`px-2 py-0.5 rounded text-[10px] font-medium border ${getStatusBadge(selectedEmail.status).className}`}>
+                          <Badge variant={getStatusBadge(selectedEmail.status).variant} className="rounded px-2 py-0.5 text-[10px] font-medium">
                             {getStatusBadge(selectedEmail.status).label}
-                          </span>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-blue-500/10 text-blue-300 border border-blue-500/30">
+                          </Badge>
+                          <Badge variant="tintBlueSoft" className="rounded px-2 py-0.5 text-[10px] font-medium">
                             Audience: {getAudienceLabel(selectedEmail)}
-                          </span>
+                          </Badge>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setShowTestEmailDialog(true)}
-                          className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg border border-green-500/40 bg-green-500/20 text-emerald-900 dark:text-green-300 hover:bg-green-500/30 transition-all text-sm flex items-center gap-1.5"
                           title="Send test email"
                         >
                           <Send className="w-3.5 h-3.5" />
@@ -512,7 +519,7 @@ export default function EmailSequenceEditorOverlay({
                         </button>
                         <button
                           onClick={() => onEditEmail(selectedEmail)}
-                          className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-violet-950 dark:text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
                         >
                           {isSent ? <Eye className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
                           {isSent ? 'View' : 'Edit'}
@@ -524,7 +531,7 @@ export default function EmailSequenceEditorOverlay({
                                 onDelete(selectedEmail.id);
                               }
                             }}
-                            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all text-sm flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/20 text-red-950 dark:text-red-300 hover:bg-red-500/30 transition-all text-sm flex items-center gap-1.5"
                             title="Delete email"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -547,11 +554,11 @@ export default function EmailSequenceEditorOverlay({
                   <div className="p-6">
                     {/* Subject */}
                     <div className="mb-6">
-                      <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+                      <label className="block text-xs font-semibold text-foreground/50 uppercase tracking-wide mb-2">
                         Subject
                       </label>
-                      <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                        <p className="text-sm text-white font-medium">
+                      <div className="p-3 rounded-lg bg-background/5 border border-border">
+                        <p className="text-sm text-foreground font-medium">
                           {selectedEmail.subject_template || '(No subject)'}
                         </p>
                       </div>
@@ -559,27 +566,27 @@ export default function EmailSequenceEditorOverlay({
 
                     {/* Body */}
                     <div>
-                      <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-2">
+                      <label className="block text-xs font-semibold text-foreground/50 uppercase tracking-wide mb-2">
                         Email Body
                       </label>
-                      <div className="p-4 rounded-lg bg-white/5 border border-white/10">
+                      <div className="p-4 rounded-lg bg-background/5 border border-border">
                         <div
                           className="prose prose-sm prose-invert max-w-none"
-                          dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-white/40">(No content)</p>' }}
+                          dangerouslySetInnerHTML={{ __html: selectedEmail.body_template || '<p class="text-foreground/40">(No content)</p>' }}
                         />
                       </div>
                     </div>
 
                     {/* Email Stats (if sent/active) */}
                     {(selectedEmail.status === 'sent' || selectedEmail.status === 'active') && (
-                      <div className="mt-6 pt-6 border-t border-white/10">
-                        <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-3">
+                      <div className="mt-6 pt-6 border-t border-border">
+                        <label className="block text-xs font-semibold text-foreground/50 uppercase tracking-wide mb-3">
                           Delivery Stats
                         </label>
                         <div className="grid grid-cols-3 gap-3">
-                          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Recipients</div>
-                            <div className="text-lg font-bold text-white">{selectedEmail.recipient_count || 0}</div>
+                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                            <div className="text-[10px] text-foreground/40 uppercase tracking-wide mb-1">Recipients</div>
+                            <div className="text-lg font-bold text-foreground">{selectedEmail.recipient_count || 0}</div>
                           </div>
                           {selectedEmail.delivered_count !== undefined && (
                             <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20">
@@ -598,25 +605,25 @@ export default function EmailSequenceEditorOverlay({
                     )}
 
                     {/* Trigger Details */}
-                    <div className="mt-6 pt-6 border-t border-white/10">
-                      <label className="block text-xs font-semibold text-white/50 uppercase tracking-wide mb-3">
+                    <div className="mt-6 pt-6 border-t border-border">
+                      <label className="block text-xs font-semibold text-foreground/50 uppercase tracking-wide mb-3">
                         Trigger Settings
                       </label>
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                          <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Type</div>
-                          <div className="text-sm text-white">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
+                        <div className="p-3 rounded-lg bg-background/5 border border-border">
+                          <div className="text-[10px] text-foreground/40 uppercase tracking-wide mb-1">Type</div>
+                          <div className="text-sm text-foreground">{selectedEmail.trigger_type.replace(/_/g, ' ')}</div>
                         </div>
                         {selectedEmail.trigger_value !== null && selectedEmail.trigger_value > 0 && (
-                          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Days</div>
-                            <div className="text-sm text-white">{selectedEmail.trigger_value}</div>
+                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                            <div className="text-[10px] text-foreground/40 uppercase tracking-wide mb-1">Days</div>
+                            <div className="text-sm text-foreground">{selectedEmail.trigger_value}</div>
                           </div>
                         )}
                         {selectedEmail.scheduled_for && (
-                          <div className="p-3 rounded-lg bg-white/5 border border-white/10">
-                            <div className="text-[10px] text-white/40 uppercase tracking-wide mb-1">Scheduled For</div>
-                            <div className="text-sm text-white">
+                          <div className="p-3 rounded-lg bg-background/5 border border-border">
+                            <div className="text-[10px] text-foreground/40 uppercase tracking-wide mb-1">Scheduled For</div>
+                            <div className="text-sm text-foreground">
                               {new Date(selectedEmail.scheduled_for).toLocaleString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
@@ -634,8 +641,8 @@ export default function EmailSequenceEditorOverlay({
               ) : (
                 <div className="h-full flex items-center justify-center p-8">
                   <div className="text-center">
-                    <Mail className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                    <p className="text-white/40 text-sm">Select an email to preview</p>
+                    <Mail className="w-12 h-12 text-foreground/20 mx-auto mb-3" />
+                    <p className="text-foreground/40 text-sm">Select an email to preview</p>
                   </div>
                 </div>
               )}
@@ -648,12 +655,12 @@ export default function EmailSequenceEditorOverlay({
       {/* Test Email Dialog */}
       {showTestEmailDialog && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl border border-white/10 shadow-2xl max-w-md w-full">
+          <div className="bg-card text-card-foreground rounded-xl border border-border shadow-2xl max-w-md w-full">
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-white/10">
+            <div className="flex items-center justify-between p-4 border-b border-border">
               <div className="flex items-center gap-2">
                 <Send className="w-5 h-5 text-green-400" />
-                <h3 className="text-lg font-semibold text-white">Send Test Email</h3>
+                <h3 className="text-lg font-semibold text-foreground">Send Test Email</h3>
               </div>
               <button
                 onClick={() => {
@@ -661,7 +668,7 @@ export default function EmailSequenceEditorOverlay({
                   setTestEmailAddress('');
                   setTestEmailError(null);
                 }}
-                className="text-white/60 hover:text-white transition-colors"
+                className="text-foreground/60 hover:text-foreground transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -682,7 +689,7 @@ export default function EmailSequenceEditorOverlay({
               )}
 
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Test Email Address
                 </label>
                 <input
@@ -690,7 +697,7 @@ export default function EmailSequenceEditorOverlay({
                   value={testEmailAddress}
                   onChange={(e) => setTestEmailAddress(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-green-500/50"
+                  className="w-full px-3 py-2 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-green-500/50"
                   autoFocus
                 />
               </div>
@@ -703,21 +710,21 @@ export default function EmailSequenceEditorOverlay({
             </div>
 
             {/* Footer */}
-            <div className="flex items-center gap-3 p-4 border-t border-white/10">
+            <div className="flex items-center gap-3 p-4 border-t border-border">
               <button
                 onClick={() => {
                   setShowTestEmailDialog(false);
                   setTestEmailAddress('');
                   setTestEmailError(null);
                 }}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSendTest}
                 disabled={isSendingTest || !testEmailAddress.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)}
-                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white font-medium hover:from-green-700 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-2.5 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-foreground font-medium hover:from-green-700 hover:to-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isSendingTest ? (
                   <>

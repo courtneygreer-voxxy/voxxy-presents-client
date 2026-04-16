@@ -399,7 +399,7 @@ export function EmailEditorPage({
         title: "Test Email Sent!",
         description: `Test email sent to ${result.recipient}. Check your inbox!`,
         variant: "default",
-        className: "bg-green-500/10 border-green-500/30 text-green-400",
+        className: "bg-green-500/10 border-green-500/30 text-emerald-900 dark:text-green-400",
       });
 
       setShowTestEmailDialog(false);
@@ -511,7 +511,7 @@ export function EmailEditorPage({
           title: "Email Created Successfully",
           description: `"${data.name}" has been created. You can now send test emails.`,
           variant: "default",
-          className: "bg-green-500/10 border-green-500/30 text-green-400",
+          className: "bg-green-500/10 border-green-500/30 text-emerald-900 dark:text-green-400",
         });
       } else if (email) {
         // EDIT mode: call onSave with existing email ID
@@ -532,7 +532,7 @@ export function EmailEditorPage({
           title: "Email Saved Successfully",
           description: `"${data.name}" has been updated.`,
           variant: "default",
-          className: "bg-green-500/10 border-green-500/30 text-green-400",
+          className: "bg-green-500/10 border-green-500/30 text-emerald-900 dark:text-green-400",
         });
       }
 
@@ -694,17 +694,17 @@ export function EmailEditorPage({
   };
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
+    <div className="fixed inset-0 voxxy-gradient-editor z-50 flex flex-col">
       {/* Main Editor Area */}
       <div className="flex-1 flex overflow-hidden">
       {/* Left Side - Main Content */}
-      <div className={`${showPreview ? 'w-1/2' : 'flex-1'} flex flex-col border-r border-white/10 transition-all duration-300`}>
+      <div className={`${showPreview ? 'w-1/2' : 'flex-1'} flex flex-col border-r border-border transition-all duration-300`}>
         {/* Top Bar */}
-        <div className="border-b border-white/10 px-8 py-2.5 flex items-center justify-between backdrop-blur-sm bg-black/20 min-h-[52px]">
+        <div className="voxxy-editor-chrome flex min-h-[52px] items-center justify-between px-8 py-2.5">
           <div className="flex items-center gap-3">
             <button
               onClick={onBack}
-              className="flex items-center gap-2 text-sm text-white/60 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back</span>
@@ -715,7 +715,7 @@ export function EmailEditorPage({
               onClick={() => setShowPreview(!showPreview)}
               variant="outline"
               size="sm"
-              className={`border-white/20 text-white h-9 ${showPreview ? 'bg-purple-500/20 hover:bg-purple-500/30' : 'bg-white/5 hover:bg-white/10'}`}
+              className={`h-9 border-border ${showPreview ? 'bg-violet-100 text-foreground hover:bg-violet-200 dark:bg-purple-500/20 dark:text-primary-foreground dark:hover:bg-purple-500/30' : 'bg-card/80 text-foreground hover:bg-muted/70 dark:bg-background/5 dark:hover:bg-background/10'}`}
             >
               {showPreview ? (
                 <>
@@ -734,7 +734,7 @@ export function EmailEditorPage({
                 onClick={() => setShowTestEmailDialog(true)}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-white/20 text-white hover:bg-white/10 h-9"
+                className="h-9 border-border bg-card/80 text-foreground hover:bg-muted/70 dark:bg-background/5 dark:hover:bg-background/10"
               >
                 <Send className="w-3.5 h-3.5 mr-1.5" />
                 Send Test
@@ -750,7 +750,7 @@ export function EmailEditorPage({
                 }}
                 variant="outline"
                 size="sm"
-                className="bg-white/5 border-red-500/30 text-red-400 hover:bg-red-500/10 hover:border-red-500/50 h-9"
+                className="h-9 border-red-500/30 bg-card/80 text-red-700 hover:bg-red-500/10 hover:border-red-500/50 dark:bg-background/5 dark:text-red-400"
               >
                 <Trash2 className="w-3.5 h-3.5 mr-1.5" />
                 Delete
@@ -765,8 +765,8 @@ export function EmailEditorPage({
                   ? 'bg-green-600 hover:bg-green-700'
                   : !canSave()
                   ? 'bg-red-600/50 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
-              } text-white`}
+                  : 'voxxy-btn-cta'
+              }`}
               title={!canSave() ? 'Fix variable errors before saving' : ''}
             >
               {isSaving ? (
@@ -859,19 +859,19 @@ export function EmailEditorPage({
 
             {/* Email Name */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
+              <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
                 Email Name
               </label>
               <Input
                 {...register('name')}
-                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
+                className="h-9 border-border bg-card/80 text-foreground placeholder:text-foreground/40 dark:bg-background/5 text-sm"
                 placeholder="e.g., Day Before Event Reminder"
               />
             </div>
 
             {/* Subject Line */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
+              <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
                 Subject Line
               </label>
               <Input
@@ -888,14 +888,14 @@ export function EmailEditorPage({
                 }}
                 onFocus={() => focusField('subject')}
                 onBlur={() => blurField('subject')}
-                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
+                className="h-9 border-border bg-card/80 text-foreground placeholder:text-foreground/40 dark:bg-background/5 text-sm"
                 placeholder="e.g., Reminder: [eventName] is Tomorrow!"
               />
             </div>
 
             {/* Email Body */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
+              <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
                 Email Body
               </label>
               <RichTextEditor
@@ -912,27 +912,27 @@ export function EmailEditorPage({
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <Lock className="w-4 h-4 text-purple-400" />
-                <label className="block text-xs font-medium text-white/70">
+                <label className="block text-xs font-medium text-foreground/70">
                   Email Footer (Locked)
                 </label>
               </div>
               <div className="relative">
-                <div className="p-4 rounded-lg bg-white/5 border border-purple-500/20 opacity-60 pointer-events-none min-h-[120px]">
+                <div className="min-h-[120px] rounded-lg border border-purple-500/20 bg-card/80 p-4 opacity-60 pointer-events-none dark:bg-background/5">
                   <div
-                    className="text-xs text-white/80"
+                    className="text-xs text-foreground/80"
                     dangerouslySetInnerHTML={{ __html: emailFooter }}
                   />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center gap-2">
+                  <div className="flex items-center gap-2 rounded-full border border-purple-500/20 bg-card/95 px-3 py-1.5 backdrop-blur-sm dark:border-purple-500/30 dark:bg-background/80">
                     <Lock className="w-3.5 h-3.5 text-purple-400" />
-                    <span className="text-xs text-white/90">
+                    <span className="text-xs text-foreground/90">
                       Footer is locked to ensure unsubscribe link is always present
                     </span>
                   </div>
                 </div>
               </div>
-              <p className="mt-1.5 text-[10px] text-white/50 leading-relaxed">
+              <p className="mt-1.5 text-[10px] text-foreground/50 leading-relaxed">
                 The footer contains the unsubscribe link required by email regulations (CAN-SPAM, GDPR) and cannot be edited.
               </p>
             </div>
@@ -942,10 +942,10 @@ export function EmailEditorPage({
 
       {/* Live Preview Panel */}
       {showPreview && (
-        <div className="w-1/2 flex flex-col bg-gradient-to-b from-black/40 to-black/20">
+        <div className="voxxy-editor-sidebar flex w-1/2 flex-col">
           {/* Preview Header */}
-          <div className="border-b border-white/10 px-12 py-3 flex items-center backdrop-blur-sm bg-black/20 min-h-[60px]">
-            <h3 className="text-sm font-medium text-white flex items-center gap-2">
+          <div className="voxxy-editor-chrome flex min-h-[60px] items-center px-12 py-3">
+            <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
               <Eye className="w-4 h-4 text-purple-400" />
               Live Preview
             </h3>
@@ -956,12 +956,12 @@ export function EmailEditorPage({
             <div className="max-w-2xl mx-auto space-y-6">
               {/* Preview Subject */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Subject
                 </label>
-                <div className="bg-white/5 rounded-lg p-4 border border-purple-500/20">
+                <div className="rounded-lg border border-purple-500/20 bg-card/85 p-4 dark:bg-background/10">
                   <div
-                    className="text-white font-medium text-sm"
+                    className="text-foreground font-medium text-sm"
                     dangerouslySetInnerHTML={{
                       __html: resolvePreviewVariables(subject || '<span style="color: rgba(255, 255, 255, 0.4); font-style: italic;">Subject will appear here...</span>')
                     }}
@@ -971,7 +971,7 @@ export function EmailEditorPage({
 
               {/* Preview Body */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Message Body
                 </label>
                 {validationErrors.length > 0 && (
@@ -984,7 +984,7 @@ export function EmailEditorPage({
                     </ul>
                   </div>
                 )}
-                <div className="bg-white/5 rounded-lg p-6 border border-purple-500/20">
+                <div className="rounded-lg border border-purple-500/20 bg-card/85 p-6 dark:bg-background/10">
                   {body ? (
                     <div
                       className="email-preview-content"
@@ -993,7 +993,7 @@ export function EmailEditorPage({
                       }}
                     />
                   ) : (
-                    <p className="text-white/40 text-sm italic">
+                    <p className="text-foreground/40 text-sm italic">
                       Email body will appear here as you type...
                     </p>
                   )}
@@ -1038,7 +1038,7 @@ export function EmailEditorPage({
       )}
 
       {/* Right Sidebar */}
-      <div className="w-80 border-l border-white/10 bg-gradient-to-b from-black/40 to-black/20 backdrop-blur-sm overflow-y-auto">
+      <div className="voxxy-editor-sidebar w-80 overflow-y-auto border-l border-border">
         <div className="p-4 space-y-4">
           {/* Trigger Settings */}
           <div>
@@ -1046,21 +1046,21 @@ export function EmailEditorPage({
               onClick={() => setTriggerSettingsOpen(!triggerSettingsOpen)}
               className="flex items-center justify-between w-full mb-2"
             >
-              <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+              <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
                 <Clock className="w-3.5 h-3.5 text-purple-400" />
                 <span>Trigger Settings</span>
               </div>
               {triggerSettingsOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                <ChevronDown className="w-3.5 h-3.5 text-foreground/60" />
               ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-white/60" />
+                <ChevronRight className="w-3.5 h-3.5 text-foreground/60" />
               )}
             </button>
 
             {triggerSettingsOpen && (
               <div className="space-y-3">
                 <div>
-                  <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                  <label className="block text-[10px] font-medium text-foreground dark:text-foreground/60 mb-1.5 uppercase tracking-wide">
                     When to Send
                   </label>
                   <Select
@@ -1068,22 +1068,22 @@ export function EmailEditorPage({
                     onValueChange={(value) => setValue('trigger_type', value)}
                     disabled={mode === 'edit'}
                   >
-                    <SelectTrigger className="bg-white/5 border-white/20 text-white text-sm h-8 disabled:opacity-50 disabled:cursor-not-allowed">
+                    <SelectTrigger className="h-8 border-border bg-card/80 text-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:bg-background/5">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-[#1a0f2e] border-purple-500/20">
+                    <SelectContent className="voxxy-select-surface">
                       {availableTriggerTypes.map((type) => (
-                        <SelectItem key={type.value} value={type.value} className="text-white text-sm">
+                        <SelectItem key={type.value} value={type.value} className="text-foreground text-sm">
                           <div>
                             <div className="font-medium text-xs">{type.label}</div>
-                            <div className="text-[10px] text-white/50">{type.description}</div>
+                            <div className="text-[10px] text-foreground/50">{type.description}</div>
                           </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                   {mode === 'edit' && (
-                    <p className="text-[9px] text-white/40 mt-1">
+                    <p className="text-[9px] text-foreground/40 mt-1">
                       Trigger type cannot be changed after creation
                     </p>
                   )}
@@ -1091,31 +1091,31 @@ export function EmailEditorPage({
 
                 {/* Email Type (Auto-determined, Read-only) */}
                 <div>
-                  <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                  <label className="block text-[10px] font-medium text-foreground dark:text-foreground/60 mb-1.5 uppercase tracking-wide">
                     Email Type
                   </label>
-                  <div className="px-3 py-2 bg-white/[0.03] border border-white/10 rounded-lg text-white/70 text-sm h-8 flex items-center">
+                  <div className="flex h-8 items-center rounded-lg border border-border bg-muted/60 px-3 py-2 text-sm text-foreground/70 dark:bg-background/10">
                     {EMAIL_TYPE_LABELS[selectedTriggerConfig?.emailType || 'event_announcements'] || 'Event Announcements'}
                   </div>
-                  <p className="text-[9px] text-white/40 mt-1">
+                  <p className="text-[9px] text-foreground/40 mt-1">
                     Auto-set based on trigger selection
                   </p>
                 </div>
 
                 {selectedTriggerConfig?.requiresValue && (
                   <div>
-                    <label className="block text-[10px] font-medium text-white/60 mb-1.5 uppercase tracking-wide">
+                    <label className="block text-[10px] font-medium text-foreground dark:text-foreground/60 mb-1.5 uppercase tracking-wide">
                       Number of Days
                     </label>
                     <Input
                       type="number"
                       {...register('trigger_value', { valueAsNumber: true })}
-                      className="bg-white/5 border-white/20 text-white text-sm h-8 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="h-8 border-border bg-card/80 text-foreground text-sm disabled:cursor-not-allowed disabled:opacity-50 dark:bg-background/5"
                       min={0}
                       placeholder="e.g., 1"
                       disabled={mode === 'edit'}
                     />
-                    <p className="text-[10px] text-white/50 mt-1.5">
+                    <p className="text-[10px] text-foreground/50 mt-1.5">
                       {mode === 'edit' ? 'Trigger timing cannot be changed after creation' : 'Sends at 8:00 AM Eastern'}
                     </p>
                   </div>
@@ -1124,7 +1124,7 @@ export function EmailEditorPage({
                 {previewDate && (
                   <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
                     <p className="text-[10px] text-purple-400/80 mb-0.5 uppercase tracking-wide font-semibold">Scheduled for:</p>
-                    <p className="text-xs text-white font-medium">{previewDate}</p>
+                    <p className="text-xs text-foreground font-medium">{previewDate}</p>
                   </div>
                 )}
               </div>
@@ -1137,14 +1137,14 @@ export function EmailEditorPage({
               onClick={() => setRecipientsOpen(!recipientsOpen)}
               className="flex items-center justify-between w-full mb-2"
             >
-              <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+              <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
                 <Users className="w-3.5 h-3.5 text-purple-400" />
                 <span>Audience</span>
               </div>
               {recipientsOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                <ChevronDown className="w-3.5 h-3.5 text-foreground/60" />
               ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-white/60" />
+                <ChevronRight className="w-3.5 h-3.5 text-foreground/60" />
               )}
             </button>
 
@@ -1178,7 +1178,7 @@ export function EmailEditorPage({
 
               return (
                 <div className="space-y-2">
-                  <label className="block text-[10px] font-medium text-white/60 uppercase tracking-wide">
+                  <label className="block text-[10px] font-medium text-foreground dark:text-foreground/60 uppercase tracking-wide">
                     Email Recipients
                   </label>
 
@@ -1186,14 +1186,14 @@ export function EmailEditorPage({
                   <div className="px-3 py-2.5 bg-blue-500/10 border border-blue-500/30 rounded-lg">
                     <div className="flex items-center gap-2 mb-1">
                       <Users className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
-                      <span className="text-sm text-white font-medium">{audienceLabel}</span>
+                      <span className="text-sm text-foreground font-medium">{audienceLabel}</span>
                     </div>
                     <p className="text-[10px] text-blue-300/70 leading-relaxed">
                       {audienceDescription}
                     </p>
                   </div>
 
-                  <p className="text-[10px] text-white/40 leading-relaxed">
+                  <p className="text-[10px] text-foreground/40 leading-relaxed">
                     The audience is automatically determined by the email's trigger type and cannot be changed.
                   </p>
                 </div>
@@ -1207,14 +1207,14 @@ export function EmailEditorPage({
               onClick={() => setAvailableTagsOpen(!availableTagsOpen)}
               className="flex items-center justify-between w-full mb-2"
             >
-              <div className="flex items-center gap-1.5 text-white font-medium text-sm">
+              <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
                 <Tag className="w-3.5 h-3.5 text-purple-400" />
                 <span>Available tags</span>
               </div>
               {availableTagsOpen ? (
-                <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                <ChevronDown className="w-3.5 h-3.5 text-foreground/60" />
               ) : (
-                <ChevronRight className="w-3.5 h-3.5 text-white/60" />
+                <ChevronRight className="w-3.5 h-3.5 text-foreground/60" />
               )}
             </button>
 
@@ -1228,7 +1228,7 @@ export function EmailEditorPage({
 
               return (
               <div className="space-y-1">
-                <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
+                <p className="text-[10px] text-foreground/60 mb-2 leading-relaxed">
                   Click a tag to insert it at your cursor position
                   {email?.email_template_item?.category === 'event_announcements' && (
                     <span className="block mt-1 text-yellow-400/80">
@@ -1238,25 +1238,25 @@ export function EmailEditorPage({
                 </p>
                 {/* Tag Search */}
                 <div className="relative mb-2">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/40" />
                   <input
                     type="text"
                     placeholder="Search tags..."
                     value={tagSearch}
                     onChange={(e) => setTagSearch(e.target.value)}
-                    className="w-full pl-7 pr-7 py-1.5 bg-white/5 border border-white/10 rounded text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                    className="w-full pl-7 pr-7 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
                   />
                   {tagSearch && (
                     <button
                       onClick={() => setTagSearch('')}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white/40 hover:text-white"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-foreground/40 hover:text-foreground"
                     >
                       <X className="w-3 h-3" />
                     </button>
                   )}
                 </div>
                 {tagSearch && filteredVariables && (
-                  <p className="text-[10px] text-white/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
+                  <p className="text-[10px] text-foreground/40 mb-1">{filteredVariables.length} of {EMAIL_VARIABLES.length} tags</p>
                 )}
 
                 {/* Show flat filtered results when searching */}
@@ -1275,8 +1275,8 @@ export function EmailEditorPage({
                           disabled={isDisabled}
                           className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                             isDisabled
-                              ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
-                              : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                              ? 'opacity-40 cursor-not-allowed border-border bg-background/5 text-foreground/40'
+                              : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
                           }`}
                           title={
                             isDisabled
@@ -1284,12 +1284,12 @@ export function EmailEditorPage({
                               : variable.description
                           }
                         >
-                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
                           <span className="flex-1 text-left truncate">{variable.label}</span>
                           <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                             isDisabled
-                              ? 'text-white/30 bg-white/5'
-                              : 'text-purple-400 bg-purple-500/10'
+                              ? 'text-foreground/30 bg-background/5'
+                              : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
                           }`}>
                             {variable.frontendVar.replace('[', '').replace(']', '')}
                           </span>
@@ -1302,7 +1302,7 @@ export function EmailEditorPage({
                   <div className="space-y-3">
                     {getGroupedVariablesForUI().map((group) => (
                       <div key={group.label}>
-                        <h4 className="text-[10px] font-semibold text-purple-400 uppercase tracking-wide mb-1.5 px-1">
+                        <h4 className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-purple-400">
                           {group.label}
                         </h4>
                         <div className="space-y-0.5">
@@ -1319,8 +1319,8 @@ export function EmailEditorPage({
                                 disabled={isDisabled}
                                 className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                                   isDisabled
-                                    ? 'opacity-40 cursor-not-allowed border-white/5 bg-white/5 text-white/40'
-                                    : 'text-white hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-white/10 bg-white/5 group'
+                                    ? 'opacity-40 cursor-not-allowed border-border bg-background/5 text-foreground/40'
+                                    : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
                                 }`}
                                 title={
                                   isDisabled
@@ -1328,12 +1328,12 @@ export function EmailEditorPage({
                                     : variable.description
                                 }
                               >
-                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-white/30' : 'text-purple-400 group-hover:text-purple-300'}`} />
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
                                 <span className="flex-1 text-left truncate">{variable.label}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                                   isDisabled
-                                    ? 'text-white/30 bg-white/5'
-                                    : 'text-purple-400 bg-purple-500/10'
+                                    ? 'text-foreground/30 bg-background/5'
+                                    : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
                                 }`}>
                                   {variable.frontendVar.replace('[', '').replace(']', '')}
                                 </span>
@@ -1356,19 +1356,19 @@ export function EmailEditorPage({
 
       {/* Test Email Dialog */}
       <Dialog open={showTestEmailDialog} onOpenChange={setShowTestEmailDialog}>
-        <DialogContent className="sm:max-w-md bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+        <DialogContent className="sm:max-w-md voxxy-gradient-page-cool border-purple-500/20">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
+            <DialogTitle className="text-foreground flex items-center gap-2">
               <Send className="w-5 h-5 text-purple-400" />
               Send Test Email
             </DialogTitle>
-            <DialogDescription className="text-white/60">
+            <DialogDescription className="text-foreground/60">
               Send a test version of this email to see how it will look when delivered.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Email Address
               </label>
               <Input
@@ -1376,7 +1376,7 @@ export function EmailEditorPage({
                 placeholder="you@example.com"
                 value={testEmailAddress}
                 onChange={(e) => setTestEmailAddress(e.target.value)}
-                className="bg-white/5 border-white/20 text-white placeholder:text-white/40"
+                className="bg-background/5 border-border text-foreground placeholder:text-foreground/40"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     e.preventDefault();
@@ -1384,7 +1384,7 @@ export function EmailEditorPage({
                   }
                 }}
               />
-              <p className="text-xs text-white/50 mt-2">
+              <p className="text-xs text-foreground/50 mt-2">
                 The email will be sent with "[TEST]" in the subject line and will include resolved variables.
               </p>
             </div>
@@ -1393,7 +1393,7 @@ export function EmailEditorPage({
             <Button
               variant="outline"
               onClick={() => setShowTestEmailDialog(false)}
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+              className="bg-background/5 border-border text-foreground hover:bg-background/10"
               disabled={isSendingTest}
             >
               Cancel
@@ -1401,7 +1401,7 @@ export function EmailEditorPage({
             <Button
               onClick={handleSendTestEmail}
               disabled={isSendingTest || !testEmailAddress}
-              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white"
+              className="voxxy-btn-cta"
             >
               {isSendingTest ? (
                 <>

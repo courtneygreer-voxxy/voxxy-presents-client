@@ -57,10 +57,10 @@ export default function SuccessMessage({
 
         {/* Success Message */}
         <div className="space-y-2">
-          <h3 className="text-2xl font-bold text-white animate-fade-in-up">
+          <h3 className="text-2xl font-bold text-foreground animate-fade-in-up">
             {title}
           </h3>
-          <p className="text-white/70 text-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+          <p className="text-foreground/70 text-sm animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
             {message}
           </p>
         </div>

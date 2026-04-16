@@ -50,13 +50,13 @@ const PRESET_IMAGES = [
 
 export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImageSelectorProps) {
   return (
-    <Card className="!bg-white/10 backdrop-blur-sm !border-white/20">
+    <Card className="!bg-background/10 backdrop-blur-sm !border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-white">
+        <CardTitle className="flex items-center gap-2 text-foreground">
           <Image className="h-5 w-5" />
           Header Image
         </CardTitle>
-        <CardDescription className="text-gray-300">
+        <CardDescription>
           Choose a header image for your organization page
         </CardDescription>
       </CardHeader>
@@ -69,7 +69,7 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
                 className={`relative overflow-hidden rounded-lg border-2 transition-all ${
                   currentImage === image.url 
                     ? 'border-purple-400 ring-2 ring-purple-400/30' 
-                    : 'border-white/20 hover:border-white/40'
+                    : 'border-border hover:border-primary/50'
                 }`}
                 onClick={() => onImageSelect(image.url)}
               >
@@ -80,25 +80,25 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
                 />
                 {currentImage === image.url && (
                   <div className="absolute inset-0 bg-purple-500/30 flex items-center justify-center">
-                    <Check className="h-6 w-6 text-purple-400 bg-white/20 backdrop-blur-sm rounded-full p-1" />
+                    <Check className="h-6 w-6 text-purple-400 bg-background/20 backdrop-blur-sm rounded-full p-1" />
                   </div>
                 )}
               </div>
               <div className="mt-2">
-                <p className="text-sm font-medium text-white">{image.name}</p>
-                <p className="text-xs text-gray-400">{image.description}</p>
+                <p className="text-sm font-medium text-foreground">{image.name}</p>
+                <p className="text-xs text-muted-foreground">{image.description}</p>
               </div>
             </div>
           ))}
         </div>
         
         {currentImage && (
-          <div className="mt-6 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg">
-            <h4 className="text-sm font-medium text-white mb-2">Current Selection</h4>
+          <div className="mt-6 p-4 bg-background/5 backdrop-blur-sm border border-border rounded-lg">
+            <h4 className="text-sm font-medium text-foreground mb-2">Current Selection</h4>
             <img 
               src={currentImage} 
               alt="Current header" 
-              className="w-full h-16 object-cover rounded border border-white/20"
+              className="w-full h-16 object-cover rounded border border-border"
             />
           </div>
         )}

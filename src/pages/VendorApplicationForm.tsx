@@ -13,6 +13,7 @@ import {
 } from '@/utils/formPersistence';
 import ReportBug from '@/components/ReportBug';
 import FloatingBugButton from '@/components/FloatingBugButton';
+import { Badge } from '@/components/ui/badge';
 
 interface VendorApplication {
   id: number;
@@ -410,7 +411,7 @@ export default function VendorApplicationForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
@@ -418,13 +419,13 @@ export default function VendorApplicationForm() {
 
   if (error && !event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Unable to Load Application</h1>
-          <p className="text-white/60 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Unable to Load Application</h1>
+          <p className="text-foreground/60 mb-6">{error}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
+            className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
             Back to Voxxy Presents
           </button>
@@ -434,21 +435,21 @@ export default function VendorApplicationForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+    <div className="min-h-screen voxxy-gradient-page-cool">
       {/* Header */}
-      <div className="bg-[#1a0d2e]/80 border-b border-white/10">
+      <div className="voxxy-nav-surface border-b border-border">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
-              <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
+              <h1 className="text-xl md:text-2xl font-bold text-foreground mb-1">
                 Apply to {event?.title}
               </h1>
-              <p className="text-white/60 text-xs md:text-sm">
+              <p className="text-foreground/60 text-xs md:text-sm">
                 {event?.location}
               </p>            </div>
             <button
               onClick={handleShareLink}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all text-sm"
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 border border-border text-foreground/70 hover:text-foreground transition-all text-sm"
               title="Share this application"
             >
               <Share2 className="w-4 h-4" />
@@ -464,25 +465,25 @@ export default function VendorApplicationForm() {
         {showRestorePrompt && (
           <div className="mb-6 bg-blue-500/10 border border-blue-500/30 rounded-lg p-4">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-blue-700 dark:text-blue-400 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="text-sm font-semibold text-white mb-1">
+                <h3 className="text-sm font-semibold text-foreground mb-1">
                   Resume Your Application?
                 </h3>
-                <p className="text-xs text-white/70 mb-3">
+                <p className="text-xs text-foreground/70 mb-3">
                   We found a previously saved version of your application from{' '}
                   {getSavedDataTimestamp(`vendor-app-${slug}-${applicationId}`)}. Would you like to continue where you left off?
                 </p>
                 <div className="flex gap-2">
                   <button
                     onClick={restoreSavedData}
-                    className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-300 text-xs font-medium transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 text-blue-950 dark:text-blue-300 text-xs font-medium transition-all"
                   >
                     Restore My Data
                   </button>
                   <button
                     onClick={discardSavedData}
-                    className="px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 text-xs transition-all"
+                    className="px-3 py-1.5 rounded-lg bg-background/5 hover:bg-background/10 border border-border text-foreground/70 text-xs transition-all"
                   >
                     Start Fresh
                   </button>
@@ -493,14 +494,14 @@ export default function VendorApplicationForm() {
         )}
 
         {/* Application Details Card */}
-        <div className="bg-gradient-to-br from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-4 mb-6">
-          <p className="text-white/60 text-[10px] mb-0.5">Applying for</p>
-          <h2 className="text-lg font-bold text-white mb-2">
+        <div className="voxxy-application-highlight p-4 mb-6">
+          <p className="text-foreground/60 text-[10px] mb-0.5">Applying for</p>
+          <h2 className="text-lg font-bold text-foreground mb-2">
             {application?.name || 'Vendor Application'}
           </h2>
 
           {application?.description && (
-            <p className="text-white/80 text-xs mb-3 whitespace-pre-wrap">
+            <p className="text-foreground/80 text-xs mb-3 whitespace-pre-wrap">
               {application.description}
             </p>
           )}
@@ -509,21 +510,18 @@ export default function VendorApplicationForm() {
           {application?.application_tags && (
             <div className="flex flex-wrap gap-1.5 mb-3">
               {application.application_tags.split(',').map((tag, idx) => (
-                <span
-                  key={idx}
-                  className="px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[10px]"
-                >
+                <Badge key={idx} variant="tintPurple" className="px-2 py-0.5 text-[10px]">
                   {tag.trim()}
-                </span>
+                </Badge>
               ))}
             </div>
           )}
 
           {/* Price - Hidden for Pancakes & Booze pilot (payment handled via external integration) */}
           {/* {application?.booth_price && (
-            <div className="mt-3 pt-3 border-t border-white/10">
+            <div className="mt-3 pt-3 border-t border-border">
               <div>
-                <p className="text-white/60 text-[10px] mb-0.5">Booth Price</p>
+                <p className="text-foreground/60 text-[10px] mb-0.5">Booth Price</p>
                 <p className="text-2xl font-bold text-purple-400">
                   ${Number(application.booth_price).toFixed(0)}
                 </p>
@@ -533,61 +531,61 @@ export default function VendorApplicationForm() {
         </div>
 
         {/* Application Form */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-4 md:p-5">
+        <div className="bg-background/5 border border-border rounded-lg p-4 md:p-5">
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Your Information */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">Your Information</h3>
+              <h3 className="text-base font-semibold text-foreground mb-3">Your Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* Full Name */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
-                    Full Name <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    Full Name <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Your full name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Business/Brand Name */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
-                    Business/Brand Name <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    Business/Brand Name <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="text"
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Email */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
-                    Email <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    Email <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="your@email.com"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
                     required
                   />
                 </div>
 
                 {/* Phone Number */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
                     Phone Number
                   </label>
                   <input
@@ -595,7 +593,7 @@ export default function VendorApplicationForm() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
                   />
                 </div>
               </div>
@@ -603,47 +601,47 @@ export default function VendorApplicationForm() {
 
             {/* Social & Portfolio (One Link Required) */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">
-                Social & Portfolio <span className="text-red-400">*</span>
-                <span className="text-xs font-normal text-white/60 ml-2">(One Link Required)</span>
+              <h3 className="text-base font-semibold text-foreground mb-3">
+                Social & Portfolio <span className="text-red-600 dark:text-red-400">*</span>
+                <span className="text-xs font-normal text-foreground/60 ml-2">(One Link Required)</span>
               </h3>
 
               {/* Row 1: Website and Instagram */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
                 {/* Link to your work */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
-                    Link to your work <span className="text-red-400">*</span>
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
+                    Link to your work <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
-                      <span className="text-white/50 text-sm whitespace-nowrap select-none">https://</span>
+                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
+                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">https://</span>
                     </div>
                     <input
                       type="text"
                       value={formData.website}
                       onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                       placeholder="yoursite.com"
-                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
                     />
                   </div>
                 </div>
 
                 {/* Instagram */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
                     Instagram
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
-                      <span className="text-white/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
+                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
+                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
                     </div>
                     <input
                       type="text"
                       value={formData.instagram_handle}
                       onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value })}
                       placeholder="yourhandle"
-                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
                     />
                   </div>
                 </div>
@@ -653,38 +651,38 @@ export default function VendorApplicationForm() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {/* TikTok */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
                     TikTok
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
-                      <span className="text-white/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
+                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
+                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
                     </div>
                     <input
                       type="text"
                       value={formData.tiktok_handle}
                       onChange={(e) => setFormData({ ...formData, tiktok_handle: e.target.value })}
                       placeholder="yourhandle"
-                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
                     />
                   </div>
                 </div>
 
                 {/* Facebook */}
                 <div>
-                  <label className="block text-xs font-medium text-white mb-1.5">
+                  <label className="block text-xs font-medium text-foreground mb-1.5">
                     Facebook
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-white/10 border border-white/20 focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-white/5 border-r border-white/10">
-                      <span className="text-white/50 text-sm whitespace-nowrap select-none">facebook.com/</span>
+                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
+                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
+                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">facebook.com/</span>
                     </div>
                     <input
                       type="text"
                       value={formData.facebook_handle}
                       onChange={(e) => setFormData({ ...formData, facebook_handle: e.target.value })}
                       placeholder="yourpage"
-                      className="flex-1 px-3 py-2 text-sm bg-transparent text-white placeholder-white/40 focus:outline-none min-w-0"
+                      className="flex-1 px-3 py-2 text-sm bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none min-w-0"
                     />
                   </div>
                 </div>
@@ -693,7 +691,7 @@ export default function VendorApplicationForm() {
 
             {/* Note to Host (Optional) */}
             <div>
-              <label className="block text-xs font-medium text-white mb-1.5">
+              <label className="block text-xs font-medium text-foreground mb-1.5">
                 Note to Host (Optional)
               </label>
               <textarea
@@ -701,13 +699,13 @@ export default function VendorApplicationForm() {
                 onChange={(e) => setFormData({ ...formData, note_to_host: e.target.value })}
                 placeholder="Tell the event organizer about your products, experience, or anything else you'd like them to know..."
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors resize-none"
               />
             </div>
 
             {/* Permissions & Preferences */}
             <div>
-              <h3 className="text-base font-semibold text-white mb-3">Permissions & Preferences</h3>
+              <h3 className="text-base font-semibold text-foreground mb-3">Permissions & Preferences</h3>
               <div className="space-y-2.5">
                 {/* Terms Agreement */}
                 <div className="flex items-start gap-2.5">
@@ -716,26 +714,26 @@ export default function VendorApplicationForm() {
                     id="agreed_to_terms"
                     checked={formData.agreed_to_terms}
                     onChange={(e) => setFormData({ ...formData, agreed_to_terms: e.target.checked })}
-                    className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500"
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500"
                     required
                   />
-                  <label htmlFor="agreed_to_terms" className="text-xs text-white/80">
+                  <label htmlFor="agreed_to_terms" className="text-xs text-foreground/90 dark:text-foreground/80">
                     I agree to the{' '}
                     <a
                       href="/legal/privacy"
-                      className="text-purple-400 hover:text-purple-300 underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 underline"
                     >
                       Privacy Policy
                     </a>{' '}
                     and{' '}
                     <a
                       href="/legal/acceptable-use"
-                      className="text-purple-400 hover:text-purple-300 underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 underline"
                     >
                       Acceptable Use Policy
                     </a>{' '}
-                    <span className="text-red-400">*</span>
-                    <p className="text-white/60 text-[10px] mt-0.5">
+                    <span className="text-red-600 dark:text-red-400">*</span>
+                    <p className="text-foreground/60 text-[10px] mt-0.5">
                       Your information will be shared with the event organizer for this application.
                     </p>
                   </label>
@@ -747,7 +745,7 @@ export default function VendorApplicationForm() {
             {/* Error Message */}
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
-                <p className="text-red-400 text-xs">{error}</p>
+                <p className="text-red-800 dark:text-red-400 text-xs">{error}</p>
               </div>
             )}
 
@@ -755,11 +753,11 @@ export default function VendorApplicationForm() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full px-5 py-3 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
+              className="w-full px-5 py-3 rounded-lg voxxy-btn-cta font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {submitting ? (
                 <>
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                   <span>
                     {retryAttempt > 0 ? `Retrying (${retryAttempt}/3)...` : 'Submitting...'}
                   </span>
@@ -772,15 +770,15 @@ export default function VendorApplicationForm() {
             </button>
 
             {/* Auto-save Indicator */}
-            <p className="text-center text-xs text-white/40">
+            <p className="text-center text-xs text-foreground/50 dark:text-foreground/40">
               Your progress is automatically saved every 30 seconds
             </p>
           </form>
         </div>
 
         {/* Powered by Voxxy Presents */}
-        <div className="mt-12 pt-8 border-t border-white/10">
-          <div className="flex items-center justify-center gap-2 text-white/40 text-sm">
+        <div className="mt-12 pt-8 border-t border-border">
+          <div className="flex items-center justify-center gap-2 text-foreground/55 dark:text-foreground/40 text-sm">
             <span>Powered by</span>
             <img
               src="/VoxxyTriangle.svg"

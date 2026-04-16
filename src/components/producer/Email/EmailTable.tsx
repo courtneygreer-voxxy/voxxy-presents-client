@@ -61,8 +61,8 @@ export default function EmailTable({
 
   if (emails.length === 0) {
     return (
-      <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
-        <p className="text-white/60">No emails found</p>
+      <div className="bg-background/5 rounded-lg border border-border p-12 text-center">
+        <p className="text-foreground/60">No emails found</p>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default function EmailTable({
     return (
       <button
         onClick={() => onSort(column)}
-        className={`flex items-center gap-1 hover:text-white transition-colors ${sortColumn === column ? 'text-white' : ''} ${className ?? ''}`}
+        className={`flex items-center gap-1 hover:text-foreground transition-colors ${sortColumn === column ? 'text-foreground' : ''} ${className ?? ''}`}
         title={title}
       >
         {label}
@@ -94,10 +94,10 @@ export default function EmailTable({
   const reminderEmails = emails.filter(email => isCustomReminder(email.trigger_type));
 
   return (
-    <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+    <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
       {/* Table Header */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-white/70 uppercase tracking-wide">
+      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
+        <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-2 items-center text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
           {col('name', 'Email Name')}
           <div className="flex items-center gap-1">Subject</div>
           {col('scheduled_for', 'Scheduled')}
@@ -140,7 +140,7 @@ export default function EmailTable({
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content
-                        className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
+                        className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-emerald-400/30 shadow-xl max-w-xs z-50"
                         sideOffset={5}
                       >
                         Core system emails that are automatically triggered by vendor actions or event milestones.
@@ -196,7 +196,7 @@ export default function EmailTable({
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content
-                        className="bg-gray-900 text-white text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                        className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
                         sideOffset={5}
                       >
                         Time-based reminders that were added to this event's sequence.

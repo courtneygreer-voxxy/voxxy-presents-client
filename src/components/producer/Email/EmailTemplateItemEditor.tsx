@@ -145,23 +145,23 @@ export default function EmailTemplateItemEditor({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-lg border border-white/20 shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-card text-card-foreground rounded-lg border border-border shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-white/10">
+        <div className="flex items-center justify-between p-6 border-b border-border">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
               <Mail className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">Edit Email</h2>
-              <p className="text-sm text-white/60">
+              <h2 className="text-xl font-bold text-foreground">Edit Email</h2>
+              <p className="text-sm text-foreground/60">
                 Customize subject, body, and trigger settings
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-lg hover:bg-white/5 text-white/60 hover:text-white transition-all"
+            className="p-2 rounded-lg hover:bg-background/5 text-foreground/60 hover:text-foreground transition-all"
           >
             <X className="w-5 h-5" />
           </button>
@@ -179,14 +179,14 @@ export default function EmailTemplateItemEditor({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Basic Info */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Tag className="w-4 h-4" />
               Basic Information
             </h3>
 
             {/* Name */}
             <div>
-              <label htmlFor="email-name" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="email-name" className="block text-sm font-medium text-foreground mb-2">
                 Email Name *
               </label>
               <input
@@ -195,21 +195,21 @@ export default function EmailTemplateItemEditor({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Welcome Email"
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 maxLength={100}
               />
             </div>
 
             {/* Category */}
             <div>
-              <label htmlFor="category" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="category" className="block text-sm font-medium text-foreground mb-2">
                 Category
               </label>
               <select
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -221,7 +221,7 @@ export default function EmailTemplateItemEditor({
 
             {/* Subject */}
             <div>
-              <label htmlFor="subject" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="subject" className="block text-sm font-medium text-foreground mb-2">
                 Subject Template *
               </label>
               <input
@@ -230,10 +230,10 @@ export default function EmailTemplateItemEditor({
                 value={formData.subject_template}
                 onChange={(e) => setFormData({ ...formData, subject_template: e.target.value })}
                 placeholder="e.g., Welcome to [eventName]!"
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 maxLength={200}
               />
-              <p className="mt-1 text-xs text-white/40">
+              <p className="mt-1 text-xs text-foreground/40">
                 Use [eventName], [firstName], etc. for dynamic content
               </p>
             </div>
@@ -241,13 +241,13 @@ export default function EmailTemplateItemEditor({
 
           {/* Body Content */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Mail className="w-4 h-4" />
               Email Body
             </h3>
 
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Body Template *
               </label>
               <RichTextEditor
@@ -255,7 +255,7 @@ export default function EmailTemplateItemEditor({
                 onChange={(value) => setFormData({ ...formData, body_template: value })}
                 placeholder="Write your email content here..."
               />
-              <p className="mt-2 text-xs text-white/40">
+              <p className="mt-2 text-xs text-foreground/40">
                 Available variables: [firstName], [eventName], [eventDate], [applicationLink], [paymentLink], [unsubscribeLink]
               </p>
             </div>
@@ -263,21 +263,21 @@ export default function EmailTemplateItemEditor({
 
           {/* Trigger Settings */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Trigger Settings
             </h3>
 
             {/* Trigger Type */}
             <div>
-              <label htmlFor="trigger-type" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="trigger-type" className="block text-sm font-medium text-foreground mb-2">
                 Trigger Type
               </label>
               <select
                 id="trigger-type"
                 value={formData.trigger_type}
                 onChange={(e) => setFormData({ ...formData, trigger_type: e.target.value })}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               >
                 {TRIGGER_TYPE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -290,7 +290,7 @@ export default function EmailTemplateItemEditor({
             {/* Trigger Value (for days_before triggers) */}
             {requiresTriggerValue && (
               <div>
-                <label htmlFor="trigger-value" className="block text-sm font-medium text-white mb-2">
+                <label htmlFor="trigger-value" className="block text-sm font-medium text-foreground mb-2">
                   Days Before
                 </label>
                 <input
@@ -300,14 +300,14 @@ export default function EmailTemplateItemEditor({
                   max="365"
                   value={formData.trigger_value}
                   onChange={(e) => setFormData({ ...formData, trigger_value: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                 />
               </div>
             )}
 
             {/* Trigger Time */}
             <div>
-              <label htmlFor="trigger-time" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="trigger-time" className="block text-sm font-medium text-foreground mb-2">
                 <Clock className="w-4 h-4 inline mr-1" />
                 Send Time
               </label>
@@ -316,29 +316,29 @@ export default function EmailTemplateItemEditor({
                 type="time"
                 value={formData.trigger_time?.slice(0, 5) || '09:00'}
                 onChange={(e) => setFormData({ ...formData, trigger_time: e.target.value + ':00' })}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               />
             </div>
           </div>
 
           {/* Filter Criteria */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
               <Filter className="w-4 h-4" />
               Recipient Filters
             </h3>
-            <p className="text-xs text-white/60">
+            <p className="text-xs text-foreground/60">
               Only send this email to recipients matching these criteria (leave empty for all recipients)
             </p>
 
             {/* Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Application Status
               </label>
               <div className="flex flex-wrap gap-2">
                 {['pending', 'approved', 'waitlist', 'declined', 'confirmed'].map((status) => (
-                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all">
+                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all">
                     <input
                       type="checkbox"
                       checked={filterStatus.includes(status)}
@@ -349,9 +349,9 @@ export default function EmailTemplateItemEditor({
                           setFilterStatus(filterStatus.filter((s) => s !== status));
                         }
                       }}
-                      className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-500/50"
+                      className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
                     />
-                    <span className="text-sm text-white capitalize">{status}</span>
+                    <span className="text-sm text-foreground capitalize">{status}</span>
                   </label>
                 ))}
               </div>
@@ -359,12 +359,12 @@ export default function EmailTemplateItemEditor({
 
             {/* Payment Status Filter */}
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Payment Status
               </label>
               <div className="flex flex-wrap gap-2">
                 {['pending', 'paid', 'overdue'].map((status) => (
-                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 cursor-pointer hover:bg-white/10 transition-all">
+                  <label key={status} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/5 border border-border cursor-pointer hover:bg-background/10 transition-all">
                     <input
                       type="checkbox"
                       checked={filterPaymentStatus.includes(status)}
@@ -375,9 +375,9 @@ export default function EmailTemplateItemEditor({
                           setFilterPaymentStatus(filterPaymentStatus.filter((s) => s !== status));
                         }
                       }}
-                      className="w-4 h-4 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-500/50"
+                      className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
                     />
-                    <span className="text-sm text-white capitalize">{status}</span>
+                    <span className="text-sm text-foreground capitalize">{status}</span>
                   </label>
                 ))}
               </div>
@@ -385,14 +385,14 @@ export default function EmailTemplateItemEditor({
 
             {/* Vendor Category Filter */}
             <div>
-              <label htmlFor="vendor-category" className="block text-sm font-medium text-white mb-2">
+              <label htmlFor="vendor-category" className="block text-sm font-medium text-foreground mb-2">
                 Vendor Category
               </label>
               <select
                 id="vendor-category"
                 value={filterVendorCategory}
                 onChange={(e) => setFilterVendorCategory(e.target.value)}
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               >
                 <option value="">All Categories</option>
                 <option value="Artist">Artist</option>
@@ -408,9 +408,9 @@ export default function EmailTemplateItemEditor({
                 type="checkbox"
                 checked={formData.enabled_by_default}
                 onChange={(e) => setFormData({ ...formData, enabled_by_default: e.target.checked })}
-                className="w-5 h-5 rounded border-white/20 bg-white/5 text-purple-600 focus:ring-purple-500/50"
+                className="w-5 h-5 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
               />
-              <span className="text-sm text-white">
+              <span className="text-sm text-foreground">
                 Enabled by default when creating new events
               </span>
             </label>
@@ -418,17 +418,17 @@ export default function EmailTemplateItemEditor({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 p-6 border-t border-white/10">
+        <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-lg border border-white/10 text-white hover:bg-white/5 transition-all"
+            className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 rounded-lg voxxy-btn-cta font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSaving ? (
               <>

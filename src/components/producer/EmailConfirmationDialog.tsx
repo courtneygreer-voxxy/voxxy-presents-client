@@ -38,7 +38,7 @@ export function EmailConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 border border-white/10">
+      <AlertDialogContent className="bg-card text-card-foreground border border-border">
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
             <div className={`p-2 rounded-lg ${isHighPriority ? 'bg-red-500/20' : 'bg-purple-500/20'}`}>
@@ -48,11 +48,11 @@ export function EmailConfirmationDialog({
                 <Mail className="h-5 w-5 text-purple-400" />
               )}
             </div>
-            <AlertDialogTitle className="text-white">{title}</AlertDialogTitle>
+            <AlertDialogTitle className="text-foreground">{title}</AlertDialogTitle>
           </div>
           <AlertDialogDescription asChild>
             <div className="space-y-3 pt-2">
-              <p className="text-sm text-white/60">{warning}</p>
+              <p className="text-sm text-foreground/60">{warning}</p>
 
               {isBulkEmail && (
                 <div className="flex items-center gap-2 rounded-lg bg-purple-500/10 border border-purple-500/20 p-3 text-sm">
@@ -83,7 +83,7 @@ export function EmailConfirmationDialog({
         <AlertDialogFooter className="pt-2">
           <AlertDialogCancel
             disabled={isLoading}
-            className="border-white/20 text-white hover:bg-white/5 hover:text-white bg-transparent"
+            className="border-border text-foreground hover:bg-background/5 hover:text-foreground bg-transparent"
           >
             {type === 'category_changed' ? 'Skip Notification' : 'Cancel'}
           </AlertDialogCancel>
@@ -95,8 +95,8 @@ export function EmailConfirmationDialog({
             disabled={isLoading}
             className={
               isHighPriority
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-purple-600 hover:bg-purple-500 text-white'
+                ? 'bg-red-600 hover:bg-red-700 text-destructive-foreground'
+                : 'voxxy-btn-solid'
             }
           >
             {isLoading ? 'Sending...' : type === 'category_changed' ? 'Send Notification' : isBulkEmail ? 'Yes, Send Emails' : 'Yes, Send Email'}

@@ -354,17 +354,17 @@ export default function Step3InviteList({
   if (invitedContactIds.length === 0) {
     return (
       <div className="space-y-6">
-        <div className="bg-white/5 rounded-2xl p-6 lg:p-8">
+        <div className="bg-background/5 rounded-2xl p-6 lg:p-8">
           <div className="mb-6">
-            <h2 className="text-xl font-semibold text-white mb-2">Select Contacts to Invite</h2>
-            <p className="text-white/60 text-sm">
+            <h2 className="text-xl font-semibold text-foreground mb-2">Select Contacts to Invite</h2>
+            <p className="text-foreground/60 text-sm">
               Choose who will receive invitations for this event
             </p>
           </div>
 
           {loadingLists ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
             </div>
           ) : (
             <div className="space-y-3">
@@ -373,20 +373,20 @@ export default function Step3InviteList({
                 className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                   inviteAllSelected
                     ? 'bg-purple-500/20 border-purple-500/40'
-                    : 'bg-white/5 border-white/10 hover:bg-white/10'
+                    : 'bg-background/5 border-border hover:bg-background/10'
                 }`}
               >
                 <input
                   type="checkbox"
                   checked={inviteAllSelected}
                   onChange={handleToggleInviteAll}
-                  className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                 />
                 <div className="flex-1 flex items-center gap-2">
                   <Users className="w-4 h-4 text-purple-400" />
-                  <span className="text-sm font-medium text-white">Invite All Contacts</span>
+                  <span className="text-sm font-medium text-foreground">Invite All Contacts</span>
                 </div>
-                <div className="text-xs text-white/60">
+                <div className="text-xs text-foreground/60">
                   ({totalContactsCount})
                 </div>
               </label>
@@ -398,28 +398,28 @@ export default function Step3InviteList({
                   className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                     selectedListIds.includes(list.id)
                       ? 'bg-purple-500/20 border-purple-500/40'
-                      : 'bg-white/5 border-white/10 hover:bg-white/10'
+                      : 'bg-background/5 border-border hover:bg-background/10'
                   }`}
                 >
                   <input
                     type="checkbox"
                     checked={selectedListIds.includes(list.id)}
                     onChange={() => handleToggleList(list.id)}
-                    className="w-4 h-4 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                    className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                   />
                   <div className="flex-1">
-                    <div className="text-sm font-medium text-white">{list.name}</div>
+                    <div className="text-sm font-medium text-foreground">{list.name}</div>
                   </div>
-                  <div className="text-xs text-white/60">
+                  <div className="text-xs text-foreground/60">
                     ({list.contacts_count || 0})
                   </div>
                 </label>
               ))}
 
               {lists.length === 0 && (
-                <div className="text-center py-8 bg-white/5 rounded-lg border border-white/10">
-                  <p className="text-white/50 text-sm">No contact lists available</p>
-                  <p className="text-white/40 text-xs mt-1">Create lists in your Network page</p>
+                <div className="text-center py-8 bg-background/5 rounded-lg border border-border">
+                  <p className="text-foreground/50 text-sm">No contact lists available</p>
+                  <p className="text-foreground/40 text-xs mt-1">Create lists in your Network page</p>
                 </div>
               )}
             </div>
@@ -429,8 +429,8 @@ export default function Step3InviteList({
           {loading && (
             <div className="mt-6 flex items-center justify-center py-8">
               <div className="flex items-center gap-3">
-                <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span className="text-white/60 text-sm">Loading contacts...</span>
+                <div className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
+                <span className="text-foreground/60 text-sm">Loading contacts...</span>
               </div>
             </div>
           )}
@@ -443,12 +443,12 @@ export default function Step3InviteList({
   return (
     <>
       <div className="space-y-6">
-        <div className="bg-white/5 rounded-2xl p-6 lg:p-8 space-y-6">
+        <div className="bg-background/5 rounded-2xl p-6 lg:p-8 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white">Invite List</h2>
-              <p className="text-white/60 text-sm mt-1">
+              <h2 className="text-xl font-semibold text-foreground">Invite List</h2>
+              <p className="text-foreground/60 text-sm mt-1">
                 {filteredContacts.length} contacts
               </p>
             </div>
@@ -462,7 +462,7 @@ export default function Step3InviteList({
                 });
                 setContacts([]);
               }}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors flex items-center gap-2"
             >
               <Users className="w-4 h-4" />
               Change Selection
@@ -496,7 +496,7 @@ export default function Step3InviteList({
           {/* Search Bar and Actions */}
           <div className="flex items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
               <input
                 type="text"
                 value={searchTerm}
@@ -505,13 +505,13 @@ export default function Step3InviteList({
                   setCurrentPage(1); // Reset to first page on search
                 }}
                 placeholder="Search by name, email, or phone..."
-                className="w-full pl-9 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-9 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
             {selectedContactIds.length > 0 && (
               <button
                 onClick={handleDeleteSelected}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-destructive-foreground rounded-lg transition-colors flex items-center gap-2 whitespace-nowrap"
               >
                 <Trash2 className="w-4 h-4" />
                 Delete {selectedContactIds.length} Selected
@@ -522,25 +522,25 @@ export default function Step3InviteList({
           {/* Table */}
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
             </div>
           ) : paginatedContacts.length === 0 ? (
-            <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10">
-              <p className="text-white/50 text-sm">No contacts match your search</p>
+            <div className="text-center py-12 bg-background/5 rounded-lg border border-border">
+              <p className="text-foreground/50 text-sm">No contacts match your search</p>
             </div>
           ) : (
-            <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+            <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
               {/* Table with horizontal scroll */}
               <div className="overflow-x-auto">
                 {/* Table Header */}
-                <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-                  <div className="grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide min-w-[1700px]">
+                <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-border">
+                  <div className="grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide min-w-[1700px]">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
                         checked={selectedContactIds.length === paginatedContacts.length && paginatedContacts.length > 0}
                         onChange={handleSelectAll}
-                        className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                       />
                     </div>
                     <div>Status</div>
@@ -573,7 +573,7 @@ export default function Step3InviteList({
                     return (
                       <div
                         key={contact.id}
-                        className={`grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center border-b border-white/5 hover:bg-white/5 transition-colors text-[11px] min-w-[1700px] ${bgClass}`}
+                        className={`grid grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] gap-2 px-2 py-1 items-center border-b border-border hover:bg-background/5 transition-colors text-[11px] min-w-[1700px] ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">
@@ -581,7 +581,7 @@ export default function Step3InviteList({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelect(contact.id)}
-                            className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
                             onClick={(e) => e.stopPropagation()}
                           />
                         </div>
@@ -592,14 +592,14 @@ export default function Step3InviteList({
                             <span
                               className={`px-1.5 py-0.5 rounded text-[9px] font-medium ${
                                 unsubscribeScope === 'global'
-                                  ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                                  : 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30'
+                                  ? 'bg-red-500/20 text-red-950 dark:text-red-300 border border-red-500/30'
+                                  : 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border border-yellow-500/30'
                               }`}
                             >
                               {unsubscribeScope === 'global' ? 'Global' : 'Org'}
                             </span>
                           ) : (
-                            <span className="px-1.5 py-0.5 bg-green-500/20 text-green-300 border border-green-500/30 rounded text-[9px] font-medium">
+                            <span className="px-1.5 py-0.5 bg-green-500/20 text-emerald-900 dark:text-green-300 border border-green-500/30 rounded text-[9px] font-medium">
                               Active
                             </span>
                           )}
@@ -607,11 +607,11 @@ export default function Step3InviteList({
 
                         {/* Name */}
                         <div className="flex items-center gap-1">
-                          <span className="text-white truncate">{contact.contact_name}</span>
+                          <span className="text-foreground truncate">{contact.contact_name}</span>
                         </div>
 
                         {/* Business */}
-                        <div className="flex items-center gap-0.5 text-white/60 truncate">
+                        <div className="flex items-center gap-0.5 text-foreground/60 truncate">
                           {contact.business_name && (
                             <>
                               <Building2 className="w-3 h-3 flex-shrink-0" />
@@ -622,19 +622,19 @@ export default function Step3InviteList({
 
                         {/* Category */}
                         <div>
-                          <span className="px-1 py-0.5 bg-white/10 text-white/60 rounded text-[10px]">
+                          <span className="px-1 py-0.5 bg-background/10 text-foreground/60 rounded text-[10px]">
                             {contact.contact_type}
                           </span>
                         </div>
 
                         {/* Email */}
-                        <div className="flex items-center gap-0.5 text-white/60 truncate">
+                        <div className="flex items-center gap-0.5 text-foreground/60 truncate">
                           <Mail className="w-3 h-3 flex-shrink-0" />
                           <span className="truncate">{contact.email}</span>
                         </div>
 
                         {/* Phone */}
-                        <div className="flex items-center gap-0.5 text-white/60 truncate">
+                        <div className="flex items-center gap-0.5 text-foreground/60 truncate">
                           {contact.phone && (
                             <>
                               <Phone className="w-3 h-3 flex-shrink-0" />
@@ -644,7 +644,7 @@ export default function Step3InviteList({
                         </div>
 
                         {/* Location */}
-                        <div className="flex items-center gap-0.5 text-white/60 truncate">
+                        <div className="flex items-center gap-0.5 text-foreground/60 truncate">
                           {contact.location && (
                             <>
                               <MapPin className="w-3 h-3 flex-shrink-0" />
@@ -660,13 +660,13 @@ export default function Step3InviteList({
                               {contact.tags.slice(0, 2).map((tag) => (
                                 <span
                                   key={tag}
-                                  className="px-1 py-0.5 text-[9px] bg-purple-500/20 text-purple-300 rounded"
+                                  className="px-1 py-0.5 text-[9px] bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded"
                                 >
                                   {tag}
                                 </span>
                               ))}
                               {contact.tags.length > 2 && (
-                                <span className="px-1 py-0.5 text-[9px] bg-white/10 text-white/50 rounded">
+                                <span className="px-1 py-0.5 text-[9px] bg-background/10 text-foreground/50 rounded">
                                   +{contact.tags.length - 2}
                                 </span>
                               )}
@@ -681,7 +681,7 @@ export default function Step3InviteList({
                               href={`https://instagram.com/${contact.instagram_handle.replace('@', '')}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-white/60 hover:text-white transition-colors"
+                              className="text-foreground/60 hover:text-foreground transition-colors"
                               onClick={(e) => e.stopPropagation()}
                             >
                               <Instagram className="w-3.5 h-3.5" />
@@ -692,7 +692,7 @@ export default function Step3InviteList({
                               href={contact.website}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-white/60 hover:text-white transition-colors text-[10px]"
+                              className="text-foreground/60 hover:text-foreground transition-colors text-[10px]"
                               onClick={(e) => e.stopPropagation()}
                             >
                               🔗
@@ -706,26 +706,26 @@ export default function Step3InviteList({
               </div>
 
               {/* Pagination Footer - Always show */}
-              <div className="bg-white/5 border-t border-white/10 px-3 py-2">
+              <div className="bg-background/5 border-t border-border px-3 py-2">
                 <div className="flex items-center justify-between text-[11px]">
-                  <div className="text-white/60">
+                  <div className="text-foreground/60">
                     Showing {(currentPage - 1) * perPage + 1}-{Math.min(currentPage * perPage, filteredContacts.length)} of {filteredContacts.length}
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                       disabled={currentPage === 1}
-                      className="px-2.5 py-1 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/30 text-white rounded transition-colors text-[11px]"
+                      className="px-2.5 py-1 bg-background/10 hover:bg-background/20 disabled:bg-background/5 disabled:text-foreground/30 text-foreground rounded transition-colors text-[11px]"
                     >
                       Previous
                     </button>
-                    <span className="text-white/60">
+                    <span className="text-foreground/60">
                       Page {currentPage} of {totalPages}
                     </span>
                     <button
                       onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-2.5 py-1 bg-white/10 hover:bg-white/20 disabled:bg-white/5 disabled:text-white/30 text-white rounded transition-colors text-[11px]"
+                      className="px-2.5 py-1 bg-background/10 hover:bg-background/20 disabled:bg-background/5 disabled:text-foreground/30 text-foreground rounded transition-colors text-[11px]"
                     >
                       Next
                     </button>

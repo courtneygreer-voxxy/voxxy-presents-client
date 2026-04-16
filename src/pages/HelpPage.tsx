@@ -53,18 +53,18 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="min-h-screen voxxy-gradient-page relative overflow-hidden">
       <Navigation activePage="help" />
 
       {/* Hero Section */}
-      <section className="relative pt-[140px] pb-20 px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
+      <section className="relative pt-[140px] pb-20 px-6 md:px-12 voxxy-gradient-page">
         <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
-          <h1 className="text-[52px] md:text-[56px] font-display font-bold text-white mb-5 leading-[1.1] tracking-tight">
+          <h1 className="text-[52px] md:text-[56px] font-display font-bold text-foreground mb-5 leading-[1.1] tracking-tight">
             We're here to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">help</em>
           </h1>
-          <p className="text-[18px] text-white/65 max-w-[700px] mx-auto leading-relaxed mb-0">
+          <p className="text-[18px] text-foreground/65 max-w-[700px] mx-auto leading-relaxed mb-0">
             Real humans, fast responses. Whether you need onboarding support or have a quick question, we've got you.
           </p>
 
@@ -78,21 +78,21 @@ export default function HelpPage() {
       </section>
 
       {/* Support Options */}
-      <section className="py-[100px] px-6 md:px-12 bg-white">
+      <section className="py-[100px] px-6 md:px-12 bg-background">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Support Options</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-4">Get the help you need</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-foreground mb-4">Get the help you need</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Email Support */}
-            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <Card className="bg-muted border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
                 <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Mail className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Email Support</CardTitle>
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-foreground">Email Support</CardTitle>
                 <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Reach our team directly for questions about your account, event setup, or anything else. We respond within 1–2 business days.
                 </p>
@@ -106,12 +106,12 @@ export default function HelpPage() {
             </Card>
 
             {/* Onboarding Guide */}
-            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <Card className="bg-muted border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
                 <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Book className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Onboarding Guide</CardTitle>
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-foreground">Onboarding Guide</CardTitle>
                 <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Step-by-step walkthrough for setting up your first event, importing vendors, configuring email flows, and going live.
                 </p>
@@ -127,12 +127,12 @@ export default function HelpPage() {
             </Card>
 
             {/* Community Discord */}
-            <Card className="bg-gray-50 border border-gray-200 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <Card className="bg-muted border border-border hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <CardContent className="pt-8 pb-8 text-center">
                 <div className="w-16 h-16 bg-voxxy-purple-brand/10 rounded-full flex items-center justify-center mx-auto mb-6">
                   <MessageCircle className="h-8 w-8 text-voxxy-purple-brand" />
                 </div>
-                <CardTitle className="text-[20px] font-display font-bold mb-4 text-gray-900">Community Discord</CardTitle>
+                <CardTitle className="text-[20px] font-display font-bold mb-4 text-foreground">Community Discord</CardTitle>
                 <p className="text-[15px] text-gray-600 mb-6 leading-relaxed">
                   Connect with other event producers, share tips, and get quick answers from the Voxxy team and community.
                 </p>
@@ -151,24 +151,24 @@ export default function HelpPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-[100px] px-6 md:px-12 bg-gradient-to-br from-[#1a0a2e] via-[#2d1b4e] to-[#0f172a]">
+      <section className="py-[100px] px-6 md:px-12 voxxy-gradient-page">
         <div className="container mx-auto max-w-[900px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-purple-400 mb-4">FAQ</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-white">Common questions</h2>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-foreground">Common questions</h2>
           </div>
 
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:shadow-md transition-all"
+                className="bg-background/5 border border-border rounded-xl overflow-hidden hover:shadow-md transition-all"
               >
                 <button
                   onClick={() => toggleFaq(index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-background/5 transition-colors"
                 >
-                  <span className="font-semibold text-white pr-4 text-[16px]">{faq.question}</span>
+                  <span className="font-semibold text-foreground pr-4 text-[16px]">{faq.question}</span>
                   <ChevronDown
                     className={`h-5 w-5 text-purple-400 flex-shrink-0 transition-transform ${
                       openFaq === index ? 'rotate-180' : ''
@@ -177,7 +177,7 @@ export default function HelpPage() {
                 </button>
                 {openFaq === index && (
                   <div className="px-6 pb-5 pt-2">
-                    <p className="text-[15px] text-gray-300 leading-relaxed">{faq.answer}</p>
+                    <p className="text-[15px] text-muted-foreground leading-relaxed">{faq.answer}</p>
                   </div>
                 )}
               </div>

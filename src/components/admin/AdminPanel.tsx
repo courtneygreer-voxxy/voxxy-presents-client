@@ -134,19 +134,19 @@ export default function AdminPanel({
 
   // Utility functions
   const getRoleBadgeColor = (role?: string) => {
-    if (!role) return 'bg-gray-500/20 border-gray-400/30 text-gray-300';
+    if (!role) return 'bg-muted/20 border-border/30 text-muted-foreground';
     switch (role) {
       case 'venue_owner':
       case 'producer':
-        return 'bg-green-500/20 border-green-400/30 text-green-300';
+        return 'bg-green-500/20 border-green-400/30 text-emerald-900 dark:text-green-300';
       case 'vendor':
-        return 'bg-blue-500/20 border-blue-400/30 text-blue-300';
+        return 'bg-blue-500/20 border-blue-400/30 text-blue-950 dark:text-blue-300';
       case 'consumer':
-        return 'bg-amber-500/20 border-amber-400/30 text-amber-300';
+        return 'bg-amber-500/20 border-amber-400/30 text-amber-950 dark:text-amber-300';
       case 'admin':
-        return 'bg-purple-500/20 border-purple-400/30 text-purple-300';
+        return 'bg-purple-500/20 border-purple-400/30 text-violet-950 dark:text-purple-300';
       default:
-        return 'bg-gray-500/20 border-gray-400/30 text-gray-300';
+        return 'bg-muted/20 border-border/30 text-muted-foreground';
     }
   };
 
@@ -195,17 +195,17 @@ export default function AdminPanel({
               }}
               variant="outline"
               size="sm"
-              className="bg-green-500/20 border border-green-400/50 text-green-300 hover:bg-green-500/30 font-mono text-xs"
+              className="bg-green-500/20 border border-green-400/50 text-emerald-900 dark:text-green-300 hover:bg-green-500/30 font-mono text-xs"
               disabled={loading || loadingAnalytics}
             >
               {loading || loadingAnalytics ? 'LOADING...' : '↻ REFRESH'}
             </Button>
           </div>
           <div className="mt-4 flex items-center gap-2 text-xs font-mono">
-            <div className="px-2 py-1 bg-cyan-500/20 border border-cyan-400/50 rounded text-cyan-300">
+            <div className="px-2 py-1 bg-cyan-500/20 border border-cyan-400/50 rounded text-cyan-950 dark:text-cyan-300">
               USER: {userProfile?.email}
             </div>
-            <div className="px-2 py-1 bg-yellow-500/20 border border-yellow-400/50 rounded text-yellow-300">
+            <div className="px-2 py-1 bg-yellow-500/20 border border-yellow-400/50 rounded text-yellow-950 dark:text-yellow-300">
               ROLE: ADMIN
             </div>
           </div>
@@ -278,16 +278,16 @@ export default function AdminPanel({
             </button>
 
             {/* Placeholder for future admin tools */}
-            <div className="bg-black/60 border-2 border-gray-500/30 rounded p-4 opacity-50">
+            <div className="bg-black/60 border-2 border-border/30 rounded p-4 opacity-50">
               <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-gray-500/20 border border-gray-400/50 rounded flex items-center justify-center">
-                  <Key className="h-4 w-4 text-gray-300" />
+                <div className="w-8 h-8 bg-muted/20 border border-border/50 rounded flex items-center justify-center">
+                  <Key className="h-4 w-4 text-muted-foreground" />
                 </div>
-                <h3 className="text-gray-300 font-mono font-bold text-sm">
+                <h3 className="text-muted-foreground font-mono font-bold text-sm">
                   MORE TOOLS
                 </h3>
               </div>
-              <p className="text-gray-400/60 font-mono text-[10px]">
+              <p className="text-muted-foreground/60 font-mono text-[10px]">
                 Coming soon...
               </p>
             </div>
@@ -310,8 +310,8 @@ export default function AdminPanel({
             </div>
             <div className={`px-3 py-1 rounded font-mono text-xs font-bold border ${
               organization
-                ? 'bg-green-500/20 text-green-300 border-green-400/50 animate-pulse'
-                : 'bg-red-500/20 text-red-300 border-red-400/50'
+                ? 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-400/50 animate-pulse'
+                : 'bg-red-500/20 text-red-950 dark:text-red-300 border-red-400/50'
             }`}>
               {organization ? '● ACTIVE' : '○ NULL'}
             </div>
@@ -335,7 +335,7 @@ export default function AdminPanel({
                 </div>
                 <div className="bg-black/60 border border-cyan-500/30 rounded p-3">
                   <div className="text-cyan-400/60 mb-1">org.name</div>
-                  <div className="text-white font-bold text-sm">{organization.name}</div>
+                  <div className="text-foreground font-bold text-sm">{organization.name}</div>
                 </div>
                 <div className="bg-black/60 border border-cyan-500/30 rounded p-3">
                   <div className="text-cyan-400/60 mb-1">org.user_id</div>
@@ -389,7 +389,7 @@ export default function AdminPanel({
               <p className="text-red-300 font-mono text-sm mb-4">ERROR: {analyticsError}</p>
               <Button
                 onClick={onLoadAnalytics}
-                className="bg-red-500/20 border border-red-400/50 text-red-300 hover:bg-red-500/30 font-mono text-xs"
+                className="bg-red-500/20 border border-red-400/50 text-red-950 dark:text-red-300 hover:bg-red-500/30 font-mono text-xs"
               >
                 ↻ RETRY_ANALYTICS
               </Button>
@@ -513,15 +513,15 @@ export default function AdminPanel({
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
                           <div className={`w-8 h-8 rounded flex items-center justify-center font-mono font-bold text-sm ${
-                            index === 0 ? 'bg-yellow-500/20 text-yellow-300 border-2 border-yellow-400/50' :
-                            index === 1 ? 'bg-gray-400/20 text-gray-300 border-2 border-gray-400/50' :
-                            index === 2 ? 'bg-amber-600/20 text-amber-400 border-2 border-amber-500/50' :
-                            'bg-purple-500/20 text-purple-300 border border-purple-400/50'
+                            index === 0 ? 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border-2 border-yellow-400/50' :
+                            index === 1 ? 'bg-muted/20 text-muted-foreground border-2 border-border/50' :
+                            index === 2 ? 'bg-amber-600/20 text-amber-950 dark:text-amber-400 border-2 border-amber-500/50' :
+                            'bg-purple-500/20 text-violet-950 dark:text-purple-300 border border-purple-400/50'
                           }`}>
                             #{index + 1}
                           </div>
                           <div>
-                            <div className="text-white font-mono text-sm font-bold">{creator.name}</div>
+                            <div className="text-foreground font-mono text-sm font-bold">{creator.name}</div>
                             <div className="text-purple-300/60 font-mono text-xs">{creator.email}</div>
                           </div>
                         </div>
@@ -559,25 +559,25 @@ export default function AdminPanel({
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex-1">
-                          <div className="text-white font-mono text-sm font-bold mb-1">{event.title}</div>
+                          <div className="text-foreground font-mono text-sm font-bold mb-1">{event.title}</div>
                           <div className="text-cyan-300/60 font-mono text-xs mb-2">
                             {event.organization_name} • {event.slug}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            <div className="px-2 py-1 bg-cyan-500/20 border border-cyan-400/50 rounded text-cyan-300 font-mono text-[9px]">
+                            <div className="px-2 py-1 bg-cyan-500/20 border border-cyan-400/50 rounded text-cyan-950 dark:text-cyan-300 font-mono text-[9px]">
                               {event.event_date}
                             </div>
                             <div className={`px-2 py-1 rounded font-mono text-[9px] border ${
                               event.published
-                                ? 'bg-green-500/20 text-green-300 border-green-400/50'
-                                : 'bg-yellow-500/20 text-yellow-300 border-yellow-400/50'
+                                ? 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-400/50'
+                                : 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border-yellow-400/50'
                             }`}>
                               {event.published ? 'PUBLISHED' : 'DRAFT'}
                             </div>
-                            <div className="px-2 py-1 bg-purple-500/20 border border-purple-400/50 rounded text-purple-300 font-mono text-[9px]">
+                            <div className="px-2 py-1 bg-purple-500/20 border border-purple-400/50 rounded text-violet-950 dark:text-purple-300 font-mono text-[9px]">
                               {event.vendor_applications_count} applications
                             </div>
-                            <div className="px-2 py-1 bg-blue-500/20 border border-blue-400/50 rounded text-blue-300 font-mono text-[9px]">
+                            <div className="px-2 py-1 bg-blue-500/20 border border-blue-400/50 rounded text-blue-950 dark:text-blue-300 font-mono text-[9px]">
                               {event.registrations_count} registrations
                             </div>
                           </div>
@@ -622,7 +622,7 @@ export default function AdminPanel({
                           {getRoleIcon(user.role)}
                         </div>
                         <div>
-                          <div className="text-white font-mono text-sm font-bold">{user.email}</div>
+                          <div className="text-foreground font-mono text-sm font-bold">{user.email}</div>
                           <div className="text-blue-300/60 font-mono text-xs">
                             {user.name || 'No name'} • ID: {user.id}
                           </div>
@@ -650,8 +650,8 @@ export default function AdminPanel({
                               <span className="text-xs font-mono text-blue-300">USER PAYMENT STATUS:</span>
                               <Badge className={`font-mono text-[10px] ${
                                 user.paid
-                                  ? 'bg-green-500/20 border-green-400/30 text-green-300'
-                                  : 'bg-red-500/20 border-red-400/30 text-red-300'
+                                  ? 'bg-green-500/20 border-green-400/30 text-emerald-900 dark:text-green-300'
+                                  : 'bg-red-500/20 border-red-400/30 text-red-950 dark:text-red-300'
                               }`}>
                                 {user.paid ? 'PAID' : 'UNPAID'}
                               </Badge>
@@ -667,8 +667,8 @@ export default function AdminPanel({
                               size="default"
                               className={`font-semibold text-xs gap-2 ${
                                 user.paid
-                                  ? 'bg-red-600 hover:bg-red-700 text-white border-2 border-red-400'
-                                  : 'bg-green-600 hover:bg-green-700 text-white border-2 border-green-400'
+                                  ? 'bg-red-600 hover:bg-red-700 text-destructive-foreground border-2 border-red-400'
+                                  : 'bg-green-600 hover:bg-green-700 text-primary-foreground border-2 border-green-400'
                               }`}
                             >
                               <DollarSign className="h-4 w-4" />
@@ -685,7 +685,7 @@ export default function AdminPanel({
                               </div>
                               {user.organizations.map((org: OrganizationSubscription) => (
                                 <div key={org.id} className="bg-black/60 border border-cyan-500/30 rounded p-3 space-y-2">
-                                  <div className="font-mono text-xs text-white font-bold mb-2">
+                                  <div className="font-mono text-xs text-foreground font-bold mb-2">
                                     {org.name} (#{org.id})
                                   </div>
                                   <div className="grid grid-cols-2 gap-2 text-[10px] font-mono">
@@ -695,14 +695,14 @@ export default function AdminPanel({
                                         org.subscription.status === 'active' ? 'text-green-300' :
                                         org.subscription.status === 'past_due' ? 'text-yellow-300' :
                                         org.subscription.status === 'canceled' ? 'text-red-300' :
-                                        'text-gray-300'
+                                        'text-muted-foreground'
                                       }`}>
                                         {org.subscription.status || 'inactive'}
                                       </span>
                                     </div>
                                     <div>
                                       <span className="text-cyan-400/60">display_status:</span>
-                                      <span className="ml-2 text-white font-bold">
+                                      <span className="ml-2 text-foreground font-bold">
                                         {org.subscription.display_status}
                                       </span>
                                     </div>

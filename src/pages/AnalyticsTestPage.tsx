@@ -24,25 +24,25 @@ export default function AnalyticsTestPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 p-8">
+    <div className="min-h-screen bg-muted p-8">
       <div className="container mx-auto max-w-4xl">
-        <Card className="bg-white/10 backdrop-blur-sm border border-white/20">
+        <Card className="bg-background/10 backdrop-blur-sm border border-border">
           <CardHeader>
-            <CardTitle className="text-white">Analytics Testing Page</CardTitle>
+            <CardTitle className="text-foreground">Analytics Testing Page</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Environment Check</h3>
-              <p className="text-gray-300">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Environment Check</h3>
+              <p className="text-muted-foreground">
                 Mixpanel Token: {import.meta.env.VITE_MIXPANEL_TOKEN ? 'Set' : 'Not Set'}
               </p>
-              <p className="text-gray-300">
+              <p className="text-muted-foreground">
                 Environment: {import.meta.env.VITE_ENVIRONMENT || 'development'}
               </p>
-              <p className="text-gray-300">
+              <p className="text-muted-foreground">
                 Debug Mode: {import.meta.env.DEV ? 'Yes' : 'No'}
               </p>
-              <p className="text-gray-300">
+              <p className="text-muted-foreground">
                 Analytics Enabled: {import.meta.env.VITE_ENVIRONMENT === 'production' ? 'Yes (Production Only)' : 'No (Non-Production)'}
               </p>
               <div className="mt-4 p-4 bg-yellow-500/20 border border-yellow-400/30 rounded-lg">
@@ -54,9 +54,9 @@ export default function AnalyticsTestPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Manual Event Testing</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Manual Event Testing</h3>
               <div className="flex gap-4">
-                <Button onClick={handleTestEvent} className="bg-purple-600 hover:bg-purple-700">
+                <Button onClick={handleTestEvent} className="voxxy-btn-solid">
                   Fire Test Event
                 </Button>
                 <Button onClick={handleTestUserProperties} className="bg-blue-600 hover:bg-blue-700">
@@ -66,7 +66,7 @@ export default function AnalyticsTestPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Tracked Components Testing</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-4">Tracked Components Testing</h3>
               <div className="flex gap-4">
                 <TrackedButton
                   className="bg-green-600 hover:bg-green-700"
@@ -82,7 +82,7 @@ export default function AnalyticsTestPage() {
 
                 <TrackedLink
                   to="/"
-                  className="inline-block px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded"
+                  className="inline-block px-4 py-2 bg-orange-600 hover:bg-orange-700 text-foreground rounded"
                   trackingData={{
                     link_text: 'Test Link',
                     destination_page: 'Home',
@@ -96,8 +96,8 @@ export default function AnalyticsTestPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Console Debug</h3>
-              <p className="text-gray-300 text-sm">
+              <h3 className="text-lg font-semibold text-foreground mb-4">Console Debug</h3>
+              <p className="text-muted-foreground text-sm">
                 Open browser console to see tracking events and debug information.
                 Page views and scroll tracking are automatic.
               </p>

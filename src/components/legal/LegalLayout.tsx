@@ -19,9 +19,9 @@ export default function LegalLayout({ children }: LegalLayoutProps) {
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       {/* Tab Navigation */}
-      <nav className="border-b border-gray-200 bg-white sticky top-0 z-40">
+      <nav className="border-b border-border bg-background sticky top-0 z-40">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="flex gap-8 overflow-x-auto">
             {tabs.map((tab) => (
@@ -32,7 +32,7 @@ export default function LegalLayout({ children }: LegalLayoutProps) {
                   py-4 px-2 text-sm font-medium whitespace-nowrap transition-colors
                   ${
                     isActive(tab.path)
-                      ? 'text-gray-900 border-b-2 border-purple-600'
+                      ? 'text-foreground border-b-2 border-purple-600'
                       : 'text-gray-500 hover:text-gray-700'
                   }
                 `}

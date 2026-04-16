@@ -61,7 +61,7 @@ export function DebugPanel() {
         <Button
           onClick={() => setIsVisible(true)}
           size="sm"
-          className="bg-red-600 hover:bg-red-700 text-white"
+          className="bg-red-600 hover:bg-red-700 text-destructive-foreground"
         >
           <Eye className="h-4 w-4" />
         </Button>
@@ -83,7 +83,7 @@ export function DebugPanel() {
       case 'approved': return 'bg-green-100 text-green-800'
       case 'pending': return 'bg-yellow-100 text-yellow-800'
       case 'denied': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-muted text-gray-800'
     }
   }
 
@@ -95,10 +95,10 @@ export function DebugPanel() {
       case 'venue_owner': return 'bg-green-100 text-green-800' // Maps to Producer
       case 'vendor': return 'bg-blue-100 text-blue-800'
       case 'consumer': return 'bg-amber-100 text-amber-800'
-      case 'guest': return 'bg-gray-100 text-gray-800'
+      case 'guest': return 'bg-muted text-gray-800'
       // Legacy Roles (deprecated)
       case 'organizer': return 'bg-green-100 text-green-800'
-      default: return 'bg-gray-100 text-gray-800'
+      default: return 'bg-muted text-gray-800'
     }
   }
 
@@ -184,7 +184,7 @@ export function DebugPanel() {
                 onClick={() => setIsExpanded(!isExpanded)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0 text-gray-300 border-gray-600 hover:bg-slate-800"
+                className="h-6 w-6 p-0 text-muted-foreground border-border hover:bg-slate-800"
               >
                 {isExpanded ? '−' : '+'}
               </Button>
@@ -192,7 +192,7 @@ export function DebugPanel() {
                 onClick={() => setIsVisible(false)}
                 size="sm"
                 variant="outline"
-                className="h-6 w-6 p-0 text-gray-300 border-gray-600 hover:bg-slate-800"
+                className="h-6 w-6 p-0 text-muted-foreground border-border hover:bg-slate-800"
               >
                 <EyeOff className="h-3 w-3" />
               </Button>
@@ -203,7 +203,7 @@ export function DebugPanel() {
         <CardContent className="space-y-3 text-xs overflow-y-auto flex-1">
           {/* Auth State */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-300">🔐 Auth State</div>
+            <div className="font-semibold text-muted-foreground">🔐 Auth State</div>
             <div className="grid grid-cols-2 gap-2">
               <Badge variant={isAuthenticated ? 'default' : 'secondary'}>
                 {isAuthenticated ? '✅ Authenticated' : '❌ Not Auth'}
@@ -279,7 +279,7 @@ export function DebugPanel() {
           {/* User Info */}
           {currentUser && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-300">👤 Current User</div>
+              <div className="font-semibold text-muted-foreground">👤 Current User</div>
               <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
                 <div><strong className="text-gray-100">ID:</strong> {currentUser.id}</div>
                 <div><strong className="text-gray-100">Email:</strong> {currentUser.email}</div>
@@ -291,7 +291,7 @@ export function DebugPanel() {
           {/* User Profile */}
           {userProfile && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-300">📋 User Profile</div>
+              <div className="font-semibold text-muted-foreground">📋 User Profile</div>
               <div className="space-y-1">
                 <div className="bg-slate-800/50 p-2 rounded text-gray-200">
                   <div><strong className="text-gray-100">ID:</strong> {userProfile.id || 'N/A'}</div>
@@ -307,7 +307,7 @@ export function DebugPanel() {
 
           {/* Role Flags */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-300">🏷️ Role Flags (V3.0)</div>
+            <div className="font-semibold text-muted-foreground">🏷️ Role Flags (V3.0)</div>
             <div className="grid grid-cols-2 gap-1">
               <Badge variant={isProducer ? 'default' : 'secondary'} className="text-xs">
                 {isProducer ? '🎯 Producer' : '⭕ Not Producer'}
@@ -324,7 +324,7 @@ export function DebugPanel() {
             </div>
             {isExpanded && (
               <>
-                <div className="font-semibold text-gray-400 text-[10px] pt-2">DEPRECATED FLAGS (Legacy)</div>
+                <div className="font-semibold text-muted-foreground text-[10px] pt-2">DEPRECATED FLAGS (Legacy)</div>
                 <div className="grid grid-cols-2 gap-1">
                   <Badge variant={isVenueOwner ? 'default' : 'secondary'} className="text-xs opacity-60">
                     {isVenueOwner ? '🏢 Venue Owner' : '⭕ Not Venue'}
@@ -341,12 +341,12 @@ export function DebugPanel() {
           {/* Producer/Organizer Profile */}
           {(isProducer || isOrganizer) && isExpanded && (
             <div className="space-y-2">
-              <div className="font-semibold text-gray-300">🎯 Producer Debug</div>
+              <div className="font-semibold text-muted-foreground">🎯 Producer Debug</div>
               <div className="bg-green-900/30 p-2 rounded text-xs text-green-200">
                 <div><strong className="text-green-100">isProducer:</strong> {isProducer ? '✅ True' : '❌ False'}</div>
                 <div><strong className="text-green-100">isOrganizer (deprecated):</strong> {isOrganizer ? '✅ True' : '❌ False'}</div>
                 <div className="mt-1 pt-1 border-t border-green-700/50">
-                  <div className="text-gray-400 text-[10px]">Organizations managed by this user will appear in the producer dashboard</div>
+                  <div className="text-muted-foreground text-[10px]">Organizations managed by this user will appear in the producer dashboard</div>
                 </div>
               </div>
             </div>
@@ -354,7 +354,7 @@ export function DebugPanel() {
 
           {/* Admin Session State */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-300">👑 Admin Session</div>
+            <div className="font-semibold text-muted-foreground">👑 Admin Session</div>
             <div className="bg-red-900/30 p-2 rounded text-xs text-gray-200">
               <div><strong className="text-gray-100">Admin Session:</strong> {localStorage.getItem('voxxy_admin_session') || 'false'}</div>
               <div><strong className="text-gray-100">Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
@@ -367,7 +367,7 @@ export function DebugPanel() {
 
           {/* Current URL */}
           <div className="space-y-2">
-            <div className="font-semibold text-gray-300">🌐 Current State</div>
+            <div className="font-semibold text-muted-foreground">🌐 Current State</div>
             <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
               <div><strong className="text-gray-100">URL:</strong> {window.location.pathname}</div>
               <div><strong className="text-gray-100">API Base:</strong> {import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'}</div>
@@ -392,7 +392,7 @@ export function DebugPanel() {
                 onClick={() => window.location.reload()}
                 size="sm"
                 variant="outline"
-                className="flex-1 h-8 text-xs text-gray-200 border-gray-600 hover:bg-slate-800"
+                className="flex-1 h-8 text-xs text-gray-200 border-border hover:bg-slate-800"
               >
                 <RefreshCw className="h-3 w-3 mr-1" />
                 Reload

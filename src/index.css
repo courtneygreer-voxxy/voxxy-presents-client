@@ -7,17 +7,6 @@
     text-wrap: balance;
   }
 
-  /* Glass morphism card utility */
-  .glass-card {
-    @apply bg-white/5 backdrop-blur-[12px] border border-white/10 rounded-lg;
-    transition: var(--transition-smooth);
-  }
-
-  .glass-card:hover {
-    background-color: rgb(255 255 255 / 0.08);
-    @apply border-white/20;
-  }
-
   /* Pricing card override - removes glass-card hover border */
   .pricing-card:hover {
     border-color: #d946ef !important; /* fuchsia-500 */
@@ -47,51 +36,50 @@
 }
 
 @layer base {
+  /* Light theme when `html` has no `.dark` */
   :root {
-    /* Voxxy Global Design System - Updated Color Tokens */
-    --background: 252 71% 11%;
-    --foreground: 210 40% 98%;
-    --card: 260 40% 15%;
-    --card-foreground: 0 0% 98%;
-    --popover: 260 40% 15%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 270 91% 65%;
+    --background: 270 35% 98%;
+    --foreground: 260 32% 14%;
+    --card: 0 0% 100%;
+    --card-foreground: 260 32% 14%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 260 32% 14%;
+    --primary: 270 82% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 260 30% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 330 81% 60%;
-    --accent-foreground: 0 0% 100%;
-    --destructive: 0 84% 60%;
+    --secondary: 270 18% 94%;
+    --secondary-foreground: 260 28% 22%;
+    --muted: 270 14% 93%;
+    --muted-foreground: 260 12% 40%;
+    --accent: 330 70% 94%;
+    --accent-foreground: 330 55% 32%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 100% / 0.1;
-    --input: 260 20% 25%;
-    --ring: 270 91% 65%;
-    --chart-1: 270 70% 60%;
-    --chart-2: 200 70% 55%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 260 14% 88%;
+    --input: 260 14% 88%;
+    --ring: 270 82% 52%;
+    --chart-1: 270 70% 50%;
+    --chart-2: 200 70% 45%;
+    --chart-3: 30 80% 48%;
+    --chart-4: 280 65% 50%;
+    --chart-5: 340 75% 52%;
     --radius: 0.5rem;
-    --sidebar-background: 260 45% 8%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 270 91% 65%;
+    --sidebar-background: 270 25% 97%;
+    --sidebar-foreground: 260 28% 18%;
+    --sidebar-primary: 270 82% 52%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 35% 15%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 260 20% 20%;
-    --sidebar-ring: 270 91% 65%;
+    --sidebar-accent: 270 16% 92%;
+    --sidebar-accent-foreground: 260 28% 18%;
+    --sidebar-border: 260 14% 88%;
+    --sidebar-ring: 270 82% 52%;
 
-    /* Smooth transitions */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* No separate dark mode - we're always dark */
+  /* Voxxy dark theme — `html.dark` */
   .dark {
-    --background: 252 71% 11%;
+    --background: 252 65% 14%;
     --foreground: 210 40% 98%;
-    --card: 260 40% 15%;
+    --card: 260 36% 18%;
     --card-foreground: 0 0% 98%;
     --popover: 260 40% 15%;
     --popover-foreground: 0 0% 98%;
@@ -113,7 +101,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 260 45% 8%;
+    --sidebar-background: 260 40% 11%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 270 91% 65%;
     --sidebar-primary-foreground: 0 0% 100%;
@@ -131,11 +119,289 @@
 
   body {
     @apply text-foreground;
-    /* Fixed gradient background */
-    background: linear-gradient(to bottom right, #1a0b2e, #2d1b4e, #0f172a);
     background-attachment: fixed;
-    /* Reduced base font size for more compact UI */
     font-size: 13px;
+  }
+
+  html.dark body {
+    background: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
+  }
+
+  html:not(.dark) body {
+    background: linear-gradient(to bottom right, hsl(270 28% 98.5%), hsl(275 22% 98%), hsl(220 24% 98.2%));
+    background-attachment: fixed;
+  }
+
+  select option {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+}
+
+/* Soft light / saturated dark — page shells, CTAs, solid buttons (no layout changes) */
+@layer components {
+  .voxxy-gradient-page {
+    background-image: linear-gradient(to bottom right, hsl(275 32% 97%), hsl(270 28% 96.5%), hsl(230 26% 96.8%));
+  }
+  .dark .voxxy-gradient-page {
+    background-image: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
+  }
+
+  .voxxy-gradient-page-alt {
+    background-image: linear-gradient(to bottom right, hsl(275 28% 97.2%), hsl(270 26% 96.4%), hsl(240 22% 96.5%));
+  }
+  .dark .voxxy-gradient-page-alt {
+    background-image: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
+  }
+
+  .voxxy-gradient-page-cool {
+    background-image: linear-gradient(to bottom right, hsl(255 26% 97.5%), hsl(270 24% 97%), hsl(220 28% 97.2%));
+  }
+  .dark .voxxy-gradient-page-cool {
+    background-image: linear-gradient(to bottom right, #221238, #181028);
+  }
+
+  .voxxy-gradient-editor {
+    background-image: linear-gradient(to bottom right, hsl(270 18% 97%), hsl(265 16% 96%), hsl(250 18% 96.5%));
+  }
+  .dark .voxxy-gradient-editor {
+    background-image: linear-gradient(to bottom right, #151028, #221a38, #151028);
+  }
+
+  .voxxy-gradient-panel {
+    background-image: linear-gradient(to bottom right, hsl(var(--card)), hsl(270 30% 97%));
+  }
+  .dark .voxxy-gradient-panel {
+    background-image: linear-gradient(to bottom right, #221838, #181222);
+  }
+
+  .voxxy-gradient-card-deep {
+    background-image: linear-gradient(to bottom, hsl(270 20% 98%), hsl(265 18% 96%));
+  }
+  .dark .voxxy-gradient-card-deep {
+    background-image: linear-gradient(to bottom, #322848, #261c38);
+  }
+
+  /**
+   * Glass cards — same purple-tinted surface as `voxxy-gradient-card-deep`
+   * (replaces near-invisible `bg-background/5` on dark pages).
+   */
+  .glass-card {
+    @apply voxxy-gradient-card-deep backdrop-blur-[12px] border border-border rounded-lg;
+    transition: var(--transition-smooth);
+  }
+
+  .glass-card:hover {
+    @apply border-foreground/20 dark:border-purple-400/35;
+  }
+
+  .voxxy-gradient-hero-split {
+    background-image: linear-gradient(to bottom right, hsl(270 52% 92%), hsl(330 58% 92%), hsl(217 52% 92%));
+  }
+  .dark .voxxy-gradient-hero-split {
+    background-image: linear-gradient(to bottom right, #a855f7, #ec4899, #3b82f6);
+  }
+
+  .voxxy-gradient-admin {
+    background-image: linear-gradient(to bottom right, hsl(270 20% 97%), hsl(265 22% 96.5%), hsl(240 20% 96.5%));
+  }
+  .dark .voxxy-gradient-admin {
+    background-image: linear-gradient(to bottom right, #120a1c, #221238, #181022);
+  }
+
+  .voxxy-nav-surface {
+    background: linear-gradient(to right, hsl(275 32% 96% / 0.94), hsl(270 28% 95% / 0.94));
+    backdrop-filter: blur(12px);
+  }
+  .dark .voxxy-nav-surface {
+    background: linear-gradient(to right, rgb(34 18 56 / 0.95), rgb(52 37 88 / 0.95));
+    backdrop-filter: blur(12px);
+  }
+
+  .voxxy-btn-cta {
+    background-image: linear-gradient(to right, hsl(270 38% 88%), hsl(285 36% 90%), hsl(210 38% 91%));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(270 22% 78% / 0.95);
+  }
+  .voxxy-btn-cta:hover {
+    filter: brightness(0.97);
+  }
+  .dark .voxxy-btn-cta {
+    background-image: linear-gradient(to right, hsl(270 55% 48%), hsl(217 78% 52%));
+    color: hsl(0 0% 100%);
+    border-color: transparent;
+  }
+  .dark .voxxy-btn-cta:hover {
+    filter: brightness(1.06);
+  }
+
+  /* Magenta / pink CTAs (auth, payments) */
+  .voxxy-btn-cta-pink {
+    background-image: linear-gradient(to right, hsl(285 38% 88%), hsl(330 42% 90%), hsl(210 38% 91%));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(300 22% 78% / 0.95);
+  }
+  .voxxy-btn-cta-pink:hover {
+    filter: brightness(0.97);
+  }
+  .dark .voxxy-btn-cta-pink {
+    background-image: linear-gradient(to right, hsl(270 55% 48%), hsl(330 70% 55%));
+    color: hsl(0 0% 100%);
+    border-color: transparent;
+  }
+  .dark .voxxy-btn-cta-pink:hover {
+    filter: brightness(1.06);
+  }
+
+  .voxxy-gradient-modal-header {
+    background: linear-gradient(to right, hsl(var(--muted)), hsl(270 22% 96%));
+  }
+  .dark .voxxy-gradient-modal-header {
+    background: linear-gradient(to right, rgb(88 28 135 / 0.92), rgb(30 58 138 / 0.92));
+  }
+
+  .voxxy-btn-solid {
+    background-color: hsl(270 38% 88%);
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+  }
+  .voxxy-btn-solid:hover {
+    background-color: hsl(270 34% 82%);
+  }
+  .dark .voxxy-btn-solid {
+    background-color: #9333ea;
+    color: hsl(var(--primary-foreground));
+    border-color: transparent;
+  }
+  .dark .voxxy-btn-solid:hover {
+    background-color: #7e22ce;
+  }
+
+  .voxxy-accent-tile {
+    background-image: linear-gradient(to bottom right, hsl(270 38% 86%), hsl(265 36% 88%));
+    color: hsl(var(--foreground));
+  }
+  .dark .voxxy-accent-tile {
+    background-color: #9333ea;
+    background-image: none;
+    color: hsl(var(--primary-foreground));
+  }
+
+  .voxxy-nav-tab-active {
+    background-image: linear-gradient(to right, hsl(270 36% 86%), hsl(217 40% 88%));
+    color: hsl(var(--foreground));
+    box-shadow: 0 4px 14px hsl(270 45% 35% / 0.1);
+  }
+  .dark .voxxy-nav-tab-active {
+    background-image: linear-gradient(to right, #7c3aed, #3b82f6);
+    color: hsl(0 0% 100%);
+    box-shadow: 0 4px 14px rgb(124 58 237 / 0.3);
+  }
+
+  /* Prefer these over `dark:bg-[#…]` in TSX — same surfaces, single source */
+  .voxxy-auth-panel {
+    @apply bg-background;
+  }
+  .dark .voxxy-auth-panel {
+    background-color: #0f0b1f;
+  }
+
+  .voxxy-footer-surface {
+    @apply bg-background;
+  }
+  .dark .voxxy-footer-surface {
+    background-color: #0f0a1a;
+  }
+
+  .voxxy-surface-elevated {
+    @apply bg-card;
+  }
+  .dark .voxxy-surface-elevated {
+    background-color: #221838;
+  }
+
+  .voxxy-input-well {
+    @apply bg-background border border-border;
+  }
+  .dark .voxxy-input-well {
+    background-color: #181028;
+  }
+
+  .voxxy-modal-surface {
+    @apply border border-border;
+    background-color: hsl(var(--card) / 0.98);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 24px 48px hsl(260 30% 15% / 0.12);
+  }
+  .dark .voxxy-modal-surface {
+    background-color: rgb(21 16 40 / 0.96);
+    border-color: rgb(168 85 247 / 0.22);
+    box-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
+  }
+
+  .voxxy-select-surface {
+    @apply bg-popover border border-border;
+  }
+  .dark .voxxy-select-surface {
+    background-color: #221838;
+    border-color: rgb(168 85 247 / 0.22);
+  }
+
+  .voxxy-surface-subtle {
+    @apply bg-muted/50 border border-border;
+  }
+  .dark .voxxy-surface-subtle {
+    background-color: #14102a;
+  }
+
+  .voxxy-editor-chrome {
+    @apply border-b border-border;
+    background: linear-gradient(to right, hsl(var(--card) / 0.92), hsl(var(--muted) / 0.82));
+    backdrop-filter: blur(12px);
+  }
+  .dark .voxxy-editor-chrome {
+    background: linear-gradient(to right, rgb(21 16 40 / 0.78), rgb(34 26 56 / 0.74));
+  }
+
+  .voxxy-editor-sidebar {
+    background: linear-gradient(to bottom, hsl(var(--card) / 0.96), hsl(var(--muted) / 0.8));
+    backdrop-filter: blur(12px);
+  }
+  .dark .voxxy-editor-sidebar {
+    background: linear-gradient(to bottom, rgb(21 16 40 / 0.82), rgb(34 26 56 / 0.72));
+  }
+
+  .voxxy-contact-shell {
+    @apply border;
+    background-color: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(8px);
+    border-color: hsl(var(--border));
+  }
+  .dark .voxxy-contact-shell {
+    background-color: rgb(45 27 78 / 0.5);
+  }
+
+  .voxxy-input-frost {
+    @apply border border-border text-foreground placeholder:text-muted-foreground transition-all;
+    background-color: hsl(var(--background) / 0.9);
+  }
+  .dark .voxxy-input-frost {
+    background-color: rgb(26 10 46 / 0.8);
+  }
+  .voxxy-input-frost:focus {
+    @apply bg-background outline-none;
+    border-color: hsl(270 91% 65% / 0.5);
+  }
+  .dark .voxxy-input-frost:focus {
+    background-color: #1a0a2e;
+  }
+
+  .voxxy-application-highlight {
+    @apply rounded-lg border border-purple-500/30;
+    background-image: linear-gradient(to bottom right, hsl(270 45% 95%), hsl(210 42% 95%));
+  }
+  .dark .voxxy-application-highlight {
+    background-image: linear-gradient(to bottom right, rgb(88 28 135 / 0.3), rgb(30 58 138 / 0.3));
   }
 }
 
@@ -144,7 +410,7 @@
   min-height: 400px;
   padding: 0.75rem;
   outline: none;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
 .ProseMirror:focus {
@@ -167,14 +433,14 @@
   font-size: 2em;
   font-weight: bold;
   margin: 1rem 0 0.5rem;
-  color: #e9d5ff;
+  color: hsl(var(--primary));
 }
 
 .ProseMirror h2 {
   font-size: 1.5em;
   font-weight: bold;
   margin: 0.75rem 0 0.5rem;
-  color: #e9d5ff;
+  color: hsl(var(--primary));
 }
 
 .ProseMirror ul,
@@ -188,18 +454,18 @@
 }
 
 .ProseMirror a {
-  color: #c4b5fd;
+  color: hsl(var(--primary));
   text-decoration: underline;
   cursor: pointer;
 }
 
 .ProseMirror a:hover {
-  color: #ddd6fe;
+  filter: brightness(1.12);
 }
 
 .ProseMirror strong {
   font-weight: bold;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
 .ProseMirror em {
@@ -207,7 +473,7 @@
 }
 
 .ProseMirror code {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: hsl(var(--foreground) / 0.1);
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;
@@ -224,21 +490,21 @@
 .ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
-  color: rgba(255, 255, 255, 0.3);
+  color: hsl(var(--muted-foreground));
   pointer-events: none;
   height: 0;
 }
 
 /* Email Preview Content - Matches ProseMirror editor styling */
 .email-preview-content {
-  color: white;
+  color: hsl(var(--foreground));
   font-size: 0.875rem;
   line-height: 1.5;
 }
 
 .email-preview-content p {
   margin: 0.75rem 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: hsl(var(--foreground) / 0.9);
 }
 
 .email-preview-content p:first-child {
@@ -253,7 +519,7 @@
   font-size: 2em;
   font-weight: bold;
   margin: 1rem 0 0.5rem;
-  color: #e9d5ff;
+  color: hsl(var(--primary));
   line-height: 1.2;
 }
 
@@ -261,7 +527,7 @@
   font-size: 1.5em;
   font-weight: bold;
   margin: 0.75rem 0 0.5rem;
-  color: #e9d5ff;
+  color: hsl(var(--primary));
   line-height: 1.3;
 }
 
@@ -273,21 +539,21 @@
 
 .email-preview-content li {
   margin: 0.25rem 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: hsl(var(--foreground) / 0.9);
 }
 
 .email-preview-content a {
-  color: #c4b5fd;
+  color: hsl(var(--primary));
   text-decoration: underline;
 }
 
 .email-preview-content a:hover {
-  color: #ddd6fe;
+  filter: brightness(1.12);
 }
 
 .email-preview-content strong {
   font-weight: bold;
-  color: white;
+  color: hsl(var(--foreground));
 }
 
 .email-preview-content em {
@@ -295,7 +561,7 @@
 }
 
 .email-preview-content code {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: hsl(var(--foreground) / 0.1);
   padding: 0.2em 0.4em;
   border-radius: 3px;
   font-family: 'Courier New', Courier, monospace;

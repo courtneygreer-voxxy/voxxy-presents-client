@@ -81,7 +81,7 @@ export default function PaymentTransactionsList({
       refunded: 'bg-blue-100 text-blue-800',
       cancelled: 'bg-red-100 text-red-800',
     };
-    return badges[status as keyof typeof badges] || 'bg-gray-100 text-gray-800';
+    return badges[status as keyof typeof badges] || 'bg-muted text-gray-800';
   };
 
   const formatAmount = (amount: string, currency: string) => {
@@ -109,15 +109,15 @@ export default function PaymentTransactionsList({
         </div>
       )}
 
-      <div className="bg-white/5 rounded-lg border border-white/10 p-6 space-y-4">
+      <div className="bg-background/5 rounded-lg border border-border p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-purple-500/20">
               <DollarSign className="w-5 h-5 text-purple-400" />
             </div>
             <div>
-              <h3 className="font-semibold text-lg text-white">Payment Transactions</h3>
-              <p className="text-sm text-white/60">
+              <h3 className="font-semibold text-lg text-foreground">Payment Transactions</h3>
+              <p className="text-sm text-foreground/60">
                 {filteredTransactions.length} of {transactions.length} transactions
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function PaymentTransactionsList({
           <button
             onClick={fetchTransactions}
             disabled={isLoading}
-            className="p-2 text-white/60 hover:bg-white/10 rounded-lg transition-colors disabled:opacity-50"
+            className="p-2 text-foreground/60 hover:bg-background/10 rounded-lg transition-colors disabled:opacity-50"
             title="Refresh"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -136,20 +136,20 @@ export default function PaymentTransactionsList({
         {/* Filters */}
         <div className="grid grid-cols-3 gap-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by email, name, ID..."
-              className="w-full pl-10 pr-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white placeholder-white/40 focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
           >
             <option value="all">All Statuses</option>
             <option value="paid">Paid</option>
@@ -161,7 +161,7 @@ export default function PaymentTransactionsList({
           <select
             value={matchFilter}
             onChange={(e) => setMatchFilter(e.target.value)}
-            className="px-4 py-2 bg-white/5 border border-white/20 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
           >
             <option value="all">All Transactions</option>
             <option value="matched">Matched Only</option>
@@ -172,58 +172,58 @@ export default function PaymentTransactionsList({
 
       {/* Transactions Table */}
       {filteredTransactions.length === 0 ? (
-        <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
-          <DollarSign className="w-12 h-12 text-white/40 mx-auto mb-4" />
-          <h3 className="font-medium text-white mb-2">No transactions found</h3>
-          <p className="text-sm text-white/60">
+        <div className="bg-background/5 rounded-lg border border-border p-12 text-center">
+          <DollarSign className="w-12 h-12 text-foreground/40 mx-auto mb-4" />
+          <h3 className="font-medium text-foreground mb-2">No transactions found</h3>
+          <p className="text-sm text-foreground/60">
             {transactions.length === 0
               ? 'No payment transactions have been synced yet.'
               : 'No transactions match your current filters.'}
           </p>
         </div>
       ) : (
-        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+        <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-white/5 border-b border-white/10">
+              <thead className="bg-background/5 border-b border-border">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                     Payer
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                     Matched Vendor
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-foreground/60 uppercase tracking-wider">
                     Date
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
                 {filteredTransactions.map((transaction) => (
-                  <tr key={transaction.id} className="hover:bg-white/5">
+                  <tr key={transaction.id} className="hover:bg-background/5">
                     <td className="px-6 py-4">
                       <div className="flex flex-col">
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-sm font-medium text-foreground">
                           {transaction.payer_first_name} {transaction.payer_last_name}
                         </p>
-                        <p className="text-sm text-white/60">{transaction.payer_email}</p>
-                        <p className="text-xs text-white/40 mt-1">
+                        <p className="text-sm text-foreground/60">{transaction.payer_email}</p>
+                        <p className="text-xs text-foreground/40 mt-1">
                           ID: {transaction.provider_transaction_id}
                         </p>
                       </div>
                     </td>
 
                     <td className="px-6 py-4">
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-medium text-foreground">
                         {formatAmount(transaction.amount, transaction.currency)}
                       </p>
-                      <p className="text-xs text-white/40">{transaction.provider}</p>
+                      <p className="text-xs text-foreground/40">{transaction.provider}</p>
                     </td>
 
                     <td className="px-6 py-4">
@@ -241,10 +241,10 @@ export default function PaymentTransactionsList({
                         <div className="flex items-start gap-2">
                           <Check className="w-4 h-4 text-green-400 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-sm font-medium text-white">
+                            <p className="text-sm font-medium text-foreground">
                               {transaction.vendor_contact.name}
                             </p>
-                            <p className="text-xs text-white/60">
+                            <p className="text-xs text-foreground/60">
                               {transaction.vendor_contact.business_name}
                             </p>
                             {transaction.registration?.vendor_fee_paid && (
@@ -264,12 +264,12 @@ export default function PaymentTransactionsList({
                     </td>
 
                     <td className="px-6 py-4">
-                      <p className="text-sm text-white">
+                      <p className="text-sm text-foreground">
                         {transaction.transaction_created_at
                           ? new Date(transaction.transaction_created_at).toLocaleDateString()
                           : 'N/A'}
                       </p>
-                      <p className="text-xs text-white/60">
+                      <p className="text-xs text-foreground/60">
                         {transaction.transaction_created_at
                           ? new Date(transaction.transaction_created_at).toLocaleTimeString()
                           : ''}
@@ -286,28 +286,28 @@ export default function PaymentTransactionsList({
       {/* Summary Stats */}
       {transactions.length > 0 && (
         <div className="grid grid-cols-4 gap-4">
-          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-            <p className="text-sm text-white/60 mb-1">Total Transactions</p>
-            <p className="text-2xl font-bold text-white">{transactions.length}</p>
+          <div className="bg-background/5 rounded-lg border border-border p-4">
+            <p className="text-sm text-foreground/60 mb-1">Total Transactions</p>
+            <p className="text-2xl font-bold text-foreground">{transactions.length}</p>
           </div>
 
-          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-            <p className="text-sm text-white/60 mb-1">Matched</p>
+          <div className="bg-background/5 rounded-lg border border-border p-4">
+            <p className="text-sm text-foreground/60 mb-1">Matched</p>
             <p className="text-2xl font-bold text-green-400">
               {transactions.filter((t) => t.vendor_contact_id).length}
             </p>
           </div>
 
-          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-            <p className="text-sm text-white/60 mb-1">Unmatched</p>
+          <div className="bg-background/5 rounded-lg border border-border p-4">
+            <p className="text-sm text-foreground/60 mb-1">Unmatched</p>
             <p className="text-2xl font-bold text-yellow-400">
               {transactions.filter((t) => !t.vendor_contact_id).length}
             </p>
           </div>
 
-          <div className="bg-white/5 rounded-lg border border-white/10 p-4">
-            <p className="text-sm text-white/60 mb-1">Total Amount</p>
-            <p className="text-2xl font-bold text-white">
+          <div className="bg-background/5 rounded-lg border border-border p-4">
+            <p className="text-sm text-foreground/60 mb-1">Total Amount</p>
+            <p className="text-2xl font-bold text-foreground">
               {formatAmount(
                 transactions
                   .filter((t) => t.payment_status === 'paid')

@@ -324,9 +324,9 @@ export function EmailAuditLogOverlay({
   const totalPages = Math.ceil(filteredAndSortedEntries.length / itemsPerPage);
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-br from-[#0f0a1e] via-[#1a0f2e] to-[#0f0a1e] z-50 flex flex-col">
+    <div className="fixed inset-0 voxxy-gradient-editor z-50 flex flex-col">
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0f0a1e]/80 backdrop-blur-sm sticky top-0 z-10 shadow-lg">
+      <div className="voxxy-nav-surface border-b border-border sticky top-0 z-10 shadow-sm dark:shadow-lg">
         <div className="px-6 py-3">
           <div className="flex items-center justify-between">
             {/* Left: Back button and title */}
@@ -335,16 +335,16 @@ export function EmailAuditLogOverlay({
                 variant="ghost"
                 size="sm"
                 onClick={onClose}
-                className="gap-1.5 text-xs"
+                className="gap-1.5 text-xs text-foreground hover:bg-foreground/5"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Mail
               </Button>
               <div className="h-5 w-px bg-border" />
               <div className="flex items-center gap-2">
-                <FileSearch className="w-5 h-5 text-purple-400" />
+                <FileSearch className="h-5 w-5 shrink-0 text-purple-700 dark:text-purple-400" />
                 <div>
-                  <h1 className="text-base font-semibold">Email Audit Log</h1>
+                  <h1 className="text-base font-semibold text-foreground">Email Audit Log</h1>
                   <p className="text-xs text-muted-foreground">
                     {event.title}
                   </p>
@@ -403,14 +403,14 @@ export function EmailAuditLogOverlay({
                   <PopoverTrigger asChild>
                     <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       filters.date_from || filters.date_to
-                        ? 'bg-purple-500/20 text-purple-300 border border-purple-500/30'
-                        : 'bg-white/5 text-white/60 hover:text-white border border-white/10 hover:bg-white/10'
+                        ? 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border border-purple-500/30'
+                        : 'bg-background/5 text-foreground/60 hover:text-foreground border border-border hover:bg-background/10'
                     }`}>
                       <CalendarIcon className="w-3.5 h-3.5" />
                       <span>{dateRangeLabel()}</span>
                     </button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0 bg-background border-white/10" align="start">
+                  <PopoverContent className="w-auto p-0 bg-background border-border" align="start">
                     <Calendar
                       mode="range"
                       selected={dateRange}
@@ -419,13 +419,13 @@ export function EmailAuditLogOverlay({
                       defaultMonth={dateRange?.from || new Date()}
                     />
                     {(filters.date_from || filters.date_to) && (
-                      <div className="border-t border-white/10 p-2 flex justify-end">
+                      <div className="border-t border-border p-2 flex justify-end">
                         <button
                           onClick={() => {
                             handleDateRangeChange(undefined);
                             setCalendarOpen(false);
                           }}
-                          className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition-colors"
+                          className="text-xs text-foreground/60 hover:text-foreground px-2 py-1 rounded hover:bg-background/10 transition-colors"
                         >
                           Clear dates
                         </button>
@@ -441,8 +441,8 @@ export function EmailAuditLogOverlay({
         {/* Total Count */}
         {!isLoading && !error && auditEntries.length > 0 && (
           <div className="mb-4">
-            <p className="text-sm text-white/60">
-              <span className="font-semibold text-white">{filteredAndSortedEntries.length}</span>
+            <p className="text-sm text-foreground/60">
+              <span className="font-semibold text-foreground">{filteredAndSortedEntries.length}</span>
               {' '}email{filteredAndSortedEntries.length !== 1 ? 's' : ''}
               {(filters.search || filters.email_name || filters.category || filters.status || filters.date_from || filters.date_to)
                 ? ' matched'
@@ -455,13 +455,13 @@ export function EmailAuditLogOverlay({
         {isLoading ? (
           <div className="border rounded-lg p-12 text-center">
             <Loader2 className="w-8 h-8 mx-auto mb-4 text-purple-400 animate-spin" />
-            <p className="text-white/60">Loading email audit log...</p>
+            <p className="text-foreground/60">Loading email audit log...</p>
           </div>
         ) : error ? (
           <div className="border rounded-lg p-12 text-center">
-            <FileSearch className="w-12 h-12 mx-auto mb-4 text-white/40" />
-            <h3 className="text-lg font-semibold text-white mb-2">Failed to load</h3>
-            <p className="text-sm text-white/60 mb-4">
+            <FileSearch className="w-12 h-12 mx-auto mb-4 text-foreground/40" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">Failed to load</h3>
+            <p className="text-sm text-foreground/60 mb-4">
               Unable to load email audit log. Please try again.
             </p>
             <Button onClick={() => window.location.reload()}>
@@ -470,9 +470,9 @@ export function EmailAuditLogOverlay({
           </div>
         ) : auditEntries.length === 0 ? (
           <div className="border rounded-lg p-12 text-center">
-            <FileSearch className="w-12 h-12 mx-auto mb-4 text-white/40" />
-            <h3 className="text-lg font-semibold text-white mb-2">No emails found</h3>
-            <p className="text-sm text-white/60">
+            <FileSearch className="w-12 h-12 mx-auto mb-4 text-foreground/40" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No emails found</h3>
+            <p className="text-sm text-foreground/60">
               {initialFilters
                 ? 'No emails match your filters. Try adjusting your search criteria.'
                 : 'No emails have been sent for this event yet.'}
@@ -480,9 +480,9 @@ export function EmailAuditLogOverlay({
           </div>
         ) : filteredAndSortedEntries.length === 0 ? (
           <div className="border rounded-lg p-12 text-center">
-            <FileSearch className="w-12 h-12 mx-auto mb-4 text-white/40" />
-            <h3 className="text-lg font-semibold text-white mb-2">No results</h3>
-            <p className="text-sm text-white/60">
+            <FileSearch className="w-12 h-12 mx-auto mb-4 text-foreground/40" />
+            <h3 className="text-lg font-semibold text-foreground mb-2">No results</h3>
+            <p className="text-sm text-foreground/60">
               No emails match your current filters. Try adjusting your search.
             </p>
           </div>
@@ -498,11 +498,11 @@ export function EmailAuditLogOverlay({
 
         {/* Pagination */}
         {!isLoading && !error && filteredAndSortedEntries.length > 0 && (
-          <div className="mt-4 flex items-center justify-between bg-white/5 px-4 py-2.5 rounded-lg border border-white/10">
-            <p className="text-xs text-white/70">
-              Showing <span className="font-semibold text-white">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
-              <span className="font-semibold text-white">{Math.min(currentPage * itemsPerPage, filteredAndSortedEntries.length)}</span> of{' '}
-              <span className="font-semibold text-white">{filteredAndSortedEntries.length}</span> emails
+          <div className="mt-4 flex items-center justify-between bg-background/5 px-4 py-2.5 rounded-lg border border-border">
+            <p className="text-xs text-foreground/70">
+              Showing <span className="font-semibold text-foreground">{(currentPage - 1) * itemsPerPage + 1}</span> -{' '}
+              <span className="font-semibold text-foreground">{Math.min(currentPage * itemsPerPage, filteredAndSortedEntries.length)}</span> of{' '}
+              <span className="font-semibold text-foreground">{filteredAndSortedEntries.length}</span> emails
               {filters.search || filters.email_name || filters.category || filters.status || filters.date_from || filters.date_to
                 ? ` (filtered from ${auditEntries.length} total)`
                 : ''}
@@ -516,8 +516,8 @@ export function EmailAuditLogOverlay({
               >
                 Previous
               </Button>
-              <span className="text-xs text-white/70 px-3 py-1 bg-white/5 rounded border border-white/10">
-                Page <span className="font-semibold text-white">{currentPage}</span> of <span className="font-semibold text-white">{totalPages}</span>
+              <span className="text-xs text-foreground/70 px-3 py-1 bg-background/5 rounded border border-border">
+                Page <span className="font-semibold text-foreground">{currentPage}</span> of <span className="font-semibold text-foreground">{totalPages}</span>
               </span>
               <Button
                 variant="outline"
