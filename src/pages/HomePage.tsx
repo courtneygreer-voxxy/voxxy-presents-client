@@ -56,6 +56,10 @@ interface ContactFormData {
 
 export default function HomePage() {
   const { isAuthenticated, isProducer } = useAuth()
+  const problemCardClass =
+    'rounded-2xl border border-slate-200/80 bg-white p-8 shadow-[0_18px_40px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-1 hover:border-violet-200 hover:shadow-[0_22px_48px_rgba(15,23,42,0.08)]'
+  const problemIconClass =
+    'mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-fuchsia-100 bg-[linear-gradient(135deg,#faf5ff_0%,#f5f3ff_100%)] text-2xl shadow-sm'
 
   // Helper function to scroll to contact section
   const scrollToContact = useCallback(() => {
@@ -269,26 +273,26 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="rounded-2xl border border-slate-700/70 bg-[#243247] p-8 shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition-all hover:-translate-y-1 hover:border-fuchsia-400/30">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📧</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-white">5–7 Tools, Zero Visibility</h3>
-              <p className="text-[15px] leading-relaxed text-slate-300">
+            <div className={problemCardClass}>
+              <div className={problemIconClass}>📧</div>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">5–7 Tools, Zero Visibility</h3>
+              <p className="text-[15px] leading-relaxed text-slate-600">
                 You're chasing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical details get buried. Deadlines slip.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-700/70 bg-[#243247] p-8 shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition-all hover:-translate-y-1 hover:border-fuchsia-400/30">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">⏱️</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-white">Hours of Unpaid Coordination</h3>
-              <p className="text-[15px] leading-relaxed text-slate-300">
+            <div className={problemCardClass}>
+              <div className={problemIconClass}>⏱️</div>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">Hours of Unpaid Coordination</h3>
+              <p className="text-[15px] leading-relaxed text-slate-600">
                 Every event eats hours of back-and-forth that doesn't scale. Your calendar grows, but your coordination workflow stays manual.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-slate-700/70 bg-[#243247] p-8 shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition-all hover:-translate-y-1 hover:border-fuchsia-400/30">
-              <div className="w-12 h-12 bg-voxxy-purple-brand/10 rounded-xl flex items-center justify-center text-2xl mb-5">📋</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-white">200+ Applications, No Way to Compare</h3>
-              <p className="text-[15px] leading-relaxed text-slate-300">
+            <div className={problemCardClass}>
+              <div className={problemIconClass}>📋</div>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">200+ Applications, No Way to Compare</h3>
+              <p className="text-[15px] leading-relaxed text-slate-600">
                 You're scrolling social profiles one by one. Great vendors get lost in the pile. By application 80, you're approving on fatigue.
               </p>
             </div>
