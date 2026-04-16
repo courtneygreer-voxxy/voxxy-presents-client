@@ -432,17 +432,45 @@ export function EmailEditorPage({
       }
     }
 
+    // Determine if this is an event-wide announcement (sent to all regardless of status)
+    const isEventAnnouncement = [
+      'on_event_update',
+      'on_event_cancel',
+      'on_bulletin_post',
+      'on_category_change',
+      'on_invitation_send'
+    ].includes(triggerType);
+
+    // Determine if this is an application-stage email (targets applicants, not just approved)
+    const isApplicationStage = [
+      'on_application_submit',
+      'on_approval',
+      'on_rejection'
+    ].includes(triggerType);
+
     // Add trigger-specific filters (targets specific vendor statuses)
-    // Payment triggers: target approved vendors with pending/overdue payments
     if (triggerType.includes('payment')) {
+      // Payment triggers: target approved vendors with pending/overdue payments
       filter_criteria["statuses"] = ["approved"];
-      filter_criteria["payment_status"] = ["pending", "overdue"];
+      filter_criteria["payment_statuses"] = ["pending", "overdue"];
     }
-    // Event countdown triggers: target approved/confirmed vendors
     else if (['days_before_event', 'on_event_date', 'days_after_event'].includes(triggerType)) {
+      // Event countdown triggers: target approved/confirmed vendors
       filter_criteria["statuses"] = ["approved", "confirmed"];
     }
-    // Application/approval triggers: no additional status filters (all registrations in category)
+    else if (isApplicationStage) {
+      // Application/approval triggers: no status filters needed (system handles per-application)
+      // These are sent individually when status changes occur
+    }
+    else if (isEventAnnouncement) {
+      // Event announcements: sent to all registrations regardless of status
+      // No status filter needed
+    }
+    else {
+      // DEFAULT for all other trigger types (custom reminders, deadlines, etc.):
+      // Target approved/confirmed vendors only (exclude pending, rejected, cancelled)
+      filter_criteria["statuses"] = ["approved", "confirmed"];
+    }
 
     return filter_criteria;
   };
