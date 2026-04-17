@@ -52,7 +52,7 @@ export default function PaymentSuccessPage() {
   }
 
   return (
-    <div className="min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
+    <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-green-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>

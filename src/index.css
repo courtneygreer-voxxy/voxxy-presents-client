@@ -143,6 +143,7 @@
   .voxxy-gradient-page {
     background-image: linear-gradient(to bottom right, hsl(275 32% 97%), hsl(270 28% 96.5%), hsl(230 26% 96.8%));
   }
+  .dark.voxxy-gradient-page,
   .dark .voxxy-gradient-page {
     background-image: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
   }
@@ -150,6 +151,7 @@
   .voxxy-gradient-page-alt {
     background-image: linear-gradient(to bottom right, hsl(275 28% 97.2%), hsl(270 26% 96.4%), hsl(240 22% 96.5%));
   }
+  .dark.voxxy-gradient-page-alt,
   .dark .voxxy-gradient-page-alt {
     background-image: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
   }
@@ -157,6 +159,7 @@
   .voxxy-gradient-page-cool {
     background-image: linear-gradient(to bottom right, hsl(255 26% 97.5%), hsl(270 24% 97%), hsl(220 28% 97.2%));
   }
+  .dark.voxxy-gradient-page-cool,
   .dark .voxxy-gradient-page-cool {
     background-image: linear-gradient(to bottom right, #221238, #181028);
   }
@@ -164,6 +167,7 @@
   .voxxy-gradient-editor {
     background-image: linear-gradient(to bottom right, hsl(270 18% 97%), hsl(265 16% 96%), hsl(250 18% 96.5%));
   }
+  .dark.voxxy-gradient-editor,
   .dark .voxxy-gradient-editor {
     background-image: linear-gradient(to bottom right, #151028, #221a38, #151028);
   }
@@ -171,6 +175,7 @@
   .voxxy-gradient-panel {
     background-image: linear-gradient(to bottom right, hsl(var(--card)), hsl(270 30% 97%));
   }
+  .dark.voxxy-gradient-panel,
   .dark .voxxy-gradient-panel {
     background-image: linear-gradient(to bottom right, #221838, #181222);
   }
@@ -178,6 +183,7 @@
   .voxxy-gradient-card-deep {
     background-image: linear-gradient(to bottom, hsl(270 20% 98%), hsl(265 18% 96%));
   }
+  .dark.voxxy-gradient-card-deep,
   .dark .voxxy-gradient-card-deep {
     background-image: linear-gradient(to bottom, #322848, #261c38);
   }
@@ -221,6 +227,7 @@
   .voxxy-gradient-hero-split {
     background-image: linear-gradient(to bottom right, hsl(270 52% 92%), hsl(330 58% 92%), hsl(217 52% 92%));
   }
+  .dark.voxxy-gradient-hero-split,
   .dark .voxxy-gradient-hero-split {
     background-image: linear-gradient(to bottom right, #a855f7, #ec4899, #3b82f6);
   }
@@ -228,6 +235,7 @@
   .voxxy-gradient-admin {
     background-image: linear-gradient(to bottom right, hsl(270 20% 97%), hsl(265 22% 96.5%), hsl(240 20% 96.5%));
   }
+  .dark.voxxy-gradient-admin,
   .dark .voxxy-gradient-admin {
     background-image: linear-gradient(to bottom right, #120a1c, #221238, #181022);
   }
@@ -366,6 +374,22 @@
   }
   .dark .voxxy-auth-link:hover {
     color: hsl(270 100% 88%);
+  }
+
+  .dark.voxxy-public-page {
+    color-scheme: dark;
+  }
+  .dark.voxxy-public-page .text-muted-foreground {
+    color: rgb(224 217 245 / 0.78);
+  }
+  .dark.voxxy-public-page [class*="text-foreground/85"] {
+    color: rgb(244 240 255 / 0.88);
+  }
+  .dark.voxxy-public-page [class*="text-foreground/80"] {
+    color: rgb(236 231 248 / 0.82);
+  }
+  .dark.voxxy-public-page .glass-card {
+    border-color: rgb(168 85 247 / 0.2);
   }
 
   .voxxy-footer-surface {

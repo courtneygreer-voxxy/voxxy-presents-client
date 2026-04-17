@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="dark voxxy-public-page min-h-screen flex">
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 voxxy-gradient-hero-split relative overflow-hidden">
         {/* Animated Background Pattern */}

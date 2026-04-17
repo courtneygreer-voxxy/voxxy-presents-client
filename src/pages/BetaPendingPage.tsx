@@ -150,7 +150,7 @@ export default function BetaPendingPage() {
   ]
 
   return (
-    <div className="min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
+    <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated Background */}
       <div
         className="absolute inset-0 opacity-20"

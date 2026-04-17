@@ -180,7 +180,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="dark voxxy-public-page relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
       <Navigation activePage="home" />
 
       {/* Hero Section */}
