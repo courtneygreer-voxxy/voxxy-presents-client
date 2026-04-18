@@ -1952,12 +1952,16 @@ export interface VendorContactsListResponse {
 
 export interface BulkImportResult {
   success: boolean
+  validate_only?: boolean
   summary: {
     total_rows: number
     created: number
     updated: number
     skipped: number
     failed: number
+    would_create?: number
+    would_update?: number
+    would_skip?: number
   }
   errors: Array<{
     row: number
@@ -1970,6 +1974,7 @@ export interface BulkImportOptions {
   skipDuplicates?: boolean
   updateExisting?: boolean
   tags?: string[]
+  validateOnly?: boolean
 }
 
 export interface ContactList {
@@ -2484,6 +2489,9 @@ export const vendorContactsApi = {
     formData.append('file', file)
     formData.append('skip_duplicates', String(options.skipDuplicates ?? true))
     formData.append('update_existing', String(options.updateExisting ?? false))
+    if (options.validateOnly) {
+      formData.append('validate_only', 'true')
+    }
 
     if (options.tags && options.tags.length > 0) {
       formData.append('tags', JSON.stringify(options.tags))

@@ -32,7 +32,7 @@ interface CSVUploadModalProps {
   onSuccess: () => void;
 }
 
-type UploadState = 'idle' | 'file_selected' | 'validating' | 'uploading' | 'success' | 'error';
+type UploadState = 'idle' | 'file_selected' | 'validating' | 'server_validating' | 'validated' | 'uploading' | 'success' | 'error';
 
 interface CSVPreviewData {
   headers: string[];
@@ -49,6 +49,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const [bulkTags, setBulkTags] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [importResult, setImportResult] = useState<BulkImportResult | null>(null);
+  const [validationResult, setValidationResult] = useState<BulkImportResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const requiredHeaders = ['name', 'email'];
@@ -145,6 +146,32 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     }
   };
 
+  const getImportTags = () =>
+    bulkTags.split(',').map(t => t.trim()).filter(t => t.length > 0);
+
+  const handleValidate = async () => {
+    if (!selectedFile) return;
+
+    setState('server_validating');
+    setErrorMessage('');
+
+    try {
+      const result = await vendorContactsApi.bulkImport(selectedFile, {
+        skipDuplicates,
+        updateExisting,
+        tags: getImportTags(),
+        validateOnly: true,
+      });
+
+      setValidationResult(result);
+      setState('validated');
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : 'Validation failed. Please check your file and try again.';
+      setErrorMessage(errorMsg);
+      setState('error');
+    }
+  };
+
   const handleUpload = async () => {
     if (!selectedFile) return;
 
@@ -152,39 +179,15 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     setErrorMessage('');
 
     try {
-      console.log('🔄 Starting CSV import:', {
-        fileName: selectedFile.name,
-        fileSize: selectedFile.size,
-        totalRows: previewData?.totalRows,
-        options: { skipDuplicates, updateExisting, tags: bulkTags }
-      });
-
-      const tags = bulkTags
-        .split(',')
-        .map(t => t.trim())
-        .filter(t => t.length > 0);
-
       const result = await vendorContactsApi.bulkImport(selectedFile, {
         skipDuplicates,
         updateExisting,
-        tags,
+        tags: getImportTags(),
       });
-
-      console.log('✅ Import successful:', result);
 
       setImportResult(result);
       setState('success');
-
-      // Don't call onSuccess() here - let user see success screen first
-      // onSuccess() will be called when they click "Done" button
     } catch (error) {
-      console.error('❌ Import failed:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        stack: error instanceof Error ? error.stack : undefined,
-        error
-      });
-
       const errorMsg = error instanceof Error ? error.message : 'Upload failed. Please check your file and try again.';
       setErrorMessage(errorMsg);
       setState('error');
@@ -196,6 +199,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     setSelectedFile(null);
     setPreviewData(null);
     setImportResult(null);
+    setValidationResult(null);
     setErrorMessage('');
     setBulkTags('');
     if (fileInputRef.current) {
@@ -324,8 +328,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
           </div>
         </div>
         <div className="flex gap-2">
-          <Button onClick={handleUpload} size="sm" className="text-xs h-8">
-            Import {previewData?.totalRows} Contacts
+          <Button onClick={handleValidate} size="sm" className="text-xs h-8">
+            Validate {previewData?.totalRows} Contacts
           </Button>
           <Button variant="outline" onClick={handleReset} size="sm" className="text-xs h-8">
             Choose Different File
@@ -438,6 +442,116 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     </div>
   );
 
+  const renderServerValidatingState = () => (
+    <div className="flex flex-col items-center justify-center py-8">
+      <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
+      <p className="text-sm font-medium">Validating contacts...</p>
+      <p className="text-xs text-white/50 mt-1">
+        Checking for errors before importing
+      </p>
+    </div>
+  );
+
+  const renderValidatedState = () => {
+    const hasErrors = (validationResult?.errors.length || 0) > 0;
+    const wouldCreate = validationResult?.summary.would_create || 0;
+    const wouldUpdate = validationResult?.summary.would_update || 0;
+    const wouldSkip = validationResult?.summary.would_skip || 0;
+    const failed = validationResult?.summary.failed || 0;
+
+    return (
+      <div className="space-y-3">
+        {/* Validation Summary */}
+        <div className={`flex items-center gap-2 justify-center py-2 ${hasErrors ? '' : ''}`}>
+          {hasErrors ? (
+            <AlertCircle className="h-6 w-6 text-yellow-400" />
+          ) : (
+            <CheckCircle2 className="h-6 w-6 text-green-400" />
+          )}
+          <h3 className="text-sm font-semibold text-white">
+            {hasErrors ? 'Validation Found Issues' : 'Validation Passed'}
+          </h3>
+        </div>
+
+        {/* Preview Stats */}
+        <div className="grid grid-cols-2 gap-2">
+          {wouldCreate > 0 && (
+            <div className="border border-green-500/30 bg-green-500/10 rounded-lg p-2.5 text-center">
+              <div className="text-lg font-bold text-green-400">{wouldCreate}</div>
+              <div className="text-[11px] text-white/60">Will be created</div>
+            </div>
+          )}
+          {wouldUpdate > 0 && (
+            <div className="border border-blue-500/30 bg-blue-500/10 rounded-lg p-2.5 text-center">
+              <div className="text-lg font-bold text-blue-400">{wouldUpdate}</div>
+              <div className="text-[11px] text-white/60">Will be updated</div>
+            </div>
+          )}
+          {wouldSkip > 0 && (
+            <div className="border border-yellow-500/30 bg-yellow-500/10 rounded-lg p-2.5 text-center">
+              <div className="text-lg font-bold text-yellow-400">{wouldSkip}</div>
+              <div className="text-[11px] text-white/60">Duplicates (skipped)</div>
+            </div>
+          )}
+          {failed > 0 && (
+            <div className="border border-red-500/30 bg-red-500/10 rounded-lg p-2.5 text-center">
+              <div className="text-lg font-bold text-red-400">{failed}</div>
+              <div className="text-[11px] text-white/60">Invalid rows</div>
+            </div>
+          )}
+        </div>
+
+        {/* Error Details */}
+        {hasErrors && validationResult && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-3.5 w-3.5" />
+            <AlertDescription>
+              <div className="space-y-1.5">
+                <p className="text-xs font-medium">
+                  {validationResult.errors.length} row(s) have errors and will be skipped:
+                </p>
+                <div className="max-h-24 overflow-y-auto text-[11px] space-y-0.5">
+                  {validationResult.errors.slice(0, 5).map((error, idx) => (
+                    <div key={idx}>
+                      Row {error.row}: {error.message}
+                    </div>
+                  ))}
+                  {validationResult.errors.length > 5 && (
+                    <div className="text-white/50">
+                      ...and {validationResult.errors.length - 5} more errors
+                    </div>
+                  )}
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadErrorReport(validationResult.errors)}
+                  className="mt-1 h-7 text-[11px]"
+                >
+                  <Download className="h-3 w-3 mr-1.5" />
+                  Download Error Report
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Actions */}
+        <div className="flex justify-between pt-1">
+          <Button variant="outline" onClick={handleReset} size="sm" className="text-xs h-8">
+            Fix &amp; Re-upload
+          </Button>
+          <Button onClick={handleUpload} size="sm" className="text-xs h-8">
+            {hasErrors
+              ? `Import Anyway (${wouldCreate + wouldUpdate} valid)`
+              : `Import ${wouldCreate + wouldUpdate} Contacts`
+            }
+          </Button>
+        </div>
+      </div>
+    );
+  };
+
   const renderErrorState = () => (
     <div className="space-y-3">
       <Alert variant="destructive">
@@ -478,6 +592,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             </div>
           )}
           {state === 'file_selected' && renderFileSelectedState()}
+          {state === 'server_validating' && renderServerValidatingState()}
+          {state === 'validated' && renderValidatedState()}
           {state === 'uploading' && renderUploadingState()}
           {state === 'success' && renderSuccessState()}
           {state === 'error' && renderErrorState()}
