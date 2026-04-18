@@ -455,8 +455,9 @@ export function EmailEditorPage({
       filter_criteria["payment_statuses"] = ["pending", "overdue"];
     }
     else if (['days_before_event', 'on_event_date', 'days_after_event'].includes(triggerType)) {
-      // Event countdown triggers: target approved/confirmed vendors
+      // Event countdown triggers: target approved/confirmed vendors who have paid
       filter_criteria["statuses"] = ["approved", "confirmed"];
+      filter_criteria["payment_statuses"] = ["paid", "confirmed"];
     }
     else if (isApplicationStage) {
       // Application/approval triggers: no status filters needed (system handles per-application)

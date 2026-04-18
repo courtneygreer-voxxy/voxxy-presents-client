@@ -66,6 +66,23 @@ export default function BetaPendingPage() {
     }
   }, [isEmailVerified, isPaid, navigate])
 
+  // Reset payment state when user returns to page (e.g., browser back button)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Reset payment state when user returns to page
+        setIsProcessingPayment(false)
+        setPaymentError(null)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
+
   const handleSignOut = async () => {
     await signOut()
     navigate('/')
