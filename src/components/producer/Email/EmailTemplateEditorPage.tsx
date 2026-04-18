@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   AlertCircle,
   Lock,
+  Search,
 } from 'lucide-react';
 import type { EmailTemplateItem } from '@/types/email';
 import {
@@ -133,6 +134,7 @@ export function EmailTemplateEditorPage({
   const [activeField, setActiveField] = useState<'subject' | 'body' | null>(null);
   const [triggerSettingsOpen, setTriggerSettingsOpen] = useState(true);
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
+  const [tagSearch, setTagSearch] = useState('');
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content
@@ -635,6 +637,16 @@ export function EmailTemplateEditorPage({
 
               {availableTagsOpen && (
                 <div className="space-y-3">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+                    <input
+                      type="text"
+                      value={tagSearch}
+                      onChange={(e) => setTagSearch(e.target.value)}
+                      placeholder="Search tags..."
+                      className="w-full pl-8 pr-3 py-1.5 text-xs bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50"
+                    />
+                  </div>
                   <p className="text-[10px] text-white/60 mb-2 leading-relaxed">
                     Click a tag to insert it at your cursor position
                     {formData.category === 'event_announcements' && (
@@ -644,13 +656,22 @@ export function EmailTemplateEditorPage({
                     )}
                   </p>
                   <div className="space-y-3">
-                    {getGroupedVariablesForUI().map((group) => (
+                    {getGroupedVariablesForUI().map((group) => {
+                      const filteredVars = tagSearch
+                        ? group.variables.filter(v =>
+                            v.label.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                            v.frontendVar.toLowerCase().includes(tagSearch.toLowerCase()) ||
+                            v.description.toLowerCase().includes(tagSearch.toLowerCase())
+                          )
+                        : group.variables;
+                      if (filteredVars.length === 0) return null;
+                      return (
                       <div key={group.label}>
                         <h4 className="text-[10px] font-semibold text-purple-400 uppercase tracking-wide mb-1.5 px-1">
                           {group.label}
                         </h4>
                         <div className="space-y-0.5">
-                          {group.variables.map((variable) => {
+                          {filteredVars.map((variable) => {
                             const isAnnouncementEmail = formData.category === 'event_announcements';
                             const isDisabled = (isAnnouncementEmail && !variable.worksInInvitations) || !activeField;
 
@@ -685,7 +706,8 @@ export function EmailTemplateEditorPage({
                           })}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}

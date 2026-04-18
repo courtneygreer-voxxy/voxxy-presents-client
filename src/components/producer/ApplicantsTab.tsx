@@ -1138,36 +1138,6 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             <span className={`text-[10px] font-medium ${statusColor} flex-shrink-0 w-16 text-right`}>
                               {deliveryStatus}
                             </span>
-                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
-                              <button
-                                onClick={async () => {
-                                  try {
-                                    await emailDeliveriesApi.retry(delivery.id);
-                                    toast.success('Email queued for retry');
-                                    let refreshedHistory: any[] = [];
-                                    if (selectedApplicant.registrationId) {
-                                      const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
-                                      refreshedHistory = [...(regHistory || [])];
-                                    }
-                                    if (selectedApplicant.invitationId) {
-                                      const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
-                                      refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
-                                    }
-                                    refreshedHistory.sort((a, b) => {
-                                      const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
-                                      const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
-                                      return dateB - dateA;
-                                    });
-                                    setEmailHistoryData(refreshedHistory);
-                                  } catch (err: any) {
-                                    toast.error(`Failed to retry: ${err.message}`);
-                                  }
-                                }}
-                                className="text-[10px] text-purple-400 hover:text-purple-300 flex-shrink-0"
-                              >
-                                Retry
-                              </button>
-                            )}
                           </div>
                         );
                       })}

@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
+import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Button } from '@/components/ui/button';
 import type { ScheduledEmail } from '@/types/email';
@@ -522,20 +522,6 @@ export default function EmailSequenceEditorOverlay({
                           {isSent ? <Eye className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
                           {isSent ? 'View' : 'Edit'}
                         </button>
-                        {!isSent && isCustomCountdown(selectedEmail.trigger_type) && (
-                          <button
-                            onClick={() => {
-                              if (confirm('Delete this email? This cannot be undone.')) {
-                                onDelete(selectedEmail.id);
-                              }
-                            }}
-                            className="px-3 py-1.5 rounded-lg border border-red-500/40 bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-all text-sm flex items-center gap-1.5"
-                            title="Delete email"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                            Delete
-                          </button>
-                        )}
                         {!isSent && (
                           <SequenceRowMenu
                             email={selectedEmail}

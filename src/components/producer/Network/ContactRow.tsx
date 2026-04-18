@@ -34,7 +34,7 @@ export default function ContactRow({
 
   return (
     <div className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-      <div className={`grid grid-cols-[28px,1fr,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}>
+      <div className={`grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}>
         {/* Checkbox */}
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
