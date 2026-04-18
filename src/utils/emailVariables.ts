@@ -140,7 +140,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: true
   },
   {
-    label: 'Booth Price',
+    label: 'Category Price',
     frontendVar: '[boothPrice]',
     backendVar: '{{booth_price}}',
     category: 'event',
@@ -166,15 +166,6 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     example: '21+',
     worksInInvitations: true
   },
-  {
-    label: 'Categories List',
-    frontendVar: '[categoryList]',
-    backendVar: '{{category_list}}',
-    category: 'event',
-    description: 'List of all vendor categories with direct application links',
-    example: '• Artist Booth - https://voxxy.io/events/event-slug/apply/123\n• Food Vendor - https://voxxy.io/events/event-slug/apply/124',
-    worksInInvitations: true
-  },
 
   // Organization Variables
   {
@@ -197,15 +188,6 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
   },
 
   // Vendor Variables
-  {
-    label: 'Greeting Name',
-    frontendVar: '[greetingName]',
-    backendVar: '{{greeting_name}}',
-    category: 'vendor',
-    description: 'Smart greeting (business name or first name)',
-    example: "John's Tacos (or John)",
-    worksInInvitations: true
-  },
   {
     label: 'First Name',
     frontendVar: '[firstName]',
@@ -243,15 +225,6 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: true
   },
   {
-    label: 'Contact Name',
-    frontendVar: '[contactName]',
-    backendVar: '{{contact_name}}',
-    category: 'vendor',
-    description: "Vendor's contact person name",
-    example: 'Jane Smith',
-    worksInInvitations: true
-  },
-  {
     label: 'Email',
     frontendVar: '[email]',
     backendVar: '{{email}}',
@@ -279,7 +252,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: true
   },
   {
-    label: 'Vendor Category',
+    label: 'Category',
     frontendVar: '[vendorCategory]',
     backendVar: '{{vendor_category}}',
     category: 'vendor',
@@ -294,24 +267,6 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     category: 'vendor',
     description: 'Description of the vendor category they applied for',
     example: 'Local restaurants and food service vendors',
-    worksInInvitations: false
-  },
-  {
-    label: 'Booth Number',
-    frontendVar: '[boothNumber]',
-    backendVar: '{{booth_number}}',
-    category: 'vendor',
-    description: 'Assigned booth location (only available after assignment)',
-    example: 'A-12',
-    worksInInvitations: false
-  },
-  {
-    label: 'Application Date',
-    frontendVar: '[applicationDate]',
-    backendVar: '{{application_date}}',
-    category: 'vendor',
-    description: 'Date vendor applied (only works after they apply)',
-    example: 'May 15, 2025',
     worksInInvitations: false
   },
   {
@@ -371,7 +326,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: true
   },
   {
-    label: 'Vendor Dashboard',
+    label: 'Event Dashboard',
     frontendVar: '[eventPortalLink]',
     backendVar: '{{event_portal_link}}',
     category: 'computed',
