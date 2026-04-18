@@ -416,6 +416,11 @@ export default function EmailSequenceEditorOverlay({
                                   {getAudienceLabel(email)}
                                 </span>
                               </div>
+                              {email.scheduled_for && (
+                                <div className="text-[10px] text-white/40 mt-1">
+                                  Sends: {new Date(email.scheduled_for).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(email.scheduled_for).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}
+                                </div>
+                              )}
                             </button>
                           );
                         })}
