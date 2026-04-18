@@ -46,7 +46,37 @@ export interface LocationData {
   place_id: string;
 }
 
+type AddressComponent = PlaceDetails['address_components'][number];
+
 class GooglePlacesService {
+  /**
+   * Google Places can represent the "city" differently depending on the market.
+   * For standard cities we usually get `locality` (e.g. Los Angeles).
+   * For NYC venues, the display city often lives under sublocality types
+   * like `sublocality_level_1` (e.g. Brooklyn, Queens, Manhattan).
+   *
+   * This helper prefers structured address components over string parsing so
+   * boroughs and other sub-city regions can be displayed correctly.
+   */
+  private getCityFromComponents(addressComponents: AddressComponent[]): string {
+    const cityPriority = [
+      'locality',
+      'sublocality_level_1',
+      'sublocality',
+      'postal_town',
+      'administrative_area_level_3',
+    ];
+
+    for (const type of cityPriority) {
+      const component = addressComponents.find(({ types }) => types.includes(type));
+      if (component) {
+        return component.long_name;
+      }
+    }
+
+    return '';
+  }
+
   /**
    * Search for places using Google Places Autocomplete API (via backend proxy)
    * @param input - Search query
@@ -142,15 +172,21 @@ class GooglePlacesService {
     let latitude: number | null = null;
     let longitude: number | null = null;
 
-    // PRIORITY 1: Extract from address_components if available (most reliable)
+    // Extract from address_components if available (most reliable)
     if (placeDetails?.address_components) {
+      // Derive the display city first so NYC boroughs can win when `locality`
+      // is absent but `sublocality_level_1` is present.
+      city = this.getCityFromComponents(placeDetails.address_components);
+
       placeDetails.address_components.forEach((component) => {
         const types = component.types;
 
-        if (types.includes('neighborhood') || types.includes('sublocality')) {
+        if (
+          types.includes('neighborhood') ||
+          types.includes('sublocality') ||
+          types.includes('sublocality_level_1')
+        ) {
           neighborhood = component.long_name;
-        } else if (types.includes('locality')) {
-          city = component.long_name;
         } else if (types.includes('administrative_area_level_1')) {
           state = component.short_name;
         } else if (types.includes('country')) {
@@ -165,39 +201,11 @@ class GooglePlacesService {
       longitude = placeDetails.geometry.location.lng;
     }
 
-    // PRIORITY 2: Fallback to structured_formatting ONLY if we don't have city/state
-    // This ensures we don't override accurate address_components with street addresses
-    if ((!city || !state) && place.structured_formatting) {
-      const secondary = place.structured_formatting.secondary_text;
-
-      if (secondary && secondary.includes(',')) {
-        const secondaryParts = secondary.split(', ').map(part => part.trim());
-
-        // For venues, secondary text might be:
-        // "123 Main St, Brooklyn, NY" (3+ parts - skip first if it's a street)
-        // "Brooklyn, NY" (2 parts - this is what we want)
-        // "New York, NY, USA" (3 parts - middle is what we want)
-
-        if (secondaryParts.length >= 3) {
-          // Likely format: "Street, City, State" or "City, State, Country"
-          // Take the second-to-last as city, last as state (skip street/country)
-          if (!city) {
-            city = secondaryParts[secondaryParts.length - 2];
-          }
-          if (!state) {
-            state = secondaryParts[secondaryParts.length - 1];
-          }
-        } else if (secondaryParts.length === 2) {
-          // Format: "City, State" - perfect!
-          if (!city) {
-            city = secondaryParts[0];
-          }
-          if (!state) {
-            state = secondaryParts[1];
-          }
-        }
-      }
-    }
+    // Do not derive city by splitting `secondary_text`.
+    // Google already gives us normalized address components, which are far more
+    // reliable than comma-separated prediction strings for venues and boroughs.
+    // If components are unavailable, we intentionally leave `city` blank rather
+    // than risk turning "Brooklyn, NY, USA" into the incorrect "NY, NY".
 
     // Create formatted address (always just city, state - never street address)
     let formattedAddress = '';
