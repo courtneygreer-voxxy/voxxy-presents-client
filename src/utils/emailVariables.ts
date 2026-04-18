@@ -24,7 +24,7 @@ export interface EmailVariable {
   backendVar: string;
 
   // Category for grouping
-  category: 'event' | 'organization' | 'vendor' | 'computed';
+  category: 'event' | 'organization' | 'vendor' | 'computed' | 'links';
 
   // Help text
   description: string;
@@ -90,8 +90,8 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventLocation]',
     backendVar: '{{event_location}}',
     category: 'event',
-    description: 'Venue and address',
-    example: 'Piedmont Park, Atlanta, GA',
+    description: 'City and state of the event',
+    example: 'Atlanta, GA',
     worksInInvitations: true
   },
   {
@@ -99,17 +99,26 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventCity]',
     backendVar: '{{event_city}}',
     category: 'event',
-    description: 'City extracted from event location',
+    description: 'City of the event',
     example: 'Atlanta',
     worksInInvitations: true
   },
   {
-    label: 'Address',
-    frontendVar: '[address]',
-    backendVar: '{{address}}',
+    label: 'Event State',
+    frontendVar: '[eventState]',
+    backendVar: '{{event_state}}',
     category: 'event',
-    description: 'Full event location/address (same as Event Location)',
-    example: 'Piedmont Park, Atlanta, GA',
+    description: 'State/region of the event',
+    example: 'GA',
+    worksInInvitations: true
+  },
+  {
+    label: 'Event Address',
+    frontendVar: '[eventAddress]',
+    backendVar: '{{event_address}}',
+    category: 'event',
+    description: 'Street address of the event',
+    example: '123 Johnson Street',
     worksInInvitations: true
   },
   {
@@ -117,7 +126,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     frontendVar: '[eventVenue]',
     backendVar: '{{event_venue}}',
     category: 'event',
-    description: 'Venue name only',
+    description: 'Venue name/title of the event location',
     example: 'Piedmont Park',
     worksInInvitations: true
   },
@@ -309,18 +318,18 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     label: 'Category Payment Link',
     frontendVar: '[categoryPaymentLink]',
     backendVar: '{{category_payment_link}}',
-    category: 'vendor',
+    category: 'links',
     description: 'Payment link for the specific vendor category (only works after they apply)',
     example: 'https://pay.stripe.com/...',
     worksInInvitations: false
   },
 
-  // Computed/Link Variables
+  // Link Variables
   {
     label: 'Apply to Event',
     frontendVar: '[eventLink]',
     backendVar: '{{event_link}}',
-    category: 'computed',
+    category: 'links',
     description: 'Public application page URL - where vendors apply to your event',
     example: 'https://voxxy.io/events/org-slug/event-slug-123',
     worksInInvitations: true
@@ -329,7 +338,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     label: 'Event Dashboard',
     frontendVar: '[eventPortalLink]',
     backendVar: '{{event_portal_link}}',
-    category: 'computed',
+    category: 'links',
     description: 'Vendor portal/dashboard link (requires email to access)',
     example: 'https://voxxy.io/portal/org-slug/event-slug-123',
     worksInInvitations: true
@@ -338,19 +347,10 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     label: 'Unsubscribe Link',
     frontendVar: '[unsubscribeLink]',
     backendVar: '{{unsubscribe_link}}',
-    category: 'computed',
+    category: 'links',
     description: 'Unsubscribe URL (required for all emails)',
     example: 'https://voxxy.io/unsubscribe/abc123token',
     worksInInvitations: true
-  },
-  {
-    label: 'Payment Link',
-    frontendVar: '[paymentLink]',
-    backendVar: '{{payment_link}}',
-    category: 'computed',
-    description: 'Payment URL for vendor (category-specific - only works after they apply)',
-    example: 'https://pay.stripe.com/...',
-    worksInInvitations: false
   },
   {
     label: 'Application Code',
@@ -508,7 +508,13 @@ export function getGroupedVariablesForUI(): VariableGroup[] {
     {
       label: 'Event Details',
       variables: EMAIL_VARIABLES
-        .filter(v => v.category === 'event' || v.category === 'computed')
+        .filter(v => v.category === 'event')
+        .sort(sortByLabel)
+    },
+    {
+      label: 'Links',
+      variables: EMAIL_VARIABLES
+        .filter(v => v.category === 'links' || v.category === 'computed')
         .sort(sortByLabel)
     }
   ];
