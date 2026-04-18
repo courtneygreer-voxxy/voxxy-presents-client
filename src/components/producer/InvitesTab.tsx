@@ -868,24 +868,6 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                                           {/* Action buttons */}
                                           <div className="flex gap-2 mt-2">
-                                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
-                                              <button
-                                                onClick={async () => {
-                                                  try {
-                                                    await emailDeliveriesApi.retry(delivery.id);
-                                                    alert('Email queued for retry');
-                                                    // Refresh email history
-                                                    const updated = await emailDeliveriesApi.getByRegistration(row.registrationId!);
-                                                    setEmailHistoryData((prev) => ({ ...prev, [row.id]: updated }));
-                                                  } catch (err: any) {
-                                                    alert(`Failed to retry: ${err.message}`);
-                                                  }
-                                                }}
-                                                className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-purple-400 hover:bg-purple-600/30 transition-smooth"
-                                              >
-                                                Retry
-                                              </button>
-                                            )}
                                           </div>
                                         </div>
                                       );
