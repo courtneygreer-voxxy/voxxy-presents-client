@@ -119,6 +119,22 @@ const BLAST_TRIGGER_TYPES = new Set([
   'on_event_update',
 ]);
 
+// System triggers: event-triggered emails that are core to the workflow
+// These can be edited (subject/body) but cannot be deleted, and their name cannot be changed
+const SYSTEM_TRIGGERS = [
+  'on_application_open',
+  'on_invitation_send',
+  'on_application_submit',
+  'on_approval',
+  'on_rejection',
+  'on_waitlist',
+  'on_payment_received',
+  'on_category_change',
+  'on_event_update',
+  'on_event_cancel',
+  'on_bulletin_post',
+];
+
 // Value-based triggers: custom countdown emails that users CAN create (vs system emails they cannot)
 // These are time-based reminders (not event-triggered) that can be edited/deleted
 const VALUE_BASED_TRIGGERS = [
@@ -210,6 +226,9 @@ export function EmailEditorPage({
   const triggerValue = watch('trigger_value');
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
+
+  // Check if this is a system email (name cannot be edited for system emails)
+  const isSystemEmail = triggerType ? SYSTEM_TRIGGERS.includes(triggerType as string) : false;
 
   // Filter trigger types based on mode and available event date fields
   const availableTriggerTypes = TRIGGER_TYPES.filter((type) => {
@@ -888,13 +907,23 @@ export function EmailEditorPage({
 
             {/* Email Name */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-white/70 mb-1.5">
+              <label className="block text-xs font-medium text-white/70 mb-1.5 flex items-center gap-2">
                 Email Name
+                {isSystemEmail && (
+                  <span className="flex items-center gap-1 text-[10px] text-white/50">
+                    <Lock className="h-3 w-3" />
+                    Locked for system emails
+                  </span>
+                )}
               </label>
               <Input
                 {...register('name')}
-                className="bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9"
+                disabled={isSystemEmail}
+                className={`bg-white/5 border-white/20 text-white placeholder:text-white/40 text-sm h-9 ${
+                  isSystemEmail ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
                 placeholder="e.g., Day Before Event Reminder"
+                title={isSystemEmail ? 'Email name cannot be changed for system emails (used to associate with trigger)' : ''}
               />
             </div>
 
