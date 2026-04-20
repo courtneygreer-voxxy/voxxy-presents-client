@@ -249,7 +249,7 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    if (!formData.name || !formData.email || !formData.business_name || !formData.vendor_category) {
+    if (!formData.name || !formData.email || !formData.vendor_category) {
       setError('Please fill in all required fields');
       return;
     }
@@ -558,7 +558,7 @@ export default function VendorApplicationForm() {
                 {/* Business/Brand Name */}
                 <div>
                   <label className="block text-xs font-medium text-white mb-1.5">
-                    Business/Brand Name <span className="text-red-400">*</span>
+                    Business/Brand Name <span className="text-white/40 text-[10px] ml-1">(optional)</span>
                   </label>
                   <input
                     type="text"
@@ -566,7 +566,6 @@ export default function VendorApplicationForm() {
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
-                    required
                   />
                 </div>
 

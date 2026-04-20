@@ -34,7 +34,7 @@ export default function ContactsTable({
     <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
       {/* Table Header - Condensed view for all screen sizes */}
       <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[28px,1fr,140px,120px,130px,100px,80px,1fr,70px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
+        <div className="grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
@@ -51,6 +51,7 @@ export default function ContactsTable({
           <div>Category</div>
           <div>Social</div>
           <div>Email</div>
+          <div>Tags</div>
           <div className="text-right">Actions</div>
         </div>
       </div>
