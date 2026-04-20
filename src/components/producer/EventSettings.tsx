@@ -402,9 +402,9 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     'voxxy-surface-subtle rounded-lg p-3'
   );
 
-  const triggerHoverClass = 'px-4 hover:no-underline hover:bg-accent/40 dark:hover:bg-background/10';
+  const triggerHoverClass = 'voxxy-hover-row px-4 hover:no-underline hover:bg-accent/40 dark:hover:bg-background/10';
   const subtleButtonClass = 'flex items-center gap-2 px-3 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-accent/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed';
-  const utilityActionClass = 'flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors hover:bg-accent/60 dark:hover:bg-background/10';
+  const utilityActionClass = 'voxxy-hover-row flex items-center gap-1 rounded px-2 py-1 text-[11px] transition-colors hover:bg-accent/60 dark:hover:bg-background/10';
 
   // Show create form
   if (currentView === 'create_app') {
@@ -654,7 +654,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               applications.map((app) => (
                 <div
                   key={app.id}
-                  className={cn(innerGlassWell, 'hover:border-purple-500/35 transition-all')}
+                  className={cn(innerGlassWell, 'voxxy-hover-panel hover:border-purple-500/35 transition-all')}
                 >
                   {/* Category Row */}
                   <div className="flex items-center justify-between p-4">
@@ -891,7 +891,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             <AccordionContent className="px-4">
               <div className="space-y-3">
                 {/* Application Page */}
-                <div className={compactWell}>
+                <div className={cn(compactWell, 'voxxy-hover-panel')}>
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-xs font-semibold text-foreground">Application Page</p>
                     <div className="flex items-center gap-1">
@@ -917,7 +917,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                 </div>
 
                 {/* Vendor Portal */}
-                <div className={compactWell}>
+                <div className={cn(compactWell, 'voxxy-hover-panel')}>
                   <div className="flex items-center justify-between mb-1.5">
                     <p className="text-xs font-semibold text-foreground">Vendor Portal</p>
                     <div className="flex items-center gap-1">
@@ -952,7 +952,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         return (
                           <div
                             key={app.id}
-                            className={`${compactWell} ${app.status !== 'active' ? 'opacity-50' : ''}`}
+                            className={cn(compactWell, 'voxxy-hover-panel', app.status !== 'active' && 'opacity-50')}
                           >
                             <div className="flex items-center justify-between mb-1.5">
                               <div className="flex items-center gap-2">

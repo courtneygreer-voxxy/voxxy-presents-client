@@ -301,8 +301,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     );
   }
 
-  const commandPanelClass = 'glass-card rounded-2xl shadow-sm';
-  const commandRowClass = 'voxxy-surface-subtle flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10';
+  const commandPanelClass = 'glass-card voxxy-hover-panel rounded-2xl shadow-sm';
+  const commandRowClass = 'voxxy-surface-subtle voxxy-hover-row flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10';
   const commandInsetClass = 'voxxy-surface-subtle rounded-xl';
   const sideLinkClass = 'voxxy-surface-subtle w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10 group';
 

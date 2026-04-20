@@ -25,6 +25,20 @@ import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import { DebugPanel } from './DebugPanel';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  EMAIL_HISTORY_ICON_CLASS,
+  EMAIL_HISTORY_META_CLASS,
+  EMAIL_HISTORY_RETRY_CLASS,
+  EMAIL_HISTORY_SUBJECT_CLASS,
+  getEmailDeliveryStatusTextClass,
+} from '@/lib/emailDeliveryTheme';
 
 interface Applicant {
   id: string; // Changed to string to support "inv-X" and "reg-X" format
@@ -683,31 +697,35 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
             {/* Status & Category Filters */}
             <div className="space-y-1.5">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="w-full px-2 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-              >
-                <option value="all">All Status</option>
-                <option value="invited">Invited (No Application)</option>
-                <option value="pending">Pending Review</option>
-                <option value="approved">Approved</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="waitlist">Waitlist</option>
-                <option value="rejected">Declined</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                  <SelectItem value="all" className="text-xs focus:bg-background/10">All Status</SelectItem>
+                  <SelectItem value="invited" className="text-xs focus:bg-background/10">Invited (No Application)</SelectItem>
+                  <SelectItem value="pending" className="text-xs focus:bg-background/10">Pending Review</SelectItem>
+                  <SelectItem value="approved" className="text-xs focus:bg-background/10">Approved</SelectItem>
+                  <SelectItem value="confirmed" className="text-xs focus:bg-background/10">Confirmed</SelectItem>
+                  <SelectItem value="waitlist" className="text-xs focus:bg-background/10">Waitlist</SelectItem>
+                  <SelectItem value="rejected" className="text-xs focus:bg-background/10">Declined</SelectItem>
+                  <SelectItem value="cancelled" className="text-xs focus:bg-background/10">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
               {uniqueCategories.length > 0 && (
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full px-2 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-                >
-                  <option value="all">All Categories</option>
-                  {uniqueCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                    <SelectItem value="all" className="text-xs focus:bg-background/10">All Categories</SelectItem>
+                    {uniqueCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat} className="text-xs focus:bg-background/10">
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
               {hasActiveFilters && (
                 <button
@@ -745,7 +763,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       className={`w-full p-2 rounded-lg text-left transition-smooth ${
                         isSelected
                           ? 'bg-purple-600/20 border border-purple-500/50'
-                          : 'bg-background/5 border border-border hover:bg-background/10 hover:border-border'
+                          : 'voxxy-hover-row bg-background/5 border border-border hover:bg-background/10 hover:border-border'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
@@ -810,7 +828,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           ) : (
             <div className="px-3 md:px-4 pb-4">
               {/* Detail Header */}
-              <div className="glass-card p-4 mb-3">
+              <div className="glass-card voxxy-hover-panel p-4 mb-3">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
@@ -901,31 +919,32 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       Pending Application
                     </div>
                   ) : (
-                    <select
+                    <Select
                       value={selectedApplicant.vendor_category}
-                      onChange={(e) => requestCategoryChange(selectedApplicant, e.target.value)}
+                      onValueChange={(value) => requestCategoryChange(selectedApplicant, value)}
                       disabled={isUpdatingCategory}
-                      className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {availableCategories.length > 0 ? (
-                        // Show all available categories, ensuring current category is included
-                        [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort().map((category) => (
-                          <option key={category} value={category}>
+                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50">
+                        <SelectValue placeholder={selectedApplicant.vendor_category} />
+                      </SelectTrigger>
+                      <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                        {(
+                          availableCategories.length > 0
+                            ? [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort()
+                            : [selectedApplicant.vendor_category]
+                        ).map((category) => (
+                          <SelectItem key={category} value={category} className="text-xs focus:bg-background/10">
                             {category}
-                          </option>
-                        ))
-                      ) : (
-                        <option value={selectedApplicant.vendor_category}>
-                          {selectedApplicant.vendor_category}
-                        </option>
-                      )}
-                    </select>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
               </div>
 
               {/* Social & Links */}
-              <div className="glass-card p-3 mb-3">
+              <div className="glass-card voxxy-hover-panel p-3 mb-3">
                 <h3 className="text-sm font-semibold text-foreground mb-3">Social & Links</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedApplicant.instagram_handle && (
@@ -997,7 +1016,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Portfolio Images */}
               {selectedApplicant.portfolio_images && selectedApplicant.portfolio_images.length > 0 && (
-                <div className="glass-card p-3 mb-3">
+                <div className="glass-card voxxy-hover-panel p-3 mb-3">
                   <h3 className="text-sm font-semibold text-foreground mb-3">Images</h3>
                   <div className="grid grid-cols-3 gap-2">
                     {selectedApplicant.portfolio_images.map((image, idx) => (
@@ -1018,7 +1037,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Status & Payment Management - Only show for applicants who have applied */}
               {selectedApplicant.status !== 'invited' && selectedApplicant.registrationId && (
-                <div className="glass-card p-3 mb-3">
+                <div className="glass-card voxxy-hover-panel p-3 mb-3">
                   <h3 className="text-sm font-semibold text-foreground mb-3">Status & Actions</h3>
                   {updatingId === selectedApplicant.id ? (
                     <div className="flex items-center justify-center py-2">
@@ -1056,21 +1075,33 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           <p className="text-[10px] text-foreground/60 mb-1">Vendor Status</p>
                           <p className="text-xs text-foreground font-medium">{getStatusBadge(selectedApplicant.status).label}</p>
                         </div>
-                        <select
+                        <Select
                           value={selectedApplicant.status}
-                          onChange={(e) => {
-                            const newStatus = e.target.value as 'approved' | 'waitlist' | 'rejected';
+                          onValueChange={(value) => {
+                            const newStatus = value as 'approved' | 'waitlist' | 'rejected';
                             if (newStatus !== selectedApplicant.status) {
                               requestStatusChange(selectedApplicant, newStatus);
                             }
                           }}
-                          className="px-2.5 py-1.5 rounded-lg bg-background/10 text-foreground text-xs border border-border hover:bg-background/20 transition-smooth"
                         >
-                          <option value={selectedApplicant.status}>Keep as {getStatusBadge(selectedApplicant.status).label}</option>
-                          <option value="approved">Change to Approved</option>
-                          <option value="waitlist">Change to Waitlist</option>
-                          <option value="rejected">Change to Declined</option>
-                        </select>
+                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50">
+                            <SelectValue placeholder={`Keep as ${getStatusBadge(selectedApplicant.status).label}`} />
+                          </SelectTrigger>
+                          <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                            <SelectItem value={selectedApplicant.status} className="text-xs focus:bg-background/10">
+                              Keep as {getStatusBadge(selectedApplicant.status).label}
+                            </SelectItem>
+                            <SelectItem value="approved" className="text-xs focus:bg-background/10">
+                              Change to Approved
+                            </SelectItem>
+                            <SelectItem value="waitlist" className="text-xs focus:bg-background/10">
+                              Change to Waitlist
+                            </SelectItem>
+                            <SelectItem value="rejected" className="text-xs focus:bg-background/10">
+                              Change to Declined
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       {/* Payment Status Row - Only for approved with payment tracking */}
@@ -1104,7 +1135,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Email History */}
               {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
-                <div className="glass-card p-4">
+                <div className="glass-card voxxy-hover-panel p-4">
                   <h3 className="text-sm font-semibold text-foreground mb-3">Email History</h3>
 
                   {loadingEmailHistory ? (
@@ -1118,17 +1149,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                         const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
                         const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
-                        let statusColor = 'text-foreground/40';
-                        if (deliveryStatus === 'delivered') statusColor = 'text-green-400';
-                        else if (deliveryStatus === 'bounced') statusColor = 'text-red-400';
-                        else if (deliveryStatus === 'dropped') statusColor = 'text-orange-400';
-                        else if (deliveryStatus === 'unsubscribed') statusColor = 'text-yellow-400';
+                        const statusColor = getEmailDeliveryStatusTextClass(deliveryStatus);
 
                         return (
                           <div key={delivery.id} className="flex items-center gap-2 py-1.5">
-                            <Mail className="w-3 h-3 text-foreground/30 flex-shrink-0" />
-                            <span className="text-[10px] text-foreground/70 truncate flex-1">{emailSubject}</span>
-                            <span className="text-[10px] text-foreground/40 tabular-nums flex-shrink-0">
+                            <Mail className={`w-3 h-3 ${EMAIL_HISTORY_ICON_CLASS} flex-shrink-0`} />
+                            <span className={`text-[10px] ${EMAIL_HISTORY_SUBJECT_CLASS} truncate flex-1`}>{emailSubject}</span>
+                            <span className={`text-[10px] ${EMAIL_HISTORY_META_CLASS} tabular-nums flex-shrink-0`}>
                               {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
@@ -1162,7 +1189,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                                     toast.error(`Failed to retry: ${err.message}`);
                                   }
                                 }}
-                                className="text-[10px] text-purple-400 hover:text-purple-300 flex-shrink-0"
+                                className={`text-[10px] ${EMAIL_HISTORY_RETRY_CLASS} flex-shrink-0`}
                               >
                                 Retry
                               </button>

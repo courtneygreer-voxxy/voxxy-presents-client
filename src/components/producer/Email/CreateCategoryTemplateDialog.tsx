@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import type { Category } from '@/types/category';
 import type { EmailCampaignTemplate } from '@/types/email';
-import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CreateCategoryTemplateDialogProps {
   isOpen: boolean;
@@ -91,8 +91,8 @@ export function CreateCategoryTemplateDialog({
             <Tag className="w-5 h-5 text-purple-400" />
             Create Template for{' '}
             <span
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold text-foreground"
-              style={getCategoryBadgeStyle(category.color)}
+              className="category-sequence-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold"
+              style={getCategorySequenceBadgeStyle(category.color)}
             >
               {category.icon && <span>{category.icon}</span>}
               {category.name}
@@ -179,8 +179,8 @@ export function CreateCategoryTemplateDialog({
             <p className="text-xs text-blue-400 mb-2 flex items-center gap-1.5 flex-wrap">
               The template will be cloned and automatically named "
               <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold text-foreground"
-                style={getCategoryBadgeStyle(category.color)}
+                className="category-sequence-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold"
+                style={getCategorySequenceBadgeStyle(category.color)}
               >
                 {category.icon && <span className="text-[10px]">{category.icon}</span>}
                 {category.name}

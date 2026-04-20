@@ -156,7 +156,7 @@ export default function EventsList({
             return (
               <div
                 key={event.id}
-                className="glass-card p-4"
+                className="glass-card voxxy-hover-panel event-list-card p-4"
               >
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
                   {/* Event Info */}

@@ -16,6 +16,13 @@ import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmation
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { GuidebookModal } from '@/components/shared/GuidebookModal';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
@@ -847,7 +854,7 @@ export default function ProducerDashboard() {
                   setCommandCenterTab('details');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:border-ring/40 mb-2"
+                className="voxxy-hover-row w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:border-ring/40 mb-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Events
@@ -871,7 +878,7 @@ export default function ProducerDashboard() {
                       setIsMobileMenuOpen(false);
                     }}
                     className={`
-                      w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
+                      voxxy-hover-row w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
                       text-xs font-medium transition-smooth
                       ${isActive
                         ? 'voxxy-nav-tab-active shadow-lg'
@@ -1053,15 +1060,16 @@ export default function ProducerDashboard() {
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Sort Dropdown */}
-                <select
-                  value={eventsSortBy}
-                  onChange={(e) => setEventsSortBy(e.target.value as 'date' | 'status' | 'name')}
-                  className="px-3 py-1.5 bg-background border border-input rounded-lg text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="name">Sort by Name</option>
-                  <option value="status">Sort by Status</option>
-                </select>
+                <Select value={eventsSortBy} onValueChange={(value) => setEventsSortBy(value as 'date' | 'status' | 'name')}>
+                  <SelectTrigger className="h-8 w-[140px] rounded-lg border border-input bg-background px-3 text-xs text-foreground focus:ring-2 focus:ring-ring">
+                    <SelectValue placeholder="Sort by Date" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                    <SelectItem value="date" className="text-xs focus:bg-background/10">Sort by Date</SelectItem>
+                    <SelectItem value="name" className="text-xs focus:bg-background/10">Sort by Name</SelectItem>
+                    <SelectItem value="status" className="text-xs focus:bg-background/10">Sort by Status</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 {/* Show Past Toggle */}
                 <button
