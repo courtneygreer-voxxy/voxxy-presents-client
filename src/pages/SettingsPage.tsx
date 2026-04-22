@@ -184,23 +184,14 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
     );
   }
 
-  /** Light: shadcn inputs. Dark: frosted violet rim on glass (scoped with dark:) */
   const inputClasses = cn(
-    'w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground transition-all placeholder:text-muted-foreground',
-    'focus:border-ring focus:outline-none focus:ring-2 focus:ring-ring/40',
-    'dark:border-white/10 dark:bg-[rgba(56,44,84,0.72)] dark:text-white/95 dark:placeholder:text-white/35 dark:shadow-inner dark:backdrop-blur-md',
-    'dark:hover:border-violet-400/25 dark:focus:border-violet-400/45 dark:focus:bg-[rgba(64,50,96,0.82)] dark:focus:ring-violet-500/20'
+    'voxxy-input-frost w-full rounded-lg px-3 py-2 text-sm',
+    'focus:ring-2 focus:ring-ring/40'
   );
 
-  const innerGlassWell = cn(
-    'rounded-lg border border-border bg-muted/50 p-3 shadow-sm',
-    'dark:border-white/8 dark:bg-[linear-gradient(180deg,rgba(62,45,96,0.78)_0%,rgba(48,34,78,0.82)_100%)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04),0_14px_30px_rgba(5,3,12,0.22)] dark:backdrop-blur-md'
-  );
+  const innerGlassWell = cn('voxxy-surface-subtle rounded-lg p-3 shadow-sm');
 
-  const sectionShell = cn(
-    'glass-card p-4 shadow-sm',
-    'dark:border-violet-400/18 dark:bg-[linear-gradient(180deg,rgba(42,28,70,0.88)_0%,rgba(30,18,52,0.9)_100%)] dark:shadow-[0_20px_55px_rgba(3,2,10,0.38),inset_0_1px_0_rgba(255,255,255,0.03)]'
-  );
+  const sectionShell = cn('glass-card p-4 shadow-sm');
 
   return (
     <div className="h-full overflow-y-auto">

@@ -986,7 +986,7 @@ export default function ProducerDashboard() {
               {/* Title Section */}
               {eventsView === 'command-center' && selectedEvent ? (
                 <div>
-                  <h2 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  <h2 className="text-sm font-bold gradient-text">
                     Command Center
                   </h2>
                   <p className="text-xs text-sidebar-foreground/70 mt-0.5">{selectedEvent.title}</p>
@@ -1107,7 +1107,7 @@ export default function ProducerDashboard() {
                     {Icon && <Icon className="w-3.5 h-3.5" />}
                     {tab.label}
                     {networkTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-violet-300/90 dark:bg-gradient-to-r dark:from-purple-600 dark:to-blue-500" />
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 [background-image:var(--voxxy-grad-nav-tab-active)]" />
                     )}
                   </button>
                 );

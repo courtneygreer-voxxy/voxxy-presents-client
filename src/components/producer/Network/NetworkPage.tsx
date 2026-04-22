@@ -811,8 +811,8 @@ export default function NetworkPage({
 
       {/* Category Add/Edit Modal */}
       {showCategoryModal && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="w-full max-w-md rounded-lg border border-border bg-card shadow-xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 voxxy-overlay-scrim">
+          <div className="w-full max-w-md rounded-lg voxxy-modal-surface shadow-xl">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-base font-semibold text-foreground">
                 {editingCategory ? 'Edit Category' : 'Add Category'}

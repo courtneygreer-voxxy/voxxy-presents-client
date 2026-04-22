@@ -987,7 +987,7 @@ export function EmailEditorPage({
                 <div className="rounded-lg border border-purple-500/20 bg-card/85 p-6 dark:bg-background/10">
                   {body ? (
                     <div
-                      className="email-preview-content"
+                      className="email-preview-content voxxy-rich-text-base"
                       dangerouslySetInnerHTML={{
                         __html: resolvePreviewVariables(body)
                       }}
@@ -1009,7 +1009,7 @@ export function EmailEditorPage({
                   </p>
                 </div>
                 <div
-                  className="email-preview-content text-xs"
+                  className="email-preview-content voxxy-rich-text-base text-xs"
                   dangerouslySetInnerHTML={{
                     __html: resolvePreviewVariables(emailFooter)
                   }}

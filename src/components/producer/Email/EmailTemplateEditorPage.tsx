@@ -715,7 +715,7 @@ export function EmailTemplateEditorPage({
                 <p className="mb-1 text-xs text-muted-foreground">Body:</p>
                 <div className="rounded-lg border border-purple-500/20 bg-card/80 p-4 dark:bg-background/5">
                   <div
-                          className="email-preview-content prose prose-sm max-w-none dark:prose-invert"
+                          className="email-preview-content voxxy-rich-text-base prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{ __html: renderPreview() }}
                   />
                 </div>

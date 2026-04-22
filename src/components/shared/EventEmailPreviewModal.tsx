@@ -313,7 +313,7 @@ export default function EventEmailPreviewModal({
                 </label>
                 <div className="bg-background/5 rounded-lg p-6 border border-border">
                   <div
-                    className="email-preview-content"
+                    className="email-preview-content voxxy-rich-text-base"
                     dangerouslySetInnerHTML={{
                       __html: removeFooter(previewData.body)
                     }}

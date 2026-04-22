@@ -84,7 +84,8 @@ export function RichTextEditor({
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-sm max-w-none min-h-[400px] px-3 py-2 text-foreground focus:outline-none dark:prose-invert',
+        class:
+          'prose prose-sm max-w-none voxxy-rich-text-base min-h-[400px] px-3 py-2 text-foreground focus:outline-none dark:prose-invert',
         placeholder,
       },
     },
