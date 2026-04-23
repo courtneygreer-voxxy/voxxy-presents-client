@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy } from 'lucide-react';
+import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle } from 'lucide-react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
 import { cn } from '@/lib/utils';
+import { CancellationEmailDialog } from './CancellationEmailDialog';
 
 interface Event {
   id: number;
@@ -27,6 +28,7 @@ interface Event {
     published?: boolean;
     registration_open?: boolean;
     status?: 'draft' | 'published' | 'cancelled' | 'completed';
+    is_live?: boolean;
   };
   published?: boolean;
   capacity?: {
@@ -80,6 +82,11 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const [isSaving, setIsSaving] = useState(false);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
 
+  // Helper to get the current event status in UI format
+  const getCurrentStatusForUI = () => {
+    return event.status?.is_live ? 'live' : (event.status?.status || 'draft');
+  };
+
   const handleCopyLink = (url: string, label: string) => {
     navigator.clipboard.writeText(url);
     setCopiedLink(label);
@@ -118,6 +125,12 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
+  // Event status management state
+  // Display "live" when event is live (is_live=true), otherwise show the actual status
+  const [eventStatus, setEventStatus] = useState<string>(getCurrentStatusForUI());
+  const [savingStatus, setSavingStatus] = useState(false);
+  const [showCancellationDialog, setShowCancellationDialog] = useState(false);
+  const [emailNotification, setEmailNotification] = useState<any>(null);
 
   useEffect(() => {
     fetchApplications();
@@ -182,6 +195,96 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     } catch (err) {
       console.error('Failed to delete event:', err);
       alert('Failed to delete event. Please try again.');
+    }
+  };
+
+  const handleSaveEventStatus = async () => {
+    if (!onUpdate) {
+      alert('Event status will be saved');
+      return;
+    }
+
+    // Special handling for cancellation - show dialog BEFORE saving
+    if (eventStatus === 'cancelled' && event.status?.status !== 'cancelled') {
+      try {
+        setSavingStatus(true);
+        // Fetch recipient count before showing dialog
+        const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/check_cancellation_impact`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to check cancellation impact');
+        }
+
+        const data = await response.json();
+
+        // Store recipient count and show dialog
+        setEmailNotification({
+          type: 'event_canceled',
+          recipient_count: data.recipient_count || 0,
+        });
+        setShowCancellationDialog(true);
+      } catch (err) {
+        console.error('Failed to check cancellation impact:', err);
+        alert('Failed to prepare cancellation. Please try again.');
+      } finally {
+        setSavingStatus(false);
+      }
+      return;
+    }
+
+    // For non-cancellation status changes, save normally
+    try {
+      setSavingStatus(true);
+      // Convert "live" to "published" for backend compatibility
+      const backendStatus = eventStatus === 'live' ? 'published' : eventStatus;
+      await onUpdate(event.slug, { status: backendStatus });
+      alert('Event status updated successfully!');
+    } catch (err) {
+      console.error('Failed to save event status:', err);
+      alert('Failed to save event status. Please try again.');
+    } finally {
+      setSavingStatus(false);
+    }
+  };
+
+  const handleSendCancellationEmails = async () => {
+    if (!emailNotification || !onUpdate) return;
+
+    try {
+      // Save status to 'cancelled' AND send emails together
+      await onUpdate(event.slug, { status: 'cancelled' });
+
+      // Send cancellation emails with confirmation
+      const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/send_cancellation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
+        },
+        body: JSON.stringify({ confirmed: true }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send cancellation emails');
+      }
+
+      const result = await response.json();
+
+      alert(`Event cancelled successfully! Cancellation emails sent to ${result.sent_count} vendors.`);
+
+      // Close dialog and reset state
+      setShowCancellationDialog(false);
+      setEmailNotification(null);
+    } catch (err) {
+      console.error('Failed to cancel event:', err);
+      alert('Failed to cancel event and send emails. Please try again.');
+      throw err;
     }
   };
 
@@ -426,7 +529,116 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
     <div className="px-3 md:px-4 max-w-6xl mx-auto space-y-4">
       {/* Accordion Sections */}
       <div className={sectionShell}>
-        <Accordion type="multiple" defaultValue={['event-details']}>
+        <Accordion type="multiple" defaultValue={['event-status', 'event-details']}>
+          {/* Event Status Section */}
+          <AccordionItem value="event-status" className="border-border">
+            <AccordionTrigger className={triggerHoverClass}>
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-blue-500/20">
+                  <AlertCircle className="w-4 h-4 text-blue-700 dark:text-blue-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-foreground">Event Status</span>
+                  <p className="text-xs text-muted-foreground font-normal">Manage event lifecycle and cancellation</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              <div className={cn(innerGlassWell, 'border border-blue-500/20')}>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-muted-foreground mb-2">Current Status</p>
+                    {event.status?.status === 'cancelled' ? (
+                      <div className="space-y-2">
+                        <div className="w-full bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2 text-foreground text-sm">
+                          ❌ Cancelled (Locked)
+                        </div>
+                        <p className="text-xs text-muted-foreground italic">
+                          Event cancellation is permanent and cannot be reversed.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        <select
+                          value={eventStatus}
+                          onChange={(e) => setEventStatus(e.target.value)}
+                          className={cn(
+                            inputClasses,
+                            'bg-card/80 border-border text-foreground'
+                          )}
+                        >
+                          {!event.status?.is_live && <option value="draft">Draft</option>}
+                          {event.status?.is_live && <option value="live">Live</option>}
+                          <option value="cancelled">Cancelled</option>
+                          <option value="completed">Completed</option>
+                        </select>
+
+                        {!event.status?.is_live && (
+                          <p className="text-xs text-muted-foreground italic mt-2">
+                            💡 To go live, go to the dashboard and review invitations / go live
+                          </p>
+                        )}
+
+                        {event.status?.is_live && (
+                          <p className="text-xs text-muted-foreground italic mt-2">
+                            ℹ️ This event has gone live and invitations have been sent. It cannot be reverted to draft status.
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  <div className={compactWell}>
+                    <p className="text-xs text-foreground/80">
+                      {eventStatus === 'draft' && '📝 Draft: Invites not sent, scheduled emails paused. Vendors can still apply if they have the link.'}
+                      {eventStatus === 'live' && '✅ Live: Invites sent, scheduled emails active, event is publicly visible.'}
+                      {eventStatus === 'cancelled' && '❌ Cancelled: Event has been cancelled. Vendors will be notified.'}
+                      {eventStatus === 'completed' && '✓ Completed: Event has concluded.'}
+                    </p>
+                  </div>
+
+                  {eventStatus === 'cancelled' && event.status?.status !== 'cancelled' && (
+                    <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                      <p className="text-xs text-yellow-900 dark:text-yellow-200 font-medium mb-1">⚠️ Cancellation Notice</p>
+                      <p className="text-xs text-yellow-900/80 dark:text-yellow-200/80">
+                        When you save this status change, you will be prompted to send cancellation emails to all registered vendors.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={handleSaveEventStatus}
+                      disabled={savingStatus || eventStatus === getCurrentStatusForUI()}
+                      className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {savingStatus ? (
+                        <>
+                          <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          Save Status
+                        </>
+                      )}
+                    </button>
+                    {eventStatus !== getCurrentStatusForUI() && (
+                      <button
+                        onClick={() => setEventStatus(getCurrentStatusForUI())}
+                        type="button"
+                        className={subtleButtonClass}
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+
           {/* Event Details Section */}
           <AccordionItem value="event-details" className="border-border">
             <AccordionTrigger className={triggerHoverClass}>
@@ -1003,43 +1215,48 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         </Accordion>
       </div>
 
-      {/* Danger Zone */}
-      <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">
-        <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
-            <Trash2 className="h-4 w-4 text-red-700 dark:text-red-400" />
-          </div>
-          <div className="flex-1">
-            <h3 className="text-sm text-foreground font-semibold mb-1">Danger Zone</h3>
-            <p className="text-foreground/60 text-xs mb-3">
-              Permanently delete this event and all associated data. This action cannot be undone.
-            </p>
-            {!showDeleteConfirm ? (
-              <button
-                onClick={() => setShowDeleteConfirm(true)}
-                className="rounded-lg border border-red-500/50 px-3 py-2 text-sm text-red-800 transition-all hover:bg-red-500/10 dark:text-red-400"
-              >
-                Delete Event
-              </button>
-            ) : (
-              <div className="flex gap-3">
+      {/* Danger Zone - Admin Only */}
+      {isAdmin && (
+        <div className="bg-red-500/10 rounded-xl p-4 border border-red-500/30">
+          <div className="flex items-start gap-3">
+            <div className="flex-shrink-0 w-8 h-8 bg-red-500/20 rounded-lg flex items-center justify-center">
+              <Trash2 className="h-4 w-4 text-red-700 dark:text-red-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm text-foreground font-semibold mb-1">Danger Zone (Admin Only)</h3>
+              <p className="text-foreground/60 text-xs mb-3">
+                Permanently delete this event and all associated data. This action cannot be undone. Only available for testing/cleanup purposes.
+              </p>
+              {!showDeleteConfirm ? (
                 <button
-                  onClick={handleDeleteEvent}
-                  className="px-3 py-2 text-sm rounded-lg bg-red-500 text-destructive-foreground font-medium hover:bg-red-600 transition-all"
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="rounded-lg border border-red-500/50 px-3 py-2 text-sm text-red-800 transition-all hover:bg-red-500/10 dark:text-red-400"
                 >
-                  Confirm Delete
+                  Delete Event
                 </button>
-                <button
-                  onClick={() => setShowDeleteConfirm(false)}
-                  className={subtleButtonClass}
-                >
-                  Cancel
-                </button>
-              </div>
-            )}
+              ) : (
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={handleDeleteEvent}
+                    className="px-3 py-2 text-sm rounded-lg bg-red-500 text-destructive-foreground font-medium hover:bg-red-600 transition-all"
+                  >
+                    Confirm Delete
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className={subtleButtonClass}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Admin Debug Panel */}
       <DebugPanel
@@ -1051,6 +1268,18 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           editingAppId,
         }}
         isAdmin={isAdmin}
+      />
+
+      {/* Cancellation Email Dialog */}
+      <CancellationEmailDialog
+        isOpen={showCancellationDialog}
+        onClose={() => {
+          setShowCancellationDialog(false);
+          setEmailNotification(null);
+        }}
+        onConfirm={handleSendCancellationEmails}
+        recipientCount={emailNotification?.recipient_count || 0}
+        eventTitle={event.title}
       />
     </div>
   );

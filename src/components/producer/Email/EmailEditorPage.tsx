@@ -119,6 +119,22 @@ const BLAST_TRIGGER_TYPES = new Set([
   'on_event_update',
 ]);
 
+// System triggers: event-triggered emails that are core to the workflow
+// These can be edited (subject/body) but cannot be deleted, and their name cannot be changed
+const SYSTEM_TRIGGERS = [
+  'on_application_open',
+  'on_invitation_send',
+  'on_application_submit',
+  'on_approval',
+  'on_rejection',
+  'on_waitlist',
+  'on_payment_received',
+  'on_category_change',
+  'on_event_update',
+  'on_event_cancel',
+  'on_bulletin_post',
+];
+
 // Value-based triggers: custom countdown emails that users CAN create (vs system emails they cannot)
 // These are time-based reminders (not event-triggered) that can be edited/deleted
 const VALUE_BASED_TRIGGERS = [
@@ -210,6 +226,9 @@ export function EmailEditorPage({
   const triggerValue = watch('trigger_value');
 
   const selectedTriggerConfig = TRIGGER_TYPES.find(t => t.value === triggerType);
+
+  // Check if this is a system email (name cannot be edited for system emails)
+  const isSystemEmail = triggerType ? SYSTEM_TRIGGERS.includes(triggerType as string) : false;
 
   // Filter trigger types based on mode and available event date fields
   const availableTriggerTypes = TRIGGER_TYPES.filter((type) => {
@@ -432,17 +451,46 @@ export function EmailEditorPage({
       }
     }
 
+    // Determine if this is an event-wide announcement (sent to all regardless of status)
+    const isEventAnnouncement = [
+      'on_event_update',
+      'on_event_cancel',
+      'on_bulletin_post',
+      'on_category_change',
+      'on_invitation_send'
+    ].includes(triggerType);
+
+    // Determine if this is an application-stage email (targets applicants, not just approved)
+    const isApplicationStage = [
+      'on_application_submit',
+      'on_approval',
+      'on_rejection'
+    ].includes(triggerType);
+
     // Add trigger-specific filters (targets specific vendor statuses)
-    // Payment triggers: target approved vendors with pending/overdue payments
     if (triggerType.includes('payment')) {
+      // Payment triggers: target approved vendors with pending/overdue payments
       filter_criteria["statuses"] = ["approved"];
-      filter_criteria["payment_status"] = ["pending", "overdue"];
+      filter_criteria["payment_statuses"] = ["pending", "overdue"];
     }
-    // Event countdown triggers: target approved/confirmed vendors
     else if (['days_before_event', 'on_event_date', 'days_after_event'].includes(triggerType)) {
+      // Event countdown triggers: target approved/confirmed vendors who have paid
+      filter_criteria["statuses"] = ["approved", "confirmed"];
+      filter_criteria["payment_statuses"] = ["paid", "confirmed"];
+    }
+    else if (isApplicationStage) {
+      // Application/approval triggers: no status filters needed (system handles per-application)
+      // These are sent individually when status changes occur
+    }
+    else if (isEventAnnouncement) {
+      // Event announcements: sent to all registrations regardless of status
+      // No status filter needed
+    }
+    else {
+      // DEFAULT for all other trigger types (custom reminders, deadlines, etc.):
+      // Target approved/confirmed vendors only (exclude pending, rejected, cancelled)
       filter_criteria["statuses"] = ["approved", "confirmed"];
     }
-    // Application/approval triggers: no additional status filters (all registrations in category)
 
     return filter_criteria;
   };
@@ -859,13 +907,23 @@ export function EmailEditorPage({
 
             {/* Email Name */}
             <div className="mb-4">
-              <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
+              <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5 flex items-center gap-2">
                 Email Name
+                {isSystemEmail && (
+                  <span className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Lock className="h-3 w-3" />
+                    Locked for system emails
+                  </span>
+                )}
               </label>
               <Input
                 {...register('name')}
-                className="h-9 border-border bg-card/80 text-sm text-foreground placeholder:text-muted-foreground dark:bg-background/5"
+                disabled={isSystemEmail}
+                className={`h-9 border-border bg-card/80 text-sm text-foreground placeholder:text-muted-foreground dark:bg-background/5 ${
+                  isSystemEmail ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
                 placeholder="e.g., Day Before Event Reminder"
+                title={isSystemEmail ? 'Email name cannot be changed for system emails (used to associate with trigger)' : ''}
               />
             </div>
 

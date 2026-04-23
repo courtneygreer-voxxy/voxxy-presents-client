@@ -183,6 +183,7 @@ export default function VendorEventPortalPage() {
           title: eventData.title,
           slug: eventData.slug,
           description: eventData.description || '',
+          status: eventData.status?.status || eventData.status || null,
           dates: {
             event_date: eventData.event_date,
             event_end_date: eventData.event_end_date || null,
@@ -431,6 +432,74 @@ export default function VendorEventPortalPage() {
   }
 
   const { event, vendor_categories } = portalData;
+
+  // Show cancellation message if event is cancelled
+  if (event.status === 'cancelled') {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+        <div className="max-w-4xl mx-auto px-6 py-12">
+          {/* Producer Preview Banner */}
+          {isProducerPreview && (
+            <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-3 mb-6 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <p className="text-sm text-purple-200">
+                <span className="font-semibold">Producer Preview</span> — This is how vendors see your event portal.
+              </p>
+            </div>
+          )}
+
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Event Cancelled</h1>
+            <p className="text-lg text-white/90 mb-4">{event.title}</p>
+            <p className="text-white/70 mb-6">
+              This event has been cancelled by the event organizer. If you submitted payment, you will be contacted regarding refund details.
+            </p>
+
+            {/* Organization Contact Info */}
+            {event.organization && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-white/60 mb-3">For questions about this cancellation, please contact:</p>
+                <p className="text-lg font-semibold text-white mb-2">{event.organization.name}</p>
+                {event.organization.email ? (
+                  <a
+                    href={`mailto:${event.organization.email}`}
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {event.organization.email}
+                  </a>
+                ) : (
+                  <p className="text-sm text-white/60 italic">Contact information not available</p>
+                )}
+                <p className="text-xs text-white/50 mt-4">
+                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                </p>
+              </div>
+            )}
+
+            {!isProducerPreview && (
+              <button
+                onClick={() => {
+                  clearPortalSession();
+                  setIsAuthenticated(false);
+                }}
+                className="px-6 py-3 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Portal Dashboard
   return (

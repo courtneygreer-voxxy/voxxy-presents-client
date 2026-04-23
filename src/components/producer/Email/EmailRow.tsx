@@ -89,10 +89,9 @@ export default function EmailRow({
   const isScheduled = email.status === 'scheduled';
   const isFailed = email.status === 'failed';
 
-  // Determine if this is a system/trigger email (event-based, not time-based)
+  // Determine if this is a system/trigger email (matches backend SYSTEM_TRIGGERS)
+  // System emails are event-triggered and cannot be deleted
   const systemTriggers = [
-    'on_application_open',        // Initial Invitation (legacy)
-    'on_invitation_send',         // Invitation to Apply (fires on "Go Live" action)
     'on_application_submit',
     'on_approval',
     'on_rejection',
@@ -101,7 +100,8 @@ export default function EmailRow({
     'on_category_change',
     'on_event_update',
     'on_event_cancel',
-    'on_bulletin_post'            // Bulletin Blast (fires when producer posts bulletin)
+    'on_invitation_send',
+    'on_bulletin_post'
   ];
   const isSystemEmail = systemTriggers.includes(email.trigger_type);
 

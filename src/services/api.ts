@@ -503,6 +503,39 @@ export const authApi = {
 
     return data
   },
+
+  /**
+   * Delete current user's account
+   * DELETE /users/:id (legacy endpoint)
+   */
+  async deleteAccount() {
+    // Get current user to get their ID
+    const user = await authApi.getCurrentUser()
+
+    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/users/${user.id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${getAuthToken()}`,
+      },
+    })
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({ error: 'Failed to delete account' }))
+      throw new ApiError(
+        data.error || 'Failed to delete account',
+        response.status,
+        data.errors
+      )
+    }
+
+    const data = await response.json()
+
+    // Clear auth token after successful deletion
+    clearAuthToken()
+
+    return data
+  },
 }
 
 // Organizations API (Voxxy Presents)
@@ -1919,12 +1952,16 @@ export interface VendorContactsListResponse {
 
 export interface BulkImportResult {
   success: boolean
+  validate_only?: boolean
   summary: {
     total_rows: number
     created: number
     updated: number
     skipped: number
     failed: number
+    would_create?: number
+    would_update?: number
+    would_skip?: number
   }
   errors: Array<{
     row: number
@@ -1937,6 +1974,7 @@ export interface BulkImportOptions {
   skipDuplicates?: boolean
   updateExisting?: boolean
   tags?: string[]
+  validateOnly?: boolean
 }
 
 export interface ContactList {
@@ -2451,6 +2489,9 @@ export const vendorContactsApi = {
     formData.append('file', file)
     formData.append('skip_duplicates', String(options.skipDuplicates ?? true))
     formData.append('update_existing', String(options.updateExisting ?? false))
+    if (options.validateOnly) {
+      formData.append('validate_only', 'true')
+    }
 
     if (options.tags && options.tags.length > 0) {
       formData.append('tags', JSON.stringify(options.tags))

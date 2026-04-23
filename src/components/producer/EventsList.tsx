@@ -61,19 +61,19 @@ export default function EventsList({
 }: EventsListProps) {
 
   const getStatusBadge = (event: Event) => {
-    const eventDate = event.dates?.start || event.event_date;
-    if (!eventDate) {
-      return { label: 'Draft', variant: 'tintPurple' as BadgeVariant, value: 'draft' };
+    if (event.status?.status === 'cancelled') {
+      return { label: 'Cancelled', variant: 'tintRed' as BadgeVariant, value: 'cancelled' };
     }
-
-    if (isDatePast(eventDate)) {
+    if (event.status?.status === 'completed') {
+      return { label: 'Completed', variant: 'tintBlue' as BadgeVariant, value: 'completed' };
+    }
+    const eventDate = event.dates?.start || event.event_date;
+    if (eventDate && isDatePast(eventDate)) {
       return { label: 'Past', variant: 'tintMuted' as BadgeVariant, value: 'past' };
     }
-
     if (event.status?.is_live) {
       return { label: 'Live', variant: 'tintGreen' as BadgeVariant, value: 'live' };
     }
-
     return { label: 'Draft', variant: 'tintPurple' as BadgeVariant, value: 'draft' };
   };
 
@@ -101,13 +101,24 @@ export default function EventsList({
       // Status filter
       const badge = getStatusBadge(event);
 
-      // Hide past events by default unless showPastEvents is true or 'Past' is explicitly filtered
-      if (!showPastEvents && badge.value === 'past' && statusFilter !== 'Past') {
+      // Hide past and cancelled events by default unless showPastEvents is true or explicitly filtered
+      const isPastOrCancelled = badge.value === 'past' || badge.value === 'cancelled';
+      // When filtering by "Past", cancelled events ARE considered explicitly filtered
+      const isExplicitlyFiltered = statusFilter === badge.label || (statusFilter === 'Past' && badge.value === 'cancelled');
+
+      if (!showPastEvents && isPastOrCancelled && !isExplicitlyFiltered) {
         return false;
       }
 
-      if (statusFilter && badge.label !== statusFilter) {
-        return false;
+      // When filtering by "Past", include cancelled events (they're effectively "over")
+      if (statusFilter) {
+        if (statusFilter === 'Past' && isPastOrCancelled) {
+          // "Past" filter includes both past and cancelled events
+          return true;
+        } else if (badge.label !== statusFilter) {
+          // For all other filters (including "Cancelled"), do exact match
+          return false;
+        }
       }
 
       return true;

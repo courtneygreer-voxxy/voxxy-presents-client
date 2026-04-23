@@ -29,17 +29,22 @@ function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; s
     : <ChevronDown className="h-3 w-3 text-violet-700 dark:text-purple-400" />;
 }
 
-// Check if email is a custom reminder (value-based trigger)
-function isCustomReminder(triggerType: string): boolean {
-  const reminderTriggers = [
-    'days_before_deadline',
-    'days_after_deadline',
-    'days_before_payment_deadline',
-    'days_after_payment_deadline',
-    'days_before_event',
-    'days_after_event'
+// Check if email is a system email (matches backend SYSTEM_TRIGGERS)
+// System emails are event-triggered and cannot be deleted
+function isSystemEmail(triggerType: string): boolean {
+  const systemTriggers = [
+    'on_application_submit',
+    'on_approval',
+    'on_rejection',
+    'on_waitlist',
+    'on_payment_received',
+    'on_category_change',
+    'on_event_update',
+    'on_event_cancel',
+    'on_invitation_send',
+    'on_bulletin_post'
   ];
-  return reminderTriggers.includes(triggerType);
+  return systemTriggers.includes(triggerType);
 }
 
 export default function EmailTable({
@@ -90,8 +95,8 @@ export default function EmailTable({
   };
 
   // Group emails into system and reminders
-  const systemEmails = emails.filter(email => !isCustomReminder(email.trigger_type));
-  const reminderEmails = emails.filter(email => isCustomReminder(email.trigger_type));
+  const systemEmails = emails.filter(email => isSystemEmail(email.trigger_type));
+  const reminderEmails = emails.filter(email => !isSystemEmail(email.trigger_type));
 
   return (
     <div className="voxxy-table-shell">

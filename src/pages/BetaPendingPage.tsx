@@ -4,10 +4,10 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
-import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles, DollarSign, Calendar, Users, BarChart3, Zap, CreditCard } from "lucide-react"
+import { ArrowRight, CheckCircle, Mail, Loader2, AlertCircle, ArrowLeft, Check, Sparkles, DollarSign, Calendar, Users, BarChart3, Zap, CreditCard, Building2, Trash2, Info } from "lucide-react"
 import { Link, useNavigate } from "react-router-dom"
 import { useAuth } from "@/contexts/AuthContext"
-import { authApi, ApiError } from '@/services/api'
+import { authApi, organizationsApi, ApiError } from '@/services/api'
 import { Separator } from "@/components/ui/separator"
 import { stripeService } from '@/services/stripeService'
 
@@ -26,11 +26,38 @@ export default function BetaPendingPage() {
   const [verificationError, setVerificationError] = useState<string | null>(null)
   const [verificationSuccess, setVerificationSuccess] = useState<string | null>(null)
 
+  // Organization state
+  const [organization, setOrganization] = useState<any>(null)
+  const [isLoadingOrg, setIsLoadingOrg] = useState(false)
+
+  // Delete account state
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+
   // Account status checks
   const isProducer = userProfile?.role === 'venue_owner' || userProfile?.role === 'producer'
   const isPaid = userProfile?.paid === true
   const needsPayment = isProducer && !isPaid
   const isEmailVerified = userProfile?.confirmed_at !== null && userProfile?.confirmed_at !== undefined
+
+  // Fetch organization details for producers
+  useEffect(() => {
+    const fetchOrganization = async () => {
+      if (!isProducer) return
+
+      setIsLoadingOrg(true)
+      try {
+        const orgData = await organizationsApi.getMine()
+        setOrganization(orgData)
+      } catch (error) {
+        console.error('Failed to fetch organization:', error)
+      } finally {
+        setIsLoadingOrg(false)
+      }
+    }
+
+    fetchOrganization()
+  }, [isProducer])
 
   // Redirect to dashboard if already paid
   useEffect(() => {
@@ -38,6 +65,23 @@ export default function BetaPendingPage() {
       navigate('/dashboard')
     }
   }, [isEmailVerified, isPaid, navigate])
+
+  // Reset payment state when user returns to page (e.g., browser back button)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        // Reset payment state when user returns to page
+        setIsProcessingPayment(false)
+        setPaymentError(null)
+      }
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
+  }, [])
 
   const handleSignOut = async () => {
     await signOut()
@@ -115,6 +159,26 @@ export default function BetaPendingPage() {
     }
   }
 
+  const handleDeleteAccount = async () => {
+    if (!showDeleteConfirm) {
+      setShowDeleteConfirm(true)
+      return
+    }
+
+    setIsDeleting(true)
+    try {
+      await authApi.deleteAccount()
+      // Sign out and redirect to home
+      await signOut()
+      navigate('/')
+    } catch (error) {
+      console.error('Failed to delete account:', error)
+      alert('Failed to delete account. Please try again or contact support.')
+      setIsDeleting(false)
+      setShowDeleteConfirm(false)
+    }
+  }
+
   // Features list matching PaymentOnboardingPage
   const features = [
     {
@@ -182,6 +246,51 @@ export default function BetaPendingPage() {
             </CardHeader>
 
             <CardContent className="space-y-6 pb-8">
+              {/* Organization Information Section (for debugging) */}
+              {isProducer && organization && (
+                <div className="bg-blue-500/10 border-2 border-blue-400/30 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building2 className="h-5 w-5 text-blue-400" />
+                    <h3 className="text-white font-semibold">Your Organization (Auto-Created)</h3>
+                    <Badge variant="outline" className="ml-auto bg-blue-500/20 border-blue-400/30 text-blue-300 text-xs">
+                      <Info className="h-3 w-3 mr-1" />
+                      Debugging Info
+                    </Badge>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400">Organization Name</span>
+                      <span className="text-white font-medium">{organization.name}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400">Slug</span>
+                      <span className="text-gray-300 font-mono text-xs">{organization.slug}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400">Email</span>
+                      <span className="text-white font-medium">{organization.email}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-gray-400">Subscription Status</span>
+                      <span className="text-yellow-300 font-medium">{organization.subscription_status || 'inactive'}</span>
+                    </div>
+                  </div>
+                  <Alert className="bg-blue-500/10 border-blue-400/30 mt-3">
+                    <Info className="h-4 w-4 text-blue-400" />
+                    <AlertDescription className="text-blue-200 text-xs">
+                      This organization was automatically created for you. You can update these details in Settings after completing payment.
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
+
+              {isProducer && isLoadingOrg && (
+                <div className="bg-white/5 rounded-lg p-4 text-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-purple-400 mx-auto" />
+                  <p className="text-sm text-gray-400 mt-2">Loading organization details...</p>
+                </div>
+              )}
+
               {/* Account Information Section */}
               {userProfile && (
                 <div className="bg-background/5 rounded-lg p-4 space-y-3">
@@ -474,17 +583,77 @@ export default function BetaPendingPage() {
               )}
 
               {/* Sign Out Section */}
-              <div className="text-center pt-6 mt-6 border-t border-border">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Need to sign in with a different account?
-                </p>
-                <Button
-                  onClick={handleSignOut}
-                  variant="ghost"
-                  className="text-pink-400 hover:text-pink-300 hover:bg-background/10"
-                >
-                  Sign Out
-                </Button>
+              <div className="text-center pt-6 mt-6 border-t border-border space-y-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Need to sign in with a different account?
+                  </p>
+                  <Button
+                    onClick={handleSignOut}
+                    variant="ghost"
+                    className="text-pink-400 hover:text-pink-300 hover:bg-background/10"
+                  >
+                    Sign Out
+                  </Button>
+                </div>
+
+                {/* Delete Account Section */}
+                <div className="pt-4 mt-4 border-t border-border/60">
+                  {!showDeleteConfirm ? (
+                    <>
+                      <p className="text-xs text-muted-foreground mb-3">
+                        Want to start over or made a mistake during signup?
+                      </p>
+                      <Button
+                        onClick={() => setShowDeleteConfirm(true)}
+                        variant="ghost"
+                        size="sm"
+                        className="text-red-600 hover:text-red-500 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300"
+                      >
+                        <Trash2 className="h-3 w-3 mr-2" />
+                        Delete Account
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
+                        <AlertCircle className="h-5 w-5" />
+                        <h4 className="font-semibold">Are you sure?</h4>
+                      </div>
+                      <p className="text-sm text-red-800/90 dark:text-red-200">
+                        This will permanently delete your account and all associated data. This action cannot be undone.
+                      </p>
+                      <div className="flex gap-3 justify-center pt-2">
+                        <Button
+                          onClick={() => setShowDeleteConfirm(false)}
+                          variant="outline"
+                          size="sm"
+                          className="border-border text-foreground hover:bg-accent/50"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleDeleteAccount}
+                          disabled={isDeleting}
+                          size="sm"
+                          className="bg-red-600 hover:bg-red-700 text-white"
+                        >
+                          {isDeleting ? (
+                            <>
+                              <Loader2 className="h-3 w-3 mr-2 animate-spin" />
+                              Deleting...
+                            </>
+                          ) : (
+                            <>
+                              <Trash2 className="h-3 w-3 mr-2" />
+                              Yes, Delete My Account
+                            </>
+                          )}
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>

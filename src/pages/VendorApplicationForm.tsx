@@ -36,6 +36,12 @@ interface Event {
   title: string;
   slug: string;
   description?: string;
+  status?: {
+    published?: boolean;
+    registration_open?: boolean;
+    status?: string;
+    is_live?: boolean;
+  };
   dates: {
     start?: string;
   };
@@ -45,6 +51,7 @@ interface Event {
   organization?: {
     id: number;
     name: string;
+    email?: string;
   };
   vendor_applications?: VendorApplication[];
 }
@@ -250,7 +257,7 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    if (!formData.name || !formData.email || !formData.business_name || !formData.vendor_category) {
+    if (!formData.name || !formData.email || !formData.vendor_category) {
       setError('Please fill in all required fields');
       return;
     }
@@ -434,6 +441,59 @@ export default function VendorApplicationForm() {
     );
   }
 
+  // Check if event is cancelled
+  if (event?.status?.status === 'cancelled') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+        <div className="max-w-3xl mx-auto px-4 py-12">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Event Cancelled</h1>
+            <p className="text-lg text-white/90 mb-4">{event.title}</p>
+            <p className="text-white/70 mb-6">
+              This event has been cancelled by the event organizer. Applications are no longer being accepted. If you submitted payment, you will be contacted regarding refund details.
+            </p>
+
+            {/* Organization Contact Info */}
+            {event.organization && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-white/60 mb-3">For questions about this cancellation, please contact:</p>
+                <p className="text-lg font-semibold text-white mb-2">{event.organization.name}</p>
+                {event.organization.email ? (
+                  <a
+                    href={`mailto:${event.organization.email}`}
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {event.organization.email}
+                  </a>
+                ) : (
+                  <p className="text-sm text-white/60 italic">Contact information not available</p>
+                )}
+                <p className="text-xs text-white/50 mt-4">
+                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen voxxy-gradient-page-cool">
       {/* Header */}
@@ -556,7 +616,7 @@ export default function VendorApplicationForm() {
                 {/* Business/Brand Name */}
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Business/Brand Name <span className="text-red-600 dark:text-red-400">*</span>
+                    Business/Brand Name <span className="text-muted-foreground text-[10px] ml-1 font-normal">(optional)</span>
                   </label>
                   <input
                     type="text"
@@ -564,7 +624,6 @@ export default function VendorApplicationForm() {
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
                     className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
-                    required
                   />
                 </div>
 

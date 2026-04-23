@@ -42,6 +42,8 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
   // Event must be published before "Send Now" is allowed
   const isEventLive = event?.published === true || event?.status?.status === 'published';
+  // Check if event is cancelled - emails become read-only
+  const isEventCancelled = event?.status?.status === 'cancelled';
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [eventData, setEventData] = useState<any | null>(null);
 
@@ -708,16 +710,28 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             )}
           </div>
 
+          {/* Locked Event Message for Cancelled Events */}
+          {isEventCancelled && (
+            <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-white/70">
+                  This event has been cancelled. All emails are in read-only mode and cannot be edited, paused, or sent.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Unified Email Table */}
           <EmailTable
             emails={filteredEmails}
             eventSlug={eventSlug}
-            onEdit={(email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })}
-            onPause={handlePause}
-            onResume={handleResume}
-            onSendNow={isEventLive ? handleSendNow : undefined}
-            onRetryFailed={handleRetryFailed}
-            onDelete={handleDelete}
+            onEdit={isEventCancelled ? undefined : (email) => setViewState({ view: 'email-editor', email, returnTo: 'table' })}
+            onPause={isEventCancelled ? undefined : handlePause}
+            onResume={isEventCancelled ? undefined : handleResume}
+            onSendNow={isEventLive && !isEventCancelled ? handleSendNow : undefined}
+            onRetryFailed={isEventCancelled ? undefined : handleRetryFailed}
+            onDelete={isEventCancelled ? undefined : handleDelete}
             onViewAuditLog={(filters) => setViewState({ view: 'audit-log', filters })}
             sortColumn={sortColumn}
             sortDirection={sortDirection}

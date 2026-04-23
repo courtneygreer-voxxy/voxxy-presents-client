@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo } from 'react';
-import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Trash2, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X } from 'lucide-react';
+import { ArrowLeft, Mail, Edit2, Eye, MoreVertical, Play, Pause, Megaphone, FileText, CreditCard, Calendar, Settings2, Plus, HelpCircle, Send, Loader2, X, Trash2 } from 'lucide-react';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { Button } from '@/components/ui/button';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
@@ -417,6 +417,11 @@ export default function EmailSequenceEditorOverlay({
                                   {getAudienceLabel(email)}
                                 </Badge>
                               </div>
+                              {email.scheduled_for && (
+                                <div className="text-[10px] text-white/40 mt-1">
+                                  Sends: {new Date(email.scheduled_for).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })} at {new Date(email.scheduled_for).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' })}
+                                </div>
+                              )}
                             </button>
                           );
                         })}
