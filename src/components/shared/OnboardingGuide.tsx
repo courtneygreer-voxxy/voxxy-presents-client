@@ -113,7 +113,7 @@ export function OnboardingGuide({
   return (
     <div className="fixed inset-0 z-[9999]" role="dialog" aria-label="Onboarding guide">
       {/* Dark overlay backdrop - no click-to-dismiss */}
-      <div className="absolute inset-0 bg-black/60 pointer-events-none" />
+      <div className="voxxy-overlay-scrim absolute inset-0 pointer-events-none" />
 
       {/* Spotlight ring on target */}
       {targetRect && (
@@ -132,7 +132,7 @@ export function OnboardingGuide({
 
       {/* Tooltip */}
       <div
-        className="w-[320px] bg-gray-900 border border-purple-500/30 rounded-xl shadow-2xl shadow-purple-500/10"
+        className="w-[320px] bg-muted border border-purple-500/30 rounded-xl shadow-2xl shadow-purple-500/10"
         style={{ ...getTooltipStyle(), zIndex: 10 }}
       >
         {/* Header */}
@@ -142,7 +142,7 @@ export function OnboardingGuide({
           </span>
           <button
             onClick={onSkip}
-            className="p-1 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1 rounded-lg text-foreground/40 hover:text-foreground hover:bg-background/10 transition-colors"
             aria-label="Skip guide"
           >
             <X className="w-4 h-4" />
@@ -151,8 +151,8 @@ export function OnboardingGuide({
 
         {/* Content */}
         <div className="px-4 pb-3">
-          <h3 className="text-sm font-semibold text-white mb-1">{step.title}</h3>
-          <p className="text-xs text-white/60 leading-relaxed">{step.description}</p>
+          <h3 className="text-sm font-semibold text-foreground mb-1">{step.title}</h3>
+          <p className="text-xs text-foreground/60 leading-relaxed">{step.description}</p>
         </div>
 
         {/* Step indicator dots */}
@@ -161,7 +161,7 @@ export function OnboardingGuide({
             <div
               key={i}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === currentStep ? 'bg-purple-400' : 'bg-white/20'
+                i === currentStep ? 'bg-purple-400' : 'bg-background/20'
               }`}
             />
           ))}
@@ -172,14 +172,14 @@ export function OnboardingGuide({
           <button
             onClick={onBack}
             disabled={isFirstStep}
-            className="flex items-center gap-1 px-3 py-1.5 text-xs text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-white/5"
+            className="flex items-center gap-1 px-3 py-1.5 text-xs text-foreground/60 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-background/5"
           >
             <ChevronLeft className="w-3.5 h-3.5" />
             Back
           </button>
           <button
             onClick={onNext}
-            className="flex items-center gap-1 px-4 py-1.5 text-xs font-medium bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
+            className="flex items-center gap-1 px-4 py-1.5 text-xs font-medium voxxy-btn-solid rounded-lg transition-colors"
           >
             {isLastStep ? 'Done' : 'Next'}
             {!isLastStep && <ChevronRight className="w-3.5 h-3.5" />}

@@ -130,9 +130,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="dark voxxy-public-page min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#a855f7] via-[#ec4899] to-[#3b82f6] relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 voxxy-gradient-hero-split relative overflow-hidden">
         {/* Animated Background Pattern */}
         <div
           className="absolute inset-0 opacity-10"
@@ -141,7 +141,7 @@ export default function LoginPage() {
           }}
         />
 
-        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-white">
+        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <div className="text-center space-y-6">
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
             <h1 className="text-5xl font-bold mb-4">Welcome Back</h1>
@@ -153,13 +153,13 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 bg-[#0f0b1f] relative overflow-hidden">
+      <div className="w-full lg:w-1/2 voxxy-auth-panel relative overflow-hidden">
         {/* Back Button */}
         <Button
           onClick={() => navigate('/')}
           variant="ghost"
           size="sm"
-          className="absolute top-4 left-4 z-50 text-gray-300 hover:text-white hover:bg-white/10"
+          className="absolute top-4 left-4 z-50 text-muted-foreground hover:text-foreground hover:bg-background/10"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Home
@@ -178,13 +178,13 @@ export default function LoginPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
               <Sparkles className="h-16 w-16 mx-auto text-purple-400 mb-4" />
-              <h1 className="text-3xl font-bold text-white">Welcome Back</h1>
+              <h1 className="text-3xl font-bold text-foreground">Welcome Back</h1>
             </div>
 
-            <Card className="w-full bg-white/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-bold text-white">Sign In</CardTitle>
-                <CardDescription className="text-gray-300">
+                <CardTitle className="text-2xl font-bold text-foreground">Sign In</CardTitle>
+                <CardDescription>
                   Enter your credentials to access your account
                 </CardDescription>
               </CardHeader>
@@ -194,7 +194,7 @@ export default function LoginPage() {
                   <Alert className="bg-red-500/20 border-red-500 border-2 mb-6 shadow-lg">
                     <AlertDescription className="flex items-start gap-3">
                       <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                      <div className="text-white font-medium">
+                      <div className="text-foreground font-medium">
                         {error || errors.submit}
                       </div>
                     </AlertDescription>
@@ -204,16 +204,16 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   {/* Email Field */}
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-white">Email</Label>
+                    <Label htmlFor="email" className="text-foreground">Email</Label>
                     <div className="relative">
-                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="email"
                         type="email"
                         placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="pl-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        className="pl-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                         disabled={isSubmitting}
                       />
                     </div>
@@ -225,7 +225,7 @@ export default function LoginPage() {
                   {/* Password Field */}
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <Label htmlFor="password" className="text-white">Password</Label>
+                      <Label htmlFor="password" className="text-foreground">Password</Label>
                       <button
                         type="button"
                         onClick={() => navigate('/forgot-password')}
@@ -236,20 +236,20 @@ export default function LoginPage() {
                       </button>
                     </div>
                     <div className="relative">
-                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                      <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input
                         id="password"
                         type={showPassword ? 'text' : 'password'}
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="pl-10 pr-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        className="pl-10 pr-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                         disabled={isSubmitting}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                         disabled={isSubmitting}
                       >
                         {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -264,7 +264,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     disabled={isSubmitting || loading}
-                    className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)]"
+                    className="w-full voxxy-btn-cta font-semibold shadow-md dark:shadow-[0_0_20px_rgba(236,72,153,0.5)]"
                   >
                     {isSubmitting || loading ? (
                       <>
@@ -285,7 +285,7 @@ export default function LoginPage() {
                       onClick={handleDevLogin}
                       disabled={isSubmitting}
                       variant="outline"
-                      className="w-full border-yellow-500/50 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-300 font-medium"
+                      className="w-full border-yellow-500/50 bg-yellow-500/10 hover:bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 font-medium"
                     >
                       🔧 Dev Login (Bypass Auth)
                     </Button>
@@ -297,9 +297,9 @@ export default function LoginPage() {
 
                 {/* Request Beta Access */}
                 <div className="mt-6">
-                  <Separator className="bg-white/20" />
+                  <Separator className="bg-background/20" />
                   <div className="text-center mt-4">
-                    <p className="text-gray-300 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       Don't have an account?{' '}
                       <button
                         onClick={() => navigate('/contact')}

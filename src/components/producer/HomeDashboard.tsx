@@ -37,6 +37,7 @@ import GoLiveCard from './GoLiveCard';
 import { formatEventDate } from '@/utils/dateHelpers';
 import { CreateBulletinModal } from './Bulletins/CreateBulletinModal';
 import { DebugPanel } from './DebugPanel';
+import { Badge } from '@/components/ui/badge';
 
 interface HomeDashboardProps {
   eventSlug: string;
@@ -300,21 +301,29 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     );
   }
 
-  // Check if event is cancelled
   const isEventCancelled = event.status?.status === 'cancelled';
+
+  const commandPanelClass = 'glass-card voxxy-hover-panel rounded-2xl shadow-sm';
+  const commandRowClass = 'voxxy-surface-subtle voxxy-hover-row flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10';
+  const commandInsetClass = 'voxxy-surface-subtle rounded-xl';
+  const sideLinkClass = 'voxxy-surface-subtle w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10 group';
 
   return (
     <div className="px-3 md:px-4">
-      {/* Locked Event Banner for Cancelled Events */}
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold text-foreground">Command Center</h2>
+        <p className="mt-1 text-sm text-foreground/65">{event.title}</p>
+      </div>
+
       {isEventCancelled && (
         <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
           <div className="flex items-start gap-3">
             <div className="p-2 rounded-lg bg-red-500/20 flex-shrink-0">
-              <Shield className="w-5 h-5 text-red-400" />
+              <Shield className="w-5 h-5 text-red-700 dark:text-red-400" />
             </div>
             <div className="flex-1">
-              <h3 className="text-sm font-bold text-white mb-1">Event Locked - Cancelled</h3>
-              <p className="text-xs text-white/70 leading-relaxed">
+              <h3 className="text-sm font-bold text-foreground mb-1">Event Locked - Cancelled</h3>
+              <p className="text-xs text-muted-foreground leading-relaxed">
                 This event has been cancelled and is now in read-only mode. You cannot create bulletins, edit emails, or change the event status. All vendors have been notified of the cancellation.
               </p>
             </div>
@@ -330,22 +339,22 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             /* Vendor Stats Cards - 4 in a row when LIVE */
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               {/* Applied */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-purple-500/20">
-                    <ClipboardList className="w-4 h-4 text-purple-400" />
+                    <ClipboardList className="w-4 h-4 text-purple-700 dark:text-purple-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-2xl font-bold text-white">{stats.applied}</p>
-                    <p className="text-[10px] text-white/60">Applied</p>
+                    <p className="text-2xl font-bold text-foreground">{stats.applied}</p>
+                    <p className="text-[10px] text-foreground/60">Applied</p>
                   </div>
                 </div>
                 {categoryStats.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                  <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.applied}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.applied}</span>
                       </div>
                     ))}
                   </div>
@@ -353,22 +362,22 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* New / Unreviewed */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-yellow-500/20">
                     <Eye className="w-4 h-4 text-yellow-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-2xl font-bold text-white">{stats.newUnreviewed}</p>
-                    <p className="text-[10px] text-white/60">New / Unreviewed</p>
+                    <p className="text-2xl font-bold text-foreground">{stats.newUnreviewed}</p>
+                    <p className="text-[10px] text-foreground/60">New / Unreviewed</p>
                   </div>
                 </div>
                 {categoryStats.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                  <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unreviewed}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.unreviewed}</span>
                       </div>
                     ))}
                   </div>
@@ -376,22 +385,22 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* Approved & Paid */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-green-500/20">
                     <CheckCircle className="w-4 h-4 text-green-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-2xl font-bold text-white">{stats.approvedPaid}</p>
-                    <p className="text-[10px] text-white/60">Approved & Paid</p>
+                    <p className="text-2xl font-bold text-foreground">{stats.approvedPaid}</p>
+                    <p className="text-[10px] text-foreground/60">Approved & Paid</p>
                   </div>
                 </div>
                 {categoryStats.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                  <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.paid}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.paid}</span>
                       </div>
                     ))}
                   </div>
@@ -399,22 +408,22 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
 
               {/* Missing Payments */}
-              <div className="glass-card p-3">
+              <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
                   <div className="p-2 rounded-lg bg-red-500/20">
                     <DollarSign className="w-4 h-4 text-red-400" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-2xl font-bold text-white">{stats.missingPayments}</p>
-                    <p className="text-[10px] text-white/60">Missing Payments</p>
+                    <p className="text-2xl font-bold text-foreground">{stats.missingPayments}</p>
+                    <p className="text-[10px] text-foreground/60">Missing Payments</p>
                   </div>
                 </div>
                 {categoryStats.length > 0 && (
-                  <div className="mt-2 pt-2 border-t border-white/10 space-y-0.5">
+                  <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-white/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-white/70 font-medium tabular-nums">{cat.unpaid}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.unpaid}</span>
                       </div>
                     ))}
                   </div>
@@ -431,42 +440,41 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           )}
 
           {/* Upcoming Emails */}
-          <div className="glass-card p-3">
+          <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-semibold text-white">Upcoming Emails</h3>
+                <Mail className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                <h3 className="text-sm font-semibold text-foreground">Upcoming Emails</h3>
               </div>
               <button
                 onClick={() => onNavigateToTab?.('emails')}
-                className="text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                className="text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
               >
                 View All →
               </button>
             </div>
 
             {scheduledEmails.length === 0 ? (
-              <p className="text-xs text-white/40 py-4 text-center">No upcoming emails</p>
+              <p className="text-xs text-foreground/40 py-4 text-center">No upcoming emails</p>
             ) : (
               <div className="space-y-2">
                 {scheduledEmails.map((email) => (
                   <div
                     key={email.id}
-                    className="flex items-center justify-between p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth"
+                    className={commandRowClass}
                   >
                     <div className="flex-1">
-                      <p className="text-xs font-medium text-white">{email.name}</p>
-                      <p className="text-[10px] text-white/60">
+                      <p className="text-xs font-medium text-foreground">{email.name}</p>
+                      <p className="text-[10px] text-foreground/60">
                         {formatDate(email.scheduled_for)} • {email.recipient_count} recipients
                       </p>
                     </div>
-                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                      email.status === 'paused'
-                        ? 'bg-yellow-500/20 text-yellow-400'
-                        : 'bg-blue-500/20 text-blue-400'
-                    }`}>
+                    <Badge
+                      variant={email.status === 'paused' ? 'tintYellow' : 'tintBlue'}
+                      className="px-2 py-0.5 text-[10px] font-medium"
+                    >
                       {email.status === 'paused' ? 'Paused' : 'Scheduled'}
-                    </span>
+                    </Badge>
                   </div>
                 ))}
               </div>
@@ -474,18 +482,18 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           </div>
 
           {/* Bulletin Board */}
-          <div className="glass-card p-3">
+          <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Megaphone className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-semibold text-white">Bulletin Board</h3>
-                <span className="text-[10px] text-white/40">({bulletins.length})</span>
+                <Megaphone className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                <h3 className="text-sm font-semibold text-foreground">Bulletin Board</h3>
+                <span className="text-[10px] text-foreground/40">({bulletins.length})</span>
               </div>
               <div className="flex items-center gap-2">
                 {bulletins.length > 3 && (
                   <button
                     onClick={() => setShowAllBulletins(!showAllBulletins)}
-                    className="text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                    className="text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
                   >
                     {showAllBulletins ? 'Show Less' : 'View All →'}
                   </button>
@@ -493,10 +501,10 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 <button
                   onClick={() => !isEventCancelled && setIsCreateBulletinModalOpen(true)}
                   disabled={isEventCancelled}
-                  className={`px-2.5 py-1 rounded-lg text-white text-xs font-medium transition-smooth flex items-center gap-1 ${
+                  className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-smooth flex items-center gap-1 ${
                     isEventCancelled
-                      ? 'bg-gray-600/50 cursor-not-allowed opacity-50'
-                      : 'bg-gradient-to-r from-purple-600 to-blue-500 hover:shadow-lg'
+                      ? 'cursor-not-allowed opacity-50 bg-muted text-muted-foreground'
+                      : 'voxxy-btn-cta hover:shadow-lg'
                   }`}
                   title={isEventCancelled ? 'Cannot create bulletins for cancelled events' : 'Create a new bulletin'}
                 >
@@ -507,7 +515,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             </div>
 
             {bulletins.length === 0 ? (
-              <p className="text-xs text-white/40 py-4 text-center">
+              <p className="py-4 text-center text-xs text-muted-foreground">
                 Post updates for your vendors
               </p>
             ) : (
@@ -515,41 +523,45 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {(showAllBulletins ? bulletins : bulletins.slice(0, 3)).map((bulletin) => (
                   <div
                     key={bulletin.id}
-                    className={`p-3 rounded-lg bg-gradient-to-b from-white/10 to-white/5 border transition-smooth ${
-                      bulletin.pinned ? 'border-purple-500/50' : 'border-white/10'
+                    className={`rounded-xl border p-3 transition-smooth ${
+                      bulletin.pinned
+                        ? 'voxxy-surface-subtle border-purple-500/40 dark:border-purple-400/24'
+                        : 'voxxy-surface-subtle'
+                    } ${
+                      bulletin.pinned ? 'dark:border-purple-400/28' : ''
                     }`}
                   >
                     {/* Header */}
                     <div className="flex items-start gap-2 mb-2">
                       {/* Author Avatar */}
-                      <div className="w-7 h-7 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center flex-shrink-0">
-                        <span className="text-white font-bold text-[10px]">
+                      <div className="w-7 h-7 rounded-full voxxy-accent-tile flex items-center justify-center flex-shrink-0">
+                        <span className="text-foreground font-bold text-[10px]">
                           {getInitials(bulletin.author.name)}
                         </span>
                       </div>
 
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-1.5 mb-0.5">
-                          <h4 className="text-xs font-semibold text-white truncate">
+                          <h4 className="text-xs font-semibold text-foreground truncate">
                             {bulletin.subject}
                           </h4>
                           {bulletin.pinned && (
-                            <Pin className="w-3 h-3 text-purple-400 fill-purple-400 flex-shrink-0" />
+                            <Pin className="h-3 w-3 shrink-0 fill-purple-700 text-purple-700 dark:fill-purple-400 dark:text-purple-400" />
                           )}
                         </div>
-                        <p className="text-[10px] text-white/60">
+                        <p className="text-[10px] text-muted-foreground">
                           {bulletin.author.name} · {formatTimeAgo(bulletin.created_at)}
                         </p>
                       </div>
                     </div>
 
                     {/* Body */}
-                    <p className="text-[10px] text-white/80 line-clamp-2 mb-2 whitespace-pre-wrap">
+                    <p className="text-[10px] text-foreground/80 line-clamp-2 mb-2 whitespace-pre-wrap">
                       {bulletin.body}
                     </p>
 
                     {/* Footer Stats */}
-                    <div className="flex items-center gap-3 text-[10px] text-white/40 pt-2 border-t border-white/10">
+                    <div className="flex items-center gap-3 border-t border-border pt-2 text-[10px] text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Eye className="w-3 h-3" />
                         <span>{bulletin.view_count}</span>
@@ -567,15 +579,15 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         </div>
 
         {/* Right Column - Event Details */}
-        <div className="glass-card p-3">
+        <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-400" />
-                <h3 className="text-sm font-semibold text-white">Event Details</h3>
+                <Calendar className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                <h3 className="text-sm font-semibold text-foreground">Event Details</h3>
               </div>
             <button
               onClick={() => onNavigateToTab?.('settings')}
-              className="text-xs text-purple-400 hover:text-purple-300 transition-smooth flex items-center gap-1"
+              className="flex items-center gap-1 text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
             >
               <Edit2 className="w-3 h-3" />
               Edit
@@ -585,7 +597,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           {/* Event Info */}
           <div className="space-y-3">
             <div>
-              <p className="text-lg font-semibold text-white mb-1">{event.title}</p>
+              <p className="text-lg font-semibold text-foreground mb-1">{event.title}</p>
             </div>
 
             {/* Event Status */}
@@ -601,18 +613,18 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   </div>
                 ) : isLive ? (
                   <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center">
-                    <Check className="w-2.5 h-2.5 text-white" />
+                    <Check className="w-2.5 h-2.5 text-foreground" />
                   </div>
                 ) : (
                   <div className="w-3.5 h-3.5 rounded-full bg-yellow-500/50" />
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Event Status</p>
+                <p className="text-[10px] text-muted-foreground">Event Status</p>
                 <p className={`text-xs font-medium ${
-                  event.status?.status === 'cancelled' ? 'text-red-400' :
-                  event.status?.status === 'completed' ? 'text-blue-400' :
-                  isLive ? 'text-green-400' : 'text-yellow-400'
+                  event.status?.status === 'cancelled' ? 'text-red-700 dark:text-red-400' :
+                  event.status?.status === 'completed' ? 'text-blue-700 dark:text-blue-400' :
+                  isLive ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-yellow-400'
                 }`}>
                   {event.status?.status === 'cancelled' ? 'Cancelled' :
                    event.status?.status === 'completed' ? 'Completed' :
@@ -623,25 +635,25 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
             {/* Description */}
             <div className="flex items-start gap-2">
-              <FileText className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <FileText className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Description</p>
-                <p className="text-xs text-white">{event.description || 'N/A'}</p>
+                <p className="text-[10px] text-muted-foreground">Description</p>
+                <p className="text-xs text-foreground">{event.description || 'N/A'}</p>
               </div>
             </div>
 
             {/* Event Date & Time */}
             <div className="flex items-start gap-2">
-              <Clock className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <Clock className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Event Date</p>
-                <p className="text-xs text-white">
+                <p className="text-[10px] text-muted-foreground">Event Date</p>
+                <p className="text-xs text-foreground">
                   {formatDate(event.event_date)}
                   {event.start_time && ` • ${formatTime(event.start_time)}`}
                   {event.end_time && ` - ${formatTime(event.end_time)}`}
                 </p>
                 {event.event_end_date && event.event_end_date !== event.event_date && (
-                  <p className="text-xs text-white/60 mt-0.5">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     Ends: {formatDate(event.event_end_date)}
                   </p>
                 )}
@@ -650,41 +662,41 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
             {/* Venue */}
             <div className="flex items-start gap-2">
-              <Building className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <Building className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Venue</p>
-                <p className="text-xs text-white">{event.venue || 'N/A'}</p>
+                <p className="text-[10px] text-muted-foreground">Venue</p>
+                <p className="text-xs text-foreground">{event.venue || 'N/A'}</p>
               </div>
             </div>
 
             {/* Location */}
             <div className="flex items-start gap-2">
-              <MapPin className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <MapPin className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Location</p>
-                <p className="text-xs text-white">{event.location || 'N/A'}</p>
+                <p className="text-[10px] text-muted-foreground">Location</p>
+                <p className="text-xs text-foreground">{event.location || 'N/A'}</p>
               </div>
             </div>
 
             {/* Age Restriction */}
             <div className="flex items-start gap-2">
-              <Shield className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <Shield className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Age Restriction</p>
-                <p className="text-xs text-white">{event.age_restriction || 'N/A'}</p>
+                <p className="text-[10px] text-muted-foreground">Age Restriction</p>
+                <p className="text-xs text-foreground">{event.age_restriction || 'N/A'}</p>
               </div>
             </div>
 
             {/* Ticket Link */}
             <div className="flex items-start gap-2">
-              <Ticket className="w-3.5 h-3.5 text-white/60 mt-0.5 flex-shrink-0" />
+              <Ticket className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <p className="text-[10px] text-white/60">Ticket Link</p>
+                  <p className="text-[10px] text-muted-foreground">Ticket Link</p>
                   {!isEditingTicketLink && (
                     <button
                       onClick={handleStartEditTicketLink}
-                      className="p-0.5 text-purple-400 hover:text-purple-300 transition-colors"
+                      className="p-0.5 text-purple-700 transition-colors hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
                       title="Edit ticket link"
                     >
                       <Edit2 className="w-3 h-3" />
@@ -699,7 +711,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       value={editedTicketLink}
                       onChange={(e) => setEditedTicketLink(e.target.value)}
                       placeholder="https://..."
-                      className="w-full px-2 py-1 text-xs bg-white/5 border border-white/20 rounded text-white placeholder-white/40 focus:ring-1 focus:ring-purple-500 focus:border-transparent"
+                      className="voxxy-input-frost w-full rounded-lg px-2 py-1 text-xs focus:border-transparent focus:ring-1 focus:ring-purple-500"
                     />
                     {ticketLinkError && (
                       <p className="text-[10px] text-red-400">{ticketLinkError}</p>
@@ -707,14 +719,14 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                     <div className="flex gap-1.5">
                       <button
                         onClick={handleSaveTicketLink}
-                        className="flex-1 px-2 py-1 text-[10px] bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 px-2 py-1 text-[10px] voxxy-btn-solid rounded transition-colors flex items-center justify-center gap-1"
                       >
                         <Save className="w-2.5 h-2.5" />
                         Save
                       </button>
                       <button
                         onClick={handleCancelEditTicketLink}
-                        className="flex-1 px-2 py-1 text-[10px] bg-white/10 text-white rounded hover:bg-white/20 transition-colors flex items-center justify-center gap-1"
+                        className="flex-1 rounded px-2 py-1 text-[10px] text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10 flex items-center justify-center gap-1"
                       >
                         <X className="w-2.5 h-2.5" />
                         Cancel
@@ -728,12 +740,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                         href={event.ticket_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-xs text-purple-400 hover:text-purple-300 underline break-all"
+                        className="break-all text-xs text-purple-700 underline transition-colors hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
                       >
                         {event.ticket_link}
                       </a>
                     ) : (
-                      <p className="text-xs text-white">N/A</p>
+                      <p className="text-xs text-foreground">N/A</p>
                     )}
                   </>
                 )}
@@ -744,8 +756,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             <div className="flex items-start gap-2">
               <AlertCircle className="w-3.5 h-3.5 text-yellow-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Application Deadline</p>
-                <p className="text-xs text-white">{formatDate(event.application_deadline)}</p>
+                <p className="text-[10px] text-foreground/60">Application Deadline</p>
+                <p className="text-xs text-foreground">{formatDate(event.application_deadline)}</p>
               </div>
             </div>
 
@@ -753,70 +765,70 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             <div className="flex items-start gap-2">
               <DollarSign className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
-                <p className="text-[10px] text-white/60">Payment Deadline</p>
-                <p className="text-xs text-white">{formatDate(event.payment_deadline)}</p>
+                <p className="text-[10px] text-foreground/60">Payment Deadline</p>
+                <p className="text-xs text-foreground">{formatDate(event.payment_deadline)}</p>
               </div>
             </div>
           </div>
 
           {/* Quick Links */}
-          <div className="mt-4 pt-3 border-t border-white/10 space-y-1.5">
+          <div className="mt-4 space-y-2 border-t border-border pt-3">
             <a
               href={applicationPageUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white group"
+              className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-purple-400" />
+                <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
                 <span>Application Page</span>
               </div>
-              <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60" />
+              <ExternalLink className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60" />
             </a>
 
             <a
               href={vendorPortalUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white group"
+              className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-purple-400" />
+                <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
                 <span>Vendor Portal</span>
               </div>
-              <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60" />
+              <ExternalLink className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60" />
             </a>
 
             {/* Category Application Links - collapsible */}
             {vendorApplications.length > 0 && (
-              <div>
+              <div className={commandInsetClass}>
                 <button
                   onClick={() => setCategoryLinksExpanded(!categoryLinksExpanded)}
-                  className="w-full flex items-center justify-between px-2.5 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-smooth text-xs text-white"
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10"
                 >
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5 text-blue-400" />
                     <span>Category Links</span>
-                    <span className="text-[10px] text-white/40">({vendorApplications.filter(a => a.status === 'active').length})</span>
+                    <span className="text-[10px] text-foreground/40">({vendorApplications.filter(a => a.status === 'active').length})</span>
                   </div>
-                  <ChevronDown className={`w-3 h-3 text-white/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3 h-3 text-foreground/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`} />
                 </button>
                 {categoryLinksExpanded && (
-                  <div className="mt-1 ml-4 space-y-1">
+                  <div className="space-y-1 border-t border-border px-2 pb-2 pt-1">
                     {vendorApplications.map((app) => (
                       <a
                         key={app.id}
                         href={`${window.location.origin}/events/${event.slug}/apply/${app.id}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg transition-smooth text-xs text-white group ${
+                        className={`w-full flex items-center justify-between rounded-lg px-2.5 py-1.5 transition-smooth text-xs text-foreground group ${
                           app.status === 'active'
-                            ? 'hover:bg-white/10'
+                            ? 'hover:bg-accent/50 dark:hover:bg-background/10'
                             : 'opacity-40 pointer-events-none'
                         }`}
                       >
                         <span className="truncate">{app.name}</span>
-                        <ExternalLink className="w-3 h-3 text-white/40 group-hover:text-white/60 flex-shrink-0" />
+                        <ExternalLink className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60 flex-shrink-0" />
                       </a>
                     ))}
                   </div>

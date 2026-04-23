@@ -14,7 +14,7 @@ export default function MobileEULAPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -22,12 +22,12 @@ export default function MobileEULAPage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Mobile End User License Agreement</h1>
+          <h1 className="text-4xl font-bold text-foreground">Mobile End User License Agreement</h1>
           <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+        <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy Presents web platform, see our{' '}
             <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
@@ -53,7 +53,7 @@ export default function MobileEULAPage() {
 
         {/* Section 1 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">1. License Grant</h2>
+          <h2 className="text-2xl font-bold text-foreground">1. License Grant</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -67,7 +67,7 @@ export default function MobileEULAPage() {
 
         {/* Section 2 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">2. Age Requirement</h2>
+          <h2 className="text-2xl font-bold text-foreground">2. Age Requirement</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -78,7 +78,7 @@ export default function MobileEULAPage() {
 
         {/* Section 3 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">3. Account Registration</h2>
+          <h2 className="text-2xl font-bold text-foreground">3. Account Registration</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -92,9 +92,9 @@ export default function MobileEULAPage() {
 
         {/* Section 4 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">4. Use of the App</h2>
+          <h2 className="text-2xl font-bold text-foreground">4. Use of the App</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Hey Voxxy is a discovery and planning tool for nightlife and events. You use it to browse events, save favorites, get AI-powered recommendations, and stay up to date with your local scene.
             </p>
@@ -133,7 +133,7 @@ export default function MobileEULAPage() {
 
         {/* Section 5 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">5. Third-Party Services</h2>
+          <h2 className="text-2xl font-bold text-foreground">5. Third-Party Services</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -150,7 +150,7 @@ export default function MobileEULAPage() {
 
         {/* Section 6 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">6. Intellectual Property</h2>
+          <h2 className="text-2xl font-bold text-foreground">6. Intellectual Property</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -164,9 +164,9 @@ export default function MobileEULAPage() {
 
         {/* Section 7 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">7. App Store Terms</h2>
+          <h2 className="text-2xl font-bold text-foreground">7. App Store Terms</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This section covers Apple App Store and Google Play Store specific requirements. If you downloaded Hey Voxxy from an app store, you also agreed to that store's terms when you installed the app.
             </p>
@@ -207,7 +207,7 @@ export default function MobileEULAPage() {
 
         {/* Section 8 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">8. Updates and Modifications</h2>
+          <h2 className="text-2xl font-bold text-foreground">8. Updates and Modifications</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -221,7 +221,7 @@ export default function MobileEULAPage() {
 
         {/* Section 9 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">9. Term and Termination</h2>
+          <h2 className="text-2xl font-bold text-foreground">9. Term and Termination</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -241,9 +241,9 @@ export default function MobileEULAPage() {
 
         {/* Section 10 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">10. Disclaimers</h2>
+          <h2 className="text-2xl font-bold text-foreground">10. Disclaimers</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This is the standard "no warranties" section required by law. In plain language: we provide the app as-is, and we can't guarantee it will always work perfectly or meet your specific needs.
             </p>
@@ -264,9 +264,9 @@ export default function MobileEULAPage() {
 
         {/* Section 11 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">11. Limitation of Liability</h2>
+          <h2 className="text-2xl font-bold text-foreground">11. Limitation of Liability</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This section limits how much we can be held liable for if something goes wrong. The caps exist to keep our legal risk manageable so we can continue operating the service.
             </p>
@@ -287,7 +287,7 @@ export default function MobileEULAPage() {
 
         {/* Section 12 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">12. Indemnification</h2>
+          <h2 className="text-2xl font-bold text-foreground">12. Indemnification</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -298,9 +298,9 @@ export default function MobileEULAPage() {
 
         {/* Section 13 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">13. Dispute Resolution</h2>
+          <h2 className="text-2xl font-bold text-foreground">13. Dispute Resolution</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If we have a legal dispute, we'll try to resolve it through binding arbitration rather than going to court. This is faster and cheaper for everyone.
             </p>
@@ -327,7 +327,7 @@ export default function MobileEULAPage() {
 
         {/* Section 14 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">14. General Provisions</h2>
+          <h2 className="text-2xl font-bold text-foreground">14. General Provisions</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -357,7 +357,7 @@ export default function MobileEULAPage() {
 
         {/* Section 15 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">15. Contact Information</h2>
+          <h2 className="text-2xl font-bold text-foreground">15. Contact Information</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>

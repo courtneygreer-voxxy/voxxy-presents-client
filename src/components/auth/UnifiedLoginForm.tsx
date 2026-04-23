@@ -128,11 +128,11 @@ export function UnifiedLoginForm({
             ) : (
               <Building2 className="h-5 w-5 text-purple-400" />
             )}
-            <h3 className="text-lg font-semibold text-white">
+            <h3 className="text-lg font-semibold text-foreground">
               {isClubOwner ? 'Club Owner Login' : 'Venue Owner Login'}
             </h3>
           </div>
-          <p className="text-gray-300 text-sm">
+          <p className="text-muted-foreground text-sm">
             {isClubOwner
               ? 'Organize events and manage your club community'
               : 'Manage your venue and connect with event organizers'
@@ -144,16 +144,16 @@ export function UnifiedLoginForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-white">Email</Label>
+            <Label htmlFor="email" className="text-foreground">Email</Label>
             <div className="relative">
-              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="email"
                 type="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="pl-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
             </div>
@@ -165,7 +165,7 @@ export function UnifiedLoginForm({
           {/* Password Field */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-white">Password</Label>
+              <Label htmlFor="password" className="text-foreground">Password</Label>
               <button
                 type="button"
                 onClick={onForgotPassword}
@@ -176,20 +176,20 @@ export function UnifiedLoginForm({
               </button>
             </div>
             <div className="relative">
-              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className="pl-10 pr-10 bg-white/10 border-white/20 text-white placeholder-gray-400 focus:border-purple-400"
+                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
                 disabled={isSubmitting}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                 disabled={isSubmitting}
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -204,7 +204,7 @@ export function UnifiedLoginForm({
           <Button
             type="submit"
             disabled={isSubmitting || loading}
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full voxxy-btn-solid"
           >
             {isSubmitting || loading ? (
               <>
@@ -230,26 +230,26 @@ export function UnifiedLoginForm({
   }
 
   return (
-    <Card className="w-full max-w-md bg-white/15 backdrop-blur-md border border-white/30">
+    <Card className="w-full max-w-md bg-background/15 backdrop-blur-md border border-border">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold text-white">Welcome Back</CardTitle>
-        <CardDescription className="text-gray-300">
+        <CardTitle className="text-2xl font-bold text-foreground">Welcome Back</CardTitle>
+        <CardDescription>
           Choose your account type to continue
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/10 backdrop-blur-sm">
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
             <TabsTrigger
               value="club-owner"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+              className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
             >
               <Users className="h-4 w-4 mr-2" />
               Club Owner
             </TabsTrigger>
             <TabsTrigger
               value="venue-owner"
-              className="data-[state=active]:bg-purple-600 data-[state=active]:text-white text-gray-300"
+              className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
             >
               <Building2 className="h-4 w-4 mr-2" />
               Venue Owner
@@ -267,9 +267,9 @@ export function UnifiedLoginForm({
 
         {/* Switch to Sign Up */}
         <div className="mt-6">
-          <Separator className="bg-white/20" />
+          <Separator className="bg-background/20" />
           <div className="text-center mt-4">
-            <p className="text-gray-300 text-sm">
+            <p className="text-muted-foreground text-sm">
               Don't have an account?{' '}
               <button
                 onClick={onSwitchToSignUp}

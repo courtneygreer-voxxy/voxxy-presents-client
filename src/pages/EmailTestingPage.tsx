@@ -106,7 +106,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a0515] via-[#1a0a2e] to-[#0f0820] p-6">
+    <div className="min-h-screen voxxy-gradient-admin p-6">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
               Email Testing Center
             </h1>
-            <p className="text-white/60">
+            <p className="text-foreground/60">
               Test all your email notifications • Emails will be sent to: <span className="font-mono text-purple-400">{testEmail || 'your email'}</span>
             </p>
           </div>
@@ -135,13 +135,13 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-[#1e1536] border-purple-500/20">
+          <Card className="border-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <Mail className="w-5 h-5 text-purple-400" />
                 Scheduled Emails
               </CardTitle>
-              <CardDescription className="text-white/60">
+              <CardDescription className="text-[13px] text-muted-foreground">
                 Send 7 automated campaign emails
               </CardDescription>
             </CardHeader>
@@ -149,7 +149,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
               <Button
                 onClick={() => sendTestEmails('scheduled')}
                 disabled={loading}
-                className="w-full bg-purple-600 hover:bg-purple-700"
+                className="w-full voxxy-btn-solid"
               >
                 {loading ? (
                   <>
@@ -166,13 +166,13 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1e1536] border-blue-500/20">
+          <Card className="border-blue-500/20">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <AlertCircle className="w-5 h-5 text-blue-400" />
                 System Notifications
               </CardTitle>
-              <CardDescription className="text-white/60">
+              <CardDescription className="text-[13px] text-muted-foreground">
                 Send 3 update notification emails
               </CardDescription>
             </CardHeader>
@@ -197,13 +197,13 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
             </CardContent>
           </Card>
 
-          <Card className="bg-[#1e1536] border-pink-500/20">
+          <Card className="border-pink-500/20">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <Mail className="w-5 h-5 text-pink-400" />
                 All Emails
               </CardTitle>
-              <CardDescription className="text-white/60">
+              <CardDescription className="text-[13px] text-muted-foreground">
                 Send all 10 test emails at once
               </CardDescription>
             </CardHeader>
@@ -211,7 +211,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
               <Button
                 onClick={() => sendTestEmails('all')}
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                className="w-full voxxy-btn-cta-pink"
               >
                 {loading ? (
                   <>
@@ -231,10 +231,10 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Email Categories */}
         {emailCategories.map((category, idx) => (
-          <Card key={idx} className="bg-[#1e1536] border-purple-500/20">
+          <Card key={idx} className="border-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-white">{category.name}</CardTitle>
-              <CardDescription className="text-white/60">
+              <CardTitle className="text-foreground">{category.name}</CardTitle>
+              <CardDescription className="text-[13px] text-muted-foreground">
                 {category.description} • {category.count} emails
               </CardDescription>
             </CardHeader>
@@ -243,11 +243,11 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
                 {category.emails.map((email, emailIdx) => (
                   <div
                     key={emailIdx}
-                    className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10"
+                    className="flex items-center justify-between p-3 rounded-lg bg-background/5 border border-border"
                   >
                     <div>
-                      <div className="text-sm font-medium text-white">{email.name}</div>
-                      <div className="text-xs text-white/60">{email.subject}</div>
+                      <div className="text-sm font-medium text-foreground">{email.name}</div>
+                      <div className="text-xs text-zinc-400">{email.subject}</div>
                     </div>
                   </div>
                 ))}
@@ -258,13 +258,13 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Results */}
         {results.length > 0 && (
-          <Card className="bg-[#1e1536] border-purple-500/20">
+          <Card className="border-purple-500/20">
             <CardHeader>
-              <CardTitle className="text-white flex items-center gap-2">
+              <CardTitle className="text-foreground flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-400" />
                 Test Results
               </CardTitle>
-              <CardDescription className="text-white/60">
+              <CardDescription className="text-[13px] text-muted-foreground">
                 {results.filter(r => r.status === 'sent').length} sent • {results.filter(r => r.status === 'failed').length} failed
               </CardDescription>
             </CardHeader>
@@ -282,13 +282,13 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
                     <div className="flex items-center gap-3">
                       {getStatusIcon(result.status)}
                       <div>
-                        <div className="text-sm font-medium text-white">{result.name}</div>
+                        <div className="text-sm font-medium text-foreground">{result.name}</div>
                         {result.error && (
                           <div className="text-xs text-red-400">{result.error}</div>
                         )}
                       </div>
                     </div>
-                    <div className="text-xs text-white/60">
+                    <div className="text-xs text-foreground/60">
                       {result.status === 'sent' ? 'Sent' : 'Failed'}
                     </div>
                   </div>

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import type { Category } from '@/types/category';
 import type { EmailCampaignTemplate } from '@/types/email';
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CreateCategoryTemplateDialogProps {
   isOpen: boolean;
@@ -84,23 +85,20 @@ export function CreateCategoryTemplateDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+      <DialogContent className="max-w-lg voxxy-gradient-page-cool border-purple-500/20">
         <DialogHeader>
-          <DialogTitle className="text-white text-xl flex items-center gap-2">
+          <DialogTitle className="text-foreground text-xl flex items-center gap-2">
             <Tag className="w-5 h-5 text-purple-400" />
             Create Template for{' '}
             <span
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold text-white"
-              style={{
-                backgroundColor: category.color || '#8B5CF6',
-                textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-              }}
+              className="category-sequence-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold"
+              style={getCategorySequenceBadgeStyle(category.color)}
             >
               {category.icon && <span>{category.icon}</span>}
               {category.name}
             </span>
           </DialogTitle>
-          <p className="text-white/60 text-sm mt-2">
+          <p className="text-foreground/60 text-sm mt-2">
             Clone an existing template and customize it for this vendor category
           </p>
         </DialogHeader>
@@ -119,14 +117,14 @@ export function CreateCategoryTemplateDialog({
 
           {/* Template Selection */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Choose Template to Clone
             </label>
             <div className="space-y-2">
               {availableTemplates.length === 0 ? (
-                <div className="p-4 rounded-lg bg-white/5 border border-white/10 text-center">
-                  <p className="text-white/60 text-sm">No generic templates available</p>
-                  <p className="text-white/40 text-xs mt-1">Create a generic template first</p>
+                <div className="p-4 rounded-lg bg-background/5 border border-border text-center">
+                  <p className="text-foreground/60 text-sm">No generic templates available</p>
+                  <p className="text-foreground/40 text-xs mt-1">Create a generic template first</p>
                 </div>
               ) : (
                 availableTemplates.map(template => (
@@ -137,35 +135,35 @@ export function CreateCategoryTemplateDialog({
                     className={`w-full p-3 rounded-lg border transition-all text-left ${
                       selectedTemplateId === template.id
                         ? 'bg-purple-500/20 border-purple-500/50'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10'
+                        : 'bg-background/5 border-border hover:bg-background/10'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${
                         selectedTemplateId === template.id
                           ? 'border-purple-400 bg-purple-400'
-                          : 'border-white/40'
+                          : 'border-border'
                       }`}>
                         {selectedTemplateId === template.id && (
-                          <div className="w-full h-full rounded-full bg-white scale-50" />
+                          <div className="w-full h-full rounded-full bg-background scale-50" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-white">{template.name}</span>
+                          <span className="text-sm font-medium text-foreground">{template.name}</span>
                           {template.is_default && (
-                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-300 border border-yellow-500/30">
+                            <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase tracking-wide bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border border-yellow-500/30">
                               Default
                             </span>
                           )}
                         </div>
                         {template.description && (
-                          <p className="text-xs text-white/60 mt-1">{template.description}</p>
+                          <p className="text-xs text-foreground/60 mt-1">{template.description}</p>
                         )}
-                        <p className="text-xs text-white/40 mt-1">
+                        <p className="text-xs text-foreground/40 mt-1">
                           {getCategorySpecificEmailCount(template)} category-specific emails
                           {template.email_count && template.email_count > getCategorySpecificEmailCount(template) && (
-                            <span className="text-white/30"> ({template.email_count - getCategorySpecificEmailCount(template)} event-wide emails excluded)</span>
+                            <span className="text-foreground/30"> ({template.email_count - getCategorySpecificEmailCount(template)} event-wide emails excluded)</span>
                           )}
                         </p>
                       </div>
@@ -181,11 +179,8 @@ export function CreateCategoryTemplateDialog({
             <p className="text-xs text-blue-400 mb-2 flex items-center gap-1.5 flex-wrap">
               The template will be cloned and automatically named "
               <span
-                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold text-white"
-                style={{
-                  backgroundColor: category.color || '#8B5CF6',
-                  textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                }}
+                className="category-sequence-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-bold"
+                style={getCategorySequenceBadgeStyle(category.color)}
               >
                 {category.icon && <span className="text-[10px]">{category.icon}</span>}
                 {category.name}
@@ -198,13 +193,13 @@ export function CreateCategoryTemplateDialog({
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+              className="bg-background/5 border-border text-foreground hover:bg-background/10"
             >
               Cancel
             </Button>
@@ -212,7 +207,7 @@ export function CreateCategoryTemplateDialog({
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting || !selectedTemplateId || availableTemplates.length === 0}
-              className="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white"
+              className="voxxy-btn-cta"
             >
               {isSubmitting ? (
                 <>

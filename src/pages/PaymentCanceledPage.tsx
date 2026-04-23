@@ -26,7 +26,7 @@ export default function PaymentCanceledPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-orange-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
@@ -37,7 +37,7 @@ export default function PaymentCanceledPage() {
         <div className="w-full max-w-2xl space-y-8">
 
           {/* Canceled Card */}
-          <Card className="bg-white/10 backdrop-blur-md border-2 border-orange-400/30 shadow-2xl">
+          <Card className="bg-background/10 backdrop-blur-md border-2 border-orange-400/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-4">
               {/* Warning Icon */}
               <div className="flex justify-center mb-4">
@@ -46,15 +46,15 @@ export default function PaymentCanceledPage() {
                 </div>
               </div>
 
-              <Badge className="bg-orange-500/20 border border-orange-400/30 text-orange-300 px-4 py-2 text-sm font-medium w-fit mx-auto">
+              <Badge className="bg-orange-500/20 border border-orange-400/30 text-orange-950 dark:text-orange-300 px-4 py-2 text-sm font-medium w-fit mx-auto">
                 Payment Canceled
               </Badge>
 
-              <CardTitle className="text-4xl font-bold text-white">
+              <CardTitle className="text-4xl font-bold text-foreground">
                 Payment Not Completed
               </CardTitle>
 
-              <CardDescription className="text-lg text-gray-200">
+              <CardDescription className="text-lg text-foreground/85 dark:text-gray-200">
                 No charges were made to your card
               </CardDescription>
             </CardHeader>
@@ -62,10 +62,10 @@ export default function PaymentCanceledPage() {
             <CardContent className="space-y-6">
               {/* Status Message */}
               <div className="bg-orange-500/10 border border-orange-400/30 rounded-lg p-6 text-center space-y-2">
-                <p className="text-white font-semibold text-lg">
+                <p className="text-foreground font-semibold text-lg">
                   Your payment was canceled
                 </p>
-                <p className="text-gray-300">
+                <p className="text-foreground/85 dark:text-muted-foreground">
                   Don't worry! You can try again whenever you're ready to activate your producer account.
                 </p>
               </div>
@@ -75,7 +75,7 @@ export default function PaymentCanceledPage() {
                 <Button
                   onClick={handleTryAgain}
                   disabled={isRetrying}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  className="w-full voxxy-btn-cta-pink"
                   size="lg"
                 >
                   {isRetrying ? (
@@ -94,7 +94,7 @@ export default function PaymentCanceledPage() {
                 <Button
                   onClick={handleGoBack}
                   variant="outline"
-                  className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15"
+                  className="w-full bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border"
                   size="lg"
                 >
                   <ArrowLeft className="mr-2 h-5 w-5" />
@@ -103,27 +103,27 @@ export default function PaymentCanceledPage() {
               </div>
 
               {/* What Happened */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 space-y-3">
-                <h3 className="font-semibold text-white text-lg mb-2 flex items-center gap-2">
+              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-6 space-y-3">
+                <h3 className="font-semibold text-foreground text-lg mb-2 flex items-center gap-2">
                   <HelpCircle className="h-5 w-5" />
                   What happened?
                 </h3>
-                <p className="text-sm text-gray-300">
+                <p className="text-sm text-muted-foreground">
                   The payment process was interrupted before completion. This could be because:
                 </p>
-                <ul className="space-y-2 text-sm text-gray-300 ml-4">
+                <ul className="space-y-2 text-sm text-muted-foreground ml-4">
                   <li>• You clicked the back button or closed the payment window</li>
                   <li>• You chose not to complete the payment at this time</li>
                   <li>• The payment session expired</li>
                 </ul>
-                <p className="text-sm text-gray-300 pt-2">
-                  <strong className="text-white">No charges were made.</strong> When you're ready, you can restart the payment process.
+                <p className="text-sm text-muted-foreground pt-2">
+                  <strong className="text-foreground">No charges were made.</strong> When you're ready, you can restart the payment process.
                 </p>
               </div>
 
               {/* Support */}
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4">
-                <p className="text-sm text-gray-300 text-center">
+              <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4">
+                <p className="text-sm text-muted-foreground text-center">
                   Having trouble? Contact us at{' '}
                   <a
                     href="mailto:support@voxxypresents.com"
@@ -135,8 +135,8 @@ export default function PaymentCanceledPage() {
               </div>
 
               {/* Reassurance */}
-              <div className="text-center border-t border-white/10 pt-6">
-                <p className="text-xs text-gray-400">
+              <div className="text-center border-t border-border pt-6">
+                <p className="text-xs text-muted-foreground">
                   🔒 All payments are securely processed by Stripe
                 </p>
               </div>

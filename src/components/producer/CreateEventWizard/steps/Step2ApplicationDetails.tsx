@@ -383,10 +383,10 @@ export default function Step2ApplicationDetails({
         </div>
       )}
 
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 space-y-4">
+      <div className="bg-background/5 backdrop-blur-sm rounded-xl p-5 border border-border space-y-4">
         <div className="mb-3">
-          <h2 className="text-base font-semibold text-white">Application Categories</h2>
-          <p className="text-white/60 text-xs mt-0.5">
+          <h2 className="text-base font-semibold text-foreground">Application Categories</h2>
+          <p className="text-foreground/60 text-xs mt-0.5">
             Choose vendor categories and configure pricing for each
           </p>
         </div>
@@ -394,16 +394,16 @@ export default function Step2ApplicationDetails({
         {/* Deadlines */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs text-white/80 font-medium mb-1.5">
+            <label className="block text-xs text-foreground/80 font-medium mb-1.5">
               Application Deadline *
             </label>
             <input
               type="date"
               value={eventDetails.application_deadline}
               onChange={(e) => handleDeadlineChange('application_deadline', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                errors.application_deadline ? 'border-red-500' : 'border-white/10'
-              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                errors.application_deadline ? 'border-red-500' : 'border-border'
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
             />
             {errors.application_deadline && (
               <p className="mt-1 text-xs text-red-500">{errors.application_deadline}</p>
@@ -411,14 +411,14 @@ export default function Step2ApplicationDetails({
           </div>
 
           <div>
-            <label className="block text-xs text-white/80 font-medium mb-1.5">
+            <label className="block text-xs text-foreground/80 font-medium mb-1.5">
               Payment Due Date
             </label>
             <input
               type="date"
               value={eventDetails.payment_deadline || ''}
               onChange={(e) => handleDeadlineChange('payment_deadline', e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+              className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
             />
           </div>
         </div>
@@ -427,17 +427,17 @@ export default function Step2ApplicationDetails({
         <div>
           <div className="flex items-center justify-between mb-3">
             <div>
-              <label className="block text-xs text-white/80 font-medium">
+              <label className="block text-xs text-foreground/80 font-medium">
                 Select Application Categories *
               </label>
-              <p className="text-white/50 text-xs mt-0.5">
+              <p className="text-foreground/50 text-xs mt-0.5">
                 Click categories to add them to your event. Each will have its own pricing and details.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setIsCreatingCategory(true)}
-              className="px-3 py-1.5 text-xs rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors flex items-center gap-1.5 whitespace-nowrap"
+              className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-colors flex items-center gap-1.5 whitespace-nowrap"
             >
               <Plus className="w-3.5 h-3.5" />
               New Category
@@ -445,12 +445,12 @@ export default function Step2ApplicationDetails({
           </div>
 
           {loadingCategories ? (
-            <div className="py-8 text-center text-white/60 text-sm">Loading categories...</div>
+            <div className="py-8 text-center text-foreground/60 text-sm">Loading categories...</div>
           ) : (
             <>
               {/* New Category Form */}
               {isCreatingCategory && (
-                <div className="mb-3 p-3 bg-white/5 rounded-lg border border-purple-500/30">
+                <div className="mb-3 p-3 bg-background/5 rounded-lg border border-purple-500/30">
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -472,12 +472,12 @@ export default function Step2ApplicationDetails({
                       }}
                       placeholder="Enter category name (e.g., Food Vendor, Artist)"
                       autoFocus
-                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:border-purple-500 transition-all"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-purple-500 transition-all"
                     />
                     <button
                       type="button"
                       onClick={handleCreateNewCategory}
-                      className="px-4 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors"
+                      className="px-4 py-2 text-sm rounded-lg voxxy-btn-solid transition-colors"
                     >
                       Create
                     </button>
@@ -488,7 +488,7 @@ export default function Step2ApplicationDetails({
                         setNewCategoryName('');
                         setCreateCategoryError('');
                       }}
-                      className="px-3 py-2 text-sm rounded-lg bg-white/5 hover:bg-white/10 text-white/70 transition-colors"
+                      className="px-3 py-2 text-sm rounded-lg bg-background/5 hover:bg-background/10 text-foreground/70 transition-colors"
                     >
                       Cancel
                     </button>
@@ -513,7 +513,7 @@ export default function Step2ApplicationDetails({
                           relative px-4 py-3 rounded-lg border-2 transition-all text-left
                           ${isSelected
                             ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
-                            : 'border-white/10 bg-white/5 hover:border-white/20 hover:bg-white/10'
+                            : 'border-border bg-background/5 hover:border-border hover:bg-background/10'
                           }
                         `}
                       >
@@ -527,19 +527,19 @@ export default function Step2ApplicationDetails({
                               {category.icon && (
                                 <span className="text-lg">{category.icon}</span>
                               )}
-                              <span className="text-sm font-medium text-white truncate">
+                              <span className="text-sm font-medium text-foreground truncate">
                                 {category.name}
                               </span>
                             </div>
                             {category.usage && (
-                              <p className="text-xs text-white/40">
+                              <p className="text-xs text-foreground/40">
                                 Used in {category.usage.applications_count} {category.usage.applications_count === 1 ? 'application' : 'applications'}
                               </p>
                             )}
                           </div>
                           {isSelected && (
-                            <div className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-600 flex items-center justify-center">
-                              <span className="text-white text-xs">✓</span>
+                            <div className="flex-shrink-0 w-5 h-5 rounded-full voxxy-accent-tile flex items-center justify-center">
+                              <span className="text-foreground text-xs">✓</span>
                             </div>
                           )}
                         </div>
@@ -549,8 +549,8 @@ export default function Step2ApplicationDetails({
                 </div>
               ) : (
                 <div className="py-8 text-center">
-                  <p className="text-sm text-white/60 mb-3">No categories yet</p>
-                  <p className="text-xs text-white/40">Click "New Category" to create your first one</p>
+                  <p className="text-sm text-foreground/60 mb-3">No categories yet</p>
+                  <p className="text-xs text-foreground/40">Click "New Category" to create your first one</p>
                 </div>
               )}
             </>
@@ -564,7 +564,7 @@ export default function Step2ApplicationDetails({
         {/* Application Configuration Forms (one per selected category) */}
         {applicationDetails.applications.length > 0 && (
           <div className="space-y-4 mt-6">
-            <h3 className="text-sm font-semibold text-white">Configure Each Category</h3>
+            <h3 className="text-sm font-semibold text-foreground">Configure Each Category</h3>
 
             {applicationDetails.applications.map((app) => {
               const category = categories.find(c => c.id === app.category_id);
@@ -572,10 +572,10 @@ export default function Step2ApplicationDetails({
               return (
                 <div
                   key={app.id}
-                  className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-3"
+                  className="bg-background/5 rounded-lg p-4 border border-border space-y-3"
                 >
                   {/* Category Header */}
-                  <div className="flex items-center gap-2 pb-2 border-b border-white/10">
+                  <div className="flex items-center gap-2 pb-2 border-b border-border">
                     <CategoryBadge category={category || null} size="md" />
                   </div>
 
@@ -591,7 +591,7 @@ export default function Step2ApplicationDetails({
                       <button
                         type="button"
                         onClick={() => clearPrefilledData(app.id)}
-                        className="flex-shrink-0 p-1 rounded hover:bg-blue-500/20 text-blue-300 hover:text-blue-200 transition-colors"
+                        className="flex-shrink-0 p-1 rounded hover:bg-blue-500/20 text-blue-950 dark:text-blue-300 hover:text-blue-200 transition-colors"
                         title="Clear pre-filled data"
                       >
                         <X className="w-3.5 h-3.5" />
@@ -601,11 +601,11 @@ export default function Step2ApplicationDetails({
 
                   {/* Booth Price */}
                   <div>
-                    <label className="block text-xs text-white/80 font-medium mb-1.5">
+                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                       Booth Price *
                     </label>
                     <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60 text-sm">$</span>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 text-sm">$</span>
                       <input
                         type="number"
                         min="0"
@@ -613,9 +613,9 @@ export default function Step2ApplicationDetails({
                         value={app.booth_price || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'booth_price', parseFloat(e.target.value) || 0)}
                         placeholder="150.00"
-                        className={`w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                          errors[`application_${app.id}_booth_price`] ? 'border-red-500' : 'border-white/10'
-                        } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
+                        className={`w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                          errors[`application_${app.id}_booth_price`] ? 'border-red-500' : 'border-border'
+                        } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
                       />
                     </div>
                     {errors[`application_${app.id}_booth_price`] && (
@@ -625,7 +625,7 @@ export default function Step2ApplicationDetails({
 
                   {/* Description */}
                   <div>
-                    <label className="block text-xs text-white/80 font-medium mb-1.5">
+                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                       Description (Optional)
                     </label>
                     <textarea
@@ -633,50 +633,50 @@ export default function Step2ApplicationDetails({
                       onChange={(e) => handleApplicationChange(app.id, 'description', e.target.value)}
                       placeholder="Describe this booth type..."
                       rows={2}
-                      className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
+                      className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
                     />
                   </div>
 
                   {/* Install Date & Times */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs text-white/80 font-medium mb-1.5">
+                      <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                         Install Date
                       </label>
                       <input
                         type="date"
                         value={app.install_date || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_date', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/80 font-medium mb-1.5">
+                      <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                         Start Time
                       </label>
                       <input
                         type="time"
                         value={app.install_start_time || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_start_time', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-white/80 font-medium mb-1.5">
+                      <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                         End Time
                       </label>
                       <input
                         type="time"
                         value={app.install_end_time || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_end_time', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                       />
                     </div>
                   </div>
 
                   {/* Payment Link */}
                   <div>
-                    <label className="block text-xs text-white/80 font-medium mb-1.5">
+                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                       Payment Link (Optional)
                     </label>
                     <input
@@ -684,18 +684,18 @@ export default function Step2ApplicationDetails({
                       value={app.payment_link || ''}
                       onChange={(e) => handleApplicationChange(app.id, 'payment_link', e.target.value)}
                       placeholder="https://example.com/pay"
-                      className="w-full px-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                      className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                     />
                   </div>
 
                   {/* Tags */}
                   <div>
-                    <label className="block text-xs text-white/80 font-medium mb-1.5">
+                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
                       Application Tags (Optional)
                     </label>
                     <div className="flex gap-2 mb-2">
                       <div className="relative flex-1">
-                        <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60" />
+                        <Tag className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/60" />
                         <input
                           type="text"
                           value={tagInputs[app.id] || ''}
@@ -707,13 +707,13 @@ export default function Step2ApplicationDetails({
                             }
                           }}
                           placeholder="e.g., handmade, food"
-                          className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-white/10 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                          className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
                         />
                       </div>
                       <button
                         type="button"
                         onClick={() => addTag(app.id)}
-                        className="px-3 py-2 text-sm rounded-lg bg-purple-600 hover:bg-purple-700 text-white transition-colors flex items-center gap-1.5"
+                        className="px-3 py-2 text-sm rounded-lg voxxy-btn-solid transition-colors flex items-center gap-1.5"
                       >
                         <Plus className="w-3.5 h-3.5" />
                         Add
@@ -725,14 +725,14 @@ export default function Step2ApplicationDetails({
                         {app.application_tags.map((tag, idx) => (
                           <div
                             key={idx}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-sm"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-sm"
                           >
                             <Tag className="w-3 h-3" />
                             <span>{tag}</span>
                             <button
                               type="button"
                               onClick={() => removeTag(app.id, tag)}
-                              className="text-white/70 hover:text-white transition-colors"
+                              className="text-foreground/70 hover:text-foreground transition-colors"
                             >
                               <X className="w-3 h-3" />
                             </button>

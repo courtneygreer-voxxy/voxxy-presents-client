@@ -1,7 +1,8 @@
 import { useState, useMemo } from 'react';
-import { Calendar, Plus, Eye, EyeOff, Trash2, Search } from 'lucide-react';
+import { Calendar, MapPin, Plus, Eye, EyeOff, Trash2, Search, Users } from 'lucide-react';
 import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 
 interface Event {
   id: number;
@@ -60,28 +61,20 @@ export default function EventsList({
 }: EventsListProps) {
 
   const getStatusBadge = (event: Event) => {
-    // Priority 1: Check explicit status field (cancelled, completed, draft, published)
     if (event.status?.status === 'cancelled') {
-      return { label: 'Cancelled', color: 'bg-red-500/20 text-red-300', value: 'cancelled' };
+      return { label: 'Cancelled', variant: 'tintRed' as BadgeVariant, value: 'cancelled' };
     }
-
     if (event.status?.status === 'completed') {
-      return { label: 'Completed', color: 'bg-blue-500/20 text-blue-300', value: 'completed' };
+      return { label: 'Completed', variant: 'tintBlue' as BadgeVariant, value: 'completed' };
     }
-
-    // Priority 2: Check if event date has passed (regardless of status)
     const eventDate = event.dates?.start || event.event_date;
     if (eventDate && isDatePast(eventDate)) {
-      return { label: 'Past', color: 'bg-gray-500/20 text-gray-300', value: 'past' };
+      return { label: 'Past', variant: 'tintMuted' as BadgeVariant, value: 'past' };
     }
-
-    // Priority 3: Check if event is live (is_live column set by go_live)
     if (event.status?.is_live) {
-      return { label: 'Live', color: 'bg-green-500/20 text-green-300', value: 'live' };
+      return { label: 'Live', variant: 'tintGreen' as BadgeVariant, value: 'live' };
     }
-
-    // Priority 4: Default to draft (not cancelled, not completed, not past, not live)
-    return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
+    return { label: 'Draft', variant: 'tintPurple' as BadgeVariant, value: 'draft' };
   };
 
   const formatEventDateDisplay = (event: Event) => {
@@ -163,7 +156,7 @@ export default function EventsList({
       {/* Events List */}
       <div className="space-y-2.5">
         {filteredAndSortedEvents.length === 0 ? (
-          <div className="text-center py-8 text-white/40">
+          <div className="text-center py-8 text-foreground/40">
             <p className="text-xs">No events found{(searchTerm || statusFilter) && ' - try adjusting your filters'}</p>
           </div>
         ) : (
@@ -174,42 +167,49 @@ export default function EventsList({
             return (
               <div
                 key={event.id}
-                className="glass-card p-4 hover:bg-white/8 hover:border-white/20 transition-smooth"
+                className="glass-card voxxy-hover-panel event-list-card p-4"
               >
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
                   {/* Event Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-white">
+                      <h3 className="text-base font-semibold text-foreground">
                         {event.title}
                       </h3>
-                      <span
-                        className={`px-2 py-0.5 rounded-full text-[10px] font-medium uppercase tracking-wide ${badge.color}`}
+                      <Badge
+                        variant={badge.variant}
+                        className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
                       >
                         {badge.label}
-                      </span>
+                      </Badge>
                     </div>
 
                     {event.description && (
-                      <p className="text-white/70 text-xs mb-1.5 line-clamp-1">
+                      <p className="text-foreground/70 text-xs mb-1.5 line-clamp-1">
                         {event.description}
                       </p>
                     )}
 
-                    {/* Event Meta */}
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-white/60">
+                    {/* Event Meta — muted copy + brighter purple icons (restores tinted dark look) */}
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground/60 dark:text-purple-300/85">
                       <div className="flex items-center gap-1">
-                        <Calendar className="w-3 h-3 text-purple-400" />
+                        <Calendar className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
                         <span>{formatEventDateDisplay(event)}</span>
                       </div>
                       {event.location && (
                         <>
-                          <span className="text-white/30">•</span>
-                          <span>{event.location}</span>
+                          <span className="text-foreground/30 dark:text-purple-400/35">•</span>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                            <span>{event.location}</span>
+                          </div>
                         </>
                       )}
-                      <span className="text-white/30">•</span>
-                      <span>{applicantCount} applicants</span>
+                      <span className="text-foreground/30 dark:text-purple-400/35">•</span>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                        <span>{applicantCount} applicants</span>
+                      </div>
                     </div>
                   </div>
 
@@ -217,7 +217,7 @@ export default function EventsList({
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCommandCenter(event.slug)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm whitespace-nowrap"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm whitespace-nowrap"
                     >
                       Command Center
                     </button>
@@ -226,7 +226,7 @@ export default function EventsList({
                     {isAdmin && onDeleteEvent && import.meta.env.MODE !== 'production' && (
                       <button
                         onClick={() => onDeleteEvent(event.namespaced_slug || event.slug)}
-                        className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-white font-medium hover:shadow-lg hover:shadow-red-500/30 transition-smooth whitespace-nowrap"
+                        className="flex flex-col items-center gap-1 px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-foreground font-medium hover:shadow-lg hover:shadow-red-500/30 transition-smooth whitespace-nowrap"
                         title="Admin Quick Delete - No Confirmation (Dev/Staging Only)"
                       >
                         <div className="flex items-center gap-1.5">

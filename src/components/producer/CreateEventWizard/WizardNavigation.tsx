@@ -19,7 +19,7 @@ export default function WizardNavigation({
         type="button"
         onClick={onCancel}
         disabled={isSubmitting}
-        className="px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-6 py-3 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Cancel
       </button>
@@ -32,7 +32,7 @@ export default function WizardNavigation({
           type="button"
           onClick={onBack}
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
@@ -45,7 +45,7 @@ export default function WizardNavigation({
           type="button"
           onClick={onNext}
           disabled={isSubmitting}
-          className="flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="flex items-center gap-2 px-6 py-3 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           Next
           <ArrowRight className="w-4 h-4" />
@@ -58,11 +58,11 @@ export default function WizardNavigation({
           type="button"
           onClick={onSubmit}
           disabled={isSubmitting}
-          className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+          className="px-6 py-3 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
         >
           {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
-              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
               Creating Event...
             </span>
           ) : (

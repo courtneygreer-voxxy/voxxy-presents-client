@@ -93,8 +93,8 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-white/60">Loading your lists...</p>
+          <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+          <p className="text-foreground/60">Loading your lists...</p>
         </div>
       </div>
     );
@@ -108,7 +108,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={fetchLists}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors"
           >
             Try Again
           </button>
@@ -122,18 +122,18 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Filter className="w-8 h-8 text-white/40" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
+            <Filter className="w-8 h-8 text-foreground/40" />
           </div>
-          <h3 className="text-lg font-semibold text-white mb-2">
+          <h3 className="text-lg font-semibold text-foreground mb-2">
             No Saved Lists Yet
           </h3>
-          <p className="text-white/50 text-sm mb-4">
+          <p className="text-foreground/50 text-sm mb-4">
             Use the filters on the All Contacts tab to find the contacts you need, then save the filter combination as a reusable list.
           </p>
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10 text-left">
-            <p className="text-white/70 text-xs font-medium mb-2">How it works:</p>
-            <ol className="text-white/50 text-xs space-y-1.5 list-decimal list-inside">
+          <div className="voxxy-surface-subtle rounded-lg p-4 text-left">
+            <p className="text-foreground/70 text-xs font-medium mb-2">How it works:</p>
+            <ol className="text-foreground/50 text-xs space-y-1.5 list-decimal list-inside">
               <li>Go to the All Contacts tab</li>
               <li>Select filters for locations, categories, or tags</li>
               <li>Click "Save as List" to save the filter combination</li>
@@ -149,31 +149,31 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h3 className="text-lg font-semibold text-white mb-1">Saved Lists</h3>
-        <p className="text-sm text-white/60">
+        <h3 className="text-lg font-semibold text-foreground mb-1">Saved Lists</h3>
+        <p className="text-sm text-foreground/60">
           {lists.length} {lists.length === 1 ? 'list' : 'lists'} saved
         </p>
       </div>
 
       {/* Lists Table */}
-      <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+      <div className="voxxy-table-shell">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-white/10 bg-white/5">
+            <tr className="voxxy-table-header">
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Name</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Name</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Filters</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Filters</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Contacts</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Contacts</span>
               </th>
               <th className="px-4 py-3 text-left">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Last Used</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Last Used</span>
               </th>
               <th className="px-4 py-3 text-right">
-                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">Actions</span>
+                <span className="voxxy-table-header-row text-xs font-semibold uppercase tracking-wide">Actions</span>
               </th>
             </tr>
           </thead>
@@ -181,18 +181,18 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
             {lists.map(list => (
               <tr
                 key={list.id}
-                className="border-b border-white/5 hover:bg-white/5 transition-colors group"
+                className="voxxy-table-row voxxy-table-row-hover group"
               >
                 {/* Name */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
                     <Filter className="w-4 h-4 text-purple-400 flex-shrink-0" />
                     <div className="min-w-0">
-                      <p className="text-sm font-medium text-white truncate">
+                      <p className="text-sm font-medium text-foreground truncate">
                         {list.name}
                       </p>
                       {list.description && (
-                        <p className="text-xs text-white/50 truncate">
+                        <p className="text-xs text-foreground/50 truncate">
                           {list.description}
                         </p>
                       )}
@@ -206,37 +206,37 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                     <div className="flex flex-wrap gap-1 max-w-xs">
                       {list.filters.categories && list.filters.categories.length > 0 && (
                         list.filters.categories.map(cat => (
-                          <span key={cat} className="text-xs px-1.5 py-0.5 bg-blue-500/15 text-blue-300 rounded">
+                          <span key={cat} className="text-xs px-1.5 py-0.5 bg-blue-500/15 text-blue-950 dark:text-blue-300 rounded">
                             {cat}
                           </span>
                         ))
                       )}
                       {list.filters.locations && list.filters.locations.length > 0 && (
                         list.filters.locations.map(loc => (
-                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-purple-500/15 text-purple-300 rounded">
+                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-purple-500/15 text-violet-950 dark:text-purple-300 rounded">
                             {loc}
                           </span>
                         ))
                       )}
                       {list.filters.tags && list.filters.tags.length > 0 && (
                         list.filters.tags.map(tag => (
-                          <span key={tag} className="text-xs px-1.5 py-0.5 bg-green-500/15 text-green-300 rounded">
+                          <span key={tag} className="text-xs px-1.5 py-0.5 bg-green-500/15 text-emerald-950 dark:text-green-300 rounded">
                             {tag}
                           </span>
                         ))
                       )}
                       {!list.filters.categories?.length && !list.filters.locations?.length && !list.filters.tags?.length && (
-                        <span className="text-xs text-white/40">No filters</span>
+                        <span className="text-xs text-foreground/75 dark:text-muted-foreground">No filters</span>
                       )}
                     </div>
                   ) : (
-                    <span className="text-xs text-white/40">No filters</span>
+                    <span className="text-xs text-foreground/75 dark:text-muted-foreground">No filters</span>
                   )}
                 </td>
 
                 {/* Contacts Count */}
                 <td className="px-4 py-3">
-                  <div className="flex items-center gap-1.5 text-white/70">
+                  <div className="flex items-center gap-1.5 text-foreground/70">
                     <Users className="w-3.5 h-3.5" />
                     <span className="text-sm font-medium">{list.contacts_count}</span>
                   </div>
@@ -245,14 +245,14 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 {/* Last Used */}
                 <td className="px-4 py-3">
                   {list.last_used_at ? (
-                    <div className="flex items-center gap-1.5 text-white/50">
+                    <div className="flex items-center gap-1.5 text-foreground/50">
                       <Calendar className="w-3.5 h-3.5" />
                       <span className="text-xs">
                         {formatDistanceToNow(new Date(list.last_used_at), { addSuffix: true })}
                       </span>
                     </div>
                   ) : (
-                    <span className="text-xs text-white/30">Never</span>
+                    <span className="text-xs text-foreground/30">Never</span>
                   )}
                 </td>
 
@@ -265,7 +265,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                           onViewList(list.filters);
                         }
                       }}
-                      className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
+                      className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
                       title="View filtered contacts"
                       disabled={!list.filters}
                     >
@@ -273,14 +273,14 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                     </button>
                     <button
                       onClick={() => handleStartEdit(list)}
-                      className="p-1.5 hover:bg-white/10 rounded text-white/60 hover:text-white transition-colors"
+                      className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
                       title="Edit list"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => handleDeleteList(list.id, list.name)}
-                      className="p-1.5 hover:bg-red-500/20 rounded text-white/60 hover:text-red-400 transition-colors"
+                      className="p-1.5 hover:bg-red-500/20 rounded text-foreground/60 hover:text-red-400 transition-colors"
                       title="Delete list"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -296,13 +296,13 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
       {/* Edit List Modal */}
       {editingId !== null && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-white">Edit List</h2>
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">Edit List</h2>
               <button
                 onClick={handleCancelEdit}
-                className="text-white/60 hover:text-white transition-colors"
+                className="text-foreground/60 hover:text-foreground transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -312,23 +312,23 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
             <div className="p-6 space-y-5">
               {/* List Name */}
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-1.5">List Name</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
                 <input
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   placeholder="List name"
                 />
               </div>
 
               {/* Description */}
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-1.5">Description (optional)</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
                   rows={2}
                   placeholder="Description (optional)"
                 />
@@ -336,7 +336,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
 
               {/* Filters */}
               <div>
-                <label className="block text-sm font-medium text-white/90 mb-2">Filters</label>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
                 <SmartListBuilder
                   organizationId={organizationId}
                   filters={editFilters}
@@ -348,18 +348,18 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
               <div className="flex gap-3 pt-2">
                 <button
                   onClick={handleCancelEdit}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-white/30 text-white/90 hover:bg-white/5 transition-all"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEdit}
                   disabled={savingEdit || !editName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {savingEdit ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                       Saving...
                     </>
                   ) : (

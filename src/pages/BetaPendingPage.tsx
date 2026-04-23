@@ -214,7 +214,7 @@ export default function BetaPendingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated Background */}
       <div
         className="absolute inset-0 opacity-20"
@@ -225,22 +225,22 @@ export default function BetaPendingPage() {
 
       <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl w-full">
-          <Card className="w-full bg-white/5 backdrop-blur-xl border border-purple-500/20 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+          <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/20 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
             <CardHeader className="text-center relative pt-12 pb-6">
               <Button
                 onClick={() => navigate('/')}
                 variant="ghost"
                 size="sm"
-                className="absolute top-4 left-4 text-gray-400 hover:text-white hover:bg-white/10"
+                className="absolute top-4 left-4 text-muted-foreground hover:text-foreground hover:bg-background/10"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Home
               </Button>
 
-              <CardTitle className="text-3xl font-bold text-white mb-3">
+              <CardTitle className="text-3xl font-bold text-foreground mb-3">
                 Welcome to <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Voxxy</span>
               </CardTitle>
-              <CardDescription className="text-gray-300 text-base">
+              <CardDescription className="text-base">
                 Complete the steps below to finish setting up your account
               </CardDescription>
             </CardHeader>
@@ -293,46 +293,46 @@ export default function BetaPendingPage() {
 
               {/* Account Information Section */}
               {userProfile && (
-                <div className="bg-white/5 rounded-lg p-4 space-y-3">
+                <div className="bg-background/5 rounded-lg p-4 space-y-3">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Email</span>
-                      <span className="text-white font-medium">{userProfile.email}</span>
+                      <span className="text-muted-foreground">Email</span>
+                      <span className="text-foreground font-medium">{userProfile.email}</span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-400">Role</span>
+                      <span className="text-muted-foreground">Role</span>
                       <span className="text-purple-300 font-semibold">
                         {userProfile.role === 'venue_owner' || userProfile.role === 'producer'
                           ? 'Producer / Venue Owner'
                           : userProfile.role?.replace('_', ' ').toUpperCase()}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400 italic">
+                    <p className="text-xs text-muted-foreground italic">
                       Meant to sign up as a different role or with another email? Use the request form below to contact us & we'll update your account information!
                     </p>
                   </div>
 
-                  <Separator className="bg-white/10" />
+                  <Separator className="bg-background/10" />
 
                   <div className="flex flex-wrap gap-2 justify-center">
                     {isEmailVerified ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-400/20 text-green-300 text-xs rounded-md">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-400/20 text-emerald-900 dark:text-green-300 text-xs rounded-md">
                         <CheckCircle className="h-3 w-3" />
                         <span>Email Verified</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-yellow-500/10 border border-yellow-400/20 text-yellow-300 text-xs rounded-md">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-yellow-500/10 border border-yellow-400/20 text-yellow-950 dark:text-yellow-300 text-xs rounded-md">
                         <AlertCircle className="h-3 w-3" />
                         <span>Email Pending</span>
                       </span>
                     )}
                     {needsPayment ? (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-400/20 text-red-300 text-xs rounded-md">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-red-500/10 border border-red-400/20 text-red-950 dark:text-red-300 text-xs rounded-md">
                         <AlertCircle className="h-3 w-3" />
                         <span>Payment Required</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-400/20 text-green-300 text-xs rounded-md">
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-500/10 border border-green-400/20 text-emerald-900 dark:text-green-300 text-xs rounded-md">
                         <CheckCircle className="h-3 w-3" />
                         <span>Paid</span>
                       </span>
@@ -347,18 +347,18 @@ export default function BetaPendingPage() {
                   {isEmailVerified ? (
                     <>
                       <CheckCircle className="h-6 w-6 text-green-400" />
-                      <h3 className="text-lg font-semibold text-white">Email Verified</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Email Verified</h3>
                       <span className="ml-auto text-sm text-green-400 font-medium">✓ Complete</span>
                     </>
                   ) : (
                     <>
                       <Mail className="h-6 w-6 text-pink-400" />
-                      <h3 className="text-lg font-semibold text-white">Verify Your Email</h3>
+                      <h3 className="text-lg font-semibold text-foreground">Verify Your Email</h3>
                       <span className="ml-auto text-sm text-yellow-400 font-medium">Step 1 of 2</span>
                     </>
                   )}
                 </div>
-                <Separator className="bg-white/10" />
+                <Separator className="bg-background/10" />
 
                 {!isEmailVerified ? (
                   <>
@@ -368,14 +368,14 @@ export default function BetaPendingPage() {
                       <p className="text-sm text-gray-200 text-center">
                         <strong>Verification code sent to:</strong>
                       </p>
-                      <p className="text-base text-white font-mono text-center mt-1 break-all">
+                      <p className="text-base text-foreground font-mono text-center mt-1 break-all">
                         {userProfile?.email}
                       </p>
                     </div>
 
                     {verificationSuccess && (
                       <Alert className="bg-green-500/20 border-green-500">
-                        <AlertDescription className="text-white font-medium flex items-center gap-2">
+                        <AlertDescription className="text-foreground font-medium flex items-center gap-2">
                           <CheckCircle className="h-4 w-4" />
                           {verificationSuccess}
                         </AlertDescription>
@@ -384,7 +384,7 @@ export default function BetaPendingPage() {
 
                     {verificationError && (
                       <Alert className="bg-red-500/20 border-red-500">
-                        <AlertDescription className="text-white font-medium flex items-center gap-2">
+                        <AlertDescription className="text-foreground font-medium flex items-center gap-2">
                           <AlertCircle className="h-4 w-4" />
                           {verificationError}
                         </AlertDescription>
@@ -393,7 +393,7 @@ export default function BetaPendingPage() {
 
                     <form onSubmit={handleVerifyEmail} className="space-y-5">
                       <div className="space-y-2">
-                        <label htmlFor="verification-code" className="text-white text-sm">
+                        <label htmlFor="verification-code" className="text-foreground text-sm">
                           Verification Code
                         </label>
                         <Input
@@ -406,10 +406,10 @@ export default function BetaPendingPage() {
                             setVerificationCode(value)
                           }}
                           maxLength={6}
-                          className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 h-12 text-center text-2xl tracking-widest font-mono focus:bg-white/15 focus:border-yellow-400/50 transition-all"
+                          className="bg-background/10 border-border text-foreground placeholder:text-muted-foreground h-12 text-center text-2xl tracking-widest font-mono focus:bg-background/15 focus:border-yellow-400/50 transition-all"
                           disabled={isVerifying || isResending}
                         />
-                        <p className="text-xs text-gray-400 text-center">
+                        <p className="text-xs text-muted-foreground text-center">
                           Check your email for the 6-digit code
                         </p>
                       </div>
@@ -417,7 +417,7 @@ export default function BetaPendingPage() {
                       <Button
                         type="submit"
                         disabled={isVerifying || isResending || verificationCode.length !== 6}
-                        className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full voxxy-btn-cta font-semibold shadow-md dark:shadow-[0_0_20px_rgba(236,72,153,0.5)] disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         {isVerifying ? (
                           <>
@@ -431,7 +431,7 @@ export default function BetaPendingPage() {
                     </form>
 
                     <div className="text-center pt-2">
-                      <p className="text-gray-300 text-sm mb-2">
+                      <p className="text-muted-foreground text-sm mb-2">
                         Didn't receive the code?
                       </p>
                       <Button
@@ -439,7 +439,7 @@ export default function BetaPendingPage() {
                         variant="ghost"
                         onClick={handleResendVerification}
                         disabled={isVerifying || isResending}
-                        className="text-pink-400 hover:text-pink-300 hover:bg-white/10"
+                        className="text-pink-400 hover:text-pink-300 hover:bg-background/10"
                       >
                         {isResending ? (
                           <>
@@ -464,34 +464,34 @@ export default function BetaPendingPage() {
               {/* Pricing Tiers Section - Always visible when payment needed */}
               {needsPayment && (
                 <div className="space-y-6 pt-6">
-                  <div className="mt-6 pt-6 border-t border-white/10">
+                  <div className="mt-6 pt-6 border-t border-border">
                     {/* Header */}
                     <div className="text-center mb-8">
                       <div className="flex items-center justify-center gap-2 mb-4">
                         <Sparkles className="h-6 w-6 text-purple-400" />
-                        <h4 className="text-2xl font-bold text-white">Start Your Producer Account</h4>
+                        <h4 className="text-2xl font-bold text-foreground">Start Your Producer Account</h4>
                       </div>
-                      <p className="text-gray-300 text-base max-w-2xl mx-auto leading-relaxed">
+                      <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
                         Get instant access to all producer features with our $80/month plan
                       </p>
                     </div>
 
                     {/* Main Payment Card */}
-                    <Card className="bg-white/10 backdrop-blur-md border-2 border-purple-400 shadow-2xl max-w-4xl mx-auto">
+                    <Card className="bg-background/10 backdrop-blur-md border-2 border-purple-400 shadow-2xl max-w-4xl mx-auto">
                       <CardHeader className="text-center pb-6 space-y-4">
                         <div className="flex justify-center mb-4">
-                          <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-4">
-                            <DollarSign className="h-12 w-12 text-white" />
+                          <div className="voxxy-accent-tile rounded-full p-4">
+                            <DollarSign className="h-12 w-12 text-foreground" />
                           </div>
                         </div>
-                        <CardTitle className="text-3xl font-bold text-white">
+                        <CardTitle className="text-3xl font-bold text-foreground">
                           Producer Monthly Plan
                         </CardTitle>
                         <div className="flex items-baseline justify-center gap-2 pt-4">
-                          <span className="text-6xl font-bold text-white">$80</span>
-                          <span className="text-xl text-gray-300">/month</span>
+                          <span className="text-6xl font-bold text-foreground">$80</span>
+                          <span className="text-xl text-muted-foreground">/month</span>
                         </div>
-                        <CardDescription className="text-gray-300 text-lg pt-2">
+                        <CardDescription className="text-lg pt-2">
                           Everything you need to manage successful events
                         </CardDescription>
                       </CardHeader>
@@ -502,16 +502,16 @@ export default function BetaPendingPage() {
                           {features.map((feature, index) => (
                             <div
                               key={index}
-                              className="flex items-start gap-3 p-4 bg-white/5 rounded-lg border border-white/30 hover:bg-white/10 hover:border-white/50 transition-colors"
+                              className="flex items-start gap-3 p-4 bg-background/5 rounded-lg border border-border hover:bg-background/10 hover:border-primary/40 transition-colors"
                             >
                               <div className="bg-purple-500/20 rounded-full p-2 flex-shrink-0">
                                 <feature.icon className="h-5 w-5 text-purple-300" />
                               </div>
                               <div>
-                                <h5 className="text-white font-semibold text-sm mb-1">
+                                <h5 className="text-foreground font-semibold text-sm mb-1">
                                   {feature.title}
                                 </h5>
-                                <p className="text-gray-400 text-xs">
+                                <p className="text-muted-foreground text-xs">
                                   {feature.description}
                                 </p>
                               </div>
@@ -519,23 +519,23 @@ export default function BetaPendingPage() {
                           ))}
                         </div>
 
-                        <Separator className="bg-white/10" />
+                        <Separator className="bg-background/10" />
 
                         {/* Payment CTA Section */}
                         <div className="space-y-4 pt-4">
                           {!isEmailVerified ? (
                             <div className="text-center p-6 bg-yellow-500/10 border-2 border-yellow-400 rounded-lg">
                               <AlertCircle className="h-10 w-10 text-yellow-400 mx-auto mb-3" />
-                              <h5 className="text-white font-semibold mb-2">Email Verification Required</h5>
-                              <p className="text-gray-300 text-sm">
+                              <h5 className="text-foreground font-semibold mb-2">Email Verification Required</h5>
+                              <p className="text-muted-foreground text-sm">
                                 Please verify your email first (Step 1 above) to start payment
                               </p>
                             </div>
                           ) : isPaid ? (
                             <div className="text-center p-6 bg-green-500/10 border-2 border-green-400 rounded-lg">
                               <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-3" />
-                              <h5 className="text-white font-semibold text-lg mb-2">Payment Complete!</h5>
-                              <p className="text-gray-300 text-sm mb-4">
+                              <h5 className="text-foreground font-semibold text-lg mb-2">Payment Complete!</h5>
+                              <p className="text-muted-foreground text-sm mb-4">
                                 Your producer account is active. Redirecting to dashboard...
                               </p>
                             </div>
@@ -554,7 +554,7 @@ export default function BetaPendingPage() {
                                 onClick={handleStartPayment}
                                 disabled={isProcessingPayment}
                                 size="lg"
-                                className="w-full h-14 text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl transition-all"
+                                className="w-full h-14 text-lg font-bold voxxy-btn-cta-pink shadow-md shadow-purple-500/15 hover:shadow-lg dark:shadow-purple-500/30 dark:hover:shadow-xl transition-all"
                               >
                                 {isProcessingPayment ? (
                                   <>
@@ -570,7 +570,7 @@ export default function BetaPendingPage() {
                                 )}
                               </Button>
 
-                              <p className="text-center text-sm text-gray-400">
+                              <p className="text-center text-sm text-muted-foreground">
                                 Secure payment powered by Stripe • Cancel anytime
                               </p>
                             </>
@@ -583,32 +583,32 @@ export default function BetaPendingPage() {
               )}
 
               {/* Sign Out Section */}
-              <div className="text-center pt-6 mt-6 border-t border-white/10 space-y-4">
+              <div className="text-center pt-6 mt-6 border-t border-border space-y-4">
                 <div>
-                  <p className="text-sm text-gray-300 mb-4">
+                  <p className="text-sm text-muted-foreground mb-4">
                     Need to sign in with a different account?
                   </p>
                   <Button
                     onClick={handleSignOut}
                     variant="ghost"
-                    className="text-pink-400 hover:text-pink-300 hover:bg-white/10"
+                    className="text-pink-400 hover:text-pink-300 hover:bg-background/10"
                   >
                     Sign Out
                   </Button>
                 </div>
 
                 {/* Delete Account Section */}
-                <div className="pt-4 mt-4 border-t border-white/5">
+                <div className="pt-4 mt-4 border-t border-border/60">
                   {!showDeleteConfirm ? (
                     <>
-                      <p className="text-xs text-gray-400 mb-3">
+                      <p className="text-xs text-muted-foreground mb-3">
                         Want to start over or made a mistake during signup?
                       </p>
                       <Button
                         onClick={() => setShowDeleteConfirm(true)}
                         variant="ghost"
                         size="sm"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        className="text-red-600 hover:text-red-500 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300"
                       >
                         <Trash2 className="h-3 w-3 mr-2" />
                         Delete Account
@@ -616,11 +616,11 @@ export default function BetaPendingPage() {
                     </>
                   ) : (
                     <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 space-y-3">
-                      <div className="flex items-center gap-2 text-red-300">
+                      <div className="flex items-center gap-2 text-red-700 dark:text-red-300">
                         <AlertCircle className="h-5 w-5" />
                         <h4 className="font-semibold">Are you sure?</h4>
                       </div>
-                      <p className="text-sm text-red-200">
+                      <p className="text-sm text-red-800/90 dark:text-red-200">
                         This will permanently delete your account and all associated data. This action cannot be undone.
                       </p>
                       <div className="flex gap-3 justify-center pt-2">
@@ -628,7 +628,7 @@ export default function BetaPendingPage() {
                           onClick={() => setShowDeleteConfirm(false)}
                           variant="outline"
                           size="sm"
-                          className="border-gray-400 text-gray-300 hover:bg-white/10"
+                          className="border-border text-foreground hover:bg-accent/50"
                         >
                           Cancel
                         </Button>

@@ -63,9 +63,9 @@ export default function EmailPreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-white">
+          <DialogTitle className="flex items-center gap-3 text-foreground">
             <Mail className="w-5 h-5 text-purple-400" />
             <span>Email Preview</span>
           </DialogTitle>
@@ -76,37 +76,37 @@ export default function EmailPreviewModal({
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-              <p className="text-white/60">Loading preview...</p>
+              <p className="text-foreground/60">Loading preview...</p>
             </div>
           ) : emailHtml ? (
             <>
               {/* Trigger Type */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Trigger Type
                 </label>
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-white/80 text-sm">Test Email</p>
+                <div className="bg-background/5 rounded-lg p-3 border border-border">
+                  <p className="text-foreground/80 text-sm">Test Email</p>
                 </div>
               </div>
 
               {/* Subject Line */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Subject Line
                 </label>
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-white font-medium text-sm">{emailName}</p>
+                <div className="bg-background/5 rounded-lg p-3 border border-border">
+                  <p className="text-foreground font-medium text-sm">{emailName}</p>
                 </div>
               </div>
 
               {/* Message Body */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Message Body
                 </label>
-                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
-                  <pre className="text-white/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
+                <div className="bg-background/5 rounded-lg p-6 border border-border">
+                  <pre className="text-foreground/90 text-sm whitespace-pre-wrap font-sans leading-relaxed">
                     {displayText}
                   </pre>
                 </div>
@@ -117,16 +117,16 @@ export default function EmailPreviewModal({
             </>
           ) : (
             <div className="flex items-center justify-center py-12">
-              <p className="text-white/60">No preview available</p>
+              <p className="text-foreground/60">No preview available</p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
           <Button
             onClick={onClose}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="voxxy-btn-solid"
           >
             Close
           </Button>

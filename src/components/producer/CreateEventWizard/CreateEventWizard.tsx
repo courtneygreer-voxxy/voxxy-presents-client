@@ -338,7 +338,7 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
       {/* Back Button */}
       <button
         onClick={onCancel}
-        className="flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors"
+        className="flex items-center gap-2 text-foreground/70 hover:text-foreground mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Events
@@ -346,8 +346,8 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">Create New Event</h1>
-        <p className="text-white/60">
+        <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">Create New Event</h1>
+        <p className="text-foreground/60">
           Follow the steps to set up your event and vendor applications
         </p>
       </div>

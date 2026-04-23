@@ -77,7 +77,7 @@ export default function PaymentOnboardingPage() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
@@ -90,39 +90,39 @@ export default function PaymentOnboardingPage() {
 
           {/* Welcome Header */}
           <div className="text-center space-y-4">
-            <Badge className="bg-purple-500/20 border border-purple-400/30 text-purple-300 px-4 py-2 text-sm font-medium">
+            <Badge className="border border-purple-400/30 bg-purple-500/20 px-4 py-2 text-sm font-medium text-violet-950 dark:text-purple-300">
               <Sparkles className="h-4 w-4 mr-2" />
               Producer Account Setup
             </Badge>
-            <h1 className="text-4xl md:text-5xl font-bold text-white">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
               Welcome to Voxxy Presents
             </h1>
             {userProfile?.name && (
-              <p className="text-xl text-gray-300">
+              <p className="text-xl text-muted-foreground">
                 Hi {userProfile.name}! 👋
               </p>
             )}
-            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               You're one step away from unlocking the complete event producer platform
             </p>
           </div>
 
           {/* Main Pricing Card */}
-          <Card className="bg-white/10 backdrop-blur-md border-2 border-purple-400/30 shadow-2xl">
+          <Card className="bg-background/10 backdrop-blur-md border-2 border-purple-400/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-2">
               <div className="flex justify-center mb-4">
                 <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-4">
-                  <Users className="h-12 w-12 text-white" />
+                  <Users className="h-12 w-12 text-foreground" />
                 </div>
               </div>
-              <CardTitle className="text-3xl font-bold text-white">
+              <CardTitle className="text-3xl font-bold text-foreground">
                 Producer Monthly Plan
               </CardTitle>
               <div className="flex items-baseline justify-center gap-2 pt-4">
-                <span className="text-6xl font-bold text-white">$80</span>
-                <span className="text-xl text-gray-300">/month</span>
+                <span className="text-6xl font-bold text-foreground">$80</span>
+                <span className="text-xl text-muted-foreground">/month</span>
               </div>
-              <CardDescription className="text-gray-300 text-lg pt-2">
+              <CardDescription className="text-lg pt-2">
                 Everything you need to manage successful events
               </CardDescription>
             </CardHeader>
@@ -133,16 +133,16 @@ export default function PaymentOnboardingPage() {
                 {features.map((feature, index) => (
                   <div
                     key={index}
-                    className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-colors"
+                    className="flex items-start gap-3 bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 hover:bg-background/10 transition-colors"
                   >
-                    <div className="bg-purple-500/20 rounded-lg p-2 flex-shrink-0">
+                    <div className="rounded-lg bg-purple-500/20 p-2 flex-shrink-0">
                       <feature.icon className="h-5 w-5 text-purple-300" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm mb-1">
+                      <h3 className="font-semibold text-foreground text-sm mb-1">
                         {feature.title}
                       </h3>
-                      <p className="text-xs text-gray-300 line-clamp-2">
+                      <p className="text-xs text-muted-foreground line-clamp-2">
                         {feature.description}
                       </p>
                     </div>
@@ -162,7 +162,7 @@ export default function PaymentOnboardingPage() {
                 <Button
                   onClick={handleStartPayment}
                   disabled={isRedirecting}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg py-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full voxxy-btn-cta-pink text-lg py-6 rounded-lg shadow-md hover:shadow-lg dark:shadow-lg dark:hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                   size="lg"
                 >
                   {isRedirecting ? (
@@ -178,34 +178,34 @@ export default function PaymentOnboardingPage() {
                   )}
                 </Button>
 
-                <p className="text-center text-sm text-gray-400">
+                <p className="text-center text-sm text-muted-foreground">
                   Secure payment powered by Stripe • Cancel anytime
                 </p>
               </div>
 
               {/* Account Info */}
               {userProfile && (
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 mt-6">
-                  <p className="text-sm text-gray-300 text-center">
-                    <strong className="text-white">Account:</strong> {userProfile.email}
+                <div className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 mt-6">
+                  <p className="text-sm text-muted-foreground text-center">
+                    <strong className="text-foreground">Account:</strong> {userProfile.email}
                   </p>
                   {userProfile.organization_id && (
-                    <p className="text-sm text-gray-300 text-center mt-1">
-                      <strong className="text-white">Organization ID:</strong> {userProfile.organization_id}
+                    <p className="text-sm text-muted-foreground text-center mt-1">
+                      <strong className="text-foreground">Organization ID:</strong> {userProfile.organization_id}
                     </p>
                   )}
                 </div>
               )}
 
               {/* Footer Actions */}
-              <div className="text-center pt-6 border-t border-white/10 space-y-4">
-                <p className="text-sm text-gray-400">
+              <div className="text-center pt-6 border-t border-border space-y-4">
+                <p className="text-sm text-muted-foreground">
                   Need to sign in with a different account?
                 </p>
                 <Button
                   onClick={handleSignOut}
                   variant="outline"
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 hover:border-white/30"
+                  className="bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 hover:border-border"
                 >
                   Sign Out
                 </Button>
@@ -215,22 +215,22 @@ export default function PaymentOnboardingPage() {
 
           {/* Trust Signals */}
           <div className="grid md:grid-cols-3 gap-4">
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10">
+            <Card className="bg-background/5 backdrop-blur-sm border border-border">
               <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-white mb-1">$80/mo</div>
-                <div className="text-sm text-gray-300">Transparent Pricing</div>
+                <div className="text-2xl font-bold text-foreground mb-1">$80/mo</div>
+                <div className="text-sm text-muted-foreground">Transparent Pricing</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10">
+            <Card className="bg-background/5 backdrop-blur-sm border border-border">
               <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-white mb-1">24/7</div>
-                <div className="text-sm text-gray-300">Platform Access</div>
+                <div className="text-2xl font-bold text-foreground mb-1">24/7</div>
+                <div className="text-sm text-muted-foreground">Platform Access</div>
               </CardContent>
             </Card>
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10">
+            <Card className="bg-background/5 backdrop-blur-sm border border-border">
               <CardContent className="pt-6 text-center">
-                <div className="text-2xl font-bold text-white mb-1">∞</div>
-                <div className="text-sm text-gray-300">Unlimited Events</div>
+                <div className="text-2xl font-bold text-foreground mb-1">∞</div>
+                <div className="text-sm text-muted-foreground">Unlimited Events</div>
               </CardContent>
             </Card>
           </div>

@@ -4,7 +4,7 @@
 /* Glass Morphism Card Overrides */
 .admin-dark .bg-white,
 .admin-dark [data-radix-collection-item] {
-  @apply !bg-white/10 backdrop-blur-sm !border-white/20;
+  @apply !bg-background/10 backdrop-blur-sm !border-foreground/20;
 }
 
 /* Card Title Styling */
@@ -14,61 +14,56 @@
 .admin-dark h4,
 .admin-dark [data-slot="title"],
 .admin-dark [data-radix-collection-item][data-state="active"] {
-  @apply text-white;
+  @apply text-foreground;
 }
 
 /* Shadcn CardTitle and CardDescription components - target by common class patterns */
 .admin-dark .font-semibold.leading-none.tracking-tight,
 .admin-dark h3.font-semibold.leading-none.tracking-tight {
-  @apply !text-white;
-}
-
-.admin-dark .text-muted-foreground,
-.admin-dark p.text-muted-foreground {
-  @apply !text-gray-300;
+  @apply !text-foreground;
 }
 
 /* Card Description and Body Text */
 .admin-dark p,
 .admin-dark span:not(.lucide),
 .admin-dark [data-slot="description"] {
-  @apply text-gray-300;
+  @apply text-muted-foreground;
 }
 
 /* Form Labels */
 .admin-dark label {
-  @apply text-white;
+  @apply text-foreground;
 }
 
 /* Input Fields - Maintain readability with dark backgrounds */
 .admin-dark input,
 .admin-dark textarea,
 .admin-dark select {
-  @apply bg-white/10 border-white/20 text-white placeholder-gray-400;
+  @apply bg-background/10 border-foreground/20 text-foreground placeholder:text-muted-foreground;
   @apply focus:border-purple-400 focus:ring-purple-400/20;
 }
 
 /* Button Overrides for Dark Theme */
 .admin-dark button[data-variant="outline"] {
-  @apply bg-white/10 border-white/20 text-white hover:bg-white/20;
+  @apply bg-background/10 border-foreground/20 text-foreground hover:bg-background/20;
 }
 
 /* Tab Navigation Styling */
 .admin-dark [data-radix-collection-item] {
-  @apply text-gray-400 hover:text-white !bg-transparent;
-  @apply data-[state=active]:!bg-white/20 data-[state=active]:!text-white;
+  @apply text-muted-foreground hover:text-foreground !bg-transparent;
+  @apply data-[state=active]:!bg-background/20 data-[state=active]:!text-foreground;
 }
 
 /* Preview and Info Boxes */
 .admin-dark .bg-gray-50,
 .admin-dark .bg-gray-100 {
-  @apply !bg-white/5 backdrop-blur-sm border border-white/10;
+  @apply !bg-background/5 backdrop-blur-sm border border-border;
 }
 
 /* Border and Ring Updates */
 .admin-dark .border-gray-200,
 .admin-dark .border-gray-300 {
-  @apply !border-white/20;
+  @apply !border-foreground/20;
 }
 
 .admin-dark .ring-purple-200 {
@@ -81,16 +76,16 @@
 
 /* Text Color Fixes */
 .admin-dark .text-gray-900 {
-  @apply !text-white;
+  @apply !text-foreground;
 }
 
 .admin-dark .text-gray-600,
 .admin-dark .text-gray-700 {
-  @apply !text-gray-300;
+  @apply !text-muted-foreground;
 }
 
 .admin-dark .text-gray-500 {
-  @apply !text-gray-400;
+  @apply !text-muted-foreground;
 }
 
 /* Check/Success Icons */
@@ -109,5 +104,5 @@
 
 /* Hover States */
 .admin-dark .hover\:border-gray-300:hover {
-  @apply !border-white/40;
+  @apply !border-foreground/40;
 }

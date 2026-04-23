@@ -132,7 +132,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
       {/* Back Button */}
       <button
         onClick={onCancel}
-        className="flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors"
+        className="flex items-center gap-2 text-foreground/70 hover:text-foreground mb-6 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         Back to Events
@@ -141,10 +141,10 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">
+          <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
             Edit Event
           </h1>
-          <p className="text-white/60">
+          <p className="text-foreground/60">
             Update your event details
           </p>
         </div>
@@ -162,23 +162,23 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#1a0d2e] rounded-2xl p-6 max-w-md w-full border border-white/10">
-            <h3 className="text-xl font-bold text-white mb-4">Delete Event?</h3>
-            <p className="text-white/70 mb-6">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-2xl p-6">
+            <h3 className="text-xl font-bold text-foreground mb-4">Delete Event?</h3>
+            <p className="text-foreground/70 mb-6">
               Are you sure you want to delete "{event.title}"? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(false)}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isDeleting}
-                className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-destructive-foreground hover:bg-red-700 transition-all disabled:opacity-50"
               >
                 {isDeleting ? 'Deleting...' : 'Delete Event'}
               </button>
@@ -189,12 +189,12 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white/5 rounded-2xl p-6 lg:p-8 space-y-6">
-          <h2 className="text-xl font-semibold text-white">Event Details</h2>
+        <div className="bg-background/5 rounded-2xl p-6 lg:p-8 space-y-6">
+          <h2 className="text-xl font-semibold text-foreground">Event Details</h2>
 
           {/* Event Name */}
           <div>
-            <label htmlFor="title" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="title" className="block text-foreground/90 font-medium mb-2">
               Event Name *
             </label>
             <input
@@ -203,9 +203,9 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               value={formData.title}
               onChange={(e) => handleChange('title', e.target.value)}
               placeholder="e.g., Downtown Art Market"
-              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                errors.title ? 'border-red-500' : 'border-white/10'
-              } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+              className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                errors.title ? 'border-red-500' : 'border-border'
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-400">{errors.title}</p>
@@ -214,7 +214,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
 
           {/* Description */}
           <div>
-            <label htmlFor="description" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="description" className="block text-foreground/90 font-medium mb-2">
               Description *
             </label>
             <textarea
@@ -223,9 +223,9 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               onChange={(e) => handleChange('description', e.target.value)}
               placeholder="Describe your event..."
               rows={4}
-              className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                errors.description ? 'border-red-500' : 'border-white/10'
-              } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none`}
+              className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                errors.description ? 'border-red-500' : 'border-border'
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none`}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-400">{errors.description}</p>
@@ -236,18 +236,18 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Event Date */}
             <div>
-              <label htmlFor="event_date" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="event_date" className="block text-foreground/90 font-medium mb-2">
                 Event Date *
               </label>
-              <p className="text-white/50 text-xs mb-2">Start date for multi-day events</p>
+              <p className="text-foreground/50 text-xs mb-2">Start date for multi-day events</p>
               <input
                 id="event_date"
                 type="date"
                 value={formData.event_date}
                 onChange={(e) => handleChange('event_date', e.target.value)}
-                className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                  errors.event_date ? 'border-red-500' : 'border-white/10'
-                } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                  errors.event_date ? 'border-red-500' : 'border-border'
+                } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
               />
               {errors.event_date && (
                 <p className="mt-1 text-sm text-red-400">{errors.event_date}</p>
@@ -256,16 +256,16 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
 
             {/* Event End Date */}
             <div>
-              <label htmlFor="event_end_date" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="event_end_date" className="block text-foreground/90 font-medium mb-2">
                 Event End Date
               </label>
-              <p className="text-white/50 text-xs mb-2">Optional for multi-day events</p>
+              <p className="text-foreground/50 text-xs mb-2">Optional for multi-day events</p>
               <input
                 id="event_end_date"
                 type="date"
                 value={formData.event_end_date}
                 onChange={(e) => handleChange('event_end_date', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Start Time */}
             <div>
-              <label htmlFor="start_time" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="start_time" className="block text-foreground/90 font-medium mb-2">
                 Start Time
               </label>
               <input
@@ -282,13 +282,13 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 type="time"
                 value={formData.start_time}
                 onChange={(e) => handleChange('start_time', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             {/* End Time */}
             <div>
-              <label htmlFor="end_time" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="end_time" className="block text-foreground/90 font-medium mb-2">
                 End Time
               </label>
               <input
@@ -296,7 +296,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 type="time"
                 value={formData.end_time}
                 onChange={(e) => handleChange('end_time', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -305,7 +305,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Venue */}
             <div>
-              <label htmlFor="venue" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="venue" className="block text-foreground/90 font-medium mb-2">
                 Venue
               </label>
               <input
@@ -314,13 +314,13 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 value={formData.venue}
                 onChange={(e) => handleChange('venue', e.target.value)}
                 placeholder="e.g., Brooklyn Steel"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             {/* Location (City) */}
             <div>
-              <label htmlFor="location" className="block text-white/90 font-medium mb-2">
+              <label htmlFor="location" className="block text-foreground/90 font-medium mb-2">
                 Location (City) *
               </label>
               <input
@@ -329,9 +329,9 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="e.g., Brooklyn, NY"
-                className={`w-full px-4 py-3 rounded-lg bg-white/5 border ${
-                  errors.location ? 'border-red-500' : 'border-white/10'
-                } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
+                  errors.location ? 'border-red-500' : 'border-border'
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
               />
               {errors.location && (
                 <p className="mt-1 text-sm text-red-400">{errors.location}</p>
@@ -341,7 +341,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
 
           {/* Age Restriction */}
           <div>
-            <label htmlFor="age_restriction" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="age_restriction" className="block text-foreground/90 font-medium mb-2">
               Age Restriction
             </label>
             <input
@@ -350,13 +350,13 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               value={formData.age_restriction}
               onChange={(e) => handleChange('age_restriction', e.target.value)}
               placeholder="e.g., All Ages, 18+, 21+"
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
 
           {/* Ticket Link */}
           <div>
-            <label htmlFor="ticket_link" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="ticket_link" className="block text-foreground/90 font-medium mb-2">
               Ticket Link
             </label>
             <input
@@ -365,13 +365,13 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               value={formData.ticket_link}
               onChange={(e) => handleChange('ticket_link', e.target.value)}
               placeholder="https://example.com/tickets"
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
 
           {/* Application Deadline */}
           <div>
-            <label htmlFor="application_deadline" className="block text-white/90 font-medium mb-2">
+            <label htmlFor="application_deadline" className="block text-foreground/90 font-medium mb-2">
               Application Deadline
             </label>
             <input
@@ -379,7 +379,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               type="date"
               value={formData.application_deadline}
               onChange={(e) => handleChange('application_deadline', e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
             />
           </div>
         </div>
@@ -390,18 +390,18 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
             type="button"
             onClick={onCancel}
             disabled={isSubmitting}
-            className="flex-1 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+            className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
             {isSubmitting ? (
               <span className="flex items-center justify-center gap-2">
-                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                 Saving...
               </span>
             ) : (

@@ -561,7 +561,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       <div className="p-3 md:p-4">
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-          <p className="text-white/60">Loading email automation...</p>
+          <p className="text-foreground/60">Loading email automation...</p>
         </div>
       </div>
     );
@@ -573,10 +573,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       <div className="mb-8">
         <div className="flex items-start justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">
+            <h2 className="text-2xl font-bold text-foreground mb-2">
               Email Automation
             </h2>
-            <p className="text-white/60">
+            <p className="text-foreground/60">
               Manage automated emails for your event
             </p>
           </div>
@@ -586,21 +586,21 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                 {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                 {/* <button
                   onClick={() => setViewState({ view: 'email-editor', email: null, returnTo: 'table' })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600 transition-all shadow-lg"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-green-600 to-emerald-500 text-foreground hover:from-green-700 hover:to-emerald-600 transition-all shadow-lg"
                 >
                   <Plus className="w-4 h-4" />
                   <span className="hidden sm:inline">New Reminder</span>
                 </button> */}
                 <button
                   onClick={() => setViewState({ view: 'sequence-editor' })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg voxxy-btn-cta transition-all shadow-lg"
                 >
                   <Mail className="w-4 h-4" />
                   <span className="hidden sm:inline">Sequence Editor</span>
                 </button>
                 <button
                   onClick={() => setViewState({ view: 'audit-log', filters: null })}
-                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+                  className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
                 >
                   <FileSearch className="w-4 h-4" />
                   <span className="hidden sm:inline">Audit Log</span>
@@ -609,7 +609,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             )}
             <button
               onClick={() => loadEmails()}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+              className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
             >
               <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span className="hidden sm:inline">Refresh</span>
@@ -622,10 +622,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                   onChange={(e) => setAutoRefresh(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-8 h-4 bg-white/10 rounded-full peer-checked:bg-purple-600 transition-all"></div>
-                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-white rounded-full transition-transform peer-checked:translate-x-4"></div>
+                <div className="w-8 h-4 bg-background/10 rounded-full peer-checked:bg-violet-400 dark:peer-checked:bg-purple-600 transition-all"></div>
+                <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-background rounded-full transition-transform peer-checked:translate-x-4"></div>
               </div>
-              <span className="text-[10px] text-white/50">Auto</span>
+              <span className="text-[10px] text-foreground/50">Auto</span>
             </label>
           </div>
         </div>
@@ -655,20 +655,20 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
       {/* Scheduled Emails */}
       {emails.length === 0 ? (
-        <div className="text-center py-16 bg-white/5 rounded-2xl border border-white/10">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600/30 to-blue-500/30 border border-white/10 mb-4">
+        <div className="text-center py-16 bg-background/5 rounded-2xl border border-border">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-200/80 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-500/30 border border-border mb-4">
             <Sparkles className="w-8 h-8 text-purple-400" />
           </div>
-          <h3 className="text-xl font-semibold text-white mb-2">
+          <h3 className="text-xl font-semibold text-foreground mb-2">
             No Scheduled Emails Yet
           </h3>
-          <p className="text-white/60 mb-6 max-w-md mx-auto">
+          <p className="text-foreground/60 mb-6 max-w-md mx-auto">
             Generate automated emails from the system template to keep your vendors informed throughout the event lifecycle.
           </p>
           <button
             onClick={handleGenerateEmails}
             disabled={isLoading}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:from-purple-500 hover:to-blue-400 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-lg voxxy-btn-cta font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? (
               <>
@@ -697,7 +697,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
           {/* Results count */}
           <div className="flex items-center justify-between">
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-foreground/60">
               Showing {filteredEmails.length} of {emails.length} emails
             </p>
             {(searchQuery || activeFilters.length > 0) && (

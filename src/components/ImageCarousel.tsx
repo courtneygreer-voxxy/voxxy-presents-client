@@ -14,7 +14,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
   // If no images, show placeholder
   if (!images || images.length === 0) {
     return (
-      <div className={`bg-gray-200 rounded-lg shadow-lg flex items-center justify-center ${className}`}>
+      <div className={`bg-muted rounded-lg shadow-lg flex items-center justify-center ${className}`}>
         <div className="text-center text-gray-500 p-8">
           <p className="text-lg font-medium">No images yet</p>
           <p className="text-sm">Images will appear here once added</p>
@@ -65,7 +65,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
       <Button
         variant="ghost"
         size="sm"
-        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
+        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-foreground rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
         onClick={goToPrevious}
         aria-label="Previous image"
       >
@@ -75,7 +75,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
       <Button
         variant="ghost"
         size="sm"
-        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
+        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-foreground rounded-full p-2 opacity-0 group-hover:opacity-[0.5]00 transition-opacity"
         onClick={goToNext}
         aria-label="Next image"
       >
@@ -89,8 +89,8 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
             key={index}
             className={`w-2 h-2 rounded-full transition-all ${
               index === currentIndex 
-                ? 'bg-white scale-125' 
-                : 'bg-white/50 hover:bg-white/75'
+                ? 'bg-background scale-125' 
+                : 'bg-background/50 hover:bg-background/75'
             }`}
             onClick={() => goToSlide(index)}
             aria-label={`Go to image ${index + 1}`}
@@ -99,7 +99,7 @@ export default function ImageCarousel({ images, altText, className = "" }: Image
       </div>
 
       {/* Image Counter */}
-      <div className="absolute top-4 right-4 bg-black/50 text-white text-sm px-2 py-1 rounded">
+      <div className="absolute top-4 right-4 bg-black/50 text-foreground text-sm px-2 py-1 rounded">
         {currentIndex + 1} / {images.length}
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { CheckCircle2, XCircle, Clock, Send, Ban, UserX, Circle } from 'lucide-react';
 import type { DeliveryStatus } from '@/types/email';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
 interface DeliveryStatusBadgeProps {
   status: DeliveryStatus;
@@ -11,73 +13,55 @@ interface DeliveryStatusBadgeProps {
 const STATUS_CONFIG: Record<DeliveryStatus, {
   label: string;
   icon: React.ComponentType<{ className?: string }>;
-  bgClass: string;
-  textClass: string;
-  iconClass: string;
+  variant: BadgeVariant;
   description: string;
 }> = {
   scheduled: {
     label: 'Scheduled',
     icon: Clock,
-    bgClass: 'bg-blue-500/10',
-    textClass: 'text-blue-400',
-    iconClass: 'text-blue-400',
+    variant: 'tintBlueSoft',
     description: 'Email is scheduled to be sent'
   },
   pending: {
     label: 'Not Sent',
     icon: Circle,
-    bgClass: 'bg-gray-500/10',
-    textClass: 'text-gray-400',
-    iconClass: 'text-gray-400',
+    variant: 'tintMutedSoft',
     description: 'Email has not been sent yet'
   },
   queued: {
     label: 'Queued',
     icon: Clock,
-    bgClass: 'bg-blue-500/10',
-    textClass: 'text-blue-400',
-    iconClass: 'text-blue-400',
+    variant: 'tintBlueSoft',
     description: 'Email is queued for sending'
   },
   sent: {
     label: 'Sent',
     icon: Send,
-    bgClass: 'bg-purple-500/10',
-    textClass: 'text-purple-400',
-    iconClass: 'text-purple-400',
+    variant: 'tintPurpleSoft',
     description: 'Email has been sent to SendGrid'
   },
   delivered: {
     label: 'Delivered',
     icon: CheckCircle2,
-    bgClass: 'bg-green-500/10',
-    textClass: 'text-green-400',
-    iconClass: 'text-green-400',
+    variant: 'tintGreenSoft',
     description: 'Email successfully delivered to recipient'
   },
   bounced: {
     label: 'Bounced',
     icon: XCircle,
-    bgClass: 'bg-red-500/10',
-    textClass: 'text-red-400',
-    iconClass: 'text-red-400',
+    variant: 'tintRedSoft',
     description: 'Email bounced (hard or soft bounce)'
   },
   dropped: {
     label: 'Dropped',
     icon: Ban,
-    bgClass: 'bg-red-500/10',
-    textClass: 'text-red-400',
-    iconClass: 'text-red-400',
+    variant: 'tintRedSoft',
     description: 'Email was dropped (e.g., previously unsubscribed)'
   },
   unsubscribed: {
     label: 'Unsubscribed',
     icon: UserX,
-    bgClass: 'bg-gray-500/10',
-    textClass: 'text-gray-400',
-    iconClass: 'text-gray-400',
+    variant: 'tintMutedSoft',
     description: 'Recipient unsubscribed from emails'
   }
 };
@@ -91,18 +75,16 @@ export default function DeliveryStatusBadge({
   const config = STATUS_CONFIG[status] || STATUS_CONFIG['pending'];
   const Icon = config.icon;
 
-  const badge = (
-    <span
-      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${config.bgClass} ${config.textClass} ${className}`}
+  return (
+    <Badge
+      variant={config.variant}
+      className={cn('gap-1.5 px-3 py-1 font-medium', className)}
       title={showTooltip ? config.description : undefined}
     >
-      {showIcon && <Icon className={`w-3.5 h-3.5 ${config.iconClass}`} />}
+      {showIcon && <Icon className="h-3.5 w-3.5 shrink-0" />}
       {config.label}
-    </span>
+    </Badge>
   );
-
-  return badge;
 }
 
-// Export status config for use in other components
 export { STATUS_CONFIG };

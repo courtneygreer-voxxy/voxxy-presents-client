@@ -49,11 +49,11 @@ export default function ShortLinkRedirectPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-background/5 border border-border rounded-2xl p-8 text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
             <svg
-              className="w-8 h-8 text-red-400"
+              className="w-8 h-8 text-red-700 dark:text-red-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -66,11 +66,11 @@ export default function ShortLinkRedirectPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">Application Not Found</h1>
-          <p className="text-white/60 mb-6">{error}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-2">Application Not Found</h1>
+          <p className="text-foreground/60 mb-6">{error}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg"
+            className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all shadow-lg"
           >
             Return Home
           </button>
@@ -80,10 +80,10 @@ export default function ShortLinkRedirectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-black flex items-center justify-center p-6">
+    <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-6">
       <div className="text-center">
         <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-white/60">Loading application...</p>
+        <p className="text-foreground/60">Loading application...</p>
       </div>
     </div>
   );

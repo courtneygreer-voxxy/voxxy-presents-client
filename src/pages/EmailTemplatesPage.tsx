@@ -6,6 +6,7 @@ import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
 import { DebugPanel } from '@/components/producer/DebugPanel';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 
 interface EmailTemplatesPageProps {
   organizationId: number;
@@ -139,41 +140,40 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
   const getTemplateTypeBadge = (template: EmailCampaignTemplate) => {
     if (template.organization_id === null) {
       if (template.is_default) {
-        return { label: 'Default', color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
+        return { label: 'Default', variant: 'tintPurple' as BadgeVariant };
       }
-      return { label: 'System', color: 'bg-blue-500/20 text-blue-300 border-blue-500/30' };
+      return { label: 'System', variant: 'tintBlue' as BadgeVariant };
     }
-    return { label: 'Custom', color: 'bg-white/10 text-white/70 border-white/20' };
+    return { label: 'Custom', variant: 'tintNeutral' as BadgeVariant };
   };
 
-  const getTriggerBadge = (item: EmailTemplateItem): { text: string; color: string } => {
+  const getTriggerBadge = (item: EmailTemplateItem): { text: string } => {
     const { trigger_type, trigger_value } = item;
     const days = trigger_value ?? 0;
 
     switch (trigger_type) {
       case 'on_application_open':
-        return { text: 'Sent when event is created', color: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' };
+        return { text: 'Sent when event is created' };
       case 'days_before_deadline':
         return {
           text: days === 0 ? 'Sent on application deadline day' : `Sent ${days} day${days > 1 ? 's' : ''} before applications close`,
-          color: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
         };
       case 'on_application_submit':
-        return { text: 'Sent when application is submitted', color: 'bg-green-500/20 text-green-300 border-green-500/30' };
+        return { text: 'Sent when application is submitted' };
       case 'on_approval':
-        return { text: 'Sent when application is approved', color: 'bg-green-500/20 text-green-300 border-green-500/30' };
+        return { text: 'Sent when application is approved' };
       case 'days_before_payment_deadline':
-        return { text: `Sent ${days} day${days > 1 ? 's' : ''} before payment deadline (if unpaid)`, color: 'bg-orange-500/20 text-orange-300 border-orange-500/30' };
+        return { text: `Sent ${days} day${days > 1 ? 's' : ''} before payment deadline (if unpaid)` };
       case 'on_payment_deadline':
-        return { text: 'Sent with acceptance (payment info)', color: 'bg-orange-500/20 text-orange-300 border-orange-500/30' };
+        return { text: 'Sent with acceptance (payment info)' };
       case 'days_before_event':
-        return { text: `Sent ${days} day${days > 1 ? 's' : ''} before event`, color: 'bg-purple-500/20 text-purple-300 border-purple-500/30' };
+        return { text: `Sent ${days} day${days > 1 ? 's' : ''} before event` };
       case 'on_event_date':
-        return { text: 'Sent on event date', color: 'bg-pink-500/20 text-pink-300 border-pink-500/30' };
+        return { text: 'Sent on event date' };
       case 'days_after_event':
-        return { text: `Sent ${days} day${days > 1 ? 's' : ''} after event`, color: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30' };
+        return { text: `Sent ${days} day${days > 1 ? 's' : ''} after event` };
       default:
-        return { text: 'Automatic', color: 'bg-white/10 text-white/60 border-white/20' };
+        return { text: 'Automatic' };
     }
   };
 
@@ -182,8 +182,8 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
     return (
       <div className="flex items-center justify-center py-12">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          <p className="text-white/60">Loading email templates...</p>
+          <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+          <p className="text-foreground/60">Loading email templates...</p>
         </div>
       </div>
     );
@@ -197,7 +197,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={fetchTemplates}
-            className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
+            className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors"
           >
             Try Again
           </button>
@@ -216,13 +216,13 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-bold text-white mb-1">Mail Sequences</h2>
-              <p className="text-sm text-white/60">
+              <h2 className="text-xl font-bold text-foreground mb-1">Mail Sequences</h2>
+              <p className="text-sm text-foreground/60">
                 Create and manage your email automation sequences
               </p>
             </div>
             <button
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
+              className="px-4 py-2 voxxy-btn-cta rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
               disabled
               title="Coming soon"
             >
@@ -232,17 +232,17 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
           </div>
 
         {/* Sequences Section */}
-        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-            <h3 className="text-base font-semibold text-white">Sequences</h3>
-            <button className="text-xs text-white/60 hover:text-white transition-colors flex items-center gap-1">
+        <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <h3 className="text-base font-semibold text-foreground">Sequences</h3>
+            <button className="text-xs text-foreground/60 hover:text-foreground transition-colors flex items-center gap-1">
               <HelpCircle className="w-3.5 h-3.5" />
               How it works
             </button>
           </div>
 
           {/* Table Header */}
-          <div className="grid grid-cols-[2fr,1fr,1fr,1fr,140px] gap-4 px-4 py-2 bg-white/5 border-b border-white/10 text-xs font-medium text-white/60">
+          <div className="grid grid-cols-[2fr,1fr,1fr,1fr,140px] gap-4 px-4 py-2 bg-background/5 border-b border-border text-xs font-medium text-foreground/60">
             <div>Name</div>
             <div>Type</div>
             <div>Emails</div>
@@ -256,20 +256,20 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             return (
               <div
                 key={template.id}
-                className="grid grid-cols-[2fr,1fr,1fr,1fr,140px] gap-4 px-4 py-3 border-b border-white/10 last:border-0 hover:bg-white/5 transition-colors items-center"
+                className="grid grid-cols-[2fr,1fr,1fr,1fr,140px] gap-4 px-4 py-3 border-b border-border last:border-0 hover:bg-background/5 transition-colors items-center"
               >
-                <div className="text-white font-medium">{template.name}</div>
+                <div className="text-foreground font-medium">{template.name}</div>
                 <div>
-                  <span className={`px-2 py-1 text-xs rounded border ${badge.color}`}>
+                  <Badge variant={badge.variant} className="rounded px-2 py-1 text-xs">
                     {badge.label}
-                  </span>
+                  </Badge>
                 </div>
-                <div className="text-white/70">{template.email_count || 0}</div>
-                <div className="text-white/40 text-sm">—</div>
+                <div className="text-foreground/70">{template.email_count || 0}</div>
+                <div className="text-foreground/40 text-sm">—</div>
                 <div className="flex items-center justify-end">
                   <button
                     onClick={() => handleViewTemplate(template)}
-                    className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+                    className="px-3 py-1.5 bg-background/10 hover:bg-background/20 text-foreground text-sm rounded-lg transition-colors flex items-center gap-1.5"
                   >
                     <Eye className="w-3.5 h-3.5" />
                     See More
@@ -281,18 +281,18 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
         </div>
 
         {/* System Notifications Section */}
-        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
-          <div className="flex items-center gap-3 px-4 py-3 border-b border-white/10 bg-amber-500/10">
+        <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
+          <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-amber-500/10">
             <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
               <Mail className="w-4 h-4 text-amber-300" />
             </div>
             <div>
-              <h3 className="text-base font-semibold text-white">System Notifications</h3>
-              <p className="text-xs text-white/60">These automatic emails are sent across all events and templates</p>
+              <h3 className="text-base font-semibold text-foreground">System Notifications</h3>
+              <p className="text-xs text-foreground/60">These automatic emails are sent across all events and templates</p>
             </div>
           </div>
 
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-border">
             {[
               {
                 name: 'Application Received',
@@ -327,16 +327,16 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             ].map((notification) => (
               <div
                 key={notification.name}
-                className="px-4 py-3 hover:bg-white/5 transition-colors flex items-center justify-between"
+                className="px-4 py-3 hover:bg-background/5 transition-colors flex items-center justify-between"
               >
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <div className="text-sm font-medium text-white">{notification.name}</div>
-                    <span className="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">
+                    <div className="text-sm font-medium text-foreground">{notification.name}</div>
+                    <span className="px-2 py-0.5 text-[10px] bg-amber-500/20 text-amber-950 dark:text-amber-300 rounded border border-amber-500/30">
                       System
                     </span>
                   </div>
-                  <div className="text-xs text-white/60">{notification.description}</div>
+                  <div className="text-xs text-foreground/60">{notification.description}</div>
                 </div>
                 <button
                   onClick={() => {
@@ -349,7 +349,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                     } as EmailTemplateItem);
                     setPreviewModalOpen(true);
                   }}
-                  className="px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-sm rounded-lg transition-colors flex items-center gap-1.5"
+                  className="px-3 py-1.5 bg-background/10 hover:bg-background/20 text-foreground text-sm rounded-lg transition-colors flex items-center gap-1.5"
                 >
                   <Eye className="w-3.5 h-3.5" />
                   View
@@ -410,24 +410,24 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             <div className="flex items-start gap-4">
               <button
                 onClick={handleBackToLibrary}
-                className="p-2 hover:bg-white/10 text-white rounded-lg transition-colors mt-1"
+                className="p-2 hover:bg-background/10 text-foreground rounded-lg transition-colors mt-1"
                 title="Back to library"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
               <div>
-                <h2 className="text-xl font-bold text-white mb-1">{selectedTemplate.name}</h2>
-                <p className="text-sm text-white/60">
+                <h2 className="text-xl font-bold text-foreground mb-1">{selectedTemplate.name}</h2>
+                <p className="text-sm text-foreground/60">
                   {selectedTemplate.description || 'Email automation sequence'}
                 </p>
-                <p className="text-xs text-white/40 mt-2">
+                <p className="text-xs text-foreground/40 mt-2">
                   {enabledCount}/{totalCount} emails (excludes system notifications)
                 </p>
               </div>
             </div>
           <div className="flex items-center gap-2">
             <button
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed"
+              className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors flex items-center gap-2 opacity-50 cursor-not-allowed"
               disabled
               title="Coming soon"
             >
@@ -435,7 +435,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
               Add Section
             </button>
             <button
-              className="px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
+              className="px-4 py-2 voxxy-btn-cta rounded-lg transition-all flex items-center gap-2 opacity-50 cursor-not-allowed"
               disabled
               title="Coming soon"
             >
@@ -447,17 +447,17 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
 
         {/* Admin-Only Test Section */}
         {isAdmin && (
-          <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-primary/8 to-blue-500/10 border border-border rounded-lg p-6">
             <div className="flex items-start justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
                   <Send className="w-5 h-5 text-purple-400" />
-                  <h3 className="text-lg font-bold text-white">Test This Sequence</h3>
-                  <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded border border-purple-500/30">
+                  <h3 className="text-lg font-bold text-foreground">Test This Sequence</h3>
+                  <Badge variant="tintPurple" className="rounded px-2 py-1 text-xs">
                     Admin Only
-                  </span>
+                  </Badge>
                 </div>
-                <p className="text-sm text-white/60 mb-4">
+                <p className="text-sm text-foreground/60 mb-4">
                   Send all emails from this sequence to your email for testing.
                   {testEmail && (
                     <span className="block mt-1">
@@ -468,7 +468,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                 <button
                   onClick={sendTestSequence}
                   disabled={testingLoading}
-                  className="px-6 py-2.5 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-all flex items-center gap-2 font-medium"
+                  className="px-6 py-2.5 voxxy-btn-cta disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all flex items-center gap-2 font-medium"
                 >
                   {testingLoading ? (
                     <>
@@ -486,12 +486,12 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
 
               {/* Test Results */}
               {testResults.length > 0 && (
-                <div className="flex-1 bg-black/20 rounded-lg p-4 border border-white/10">
+                <div className="flex-1 bg-black/20 rounded-lg p-4 border border-border">
                   <div className="flex items-center gap-2 mb-3">
                     <CheckCircle2 className="w-4 h-4 text-green-400" />
-                    <h4 className="text-sm font-semibold text-white">Test Results</h4>
+                    <h4 className="text-sm font-semibold text-foreground">Test Results</h4>
                   </div>
-                  <div className="text-xs text-white/60 mb-3">
+                  <div className="text-xs text-foreground/60 mb-3">
                     {testResults.filter(r => r.status === 'sent').length} sent • {testResults.filter(r => r.status === 'failed').length} failed
                   </div>
                   <div className="space-y-1.5 max-h-64 overflow-y-auto">
@@ -500,8 +500,8 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                         key={idx}
                         className={`flex items-center gap-2 p-2 rounded text-xs border ${
                           result.status === 'sent'
-                            ? 'bg-green-500/10 border-green-500/20 text-green-300'
-                            : 'bg-red-500/10 border-red-500/20 text-red-300'
+                            ? 'bg-green-500/10 border-green-500/20 text-emerald-900 dark:text-green-300'
+                            : 'bg-red-500/10 border-red-500/20 text-red-950 dark:text-red-300'
                         }`}
                       >
                         {getStatusIcon(result.status)}
@@ -519,9 +519,9 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
         )}
 
         {/* Email Table */}
-        <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+        <div className="bg-background/5 rounded-lg border border-border overflow-hidden">
           {/* Table Header */}
-          <div className="px-4 py-3 bg-white/5 border-b border-white/10 grid grid-cols-10 gap-4 text-xs font-semibold text-white/70 uppercase tracking-wide">
+          <div className="px-4 py-3 bg-background/5 border-b border-border grid grid-cols-10 gap-4 text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
             <div className="col-span-2">Send Date</div>
             <div className="col-span-3">Trigger</div>
             <div className="col-span-4">Email</div>
@@ -529,43 +529,43 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
           </div>
 
           {/* Table Body */}
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-border">
             {emailItems.map((email: EmailTemplateItem) => {
               const triggerBadge = getTriggerBadge(email);
 
               return (
                 <div
                   key={email.id}
-                  className="px-4 py-3 hover:bg-white/5 transition-colors grid grid-cols-10 gap-4 items-center"
+                  className="px-4 py-3 hover:bg-background/5 transition-colors grid grid-cols-10 gap-4 items-center"
                 >
                   {/* Send Date - Not available for templates */}
                   <div className="col-span-2">
-                    <span className="text-xs text-white/40">Event specific</span>
+                    <span className="text-xs text-foreground/40">Event specific</span>
                   </div>
 
                   {/* Trigger */}
-                  <div className="col-span-3 text-sm text-white/80">
+                  <div className="col-span-3 text-sm text-foreground/80">
                     {triggerBadge.text}
                   </div>
 
                   {/* Email Name & Subject */}
                   <div className="col-span-4 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-sm font-medium text-white truncate">{email.name}</h4>
+                      <h4 className="text-sm font-medium text-foreground truncate">{email.name}</h4>
                       {!email.enabled_by_default && (
-                        <span className="text-xs px-2 py-0.5 bg-white/10 text-white/50 rounded flex-shrink-0">
+                        <span className="text-xs px-2 py-0.5 bg-background/10 text-foreground/50 rounded flex-shrink-0">
                           Auto
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-white/60 truncate">{email.subject_template}</p>
+                    <p className="text-xs text-foreground/60 truncate">{email.subject_template}</p>
                   </div>
 
                   {/* Actions */}
                   <div className="col-span-1 flex justify-end">
                     <button
                       onClick={() => handlePreviewEmail(email)}
-                      className="p-1.5 hover:bg-white/10 text-white/60 hover:text-white rounded transition-colors"
+                      className="p-1.5 hover:bg-background/10 text-foreground/60 hover:text-foreground rounded transition-colors"
                       title="Preview email"
                     >
                       <Eye className="w-4 h-4" />

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { X, Plus, ChevronDown, Check } from 'lucide-react';
 import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface EditContactModalProps {
   organizationId: number;
@@ -139,17 +140,17 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+      <div className="bg-card text-card-foreground rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 bg-gradient-to-r from-purple-900/90 to-blue-900/90 backdrop-blur-md border-b border-purple-500/20 px-6 py-3">
+        <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-white">Edit Contact</h2>
-              <p className="text-white/50 text-xs mt-0.5">{contact.contact_name}</p>
+              <h2 className="text-lg font-bold text-foreground">Edit Contact</h2>
+              <p className="text-foreground/50 text-xs mt-0.5">{contact.contact_name}</p>
             </div>
             <button
               onClick={onClose}
-              className="text-white/60 hover:text-white transition-colors"
+              className="text-foreground/60 hover:text-foreground transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -161,7 +162,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Row 1: Full Name, Business Name, Email */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="contact_name" className="block text-white/90 text-sm font-medium mb-1.5">
+              <label htmlFor="contact_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -169,9 +170,9 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="text"
                 value={formData.contact_name}
                 onChange={(e) => handleChange('contact_name', e.target.value)}
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border ${
-                  errors.contact_name ? 'border-red-500' : 'border-white/20'
-                } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
+                  errors.contact_name ? 'border-red-500' : 'border-border'
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
               />
               {errors.contact_name && (
                 <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
@@ -179,7 +180,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="business_name" className="block text-white/90 text-sm font-medium mb-1.5">
+              <label htmlFor="business_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
                 Business Name
               </label>
               <input
@@ -187,12 +188,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="text"
                 value={formData.business_name}
                 onChange={(e) => handleChange('business_name', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-white/90 text-sm font-medium mb-1.5">
+              <label htmlFor="email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
                 Email <span className="text-red-400">*</span>
               </label>
               <input
@@ -200,9 +201,9 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="email"
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border ${
-                  errors.email ? 'border-red-500' : 'border-white/20'
-                } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
+                  errors.email ? 'border-red-500' : 'border-border'
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-400">{errors.email}</p>
@@ -213,7 +214,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Row 2: Phone, Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="phone" className="block text-white/90 text-sm font-medium mb-1.5">
+              <label htmlFor="phone" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
                 Phone
               </label>
               <input
@@ -221,12 +222,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-white/90 text-sm font-medium mb-1.5">
+              <label htmlFor="location" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
                 Location
               </label>
               <input
@@ -235,7 +236,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="City, State, ZIP"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -243,7 +244,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Row 3: Social Media */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="instagram_handle" className="block text-white/90 text-sm font-medium mb-1.5 flex items-center gap-2">
+              <label htmlFor="instagram_handle" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
                 <span className="text-pink-400">@</span> Instagram
               </label>
               <input
@@ -252,12 +253,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.instagram_handle}
                 onChange={(e) => handleChange('instagram_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="tiktok_handle" className="block text-white/90 text-sm font-medium mb-1.5 flex items-center gap-2">
+              <label htmlFor="tiktok_handle" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
                 <span className="text-cyan-400">@</span> TikTok
               </label>
               <input
@@ -266,12 +267,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.tiktok_handle}
                 onChange={(e) => handleChange('tiktok_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="website" className="block text-white/90 text-sm font-medium mb-1.5 flex items-center gap-2">
+              <label htmlFor="website" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
                 <span className="text-blue-400">🔗</span> Portfolio URL
               </label>
               <input
@@ -280,9 +281,9 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.website}
                 onChange={(e) => handleChange('website', e.target.value)}
                 placeholder="https://..."
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border ${
-                  errors.website ? 'border-red-500' : 'border-white/20'
-                } text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
+                  errors.website ? 'border-red-500' : 'border-border'
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
               />
               {errors.website && (
                 <p className="mt-1 text-xs text-red-400">{errors.website}</p>
@@ -292,45 +293,42 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
 
           {/* Categories */}
           <div>
-            <label className="block text-white/90 text-sm font-medium mb-1.5">
+            <label className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
               Categories
             </label>
             <div className="relative" ref={categoryDropdownRef}>
               <button
                 type="button"
                 onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-left flex items-center justify-between hover:bg-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
-                <span className={formData.categories.length > 0 ? 'text-white' : 'text-white/40'}>
+                <span className={formData.categories.length > 0 ? 'text-foreground' : 'text-foreground/40'}>
                   {formData.categories.length > 0
                     ? `${formData.categories.length} selected`
                     : 'Select categories...'}
                 </span>
-                <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-4 h-4 text-foreground/50 transition-transform ${categoryDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {categoryDropdownOpen && (
-                <div className="absolute z-20 left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+                <div className="absolute z-20 left-0 right-0 mt-1 bg-muted border border-border rounded-lg shadow-xl max-h-48 overflow-y-auto">
                   {organizationCategories.length > 0 ? (
                     organizationCategories.map((category) => (
                       <button
                         key={category.id}
                         type="button"
                         onClick={() => handleCategoryToggle(category.name)}
-                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 transition-colors"
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-background/10 transition-colors"
                       >
                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          formData.categories.includes(category.name) ? 'bg-purple-500 border-purple-500' : 'border-white/30'
+                          formData.categories.includes(category.name) ? 'bg-purple-500 border-purple-500' : 'border-border'
                         }`}>
-                          {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                          {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-foreground" strokeWidth={3} />}
                         </div>
                         <span
                           className={`inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
-                            formData.categories.includes(category.name) ? 'text-white font-semibold' : 'text-white/70 bg-white/5 font-medium'
+                            formData.categories.includes(category.name) ? 'text-foreground font-semibold' : 'text-foreground/70 bg-background/5 font-medium'
                           }`}
-                          style={formData.categories.includes(category.name) ? {
-                            backgroundColor: category.color || '#8B5CF6',
-                            textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                          } : undefined}
+                          style={formData.categories.includes(category.name) ? getCategoryBadgeStyle(category.color) : undefined}
                         >
                           {category.icon && <span>{category.icon}</span>}
                           {category.name}
@@ -338,7 +336,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                       </button>
                     ))
                   ) : (
-                    <div className="px-3 py-2 text-xs text-white/40">
+                    <div className="px-3 py-2 text-xs text-foreground/40">
                       No categories available. Please add categories in the Event Wizard.
                     </div>
                   )}
@@ -353,11 +351,8 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                   return (
                     <span
                       key={cat}
-                      className="px-2 py-0.5 rounded text-xs flex items-center gap-1.5 text-white font-semibold"
-                      style={{
-                        backgroundColor: categoryColor,
-                        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)'
-                      }}
+                      className="px-2 py-0.5 rounded text-xs flex items-center gap-1.5 text-foreground font-semibold"
+                      style={getCategoryBadgeStyle(categoryColor)}
                     >
                       {category?.icon && <span className="text-[10px]">{category.icon}</span>}
                       {cat}
@@ -373,7 +368,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
 
           {/* Tags */}
           <div>
-            <label htmlFor="tags" className="block text-white/90 text-sm font-medium mb-2">
+            <label htmlFor="tags" className="block text-foreground text-sm font-medium mb-2 dark:text-foreground/90">
               Tags
             </label>
             <div className="relative">
@@ -390,19 +385,19 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                     }
                   }}
                   placeholder="Add tag..."
-                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
+                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add
                 </button>
               </div>
               {tagInput.length > 0 && availableTags.filter(t => t.toLowerCase().includes(tagInput.toLowerCase()) && !formData.tags.includes(t)).length > 0 && (
-                <div className="absolute left-0 right-16 z-10 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-32 overflow-y-auto">
+                <div className="absolute left-0 right-16 z-10 bg-muted border border-border rounded-lg shadow-xl max-h-32 overflow-y-auto">
                   {availableTags
                     .filter(t => t.toLowerCase().includes(tagInput.toLowerCase()) && !formData.tags.includes(t))
                     .slice(0, 5)
@@ -414,7 +409,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                           setFormData(prev => ({ ...prev, tags: [...prev.tags, tag] }));
                           setTagInput('');
                         }}
-                        className="w-full text-left px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition-colors"
+                        className="w-full text-left px-3 py-2 text-sm text-foreground/80 hover:bg-background/10 transition-colors"
                       >
                         #{tag}
                       </button>
@@ -427,13 +422,13 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs flex items-center gap-1.5 border border-purple-500/30"
+                    className="px-3 py-1 bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded-full text-xs flex items-center gap-1.5 border border-purple-500/30"
                   >
                     #{tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-purple-100"
+                      className="hover:text-violet-800 dark:hover:text-purple-100"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -445,7 +440,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
 
           {/* Notes */}
           <div>
-            <label htmlFor="notes" className="block text-white/90 text-sm font-medium mb-2">
+            <label htmlFor="notes" className="block text-foreground text-sm font-medium mb-2 dark:text-foreground/90">
               Notes
             </label>
             <textarea
@@ -454,31 +449,31 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Add notes..."
               rows={3}
-              className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+              className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
             />
           </div>
 
           {/* Metadata */}
-          <div className="bg-white/5 rounded-lg p-4 space-y-2 text-xs border border-white/10">
-            <div className="flex justify-between text-white/50">
+          <div className="bg-background/5 rounded-lg p-4 space-y-2 text-xs border border-border">
+            <div className="flex justify-between text-foreground/50">
               <span>Source:</span>
-              <span className="text-white/70 capitalize">{contact.source?.replace('_', ' ') || 'Manual'}</span>
+              <span className="text-foreground/70 capitalize">{contact.source?.replace('_', ' ') || 'Manual'}</span>
             </div>
-            <div className="flex justify-between text-white/50">
+            <div className="flex justify-between text-foreground/50">
               <span>Interactions:</span>
-              <span className="text-white/70">{contact.interaction_count || 0}</span>
+              <span className="text-foreground/70">{contact.interaction_count || 0}</span>
             </div>
             {contact.last_contacted_at && (
-              <div className="flex justify-between text-white/50">
+              <div className="flex justify-between text-foreground/50">
                 <span>Last Contacted:</span>
-                <span className="text-white/70">
+                <span className="text-foreground/70">
                   {new Date(contact.last_contacted_at).toLocaleDateString()}
                 </span>
               </div>
             )}
-            <div className="flex justify-between text-white/50">
+            <div className="flex justify-between text-foreground/50">
               <span>Added:</span>
-              <span className="text-white/70">
+              <span className="text-foreground/70">
                 {new Date(contact.created_at).toLocaleDateString()}
               </span>
             </div>
@@ -497,18 +492,18 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-white/30 text-white/90 hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                   Saving...
                 </span>
               ) : (

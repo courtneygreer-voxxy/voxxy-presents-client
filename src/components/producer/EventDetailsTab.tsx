@@ -250,21 +250,21 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
         {/* Total Applicants Card */}
         <div
           onClick={() => onNavigateToTab?.('applicants')}
-          className="bg-[#1e1536] rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all group cursor-pointer"
+          className="voxxy-gradient-panel rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all group cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
             <div className="p-3 rounded-lg bg-purple-500/20">
               <Users className="w-6 h-6 text-purple-400" />
             </div>
-            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+            <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
           </div>
           <div className="mb-2">
-            <p className="text-white/60 text-sm mb-1">Total Applicants</p>
-            <p className="text-3xl font-bold text-white">
+            <p className="text-foreground/60 text-sm mb-1">Total Applicants</p>
+            <p className="text-3xl font-bold text-foreground">
               {loadingStats ? '...' : stats.total}
             </p>
           </div>
-          <div className="flex items-center gap-3 text-xs text-white/50">
+          <div className="flex items-center gap-3 text-xs text-foreground/50">
             <span>{stats.new} new</span>
             <span>•</span>
             <span>{stats.approved} approved</span>
@@ -276,39 +276,39 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
         {/* Confirmed Vendors Card */}
         <div
           onClick={() => onNavigateToTab?.('vendors')}
-          className="bg-[#1e1536] rounded-xl p-5 border border-green-500/20 hover:border-green-500/40 transition-all group cursor-pointer"
+          className="voxxy-gradient-panel rounded-xl p-5 border border-green-500/20 hover:border-green-500/40 transition-all group cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
             <div className="p-3 rounded-lg bg-green-500/20">
               <Check className="w-6 h-6 text-green-400" />
             </div>
-            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+            <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
           </div>
           <div className="mb-2">
-            <p className="text-white/60 text-sm mb-1">Confirmed Vendors</p>
-            <p className="text-3xl font-bold text-white">
+            <p className="text-foreground/60 text-sm mb-1">Confirmed Vendors</p>
+            <p className="text-3xl font-bold text-foreground">
               {loadingStats ? '...' : stats.approved}
             </p>
           </div>
-          <p className="text-xs text-white/50">Approved & paid vendors ready for event</p>
+          <p className="text-xs text-foreground/50">Approved & paid vendors ready for event</p>
         </div>
 
         {/* Event Settings Card */}
         <div
           onClick={handleEdit}
-          className="bg-[#1e1536] rounded-xl p-5 border border-orange-500/20 hover:border-orange-500/40 transition-all group cursor-pointer"
+          className="voxxy-gradient-panel rounded-xl p-5 border border-orange-500/20 hover:border-orange-500/40 transition-all group cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
             <div className="p-3 rounded-lg bg-orange-500/20">
               <Settings className="w-6 h-6 text-orange-400" />
             </div>
-            <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+            <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
           </div>
           <div className="mb-2">
-            <p className="text-white/60 text-sm mb-1">Event Settings</p>
-            <p className="text-lg font-semibold text-white">Edit Event Details</p>
+            <p className="text-foreground/60 text-sm mb-1">Event Settings</p>
+            <p className="text-lg font-semibold text-foreground">Edit Event Details</p>
           </div>
-          <p className="text-xs text-white/50">Update venue, dates, categories, and more</p>
+          <p className="text-xs text-foreground/50">Update venue, dates, categories, and more</p>
         </div>
       </div>
 
@@ -317,7 +317,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
         {/* Copy Link Button */}
         <button
           onClick={handleCopyUrl}
-          className="flex items-center justify-between p-4 bg-[#1e1536] rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all group"
+          className="flex items-center justify-between p-4 voxxy-gradient-panel rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all group"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
@@ -328,13 +328,13 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
               )}
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-white">
+              <p className="text-sm font-semibold text-foreground">
                 {copied ? 'Link Copied!' : 'Copy Link'}
               </p>
-              <p className="text-xs text-white/60">Share event URL</p>
+              <p className="text-xs text-foreground/60">Share event URL</p>
             </div>
           </div>
-          <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
         </button>
 
         {/* View Link Button */}
@@ -342,18 +342,18 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
           href={publicEventUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center justify-between p-4 bg-[#1e1536] rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-all group"
+          className="flex items-center justify-between p-4 voxxy-gradient-panel rounded-xl border border-blue-500/20 hover:border-blue-500/40 transition-all group"
         >
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-blue-500/20 group-hover:bg-blue-500/30 transition-colors">
               <ExternalLink className="w-5 h-5 text-blue-400" />
             </div>
             <div className="text-left">
-              <p className="text-sm font-semibold text-white">View Link</p>
-              <p className="text-xs text-white/60">Open application page</p>
+              <p className="text-sm font-semibold text-foreground">View Link</p>
+              <p className="text-xs text-foreground/60">Open application page</p>
             </div>
           </div>
-          <ArrowRight className="w-5 h-5 text-white/40 group-hover:text-white/60 transition-colors" />
+          <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
         </a>
       </div>
 
@@ -367,16 +367,16 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
       {/* Edit Form (Hidden by default) */}
       {isEditing && (
         <div className="space-y-6 animate-in fade-in slide-in-from-top-4 duration-300">
-          <div className="flex items-center justify-between pb-4 border-b border-white/10">
+          <div className="flex items-center justify-between pb-4 border-b border-border">
             <div>
-              <h3 className="text-xl font-bold text-white">Edit Event Details</h3>
-              <p className="text-white/60 text-sm mt-1">Update your event information</p>
+              <h3 className="text-xl font-bold text-foreground">Edit Event Details</h3>
+              <p className="text-foreground/60 text-sm mt-1">Update your event information</p>
             </div>
             <div className="flex gap-2">
               <button
                 onClick={handleCancel}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-white/30 text-white hover:bg-white/5 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50"
               >
                 <X className="w-4 h-4" />
                 Cancel
@@ -384,7 +384,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:shadow-lg transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg voxxy-btn-cta hover:shadow-lg transition-all disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
                 {isSaving ? 'Saving...' : 'Save Changes'}
@@ -399,49 +399,49 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
             </div>
           )}
 
-          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-6">
+          <div className="voxxy-gradient-panel rounded-xl p-6 border border-purple-500/20 space-y-6">
             {/* Event Name */}
             <div>
-              <label className="block text-white/90 font-medium mb-2">Event Name *</label>
+              <label className="block text-foreground/90 font-medium mb-2">Event Name *</label>
               <input
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             {/* Event Description */}
             <div>
-              <label className="block text-white/90 font-medium mb-2">Description</label>
+              <label className="block text-foreground/90 font-medium mb-2">Description</label>
               <textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
               />
             </div>
 
             {/* Venue & Location */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-white/90 font-medium mb-2">Venue</label>
+                <label className="block text-foreground/90 font-medium mb-2">Venue</label>
                 <input
                   type="text"
                   value={formData.venue}
                   onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
                   placeholder="e.g., Brooklyn Steel"
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">Location (City) *</label>
+                <label className="block text-foreground/90 font-medium mb-2">Location (City) *</label>
                 <input
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="e.g., Brooklyn, NY"
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -449,23 +449,23 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
             {/* Event Dates */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-white/90 font-medium mb-2">Event Date *</label>
-                <p className="text-white/50 text-xs mb-2">Start date for multi-day events</p>
+                <label className="block text-foreground/90 font-medium mb-2">Event Date *</label>
+                <p className="text-foreground/50 text-xs mb-2">Start date for multi-day events</p>
                 <input
                   type="date"
                   value={formData.event_date}
                   onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">Event End Date</label>
-                <p className="text-white/50 text-xs mb-2">Optional for multi-day events</p>
+                <label className="block text-foreground/90 font-medium mb-2">Event End Date</label>
+                <p className="text-foreground/50 text-xs mb-2">Optional for multi-day events</p>
                 <input
                   type="date"
                   value={formData.event_end_date}
                   onChange={(e) => setFormData({ ...formData, event_end_date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -473,69 +473,69 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
             {/* Event Times */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-white/90 font-medium mb-2">Start Time</label>
+                <label className="block text-foreground/90 font-medium mb-2">Start Time</label>
                 <input
                   type="time"
                   value={formData.start_time}
                   onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">End Time</label>
+                <label className="block text-foreground/90 font-medium mb-2">End Time</label>
                 <input
                   type="time"
                   value={formData.end_time}
                   onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
 
             {/* Age Restriction */}
             <div>
-              <label className="block text-white/90 font-medium mb-2">Age Restriction</label>
+              <label className="block text-foreground/90 font-medium mb-2">Age Restriction</label>
               <input
                 type="text"
                 value={formData.age_restriction}
                 onChange={(e) => setFormData({ ...formData, age_restriction: e.target.value })}
                 placeholder="e.g., All Ages, 18+, 21+"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             {/* Ticket Link */}
             <div>
-              <label className="block text-white/90 font-medium mb-2">Ticket Link</label>
+              <label className="block text-foreground/90 font-medium mb-2">Ticket Link</label>
               <input
                 type="url"
                 value={formData.ticket_link}
                 onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
                 placeholder="https://example.com/tickets"
-                className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
               />
             </div>
 
             {/* Application Deadline & Payment Deadline */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
-                <p className="text-white/50 text-xs mb-2">Deadline for vendors to submit applications</p>
+                <label className="block text-foreground/90 font-medium mb-2">Application Deadline *</label>
+                <p className="text-foreground/50 text-xs mb-2">Deadline for vendors to submit applications</p>
                 <input
                   type="date"
                   value={formData.application_deadline}
                   onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
               <div>
-                <label className="block text-white/90 font-medium mb-2">Payment Deadline</label>
-                <p className="text-white/50 text-xs mb-2">Deadline for approved vendors to pay</p>
+                <label className="block text-foreground/90 font-medium mb-2">Payment Deadline</label>
+                <p className="text-foreground/50 text-xs mb-2">Deadline for approved vendors to pay</p>
                 <input
                   type="date"
                   value={formData.payment_deadline}
                   onChange={(e) => setFormData({ ...formData, payment_deadline: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
             </div>
@@ -547,58 +547,58 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
       {!isEditing && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Basic Info Card */}
-          <div className="bg-[#1e1536] rounded-xl p-6 border border-purple-500/20 space-y-4">
-            <h3 className="text-lg font-semibold text-white mb-4">Basic Information</h3>
+          <div className="voxxy-gradient-panel rounded-xl p-6 border border-purple-500/20 space-y-4">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Basic Information</h3>
 
             <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+              <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                 <Tag className="w-4 h-4" />
                 Event Name
               </div>
-              <p className="text-white font-medium">{event.title}</p>
+              <p className="text-foreground font-medium">{event.title}</p>
             </div>
 
             {event.description && (
               <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                   <AlertCircle className="w-4 h-4" />
                   Description
                 </div>
-                <p className="text-white/80">{event.description}</p>
+                <p className="text-foreground/80">{event.description}</p>
               </div>
             )}
 
             {event.venue && (
               <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                   <Building2 className="w-4 h-4" />
                   Venue
                 </div>
-                <p className="text-white">{event.venue}</p>
+                <p className="text-foreground">{event.venue}</p>
               </div>
             )}
 
             <div>
-              <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+              <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                 <MapPin className="w-4 h-4" />
                 Location
               </div>
-              <p className="text-white">{event.location || 'Not set'}</p>
+              <p className="text-foreground">{event.location || 'Not set'}</p>
             </div>
 
             {event.age_restriction && (
               <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                   <Users className="w-4 h-4" />
                   Age Restriction
                 </div>
-                <p className="text-white">{event.age_restriction}</p>
+                <p className="text-foreground">{event.age_restriction}</p>
               </div>
             )}
 
             {event.ticket_link && (
               <div>
-                <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+                <div className="flex items-center gap-2 text-foreground/60 text-sm mb-1">
                   <LinkIcon className="w-4 h-4" />
                   Ticket Link
                 </div>

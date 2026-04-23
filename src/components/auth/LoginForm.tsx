@@ -115,7 +115,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50">
+    <Card className="voxxy-auth-card mx-auto w-full max-w-md text-foreground">
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
         <CardDescription className="text-center">
@@ -147,7 +147,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
                 id="email"
                 type="email"
                 placeholder="Enter your email"
-                className="pl-10"
+                className="voxxy-input-frost pl-10"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
                 onBlur={() => {
@@ -170,7 +170,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
               <Label htmlFor="password">Password</Label>
               <button
                 type="button"
-                className="text-sm text-primary underline hover:no-underline"
+                className="voxxy-auth-link text-sm underline hover:no-underline"
                 onClick={onForgotPassword}
                 disabled={isSubmitting || loading}
               >
@@ -183,7 +183,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
                 id="password"
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Enter your password"
-                className="pl-10 pr-10"
+                className="voxxy-input-frost pl-10 pr-10"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
                 onBlur={() => {
@@ -213,7 +213,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
             <input
               id="rememberMe"
               type="checkbox"
-              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
               checked={formData.rememberMe}
               onChange={(e) => handleInputChange('rememberMe', e.target.checked)}
               disabled={isSubmitting || loading}
@@ -226,7 +226,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+            className="w-full voxxy-btn-solid"
             disabled={isSubmitting || loading}
             size="lg"
           >
@@ -248,7 +248,7 @@ export function LoginForm({ onSuccess, onSwitchToSignUp, onForgotPassword }: Log
             Don't have an account?{' '}
             <button
               type="button"
-              className="text-primary underline hover:no-underline font-medium"
+              className="voxxy-auth-link font-medium underline hover:no-underline"
               onClick={onSwitchToSignUp}
               disabled={isSubmitting || loading}
             >

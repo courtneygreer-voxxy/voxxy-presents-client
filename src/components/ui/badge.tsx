@@ -14,7 +14,70 @@ const badgeVariants = cva(
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
           "border-transparent bg-destructive text-destructive-foreground hover:bg-destructive/80",
-        outline: "text-foreground",
+        outline: "border-border text-foreground",
+
+        /* Tinted status / filter pills — single source for light + dark contrast */
+        tintPurple:
+          "border-purple-500/30 bg-purple-500/20 text-violet-950 dark:text-purple-400",
+        tintPurpleSoft:
+          "border-purple-500/30 bg-purple-500/10 text-violet-950 dark:text-purple-400",
+        tintPurpleFaint:
+          "border-purple-400/20 bg-purple-500/15 text-violet-950 dark:text-purple-300",
+
+        tintFuchsiaFaint:
+          "border-fuchsia-400/20 bg-fuchsia-500/15 text-fuchsia-950 dark:text-fuchsia-300",
+
+        tintBlue:
+          "border-blue-500/30 bg-blue-500/20 text-blue-950 dark:text-blue-400",
+        tintBlueSoft:
+          "border-blue-500/30 bg-blue-500/10 text-blue-950 dark:text-blue-400",
+
+        tintGreen:
+          "border-green-500/30 bg-green-500/20 text-emerald-900 dark:text-green-400",
+        tintGreenSoft:
+          "border-green-500/30 bg-green-500/10 text-emerald-900 dark:text-green-400",
+        tintGreenDeep:
+          "border-green-500/30 bg-green-600/20 text-emerald-900 dark:text-green-300",
+
+        tintYellow:
+          "border-yellow-500/30 bg-yellow-500/20 text-yellow-950 dark:text-yellow-400",
+        tintYellowSoft:
+          "border-yellow-500/30 bg-yellow-500/10 text-yellow-950 dark:text-yellow-400",
+
+        tintRed:
+          "border-red-500/30 bg-red-500/20 text-red-950 dark:text-red-400",
+        tintRedSoft:
+          "border-red-500/30 bg-red-500/10 text-red-950 dark:text-red-400",
+
+        tintOrange:
+          "border-orange-500/30 bg-orange-500/20 text-orange-950 dark:text-orange-400",
+        tintOrangeSoft:
+          "border-orange-500/30 bg-orange-500/10 text-orange-950 dark:text-orange-400",
+
+        tintSlate:
+          "border-slate-500/30 bg-slate-500/20 text-slate-800 dark:text-slate-400",
+
+        tintPink:
+          "border-pink-500/30 bg-pink-500/20 text-rose-950 dark:text-pink-300",
+
+        tintCyan:
+          "border-cyan-500/30 bg-cyan-500/20 text-cyan-950 dark:text-cyan-400",
+
+        tintAmber:
+          "border-amber-500/30 bg-amber-500/20 text-amber-950 dark:text-amber-300",
+
+        tintIndigo:
+          "border-indigo-500/30 bg-indigo-500/20 text-indigo-950 dark:text-indigo-300",
+
+        tintMuted:
+          "border-border/50 bg-muted/20 text-muted-foreground",
+        tintMutedSoft:
+          "border-border/30 bg-muted/10 text-muted-foreground",
+
+        tintNeutral:
+          "border-border bg-background/10 text-foreground/70",
+        tintNeutralFaint:
+          "border-border bg-background/10 text-foreground/60",
       },
     },
     defaultVariants: {
@@ -23,14 +86,17 @@ const badgeVariants = cva(
   }
 )
 
+export type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>
+
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends React.ComponentPropsWithoutRef<"span">,
     VariantProps<typeof badgeVariants> {}
 
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
+  ({ className, variant, ...props }, ref) => (
+    <span ref={ref} className={cn(badgeVariants({ variant }), className)} {...props} />
   )
-}
+)
+Badge.displayName = "Badge"
 
 export { Badge, badgeVariants }

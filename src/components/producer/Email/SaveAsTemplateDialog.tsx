@@ -88,7 +88,7 @@ export default function SaveAsTemplateDialog({
         <div className="space-y-4 py-4">
           {/* Template Name */}
           <div>
-            <label htmlFor="template-name" className="block text-sm font-medium text-white mb-2">
+            <label htmlFor="template-name" className="block text-sm font-medium text-foreground mb-2">
               Template Name *
             </label>
             <input
@@ -97,7 +97,7 @@ export default function SaveAsTemplateDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Summer Festival Campaign"
-              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
               disabled={isSaving}
               maxLength={100}
             />
@@ -105,8 +105,8 @@ export default function SaveAsTemplateDialog({
 
           {/* Description (Optional) */}
           <div>
-            <label htmlFor="template-description" className="block text-sm font-medium text-white mb-2">
-              Description <span className="text-white/40 font-normal">(Optional)</span>
+            <label htmlFor="template-description" className="block text-sm font-medium text-foreground mb-2">
+              Description <span className="text-foreground/40 font-normal">(Optional)</span>
             </label>
             <textarea
               id="template-description"
@@ -114,11 +114,11 @@ export default function SaveAsTemplateDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe when to use this template..."
               rows={3}
-              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
+              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
               disabled={isSaving}
               maxLength={500}
             />
-            <p className="mt-1 text-xs text-white/40">
+            <p className="mt-1 text-xs text-foreground/40">
               {description.length}/500 characters
             </p>
           </div>
@@ -142,14 +142,14 @@ export default function SaveAsTemplateDialog({
           <button
             onClick={handleClose}
             disabled={isSaving}
-            className="px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={isSaving || !name.trim()}
-            className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 text-white font-medium hover:from-purple-500 hover:to-blue-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-4 py-2 rounded-lg voxxy-btn-cta font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             {isSaving ? (
               <>

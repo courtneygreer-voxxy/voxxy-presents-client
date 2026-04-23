@@ -71,7 +71,7 @@ export function EmailAuditFilters({
     onFiltersChange({});
   };
 
-  const inputClasses = "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-white/10";
+  const inputClasses = "w-full px-3 py-2 bg-background/5 border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-background/10";
 
   // Format the date range display text
   const dateRangeLabel = () => {
@@ -88,10 +88,10 @@ export function EmailAuditFilters({
   };
 
   return (
-    <div className="p-4 border border-white/10 rounded-lg bg-gradient-to-br from-white/5 to-white/[0.02] space-y-3">
+    <div className="p-4 border border-border rounded-lg bg-gradient-to-br from-white/5 to-white/[0.02] space-y-3">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/65 dark:text-foreground/40" />
         <input
           type="text"
           placeholder="Search by recipient name or email..."
@@ -99,7 +99,7 @@ export function EmailAuditFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, search: e.target.value || undefined })
           }
-          className="w-full pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+          className="w-full pl-9 pr-4 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
         />
       </div>
 
@@ -107,7 +107,7 @@ export function EmailAuditFilters({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Email Name */}
         <div>
-          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-foreground dark:text-foreground/70 mb-1 uppercase tracking-wide">
             Email Name
           </label>
           <select
@@ -131,7 +131,7 @@ export function EmailAuditFilters({
 
         {/* Category */}
         <div>
-          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-foreground dark:text-foreground/70 mb-1 uppercase tracking-wide">
             Category
           </label>
           <select
@@ -155,7 +155,7 @@ export function EmailAuditFilters({
 
         {/* Status */}
         <div>
-          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-foreground dark:text-foreground/70 mb-1 uppercase tracking-wide">
             Status
           </label>
           <select
@@ -181,19 +181,19 @@ export function EmailAuditFilters({
 
         {/* Date Range - Single calendar picker */}
         <div>
-          <label className="block text-[10px] font-semibold text-white/70 mb-1 uppercase tracking-wide">
+          <label className="block text-[10px] font-semibold text-foreground dark:text-foreground/70 mb-1 uppercase tracking-wide">
             Date Range
           </label>
           <Popover open={calendarOpen} onOpenChange={setCalendarOpen}>
             <PopoverTrigger asChild>
               <button className={`${inputClasses} flex items-center gap-2 text-left`}>
-                <CalendarIcon className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                <span className={filters.date_from || filters.date_to ? 'text-white' : 'text-white/40'}>
+                <CalendarIcon className="w-3.5 h-3.5 text-foreground/65 dark:text-foreground/40 shrink-0" />
+                <span className={filters.date_from || filters.date_to ? 'text-foreground' : 'text-foreground/75 dark:text-foreground/40'}>
                   {dateRangeLabel()}
                 </span>
               </button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0 bg-background border-white/10" align="start">
+            <PopoverContent className="w-auto p-0 bg-background border-border" align="start">
               <Calendar
                 mode="range"
                 selected={dateRange}
@@ -202,13 +202,13 @@ export function EmailAuditFilters({
                 defaultMonth={dateRange?.from || new Date()}
               />
               {(filters.date_from || filters.date_to) && (
-                <div className="border-t border-white/10 p-2 flex justify-end">
+                <div className="border-t border-border p-2 flex justify-end">
                   <button
                     onClick={() => {
                       handleDateRangeChange(undefined);
                       setCalendarOpen(false);
                     }}
-                    className="text-xs text-white/60 hover:text-white px-2 py-1 rounded hover:bg-white/10 transition-colors"
+                    className="text-xs text-foreground dark:text-foreground/60 hover:text-foreground px-2 py-1 rounded hover:bg-background/10 transition-colors"
                   >
                     Clear dates
                   </button>
@@ -221,14 +221,14 @@ export function EmailAuditFilters({
 
       {/* Clear Filters */}
       {hasActiveFilters && (
-        <div className="flex items-center justify-between pt-3 border-t border-white/10">
-          <p className="text-sm text-white/60 font-medium">
+        <div className="flex items-center justify-between pt-3 border-t border-border">
+          <p className="text-sm text-foreground/85 dark:text-foreground/60 font-medium">
             {Object.keys(filters).filter((k) => filters[k as keyof AuditFilters]).length}{' '}
             active {Object.keys(filters).filter((k) => filters[k as keyof AuditFilters]).length === 1 ? 'filter' : 'filters'}
           </p>
           <button
             onClick={clearFilters}
-            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all hover:border-white/20"
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-foreground/90 dark:text-foreground/80 hover:text-foreground bg-background/5 hover:bg-background/10 border border-border rounded-lg transition-all hover:border-border"
           >
             <X className="w-3.5 h-3.5" />
             Clear All Filters

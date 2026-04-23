@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X, ChevronLeft, ChevronRight, Users, Tag, Mail, Calendar, BookOpen } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 // --- Page content ---
 
@@ -28,16 +29,16 @@ const GUIDE_PAGES: GuidePage[] = [
             { icon: Mail, label: 'Emails', desc: 'Automated communications' },
             { icon: Calendar, label: 'Events', desc: 'Create & manage markets' },
           ].map(({ icon: Icon, label, desc }) => (
-            <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-white/5 border border-white/10">
+            <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-background/5 border border-border">
               <Icon className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-xs font-semibold text-white">{label}</p>
-                <p className="text-[11px] text-white/50">{desc}</p>
+                <p className="text-xs font-semibold text-foreground">{label}</p>
+                <p className="text-[11px] text-foreground/50">{desc}</p>
               </div>
             </div>
           ))}
         </div>
-        <p className="text-white/50 text-[11px] italic">
+        <p className="text-foreground/50 text-[11px] italic">
           Use the arrows below to navigate, or click a section on the left.
         </p>
       </div>
@@ -54,21 +55,21 @@ const GUIDE_PAGES: GuidePage[] = [
           The <strong>Network</strong> tab is your vendor database. Start by
           importing your existing contacts.
         </p>
-        <ol className="space-y-2 text-white/80">
+        <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">1</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
             <span>Go to the <strong>Network</strong> tab in the sidebar.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">2</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
             <span>Click <strong>Import CSV</strong> to upload a spreadsheet of vendors.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">3</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
             <span>Map your columns (name, email, phone, category) and confirm.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">4</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">4</Badge>
             <span>You can also click <strong>Add Contact</strong> to add vendors one at a time.</span>
           </li>
         </ol>
@@ -101,7 +102,7 @@ const GUIDE_PAGES: GuidePage[] = [
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
-              <span className="text-white/80">{item}</span>
+              <span className="text-foreground/80">{item}</span>
             </li>
           ))}
         </ul>
@@ -125,23 +126,23 @@ const GUIDE_PAGES: GuidePage[] = [
           types:
         </p>
         <div className="space-y-2">
-          <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-2.5 rounded-lg bg-background/5 border border-border">
             <p className="text-xs font-semibold text-purple-300 mb-1">Smart Lists</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Auto-update based on rules you set (e.g. "all contacts tagged
               'returning vendor'"). Members update automatically as contacts
               change.
             </p>
           </div>
-          <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-2.5 rounded-lg bg-background/5 border border-border">
             <p className="text-xs font-semibold text-blue-300 mb-1">Manual Lists</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Hand-pick specific contacts. Great for VIP vendors, priority
               invites, or custom groups that don't follow a pattern.
             </p>
           </div>
         </div>
-        <p className="text-white/80">
+        <p className="text-foreground/80">
           To create a list, go to <strong>Network → Lists</strong> tab and click
           <strong> New List</strong>.
         </p>
@@ -161,32 +162,32 @@ const GUIDE_PAGES: GuidePage[] = [
         </p>
         <p>They are used in three key places:</p>
         <div className="space-y-2">
-          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
             <Calendar className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-white">Event Creation</p>
-              <p className="text-[11px] text-white/60">
+              <p className="text-xs font-semibold text-foreground">Event Creation</p>
+              <p className="text-[11px] text-foreground/60">
                 When setting up an event, you choose which categories are
                 accepting applications. Each category gets its own booth price
                 and application link.
               </p>
             </div>
           </div>
-          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
             <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-white">Contact Assignments</p>
-              <p className="text-[11px] text-white/60">
+              <p className="text-xs font-semibold text-foreground">Contact Assignments</p>
+              <p className="text-[11px] text-foreground/60">
                 Assign a category to any contact in your network. This helps
                 you filter and find vendors by type.
               </p>
             </div>
           </div>
-          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
             <Mail className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-xs font-semibold text-white">Targeted Emails</p>
-              <p className="text-[11px] text-white/60">
+              <p className="text-xs font-semibold text-foreground">Targeted Emails</p>
+              <p className="text-[11px] text-foreground/60">
                 Send category-specific emails — for example, "Food Vendor
                 Setup Instructions" that only food vendors receive.
               </p>
@@ -203,17 +204,17 @@ const GUIDE_PAGES: GuidePage[] = [
     title: 'Creating & Managing Categories',
     content: (
       <div className="space-y-3">
-        <ol className="space-y-2 text-white/80">
+        <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">1</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
             <span>Go to <strong>Network → Categories</strong> tab.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">2</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
             <span>Click <strong>Add Category</strong> and enter a name (e.g. "Food Vendor").</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">3</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
             <span>Optionally pick a color and icon to make it easy to spot.</span>
           </li>
         </ol>
@@ -243,7 +244,7 @@ const GUIDE_PAGES: GuidePage[] = [
           of automated emails that send at the right time throughout your
           event lifecycle.
         </p>
-        <p className="text-white/70">
+        <p className="text-foreground/70">
           Emails are organized into five groups:
         </p>
         <div className="space-y-1.5">
@@ -254,9 +255,9 @@ const GUIDE_PAGES: GuidePage[] = [
             { label: 'Event Countdown', desc: 'Setup instructions and final reminders', color: 'text-green-300' },
             { label: 'Post-Event', desc: 'Thank you notes and follow-ups', color: 'text-yellow-300' },
           ].map(({ label, desc, color }) => (
-            <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-white/5">
+            <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background/5">
               <span className={`text-xs font-semibold ${color}`}>{label}</span>
-              <span className="text-[11px] text-white/40">— {desc}</span>
+              <span className="text-[11px] text-foreground/40">— {desc}</span>
             </div>
           ))}
         </div>
@@ -272,23 +273,23 @@ const GUIDE_PAGES: GuidePage[] = [
       <div className="space-y-3">
         <p>Every email has a <strong>trigger</strong> that determines when it sends:</p>
         <div className="space-y-2">
-          <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-2.5 rounded-lg bg-background/5 border border-border">
             <p className="text-xs font-semibold text-green-300 mb-1">Event-Based (Instant)</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Send immediately when something happens — a vendor applies, gets
               approved, makes a payment, or you post a bulletin.
             </p>
           </div>
-          <div className="p-2.5 rounded-lg bg-white/5 border border-white/10">
+          <div className="p-2.5 rounded-lg bg-background/5 border border-border">
             <p className="text-xs font-semibold text-blue-300 mb-1">Time-Based (Scheduled)</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Send on a specific date — like 7 days before the event, on the
               payment deadline, or 3 days after the event. All scheduled
               emails send at 8:00 AM Eastern.
             </p>
           </div>
         </div>
-        <p className="text-white/80">
+        <p className="text-foreground/80">
           You can <strong>pause</strong> any email to temporarily stop it,
           <strong> resume</strong> it later, or <strong>send it now</strong>{' '}
           manually (once your event is live).
@@ -307,7 +308,7 @@ const GUIDE_PAGES: GuidePage[] = [
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
             <p className="text-xs font-semibold text-purple-300 mb-1">Universal Emails</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Sent to <em>every</em> vendor regardless of category. Use these
               for event-wide announcements, general reminders, and post-event
               follow-ups.
@@ -315,7 +316,7 @@ const GUIDE_PAGES: GuidePage[] = [
           </div>
           <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <p className="text-xs font-semibold text-blue-300 mb-1">Category-Specific Emails</p>
-            <p className="text-[11px] text-white/60">
+            <p className="text-[11px] text-foreground/60">
               Sent only to vendors in a particular category. Perfect for
               tailored setup instructions, category-specific pricing, or
               booth assignment details.
@@ -343,7 +344,7 @@ const GUIDE_PAGES: GuidePage[] = [
           Make emails personal by inserting <strong>tags</strong> that auto-fill
           with each vendor's info when sent.
         </p>
-        <p className="text-white/70">
+        <p className="text-foreground/70">
           In the email editor, click any tag in the sidebar to insert it.
           Tags use bracket format:
         </p>
@@ -358,13 +359,13 @@ const GUIDE_PAGES: GuidePage[] = [
             { tag: '[boothPrice]', desc: 'Booth cost' },
             { tag: '[installDate]', desc: 'Setup date' },
           ].map(({ tag, desc }) => (
-            <div key={tag} className="flex items-center gap-2 px-2 py-1.5 rounded bg-white/5">
+            <div key={tag} className="flex items-center gap-2 px-2 py-1.5 rounded bg-background/5">
               <code className="text-[10px] text-purple-300 font-mono">{tag}</code>
-              <span className="text-[10px] text-white/40">{desc}</span>
+              <span className="text-[10px] text-foreground/40">{desc}</span>
             </div>
           ))}
         </div>
-        <p className="text-[11px] text-white/50">
+        <p className="text-[11px] text-foreground/50">
           The editor shows a live preview so you can see exactly how the email
           will look before sending.
         </p>
@@ -382,21 +383,21 @@ const GUIDE_PAGES: GuidePage[] = [
           Events are the core of Voxxy Presents. Each event represents a
           vendor market or fair you're organizing.
         </p>
-        <ol className="space-y-2 text-white/80">
+        <ol className="space-y-2 text-foreground/80">
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">1</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">1</Badge>
             <span>Click <strong>Create New Event</strong> from the Events page.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">2</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">2</Badge>
             <span>Fill in event details: name, date, venue, location, and description.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">3</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">3</Badge>
             <span>Set up application categories — choose which vendor types you'll accept and set booth prices.</span>
           </li>
           <li className="flex gap-2">
-            <span className="flex-shrink-0 w-5 h-5 rounded-full bg-purple-500/20 text-purple-300 text-[11px] flex items-center justify-center font-bold">4</span>
+            <Badge variant="tintPurple" className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full p-0 text-[11px] font-bold">4</Badge>
             <span>Your event starts as a <strong>Draft</strong>. Go live when you're ready to start accepting applications.</span>
           </li>
         </ol>
@@ -433,9 +434,9 @@ const GUIDE_PAGES: GuidePage[] = [
               desc: 'Edit event details, manage application categories, access shareable links, and export data.',
             },
           ].map(({ tab, desc }) => (
-            <div key={tab} className="p-2.5 rounded-lg bg-white/5 border border-white/10">
-              <p className="text-xs font-semibold text-white mb-0.5">{tab}</p>
-              <p className="text-[11px] text-white/60">{desc}</p>
+            <div key={tab} className="p-2.5 rounded-lg bg-background/5 border border-border">
+              <p className="text-xs font-semibold text-foreground mb-0.5">{tab}</p>
+              <p className="text-[11px] text-foreground/60">{desc}</p>
             </div>
           ))}
         </div>
@@ -454,7 +455,7 @@ const GUIDE_PAGES: GuidePage[] = [
           Open the <strong>Sequence Editor</strong> from the Mail tab to see all
           emails organized by category.
         </p>
-        <p className="text-white/70">From the sequence editor you can:</p>
+        <p className="text-foreground/70">From the sequence editor you can:</p>
         <ul className="space-y-1.5">
           {[
             'Preview and edit any email in the sequence',
@@ -465,7 +466,7 @@ const GUIDE_PAGES: GuidePage[] = [
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
-              <span className="text-white/80">{item}</span>
+              <span className="text-foreground/80">{item}</span>
             </li>
           ))}
         </ul>
@@ -489,12 +490,12 @@ const GUIDE_PAGES: GuidePage[] = [
         <p>
           Need to send a quick update to all your vendors? Use <strong>Bulletins</strong>.
         </p>
-        <p className="text-white/70">
+        <p className="text-foreground/70">
           Bulletins are one-off announcements you post from the Command Center.
           When you post a bulletin, vendors with "bulletin" email notifications
           enabled receive it automatically.
         </p>
-        <p className="text-white/70">
+        <p className="text-foreground/70">
           Common uses:
         </p>
         <ul className="space-y-1.5">
@@ -506,7 +507,7 @@ const GUIDE_PAGES: GuidePage[] = [
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
               <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
-              <span className="text-white/80">{item}</span>
+              <span className="text-foreground/80">{item}</span>
             </li>
           ))}
         </ul>
@@ -557,13 +558,13 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-[680px] max-w-[95vw] max-h-[85vh] bg-gray-900 border border-white/15 rounded-2xl shadow-2xl shadow-purple-500/10 flex overflow-hidden">
+      <div className="relative w-[680px] max-w-[95vw] max-h-[85vh] bg-muted border border-border rounded-2xl shadow-2xl shadow-purple-500/10 flex overflow-hidden">
         {/* Left sidebar - section nav */}
-        <div className="hidden sm:flex flex-col w-44 bg-white/5 border-r border-white/10 py-4">
+        <div className="hidden sm:flex flex-col w-44 bg-background/5 border-r border-border py-4">
           <div className="px-4 mb-4">
             <div className="flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-purple-400" />
-              <span className="text-xs font-bold text-white tracking-wide">GUIDE</span>
+              <span className="text-xs font-bold text-foreground tracking-wide">GUIDE</span>
             </div>
           </div>
           <nav className="flex-1 space-y-0.5 px-2">
@@ -576,8 +577,8 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   onClick={() => setPageIndex(sectionStartIndex[section])}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActiveSection
-                      ? 'bg-purple-600/30 text-purple-300'
-                      : 'text-white/50 hover:text-white hover:bg-white/5'
+                      ? 'bg-purple-600/30 text-violet-950 dark:text-purple-300'
+                      : 'text-foreground/50 hover:text-foreground hover:bg-background/5'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -586,8 +587,8 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
               );
             })}
           </nav>
-          <div className="px-4 pt-3 border-t border-white/10">
-            <p className="text-[10px] text-white/30 text-center">
+          <div className="px-4 pt-3 border-t border-border">
+            <p className="text-[10px] text-foreground/30 text-center">
               {pageIndex + 1} / {GUIDE_PAGES.length}
             </p>
           </div>
@@ -596,16 +597,16 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
         {/* Right content */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* Header */}
-          <div className="flex items-center justify-between px-5 py-4 border-b border-white/10">
+          <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div>
               <p className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider mb-0.5">
                 {page.section}
               </p>
-              <h2 className="text-base font-bold text-white">{page.title}</h2>
+              <h2 className="text-base font-bold text-foreground">{page.title}</h2>
             </div>
             <button
               onClick={onClose}
-              className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/10 transition-colors"
+              className="p-1.5 rounded-lg text-foreground/40 hover:text-foreground hover:bg-background/10 transition-colors"
               aria-label="Close guide"
             >
               <X className="w-4 h-4" />
@@ -613,23 +614,23 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
           </div>
 
           {/* Body */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 text-sm text-white/80 leading-relaxed">
+          <div className="flex-1 overflow-y-auto px-5 py-4 text-sm text-foreground/80 leading-relaxed">
             {page.content}
           </div>
 
           {/* Footer nav */}
-          <div className="flex items-center justify-between px-5 py-3 border-t border-white/10">
+          <div className="flex items-center justify-between px-5 py-3 border-t border-border">
             <button
               onClick={() => setPageIndex(Math.max(0, pageIndex - 1))}
               disabled={isFirst}
-              className="flex items-center gap-1 px-3 py-1.5 text-xs text-white/60 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-white/5"
+              className="flex items-center gap-1 px-3 py-1.5 text-xs text-foreground/60 hover:text-foreground disabled:opacity-30 disabled:cursor-not-allowed transition-colors rounded-lg hover:bg-background/5"
             >
               <ChevronLeft className="w-3.5 h-3.5" />
               Back
             </button>
 
             {/* Mobile section label */}
-            <span className="sm:hidden text-[10px] text-white/30">
+            <span className="sm:hidden text-[10px] text-foreground/30">
               {pageIndex + 1} / {GUIDE_PAGES.length}
             </span>
 
@@ -640,7 +641,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   key={i}
                   onClick={() => setPageIndex(i)}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    i === pageIndex ? 'bg-purple-400' : 'bg-white/15 hover:bg-white/30'
+                    i === pageIndex ? 'bg-purple-400' : 'bg-background/15 hover:bg-background/30'
                   }`}
                 />
               ))}
@@ -654,7 +655,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   setPageIndex(pageIndex + 1);
                 }
               }}
-              className="flex items-center gap-1 px-4 py-1.5 text-xs font-medium bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-colors"
+              className="flex items-center gap-1 px-4 py-1.5 text-xs font-medium voxxy-btn-solid rounded-lg transition-colors"
             >
               {isLast ? 'Done' : 'Next'}
               {!isLast && <ChevronRight className="w-3.5 h-3.5" />}

@@ -233,14 +233,14 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       <div
         onDrop={handleFileDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-purple-500/40 bg-white/5 rounded-lg p-6 text-center hover:border-purple-500 hover:bg-white/10 transition-all cursor-pointer"
+        className="border-2 border-dashed border-purple-500/40 bg-background/5 rounded-lg p-6 text-center hover:border-purple-500 hover:bg-background/10 transition-all cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
         <Upload className="mx-auto h-8 w-8 text-purple-400" />
-        <p className="mt-1.5 text-xs text-white/80">
+        <p className="mt-1.5 text-xs text-foreground/80">
           Drag and drop your CSV file here, or click to browse
         </p>
-        <p className="mt-0.5 text-[11px] text-white/50">CSV files only</p>
+        <p className="mt-0.5 text-[11px] text-foreground/50">CSV files only</p>
       </div>
 
       <input
@@ -256,9 +256,9 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const renderFileSelectedState = () => (
     <div className="space-y-3">
       {/* File Info */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-purple-500/20 rounded-lg">
+      <div className="flex items-center gap-2 px-3 py-2 bg-background/5 border border-purple-500/20 rounded-lg">
         <FileText className="h-3.5 w-3.5 text-purple-400 shrink-0" />
-        <span className="text-xs text-white/90 truncate">
+        <span className="text-xs text-foreground/90 truncate">
           <strong>{selectedFile?.name}</strong> — {previewData?.totalRows} contacts
         </span>
       </div>
@@ -267,18 +267,18 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       {(() => {
         const visibleHeaders = previewData?.headers.filter(h => !hiddenPreviewColumns.includes(h.toLowerCase())) || [];
         return (
-          <div className="border border-purple-500/20 rounded-lg overflow-hidden bg-white/5">
+          <div className="border border-purple-500/20 rounded-lg overflow-hidden bg-background/5">
             <div className="bg-purple-500/10 px-3 py-1.5 border-b border-purple-500/20">
-              <h4 className="text-[11px] font-medium text-white/70 uppercase tracking-wide">Preview (first 10 rows)</h4>
+              <h4 className="text-[11px] font-medium text-foreground/70 uppercase tracking-wide">Preview (first 10 rows)</h4>
             </div>
             <div className="overflow-x-auto max-h-[40vh]">
               <table className="w-full text-[11px]">
-                <thead className="bg-white/5 sticky top-0">
+                <thead className="bg-background/5 sticky top-0">
                   <tr>
                     {visibleHeaders.map((header) => (
                       <th
                         key={header}
-                        className="px-2 py-1 text-left font-medium text-white/80 border-b border-purple-500/20 whitespace-nowrap"
+                        className="px-2 py-1 text-left font-medium text-foreground/80 border-b border-purple-500/20 whitespace-nowrap"
                       >
                         <div className="flex items-center gap-1">
                           <span className="truncate max-w-[100px]" title={header}>
@@ -294,11 +294,11 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
                 </thead>
                 <tbody>
                   {previewData?.rows.map((row, idx) => (
-                    <tr key={idx} className="border-b border-purple-500/10 hover:bg-white/5">
+                    <tr key={idx} className="border-b border-purple-500/10 hover:bg-background/5">
                       {visibleHeaders.map((header) => (
-                        <td key={header} className="px-2 py-1 text-white/60">
+                        <td key={header} className="px-2 py-1 text-foreground/60">
                           <div className="truncate max-w-[150px]" title={row[header] || ''}>
-                            {row[header] || <span className="text-white/30">—</span>}
+                            {row[header] || <span className="text-foreground/30">—</span>}
                           </div>
                         </td>
                       ))}
@@ -315,7 +315,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       <div className="space-y-2">
         <div className="flex items-end gap-3 max-w-md">
           <div className="flex-1">
-            <Label htmlFor="bulk-tags" className="text-[11px] text-white/70 mb-1 block">
+            <Label htmlFor="bulk-tags" className="text-[11px] text-foreground/70 mb-1 block">
               Tags (comma-separated)
             </Label>
             <Input
@@ -343,7 +343,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
     <div className="flex flex-col items-center justify-center py-8">
       <Loader2 className="h-8 w-8 animate-spin text-primary mb-3" />
       <p className="text-sm font-medium">Importing contacts...</p>
-      <p className="text-xs text-white/50 mt-1">
+      <p className="text-xs text-foreground/50 mt-1">
         This may take a moment for large files
       </p>
     </div>
@@ -354,7 +354,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       {/* Success Header */}
       <div className="flex items-center gap-2 justify-center py-2">
         <CheckCircle2 className="h-6 w-6 text-green-400" />
-        <h3 className="text-sm font-semibold text-white">Import Complete</h3>
+        <h3 className="text-sm font-semibold text-foreground">Import Complete</h3>
       </div>
 
       {/* Summary Stats */}
@@ -363,7 +363,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
           <div className="text-lg font-bold text-green-400">
             {importResult?.summary.created}
           </div>
-          <div className="text-[11px] text-white/60">Created</div>
+          <div className="text-[11px] text-foreground/60">Created</div>
         </div>
 
         {importResult && importResult.summary.updated > 0 && (
@@ -371,7 +371,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             <div className="text-lg font-bold text-blue-400">
               {importResult.summary.updated}
             </div>
-            <div className="text-[11px] text-white/60">Updated</div>
+            <div className="text-[11px] text-foreground/60">Updated</div>
           </div>
         )}
 
@@ -380,7 +380,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             <div className="text-lg font-bold text-yellow-400">
               {importResult.summary.skipped}
             </div>
-            <div className="text-[11px] text-white/60">Skipped</div>
+            <div className="text-[11px] text-foreground/60">Skipped</div>
           </div>
         )}
 
@@ -389,7 +389,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
             <div className="text-lg font-bold text-red-400">
               {importResult.summary.failed}
             </div>
-            <div className="text-[11px] text-white/60">Failed</div>
+            <div className="text-[11px] text-foreground/60">Failed</div>
           </div>
         )}
       </div>
@@ -410,7 +410,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
                   </div>
                 ))}
                 {importResult.errors.length > 5 && (
-                  <div className="text-white/50">
+                  <div className="text-foreground/50">
                     ...and {importResult.errors.length - 5} more errors
                   </div>
                 )}
@@ -576,10 +576,10 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[95vw] max-w-5xl max-h-[85vh] overflow-y-auto bg-[#1a0f2e]/95 backdrop-blur-xl border border-purple-500/30 shadow-2xl p-5">
+      <DialogContent className="voxxy-modal-surface max-h-[85vh] w-[95vw] max-w-5xl overflow-y-auto p-5">
         <DialogHeader className="mb-2">
-          <DialogTitle className="text-base text-white">Import Contacts from CSV</DialogTitle>
-          <DialogDescription className="text-white/60 text-xs">
+          <DialogTitle className="text-base text-foreground">Import Contacts from CSV</DialogTitle>
+          <DialogDescription className="text-foreground/60 text-xs">
             Upload a CSV file to bulk import vendor contacts
           </DialogDescription>
         </DialogHeader>

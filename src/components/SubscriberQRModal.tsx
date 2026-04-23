@@ -72,17 +72,17 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white">
+        <Button className="voxxy-btn-cta-pink">
           <QrCode className="h-4 w-4 mr-2" />
           Get QR Code
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-gradient-to-br from-gray-900/95 via-purple-900/95 to-gray-900/95 backdrop-blur-xl border-2 border-purple-400/50 text-white">
+      <DialogContent className="sm:max-w-md bg-card border-border text-card-foreground dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-purple-900/95 dark:to-gray-900/95 dark:backdrop-blur-xl dark:border-2 dark:border-purple-400/50">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
             Subscriber QR Code
           </DialogTitle>
-          <p className="text-purple-200 text-center text-sm">
+          <p className="text-muted-foreground dark:text-purple-200 text-center text-sm">
             Scan to subscribe to {organizationName}
           </p>
         </DialogHeader>
@@ -90,7 +90,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
         <div className="space-y-6 mt-4">
           {/* QR Code Display */}
           <div className="flex justify-center">
-            <div className="bg-white p-6 rounded-xl shadow-2xl" ref={qrRef}>
+            <div className="bg-background p-6 rounded-xl shadow-2xl" ref={qrRef}>
               <QRCodeCanvas
                 value={subscribeUrl}
                 size={256}
@@ -115,14 +115,14 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
                 type="text"
                 value={subscribeUrl}
                 readOnly
-                className="flex-1 bg-white/10 border border-purple-400/30 rounded px-3 py-2 text-sm text-white"
+                className="flex-1 bg-background/10 border border-purple-400/30 rounded px-3 py-2 text-sm text-foreground"
                 onClick={(e) => e.currentTarget.select()}
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleCopyLink}
-                className="bg-white/10 border-purple-400/30 text-white hover:bg-white/20"
+                className="bg-background/10 border-purple-400/30 text-foreground hover:bg-background/20"
               >
                 {copied ? (
                   <CheckCircle className="h-4 w-4 text-green-400" />
@@ -137,14 +137,14 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={handleDownload}
-              className="bg-purple-600 hover:bg-purple-700 text-white"
+              className="voxxy-btn-solid"
             >
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
             <Button
               onClick={handleShare}
-              className="bg-pink-600 hover:bg-pink-700 text-white"
+              className="bg-pink-600 hover:bg-pink-700 text-foreground"
             >
               <Share2 className="h-4 w-4 mr-2" />
               Share

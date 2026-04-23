@@ -222,13 +222,13 @@ export default function ScheduledEmailList({
   if (emails.length === 0) {
     return (
       <div className="text-center py-16">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/5 border border-white/10 mb-4">
-          <Mail className="w-8 h-8 text-white/40" />
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background/5 border border-border mb-4">
+          <Mail className="w-8 h-8 text-foreground/40" />
         </div>
-        <h3 className="text-xl font-semibold text-white mb-2">
+        <h3 className="text-xl font-semibold text-foreground mb-2">
           No Scheduled Emails
         </h3>
-        <p className="text-white/60">
+        <p className="text-foreground/60">
           Emails will be automatically generated based on your event template.
         </p>
       </div>
@@ -241,23 +241,23 @@ export default function ScheduledEmailList({
       <div className="flex flex-col sm:flex-row gap-4">
         {/* Search */}
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
           <input
             type="text"
             placeholder="Search emails..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="w-full pl-10 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
           />
         </div>
 
         {/* Status Filter */}
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-white/60" />
+          <Filter className="w-4 h-4 text-foreground/60" />
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as FilterType)}
-            className="px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+            className="px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
           >
             {FILTER_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>
@@ -271,7 +271,7 @@ export default function ScheduledEmailList({
 
       {/* Results count */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-white/60">
+        <p className="text-sm text-foreground/60">
           Showing {filteredEmails.length} of {emails.length} emails
         </p>
         {searchQuery && (
@@ -293,33 +293,33 @@ export default function ScheduledEmailList({
             const isExpanded = expandedCategories.has(category as EmailCategory);
 
             return (
-              <div key={category} className="bg-[#1e1536] rounded-xl border border-purple-500/20 overflow-hidden">
+              <div key={category} className="glass-card overflow-hidden rounded-xl border border-purple-500/20">
                 {/* Category Header */}
                 <button
                   onClick={() => toggleCategory(category as EmailCategory)}
-                  className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
+                  className="w-full p-5 flex items-center justify-between hover:bg-background/5 transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${config.bgColor}`}>
                       <Icon className={`w-5 h-5 ${config.color}`} />
                     </div>
                     <div className="text-left">
-                      <h3 className="text-lg font-semibold text-white">{config.label}</h3>
-                      <p className="text-sm text-white/60">
+                      <h3 className="text-lg font-semibold text-foreground">{config.label}</h3>
+                      <p className="text-sm text-foreground/60">
                         {categoryEmails?.length || 0} {categoryEmails?.length === 1 ? 'email' : 'emails'}
                       </p>
                     </div>
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-white/60" />
+                    <ChevronUp className="w-5 h-5 text-foreground/60" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-white/60" />
+                    <ChevronDown className="w-5 h-5 text-foreground/60" />
                   )}
                 </button>
 
                 {/* Category Emails */}
                 {isExpanded && categoryEmails && categoryEmails.length > 0 && (
-                  <div className="border-t border-white/10">
+                  <div className="border-t border-border">
                     <div className="p-4 space-y-3">
                       {categoryEmails.map(email => (
                         <ScheduledEmailCard
@@ -342,13 +342,13 @@ export default function ScheduledEmailList({
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-white/60">No emails match your filters</p>
+          <p className="text-foreground/80 dark:text-foreground/60">No emails match your filters</p>
           <button
             onClick={() => {
               setSearchQuery('');
               setStatusFilter('all');
             }}
-            className="mt-4 text-sm text-purple-400 hover:text-purple-300"
+            className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300"
           >
             Clear all filters
           </button>

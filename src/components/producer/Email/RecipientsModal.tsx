@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
 
 interface Recipient {
   email: string;
@@ -101,44 +102,44 @@ export default function RecipientsModal({
   const getEmailTypeBadge = (type: string) => {
     if (type === 'initial_invitations') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-pink-500/20 text-pink-300 border border-pink-500/30">
-          <Users className="w-3 h-3" />
+        <Badge variant="tintPink" className="gap-1.5 px-2.5 py-1 text-xs font-medium">
+          <Users className="h-3 w-3" />
           Initial Invitations
-        </span>
+        </Badge>
       );
     }
     if (type === 'invitation_reminders') {
       return (
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-300 border border-purple-500/30">
-          <Users className="w-3 h-3" />
+        <Badge variant="tintPurple" className="gap-1.5 px-2.5 py-1 text-xs font-medium">
+          <Users className="h-3 w-3" />
           Invitation Reminders
-        </span>
+        </Badge>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300 border border-blue-500/30">
-        <Users className="w-3 h-3" />
+      <Badge variant="tintBlue" className="gap-1.5 px-2.5 py-1 text-xs font-medium">
+        <Users className="h-3 w-3" />
         Application Emails
-      </span>
+      </Badge>
     );
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-hidden flex flex-col bg-[#0f0a1e] border-purple-500/20">
+      <DialogContent className="voxxy-modal-surface flex max-h-[85vh] max-w-3xl flex-col overflow-hidden">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-white">
+          <DialogTitle className="flex items-center gap-3 text-foreground">
             <Mail className="w-5 h-5 text-purple-400" />
             <span>Email Recipients</span>
           </DialogTitle>
         </DialogHeader>
 
         {/* Email Info Header */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
+        <div className="bg-background/5 rounded-lg p-3 border border-border">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-white font-medium text-sm">{emailName}</h3>
+            <h3 className="text-foreground font-medium text-sm">{emailName}</h3>
             {recipientsData && (
-              <div className="text-white font-bold text-lg">
+              <div className="text-foreground font-bold text-lg">
                 {recipientsData.count}
               </div>
             )}
@@ -156,7 +157,7 @@ export default function RecipientsModal({
           {loading && (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-              <p className="text-white/60 text-sm">Loading recipients...</p>
+              <p className="text-foreground/60 text-sm">Loading recipients...</p>
             </div>
           )}
 
@@ -172,12 +173,12 @@ export default function RecipientsModal({
             <>
               {/* Empty State */}
               {recipientsData.count === 0 ? (
-                <div className="text-center py-12 bg-white/5 rounded-lg border border-white/10 m-4">
-                  <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3">
-                    <User className="w-6 h-6 text-white/30" />
+                <div className="text-center py-12 bg-background/5 rounded-lg border border-border m-4">
+                  <div className="w-12 h-12 rounded-full bg-background/5 flex items-center justify-center mx-auto mb-3">
+                    <User className="w-6 h-6 text-foreground/30" />
                   </div>
-                  <p className="text-white/60 text-sm font-medium mb-1">No recipients found</p>
-                  <p className="text-white/40 text-xs">
+                  <p className="text-foreground/60 text-sm font-medium mb-1">No recipients found</p>
+                  <p className="text-foreground/40 text-xs">
                     This email will not be sent to anyone with the current filters.
                   </p>
                 </div>
@@ -186,8 +187,8 @@ export default function RecipientsModal({
                   {/* Recipients List - Compact Table */}
                   <div className="flex-1 overflow-y-auto">
                     {/* Table Header */}
-                    <div className="sticky top-0 bg-[#0f0a1e] z-10 border-b border-white/10">
-                      <div className="grid grid-cols-[1fr,2fr,2fr] gap-3 px-4 py-2 text-[10px] font-semibold text-white/50 uppercase tracking-wide">
+                    <div className="voxxy-modal-surface sticky top-0 z-10 border-b border-border">
+                      <div className="grid grid-cols-[1fr,2fr,2fr] gap-3 px-4 py-2 text-[10px] font-semibold text-foreground/50 uppercase tracking-wide">
                         <div>Name</div>
                         <div>Email</div>
                         <div>Organization</div>
@@ -199,24 +200,24 @@ export default function RecipientsModal({
                       {recipientsData.recipients.map((recipient, index) => (
                         <div
                           key={index}
-                          className="grid grid-cols-[1fr,2fr,2fr] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs"
+                          className="grid grid-cols-[1fr,2fr,2fr] gap-3 px-4 py-1.5 hover:bg-background/5 transition-colors border-b border-border last:border-0 items-center text-xs"
                         >
                           <div className="min-w-0">
-                            <div className="font-medium text-white truncate">
+                            <div className="font-medium text-foreground truncate">
                               {recipient.name}
                             </div>
                           </div>
                           <div className="min-w-0">
                             <a
                               href={`mailto:${recipient.email}`}
-                              className="text-white/70 hover:text-purple-400 transition-colors truncate block"
+                              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {recipient.email}
                             </a>
                           </div>
                           <div className="min-w-0">
-                            <div className="text-white/60 truncate">
+                            <div className="text-foreground/60 truncate">
                               {recipient.organization && recipient.organization !== recipient.name
                                 ? recipient.organization
                                 : '—'}

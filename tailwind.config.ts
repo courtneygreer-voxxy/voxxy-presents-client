@@ -71,7 +71,18 @@ const config: Config = {
   				'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
   				border: 'hsl(var(--sidebar-border))',
   				ring: 'hsl(var(--sidebar-ring))'
-  			}
+  			},
+  			/**
+  			 * RGB semantic tokens (space-separated channels, e.g. `--background-rgb: 15 23 42`).
+  			 * Utilities: `bg-rgb-background`, `text-rgb-foreground`, etc.
+  			 */
+  			rgb: {
+  				background: 'rgb(var(--background-rgb) / <alpha-value>)',
+  				foreground: 'rgb(var(--foreground-rgb) / <alpha-value>)',
+  				border: 'rgb(var(--border-rgb) / <alpha-value>)',
+  				primary: 'rgb(var(--primary-rgb) / <alpha-value>)',
+  				muted: 'rgb(var(--muted-rgb) / <alpha-value>)',
+  			},
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

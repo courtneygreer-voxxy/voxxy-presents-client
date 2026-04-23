@@ -4,6 +4,7 @@ import { MoreVertical, Eye, Edit2, Play, Pause, Trash2, RefreshCcw, Users, Megap
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { ScheduledEmail, EmailCategory, AuditFilters, DeliveryStatus, TRIGGER_TYPES } from '@/types/email';
 import DeliveryStatusBadge from './DeliveryStatusBadge';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import RecipientsModal from './RecipientsModal';
 import { backendToFrontend } from '@/utils/emailVariables';
 import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
@@ -110,20 +111,20 @@ export default function EmailRow({
       return <DeliveryStatusBadge status={email.status as DeliveryStatus} />;
     }
 
-    const statusColors = {
-      scheduled: 'bg-blue-500/10 text-blue-400 border-blue-500/30',
-      paused: 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30',
-      active: 'bg-green-500/10 text-green-400 border-green-500/30',
-      failed: 'bg-red-500/10 text-red-400 border-red-500/30',
-      cancelled: 'bg-gray-500/10 text-gray-400 border-gray-500/30'
+    const statusVariants: Record<string, BadgeVariant> = {
+      scheduled: 'tintBlueSoft',
+      paused: 'tintYellowSoft',
+      active: 'tintGreenSoft',
+      failed: 'tintRedSoft',
+      cancelled: 'tintMutedSoft',
     };
 
-    const colorClass = statusColors[email.status as keyof typeof statusColors] || 'bg-gray-500/10 text-gray-400 border-gray-500/30';
+    const variant = statusVariants[email.status] ?? 'tintMutedSoft';
 
     return (
-      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-medium border ${colorClass}`}>
+      <Badge variant={variant} className="rounded px-2 py-0.5 text-[10px] font-medium">
         {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
-      </span>
+      </Badge>
     );
   };
 
@@ -141,7 +142,7 @@ export default function EmailRow({
 
     return (
       <div className="space-y-1">
-        <div className="font-semibold text-xs mb-2 border-b border-white/20 pb-1">Delivery Status</div>
+        <div className="font-semibold text-xs mb-2 border-b border-border pb-1">Delivery Status</div>
         <div className="flex items-center justify-between gap-3 text-xs">
           <span className="text-green-400">✓ Delivered:</span>
           <span className="font-medium">{deliveryCounts.delivered}</span>
@@ -162,7 +163,7 @@ export default function EmailRow({
           <span className="text-blue-400">⋯ Pending:</span>
           <span className="font-medium">{deliveryCounts.pending}</span>
         </div>
-        <div className="flex items-center justify-between gap-3 text-xs pt-1 mt-1 border-t border-white/20">
+        <div className="flex items-center justify-between gap-3 text-xs pt-1 mt-1 border-t border-border">
           <span className="font-semibold">Total Sent:</span>
           <span className="font-bold">{deliveryCounts.total_sent}</span>
         </div>
@@ -171,7 +172,7 @@ export default function EmailRow({
   };
 
   return (
-    <div className="grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] gap-3 px-4 py-1.5 hover:bg-white/5 transition-colors border-b border-white/5 last:border-0 items-center text-xs">
+    <div className="voxxy-table-row voxxy-table-row-hover grid grid-cols-[200px,220px,130px,120px,90px,80px,80px,100px,80px] items-center gap-3 px-4 py-1.5 text-xs last:border-0">
       {/* Email Name */}
       <div className="flex items-center gap-2 min-w-0">
         {email.overdue && email.overdue_message && (
@@ -184,7 +185,7 @@ export default function EmailRow({
               </Tooltip.Trigger>
               <Tooltip.Portal>
                 <Tooltip.Content
-                  className="z-50 bg-red-900/90 text-white px-3 py-2 rounded-lg shadow-xl border border-red-500/30"
+                  className="z-50 bg-red-900/90 text-destructive-foreground px-3 py-2 rounded-lg shadow-xl border border-red-500/30"
                   sideOffset={5}
                 >
                   <div className="text-xs font-semibold">Overdue: {email.overdue_message}</div>
@@ -196,7 +197,7 @@ export default function EmailRow({
         )}
         <div className="flex-1 min-w-0">
           <div
-            className={`font-medium truncate ${email.overdue ? 'text-red-400' : 'text-white'} ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+            className={`truncate font-medium ${email.overdue ? 'text-red-600 dark:text-red-400' : 'text-foreground'} ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
             onClick={(e) => {
               if (onEdit) {
                 e.stopPropagation();
@@ -211,7 +212,7 @@ export default function EmailRow({
 
       {/* Subject */}
       <div
-        className={`text-white/70 truncate ${onEdit ? 'cursor-pointer hover:text-purple-300 transition-colors' : ''}`}
+        className={`truncate text-foreground/75 ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
         title={backendToFrontend(email.subject_template || '')}
         onClick={(e) => {
           if (onEdit) {
@@ -224,20 +225,20 @@ export default function EmailRow({
       </div>
 
       {/* Scheduled Date/Time or Trigger */}
-      <div className="text-white/60">
+      <div className="text-muted-foreground">
         {isSystemEmail ? (
           // Show trigger type for system/trigger emails (event-based)
-          <span className="text-white/50 text-[11px]">
+          <span className="text-[11px] text-muted-foreground">
             {TRIGGER_TYPES.find(t => t.value === email.trigger_type)?.label || 'Event-triggered'}
           </span>
         ) : scheduledDate ? (
           // Show date/time for scheduled emails (time-based)
           <div className="flex flex-col">
             <span className="text-[11px]">{format(scheduledDate, 'MMM d, yyyy')}</span>
-            <span className="text-[10px] text-white/40">{format(scheduledDate, 'h:mm a')}</span>
+            <span className="text-[10px] text-foreground/55 dark:text-foreground/40">{format(scheduledDate, 'h:mm a')}</span>
           </div>
         ) : (
-          <span className="text-white/40 text-[11px]">Event-triggered</span>
+          <span className="text-[11px] text-foreground/55 dark:text-foreground/40">Event-triggered</span>
         )}
       </div>
 
@@ -250,7 +251,7 @@ export default function EmailRow({
       </div>
 
       {/* Vendor Category */}
-      <div className="text-white/60 text-[11px] truncate">
+      <div className="truncate text-[11px] text-muted-foreground">
         {email.category?.name || (audienceCategory === 'application_updates' ? 'All Invitations' : 'All Vendors')}
       </div>
 
@@ -264,7 +265,7 @@ export default function EmailRow({
               onViewAuditLog({ email_name: email.name });
             }
           }}
-          className="flex items-center gap-1 text-white/60 hover:text-white hover:bg-white/10 px-2 py-1 rounded transition-colors cursor-pointer"
+          className="flex cursor-pointer items-center gap-1 rounded px-2 py-1 text-muted-foreground transition-colors hover:bg-background/10 hover:text-foreground"
           title="Click to view audit log for this email"
         >
           <Users className="w-3 h-3" />
@@ -273,7 +274,7 @@ export default function EmailRow({
       </div>
 
       {/* Undelivered Count */}
-      <div className="text-center text-white/60">
+      <div className="text-center text-muted-foreground">
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -282,7 +283,7 @@ export default function EmailRow({
             }
           }}
           disabled={email.status !== 'sent' || !onViewAuditLog || undeliveredCount === 0}
-          className={`${undeliveredCount > 0 ? 'text-red-400 font-medium' : ''} ${email.status === 'sent' && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer hover:bg-white/10 px-2 py-1 rounded hover:text-red-300 transition-colors' : ''}`}
+          className={`${undeliveredCount > 0 ? 'font-medium text-red-600 dark:text-red-400' : ''} ${email.status === 'sent' && onViewAuditLog && undeliveredCount > 0 ? 'cursor-pointer rounded px-2 py-1 transition-colors hover:bg-background/10 hover:text-red-700 dark:hover:text-red-300' : ''}`}
           title={email.status === 'sent' && undeliveredCount > 0 ? "Click to view undelivered emails in audit log" : undefined}
         >
           {undeliveredCount}
@@ -303,7 +304,7 @@ export default function EmailRow({
                 e.stopPropagation();
                 setShowMenu(!showMenu);
               }}
-              className="p-1.5 hover:bg-white/10 text-white/70 hover:text-white rounded transition-colors relative z-0"
+              className="p-1.5 hover:bg-background/10 text-foreground/70 hover:text-foreground rounded transition-colors relative z-0"
               title="Actions"
               disabled={isProcessing}
             >
@@ -317,7 +318,7 @@ export default function EmailRow({
                   onClick={() => setShowMenu(false)}
                 />
                 <div
-                  className="fixed z-[101] bg-gray-900 border border-white/20 rounded-lg shadow-xl py-1 min-w-[140px]"
+                  className="fixed z-[101] bg-muted border border-border rounded-lg shadow-xl py-1 min-w-[140px]"
                   style={{
                     right: `${window.innerWidth - menuButtonRef.current.getBoundingClientRect().right}px`,
                     top: `${menuButtonRef.current.getBoundingClientRect().bottom + 4}px`
@@ -330,7 +331,7 @@ export default function EmailRow({
                         setShowMenu(false);
                         onEdit(email);
                       }}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
                     >
                       <Edit2 className="w-3.5 h-3.5" />
                       {isSent ? 'View' : 'Edit'}
@@ -342,7 +343,7 @@ export default function EmailRow({
                         e.stopPropagation();
                         handleAction(() => onSendNow(email.id));
                       }}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
                     >
                       <Play className="w-3.5 h-3.5" />
                       Send Now
@@ -354,7 +355,7 @@ export default function EmailRow({
                         e.stopPropagation();
                         handleAction(() => onPause(email.id));
                       }}
-                      className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
+                      className="w-full px-4 py-2 text-left text-sm text-foreground hover:bg-background/10 flex items-center gap-2 transition-colors"
                     >
                       <Pause className="w-3.5 h-3.5" />
                       Pause
@@ -379,7 +380,7 @@ export default function EmailRow({
                         e.stopPropagation();
                         handleAction(() => onDelete(email.id));
                       }}
-                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors border-t border-white/10"
+                      className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors border-t border-border"
                       title="Delete custom email"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

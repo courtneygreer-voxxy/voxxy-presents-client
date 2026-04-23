@@ -129,7 +129,7 @@ export function PreviewDisclaimerModal({
             className={`w-full sm:w-auto ${
               isPreview 
                 ? 'bg-blue-600 hover:bg-blue-700' 
-                : 'bg-purple-600 hover:bg-purple-700'
+                : 'voxxy-btn-solid'
             }`}
           >
             Continue with {isPreview ? 'Preview' : 'Beta'}

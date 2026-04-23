@@ -33,9 +33,9 @@ export default function EventDetailsCard({
   onRemove 
 }: EventDetailsCardProps) {
   return (
-    <div className="border rounded-lg p-4 space-y-4 bg-gray-50">
+    <div className="border rounded-lg p-4 space-y-4 bg-muted">
       <div className="flex items-center justify-between">
-        <h4 className="font-medium text-gray-900">Event {index + 1}</h4>
+        <h4 className="font-medium text-foreground">Event {index + 1}</h4>
         <Button
           type="button"
           variant="ghost"

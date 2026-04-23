@@ -44,7 +44,7 @@ export function BulkActionToolbar({
   if (selectedCount === 0) return null;
 
   return (
-    <div className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 border border-purple-500/30 rounded-lg p-4 mb-4">
+    <div className="bg-gradient-to-r from-primary/10 to-blue-500/10 border border-border rounded-lg p-4 mb-4">
       <div className="flex items-center justify-between gap-4">
         {/* Left: Selection info */}
         <div className="flex items-center gap-3">
@@ -53,10 +53,10 @@ export function BulkActionToolbar({
               <Users className="w-4 h-4 text-purple-300" />
             </div>
             <div>
-              <p className="text-sm font-medium text-white">
+              <p className="text-sm font-medium text-foreground">
                 {selectedCount} {selectedCount === 1 ? 'contact' : 'contacts'} selected
               </p>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-foreground/60">
                 Apply bulk actions to selected contacts
               </p>
             </div>
@@ -67,11 +67,11 @@ export function BulkActionToolbar({
         <div className="flex items-center gap-4">
           {/* Category selector */}
           <div className="flex items-center gap-2">
-            <Tag className="w-4 h-4 text-white/60" />
+            <Tag className="w-4 h-4 text-foreground/60" />
             <select
               value={selectedCategoryId || ''}
               onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : null)}
-              className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
               disabled={loading}
             >
               <option value="">Select category...</option>
@@ -85,15 +85,15 @@ export function BulkActionToolbar({
             <button
               onClick={handleApplyCategory}
               disabled={!selectedCategoryId || loading}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium rounded-lg transition-colors"
             >
               {loading ? 'Updating...' : 'Apply'}
             </button>
           </div>
 
           {/* Location input */}
-          <div className="flex items-center gap-2 border-l border-white/20 pl-4">
-            <MapPin className="w-4 h-4 text-white/60" />
+          <div className="flex items-center gap-2 border-l border-border pl-4">
+            <MapPin className="w-4 h-4 text-foreground/60" />
             <input
               type="text"
               value={locationInput}
@@ -105,14 +105,14 @@ export function BulkActionToolbar({
                 }
               }}
               placeholder="City, State..."
-              className="px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-sm text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
+              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
               disabled={loading}
             />
 
             <button
               onClick={handleApplyLocation}
               disabled={!locationInput.trim() || loading}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-lg transition-colors"
+              className="px-4 py-2 voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium rounded-lg transition-colors"
             >
               {loading ? 'Updating...' : 'Apply'}
             </button>
@@ -134,7 +134,7 @@ export function BulkActionToolbar({
           <button
             onClick={onClear}
             disabled={loading}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-3 py-2 text-sm text-foreground/70 hover:text-foreground hover:bg-background/10 rounded-lg transition-colors"
             title="Clear selection"
           >
             <X className="w-4 h-4" />

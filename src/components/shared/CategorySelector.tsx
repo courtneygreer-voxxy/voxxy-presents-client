@@ -101,8 +101,8 @@ export function CategorySelector({
       <div
         className={`
           min-h-[42px] px-3 py-2 rounded-lg border
-          ${disabled ? 'bg-white/5 cursor-not-allowed' : 'bg-[#1a0f2e] cursor-pointer hover:border-purple-500/50'}
-          border-white/10 transition-smooth
+          ${disabled ? 'bg-background/5 cursor-not-allowed' : 'voxxy-surface-elevated cursor-pointer hover:border-purple-500/50'}
+          border-border transition-smooth
         `}
         onClick={() => !disabled && setIsOpen(!isOpen)}
       >
@@ -126,21 +126,21 @@ export function CategorySelector({
             ))}
           </div>
         ) : (
-          <span className="text-sm text-white/40">{placeholder}</span>
+          <span className="text-sm text-foreground/40">{placeholder}</span>
         )}
       </div>
 
       {/* Dropdown */}
       {isOpen && !disabled && (
-        <div className="absolute top-full left-0 right-0 mt-2 bg-[#1a0f2e] border border-white/10 rounded-lg shadow-xl z-50 max-h-80 overflow-hidden flex flex-col">
+        <div className="absolute top-full left-0 right-0 mt-2 voxxy-surface-elevated border border-border rounded-lg shadow-xl z-50 max-h-80 overflow-hidden flex flex-col">
           {/* Search */}
-          <div className="p-3 border-b border-white/10">
+          <div className="p-3 border-b border-border">
             <input
               type="text"
               placeholder="Search categories..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-3 py-2 bg-[#0f0820] border border-white/10 rounded-lg text-sm text-white placeholder-white/40 focus:outline-none focus:border-purple-500/50"
+              className="voxxy-input-well w-full rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/50"
               autoFocus
             />
           </div>
@@ -157,26 +157,26 @@ export function CategorySelector({
                       onClick={() => handleSelect(category.id)}
                       className={`
                         w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-smooth
-                        ${isSelected ? 'bg-purple-600/20 text-white' : 'text-white/70 hover:bg-white/5 hover:text-white'}
+                        ${isSelected ? 'bg-purple-600/20 text-foreground' : 'text-foreground/70 hover:bg-background/5 hover:text-foreground'}
                       `}
                     >
                       <div className="flex items-center gap-2">
                         <CategoryBadge category={category} size="sm" />
                         {category.usage && (
-                          <span className="text-xs text-white/40">
+                          <span className="text-xs text-foreground/40">
                             ({category.usage.applications_count} apps)
                           </span>
                         )}
                       </div>
                       {isSelected && (
-                        <span className="text-purple-400 text-xs">✓</span>
+                        <span className="text-violet-700 dark:text-purple-400 text-xs">✓</span>
                       )}
                     </button>
                   );
                 })}
               </div>
             ) : (
-              <div className="p-6 text-center text-sm text-white/40">
+              <div className="p-6 text-center text-sm text-foreground/40">
                 No categories found
               </div>
             )}
@@ -184,14 +184,14 @@ export function CategorySelector({
 
           {/* Create New Category */}
           {allowCreate && onCreateCategory && searchQuery && filteredCategories.length === 0 && (
-            <div className="p-3 border-t border-white/10">
+            <div className="p-3 border-t border-border">
               <div className="flex items-center gap-2">
                 <input
                   type="text"
                   placeholder="New category name"
                   value={newCategoryName || searchQuery}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="flex-1 px-3 py-2 bg-[#0f0820] border border-white/10 rounded-lg text-sm text-white placeholder-white/40 focus:outline-none focus:border-purple-500/50"
+                  className="flex-1 px-3 py-2 voxxy-input-well rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();
@@ -202,7 +202,7 @@ export function CategorySelector({
                 <button
                   onClick={handleCreate}
                   disabled={isCreating || !newCategoryName.trim()}
-                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-purple-600/50 disabled:cursor-not-allowed text-white text-sm rounded-lg flex items-center gap-2 transition-smooth"
+                  className="px-4 py-2 voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed text-sm rounded-lg flex items-center gap-2 transition-smooth"
                 >
                   <Plus className="w-4 h-4" />
                   Create
@@ -216,7 +216,7 @@ export function CategorySelector({
 
           {/* Footer Info */}
           {mode === 'multi' && (
-            <div className="px-3 py-2 bg-white/5 text-xs text-white/40">
+            <div className="px-3 py-2 bg-background/5 text-xs text-foreground/40">
               {selectedIds.length} selected
             </div>
           )}

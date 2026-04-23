@@ -1,4 +1,5 @@
 import { Category } from '@/types/category';
+import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CategoryBadgeProps {
   category: Category | null;
@@ -28,8 +29,8 @@ export function CategoryBadge({
           ${size === 'sm' ? 'px-2 py-0.5 text-xs' : ''}
           ${size === 'md' ? 'px-2.5 py-1 text-sm' : ''}
           ${size === 'lg' ? 'px-3 py-1.5 text-base' : ''}
-          ${variant === 'default' ? 'bg-white/10 text-white/60' : 'border border-white/20 text-white/60'}
-          ${onClick ? 'cursor-pointer hover:bg-white/20 transition-smooth' : ''}
+          ${variant === 'default' ? 'bg-background/10 text-foreground/60' : 'border border-border text-foreground/60'}
+          ${onClick ? 'cursor-pointer hover:bg-background/20 transition-smooth' : ''}
           ${className}
         `}
         onClick={onClick}
@@ -49,14 +50,13 @@ export function CategoryBadge({
         ${size === 'sm' ? 'px-2 py-0.5 text-xs' : ''}
         ${size === 'md' ? 'px-2.5 py-1 text-sm' : ''}
         ${size === 'lg' ? 'px-3 py-1.5 text-base' : ''}
-        ${variant === 'default' ? 'text-white' : 'border text-white'}
+        ${variant === 'default' ? 'text-foreground' : 'border text-foreground'}
         ${onClick ? 'cursor-pointer hover:opacity-80 transition-smooth' : ''}
         ${className}
       `}
       style={{
-        backgroundColor: variant === 'default' ? badgeColor : 'transparent',
+        ...(variant === 'default' ? getCategoryBadgeStyle(badgeColor) : { color: badgeColor }),
         borderColor: variant === 'outline' ? badgeColor : undefined,
-        textShadow: '0 1px 2px rgba(0, 0, 0, 0.8), 0 0 4px rgba(0, 0, 0, 0.4)',
       }}
       onClick={onClick}
     >

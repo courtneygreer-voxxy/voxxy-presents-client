@@ -31,16 +31,16 @@ export default function ContactsTable({
   const allSelected = contacts.length > 0 && selectedContacts.length === contacts.length;
 
   return (
-    <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden">
+    <div className="voxxy-table-shell">
       {/* Table Header - Condensed view for all screen sizes */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className="grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-1 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide">
+      <div className="voxxy-table-header">
+        <div className="voxxy-table-header-row grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
               checked={allSelected}
               onChange={onSelectAll}
-              className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+              className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
               title={allSelected ? 'Deselect all' : 'Select all'}
             />
           </div>
@@ -60,7 +60,7 @@ export default function ContactsTable({
       <div>
         {contacts.length === 0 ? (
           <div className="px-4 py-12 text-center">
-            <p className="text-white/50 text-sm">No contacts found</p>
+            <p className="text-sm text-muted-foreground">No contacts found</p>
           </div>
         ) : (
           contacts.map((contact) => (

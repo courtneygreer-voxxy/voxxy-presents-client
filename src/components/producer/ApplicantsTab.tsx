@@ -24,6 +24,21 @@ import { toast } from 'sonner';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import { DebugPanel } from './DebugPanel';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  EMAIL_HISTORY_ICON_CLASS,
+  EMAIL_HISTORY_META_CLASS,
+  EMAIL_HISTORY_RETRY_CLASS,
+  EMAIL_HISTORY_SUBJECT_CLASS,
+  getEmailDeliveryStatusTextClass,
+} from '@/lib/emailDeliveryTheme';
 
 interface Applicant {
   id: string; // Changed to string to support "inv-X" and "reg-X" format
@@ -517,49 +532,49 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       case 'invited':
         return {
           label: 'Invited',
-          color: 'bg-slate-500/20 text-slate-400',
+          variant: 'tintSlate' as BadgeVariant,
           icon: Mail,
         };
       case 'pending':
         return {
           label: 'Pending',
-          color: 'bg-blue-500/20 text-blue-400',
+          variant: 'tintBlue' as BadgeVariant,
           icon: Clock,
         };
       case 'approved':
         return {
           label: 'Approved',
-          color: 'bg-green-500/20 text-green-400',
+          variant: 'tintGreen' as BadgeVariant,
           icon: CheckCircle,
         };
       case 'confirmed':
         return {
           label: 'Confirmed',
-          color: 'bg-green-600/20 text-green-300',
+          variant: 'tintGreenDeep' as BadgeVariant,
           icon: CheckCircle,
         };
       case 'waitlist':
         return {
           label: 'Waitlisted',
-          color: 'bg-yellow-500/20 text-yellow-400',
+          variant: 'tintYellow' as BadgeVariant,
           icon: AlertCircle,
         };
       case 'rejected':
         return {
           label: 'Declined',
-          color: 'bg-red-500/20 text-red-400',
+          variant: 'tintRed' as BadgeVariant,
           icon: XCircle,
         };
       case 'cancelled':
         return {
           label: 'Cancelled',
-          color: 'bg-gray-500/20 text-gray-400',
+          variant: 'tintMuted' as BadgeVariant,
           icon: XCircle,
         };
       default:
         return {
           label: status,
-          color: 'bg-gray-500/20 text-gray-400',
+          variant: 'tintMuted' as BadgeVariant,
           icon: Clock,
         };
     }
@@ -569,11 +584,11 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     switch (paymentStatus) {
       case 'paid':
       case 'confirmed':
-        return { label: 'Paid', color: 'bg-green-500/20 text-green-400' };
+        return { label: 'Paid', variant: 'tintGreen' as BadgeVariant };
       case 'overdue':
-        return { label: 'Overdue', color: 'bg-red-500/20 text-red-400' };
+        return { label: 'Overdue', variant: 'tintRed' as BadgeVariant };
       case 'pending':
-        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400' };
+        return { label: 'Pending', variant: 'tintYellow' as BadgeVariant };
       case 'n/a':
       default:
         return null;
@@ -642,7 +657,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           <p className="text-sm text-red-400 mb-3">{error}</p>
           <button
             onClick={fetchApplicants}
-            className="px-3 py-1.5 text-xs rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth"
+            className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-smooth"
           >
             Retry
           </button>
@@ -656,12 +671,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       {/* Two-Panel Layout */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Applicant List */}
-        <div className="w-80 border-r border-white/10 flex flex-col">
+        <div className="w-80 border-r border-border flex flex-col">
           {/* List Header */}
-          <div className="px-3 md:px-4 pb-3 border-b border-white/10">
+          <div className="px-3 md:px-4 pb-3 border-b border-border">
             <div className="mb-2">
-              <h2 className="text-2xl font-bold text-white">Vendors & Applicants</h2>
-              <p className="text-[10px] text-white/60">
+              <h2 className="text-2xl font-bold text-foreground">Vendors & Applicants</h2>
+              <p className="text-[10px] text-foreground/85 dark:text-foreground/60">
                 {filteredApplicants.length} total
                 {statusFilter !== 'all' && ` • ${statusFilter}`}
                 {categoryFilter !== 'all' && ` • ${categoryFilter}`}
@@ -670,48 +685,52 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
             {/* Search Bar */}
             <div className="relative mb-2">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-white/40" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/65 dark:text-foreground/40" />
               <input
                 type="text"
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-7 pr-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50"
               />
             </div>
 
             {/* Status & Category Filters */}
             <div className="space-y-1.5">
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-              >
-                <option value="all">All Status</option>
-                <option value="invited">Invited (No Application)</option>
-                <option value="pending">Pending Review</option>
-                <option value="approved">Approved</option>
-                <option value="confirmed">Confirmed</option>
-                <option value="waitlist">Waitlist</option>
-                <option value="rejected">Declined</option>
-                <option value="cancelled">Cancelled</option>
-              </select>
+              <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                  <SelectItem value="all" className="text-xs focus:bg-background/10">All Status</SelectItem>
+                  <SelectItem value="invited" className="text-xs focus:bg-background/10">Invited (No Application)</SelectItem>
+                  <SelectItem value="pending" className="text-xs focus:bg-background/10">Pending Review</SelectItem>
+                  <SelectItem value="approved" className="text-xs focus:bg-background/10">Approved</SelectItem>
+                  <SelectItem value="confirmed" className="text-xs focus:bg-background/10">Confirmed</SelectItem>
+                  <SelectItem value="waitlist" className="text-xs focus:bg-background/10">Waitlist</SelectItem>
+                  <SelectItem value="rejected" className="text-xs focus:bg-background/10">Declined</SelectItem>
+                  <SelectItem value="cancelled" className="text-xs focus:bg-background/10">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
               {uniqueCategories.length > 0 && (
-                <select
-                  value={categoryFilter}
-                  onChange={(e) => setCategoryFilter(e.target.value)}
-                  className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-1 focus:ring-purple-500/50"
-                >
-                  <option value="all">All Categories</option>
-                  {uniqueCategories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                    <SelectValue placeholder="All Categories" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                    <SelectItem value="all" className="text-xs focus:bg-background/10">All Categories</SelectItem>
+                    {uniqueCategories.map((cat) => (
+                      <SelectItem key={cat} value={cat} className="text-xs focus:bg-background/10">
+                        {cat}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               )}
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="w-full px-2 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
+                  className="w-full px-2 py-1.5 rounded-lg bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground hover:bg-background/10 text-xs transition-smooth"
                 >
                   Clear filters
                 </button>
@@ -723,8 +742,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           <div className="flex-1 overflow-y-auto">
             {filteredApplicants.length === 0 ? (
               <div className="p-4 text-center">
-                <Building2 className="w-8 h-8 text-white/20 mx-auto mb-2" />
-                <p className="text-xs text-white/60">
+                <Building2 className="w-8 h-8 text-foreground/20 mx-auto mb-2" />
+                <p className="text-xs text-foreground/80 dark:text-foreground/60">
                   {hasActiveFilters ? 'No matches found' : 'No pending applications'}
                 </p>
               </div>
@@ -744,12 +763,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       className={`w-full p-2 rounded-lg text-left transition-smooth ${
                         isSelected
                           ? 'bg-purple-600/20 border border-purple-500/50'
-                          : 'bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20'
+                          : 'voxxy-hover-row bg-background/5 border border-border hover:bg-background/10 hover:border-border'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
                         <div className="flex items-center gap-1 flex-1 min-w-0">
-                          <h3 className="text-xs font-semibold text-white truncate">
+                          <h3 className="text-xs font-semibold text-foreground truncate">
                             {applicant.contact_name || applicant.business_name}
                           </h3>
                           {applicant.is_returning && (
@@ -759,32 +778,33 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             <MailX className="w-2.5 h-2.5 text-orange-400 flex-shrink-0" />
                           )}
                         </div>
-                        <span
-                          className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full text-[9px] font-medium ${statusBadge.color} flex-shrink-0 ml-2`}
+                        <Badge
+                          variant={statusBadge.variant}
+                          className="ml-2 inline-flex shrink-0 items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
                         >
-                          <StatusIcon className="w-2 h-2" />
+                          <StatusIcon className="h-2 w-2" />
                           {statusBadge.label}
-                        </span>
+                        </Badge>
                       </div>
-                      <p className="text-[10px] text-white/60 truncate mb-1.5">
+                      <p className="text-[10px] text-foreground/60 truncate mb-1.5">
                         {applicant.contact_name ? applicant.business_name || applicant.email : applicant.email}
                       </p>
                       <div className="flex flex-wrap items-center gap-1">
                         {applicant.status !== 'invited' && (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-purple-500/20 text-purple-400">
+                          <Badge variant="tintPurple" className="inline-block rounded px-1.5 py-0.5 text-[9px] font-medium">
                             {applicant.vendor_category}
-                          </span>
+                          </Badge>
                         )}
                         {applicant.source === 'net_new' && (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-medium bg-cyan-500/20 text-cyan-400">
+                          <Badge variant="tintCyan" className="inline-block rounded px-1.5 py-0.5 text-[9px] font-medium">
                             New
-                          </span>
+                          </Badge>
                         )}
                         {paymentBadge && applicant.status === 'approved' && (
-                          <span className={`inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium ${paymentBadge.color}`}>
-                            <DollarSign className="w-2 h-2" />
+                          <Badge variant={paymentBadge.variant} className="inline-flex items-center gap-0.5 rounded px-1.5 py-0.5 text-[9px] font-medium">
+                            <DollarSign className="h-2 w-2" />
                             {paymentBadge.label}
-                          </span>
+                          </Badge>
                         )}
                       </div>
                     </button>
@@ -800,63 +820,59 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           {!selectedApplicant ? (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                <Building2 className="w-16 h-16 text-white/20 mx-auto mb-3" />
-                <h3 className="text-sm font-semibold text-white mb-1">No Applicant Selected</h3>
-                <p className="text-xs text-white/60">Select an applicant from the list to view details</p>
+                <Building2 className="w-16 h-16 text-foreground/20 mx-auto mb-3" />
+                <h3 className="text-sm font-semibold text-foreground mb-1">No Applicant Selected</h3>
+                <p className="text-xs text-foreground/60">Select an applicant from the list to view details</p>
               </div>
             </div>
           ) : (
             <div className="px-3 md:px-4 pb-4">
               {/* Detail Header */}
-              <div className="glass-card p-4 mb-3">
+              <div className="glass-card voxxy-hover-panel p-4 mb-3">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                      <h2 className="text-lg font-bold text-white">{selectedApplicant.contact_name || selectedApplicant.business_name}</h2>
+                      <h2 className="text-lg font-bold text-foreground">{selectedApplicant.contact_name || selectedApplicant.business_name}</h2>
                       {selectedApplicant.is_returning && (
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/20 border border-yellow-500/30">
-                          <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />
-                          <span className="text-[10px] font-medium text-yellow-400">Returning</span>
-                        </div>
+                        <Badge variant="tintYellow" className="gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium">
+                          <Star className="h-3 w-3 text-yellow-800 dark:text-yellow-400" fill="currentColor" />
+                          Returning
+                        </Badge>
                       )}
                       {selectedApplicant.source && (
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${
-                          selectedApplicant.source === 'net_new'
-                            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-                            : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
-                        }`}>
+                        <Badge
+                          variant={selectedApplicant.source === 'net_new' ? 'tintCyan' : 'tintPurple'}
+                          className="rounded-full px-2 py-0.5 text-[10px] font-medium"
+                        >
                           {selectedApplicant.source === 'net_new' ? 'New Applicant' : 'From Contacts'}
-                        </span>
+                        </Badge>
                       )}
                       {selectedApplicant.email_unsubscribed && selectedApplicant.unsubscribe_status && (
-                        <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-500/20 border border-orange-500/30">
-                          <MailX className="w-3 h-3 text-orange-400" />
-                          <span className="text-[10px] font-medium text-orange-400">
-                            Unsubscribed ({selectedApplicant.unsubscribe_status.scope})
-                          </span>
-                        </div>
+                        <Badge variant="tintOrange" className="gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium">
+                          <MailX className="h-3 w-3 text-orange-800 dark:text-orange-400" />
+                          Unsubscribed ({selectedApplicant.unsubscribe_status.scope})
+                        </Badge>
                       )}
                     </div>
                     {selectedApplicant.contact_name && selectedApplicant.business_name && (
-                      <p className="text-sm text-white/80 mb-2">{selectedApplicant.business_name}</p>
+                      <p className="text-sm text-foreground/80 mb-2">{selectedApplicant.business_name}</p>
                     )}
-                    <span
-                      className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${
-                        getStatusBadge(selectedApplicant.status).color
-                      }`}
+                    <Badge
+                      variant={getStatusBadge(selectedApplicant.status).variant}
+                      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
                     >
                       {React.createElement(getStatusBadge(selectedApplicant.status).icon, {
-                        className: 'w-3 h-3',
+                        className: 'h-3 w-3',
                       })}
                       {getStatusBadge(selectedApplicant.status).label}
-                    </span>
+                    </Badge>
                   </div>
                 </div>
 
                 {/* Contact Info Grid */}
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div>
-                    <p className="text-[10px] text-white/60 mb-1">Email</p>
+                    <p className="text-[10px] text-foreground/60 mb-1">Email</p>
                     <a
                       href={`mailto:${selectedApplicant.email}`}
                       className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
@@ -867,7 +883,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   </div>
                   {selectedApplicant.phone && (
                     <div>
-                      <p className="text-[10px] text-white/60 mb-1">Phone</p>
+                      <p className="text-[10px] text-foreground/60 mb-1">Phone</p>
                       <a
                         href={`tel:${selectedApplicant.phone}`}
                         className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
@@ -879,17 +895,17 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   )}
                   {selectedApplicant.location && (
                     <div>
-                      <p className="text-[10px] text-white/60 mb-1">Location</p>
-                      <div className="flex items-center gap-1.5 text-xs text-white/80">
-                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
+                      <p className="text-[10px] text-foreground/60 mb-1">Location</p>
+                      <div className="flex items-center gap-1.5 text-xs text-foreground/80">
+                        <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-foreground/60" />
                         <span>{selectedApplicant.location}</span>
                       </div>
                     </div>
                   )}
                   <div>
-                    <p className="text-[10px] text-white/60 mb-1">Applied</p>
-                    <div className="flex items-center gap-1.5 text-xs text-white/80">
-                      <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-white/60" />
+                    <p className="text-[10px] text-foreground/60 mb-1">Applied</p>
+                    <div className="flex items-center gap-1.5 text-xs text-foreground/80">
+                      <Calendar className="w-3.5 h-3.5 flex-shrink-0 text-foreground/60" />
                       <span>{formatDate(selectedApplicant.created_at)}</span>
                     </div>
                   </div>
@@ -897,38 +913,39 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
                 {/* Category */}
                 <div className="mb-3">
-                  <p className="text-[10px] text-white/60 mb-1">Category</p>
+                  <p className="text-[10px] text-foreground/60 mb-1">Category</p>
                   {selectedApplicant.status === 'invited' ? (
-                    <div className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white/40 text-xs border border-white/10 italic">
+                    <div className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground/40 text-xs border border-border italic">
                       Pending Application
                     </div>
                   ) : (
-                    <select
+                    <Select
                       value={selectedApplicant.vendor_category}
-                      onChange={(e) => requestCategoryChange(selectedApplicant, e.target.value)}
+                      onValueChange={(value) => requestCategoryChange(selectedApplicant, value)}
                       disabled={isUpdatingCategory}
-                      className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {availableCategories.length > 0 ? (
-                        // Show all available categories, ensuring current category is included
-                        [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort().map((category) => (
-                          <option key={category} value={category}>
+                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50">
+                        <SelectValue placeholder={selectedApplicant.vendor_category} />
+                      </SelectTrigger>
+                      <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                        {(
+                          availableCategories.length > 0
+                            ? [...new Set([selectedApplicant.vendor_category, ...availableCategories])].filter(Boolean).sort()
+                            : [selectedApplicant.vendor_category]
+                        ).map((category) => (
+                          <SelectItem key={category} value={category} className="text-xs focus:bg-background/10">
                             {category}
-                          </option>
-                        ))
-                      ) : (
-                        <option value={selectedApplicant.vendor_category}>
-                          {selectedApplicant.vendor_category}
-                        </option>
-                      )}
-                    </select>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   )}
                 </div>
               </div>
 
               {/* Social & Links */}
-              <div className="glass-card p-3 mb-3">
-                <h3 className="text-sm font-semibold text-white mb-3">Social & Links</h3>
+              <div className="glass-card voxxy-hover-panel p-3 mb-3">
+                <h3 className="text-sm font-semibold text-foreground mb-3">Social & Links</h3>
                 <div className="flex flex-wrap gap-2">
                   {selectedApplicant.instagram_handle && (
                     <a
@@ -939,7 +956,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
                     >
                       <Instagram className="w-4 h-4" />
                       <span>Instagram</span>
@@ -955,7 +972,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
                     >
                       <Music className="w-4 h-4" />
                       <span>TikTok</span>
@@ -971,7 +988,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
                     >
                       <Star className="w-4 h-4 text-yellow-400" />
                       <span>Portfolio</span>
@@ -987,7 +1004,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       }
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white transition-smooth border border-white/10"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
                     >
                       <Globe className="w-4 h-4" />
                       <span>Website</span>
@@ -999,13 +1016,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Portfolio Images */}
               {selectedApplicant.portfolio_images && selectedApplicant.portfolio_images.length > 0 && (
-                <div className="glass-card p-3 mb-3">
-                  <h3 className="text-sm font-semibold text-white mb-3">Images</h3>
+                <div className="glass-card voxxy-hover-panel p-3 mb-3">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">Images</h3>
                   <div className="grid grid-cols-3 gap-2">
                     {selectedApplicant.portfolio_images.map((image, idx) => (
                       <div
                         key={idx}
-                        className="aspect-square rounded-lg bg-white/5 border border-white/10 overflow-hidden"
+                        className="aspect-square rounded-lg bg-background/5 border border-border overflow-hidden"
                       >
                         <img
                           src={image}
@@ -1020,8 +1037,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Status & Payment Management - Only show for applicants who have applied */}
               {selectedApplicant.status !== 'invited' && selectedApplicant.registrationId && (
-                <div className="glass-card p-3 mb-3">
-                  <h3 className="text-sm font-semibold text-white mb-3">Status & Actions</h3>
+                <div className="glass-card voxxy-hover-panel p-3 mb-3">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">Status & Actions</h3>
                   {updatingId === selectedApplicant.id ? (
                     <div className="flex items-center justify-center py-2">
                       <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
@@ -1037,14 +1054,14 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       </button>
                       <button
                         onClick={() => requestStatusChange(selectedApplicant, 'waitlist')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
                       >
                         <AlertCircle className="w-3.5 h-3.5" />
                         Waitlist
                       </button>
                       <button
                         onClick={() => requestStatusChange(selectedApplicant, 'rejected')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-800 dark:text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
                       >
                         <XCircle className="w-3.5 h-3.5" />
                         Decline
@@ -1053,45 +1070,58 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   ) : (
                     <div className="space-y-3">
                       {/* Vendor Status Row */}
-                      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                      <div className="flex items-center justify-between pb-3 border-b border-border">
                         <div>
-                          <p className="text-[10px] text-white/60 mb-1">Vendor Status</p>
-                          <p className="text-xs text-white font-medium">{getStatusBadge(selectedApplicant.status).label}</p>
+                          <p className="text-[10px] text-foreground/60 mb-1">Vendor Status</p>
+                          <p className="text-xs text-foreground font-medium">{getStatusBadge(selectedApplicant.status).label}</p>
                         </div>
-                        <select
+                        <Select
                           value={selectedApplicant.status}
-                          onChange={(e) => {
-                            const newStatus = e.target.value as 'approved' | 'waitlist' | 'rejected';
+                          onValueChange={(value) => {
+                            const newStatus = value as 'approved' | 'waitlist' | 'rejected';
                             if (newStatus !== selectedApplicant.status) {
                               requestStatusChange(selectedApplicant, newStatus);
                             }
                           }}
-                          className="px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth"
                         >
-                          <option value={selectedApplicant.status}>Keep as {getStatusBadge(selectedApplicant.status).label}</option>
-                          <option value="approved">Change to Approved</option>
-                          <option value="waitlist">Change to Waitlist</option>
-                          <option value="rejected">Change to Declined</option>
-                        </select>
+                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50">
+                            <SelectValue placeholder={`Keep as ${getStatusBadge(selectedApplicant.status).label}`} />
+                          </SelectTrigger>
+                          <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                            <SelectItem value={selectedApplicant.status} className="text-xs focus:bg-background/10">
+                              Keep as {getStatusBadge(selectedApplicant.status).label}
+                            </SelectItem>
+                            <SelectItem value="approved" className="text-xs focus:bg-background/10">
+                              Change to Approved
+                            </SelectItem>
+                            <SelectItem value="waitlist" className="text-xs focus:bg-background/10">
+                              Change to Waitlist
+                            </SelectItem>
+                            <SelectItem value="rejected" className="text-xs focus:bg-background/10">
+                              Change to Declined
+                            </SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
 
                       {/* Payment Status Row - Only for approved with payment tracking */}
                       {selectedApplicant.status === 'approved' && selectedApplicant.payment_status !== 'n/a' && (
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-[10px] text-white/60 mb-1">Payment Status</p>
-                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium ${
-                              getPaymentBadge(selectedApplicant.payment_status)?.color || 'bg-gray-500/20 text-gray-400'
-                            }`}>
-                              <DollarSign className="w-3.5 h-3.5" />
+                            <p className="text-[10px] text-foreground/60 mb-1">Payment Status</p>
+                            <Badge
+                              variant={getPaymentBadge(selectedApplicant.payment_status)?.variant ?? 'tintMuted'}
+                              className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium"
+                            >
+                              <DollarSign className="h-3.5 w-3.5" />
                               {getPaymentBadge(selectedApplicant.payment_status)?.label || 'Unknown'}
-                            </span>
+                            </Badge>
                           </div>
                           {selectedApplicant.payment_status !== 'paid' && (
                             <button
                               onClick={() => requestPaymentChange(selectedApplicant)}
                               disabled={updatingId === selectedApplicant.id}
-                              className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="px-3 py-1.5 rounded-lg bg-background/10 text-foreground text-xs border border-border hover:bg-background/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                               Mark as Paid
                             </button>
@@ -1105,31 +1135,27 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
               {/* Email History */}
               {(selectedApplicant.registrationId || selectedApplicant.invitationId) && (
-                <div className="glass-card p-4">
-                  <h3 className="text-sm font-semibold text-white mb-3">Email History</h3>
+                <div className="glass-card voxxy-hover-panel p-4">
+                  <h3 className="text-sm font-semibold text-foreground mb-3">Email History</h3>
 
                   {loadingEmailHistory ? (
                     <div className="flex items-center justify-center py-4">
                       <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
                     </div>
                   ) : emailHistoryData.length > 0 ? (
-                    <div className="divide-y divide-white/5">
+                    <div className="divide-y divide-border">
                       {emailHistoryData.map((delivery: any) => {
                         const deliveryStatus = delivery.status;
                         const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
                         const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
-                        let statusColor = 'text-white/40';
-                        if (deliveryStatus === 'delivered') statusColor = 'text-green-400';
-                        else if (deliveryStatus === 'bounced') statusColor = 'text-red-400';
-                        else if (deliveryStatus === 'dropped') statusColor = 'text-orange-400';
-                        else if (deliveryStatus === 'unsubscribed') statusColor = 'text-yellow-400';
+                        const statusColor = getEmailDeliveryStatusTextClass(deliveryStatus);
 
                         return (
                           <div key={delivery.id} className="flex items-center gap-2 py-1.5">
-                            <Mail className="w-3 h-3 text-white/30 flex-shrink-0" />
-                            <span className="text-[10px] text-white/70 truncate flex-1">{emailSubject}</span>
-                            <span className="text-[10px] text-white/40 tabular-nums flex-shrink-0">
+                            <Mail className={`w-3 h-3 ${EMAIL_HISTORY_ICON_CLASS} flex-shrink-0`} />
+                            <span className={`text-[10px] ${EMAIL_HISTORY_SUBJECT_CLASS} truncate flex-1`}>{emailSubject}</span>
+                            <span className={`text-[10px] ${EMAIL_HISTORY_META_CLASS} tabular-nums flex-shrink-0`}>
                               {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
                                 month: 'short',
                                 day: 'numeric',
@@ -1138,6 +1164,36 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             <span className={`text-[10px] font-medium ${statusColor} flex-shrink-0 w-16 text-right`}>
                               {deliveryStatus}
                             </span>
+                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                              <button
+                                onClick={async () => {
+                                  try {
+                                    await emailDeliveriesApi.retry(delivery.id);
+                                    toast.success('Email queued for retry');
+                                    let refreshedHistory: any[] = [];
+                                    if (selectedApplicant.registrationId) {
+                                      const regHistory = await emailDeliveriesApi.getByRegistration(selectedApplicant.registrationId);
+                                      refreshedHistory = [...(regHistory || [])];
+                                    }
+                                    if (selectedApplicant.invitationId) {
+                                      const invHistory = await emailDeliveriesApi.getByInvitation(eventSlug, selectedApplicant.invitationId);
+                                      refreshedHistory = [...refreshedHistory, ...(invHistory || [])];
+                                    }
+                                    refreshedHistory.sort((a, b) => {
+                                      const dateA = new Date(a.delivered_at || a.sent_at || a.created_at).getTime();
+                                      const dateB = new Date(b.delivered_at || b.sent_at || b.created_at).getTime();
+                                      return dateB - dateA;
+                                    });
+                                    setEmailHistoryData(refreshedHistory);
+                                  } catch (err: any) {
+                                    toast.error(`Failed to retry: ${err.message}`);
+                                  }
+                                }}
+                                className={`text-[10px] ${EMAIL_HISTORY_RETRY_CLASS} flex-shrink-0`}
+                              >
+                                Retry
+                              </button>
+                            )}
                           </div>
                         );
                       })}
@@ -1151,18 +1207,18 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             <p className="text-xs text-orange-400 font-medium mb-1">
                               No Emails Sent (Unsubscribed)
                             </p>
-                            <p className="text-[10px] text-white/60">
+                            <p className="text-[10px] text-foreground/60">
                               This vendor unsubscribed from {selectedApplicant.unsubscribe_status.scope} emails.
                               No automated messages will be sent.
                             </p>
                           </div>
                         </div>
                       ) : (
-                        <div className="flex items-start gap-2 p-3 rounded-lg bg-white/5 border border-white/10">
-                          <Clock className="w-4 h-4 text-white/40 flex-shrink-0 mt-0.5" />
+                        <div className="flex items-start gap-2 p-3 rounded-lg bg-background/5 border border-border">
+                          <Clock className="w-4 h-4 text-foreground/40 flex-shrink-0 mt-0.5" />
                           <div>
-                            <p className="text-xs text-white/60 font-medium mb-1">No Email History</p>
-                            <p className="text-[10px] text-white/40">
+                            <p className="text-xs text-foreground/60 font-medium mb-1">No Email History</p>
+                            <p className="text-[10px] text-foreground/40">
                               No automated emails have been triggered yet.
                             </p>
                           </div>
@@ -1193,7 +1249,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       {/* Status Change Confirmation Modal */}
       {showStatusConfirmModal && pendingStatusChange && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+          <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-md w-full p-6 space-y-4">
             {/* Header */}
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${
@@ -1212,10 +1268,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 }`} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-1">
+                <h3 className="text-lg font-semibold text-foreground mb-1">
                   Change Status to {pendingStatusChange.newStatus === 'approved' ? 'Approved' : pendingStatusChange.newStatus === 'rejected' ? 'Declined' : 'Waitlisted'}?
                 </h3>
-                <p className="text-sm text-white/60">
+                <p className="text-sm text-foreground/60">
                   This will send an automated email notification
                 </p>
               </div>
@@ -1230,11 +1286,11 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             </div>
 
             {/* Vendor Info */}
-            <div className="bg-white/5 rounded-lg p-3 space-y-1">
-              <p className="text-sm text-white font-medium">
+            <div className="bg-background/5 rounded-lg p-3 space-y-1">
+              <p className="text-sm text-foreground font-medium">
                 {pendingStatusChange.applicant.business_name}
               </p>
-              <p className="text-xs text-white/60">
+              <p className="text-xs text-foreground/60">
                 {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
               </p>
               <p className="text-xs text-purple-400">
@@ -1246,13 +1302,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             <div className="flex gap-2 pt-2">
               <button
                 onClick={cancelStatusChange}
-                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+                className="flex-1 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-smooth text-sm font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmStatusChange}
-                className={`flex-1 px-4 py-2 rounded-lg text-white text-sm font-medium transition-smooth ${
+                className={`flex-1 px-4 py-2 rounded-lg text-foreground text-sm font-medium transition-smooth ${
                   pendingStatusChange.newStatus === 'approved'
                     ? 'bg-green-600 hover:bg-green-500'
                     : pendingStatusChange.newStatus === 'rejected'
@@ -1270,35 +1326,35 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       {/* Category Change Confirmation Modal */}
       {showCategoryConfirmModal && pendingCategoryChange && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+          <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-md w-full p-6 space-y-4">
             {/* Header */}
             <div className="flex items-start gap-3">
               <div className="p-2 rounded-lg bg-purple-500/20">
                 <ArrowLeftRight className="w-5 h-5 text-purple-400" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-1">
+                <h3 className="text-lg font-semibold text-foreground mb-1">
                   Reassign Category?
                 </h3>
-                <p className="text-sm text-white/60">
+                <p className="text-sm text-foreground/60">
                   This may affect pricing. You can notify the vendor in the next step.
                 </p>
               </div>
             </div>
 
             {/* Category Change Info */}
-            <div className="bg-white/5 rounded-lg p-3 space-y-2">
-              <p className="text-sm text-white font-medium">
+            <div className="bg-background/5 rounded-lg p-3 space-y-2">
+              <p className="text-sm text-foreground font-medium">
                 {pendingCategoryChange.applicant.business_name}
               </p>
               <div className="flex items-center gap-2 text-xs">
-                <span className="px-2 py-1 rounded bg-red-500/20 text-red-400 line-through">
+                <Badge variant="tintRed" className="rounded px-2 py-1 line-through">
                   {pendingCategoryChange.applicant.vendor_category}
-                </span>
-                <span className="text-white/40">→</span>
-                <span className="px-2 py-1 rounded bg-green-500/20 text-green-400">
+                </Badge>
+                <span className="text-foreground/40">→</span>
+                <Badge variant="tintGreen" className="rounded px-2 py-1">
                   {pendingCategoryChange.newCategory}
-                </span>
+                </Badge>
               </div>
             </div>
 
@@ -1306,13 +1362,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             <div className="flex gap-2 pt-2">
               <button
                 onClick={cancelCategoryChange}
-                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+                className="flex-1 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-smooth text-sm font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmCategoryChange}
-                className="flex-1 px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-smooth"
+                className="flex-1 px-4 py-2 rounded-lg voxxy-btn-solid text-sm font-medium transition-smooth"
               >
                 Reassign Category
               </button>
@@ -1324,7 +1380,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
       {/* Payment Change Confirmation Modal */}
       {showPaymentConfirmModal && pendingPaymentChange && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-br from-gray-900 via-purple-900/20 to-gray-900 rounded-2xl border border-white/10 max-w-md w-full p-6 space-y-4">
+          <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-md w-full p-6 space-y-4">
             {/* Header */}
             <div className="flex items-start gap-3">
               <div className={`p-2 rounded-lg ${
@@ -1339,10 +1395,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 }`} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-white mb-1">
+                <h3 className="text-lg font-semibold text-foreground mb-1">
                   Mark as {pendingPaymentChange.newPaymentStatus === 'paid' ? 'Paid' : 'Pending'}?
                 </h3>
-                <p className="text-sm text-white/60">
+                <p className="text-sm text-foreground/60">
                   This will send an automated email notification
                 </p>
               </div>
@@ -1357,24 +1413,24 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             </div>
 
             {/* Payment Change Info */}
-            <div className="bg-white/5 rounded-lg p-3 space-y-2">
-              <p className="text-sm text-white font-medium">
+            <div className="bg-background/5 rounded-lg p-3 space-y-2">
+              <p className="text-sm text-foreground font-medium">
                 {pendingPaymentChange.applicant.business_name}
               </p>
               <div className="flex items-center gap-2 text-xs">
-                <DollarSign className="w-4 h-4 text-white/60" />
+                <DollarSign className="w-4 h-4 text-foreground/60" />
                 <span className={`px-2 py-1 rounded ${
                   pendingPaymentChange.applicant.payment_status === 'paid'
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-yellow-500/20 text-yellow-400'
+                    ? 'bg-green-500/20 text-emerald-900 dark:text-green-400'
+                    : 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400'
                 } line-through`}>
                   {pendingPaymentChange.applicant.payment_status === 'paid' ? 'Paid' : 'Pending'}
                 </span>
-                <span className="text-white/40">→</span>
+                <span className="text-foreground/40">→</span>
                 <span className={`px-2 py-1 rounded ${
                   pendingPaymentChange.newPaymentStatus === 'paid'
-                    ? 'bg-green-500/20 text-green-400'
-                    : 'bg-yellow-500/20 text-yellow-400'
+                    ? 'bg-green-500/20 text-emerald-900 dark:text-green-400'
+                    : 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400'
                 }`}>
                   {pendingPaymentChange.newPaymentStatus === 'paid' ? 'Paid' : 'Pending'}
                 </span>
@@ -1385,13 +1441,13 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             <div className="flex gap-2 pt-2">
               <button
                 onClick={cancelPaymentChange}
-                className="flex-1 px-4 py-2 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-smooth text-sm font-medium"
+                className="flex-1 px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-smooth text-sm font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={confirmPaymentChange}
-                className={`flex-1 px-4 py-2 rounded-lg text-white text-sm font-medium transition-smooth ${
+                className={`flex-1 px-4 py-2 rounded-lg text-foreground text-sm font-medium transition-smooth ${
                   pendingPaymentChange.newPaymentStatus === 'paid'
                     ? 'bg-green-600 hover:bg-green-500'
                     : 'bg-yellow-600 hover:bg-yellow-500'

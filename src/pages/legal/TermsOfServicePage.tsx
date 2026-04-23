@@ -14,7 +14,7 @@ export default function TermsOfServicePage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -22,12 +22,12 @@ export default function TermsOfServicePage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Terms Of Service</h1>
+          <h1 className="text-4xl font-bold text-foreground">Terms Of Service</h1>
           <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+        <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This page explains our Terms of Service, which contains important information about your legal rights. When you use Voxxy Presents, you're agreeing to these terms. To help make them easier to understand, we've included annotations in these highlighted boxes. The annotations aren't part of the official terms, but are intended to clarify key sections.
           </p>
@@ -60,9 +60,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 1 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">1. Definitions</h2>
+          <h2 className="text-2xl font-bold text-foreground">1. Definitions</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               These definitions help clarify who's who and what's what throughout the rest of the agreement.
             </p>
@@ -86,9 +86,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 2 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">2. Creating an Account</h2>
+          <h2 className="text-2xl font-bold text-foreground">2. Creating an Account</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Make sure your account information is accurate and keep your account safe. You're responsible for your account and any activity on it. You need to be at least 18 years old to use Voxxy Presents.
             </p>
@@ -112,9 +112,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 3 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">3. The Services</h2>
+          <h2 className="text-2xl font-bold text-foreground">3. The Services</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Voxxy Presents is a software platform for managing recurring community events. We provide the tools — you run your events. We're not a co-organizer, venue, or event producer.
             </p>
@@ -135,9 +135,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 4 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">4. Customer Data and End User Contacts</h2>
+          <h2 className="text-2xl font-bold text-foreground">4. Customer Data and End User Contacts</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               When you import your contacts into Voxxy, you're telling us that those people have given you permission to communicate with them. You still own your data. We process it on your behalf to provide the Services.
             </p>
@@ -164,9 +164,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 5 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">5. Your Responsibilities</h2>
+          <h2 className="text-2xl font-bold text-foreground">5. Your Responsibilities</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               You're responsible for your events, your contacts, your content, and following the law. We provide the tools; you handle the rest.
             </p>
@@ -190,9 +190,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 6 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">6. Paid Services and Fees</h2>
+          <h2 className="text-2xl font-bold text-foreground">6. Paid Services and Fees</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Voxxy Presents is a paid service. We'll bill you on a recurring basis through Stripe. You can cancel anytime, but refunds are at our discretion.
             </p>
@@ -225,9 +225,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 7 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">7. Third Party Services</h2>
+          <h2 className="text-2xl font-bold text-foreground">7. Third Party Services</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Voxxy integrates with other tools and services. Your use of those services is governed by their own terms — we're not responsible for them.
             </p>
@@ -245,9 +245,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 8 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">8. Intellectual Property</h2>
+          <h2 className="text-2xl font-bold text-foreground">8. Intellectual Property</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Voxxy owns the platform. You own your data. We can use your feedback to improve our product.
             </p>
@@ -265,9 +265,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 9 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">9. Our Rights</h2>
+          <h2 className="text-2xl font-bold text-foreground">9. Our Rights</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               To keep the platform running safely and effectively, we need to maintain certain controls over the Services.
             </p>
@@ -285,9 +285,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 10 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">10. Privacy</h2>
+          <h2 className="text-2xl font-bold text-foreground">10. Privacy</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Our Privacy Policy explains how we handle data. It's part of this agreement.
             </p>
@@ -306,9 +306,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 11 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">11. Term and Termination</h2>
+          <h2 className="text-2xl font-bold text-foreground">11. Term and Termination</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Either of us can end this agreement. If you cancel, you'll have time to export your data.
             </p>
@@ -332,9 +332,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 12 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">12. Warranty Disclaimers</h2>
+          <h2 className="text-2xl font-bold text-foreground">12. Warranty Disclaimers</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We work hard to make Voxxy great, but the Services are provided as is, without warranties.
             </p>
@@ -352,9 +352,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 13 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">13. Limitation of Liability</h2>
+          <h2 className="text-2xl font-bold text-foreground">13. Limitation of Liability</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If something goes wrong, our financial liability is capped at the fees you've paid us in the last six months.
             </p>
@@ -375,9 +375,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 14 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">14. Indemnification</h2>
+          <h2 className="text-2xl font-bold text-foreground">14. Indemnification</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If something you do on our platform gets us sued, you agree to cover us.
             </p>
@@ -392,9 +392,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 15 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">15. Dispute Resolution</h2>
+          <h2 className="text-2xl font-bold text-foreground">15. Dispute Resolution</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Before filing a claim, you agree to try to work it out with us informally first. Formal disputes are resolved through arbitration, not court, unless you opt out. Claims can only be brought individually — no class actions.
             </p>
@@ -433,9 +433,9 @@ export default function TermsOfServicePage() {
 
         {/* Section 16 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">16. Additional Terms</h2>
+          <h2 className="text-2xl font-bold text-foreground">16. Additional Terms</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This Agreement is the whole agreement between us. We'll give you notice if we make changes that affect your rights.
             </p>

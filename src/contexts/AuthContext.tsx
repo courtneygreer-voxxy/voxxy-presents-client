@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { authApi, getAuthToken, clearAuthToken, ApiError } from '@/services/api'
 import { analytics } from '@/lib/analytics'
 import { getCachedUserProfile, cacheUserProfile, removeCachedUserProfile } from '@/utils/cache'
+import { resetThemePreference, restoreDashboardThemePreference } from '@/contexts/ThemeContext'
 
 // Rails User type
 interface User {
@@ -200,6 +201,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setCurrentUser(user)
         setUserProfile(user)
         cacheUserProfile('rails-user', user)
+        restoreDashboardThemePreference()
 
         // Track sign up
         analytics.trackUserSignIn(user.email, String(user.id), user.role)
@@ -238,6 +240,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setCurrentUser(user)
       setUserProfile(user)
       cacheUserProfile('rails-user', user)
+      restoreDashboardThemePreference()
 
       // Track sign in
       analytics.trackUserSignIn(user.email, String(user.id), user.role)
@@ -267,6 +270,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // Call logout endpoint and clear token
       await authApi.logout()
+
+      // Public brand pages should return to the default dark theme after sign-out.
+      resetThemePreference()
 
       // Clear state
       setCurrentUser(null)
