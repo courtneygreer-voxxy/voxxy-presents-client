@@ -300,8 +300,28 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
     );
   }
 
+  // Check if event is cancelled
+  const isEventCancelled = event.status?.status === 'cancelled';
+
   return (
     <div className="px-3 md:px-4">
+      {/* Locked Event Banner for Cancelled Events */}
+      {isEventCancelled && (
+        <div className="mb-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-red-500/20 flex-shrink-0">
+              <Shield className="w-5 h-5 text-red-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-sm font-bold text-white mb-1">Event Locked - Cancelled</h3>
+              <p className="text-xs text-white/70 leading-relaxed">
+                This event has been cancelled and is now in read-only mode. You cannot create bulletins, edit emails, or change the event status. All vendors have been notified of the cancellation.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Grid: Left Column (Stats/Emails/Bulletins) + Right Column (Event Details) */}
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
         {/* Left Column - Vendor Stats (when live) or Go Live Card (when not live), then Emails & Bulletins */}
@@ -471,8 +491,14 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   </button>
                 )}
                 <button
-                  onClick={() => setIsCreateBulletinModalOpen(true)}
-                  className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white text-xs font-medium hover:shadow-lg transition-smooth flex items-center gap-1"
+                  onClick={() => !isEventCancelled && setIsCreateBulletinModalOpen(true)}
+                  disabled={isEventCancelled}
+                  className={`px-2.5 py-1 rounded-lg text-white text-xs font-medium transition-smooth flex items-center gap-1 ${
+                    isEventCancelled
+                      ? 'bg-gray-600/50 cursor-not-allowed opacity-50'
+                      : 'bg-gradient-to-r from-purple-600 to-blue-500 hover:shadow-lg'
+                  }`}
+                  title={isEventCancelled ? 'Cannot create bulletins for cancelled events' : 'Create a new bulletin'}
                 >
                   <MessageSquare className="w-3 h-3" />
                   Create Bulletin
@@ -565,7 +591,15 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             {/* Event Status */}
             <div className="flex items-start gap-2">
               <div className="flex-shrink-0 mt-0.5">
-                {isLive ? (
+                {event.status?.status === 'cancelled' ? (
+                  <div className="w-3.5 h-3.5 rounded-full bg-red-500 flex items-center justify-center">
+                    <X className="w-2.5 h-2.5 text-white" />
+                  </div>
+                ) : event.status?.status === 'completed' ? (
+                  <div className="w-3.5 h-3.5 rounded-full bg-blue-500 flex items-center justify-center">
+                    <Check className="w-2.5 h-2.5 text-white" />
+                  </div>
+                ) : isLive ? (
                   <div className="w-3.5 h-3.5 rounded-full bg-green-500 flex items-center justify-center">
                     <Check className="w-2.5 h-2.5 text-white" />
                   </div>
@@ -575,8 +609,14 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
               <div className="flex-1">
                 <p className="text-[10px] text-white/60">Event Status</p>
-                <p className={`text-xs font-medium ${isLive ? 'text-green-400' : 'text-yellow-400'}`}>
-                  {isLive ? 'Live' : 'Draft'}
+                <p className={`text-xs font-medium ${
+                  event.status?.status === 'cancelled' ? 'text-red-400' :
+                  event.status?.status === 'completed' ? 'text-blue-400' :
+                  isLive ? 'text-green-400' : 'text-yellow-400'
+                }`}>
+                  {event.status?.status === 'cancelled' ? 'Cancelled' :
+                   event.status?.status === 'completed' ? 'Completed' :
+                   isLive ? 'Live' : 'Draft'}
                 </p>
               </div>
             </div>

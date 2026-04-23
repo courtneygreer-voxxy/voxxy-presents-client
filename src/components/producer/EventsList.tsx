@@ -60,23 +60,27 @@ export default function EventsList({
 }: EventsListProps) {
 
   const getStatusBadge = (event: Event) => {
-    // Determine badge based on event date and is_live status
-    const eventDate = event.dates?.start || event.event_date;
-    if (!eventDate) {
-      return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
+    // Priority 1: Check explicit status field (cancelled, completed, draft, published)
+    if (event.status?.status === 'cancelled') {
+      return { label: 'Cancelled', color: 'bg-red-500/20 text-red-300', value: 'cancelled' };
     }
 
-    // Check if event date has passed
-    if (isDatePast(eventDate)) {
+    if (event.status?.status === 'completed') {
+      return { label: 'Completed', color: 'bg-blue-500/20 text-blue-300', value: 'completed' };
+    }
+
+    // Priority 2: Check if event date has passed (regardless of status)
+    const eventDate = event.dates?.start || event.event_date;
+    if (eventDate && isDatePast(eventDate)) {
       return { label: 'Past', color: 'bg-gray-500/20 text-gray-300', value: 'past' };
     }
 
-    // Check if event is live (invitation email has been sent)
+    // Priority 3: Check if event is live (is_live column set by go_live)
     if (event.status?.is_live) {
       return { label: 'Live', color: 'bg-green-500/20 text-green-300', value: 'live' };
     }
 
-    // Otherwise it's still a draft
+    // Priority 4: Default to draft (not cancelled, not completed, not past, not live)
     return { label: 'Draft', color: 'bg-purple-500/20 text-purple-300', value: 'draft' };
   };
 
@@ -104,13 +108,24 @@ export default function EventsList({
       // Status filter
       const badge = getStatusBadge(event);
 
-      // Hide past events by default unless showPastEvents is true or 'Past' is explicitly filtered
-      if (!showPastEvents && badge.value === 'past' && statusFilter !== 'Past') {
+      // Hide past and cancelled events by default unless showPastEvents is true or explicitly filtered
+      const isPastOrCancelled = badge.value === 'past' || badge.value === 'cancelled';
+      // When filtering by "Past", cancelled events ARE considered explicitly filtered
+      const isExplicitlyFiltered = statusFilter === badge.label || (statusFilter === 'Past' && badge.value === 'cancelled');
+
+      if (!showPastEvents && isPastOrCancelled && !isExplicitlyFiltered) {
         return false;
       }
 
-      if (statusFilter && badge.label !== statusFilter) {
-        return false;
+      // When filtering by "Past", include cancelled events (they're effectively "over")
+      if (statusFilter) {
+        if (statusFilter === 'Past' && isPastOrCancelled) {
+          // "Past" filter includes both past and cancelled events
+          return true;
+        } else if (badge.label !== statusFilter) {
+          // For all other filters (including "Cancelled"), do exact match
+          return false;
+        }
       }
 
       return true;

@@ -1041,7 +1041,7 @@ export default function ProducerDashboard() {
               {/* Filter Pills & Controls */}
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Status Filter Buttons */}
-                {['Live', 'Draft', 'Past'].map(status => (
+                {['Live', 'Draft', 'Cancelled', 'Past'].map(status => (
                   <button
                     key={status}
                     onClick={() => setEventsStatusFilter(eventsStatusFilter === status ? null : status)}

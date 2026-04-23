@@ -15,6 +15,7 @@ export interface EventDetails {
   title: string;
   slug: string;
   description: string;
+  status?: string;
   dates: {
     event_date: string;
     event_end_date: string | null;
@@ -34,6 +35,7 @@ export interface Organization {
   id: number;
   name: string;
   slug: string;
+  email?: string;
 }
 
 export interface VendorCategory {
