@@ -137,7 +137,7 @@ export function OnboardingGuide({
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <span className="text-xs text-purple-300 font-medium">
+          <span className="text-xs text-purple-800 dark:text-purple-300 font-medium">
             Step {currentStep + 1} of {totalSteps}
           </span>
           <button
@@ -161,7 +161,7 @@ export function OnboardingGuide({
             <div
               key={i}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === currentStep ? 'bg-purple-400' : 'bg-background/20'
+                i === currentStep ? 'bg-purple-600 dark:bg-purple-400' : 'bg-background/20'
               }`}
             />
           ))}

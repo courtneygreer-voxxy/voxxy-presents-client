@@ -1047,21 +1047,21 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => requestStatusChange(selectedApplicant, 'approved')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-green-500/30 text-green-400 hover:bg-green-500/10 text-xs font-medium transition-smooth"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-emerald-400/50 bg-emerald-100 text-emerald-950 hover:bg-emerald-200/90 dark:border-green-500/30 dark:bg-transparent dark:text-green-400 dark:hover:bg-green-500/10 text-xs font-medium transition-smooth"
                       >
                         <CheckCircle className="w-3.5 h-3.5" />
                         Approve
                       </button>
                       <button
                         onClick={() => requestStatusChange(selectedApplicant, 'waitlist')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-400/50 bg-amber-100 text-amber-950 hover:bg-amber-200/90 dark:border-yellow-500/30 dark:bg-transparent dark:text-yellow-400 dark:hover:bg-yellow-500/10 text-xs font-medium transition-smooth"
                       >
                         <AlertCircle className="w-3.5 h-3.5" />
                         Waitlist
                       </button>
                       <button
                         onClick={() => requestStatusChange(selectedApplicant, 'rejected')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-500/30 text-red-800 dark:text-red-400 hover:bg-red-500/10 text-xs font-medium transition-smooth"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-red-400/50 bg-red-100 text-red-950 hover:bg-red-200/90 dark:border-red-500/30 dark:bg-transparent dark:text-red-400 dark:hover:bg-red-500/10 text-xs font-medium transition-smooth"
                       >
                         <XCircle className="w-3.5 h-3.5" />
                         Decline

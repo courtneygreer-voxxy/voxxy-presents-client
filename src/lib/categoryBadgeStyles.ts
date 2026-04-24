@@ -55,14 +55,6 @@ function blendRgb(
   };
 }
 
-function blendWithWhite(color: string, whiteRatio: number) {
-  return rgbToCss(blendRgb(hexToRgb(color), { r: 255, g: 255, b: 255 }, whiteRatio));
-}
-
-function blendWithBlack(color: string, blackRatio: number) {
-  return rgbToCss(blendRgb(hexToRgb(color), { r: 0, g: 0, b: 0 }, blackRatio));
-}
-
 function relativeLuminance(color: { r: number; g: number; b: number }) {
   const toLinear = (channel: number) => {
     const value = channel / 255;
@@ -95,20 +87,6 @@ function pickReadableTextColor(
 
 export function getCategoryBadgeColor(color?: string) {
   return normalizeHexColor(color);
-}
-
-export function getCategoryBadgeTextColor(color?: string) {
-  return '#1e293b';
-}
-
-export function getCategoryBadgeStyle(color?: string) {
-  const baseColor = getCategoryBadgeColor(color);
-
-  return {
-    backgroundColor: blendWithWhite(baseColor, 0.82),
-    border: `1px solid ${blendWithWhite(baseColor, 0.62)}`,
-    color: getCategoryBadgeTextColor(baseColor),
-  };
 }
 
 export function getCategorySequenceBadgeStyle(color?: string): CSSProperties {
