@@ -329,9 +329,9 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                 <div className={innerGlassWell}>
                   <label className="block text-xs font-medium text-foreground/85 mb-1">Payment Status</label>
                   <p className={`text-sm font-semibold ${
-                    userProfile?.paid ? 'text-emerald-700 dark:text-emerald-400' : 'text-destructive'
+                    userProfile?.subscription_active ? 'text-emerald-700 dark:text-emerald-400' : 'text-destructive'
                   }`}>
-                    {userProfile?.paid ? 'PAID' : 'UNPAID'}
+                    {userProfile?.subscription_display_status || 'UNPAID'}
                   </p>
                 </div>
                 <div className={innerGlassWell}>
@@ -354,7 +354,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                       EMAIL_UNVERIFIED
                     </span>
                   )}
-                  {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && !userProfile?.paid && (
+                  {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && !userProfile?.subscription_active && (
                     <span className="px-2 py-1 rounded text-xs font-mono border border-destructive/40 bg-destructive/10 text-destructive">
                       PAYMENT_REQUIRED
                     </span>
@@ -368,7 +368,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
               </div>
 
               {/* Billing Management - Only for paid producers */}
-              {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && userProfile?.paid && (
+              {(userProfile?.role === 'venue_owner' || userProfile?.role === 'producer') && userProfile?.subscription_active && (
                 <div
                   className={cn(
                     'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',

@@ -13,7 +13,7 @@ import { stripeService } from '@/services/stripeService'
 
 export default function BetaPendingPage() {
   const navigate = useNavigate()
-  const { userProfile, signOut, refreshUserProfile } = useAuth()
+  const { userProfile, signOut, refreshUserProfile, isProducer, isEmailVerified, isPaid } = useAuth()
 
   // Payment state
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
@@ -34,11 +34,8 @@ export default function BetaPendingPage() {
   const [isDeleting, setIsDeleting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
-  // Account status checks
-  const isProducer = userProfile?.role === 'venue_owner' || userProfile?.role === 'producer'
-  const isPaid = userProfile?.paid === true
+  // Account status checks (V4.0: using subscription_active from AuthContext)
   const needsPayment = isProducer && !isPaid
-  const isEmailVerified = userProfile?.confirmed_at !== null && userProfile?.confirmed_at !== undefined
 
   // Fetch organization details for producers
   useEffect(() => {

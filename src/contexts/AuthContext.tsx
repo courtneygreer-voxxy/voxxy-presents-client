@@ -16,8 +16,13 @@ interface User {
   username?: string
   status?: 'active' | 'suspended' | 'banned'
   product_context?: 'mobile' | 'presents' | 'both'
-  paid?: boolean  // Payment status for producers
+  paid?: boolean  // LEGACY - Payment status for producers (deprecated, use subscription_active)
   organization_id?: number  // For producers: their primary organization
+  // V4.0: Stripe subscription status (replaces legacy 'paid' field)
+  subscription_active?: boolean  // True if organization has active subscription
+  subscription_status?: string | null  // 'active', 'inactive', 'past_due', 'canceled'
+  subscription_display_status?: string  // Human-readable status
+  requires_payment?: boolean  // True if user needs to pay (producers only)
 }
 
 interface SignUpData {
@@ -60,6 +65,11 @@ interface AuthContextType {
   isOrganizer: boolean // DEPRECATED - alias for isProducer
   isVenueOwner: boolean // DEPRECATED - alias for isVendor
   hasRole: (role: User['role']) => boolean
+
+  // Payment/Subscription helpers (V4.0)
+  isPaid: boolean  // True if user has active subscription (replaces legacy paid check)
+  requiresPayment: boolean  // True if user needs to pay
+  hasActiveSubscription: boolean  // True if subscription_active
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -339,6 +349,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const hasRole = (role: User['role']) => userProfile?.role === role
 
+  // Payment/Subscription helpers (V4.0)
+  // These replace the legacy 'paid' boolean check with organization subscription status
+  const hasActiveSubscription = userProfile?.subscription_active ?? false
+  const requiresPayment = userProfile?.requires_payment ?? false
+  const isPaid = hasActiveSubscription  // New: based on subscription_active, not legacy paid field
+
   const value: AuthContextType = {
     currentUser,
     userProfile,
@@ -358,7 +374,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
     isGuest,
     isOrganizer, // DEPRECATED - use isProducer
     isVenueOwner, // DEPRECATED - use isVendor
-    hasRole
+    hasRole,
+    // V4.0: Payment/Subscription helpers
+    isPaid,
+    requiresPayment,
+    hasActiveSubscription
   }
 
   return (
