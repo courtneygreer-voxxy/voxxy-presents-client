@@ -1076,8 +1076,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           <p className="text-xs text-foreground font-medium">{getStatusBadge(selectedApplicant.status).label}</p>
                         </div>
                         <Select
-                          value={selectedApplicant.status}
+                          // Use a sentinel for "keep current" so it never shares a value with
+                          // Change to Approved/Waitlist/Declined — duplicate values break Radix Select
+                          // (double checkmarks, concatenated trigger text).
+                          value="keep"
                           onValueChange={(value) => {
+                            if (value === 'keep') return;
                             const newStatus = value as 'approved' | 'waitlist' | 'rejected';
                             if (newStatus !== selectedApplicant.status) {
                               requestStatusChange(selectedApplicant, newStatus);
@@ -1088,7 +1092,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             <SelectValue placeholder={`Keep as ${getStatusBadge(selectedApplicant.status).label}`} />
                           </SelectTrigger>
                           <SelectContent className="border-border bg-muted text-foreground shadow-xl">
-                            <SelectItem value={selectedApplicant.status} className="text-xs focus:bg-background/10">
+                            <SelectItem value="keep" className="text-xs focus:bg-background/10">
                               Keep as {getStatusBadge(selectedApplicant.status).label}
                             </SelectItem>
                             <SelectItem value="approved" className="text-xs focus:bg-background/10">
