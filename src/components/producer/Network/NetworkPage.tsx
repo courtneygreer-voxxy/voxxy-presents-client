@@ -412,6 +412,19 @@ export default function NetworkPage({
     setListName('');
   };
 
+  // Fetch full contact details before opening edit modal
+  const handleEditContact = async (contact: VendorContact) => {
+    try {
+      // Fetch full contact with event history and change history
+      const fullContact = await vendorContactsApi.getById(contact.id);
+      setEditingContact(fullContact);
+    } catch (error) {
+      console.error('Failed to fetch contact details:', error);
+      // Fallback to partial contact if fetch fails
+      setEditingContact(contact);
+    }
+  };
+
   // Category CRUD functions
   const openAddCategoryModal = () => {
     setEditingCategory(null);
@@ -721,7 +734,7 @@ export default function NetworkPage({
               onSelectContact={handleSelectContact}
               onSelectAll={handleSelectAll}
               onDeleteContact={handleDeleteContact}
-              onEditContact={(contact) => setEditingContact(contact)}
+              onEditContact={handleEditContact}
               paginationMeta={paginationMeta}
               onPageChange={handlePageChange}
             />

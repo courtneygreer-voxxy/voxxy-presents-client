@@ -2171,6 +2171,11 @@ export const vendorContactsApi = {
       created_at: contact.created_at || contact.metadata?.created_at || '',
       updated_at: contact.updated_at || contact.metadata?.updated_at || '',
       unsubscribe_status: contact.unsubscribe_status || undefined,
+      // Include event history and change history (from include_relations: true)
+      event_history: contact.event_history || undefined,
+      change_history: contact.change_history || undefined,
+      total_applications: contact.total_applications || undefined,
+      total_events: contact.total_events || undefined,
     }
   },
 
