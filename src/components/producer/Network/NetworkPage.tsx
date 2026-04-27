@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check } from 'lucide-react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Calendar } from 'lucide-react';
 import { MapPin, Tags } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
@@ -163,7 +163,12 @@ export default function NetworkPage({
   // Category CRUD state
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
-  const [categoryFormData, setCategoryFormData] = useState({ name: '', icon: '', color: '#FF6B6B' });
+  const [categoryFormData, setCategoryFormData] = useState({
+    name: '',
+    color: '#FF6B6B',
+    description: '',
+    booth_price: 0
+  });
 
   // Filter options from backend
   const [filterOptions, setFilterOptions] = useState<{
@@ -410,13 +415,23 @@ export default function NetworkPage({
   // Category CRUD functions
   const openAddCategoryModal = () => {
     setEditingCategory(null);
-    setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+    setCategoryFormData({
+      name: '',
+      color: '#FF6B6B',
+      description: '',
+      booth_price: 0
+    });
     setShowCategoryModal(true);
   };
 
   const openEditCategoryModal = (category: Category) => {
     setEditingCategory(category);
-    setCategoryFormData({ name: category.name, icon: category.icon || '', color: category.color || '#FF6B6B' });
+    setCategoryFormData({
+      name: category.name,
+      color: category.color || '#FF6B6B',
+      description: category.description || '',
+      booth_price: category.booth_price || 0
+    });
     setShowCategoryModal(true);
   };
 
@@ -429,20 +444,27 @@ export default function NetworkPage({
       if (editingCategory) {
         await categoriesApi.update(editingCategory.id, {
           name: categoryFormData.name.trim(),
-          icon: categoryFormData.icon.trim() || undefined,
           color: categoryFormData.color,
+          description: categoryFormData.description.trim() || undefined,
+          booth_price: categoryFormData.booth_price || undefined,
         });
       } else {
         await categoriesApi.create(organizationId, {
           name: categoryFormData.name.trim(),
-          icon: categoryFormData.icon.trim() || undefined,
           color: categoryFormData.color,
+          description: categoryFormData.description.trim() || undefined,
+          booth_price: categoryFormData.booth_price || undefined,
         });
       }
       await loadCategories();
       setShowCategoryModal(false);
       setEditingCategory(null);
-      setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' });
+      setCategoryFormData({
+        name: '',
+        color: '#FF6B6B',
+        description: '',
+        booth_price: 0
+      });
     } catch (error: any) {
       alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
     }
@@ -754,56 +776,118 @@ export default function NetworkPage({
               <p className="text-foreground/40 text-xs mt-1">Create your first category to organize your vendors</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {categories.map((category) => (
-                <div
-                  key={category.id}
-                  className="group flex items-center justify-between rounded-lg border border-border bg-card/80 p-4 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
-                >
-                  <div className="flex items-center gap-3">
-                    {category.icon && <span className="text-2xl">{category.icon}</span>}
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm text-foreground font-medium">{category.name}</h3>
-                        {category.color && (
-                          <div
-                            className="w-4 h-4 rounded border border-border"
-                            style={{ backgroundColor: category.color }}
-                          />
-                        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {categories.map((category) => {
+                const boothPrice = category.booth_price ? Number(category.booth_price) : 0;
+                const defaultBoothPrice = category.default_booth_price ? Number(category.default_booth_price) : 0;
+                const hasBoothPrice = boothPrice > 0;
+                const hasDescription = category.description && category.description.trim().length > 0;
+                const hasSmartDefaults = defaultBoothPrice > 0;
+
+                return (
+                  <div
+                    key={category.id}
+                    className="group relative rounded-lg border border-border bg-card hover:shadow-md transition-all overflow-hidden"
+                    style={{
+                      borderLeftWidth: '4px',
+                      borderLeftColor: category.color || '#8B5CF6',
+                    }}
+                  >
+                    {/* Header Section */}
+                    <div className="p-4 pb-3">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <h3 className="text-base font-semibold text-foreground leading-tight">
+                          {category.name}
+                        </h3>
+                        <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
+                          <button
+                            onClick={() => handleViewCategory(category)}
+                            className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
+                            title="View contacts in this category"
+                          >
+                            <Users className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => openEditCategoryModal(category)}
+                            className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
+                            title="Edit category"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteCategory(category)}
+                            className="p-1.5 rounded-md hover:bg-red-500/20 text-foreground/60 hover:text-red-400 transition-all"
+                            title="Delete category"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </div>
-                      {category.usage_stats && (
-                        <p className="text-xs text-foreground/60 mt-0.5">
-                          {category.usage_stats.applications_count || 0} vendor{category.usage_stats.applications_count !== 1 ? 's' : ''}
+
+                      {/* Description */}
+                      {hasDescription ? (
+                        <p className="text-xs text-foreground/60 line-clamp-2 mb-3">
+                          {category.description}
+                        </p>
+                      ) : (
+                        <p className="text-xs text-foreground/40 italic mb-3">
+                          No description
                         </p>
                       )}
+
+                      {/* Price Badge */}
+                      {hasBoothPrice ? (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-500/10 border border-green-500/20 mb-2">
+                          <DollarSign className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
+                          <span className="text-sm font-semibold text-green-700 dark:text-green-300">
+                            ${boothPrice.toFixed(2)}
+                          </span>
+                          <span className="text-xs text-green-600/70 dark:text-green-400/70">
+                            default
+                          </span>
+                        </div>
+                      ) : hasSmartDefaults ? (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 mb-2">
+                          <DollarSign className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                            ${defaultBoothPrice.toFixed(2)}
+                          </span>
+                          <span className="text-xs text-blue-600/70 dark:text-blue-400/70">
+                            from last event
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-foreground/5 border border-border mb-2">
+                          <DollarSign className="w-3.5 h-3.5 text-foreground/40" />
+                          <span className="text-xs text-foreground/50">
+                            No price set
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer Section */}
+                    <div className="px-4 py-2.5 border-t border-border bg-background/20 dark:bg-background/5">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-1.5 text-foreground/60">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>
+                            {category.usage_stats?.contacts_count || 0} contact{category.usage_stats?.contacts_count !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        {category.last_used_event_name && (
+                          <div className="flex items-center gap-1.5 text-foreground/50" title={`Last used in: ${category.last_used_event_name}`}>
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span className="truncate max-w-[120px]">
+                              {category.last_used_event_name}
+                            </span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button
-                      onClick={() => handleViewCategory(category)}
-                      className="p-2 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
-                      title="View contacts in this category"
-                    >
-                      <Users className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => openEditCategoryModal(category)}
-                      className="p-2 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
-                      title="Edit category"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(category)}
-                      className="p-2 rounded-lg hover:bg-red-500/20 text-foreground/60 hover:text-red-400 transition-all"
-                      title="Delete category"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -818,7 +902,16 @@ export default function NetworkPage({
                 {editingCategory ? 'Edit Category' : 'Add Category'}
               </h3>
               <button
-                onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
+                onClick={() => {
+                  setShowCategoryModal(false);
+                  setEditingCategory(null);
+                  setCategoryFormData({
+                    name: '',
+                    color: '#FF6B6B',
+                    description: '',
+                    booth_price: 0
+                  });
+                }}
                 className="p-1 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
               >
                 <X className="w-5 h-5" />
@@ -834,17 +927,6 @@ export default function NetworkPage({
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
                   className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
                   autoFocus
-                />
-              </div>
-              <div>
-                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Icon (Emoji) - Optional</label>
-                <input
-                  type="text"
-                  value={categoryFormData.icon}
-                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, icon: e.target.value }))}
-                  placeholder="🍕 or 🎨 or 🎤"
-                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
-                  maxLength={2}
                 />
               </div>
               <div>
@@ -870,10 +952,36 @@ export default function NetworkPage({
                   />
                 </div>
               </div>
+              <div>
+                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Description - Optional</label>
+                <textarea
+                  value={categoryFormData.description}
+                  onChange={(e) => setCategoryFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Describe this category..."
+                  rows={3}
+                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10 resize-none"
+                />
+                <p className="mt-1 text-xs text-foreground/50">Internal notes about this vendor category</p>
+              </div>
+              <div>
+                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Default Booth Price - Optional</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 text-sm">$</span>
+                  <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={categoryFormData.booth_price || ''}
+                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, booth_price: parseFloat(e.target.value) || 0 }))}
+                    placeholder="150.00"
+                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-card/80 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                  />
+                </div>
+                <p className="mt-1 text-xs text-foreground/50">Pre-fills booth price when creating events with this category</p>
+              </div>
               <div className="voxxy-surface-subtle rounded-lg p-3">
                 <p className="text-xs text-foreground/60 mb-2">Preview:</p>
                 <div className="flex items-center gap-2">
-                  {categoryFormData.icon && <span className="text-2xl">{categoryFormData.icon}</span>}
                   <span className="text-sm text-foreground font-medium">{categoryFormData.name || 'Category Name'}</span>
                   <div className="w-4 h-4 rounded border border-border" style={{ backgroundColor: categoryFormData.color }} />
                 </div>
@@ -881,7 +989,16 @@ export default function NetworkPage({
             </div>
             <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
               <button
-                onClick={() => { setShowCategoryModal(false); setEditingCategory(null); setCategoryFormData({ name: '', icon: '', color: '#FF6B6B' }); }}
+                onClick={() => {
+                  setShowCategoryModal(false);
+                  setEditingCategory(null);
+                  setCategoryFormData({
+                    name: '',
+                    color: '#FF6B6B',
+                    description: '',
+                    booth_price: 0
+                  });
+                }}
                 className="px-4 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-background/10 transition-all"
               >
                 Cancel

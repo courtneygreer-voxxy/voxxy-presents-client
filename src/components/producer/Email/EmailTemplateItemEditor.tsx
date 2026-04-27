@@ -53,7 +53,6 @@ export default function EmailTemplateItemEditor({
 }: EmailTemplateItemEditorProps) {
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
     category: 'application_updates',
     subject_template: '',
     body_template: '',
@@ -74,7 +73,6 @@ export default function EmailTemplateItemEditor({
     if (item) {
       setFormData({
         name: item.name || '',
-        description: item.description || '',
         category: item.category || 'application_updates',
         subject_template: item.subject_template || '',
         body_template: item.body_template || '',
@@ -120,7 +118,6 @@ export default function EmailTemplateItemEditor({
       const updatedItem = {
         ...item,
         name: formData.name,
-        description: formData.description || null,
         category: formData.category as any,
         subject_template: formData.subject_template,
         body_template: formData.body_template,

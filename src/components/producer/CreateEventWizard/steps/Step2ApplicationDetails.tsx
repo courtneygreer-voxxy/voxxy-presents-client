@@ -116,8 +116,14 @@ export default function Step2ApplicationDetails({
         // Keep existing application data
         newApps.push(existingApp);
       } else if (category) {
-        // Create new application using category defaults (no API call!)
-        const hasDefaults = category.default_booth_price && category.default_booth_price > 0;
+        // Create new application using category values with precedence logic
+        // Precedence: manual booth_price > default_booth_price (from last event) > 0
+        const boothPrice = category.booth_price ?? category.default_booth_price ?? 0;
+        const description = category.description || category.default_description || '';
+
+        // Only show "Pre-filled from..." if using smart defaults (not manually set values)
+        const usingSmartDefaults = !category.booth_price && category.default_booth_price && category.default_booth_price > 0;
+
         // Default install_date to event date (installs typically happen day-of)
         const installDateDefault = eventDetails.event_date || '';
 
@@ -129,16 +135,16 @@ export default function Step2ApplicationDetails({
           category_icon: category.icon,
           category_email_campaign_template_id: category.email_campaign_template_id,
           name: category.name,
-          booth_price: category.default_booth_price || 0,
-          description: category.default_description || '',
+          booth_price: boothPrice,
+          description: description,
           install_date: installDateDefault,
           install_start_time: category.default_install_start_time || '',
           install_end_time: category.default_install_end_time || '',
           payment_link: category.default_payment_link || '',
           application_tags: category.default_application_tags || [],
-          // Track where pre-filled data came from
-          prefilled_from_event: hasDefaults ? category.last_used_event_name : undefined,
-          prefilled_from_event_id: hasDefaults ? category.last_used_event_id : undefined,
+          // Track where pre-filled data came from (only for smart defaults, not manual values)
+          prefilled_from_event: usingSmartDefaults ? category.last_used_event_name : undefined,
+          prefilled_from_event_id: usingSmartDefaults ? category.last_used_event_id : undefined,
         });
       }
     }

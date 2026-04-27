@@ -144,7 +144,6 @@ export function EmailTemplateEditorPage({
   // Form state
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
     category: 'application_updates',
     subject_template: '',
     body_template: '', // This will now contain only editable content (without footer)
@@ -163,7 +162,6 @@ export function EmailTemplateEditorPage({
 
       setFormData({
         name: item.name || '',
-        description: item.description || '',
         category: item.category || 'application_updates',
         subject_template: item.subject_template || '',
         body_template: content,
@@ -182,7 +180,6 @@ export function EmailTemplateEditorPage({
 
       setFormData({
         name: '',
-        description: '',
         category: defaultCategory,
         subject_template: '',
         body_template: '<p>Hi [firstName],</p><p></p><p>Best regards,</p><p>[organizationName]</p>',
@@ -312,7 +309,6 @@ export function EmailTemplateEditorPage({
         // Create mode: Create new template item
         const newItemData = {
           name: formData.name,
-          description: formData.description,
           position: nextPosition,
           subject_template: formData.subject_template,
           body_template: fullBodyTemplate,
@@ -329,7 +325,6 @@ export function EmailTemplateEditorPage({
         const updatedItem: EmailTemplateItem = {
           ...item,
           name: formData.name,
-          description: formData.description,
           category: formData.category as any,
           subject_template: formData.subject_template,
           body_template: fullBodyTemplate, // Content + footer rejoined
@@ -441,19 +436,6 @@ export function EmailTemplateEditorPage({
                 value={formData.name}
                 onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Application Received"
-                className="border-border bg-card/80 text-foreground dark:bg-background/5"
-              />
-            </div>
-
-            {/* Description */}
-            <div>
-              <label className="block text-xs font-medium text-foreground dark:text-foreground/60 mb-1">
-                Description (Optional)
-              </label>
-              <Input
-                value={formData.description}
-                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Brief description of this email"
                 className="border-border bg-card/80 text-foreground dark:bg-background/5"
               />
             </div>

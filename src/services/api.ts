@@ -1938,6 +1938,29 @@ export interface VendorContact {
     is_unsubscribed: boolean
     scope: 'global' | 'organization' | 'event' | null
   }
+  // Event history (only included when fetching single contact)
+  event_history?: EventHistoryItem[]
+  change_history?: ContactChangeHistoryItem[]
+  total_applications?: number
+  total_events?: number
+}
+
+export interface EventHistoryItem {
+  event_id: number
+  event_name: string
+  event_date: string
+  category: string
+  status: string
+  applied_at: string
+  application_id: number
+}
+
+export interface ContactChangeHistoryItem {
+  field: string
+  old_value: string
+  new_value: string
+  changed_at: string
+  event_name: string
 }
 
 export interface VendorContactsListResponse {
@@ -2767,6 +2790,7 @@ export const categoriesApi = {
     description?: string;
     color?: string;
     icon?: string;
+    booth_price?: number;
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/organizations/${organizationId}/categories`,
@@ -2786,6 +2810,7 @@ export const categoriesApi = {
     description?: string;
     color?: string;
     icon?: string;
+    booth_price?: number;
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/categories/${categoryId}`,

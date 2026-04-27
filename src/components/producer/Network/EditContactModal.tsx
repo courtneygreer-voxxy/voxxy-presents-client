@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { X, Plus, ChevronDown, Check } from 'lucide-react';
+import { X, Plus, ChevronDown, Check, Calendar, History, TrendingUp } from 'lucide-react';
 import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category } from '@/types/category';
 import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
@@ -478,6 +478,94 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
               </span>
             </div>
           </div>
+
+          {/* Event History Section */}
+          {contact.event_history && contact.event_history.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-border">
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-4 h-4 text-purple-500" />
+                <h3 className="text-sm font-semibold text-foreground">Event Application History</h3>
+                <span className="text-xs text-foreground/50">
+                  ({contact.total_applications || 0} application{contact.total_applications !== 1 ? 's' : ''} • {contact.total_events || 0} event{contact.total_events !== 1 ? 's' : ''})
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {contact.event_history.map((event, index) => (
+                  <div
+                    key={index}
+                    className="p-3 rounded-lg bg-background/20 border border-border hover:border-purple-500/30 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h4 className="text-sm font-medium text-foreground truncate">{event.event_name}</h4>
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                            {event.category}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-foreground/60">
+                          <span>{new Date(event.event_date).toLocaleDateString()}</span>
+                          <span>•</span>
+                          <span>Applied {new Date(event.applied_at).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          event.status === 'approved' || event.status === 'confirmed'
+                            ? 'bg-green-500/10 text-green-400 border border-green-500/20'
+                            : event.status === 'pending'
+                            ? 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20'
+                            : event.status === 'rejected'
+                            ? 'bg-red-500/10 text-red-400 border border-red-500/20'
+                            : 'bg-gray-500/10 text-gray-400 border border-gray-500/20'
+                        }`}>
+                          {event.status}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Contact Info Change History */}
+          {contact.change_history && contact.change_history.length > 0 && (
+            <div className="mt-6 pt-6 border-t border-border">
+              <div className="flex items-center gap-2 mb-4">
+                <History className="w-4 h-4 text-blue-500" />
+                <h3 className="text-sm font-semibold text-foreground">Contact Information Changes</h3>
+                <span className="text-xs text-foreground/50">
+                  ({contact.change_history.length} change{contact.change_history.length !== 1 ? 's' : ''})
+                </span>
+              </div>
+
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {contact.change_history.map((change, index) => (
+                  <div
+                    key={index}
+                    className="p-2.5 rounded-lg bg-background/10 border border-border text-xs"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <span className="font-medium text-foreground capitalize">{change.field.replace(/_/g, ' ')}</span>
+                      <span className="text-foreground/50 flex-shrink-0">
+                        {new Date(change.changed_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 text-foreground/60">
+                      <span className="line-through">{change.old_value || '(empty)'}</span>
+                      <span>→</span>
+                      <span className="text-green-400 font-medium">{change.new_value}</span>
+                    </div>
+                    <div className="mt-1 text-foreground/50">
+                      via {change.event_name}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Error Message */}
           {errors.submit && (
