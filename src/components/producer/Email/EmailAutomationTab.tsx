@@ -9,6 +9,7 @@ import { EmailAuditLogOverlay } from './EmailAuditLogOverlay';
 import EmailSequenceEditorOverlay from './EmailSequenceEditorOverlay';
 import { DebugPanel } from '../DebugPanel';
 import { SearchFilterBar, type ActiveFilter, type FilterFieldConfig } from '@/components/shared/SearchFilterBar';
+import { getEmailTypeInfo } from '@/utils/emailTypeHelper';
 import { logger } from '@/utils/logger';
 
 interface EmailAutomationTabProps {
@@ -288,42 +289,62 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     ...categories.map(c => c.icon ? `${c.icon} ${c.name}` : c.name),
   ];
 
-  const filterFieldConfigs: FilterFieldConfig[] = [
-    { key: 'status', label: 'Status', options: statusOptions, multi: false },
-    { key: 'category', label: 'Category', options: categoryOptions, multi: false },
+  const emailTypeOptions = [
+    'Event Announcement',
+    'Application',
+    'Payment',
+    'Event Countdown',
+    'Other',
   ];
 
-  // Derive filter values from activeFilters for backward compatibility
-  const statusFilterFromBar = activeFilters.find(f => f.fieldKey === 'status')?.values[0];
-  const categoryFilterFromBar = activeFilters.find(f => f.fieldKey === 'category')?.values[0];
+  const filterFieldConfigs: FilterFieldConfig[] = [
+    { key: 'status', label: 'Status', options: statusOptions, multi: true },
+    { key: 'email_type', label: 'Email Type', options: emailTypeOptions, multi: true },
+    { key: 'category', label: 'Category', options: categoryOptions, multi: true },
+  ];
 
-  // Map status label back to FilterType value
-  const derivedStatusFilter: FilterType = statusFilterFromBar
-    ? (FILTER_OPTIONS.find(o => o.label === statusFilterFromBar)?.value ?? 'all')
-    : 'all';
+  // Derive filter values from activeFilters (now supporting multi-select)
+  const statusFiltersFromBar = activeFilters.find(f => f.fieldKey === 'status')?.values || [];
+  const emailTypeFiltersFromBar = activeFilters.find(f => f.fieldKey === 'email_type')?.values || [];
+  const categoryFiltersFromBar = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
 
-  // Map category label back to selectedCategoryId value
-  const derivedCategoryId: number | 'all' | 'all_invitations' | 'all_vendors' = (() => {
-    if (!categoryFilterFromBar) return 'all';
-    if (categoryFilterFromBar === 'All Invitations') return 'all_invitations';
-    if (categoryFilterFromBar === 'All Vendors') return 'all_vendors';
+  // Map status labels back to FilterType values (array)
+  const derivedStatusFilters: FilterType[] = statusFiltersFromBar.length > 0
+    ? statusFiltersFromBar.map(label => FILTER_OPTIONS.find(o => o.label === label)?.value ?? 'all').filter(v => v !== 'all')
+    : [];
+
+  // Email type filter values (array of direct label matches)
+  const derivedEmailTypeFilters: string[] = emailTypeFiltersFromBar;
+
+  // Map category labels to category IDs and special values (array)
+  const derivedCategoryFilters: (number | 'all_invitations' | 'all_vendors')[] = categoryFiltersFromBar.map(label => {
+    if (label === 'All Invitations') return 'all_invitations';
+    if (label === 'All Vendors') return 'all_vendors';
     const matchedCategory = categories.find(c =>
-      (c.icon ? `${c.icon} ${c.name}` : c.name) === categoryFilterFromBar
+      (c.icon ? `${c.icon} ${c.name}` : c.name) === label
     );
-    return matchedCategory ? matchedCategory.id : 'all';
-  })();
+    return matchedCategory ? matchedCategory.id : null;
+  }).filter((v): v is number | 'all_invitations' | 'all_vendors' => v !== null);
 
   // Filter and search emails
   const filteredEmails = useMemo(() => {
     let result = emails;
 
-    // Filter by status
-    if (derivedStatusFilter !== 'all') {
-      result = result.filter(email => email.status === derivedStatusFilter);
+    // Filter by status (OR logic - email matches ANY selected status)
+    if (derivedStatusFilters.length > 0) {
+      result = result.filter(email => derivedStatusFilters.includes(email.status as FilterType));
     }
 
-    // Filter by vendor category
-    if (derivedCategoryId !== 'all') {
+    // Filter by email type (OR logic - email matches ANY selected type)
+    if (derivedEmailTypeFilters.length > 0) {
+      result = result.filter(email => {
+        const emailTypeInfo = getEmailTypeInfo(email.trigger_type);
+        return derivedEmailTypeFilters.includes(emailTypeInfo.label);
+      });
+    }
+
+    // Filter by vendor category (OR logic - email matches ANY selected category)
+    if (derivedCategoryFilters.length > 0) {
       result = result.filter(email => {
         // Helper function to infer email type using same logic as EmailRow.tsx
         const inferCategory = (): EmailCategory => {
@@ -346,36 +367,39 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
 
         const emailCategory = email.email_template_item?.category || inferCategory();
 
-        // Filter by "All Invitations" - show only application emails without specific category
-        if (derivedCategoryId === 'all_invitations') {
-          return !email.category_id && emailCategory === 'application_updates';
-        }
-
-        // Filter by "All Vendors" - show only announcement emails without specific category
-        if (derivedCategoryId === 'all_vendors') {
-          return !email.category_id && emailCategory !== 'application_updates';
-        }
-
-        // Filter by specific vendor category
-        if (typeof derivedCategoryId === 'number') {
-          // Include emails that have a matching category_id
-          if (email.category_id && email.category_id === derivedCategoryId) {
-            return true;
+        // Check if email matches ANY of the selected category filters
+        return derivedCategoryFilters.some(categoryFilter => {
+          // Filter by "All Invitations" - show only application emails without specific category
+          if (categoryFilter === 'all_invitations') {
+            return !email.category_id && emailCategory === 'application_updates';
           }
-          // For emails without a category_id (All Invitations / All Vendors)
-          if (!email.category_id) {
-            // Exclude "All Invitations" (application_updates) when filtering by specific category
-            // because once someone has a vendor category, they're approved and won't receive application emails
-            if (emailCategory === 'application_updates') {
-              return false;
+
+          // Filter by "All Vendors" - show only announcement emails without specific category
+          if (categoryFilter === 'all_vendors') {
+            return !email.category_id && emailCategory !== 'application_updates';
+          }
+
+          // Filter by specific vendor category
+          if (typeof categoryFilter === 'number') {
+            // Include emails that have a matching category_id
+            if (email.category_id && email.category_id === categoryFilter) {
+              return true;
             }
+            // For emails without a category_id (All Invitations / All Vendors)
+            if (!email.category_id) {
+              // Exclude "All Invitations" (application_updates) when filtering by specific category
+              // because once someone has a vendor category, they're approved and won't receive application emails
+              if (emailCategory === 'application_updates') {
+                return false;
+              }
 
-            // Include "All Vendors" emails (announcements, event updates, etc.)
-            return true;
+              // Include "All Vendors" emails (announcements, event updates, etc.)
+              return true;
+            }
           }
-        }
 
-        return false;
+          return false;
+        });
       });
     }
 
@@ -496,7 +520,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
       return dateA - dateB;
     });
-  }, [emails, searchQuery, derivedStatusFilter, derivedCategoryId, sortColumn, sortDirection]);
+  }, [emails, searchQuery, derivedStatusFilters, derivedEmailTypeFilters, derivedCategoryFilters, sortColumn, sortDirection]);
 
   // Calculate statistics
   const stats = {
