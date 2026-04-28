@@ -300,7 +300,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
   const filterFieldConfigs: FilterFieldConfig[] = [
     { key: 'status', label: 'Status', options: statusOptions, multi: true },
     { key: 'email_type', label: 'Email Type', options: emailTypeOptions, multi: true },
-    { key: 'category', label: 'Category', options: categoryOptions, multi: true },
+    { key: 'category', label: 'Audience', options: categoryOptions, multi: true },
   ];
 
   // Derive filter values from activeFilters (now supporting multi-select)
