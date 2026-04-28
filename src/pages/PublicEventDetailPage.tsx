@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock, Building2 } from 'lucide-react';
 import { eventsApi } from '@/services/api';
+import { Badge } from '@/components/ui/badge';
 
 interface VendorApplication {
   id: number;
@@ -23,6 +24,12 @@ interface Event {
   title: string;
   slug: string;
   description?: string;
+  status?: {
+    published?: boolean;
+    registration_open?: boolean;
+    status?: string;
+    is_live?: boolean;
+  };
   dates: {
     start?: string;
     end?: string;
@@ -50,6 +57,7 @@ interface Event {
   organization: {
     id: number;
     name: string;
+    email?: string;
     city?: string;
     state?: string;
   };
@@ -147,7 +155,7 @@ export default function PublicEventDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
@@ -155,13 +163,13 @@ export default function PublicEventDetailPage() {
 
   if (error || !event) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Event Not Found</h1>
-          <p className="text-white/60 mb-6">{error || 'The event you are looking for does not exist.'}</p>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Event Not Found</h1>
+          <p className="text-foreground/60 mb-6">{error || 'The event you are looking for does not exist.'}</p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
+            className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
             Go Home
           </button>
@@ -170,33 +178,86 @@ export default function PublicEventDetailPage() {
     );
   }
 
+  // Show cancellation message if event is cancelled
+  if (event.status?.status === 'cancelled') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+        <div className="max-w-4xl mx-auto px-6 py-12">
+          <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
+              <svg className="w-8 h-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Event Cancelled</h1>
+            <p className="text-lg text-white/90 mb-4">{event.title}</p>
+            <p className="text-white/70 mb-6">
+              This event has been cancelled by the event organizer. If you submitted payment, you will be contacted regarding refund details.
+            </p>
+
+            {/* Organization Contact Info */}
+            {event.organization && (
+              <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6 max-w-md mx-auto">
+                <p className="text-sm text-white/60 mb-3">For questions about this cancellation, please contact:</p>
+                <p className="text-lg font-semibold text-white mb-2">{event.organization.name}</p>
+                {event.organization.email ? (
+                  <a
+                    href={`mailto:${event.organization.email}`}
+                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    {event.organization.email}
+                  </a>
+                ) : (
+                  <p className="text-sm text-white/60 italic">Contact information not available</p>
+                )}
+                <p className="text-xs text-white/50 mt-4">
+                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+            >
+              Back to Events
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+    <div className="min-h-screen voxxy-gradient-page-cool">
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Main Card Container */}
-        <div className="bg-[#1e1b2e] border border-white/10 rounded-lg p-4 md:p-5">
+        <div className="voxxy-gradient-panel border border-border rounded-lg p-4 md:p-5">
           {/* Event Title and Location */}
           <div className="mb-4">
             <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-1">
               {event.title}
             </h1>
-            <div className="flex items-center gap-1.5 text-white/60 text-xs">
+            <div className="flex items-center gap-1.5 text-foreground/60 text-xs">
               <MapPin className="w-3.5 h-3.5" />
               <span>{event.location}</span>
             </div>
           </div>
 
           {/* Event Details Grid */}
-          <div className="py-4 border-t border-b border-white/10 mb-6">
+          <div className="py-4 border-t border-b border-border mb-6">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {/* Venue */}
               {event.venue && (
                 <div className="flex items-start gap-2">
-                  <Building2 className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Building2 className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Venue</p>
-                    <p className="text-white text-xs">{event.venue}</p>
+                    <p className="text-foreground/60 text-[10px] mb-0.5">Venue</p>
+                    <p className="text-foreground text-xs">{event.venue}</p>
                   </div>
                 </div>
               )}
@@ -204,14 +265,14 @@ export default function PublicEventDetailPage() {
               {/* Tickets */}
               {(event.ticket_link || event.ticket_url) && (
                 <div className="flex items-start gap-2">
-                  <DollarSign className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <DollarSign className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Tickets</p>
+                    <p className="text-foreground/60 text-[10px] mb-0.5">Tickets</p>
                     <a
                       href={normalizeUrl(event.ticket_link || event.ticket_url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-purple-400 hover:text-purple-300 text-sm"
+                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 text-sm"
                     >
                       Buy Tickets
                     </a>
@@ -222,10 +283,10 @@ export default function PublicEventDetailPage() {
               {/* Apply By */}
               {event.application_deadline && (
                 <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Apply By</p>
-                    <p className="text-white text-xs">
+                    <p className="text-foreground/60 text-[10px] mb-0.5">Apply By</p>
+                    <p className="text-foreground text-xs">
                       {new Date(event.application_deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                     </p>
                   </div>
@@ -235,10 +296,10 @@ export default function PublicEventDetailPage() {
               {/* Age */}
               {event.age_restriction && (
                 <div className="flex items-start gap-2">
-                  <Users className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Users className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-white/60 text-[10px] mb-0.5">Age</p>
-                    <p className="text-white text-xs">{event.age_restriction}</p>
+                    <p className="text-foreground/60 text-[10px] mb-0.5">Age</p>
+                    <p className="text-foreground text-xs">{event.age_restriction}</p>
                   </div>
                 </div>
               )}
@@ -248,8 +309,8 @@ export default function PublicEventDetailPage() {
         {/* About This Event */}
         {event.description && (
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-white mb-3">About This Event</h2>
-            <p className="text-white/80 text-xs leading-relaxed whitespace-pre-wrap">
+            <h2 className="text-lg font-bold text-foreground mb-3">About This Event</h2>
+            <p className="text-foreground/80 text-xs leading-relaxed whitespace-pre-wrap">
               {event.description}
             </p>
           </div>
@@ -258,26 +319,26 @@ export default function PublicEventDetailPage() {
         {/* Application Categories */}
         {event.vendor_applications && event.vendor_applications.length > 0 && (
           <div>
-            <h2 className="text-lg font-bold text-white mb-3">Application Categories</h2>
+            <h2 className="text-lg font-bold text-foreground mb-3">Application Categories</h2>
 
             {/* Map through all vendor applications */}
             <div className="space-y-3">
               {event.vendor_applications.map((application) => (
-                <div key={application.id} className="bg-white/5 border border-white/10 rounded-lg p-4">
+                <div key={application.id} className="bg-background/5 border border-border rounded-lg p-4">
                   {/* Title Row - Price hidden for Pancakes & Booze pilot */}
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-base font-bold text-white">
+                    <h3 className="text-base font-bold text-foreground">
                       {application.name}
                     </h3>
                     {/* Price display commented out for pilot - payment handled via external integration */}
                     {/* <div className="text-right">
                       {application.booth_price && (
                         <>
-                          <p className="text-xl font-bold text-purple-400">
+                          <p className="text-xl font-bold text-violet-900 dark:text-purple-400">
                             ${Number(application.booth_price).toFixed(0)}
                           </p>
                           {event.application_deadline && (
-                            <p className="text-white/60 text-[10px] mt-0.5">
+                            <p className="text-foreground/60 text-[10px] mt-0.5">
                               Early bird: {new Date(event.application_deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </p>
                           )}
@@ -288,7 +349,7 @@ export default function PublicEventDetailPage() {
 
                   {/* Description */}
                   {application.description && (
-                    <p className="text-white/80 text-xs mb-3 whitespace-pre-wrap">
+                    <p className="text-foreground/80 text-xs mb-3 whitespace-pre-wrap">
                       {application.description}
                     </p>
                   )}
@@ -297,12 +358,9 @@ export default function PublicEventDetailPage() {
                   {application.application_tags && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
                       {application.application_tags.split(',').map((tag, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-purple-300 text-[10px]"
-                        >
+                        <Badge key={idx} variant="tintPurple" className="px-2 py-0.5 text-[10px]">
                           {tag.trim()}
-                        </span>
+                        </Badge>
                       ))}
                     </div>
                   )}
@@ -312,7 +370,7 @@ export default function PublicEventDetailPage() {
                     href={`/events/${event.slug}/apply/${application.id}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="block w-full text-center px-5 py-2.5 rounded-lg bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white font-semibold hover:opacity-90 transition-all text-sm"
+                    className="block w-full text-center px-5 py-2.5 rounded-lg voxxy-btn-cta font-semibold hover:opacity-90 transition-all text-sm"
                   >
                     Apply Now
                   </a>
@@ -324,8 +382,8 @@ export default function PublicEventDetailPage() {
         </div>
 
         {/* Powered by Voxxy Presents */}
-        <div className="mt-6 pt-6 border-t border-white/10">
-          <div className="flex items-center justify-center gap-2 text-white/40 text-xs">
+        <div className="mt-6 pt-6 border-t border-border">
+          <div className="flex items-center justify-center gap-2 text-foreground/40 text-xs">
             <span>Powered by</span>
             <img
               src="/VoxxyTriangle.svg"

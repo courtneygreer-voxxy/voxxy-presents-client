@@ -22,6 +22,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 
 export type SortColumn = 'sent_at' | 'recipient_name' | 'recipient_email' | 'email_name' | 'category' | 'status';
 type SortDirection = 'asc' | 'desc';
@@ -49,49 +50,64 @@ function SortIcon({
     : <ChevronDown className="w-3 h-3 text-purple-400" />;
 }
 
+const STATUS_COLOR_VARIANT: Record<
+  (typeof DELIVERY_STATUS_CONFIGS)[keyof typeof DELIVERY_STATUS_CONFIGS]['color'],
+  BadgeVariant
+> = {
+  gray: 'tintMuted',
+  blue: 'tintBlue',
+  green: 'tintGreen',
+  red: 'tintRed',
+  yellow: 'tintYellow',
+};
+
 function StatusBadge({ status }: { status: AuditEntry['status'] }) {
   const config = DELIVERY_STATUS_CONFIGS[status] || DELIVERY_STATUS_CONFIGS['pending'];
-  const colorClasses = {
-    gray: 'bg-gray-500/20 text-gray-300 border-gray-500/30',
-    blue: 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-    green: 'bg-green-500/20 text-green-300 border-green-500/30',
-    red: 'bg-red-500/20 text-red-300 border-red-500/30',
-    yellow: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
-  };
+  const variant = STATUS_COLOR_VARIANT[config.color];
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-medium border ${colorClasses[config.color]}`}
+    <Badge
+      variant={variant}
+      className="inline-flex max-w-full gap-1 rounded px-1.5 py-0.5 text-[11px] font-medium"
       title={config.description}
     >
-      <span>{config.icon}</span>
-      <span>{config.label}</span>
-    </span>
+      <span className="shrink-0">{config.icon}</span>
+      <span className="truncate">{config.label}</span>
+    </Badge>
   );
 }
 
-const CATEGORY_CONFIG: Record<string, { label: string; text: string; bg: string; border: string }> = {
-  'pre_application': { label: 'Announcements', text: 'text-purple-300', bg: 'bg-purple-500/20', border: 'border-purple-500/30' },
-  'application':     { label: 'Application',   text: 'text-pink-300',   bg: 'bg-pink-500/20',   border: 'border-pink-500/30' },
-  'payment':         { label: 'Payment',        text: 'text-blue-300',   bg: 'bg-blue-500/20',   border: 'border-blue-500/30' },
-  'pre_event':       { label: 'Countdown',      text: 'text-green-300',  bg: 'bg-green-500/20',  border: 'border-green-500/30' },
-  'event_day':       { label: 'Event Day',      text: 'text-orange-300', bg: 'bg-orange-500/20', border: 'border-orange-500/30' },
-  'post_event':      { label: 'Post-Event',     text: 'text-cyan-300',   bg: 'bg-cyan-500/20',   border: 'border-cyan-500/30' },
-  'system':          { label: 'System',          text: 'text-yellow-300', bg: 'bg-yellow-500/20', border: 'border-yellow-500/30' },
+const CATEGORY_VARIANT: Record<string, BadgeVariant> = {
+  pre_application: 'tintPurple',
+  application: 'tintPink',
+  payment: 'tintBlue',
+  pre_event: 'tintGreen',
+  event_day: 'tintOrange',
+  post_event: 'tintCyan',
+  system: 'tintYellow',
 };
 
-const DEFAULT_CATEGORY = { label: '', text: 'text-gray-300', bg: 'bg-gray-500/20', border: 'border-gray-500/30' };
+const CATEGORY_CONFIG_LABEL: Record<string, string> = {
+  pre_application: 'Announcements',
+  application: 'Application',
+  payment: 'Payment',
+  pre_event: 'Countdown',
+  event_day: 'Event Day',
+  post_event: 'Post-Event',
+  system: 'System',
+};
 
 function CategoryBadge({ category }: { category: string }) {
-  const config = CATEGORY_CONFIG[category] || DEFAULT_CATEGORY;
-  const label = config.label || category;
+  const variant = CATEGORY_VARIANT[category] ?? 'tintMuted';
+  const label = CATEGORY_CONFIG_LABEL[category] || category;
   return (
-    <span
-      className={`inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium border truncate max-w-full ${config.bg} ${config.text} ${config.border}`}
+    <Badge
+      variant={variant}
+      className="max-w-full truncate rounded px-1.5 py-0.5 text-[11px] font-medium"
       title={label}
     >
       {label}
-    </span>
+    </Badge>
   );
 }
 
@@ -109,8 +125,8 @@ export function EmailAuditTable({
 }: EmailAuditTableProps) {
   if (entries.length === 0) {
     return (
-      <div className="bg-white/5 rounded-lg border border-white/10 p-12 text-center">
-        <p className="text-white/60">No audit entries found</p>
+      <div className="bg-background/5 rounded-lg border border-border p-12 text-center">
+        <p className="text-foreground/60">No audit entries found</p>
       </div>
     );
   }
@@ -118,7 +134,7 @@ export function EmailAuditTable({
   const col = (column: SortColumn, label: string) => (
     <button
       onClick={() => onSort?.(column)}
-      className={`flex items-center gap-1 hover:text-white transition-colors ${sortColumn === column ? 'text-white' : ''}`}
+      className={`flex items-center gap-1 hover:text-foreground transition-colors ${sortColumn === column ? 'text-foreground' : ''}`}
     >
       {label}
       <SortIcon column={column} sortColumn={sortColumn} sortDirection={sortDirection} />
@@ -129,10 +145,10 @@ export function EmailAuditTable({
   const gridCols = 'grid-cols-[100px_minmax(60px,0.8fr)_minmax(80px,1fr)_minmax(80px,1fr)_minmax(50px,0.7fr)_100px_minmax(80px,1.2fr)_36px]';
 
   return (
-    <div className="bg-white/5 rounded-lg border border-white/10 overflow-hidden overflow-x-auto">
+    <div className="voxxy-table-shell overflow-x-auto">
       {/* Table Header */}
-      <div className="bg-gradient-to-r from-purple-900/40 to-blue-900/40 border-b border-white/10">
-        <div className={`grid ${gridCols} gap-2 px-4 py-2 items-center text-[10px] font-semibold text-white/70 uppercase tracking-wide min-w-[800px]`}>
+      <div className="voxxy-table-header">
+        <div className={`voxxy-table-header-row grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-2 text-[10px] font-semibold uppercase tracking-wide`}>
           {col('sent_at', 'Date Sent')}
           {col('recipient_name', 'Recipient')}
           {col('recipient_email', 'Email')}
@@ -149,30 +165,30 @@ export function EmailAuditTable({
         {entries.map((entry) => (
           <div
             key={entry.id}
-            className={`grid ${gridCols} gap-2 px-4 py-1.5 items-center border-b border-white/5 hover:bg-white/5 transition-colors min-w-[800px]`}
+            className={`voxxy-table-row voxxy-table-row-hover grid ${gridCols} min-w-[800px] items-center gap-2 px-4 py-1.5`}
           >
             {/* Date Sent */}
-            <div className="text-[11px] text-white/80">
+            <div className="text-[11px] text-foreground/80">
               {entry.sent_at
                 ? format(new Date(entry.sent_at), 'MMM d, h:mm a')
                 : entry.scheduled_for
-                  ? <span className="text-blue-300">{format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}</span>
-                  : <span className="text-white/40">--</span>
+                  ? <span className="text-blue-700 dark:text-blue-300">{format(new Date(entry.scheduled_for), 'MMM d, h:mm a')}</span>
+                  : <span className="text-muted-foreground">--</span>
               }
             </div>
 
             {/* Recipient Name */}
-            <div className="text-[11px] text-white/80 truncate" title={entry.recipient_name || 'Unknown'}>
-              {entry.recipient_name || <span className="text-white/40">Unknown</span>}
+            <div className="text-[11px] text-foreground/80 truncate" title={entry.recipient_name || 'Unknown'}>
+              {entry.recipient_name || <span className="text-muted-foreground">Unknown</span>}
             </div>
 
             {/* Email Address */}
-            <div className="text-[11px] text-white/60 font-mono truncate" title={entry.recipient_email}>
+            <div className="text-[11px] text-foreground/60 font-mono truncate" title={entry.recipient_email}>
               {entry.recipient_email}
             </div>
 
             {/* Email Name */}
-            <div className="text-[11px] text-white/80 truncate" title={entry.email_name}>
+            <div className="text-[11px] text-foreground/80 truncate" title={entry.email_name}>
               {entry.email_name}
             </div>
 
@@ -190,13 +206,13 @@ export function EmailAuditTable({
             <div className="min-w-0">
               {(entry.bounce_reason || entry.drop_reason) ? (
                 <span
-                  className="text-[11px] text-red-400/80 truncate block cursor-help"
+                  className="block cursor-help truncate text-[11px] text-red-700 dark:text-red-400/80"
                   title={entry.bounce_reason || entry.drop_reason || ''}
                 >
                   {entry.bounce_reason || entry.drop_reason}
                 </span>
               ) : (
-                <span className="text-[11px] text-white/30">-</span>
+                <span className="text-[11px] text-muted-foreground">-</span>
               )}
             </div>
 
@@ -206,10 +222,10 @@ export function EmailAuditTable({
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
-                      className="p-1 hover:bg-white/10 rounded transition-colors"
+                      className="p-1 hover:bg-background/10 rounded transition-colors"
                       title="Actions"
                     >
-                      <MoreVertical className="w-3.5 h-3.5 text-white/40 hover:text-white/70" />
+                      <MoreVertical className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground/70" />
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-[140px]">
@@ -223,7 +239,7 @@ export function EmailAuditTable({
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <span className="text-white/10">-</span>
+                <span className="text-muted-foreground/60">-</span>
               )}
             </div>
           </div>

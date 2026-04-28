@@ -59,9 +59,9 @@ export default function ListSelector({
 
   if (loading) {
     return (
-      <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+      <div className="bg-background/5 rounded-lg p-4 border border-border">
         <div className="flex items-center justify-center py-6">
-          <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-border border-t-primary rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -87,24 +87,24 @@ export default function ListSelector({
   }
 
   return (
-    <div className="bg-white/5 rounded-lg border border-white/10">
+    <div className="bg-background/5 rounded-lg border border-border">
       {/* Header */}
       <div
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/5 transition-colors"
+        className="flex items-center justify-between p-4 cursor-pointer hover:bg-background/5 transition-colors"
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
           <Filter className="w-5 h-5 text-purple-400" />
           <div>
-            <h3 className="text-sm font-semibold text-white">Use Saved Lists</h3>
-            <p className="text-xs text-white/50">
+            <h3 className="text-sm font-semibold text-foreground">Use Saved Lists</h3>
+            <p className="text-xs text-foreground/50">
               {selectedListIds.length === 0
                 ? 'Select lists to quickly add contacts'
                 : `${selectedListIds.length} ${selectedListIds.length === 1 ? 'list' : 'lists'} selected • ~${totalContactsFromLists} contacts`}
             </p>
           </div>
         </div>
-        <button className="text-white/60 hover:text-white transition-colors">
+        <button className="text-foreground/60 hover:text-foreground transition-colors">
           {expanded ? (
             <ChevronUp className="w-5 h-5" />
           ) : (
@@ -115,11 +115,11 @@ export default function ListSelector({
 
       {/* Expanded Content */}
       {expanded && (
-        <div className="border-t border-white/10 p-4 space-y-3">
+        <div className="border-t border-border p-4 space-y-3">
           {/* Select All */}
           {lists.length > 1 && (
-            <div className="flex items-center justify-between pb-2 border-b border-white/5">
-              <span className="text-xs text-white/60">
+            <div className="flex items-center justify-between pb-2 border-b border-border">
+              <span className="text-xs text-foreground/60">
                 {lists.length} {lists.length === 1 ? 'list' : 'lists'} available
               </span>
               <button
@@ -144,7 +144,7 @@ export default function ListSelector({
                     ${
                       isSelected
                         ? 'bg-purple-500/20 border-purple-500/50'
-                        : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                        : 'bg-background/5 border-border hover:bg-background/10 hover:border-border'
                     }
                   `}
                 >
@@ -154,11 +154,11 @@ export default function ListSelector({
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                         isSelected
                           ? 'bg-purple-500 border-purple-500'
-                          : 'border-white/30'
+                          : 'border-border'
                       }`}
                     >
                       {isSelected && (
-                        <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />
+                        <Check className="w-3.5 h-3.5 text-foreground" strokeWidth={3} />
                       )}
                     </div>
 
@@ -166,13 +166,13 @@ export default function ListSelector({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <Filter className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
-                        <h4 className="text-sm font-medium text-white truncate">
+                        <h4 className="text-sm font-medium text-foreground truncate">
                           {list.name}
                         </h4>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-1 text-xs text-white/50">
+                        <div className="flex items-center gap-1 text-xs text-foreground/50">
                           <Users className="w-3 h-3" />
                           <span>
                             {list.contacts_count}{' '}
@@ -182,8 +182,8 @@ export default function ListSelector({
 
                         {list.description && (
                           <>
-                            <span className="text-white/30">•</span>
-                            <p className="text-xs text-white/50 truncate">
+                            <span className="text-foreground/30">•</span>
+                            <p className="text-xs text-foreground/50 truncate">
                               {list.description}
                             </p>
                           </>
@@ -194,19 +194,19 @@ export default function ListSelector({
                       {list.filters && (
                         <div className="mt-1.5 flex flex-wrap gap-1">
                           {list.filters.categories && list.filters.categories.length > 0 && (
-                            <span className="text-xs px-1.5 py-0.5 bg-white/10 text-white/60 rounded">
+                            <span className="text-xs px-1.5 py-0.5 bg-background/10 text-foreground/60 rounded">
                               {list.filters.categories.length}{' '}
                               {list.filters.categories.length === 1 ? 'category' : 'categories'}
                             </span>
                           )}
                           {list.filters.locations && list.filters.locations.length > 0 && (
-                            <span className="text-xs px-1.5 py-0.5 bg-white/10 text-white/60 rounded">
+                            <span className="text-xs px-1.5 py-0.5 bg-background/10 text-foreground/60 rounded">
                               {list.filters.locations.length}{' '}
                               {list.filters.locations.length === 1 ? 'location' : 'locations'}
                             </span>
                           )}
                           {list.filters.tags && list.filters.tags.length > 0 && (
-                            <span className="text-xs px-1.5 py-0.5 bg-white/10 text-white/60 rounded">
+                            <span className="text-xs px-1.5 py-0.5 bg-background/10 text-foreground/60 rounded">
                               {list.filters.tags.length}{' '}
                               {list.filters.tags.length === 1 ? 'tag' : 'tags'}
                             </span>
@@ -222,17 +222,17 @@ export default function ListSelector({
 
           {/* Summary */}
           {selectedLists.length > 0 && (
-            <div className="pt-3 border-t border-white/10">
+            <div className="pt-3 border-t border-border">
               <div className="bg-purple-500/10 rounded-lg p-3 border border-purple-500/20">
                 <div className="flex items-center gap-2 text-sm">
                   <Users className="w-4 h-4 text-purple-400" />
-                  <span className="text-white/90">
-                    Approximately <strong className="text-white">{totalContactsFromLists}</strong>{' '}
+                  <span className="text-foreground/90">
+                    Approximately <strong className="text-foreground">{totalContactsFromLists}</strong>{' '}
                     contacts from {selectedLists.length}{' '}
                     {selectedLists.length === 1 ? 'list' : 'lists'}
                   </span>
                 </div>
-                <p className="text-xs text-white/50 mt-1">
+                <p className="text-xs text-foreground/50 mt-1">
                   Note: Duplicates will be automatically removed
                 </p>
               </div>

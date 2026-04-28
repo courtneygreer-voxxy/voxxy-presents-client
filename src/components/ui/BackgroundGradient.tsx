@@ -6,7 +6,7 @@ import React from 'react'
  */
 export function BackgroundGradient({ children, className = '' }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden ${className}`}>
+    <div className={`min-h-screen voxxy-gradient-page-alt relative overflow-hidden ${className}`}>
       {children}
     </div>
   )
@@ -19,7 +19,7 @@ export function BackgroundGradient({ children, className = '' }: { children: Rea
 export function BackgroundGradientLayer({ className = '', opacity = 0.5 }: { className?: string; opacity?: number }) {
   return (
     <div
-      className={`absolute inset-0 bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] ${className}`}
+      className={`absolute inset-0 voxxy-gradient-page-alt ${className}`}
       style={{ opacity }}
     />
   )

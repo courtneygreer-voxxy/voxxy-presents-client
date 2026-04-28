@@ -61,7 +61,7 @@ import { DebugPanel } from './components/debug/DebugPanel'
 
 // Protected Dashboard - ensures user is verified and paid before showing dashboard
 function ProtectedDashboard() {
-  const { userProfile, loading } = useAuth()
+  const { userProfile, loading, isAdmin, isProducer, isEmailVerified, isPaid } = useAuth()
 
   if (loading) {
     return <LoadingTransition message="Loading your dashboard..." />
@@ -71,12 +71,6 @@ function ProtectedDashboard() {
     console.log('🔒 No user profile, redirecting to home')
     return <Navigate to="/" replace />
   }
-
-  const role = userProfile.role
-  const isAdmin = role === 'admin'
-  const isProducer = role === 'producer' || role === 'venue_owner'
-  const isEmailVerified = userProfile.confirmed_at !== null && userProfile.confirmed_at !== undefined
-  const isPaid = userProfile.paid === true
 
   // Admins always have access
   if (isAdmin) {
@@ -90,9 +84,11 @@ function ProtectedDashboard() {
     return <Navigate to="/pending" replace />
   }
 
-  // Check payment for producers
+  // Check payment for producers (V4.0: now checks subscription_active from organization)
   if (isProducer && !isPaid) {
-    console.log('🔒 Producer without payment, redirecting to pending')
+    console.log('🔒 Producer without active subscription, redirecting to pending')
+    console.log('   - Subscription Active:', userProfile.subscription_active)
+    console.log('   - Subscription Status:', userProfile.subscription_status)
     return <Navigate to="/pending" replace />
   }
 
@@ -103,7 +99,7 @@ function ProtectedDashboard() {
 
 // Role-based redirect component - routes authenticated users to their holding screen
 function RoleBasedDashboardRedirect() {
-  const { userProfile, loading } = useAuth()
+  const { userProfile, loading, isAdmin, isProducer, isEmailVerified, isPaid } = useAuth()
   const [isRedirecting, setIsRedirecting] = useState(true)
 
   // Show loading state for minimum 300ms to avoid flash
@@ -130,10 +126,6 @@ function RoleBasedDashboardRedirect() {
   const role = userProfile.role
   const productContext = userProfile.product_context
   const hasPresentsAccess = productContext === 'presents' || productContext === 'both'
-  const isProducer = role === 'producer' || role === 'venue_owner'
-  const isAdmin = role === 'admin'
-  const paid = userProfile.paid
-  const isEmailVerified = userProfile.confirmed_at !== null && userProfile.confirmed_at !== undefined
 
   // Email verification OR Payment check for producers (admins bypass these checks)
   // Redirect to pending page which serves as account setup hub
@@ -143,9 +135,12 @@ function RoleBasedDashboardRedirect() {
       console.log('   - Email:', userProfile.email, 'Confirmed At:', userProfile.confirmed_at)
       return <Navigate to="/pending" replace />
     }
-    if (isProducer && !paid) {
-      console.log('💳 Producer without payment, redirecting to payment onboarding')
-      console.log('   - Role:', role, 'Paid:', paid)
+    // V4.0: Check subscription_active instead of legacy paid field
+    if (isProducer && !isPaid) {
+      console.log('💳 Producer without active subscription, redirecting to payment onboarding')
+      console.log('   - Role:', role)
+      console.log('   - Subscription Active:', userProfile.subscription_active)
+      console.log('   - Subscription Status:', userProfile.subscription_status)
       return <Navigate to="/payment/onboarding" replace />
     }
   }

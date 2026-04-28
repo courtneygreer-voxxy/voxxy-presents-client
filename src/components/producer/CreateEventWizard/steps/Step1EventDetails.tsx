@@ -178,17 +178,17 @@ export default function Step1EventDetails({
         </div>
       )}
 
-      <div className="bg-white/5 backdrop-blur-sm rounded-xl p-5 border border-white/10 space-y-4">
+      <div className="bg-background/5 backdrop-blur-sm rounded-xl p-5 border border-border space-y-4">
         <div className="mb-3">
-          <h2 className="text-base font-semibold text-white">Event Details</h2>
-          <p className="text-white/60 text-xs mt-0.5">
+          <h2 className="text-base font-semibold text-foreground">Event Details</h2>
+          <p className="text-foreground/60 text-xs mt-0.5">
             Provide basic information about your event
           </p>
         </div>
 
         {/* Event Name */}
         <div>
-          <label htmlFor="title" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="title" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Event Name *
           </label>
           <input
@@ -197,19 +197,19 @@ export default function Step1EventDetails({
             value={eventDetails.title}
             onChange={(e) => handleChange('title', e.target.value)}
             placeholder="e.g., Downtown Art Market"
-            className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-              errors.title ? 'border-red-500' : 'border-white/10'
-            } text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+              errors.title ? 'border-red-500' : 'border-border'
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
           />
           {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
         </div>
 
         {/* Venue - Google Places Autocomplete */}
         <div>
-          <label htmlFor="venue" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="venue" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Event Venue
           </label>
-          <p className="text-white/50 text-xs mb-1.5">
+          <p className="text-foreground/50 text-xs mb-1.5">
             Search for the venue where the event will take place
           </p>
           <div className="relative">
@@ -225,7 +225,7 @@ export default function Step1EventDetails({
               <button
                 type="button"
                 onClick={handleClearVenue}
-                className="absolute right-3 top-2 z-10 text-white/60 hover:text-white transition-colors"
+                className="absolute right-3 top-2 z-10 text-foreground/60 hover:text-foreground transition-colors"
                 aria-label="Clear venue"
               >
                 <X className="w-4 h-4" />
@@ -236,13 +236,13 @@ export default function Step1EventDetails({
 
         {/* Location - Conditional based on venue selection */}
         <div>
-          <label htmlFor="location" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="location" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Location (City) *
           </label>
 
           {isVenueSelected ? (
             <>
-              <p className="text-white/50 text-xs mb-1.5 flex items-center gap-1.5">
+              <p className="text-foreground/50 text-xs mb-1.5 flex items-center gap-1.5">
                 <Lock className="w-3 h-3" />
                 Location locked to venue
               </p>
@@ -253,19 +253,19 @@ export default function Step1EventDetails({
                   type="text"
                   value={eventDetails.location}
                   disabled
-                  className="w-full px-3 py-2 pl-8 text-sm rounded-lg bg-white/5 border border-white/10 text-white/60 cursor-not-allowed"
+                  className="w-full px-3 py-2 pl-8 text-sm rounded-lg bg-background/5 border border-border text-foreground/60 cursor-not-allowed"
                 />
-                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-white/60">
+                <div className="absolute left-2.5 top-1/2 -translate-y-1/2 text-foreground/60">
                   <Lock className="w-4 h-4" />
                 </div>
               </div>
-              <p className="mt-1 text-xs text-white/50">
+              <p className="mt-1 text-xs text-foreground/50">
                 Clear the venue to manually select a city
               </p>
             </>
           ) : (
             <>
-              <p className="text-white/50 text-xs mb-1.5">
+              <p className="text-foreground/50 text-xs mb-1.5">
                 Search for the city where the event will be held
               </p>
               {/* City autocomplete when no venue selected */}
@@ -282,18 +282,18 @@ export default function Step1EventDetails({
         {/* Event Date */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="event_date" className="block text-xs text-white/80 font-medium mb-1.5">
+            <label htmlFor="event_date" className="block text-xs text-foreground/80 font-medium mb-1.5">
               Event Date *
             </label>
-            <p className="text-white/50 text-xs mb-1.5">Start date for multi-day events</p>
+            <p className="text-foreground/50 text-xs mb-1.5">Start date for multi-day events</p>
             <input
               id="event_date"
               type="date"
               value={eventDetails.event_date}
               onChange={(e) => handleChange('event_date', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                errors.event_date ? 'border-red-500' : 'border-white/10'
-              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                errors.event_date ? 'border-red-500' : 'border-border'
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
             />
             {errors.event_date && (
               <p className="mt-1 text-xs text-red-500">{errors.event_date}</p>
@@ -301,18 +301,18 @@ export default function Step1EventDetails({
           </div>
 
           <div>
-            <label htmlFor="event_end_date" className="block text-xs text-white/80 font-medium mb-1.5">
+            <label htmlFor="event_end_date" className="block text-xs text-foreground/80 font-medium mb-1.5">
               Event End Date
             </label>
-            <p className="text-white/50 text-xs mb-1.5">Optional for multi-day events</p>
+            <p className="text-foreground/50 text-xs mb-1.5">Optional for multi-day events</p>
             <input
               id="event_end_date"
               type="date"
               value={eventDetails.event_end_date || ''}
               onChange={(e) => handleChange('event_end_date', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                errors.event_end_date ? 'border-red-500' : 'border-white/10'
-              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                errors.event_end_date ? 'border-red-500' : 'border-border'
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
             />
             {errors.event_end_date && (
               <p className="mt-1 text-xs text-red-500">{errors.event_end_date}</p>
@@ -323,7 +323,7 @@ export default function Step1EventDetails({
         {/* Event Times */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
-            <label htmlFor="start_time" className="block text-xs text-white/80 font-medium mb-1.5">
+            <label htmlFor="start_time" className="block text-xs text-foreground/80 font-medium mb-1.5">
               Start Time
             </label>
             <input
@@ -331,9 +331,9 @@ export default function Step1EventDetails({
               type="time"
               value={eventDetails.start_time || ''}
               onChange={(e) => handleChange('start_time', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                errors.start_time ? 'border-red-500' : 'border-white/10'
-              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                errors.start_time ? 'border-red-500' : 'border-border'
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
             />
             {errors.start_time && (
               <p className="mt-1 text-xs text-red-500">{errors.start_time}</p>
@@ -341,7 +341,7 @@ export default function Step1EventDetails({
           </div>
 
           <div>
-            <label htmlFor="end_time" className="block text-xs text-white/80 font-medium mb-1.5">
+            <label htmlFor="end_time" className="block text-xs text-foreground/80 font-medium mb-1.5">
               End Time
             </label>
             <input
@@ -349,9 +349,9 @@ export default function Step1EventDetails({
               type="time"
               value={eventDetails.end_time || ''}
               onChange={(e) => handleChange('end_time', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-                errors.end_time ? 'border-red-500' : 'border-white/10'
-              } text-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+                errors.end_time ? 'border-red-500' : 'border-border'
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
             />
             {errors.end_time && (
               <p className="mt-1 text-xs text-red-500">{errors.end_time}</p>
@@ -361,10 +361,10 @@ export default function Step1EventDetails({
 
         {/* Age Restriction */}
         <div>
-          <label htmlFor="age_restriction" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="age_restriction" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Age Restriction
           </label>
-          <p className="text-white/50 text-xs mb-1.5">
+          <p className="text-foreground/50 text-xs mb-1.5">
             Specify if there's an age requirement (e.g., "18+", "21+", "All Ages")
           </p>
           <input
@@ -373,9 +373,9 @@ export default function Step1EventDetails({
             value={eventDetails.age_restriction || ''}
             onChange={(e) => handleChange('age_restriction', e.target.value)}
             placeholder="e.g., All Ages, 18+, 21+"
-            className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-              errors.age_restriction ? 'border-red-500' : 'border-white/10'
-            } text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+              errors.age_restriction ? 'border-red-500' : 'border-border'
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
           />
           {errors.age_restriction && (
             <p className="mt-1 text-xs text-red-500">{errors.age_restriction}</p>
@@ -384,10 +384,10 @@ export default function Step1EventDetails({
 
         {/* Ticket Link */}
         <div>
-          <label htmlFor="ticket_link" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="ticket_link" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Ticket Link
           </label>
-          <p className="text-white/50 text-xs mb-1.5">
+          <p className="text-foreground/50 text-xs mb-1.5">
             URL where attendees can purchase tickets
           </p>
           <input
@@ -396,9 +396,9 @@ export default function Step1EventDetails({
             value={eventDetails.ticket_link || ''}
             onChange={(e) => handleChange('ticket_link', e.target.value)}
             placeholder="https://example.com/tickets"
-            className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-              errors.ticket_link ? 'border-red-500' : 'border-white/10'
-            } text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+              errors.ticket_link ? 'border-red-500' : 'border-border'
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
           />
           {errors.ticket_link && (
             <p className="mt-1 text-xs text-red-500">{errors.ticket_link}</p>
@@ -407,10 +407,10 @@ export default function Step1EventDetails({
 
         {/* Event Details (Description) - Moved to bottom and made optional */}
         <div>
-          <label htmlFor="description" className="block text-xs text-white/80 font-medium mb-1.5">
+          <label htmlFor="description" className="block text-xs text-foreground/80 font-medium mb-1.5">
             Event Details
           </label>
-          <p className="text-white/50 text-xs mb-1.5">
+          <p className="text-foreground/50 text-xs mb-1.5">
             Provide additional details about your event
           </p>
           <textarea
@@ -419,9 +419,9 @@ export default function Step1EventDetails({
             onChange={(e) => handleChange('description', e.target.value)}
             placeholder="Describe your event, what vendors can expect, special features, etc..."
             rows={2}
-            className={`w-full px-3 py-2 text-sm rounded-lg bg-white/10 border ${
-              errors.description ? 'border-red-500' : 'border-white/10'
-            } text-white placeholder:text-white/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none`}
+            className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+              errors.description ? 'border-red-500' : 'border-border'
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none`}
           />
           {errors.description && (
             <p className="mt-1 text-xs text-red-500">{errors.description}</p>

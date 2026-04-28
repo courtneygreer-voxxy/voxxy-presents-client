@@ -19,149 +19,140 @@ export default function ContactRow({
 }: ContactRowProps) {
   const [showMenu, setShowMenu] = useState(false);
 
-  // Category badge colors
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      'Artist': 'bg-purple-500/20 text-purple-300 border-purple-500/30',
-      'Table Vendor': 'bg-blue-500/20 text-blue-300 border-blue-500/30',
-      'Sponsor': 'bg-amber-500/20 text-amber-300 border-amber-500/30',
-      'Food & Beverage': 'bg-green-500/20 text-green-300 border-green-500/30',
+      Artist: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30',
+      'Table Vendor': 'bg-blue-500/20 text-blue-950 dark:text-blue-300 border-blue-500/30',
+      Sponsor: 'bg-amber-500/20 text-amber-950 dark:text-amber-300 border-amber-500/30',
+      'Food & Beverage': 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-500/30',
     };
-    return colors[category] || 'bg-white/10 text-white/70 border-white/20';
+    return colors[category] || 'bg-background/10 text-foreground/70 border-border';
   };
 
   const isUnsubscribed = contact.unsubscribe_status?.is_unsubscribed;
 
   return (
-    <div className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
-      <div className={`grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}>
-        {/* Checkbox */}
+    <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
+      <div
+        className={`grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
+      >
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
             type="checkbox"
             checked={isSelected}
             onChange={onSelect}
-            className="w-3.5 h-3.5 rounded border-white/20 bg-white/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
           />
         </div>
 
-        {/* Name */}
         <div className="min-w-0">
-          <div className="font-semibold text-white truncate flex items-center gap-1">
+          <div className="font-semibold text-foreground truncate flex items-center gap-1">
             {contact.contact_name}
             {isUnsubscribed && (
-              <span className="px-1 py-0.5 text-[8px] bg-red-500/20 text-red-400 border border-red-500/30 rounded flex-shrink-0">
+              <span className="px-1 py-0.5 text-[8px] bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30 rounded flex-shrink-0">
                 UNSUB
               </span>
             )}
           </div>
         </div>
 
-          {/* Business */}
-          <div className="min-w-0">
-            <div className="text-white/70 truncate">
-              {contact.business_name || '—'}
+        <div className="min-w-0">
+          <div className="text-foreground/70 truncate">{contact.business_name || '—'}</div>
+        </div>
+
+        <div className="min-w-0">
+          {contact.location ? (
+            <div className="flex items-center gap-0.5 text-foreground/70">
+              <MapPin className="w-3 h-3 flex-shrink-0 text-foreground/50" />
+              <span className="truncate">{contact.location}</span>
             </div>
-          </div>
+          ) : (
+            <span className="text-foreground/40">—</span>
+          )}
+        </div>
 
-          {/* Location */}
-          <div className="min-w-0">
-            {contact.location ? (
-              <div className="flex items-center gap-0.5 text-white/70">
-                <MapPin className="w-3 h-3 flex-shrink-0 text-white/50" />
-                <span className="truncate">{contact.location}</span>
-              </div>
+        <div className="min-w-0">
+          {contact.phone ? (
+            <a
+              href={`tel:${contact.phone}`}
+              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {contact.phone}
+            </a>
+          ) : (
+            <span className="text-foreground/40">—</span>
+          )}
+        </div>
+
+        <div className="min-w-0">
+          <div className="flex flex-wrap gap-0.5">
+            {contact.categories && contact.categories.length > 0 ? (
+              contact.categories.slice(0, 1).map((category) => (
+                <span
+                  key={category}
+                  className={`px-1 py-0.5 text-[9px] rounded border truncate ${getCategoryColor(category)}`}
+                >
+                  {category}
+                </span>
+              ))
             ) : (
-              <span className="text-white/40">—</span>
+              <span className="text-foreground/40">—</span>
             )}
           </div>
+        </div>
 
-          {/* Phone */}
-          <div className="min-w-0">
-            {contact.phone ? (
-              <a
-                href={`tel:${contact.phone}`}
-                className="text-white/70 hover:text-purple-400 transition-colors truncate block"
-                onClick={(e) => e.stopPropagation()}
-              >
-                {contact.phone}
-              </a>
-            ) : (
-              <span className="text-white/40">—</span>
-            )}
-          </div>
+        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+          {contact.instagram_handle && (
+            <a
+              href={`https://instagram.com/${contact.instagram_handle.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-pink-400 hover:text-pink-300 transition-colors"
+              title={contact.instagram_handle}
+            >
+              <Instagram className="w-3.5 h-3.5" />
+            </a>
+          )}
+          {contact.tiktok_handle && (
+            <a
+              href={`https://tiktok.com/@${contact.tiktok_handle.replace('@', '')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 transition-colors"
+              title={contact.tiktok_handle}
+            >
+              <Music2 className="w-3.5 h-3.5" />
+            </a>
+          )}
+          {contact.website && (
+            <a
+              href={contact.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:text-blue-300 transition-colors"
+              title="Website"
+            >
+              <Globe className="w-3.5 h-3.5" />
+            </a>
+          )}
+          {!contact.instagram_handle && !contact.tiktok_handle && !contact.website && (
+            <span className="text-foreground/40">—</span>
+          )}
+        </div>
 
-          {/* Category */}
-          <div className="min-w-0">
-            <div className="flex flex-wrap gap-0.5">
-              {contact.categories && contact.categories.length > 0 ? (
-                contact.categories.slice(0, 1).map((category) => (
-                  <span
-                    key={category}
-                    className={`px-1 py-0.5 text-[9px] rounded border truncate ${getCategoryColor(category)}`}
-                  >
-                    {category}
-                  </span>
-                ))
-              ) : (
-                <span className="text-white/40">—</span>
-              )}
-            </div>
-          </div>
-
-          {/* Social */}
-          <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-            {contact.instagram_handle && (
-              <a
-                href={`https://instagram.com/${contact.instagram_handle.replace('@', '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-pink-400 hover:text-pink-300 transition-colors"
-                title={contact.instagram_handle}
-              >
-                <Instagram className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {contact.tiktok_handle && (
-              <a
-                href={`https://tiktok.com/@${contact.tiktok_handle.replace('@', '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-cyan-400 hover:text-cyan-300 transition-colors"
-                title={contact.tiktok_handle}
-              >
-                <Music2 className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {contact.website && (
-              <a
-                href={contact.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-400 hover:text-blue-300 transition-colors"
-                title="Website"
-              >
-                <Globe className="w-3.5 h-3.5" />
-              </a>
-            )}
-            {!contact.instagram_handle && !contact.tiktok_handle && !contact.website && (
-              <span className="text-white/40">—</span>
-            )}
-          </div>
-
-        {/* Email */}
         <div className="min-w-0">
           <div className="flex items-center gap-1">
             <a
               href={`mailto:${contact.email}`}
-              className="text-white/70 hover:text-purple-400 transition-colors truncate block flex-1"
+              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block flex-1"
               onClick={(e) => e.stopPropagation()}
             >
               {contact.email}
             </a>
             {contact.unsubscribe_status?.is_unsubscribed && (
               <div
-                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-400 border border-red-500/30"
+                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30"
                 title={`Unsubscribed (${contact.unsubscribe_status.scope || 'unknown'})`}
               >
                 <MailX className="w-3 h-3" />
@@ -170,37 +161,36 @@ export default function ContactRow({
           </div>
         </div>
 
-        {/* Tags */}
         <div className="min-w-0">
           <div className="flex flex-wrap gap-0.5">
             {contact.tags && contact.tags.length > 0 ? (
               contact.tags.slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  className="px-1 py-0.5 text-[9px] bg-purple-500/10 text-purple-300 rounded border border-purple-500/20 truncate"
+                  className="px-1 py-0.5 text-[9px] bg-purple-500/10 text-violet-950 dark:text-purple-300 rounded border border-purple-500/20 truncate"
                 >
                   #{tag}
                 </span>
               ))
             ) : (
-              <span className="text-white/40">—</span>
+              <span className="text-foreground/40">—</span>
             )}
             {(contact.tags?.length || 0) > 2 && (
-              <span className="px-1 py-0.5 text-[9px] text-white/50">
+              <span className="px-1 py-0.5 text-[9px] text-muted-foreground">
                 +{(contact.tags?.length || 0) - 2}
               </span>
             )}
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               setShowMenu(!showMenu);
             }}
-            className="p-1.5 hover:bg-white/10 text-white/70 hover:text-white rounded transition-colors relative z-0"
+            className="p-1.5 hover:bg-accent/50 text-foreground/70 hover:text-foreground rounded transition-colors relative z-0"
             title="Actions"
           >
             <MoreVertical className="w-4 h-4" />
@@ -208,34 +198,34 @@ export default function ContactRow({
 
           {showMenu && (
             <>
+              <div className="fixed inset-0 z-[100]" onClick={() => setShowMenu(false)} />
               <div
-                className="fixed inset-0 z-[100]"
-                onClick={() => setShowMenu(false)}
-              />
-              <div className="fixed z-[101] bg-gray-900 border border-white/20 rounded-lg shadow-xl py-1 min-w-[120px]"
+                className="fixed z-[101] min-w-[120px] rounded-lg border border-border bg-card/95 py-1 shadow-xl dark:bg-[rgba(44,32,70,0.96)]"
                 style={{
                   right: '20px',
-                  top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`
+                  top: `${(document.activeElement as HTMLElement)?.getBoundingClientRect().bottom + 4}px`,
                 }}
               >
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowMenu(false);
                     onEdit();
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-2 transition-colors"
+                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-foreground transition-colors hover:bg-accent/60 dark:hover:bg-background/10"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                   Edit
                 </button>
                 <button
+                  type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setShowMenu(false);
                     onDelete();
                   }}
-                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors"
+                  className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-500/10 dark:text-red-400 flex items-center gap-2 transition-colors"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   Delete

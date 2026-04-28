@@ -31,7 +31,7 @@ export function PreviewBadge({ variant = 'preview', size = 'sm', className }: Pr
         }
       default:
         return {
-          className: 'bg-gray-100 text-gray-800',
+          className: 'bg-muted text-gray-800',
           icon: null,
           text: 'Preview'
         }

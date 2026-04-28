@@ -75,7 +75,7 @@ export default function AdminBugReportsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
@@ -83,13 +83,13 @@ export default function AdminBugReportsPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
         <div className="bg-red-500/20 border border-red-400/30 rounded-lg p-6 text-center max-w-md">
           <AlertCircle className="w-8 h-8 text-red-400 mx-auto mb-3" />
           <p className="text-red-300 mb-4">{error}</p>
           <button
             onClick={loadBugReports}
-            className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+            className="px-4 py-2 voxxy-btn-solid rounded-lg transition-colors"
           >
             Try Again
           </button>
@@ -99,22 +99,22 @@ export default function AdminBugReportsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+    <div className="min-h-screen voxxy-gradient-page-cool">
       <div className="p-4 lg:p-6">
         <div className="max-w-7xl mx-auto space-y-6">
           {/* Header */}
-          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+          <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <button
                 onClick={() => window.close()}
-                className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/20 text-white rounded-lg transition-colors text-sm"
+                className="flex items-center gap-2 px-3 py-2 bg-background/5 hover:bg-background/10 border border-border text-foreground rounded-lg transition-colors text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Close
               </button>
               <button
                 onClick={loadBugReports}
-                className="px-4 py-2 bg-white/10 hover:bg-white/15 border border-white/20 text-white rounded-lg transition-colors"
+                className="px-4 py-2 bg-background/10 hover:bg-background/15 border border-border text-foreground rounded-lg transition-colors"
               >
                 Refresh
               </button>
@@ -124,8 +124,8 @@ export default function AdminBugReportsPage() {
                 <Bug className="h-6 w-6 text-yellow-300" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Bug Reports</h1>
-                <p className="text-gray-300">
+                <h1 className="text-2xl font-bold text-foreground">Bug Reports</h1>
+                <p className="text-muted-foreground">
                   {reports.length} {reports.length === 1 ? 'report' : 'reports'} submitted by users
                 </p>
               </div>
@@ -134,10 +134,10 @@ export default function AdminBugReportsPage() {
 
           {/* Reports List */}
           {reports.length === 0 ? (
-            <div className="bg-white/5 border border-white/10 rounded-lg p-12 text-center">
-              <Bug className="w-12 h-12 text-white/40 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">No Bug Reports Yet</h3>
-              <p className="text-white/60">
+            <div className="bg-background/5 border border-border rounded-lg p-12 text-center">
+              <Bug className="w-12 h-12 text-foreground/40 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">No Bug Reports Yet</h3>
+              <p className="text-foreground/60">
                 Bug reports submitted by users will appear here.
               </p>
             </div>
@@ -150,12 +150,12 @@ export default function AdminBugReportsPage() {
                 return (
                   <div
                     key={report.id}
-                    className="bg-white/5 border border-white/10 rounded-lg overflow-hidden hover:border-white/20 transition-colors"
+                    className="bg-background/5 border border-border rounded-lg overflow-hidden hover:border-border transition-colors"
                   >
                     {/* Report Header (Always Visible) */}
                     <button
                       onClick={() => toggleExpand(report.id)}
-                      className="w-full p-4 flex items-start gap-4 text-left hover:bg-white/5 transition-colors"
+                      className="w-full p-4 flex items-start gap-4 text-left hover:bg-background/5 transition-colors"
                     >
                       {/* Icon */}
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
@@ -174,7 +174,7 @@ export default function AdminBugReportsPage() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div className="flex-1 min-w-0">
-                            <h3 className="text-white font-medium truncate">
+                            <h3 className="text-foreground font-medium truncate">
                               {report.error_context?.errorMessage || report.bug_description || 'Bug Report'}
                             </h3>
                             {report.error_context?.componentName && (
@@ -184,13 +184,13 @@ export default function AdminBugReportsPage() {
                             )}
                           </div>
                           {isAutoReported && (
-                            <span className="px-2 py-1 bg-red-500/20 border border-red-400/30 text-red-300 text-xs rounded">
+                            <span className="px-2 py-1 bg-red-500/20 border border-red-400/30 text-red-950 dark:text-red-300 text-xs rounded">
                               Auto-reported
                             </span>
                           )}
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-white/60">
+                        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-foreground/60">
                           <span className="flex items-center gap-1">
                             <User className="w-3 h-3" />
                             {report.name}
@@ -209,21 +209,21 @@ export default function AdminBugReportsPage() {
                       {/* Expand Icon */}
                       <div className="flex-shrink-0">
                         {isExpanded ? (
-                          <ChevronUp className="w-5 h-5 text-white/60" />
+                          <ChevronUp className="w-5 h-5 text-foreground/60" />
                         ) : (
-                          <ChevronDown className="w-5 h-5 text-white/60" />
+                          <ChevronDown className="w-5 h-5 text-foreground/60" />
                         )}
                       </div>
                     </button>
 
                     {/* Expanded Details */}
                     {isExpanded && (
-                      <div className="border-t border-white/10 p-4 space-y-4 bg-black/20">
+                      <div className="border-t border-border p-4 space-y-4 bg-black/20">
                         {/* User Description */}
                         {report.bug_description && (
                           <div>
-                            <h4 className="text-sm font-semibold text-white mb-2">User Description</h4>
-                            <p className="text-sm text-white/70 whitespace-pre-wrap">
+                            <h4 className="text-sm font-semibold text-foreground mb-2">User Description</h4>
+                            <p className="text-sm text-foreground/70 whitespace-pre-wrap">
                               {report.bug_description}
                             </p>
                           </div>
@@ -232,12 +232,12 @@ export default function AdminBugReportsPage() {
                         {/* Error Context */}
                         {report.error_context && (
                           <div className="space-y-3">
-                            <h4 className="text-sm font-semibold text-white">Technical Details</h4>
+                            <h4 className="text-sm font-semibold text-foreground">Technical Details</h4>
 
                             {/* URL */}
                             {report.error_context.url && (
                               <div>
-                                <p className="text-xs text-white/50 mb-1">Page URL</p>
+                                <p className="text-xs text-foreground/50 mb-1">Page URL</p>
                                 <a
                                   href={report.error_context.url}
                                   target="_blank"
@@ -254,16 +254,16 @@ export default function AdminBugReportsPage() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                               {report.error_context.browser && (
                                 <div>
-                                  <p className="text-xs text-white/50 mb-1">Browser</p>
-                                  <p className="text-sm text-white/70 font-mono text-xs truncate">
+                                  <p className="text-xs text-foreground/50 mb-1">Browser</p>
+                                  <p className="text-sm text-foreground/70 font-mono text-xs truncate">
                                     {report.error_context.browser}
                                   </p>
                                 </div>
                               )}
                               {report.error_context.screen_resolution && (
                                 <div>
-                                  <p className="text-xs text-white/50 mb-1">Screen / Viewport</p>
-                                  <p className="text-sm text-white/70">
+                                  <p className="text-xs text-foreground/50 mb-1">Screen / Viewport</p>
+                                  <p className="text-sm text-foreground/70">
                                     {report.error_context.screen_resolution}
                                     {report.error_context.viewport && ` / ${report.error_context.viewport}`}
                                   </p>
@@ -274,7 +274,7 @@ export default function AdminBugReportsPage() {
                             {/* Stack Trace */}
                             {report.error_context.stack && (
                               <div>
-                                <p className="text-xs text-white/50 mb-1">Stack Trace</p>
+                                <p className="text-xs text-foreground/50 mb-1">Stack Trace</p>
                                 <pre className="text-xs text-red-300 font-mono bg-black/40 border border-red-500/20 rounded p-3 overflow-x-auto max-h-48">
                                   {report.error_context.stack}
                                 </pre>
@@ -284,8 +284,8 @@ export default function AdminBugReportsPage() {
                             {/* Component Stack */}
                             {report.error_context.componentStack && (
                               <div>
-                                <p className="text-xs text-white/50 mb-1">Component Stack</p>
-                                <pre className="text-xs text-white/60 font-mono bg-black/40 border border-white/10 rounded p-3 overflow-x-auto max-h-32">
+                                <p className="text-xs text-foreground/50 mb-1">Component Stack</p>
+                                <pre className="text-xs text-foreground/60 font-mono bg-black/40 border border-border rounded p-3 overflow-x-auto max-h-32">
                                   {report.error_context.componentStack}
                                 </pre>
                               </div>
@@ -294,8 +294,8 @@ export default function AdminBugReportsPage() {
                             {/* Form Data (if available) */}
                             {report.error_context.formData && (
                               <div>
-                                <p className="text-xs text-white/50 mb-1">Form Data (at time of error)</p>
-                                <pre className="text-xs text-white/60 font-mono bg-black/40 border border-white/10 rounded p-3 overflow-x-auto max-h-48">
+                                <p className="text-xs text-foreground/50 mb-1">Form Data (at time of error)</p>
+                                <pre className="text-xs text-foreground/60 font-mono bg-black/40 border border-border rounded p-3 overflow-x-auto max-h-48">
                                   {JSON.stringify(report.error_context.formData, null, 2)}
                                 </pre>
                               </div>
@@ -304,10 +304,10 @@ export default function AdminBugReportsPage() {
                         )}
 
                         {/* Contact Action */}
-                        <div className="pt-3 border-t border-white/10">
+                        <div className="pt-3 border-t border-border">
                           <a
                             href={`mailto:${report.email}?subject=Re: Bug Report #${report.id}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm rounded-lg transition-colors"
+                            className="inline-flex items-center gap-2 px-4 py-2 voxxy-btn-solid text-sm rounded-lg transition-colors"
                           >
                             <Mail className="w-4 h-4" />
                             Email Reporter

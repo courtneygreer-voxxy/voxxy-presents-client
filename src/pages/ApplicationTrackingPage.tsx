@@ -26,35 +26,35 @@ const STATUS_CONFIG = {
   pending: {
     label: 'Pending Review',
     icon: Clock,
-    color: 'text-blue-400',
+    color: 'text-blue-800 dark:text-blue-400',
     bg: 'bg-blue-500/20',
     border: 'border-blue-500/30',
   },
   approved: {
     label: 'Approved',
     icon: CheckCircle,
-    color: 'text-green-400',
+    color: 'text-emerald-800 dark:text-green-400',
     bg: 'bg-green-500/20',
     border: 'border-green-500/30',
   },
   rejected: {
     label: 'Not Selected',
     icon: XCircle,
-    color: 'text-red-400',
+    color: 'text-red-800 dark:text-red-400',
     bg: 'bg-red-500/20',
     border: 'border-red-500/30',
   },
   waitlist: {
     label: 'Waitlisted',
     icon: AlertCircle,
-    color: 'text-yellow-400',
+    color: 'text-yellow-800 dark:text-yellow-400',
     bg: 'bg-yellow-500/20',
     border: 'border-yellow-500/30',
   },
   confirmed: {
     label: 'Confirmed',
     icon: CheckCircle,
-    color: 'text-purple-400',
+    color: 'text-violet-800 dark:text-purple-400',
     bg: 'bg-purple-500/20',
     border: 'border-purple-500/30',
   },
@@ -99,7 +99,7 @@ export default function ApplicationTrackingPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
@@ -107,15 +107,15 @@ export default function ApplicationTrackingPage() {
 
   if (error || !registration) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">Application Not Found</h1>
-          <p className="text-white/60 mb-6">
+          <h1 className="text-2xl font-bold text-foreground mb-4">Application Not Found</h1>
+          <p className="text-foreground/60 mb-6">
             {error || 'We could not find an application with this tracking code.'}
           </p>
           <button
             onClick={() => navigate('/')}
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
+            className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
             Go Home
           </button>
@@ -128,20 +128,20 @@ export default function ApplicationTrackingPage() {
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] py-12 px-4">
+    <div className="min-h-screen voxxy-gradient-page-cool py-12 px-4">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-white mb-2">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
             Application Status
           </h1>
-          <p className="text-white/60">
-            Tracking Code: <span className="font-mono text-purple-300">{registration.ticket_code}</span>
+          <p className="text-foreground/60">
+            Tracking Code: <span className="font-mono text-violet-900 dark:text-purple-300">{registration.ticket_code}</span>
           </p>
         </div>
 
         {/* Status Card */}
-        <div className={`bg-white/5 border ${statusConfig.border} rounded-lg p-8 mb-6`}>
+        <div className={`bg-background/5 border ${statusConfig.border} rounded-lg p-8 mb-6`}>
           <div className="flex items-center justify-center mb-6">
             <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.bg}`}>
               <StatusIcon className={`w-12 h-12 ${statusConfig.color}`} />
@@ -152,35 +152,35 @@ export default function ApplicationTrackingPage() {
             <h2 className={`text-2xl font-bold ${statusConfig.color} mb-2`}>
               {statusConfig.label}
             </h2>
-            <p className="text-white/80">
+            <p className="text-foreground/80">
               Your vendor application for <span className="font-semibold">{registration.event.title}</span>
             </p>
           </div>
 
           {/* Status Messages */}
-          <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+          <div className="bg-background/5 border border-border rounded-lg p-6">
             {registration.status === 'pending' && (
-              <p className="text-white/80 text-center">
+              <p className="text-foreground/80 text-center">
                 Your application is currently being reviewed by the event organizers. You'll be notified by email when there's an update.
               </p>
             )}
             {registration.status === 'approved' && (
-              <p className="text-white/80 text-center">
+              <p className="text-foreground/80 text-center">
                 Congratulations! Your vendor application has been approved. Check your email for next steps and payment information.
               </p>
             )}
             {registration.status === 'rejected' && (
-              <p className="text-white/80 text-center">
+              <p className="text-foreground/80 text-center">
                 Unfortunately, your application was not selected for this event. We encourage you to apply for future opportunities.
               </p>
             )}
             {registration.status === 'waitlist' && (
-              <p className="text-white/80 text-center">
+              <p className="text-foreground/80 text-center">
                 You've been added to the waitlist. If a spot becomes available, you'll be notified via email.
               </p>
             )}
             {registration.status === 'confirmed' && (
-              <p className="text-white/80 text-center">
+              <p className="text-foreground/80 text-center">
                 Your vendor spot is confirmed! Check your email for event day details and vendor guidelines.
               </p>
             )}
@@ -188,40 +188,40 @@ export default function ApplicationTrackingPage() {
         </div>
 
         {/* Application Details */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Application Details</h3>
+        <div className="bg-background/5 border border-border rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Application Details</h3>
           <div className="space-y-3">
             <div className="flex justify-between">
-              <span className="text-white/60">Business Name</span>
-              <span className="text-white font-medium">{registration.business_name}</span>
+              <span className="text-foreground/60">Business Name</span>
+              <span className="text-foreground font-medium">{registration.business_name}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Category</span>
-              <span className="px-2 py-1 rounded text-sm bg-purple-500/20 text-purple-300">
+              <span className="text-foreground/60">Category</span>
+              <span className="px-2 py-1 rounded text-sm bg-purple-500/20 text-violet-950 dark:text-purple-300">
                 {registration.vendor_category}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Email</span>
-              <span className="text-white">{registration.email}</span>
+              <span className="text-foreground/60">Email</span>
+              <span className="text-foreground">{registration.email}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-white/60">Submitted</span>
-              <span className="text-white">{formatDate(registration.created_at)}</span>
+              <span className="text-foreground/60">Submitted</span>
+              <span className="text-foreground">{formatDate(registration.created_at)}</span>
             </div>
           </div>
         </div>
 
         {/* Event Details */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6 mb-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Event Details</h3>
+        <div className="bg-background/5 border border-border rounded-lg p-6 mb-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Event Details</h3>
           <div className="space-y-3">
             {registration.event.dates.start && (
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-purple-400 mt-0.5" />
+                <Calendar className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5" />
                 <div>
-                  <p className="text-white/60 text-sm">Date</p>
-                  <p className="text-white">
+                  <p className="text-foreground/60 text-sm">Date</p>
+                  <p className="text-foreground">
                     {new Date(registration.event.dates.start).toLocaleDateString('en-US', {
                       weekday: 'long',
                       year: 'numeric',
@@ -234,10 +234,10 @@ export default function ApplicationTrackingPage() {
             )}
             {registration.event.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-purple-400 mt-0.5" />
+                <MapPin className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5" />
                 <div>
-                  <p className="text-white/60 text-sm">Location</p>
-                  <p className="text-white">{registration.event.location}</p>
+                  <p className="text-foreground/60 text-sm">Location</p>
+                  <p className="text-foreground">{registration.event.location}</p>
                 </div>
               </div>
             )}
@@ -248,13 +248,13 @@ export default function ApplicationTrackingPage() {
         <div className="flex gap-3">
           <button
             onClick={() => navigate(`/events/${registration.event.slug}`)}
-            className="flex-1 px-6 py-3 rounded-lg bg-white/10 border border-white/20 text-white hover:bg-white/20 transition-all"
+            className="flex-1 px-6 py-3 rounded-lg bg-background/10 border border-border text-foreground hover:bg-background/20 transition-all"
           >
             View Event
           </button>
           <button
             onClick={() => navigate('/')}
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all"
+            className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
             Voxxy Presents Home
           </button>

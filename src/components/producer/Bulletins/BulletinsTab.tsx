@@ -116,7 +116,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-gray-400">Loading bulletins...</div>
+        <div className="text-muted-foreground">Loading bulletins...</div>
       </div>
     );
   }
@@ -137,12 +137,12 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
       {/* Header */}
       <div className="flex items-center justify-between p-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center">
-            <Megaphone className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-lg voxxy-accent-tile flex items-center justify-center">
+            <Megaphone className="w-5 h-5 text-foreground" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white">Bulletins</h2>
-            <p className="text-gray-400 text-sm">
+            <h2 className="text-2xl font-bold text-foreground">Bulletins</h2>
+            <p className="text-muted-foreground text-sm">
               Share important updates and announcements with vendors
             </p>
           </div>
@@ -150,7 +150,7 @@ export function BulletinsTab({ eventSlug: eventSlugProp }: BulletinsTabProps = {
 
         <Button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-purple-600 hover:bg-purple-700"
+          className="voxxy-btn-solid"
         >
           <Plus className="w-4 h-4 mr-2" />
           Create Bulletin

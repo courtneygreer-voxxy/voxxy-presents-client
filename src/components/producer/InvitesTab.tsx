@@ -18,6 +18,7 @@ import { eventInvitationsApi, vendorApplicationsApi, registrationsApi, emailDeli
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import { DebugPanel } from './DebugPanel';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 
 // Unified invite row interface
 interface InviteRow {
@@ -436,21 +437,21 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
   const getStatusBadge = (status: InviteRow['status']) => {
     switch (status) {
       case 'invited':
-        return { label: 'Invited', color: 'bg-slate-500/20 text-slate-400' };
+        return { label: 'Invited', variant: 'tintSlate' as BadgeVariant };
       case 'applied':
-        return { label: 'Applied', color: 'bg-blue-500/20 text-blue-400' };
+        return { label: 'Applied', variant: 'tintBlue' as BadgeVariant };
       case 'approved':
-        return { label: 'Approved', color: 'bg-green-500/20 text-green-400' };
+        return { label: 'Approved', variant: 'tintGreen' as BadgeVariant };
       case 'waitlist':
-        return { label: 'Waitlist', color: 'bg-yellow-500/20 text-yellow-400' };
+        return { label: 'Waitlist', variant: 'tintYellow' as BadgeVariant };
       case 'declined':
-        return { label: 'Declined', color: 'bg-red-500/20 text-red-400' };
+        return { label: 'Declined', variant: 'tintRed' as BadgeVariant };
       case 'bounced':
-        return { label: 'Bounced', color: 'bg-orange-500/20 text-orange-400' };
+        return { label: 'Bounced', variant: 'tintOrange' as BadgeVariant };
       case 'unsubscribed':
-        return { label: 'Unsubscribed', color: 'bg-gray-500/20 text-gray-400' };
+        return { label: 'Unsubscribed', variant: 'tintMuted' as BadgeVariant };
       default:
-        return { label: status, color: 'bg-gray-500/20 text-gray-400' };
+        return { label: status, variant: 'tintMuted' as BadgeVariant };
     }
   };
 
@@ -458,14 +459,14 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
     switch (paymentStatus) {
       case 'paid':
       case 'confirmed':
-        return { label: 'Paid', color: 'bg-green-500/20 text-green-400' };
+        return { label: 'Paid', variant: 'tintGreen' as BadgeVariant };
       case 'overdue':
-        return { label: 'Overdue', color: 'bg-red-500/20 text-red-400' };
+        return { label: 'Overdue', variant: 'tintRed' as BadgeVariant };
       case 'pending':
-        return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-400' };
+        return { label: 'Pending', variant: 'tintYellow' as BadgeVariant };
       case 'n/a':
       default:
-        return { label: '—', color: 'text-white/20' };
+        return { label: '—', variant: 'tintMuted' as BadgeVariant };
     }
   };
 
@@ -528,7 +529,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           <p className="text-sm text-red-400 mb-3">{error}</p>
           <button
             onClick={() => fetchInviteRows(1)}
-            className="px-3 py-1.5 text-xs rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth"
+            className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-smooth"
           >
             Retry
           </button>
@@ -541,19 +542,19 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
     <div className="p-6 lg:p-8">
       {/* Header */}
       <div className="mb-3">
-        <h2 className="text-lg font-bold text-white mb-0.5">Invites</h2>
-        <p className="text-[10px] text-white/60">{filteredRows.length} contacts</p>
+        <h2 className="text-lg font-bold text-foreground mb-0.5">Invites</h2>
+        <p className="text-[10px] text-foreground/85 dark:text-foreground/60">{filteredRows.length} contacts</p>
       </div>
 
       {/* Search Bar */}
       <div className="relative mb-3">
-        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-foreground/65 dark:text-foreground/40" />
         <input
           type="text"
           placeholder="Search name, email, category..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="w-full pl-8 pr-3 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         />
       </div>
 
@@ -563,7 +564,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         >
           <option value="all">All Status</option>
           <option value="invited">Invited</option>
@@ -579,7 +580,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={reviewFilter}
           onChange={(e) => setReviewFilter(e.target.value as ReviewFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         >
           <option value="all">All Reviews</option>
           <option value="reviewed">Reviewed</option>
@@ -590,7 +591,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value as PaymentFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         >
           <option value="all">All Payment</option>
           <option value="paid">Paid</option>
@@ -602,7 +603,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={sourceFilter}
           onChange={(e) => setSourceFilter(e.target.value as SourceFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
         >
           <option value="all">All Sources</option>
           <option value="contact">Contact</option>
@@ -612,7 +613,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="px-2.5 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 text-xs transition-smooth"
+            className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground hover:bg-background/10 text-xs transition-smooth"
           >
             Clear Filters
           </button>
@@ -622,20 +623,20 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
       {/* Table */}
       {filteredRows.length === 0 ? (
         <div className="glass-card p-6 text-center">
-          <Building2 className="w-8 h-8 text-white/20 mx-auto mb-2" />
-          <p className="text-xs text-white/60">No invites found</p>
+          <Building2 className="w-8 h-8 text-foreground/20 mx-auto mb-2" />
+          <p className="text-xs text-foreground/80 dark:text-foreground/60">No invites found</p>
         </div>
       ) : (
         <div className="glass-card overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2 bg-white/5 border-b border-white/10">
+          <div className="grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2 bg-background/5 border-b border-border">
             <div className="w-6" /> {/* Expand icon */}
-            <div className="text-xs font-semibold text-white/80">Business Name</div>
-            <div className="text-xs font-semibold text-white/80">Category</div>
-            <div className="text-xs font-semibold text-white/80">Status</div>
-            <div className="text-xs font-semibold text-white/80">Payment</div>
-            <div className="text-xs font-semibold text-white/80">Source</div>
-            <div className="text-xs font-semibold text-white/80">Reviewed</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Business Name</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Category</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Status</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Payment</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Source</div>
+            <div className="text-xs font-semibold text-foreground/90 dark:text-foreground/80">Reviewed</div>
           </div>
 
           {/* Table Body */}
@@ -649,52 +650,52 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
               return (
                 <div
                   key={row.id}
-                  className={`border-b border-white/10 last:border-b-0 ${
+                  className={`border-b border-border last:border-b-0 ${
                     isUnreviewed ? 'bg-blue-500/5' : ''
-                  } ${isExpanded ? 'bg-white/5 border-l-2 border-l-purple-500' : ''}`}
+                  } ${isExpanded ? 'bg-background/5 border-l-2 border-l-purple-500' : ''}`}
                 >
                   {/* Row Header */}
                   <button
                     onClick={() => handleExpandRow(row.id)}
-                    className="w-full grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2.5 hover:bg-white/5 transition-smooth text-left"
+                    className="w-full grid grid-cols-[auto_2fr_1fr_1fr_1fr_1fr_1fr] gap-3 px-3 py-2.5 hover:bg-background/5 transition-smooth text-left"
                   >
                     <div className="flex items-center">
                       {isExpanded ? (
-                        <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                        <ChevronUp className="w-3.5 h-3.5 text-foreground/60" />
                       ) : (
-                        <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                        <ChevronDown className="w-3.5 h-3.5 text-foreground/60" />
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-white font-medium">{row.businessName}</span>
+                      <span className="text-sm text-foreground font-medium">{row.businessName}</span>
                       {row.isReturning && <Star className="w-3 h-3 text-yellow-400" fill="currentColor" />}
                     </div>
                     <div>
-                      <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 text-purple-400">
+                      <Badge variant="tintPurple" className="px-2 py-0.5 text-[10px] font-medium">
                         {row.category}
-                      </span>
+                      </Badge>
                     </div>
                     <div>
-                      <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${statusBadge.color}`}>
+                      <Badge variant={statusBadge.variant} className="px-2 py-0.5 text-[10px] font-medium">
                         {statusBadge.label}
-                      </span>
+                      </Badge>
                     </div>
                     <div>
                       {row.status === 'approved' && row.paymentStatus !== 'n/a' ? (
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${paymentBadge.color}`}>
+                        <Badge variant={paymentBadge.variant} className="px-2 py-0.5 text-[10px] font-medium">
                           {paymentBadge.label}
-                        </span>
+                        </Badge>
                       ) : (
-                        <span className="text-white/20 text-xs">—</span>
+                        <span className="text-foreground/20 text-xs">—</span>
                       )}
                     </div>
                     <div>
                       {row.source === 'net_new' ? (
-                        <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium bg-purple-500/20 text-purple-400">
+                        <Badge variant="tintPurple" className="px-2 py-0.5 text-[10px] font-medium">
                           Net New
-                        </span>
+                        </Badge>
                       ) : (
-                        <span className="text-xs text-white/60">Contact</span>
+                        <span className="text-xs text-foreground/60">Contact</span>
                       )}
                     </div>
                     <div className="flex items-center">
@@ -705,28 +706,28 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                       ) : row.status === 'applied' ? (
                         <div className="w-2 h-2 rounded-full bg-blue-400" title="Unreviewed" />
                       ) : (
-                        <span className="text-white/20 text-xs">—</span>
+                        <span className="text-foreground/20 text-xs">—</span>
                       )}
                     </div>
                   </button>
 
                   {/* Expanded Detail Panel */}
                   {isExpanded && (
-                    <div className="px-3 py-3 bg-[#14102a] border-t border-white/10">
+                    <div className="voxxy-surface-subtle border-t border-border px-3 py-3">
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Left Column - Contact Info */}
                         <div className="space-y-3">
-                          <h4 className="text-xs font-semibold text-white/70 uppercase tracking-wide">Contact Info</h4>
+                          <h4 className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">Contact Info</h4>
 
                           {row.contactName && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-0.5">Name</p>
-                              <p className="text-sm text-white">{row.contactName}</p>
+                              <p className="text-[10px] text-foreground/60 mb-0.5">Name</p>
+                              <p className="text-sm text-foreground">{row.contactName}</p>
                             </div>
                           )}
 
                           <div>
-                            <p className="text-[10px] text-white/60 mb-0.5">Email</p>
+                            <p className="text-[10px] text-foreground/60 mb-0.5">Email</p>
                             <a href={`mailto:${row.email}`} className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1.5">
                               <Mail className="w-3.5 h-3.5" />
                               {row.email}
@@ -735,7 +736,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                           {row.phone && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-0.5">Phone</p>
+                              <p className="text-[10px] text-foreground/60 mb-0.5">Phone</p>
                               <a href={`tel:${row.phone}`} className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1.5">
                                 <Phone className="w-3.5 h-3.5" />
                                 {row.phone}
@@ -745,21 +746,21 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                           {row.location && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-0.5">Location</p>
-                              <p className="text-sm text-white/80">{row.location}</p>
+                              <p className="text-[10px] text-foreground/60 mb-0.5">Location</p>
+                              <p className="text-sm text-foreground/80">{row.location}</p>
                             </div>
                           )}
 
                           {/* Social Links */}
                           <div>
-                            <p className="text-[10px] text-white/60 mb-1.5">Social Links</p>
+                            <p className="text-[10px] text-foreground/60 mb-1.5">Social Links</p>
                             <div className="flex flex-wrap gap-2">
                               {row.instagram && (
                                 <a
                                   href={row.instagram.startsWith('http') ? row.instagram : `https://instagram.com/${row.instagram.replace('@', '')}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/80 hover:text-white transition-smooth"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
                                 >
                                   <Instagram className="w-3 h-3" />
                                   <span>Instagram</span>
@@ -771,7 +772,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   href={row.tiktok.startsWith('http') ? row.tiktok : `https://tiktok.com/@${row.tiktok.replace('@', '')}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/80 hover:text-white transition-smooth"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
                                 >
                                   <Music className="w-3 h-3" />
                                   <span>TikTok</span>
@@ -783,7 +784,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   href={row.website.startsWith('http') ? row.website : `https://${row.website}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-white/80 hover:text-white transition-smooth"
+                                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground/80 hover:text-foreground transition-smooth"
                                 >
                                   <Globe className="w-3 h-3" />
                                   <span>Website</span>
@@ -791,25 +792,25 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                 </a>
                               )}
                               {!row.instagram && !row.tiktok && !row.website && (
-                                <span className="text-xs text-white/40 italic">N/A</span>
+                                <span className="text-xs text-foreground/40 italic">N/A</span>
                               )}
                             </div>
                           </div>
 
                           {/* Email History Section */}
                           {(row.registrationId || row.invitationId) && (
-                            <div className="pt-3 border-t border-white/10">
+                            <div className="pt-3 border-t border-border">
                               <button
                                 onClick={() => handleToggleEmailHistory(row.id, row.registrationId, row.invitationId)}
-                                className="w-full flex items-center justify-between text-left hover:bg-white/5 p-2 rounded-lg transition-smooth"
+                                className="w-full flex items-center justify-between text-left hover:bg-background/5 p-2 rounded-lg transition-smooth"
                               >
-                                <span className="text-xs font-semibold text-white/70 uppercase tracking-wide">
+                                <span className="text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide">
                                   Email History
                                 </span>
                                 {emailHistoryExpanded === row.id ? (
-                                  <ChevronUp className="w-3.5 h-3.5 text-white/60" />
+                                  <ChevronUp className="w-3.5 h-3.5 text-foreground/60" />
                                 ) : (
-                                  <ChevronDown className="w-3.5 h-3.5 text-white/60" />
+                                  <ChevronDown className="w-3.5 h-3.5 text-foreground/60" />
                                 )}
                               </button>
 
@@ -826,24 +827,23 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                       const emailSubject = delivery.subject || delivery.scheduled_email?.subject || 'Unknown Email';
                                       const deliveredDate = delivery.delivered_at || delivery.sent_at || delivery.created_at;
 
-                                      // Status badge colors
-                                      let statusColor = 'bg-gray-500/20 text-gray-400';
-                                      if (deliveryStatus === 'delivered') statusColor = 'bg-green-500/20 text-green-400';
-                                      else if (deliveryStatus === 'bounced') statusColor = 'bg-red-500/20 text-red-400';
-                                      else if (deliveryStatus === 'dropped') statusColor = 'bg-orange-500/20 text-orange-400';
-                                      else if (deliveryStatus === 'unsubscribed') statusColor = 'bg-yellow-500/20 text-yellow-400';
+                                      let deliveryVariant: BadgeVariant = 'tintMuted';
+                                      if (deliveryStatus === 'delivered') deliveryVariant = 'tintGreen';
+                                      else if (deliveryStatus === 'bounced') deliveryVariant = 'tintRed';
+                                      else if (deliveryStatus === 'dropped') deliveryVariant = 'tintOrange';
+                                      else if (deliveryStatus === 'unsubscribed') deliveryVariant = 'tintYellow';
 
                                       return (
                                         <div
                                           key={delivery.id}
-                                          className="bg-white/5 border border-white/10 rounded-lg p-2.5 space-y-1.5"
+                                          className="bg-background/5 border border-border rounded-lg p-2.5 space-y-1.5"
                                         >
                                           <div className="flex items-start justify-between gap-2">
                                             <div className="flex-1 min-w-0">
-                                              <p className="text-xs text-white font-medium truncate">
+                                              <p className="text-xs text-foreground font-medium truncate">
                                                 {emailSubject}
                                               </p>
-                                              <p className="text-[10px] text-white/60 mt-0.5">
+                                              <p className="text-[10px] text-foreground/60 mt-0.5">
                                                 {deliveredDate ? new Date(deliveredDate).toLocaleDateString('en-US', {
                                                   month: 'short',
                                                   day: 'numeric',
@@ -853,9 +853,9 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                                 }) : 'Date unknown'}
                                               </p>
                                             </div>
-                                            <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-medium ${statusColor} whitespace-nowrap`}>
+                                            <Badge variant={deliveryVariant} className="px-2 py-0.5 text-[10px] font-medium whitespace-nowrap">
                                               {deliveryStatus}
-                                            </span>
+                                            </Badge>
                                           </div>
 
                                           {/* Bounce/Drop reason */}
@@ -868,6 +868,24 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                                           {/* Action buttons */}
                                           <div className="flex gap-2 mt-2">
+                                            {(deliveryStatus === 'bounced' || deliveryStatus === 'dropped') && (
+                                              <button
+                                                onClick={async () => {
+                                                  try {
+                                                    await emailDeliveriesApi.retry(delivery.id);
+                                                    alert('Email queued for retry');
+                                                    // Refresh email history
+                                                    const updated = await emailDeliveriesApi.getByRegistration(row.registrationId!);
+                                                    setEmailHistoryData((prev) => ({ ...prev, [row.id]: updated }));
+                                                  } catch (err: any) {
+                                                    alert(`Failed to retry: ${err.message}`);
+                                                  }
+                                                }}
+                                                className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-violet-950 dark:text-purple-400 hover:bg-purple-600/30 transition-smooth"
+                                              >
+                                                Retry
+                                              </button>
+                                            )}
                                           </div>
                                         </div>
                                       );
@@ -882,7 +900,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                           </p>
                                         </div>
                                       ) : (
-                                        <p className="text-xs text-white/40 italic">No email history found</p>
+                                        <p className="text-xs text-foreground/40 italic">No email history found</p>
                                       )}
                                     </div>
                                   )}
@@ -897,7 +915,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Status Actions (only for applied/approved/waitlist/declined) */}
                           {row.status !== 'invited' && row.registrationId && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-1.5 uppercase tracking-wide">Status</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Status</p>
                               {updatingId === row.id ? (
                                 <div className="flex items-center justify-center py-3">
                                   <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
@@ -912,29 +930,29 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   </button>
                                   <button
                                     onClick={() => handleUpdateStatus(row, 'waitlist')}
-                                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-400 hover:bg-yellow-500/10 transition-smooth text-xs font-medium"
+                                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-yellow-500/30 text-yellow-800 dark:text-yellow-400 hover:bg-yellow-500/10 transition-smooth text-xs font-medium"
                                   >
                                     Waitlist
                                   </button>
                                   <button
                                     onClick={() => handleUpdateStatus(row, 'declined')}
-                                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-smooth text-xs font-medium"
+                                    className="flex-1 px-2.5 py-1.5 rounded-lg border border-red-500/30 text-red-800 dark:text-red-400 hover:bg-red-500/10 transition-smooth text-xs font-medium"
                                   >
                                     Decline
                                   </button>
                                 </div>
                               ) : (
                                 <div className="flex items-center gap-2">
-                                  <span className={`inline-flex px-2.5 py-1.5 rounded-lg text-xs font-medium ${statusBadge.color}`}>
+                                  <Badge variant={statusBadge.variant} className="rounded-lg px-2.5 py-1.5 text-xs font-medium">
                                     {statusBadge.label}
-                                  </span>
+                                  </Badge>
                                   <select
                                     value={row.status}
                                     onChange={(e) => {
                                       const newStatus = e.target.value as 'approved' | 'waitlist' | 'declined';
                                       handleUpdateStatus(row, newStatus);
                                     }}
-                                    className="flex-1 px-2.5 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth"
+                                    className="flex-1 px-2.5 py-1.5 rounded-lg bg-background/10 text-foreground text-xs border border-border hover:bg-background/20 transition-smooth"
                                   >
                                     <option value="approved">Change to Approved</option>
                                     <option value="waitlist">Change to Waitlist</option>
@@ -948,12 +966,12 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Category Dropdown (only for applied/approved/waitlist) */}
                           {row.status !== 'invited' && row.registrationId && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-1.5 uppercase tracking-wide">Category</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Category</p>
                               <select
                                 value={row.category}
                                 onChange={(e) => handleUpdateCategory(row, e.target.value)}
                                 disabled={isUpdatingCategory}
-                                className="w-full px-2.5 py-1.5 rounded-lg bg-white/5 text-white text-xs border border-white/10 focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {availableCategories.length > 0 ? (
                                   // Show all available categories, ensuring current category is included
@@ -972,15 +990,15 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Payment Toggle (only for approved) */}
                           {row.status === 'approved' && row.paymentStatus !== 'n/a' && (
                             <div>
-                              <p className="text-[10px] text-white/60 mb-1.5 uppercase tracking-wide">Payment</p>
+                              <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Payment</p>
                               <div className="flex items-center gap-2">
-                                <span className={`inline-flex px-2.5 py-1.5 rounded-lg text-xs font-medium ${paymentBadge.color}`}>
+                                <Badge variant={paymentBadge.variant} className="rounded-lg px-2.5 py-1.5 text-xs font-medium">
                                   {paymentBadge.label}
-                                </span>
+                                </Badge>
                                 <button
                                   onClick={() => handleTogglePayment(row)}
                                   disabled={updatingId === row.id}
-                                  className="px-3 py-1.5 rounded-lg bg-white/10 text-white text-xs border border-white/20 hover:bg-white/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-lg bg-background/10 text-foreground text-xs border border-border hover:bg-background/20 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   Mark as {row.paymentStatus === 'paid' ? 'Pending' : 'Paid'}
                                 </button>
@@ -991,7 +1009,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {/* Producer Notes */}
                           <div>
                             <div className="flex items-center justify-between mb-1.5">
-                              <p className="text-[10px] text-white/60 uppercase tracking-wide">Producer Notes</p>
+                              <p className="text-[10px] text-foreground/60 uppercase tracking-wide">Producer Notes</p>
                               {editingNotesId !== row.id && (
                                 <button
                                   onClick={() => {
@@ -1011,12 +1029,12 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   onChange={(e) => setNotesEditValue(e.target.value)}
                                   placeholder="Add private notes..."
                                   rows={3}
-                                  className="w-full px-2.5 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                                  className="w-full px-2.5 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
                                 />
                                 <div className="flex gap-2">
                                   <button
                                     onClick={() => handleSaveNotes(row)}
-                                    className="px-3 py-1.5 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth text-xs"
+                                    className="px-3 py-1.5 rounded-lg voxxy-btn-solid transition-smooth text-xs"
                                   >
                                     Save
                                   </button>
@@ -1025,22 +1043,22 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                       setEditingNotesId(null);
                                       setNotesEditValue('');
                                     }}
-                                    className="px-3 py-1.5 rounded-lg bg-white/5 text-white/60 hover:text-white hover:bg-white/10 transition-smooth text-xs"
+                                    className="px-3 py-1.5 rounded-lg bg-background/5 text-foreground/60 hover:text-foreground hover:bg-background/10 transition-smooth text-xs"
                                   >
                                     Cancel
                                   </button>
                                 </div>
                               </div>
                             ) : (
-                              <p className="text-xs text-white/80">
-                                {row.producerNotes || <span className="text-white/40 italic">No notes yet</span>}
+                              <p className="text-xs text-foreground/80">
+                                {row.producerNotes || <span className="text-foreground/40 italic">No notes yet</span>}
                               </p>
                             )}
                           </div>
 
                           {/* Meta Info */}
-                          <div className="pt-3 border-t border-white/10">
-                            <p className="text-[10px] text-white/40">
+                          <div className="pt-3 border-t border-border">
+                            <p className="text-[10px] text-foreground/40">
                               {row.appliedAt && `Applied: ${new Date(row.appliedAt).toLocaleDateString()}`}
                               {row.appliedAt && row.reviewedAt && ' • '}
                               {row.reviewedAt && `Reviewed: ${new Date(row.reviewedAt).toLocaleDateString()}`}
@@ -1059,15 +1077,15 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
           {/* Load More Button */}
           {hasNextPage && (
-            <div className="px-3 py-4 border-t border-white/10 text-center">
+            <div className="px-3 py-4 border-t border-border text-center">
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                className="px-4 py-2 rounded-lg voxxy-btn-solid transition-smooth disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
               >
                 {loadingMore ? (
                   <>
-                    <div className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    <div className="inline-block w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin mr-2" />
                     Loading...
                   </>
                 ) : (

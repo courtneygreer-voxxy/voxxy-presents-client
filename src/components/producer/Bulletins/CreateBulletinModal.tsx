@@ -144,10 +144,10 @@ export function CreateBulletinModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-2xl bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] border-purple-500/20 p-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl voxxy-gradient-card-deep border-purple-500/20 p-0 max-h-[90vh] overflow-y-auto">
           {/* Header */}
-          <div className="flex items-center justify-between p-6 border-b border-white/10">
-            <DialogTitle className="text-2xl font-bold text-white">
+          <div className="flex items-center justify-between p-6 border-b border-border">
+            <DialogTitle className="text-2xl font-bold text-foreground">
               {editBulletin ? 'Edit Bulletin Message' : 'Create Bulletin Message'}
             </DialogTitle>
           </div>
@@ -156,13 +156,13 @@ export function CreateBulletinModal({
           <div className="px-6 pt-4">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">
+                <span className="text-foreground font-bold text-lg">
                   {userProfile?.name ? getInitials(userProfile.name) : 'GG'}
                 </span>
               </div>
               <div>
-                <p className="text-white font-semibold">{userProfile?.name || 'Producer'}</p>
-                <p className="text-sm text-white/60">Producer</p>
+                <p className="text-foreground font-semibold">{userProfile?.name || 'Producer'}</p>
+                <p className="text-sm text-foreground/60">Producer</p>
               </div>
             </div>
           </div>
@@ -175,7 +175,7 @@ export function CreateBulletinModal({
               placeholder="Subject or title for your message..."
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-purple-500/50"
+              className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-purple-500/50"
               autoFocus
             />
 
@@ -186,12 +186,12 @@ export function CreateBulletinModal({
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 rows={10}
-                className="bg-white/5 border-white/10 text-white placeholder:text-white/40 focus:border-purple-500/50 resize-none"
+                className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-purple-500/50 resize-none"
               />
-              <p className="text-xs text-white/50">
+              <p className="text-xs text-foreground/50">
                 You can format your message with:
               </p>
-              <ul className="text-xs text-white/40 space-y-1 pl-4">
+              <ul className="text-xs text-foreground/40 space-y-1 pl-4">
                 <li>• Bullet points</li>
                 <li>• Multiple paragraphs</li>
                 <li>• Important announcements</li>
@@ -199,10 +199,10 @@ export function CreateBulletinModal({
             </div>
 
             {/* Pin Option */}
-            <div className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+            <div className="flex items-center justify-between p-3 bg-background/5 rounded-lg border border-border">
               <div>
-                <p className="text-sm font-medium text-white">Pin this message</p>
-                <p className="text-xs text-white/60">Pinned messages appear at the top</p>
+                <p className="text-sm font-medium text-foreground">Pin this message</p>
+                <p className="text-xs text-foreground/60">Pinned messages appear at the top</p>
               </div>
               <Switch
                 checked={pinned}
@@ -215,8 +215,8 @@ export function CreateBulletinModal({
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-purple-400" />
                 <div>
-                  <p className="text-sm font-medium text-white">Send as Email</p>
-                  <p className="text-xs text-white/60">Email vendors with this bulletin</p>
+                  <p className="text-sm font-medium text-foreground">Send as Email</p>
+                  <p className="text-xs text-foreground/60">Email vendors with this bulletin</p>
                 </div>
               </div>
               <Switch
@@ -227,8 +227,8 @@ export function CreateBulletinModal({
 
             {/* Audience Selection (shown when email is enabled) */}
             {sendEmail && (
-              <div className="space-y-4 border-t border-white/10 pt-4">
-                <label className="text-sm font-medium text-white/90 flex items-center gap-2">
+              <div className="space-y-4 border-t border-border pt-4">
+                <label className="text-sm font-medium text-foreground/90 flex items-center gap-2">
                   <Info className="w-4 h-4" />
                   Email Audience
                 </label>
@@ -240,8 +240,8 @@ export function CreateBulletinModal({
                     onClick={() => setAudienceType('approved')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       audienceType === 'approved'
-                        ? 'bg-purple-600 text-white border-2 border-purple-400'
-                        : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
+                        ? 'voxxy-btn-solid border-2 border-violet-400'
+                        : 'bg-background/5 text-foreground/70 border border-border hover:bg-background/10'
                     }`}
                   >
                     Approved Vendors
@@ -251,8 +251,8 @@ export function CreateBulletinModal({
                     onClick={() => setAudienceType('all')}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                       audienceType === 'all'
-                        ? 'bg-purple-600 text-white border-2 border-purple-400'
-                        : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
+                        ? 'voxxy-btn-solid border-2 border-violet-400'
+                        : 'bg-background/5 text-foreground/70 border border-border hover:bg-background/10'
                     }`}
                   >
                     All Vendors
@@ -262,15 +262,15 @@ export function CreateBulletinModal({
                 {/* Recipient Preview */}
                 {loadingPreview ? (
                   <div className="bg-purple-900/20 border border-purple-500/30 rounded p-3 text-center">
-                    <p className="text-sm text-white/60">Loading recipient count...</p>
+                    <p className="text-sm text-foreground/60">Loading recipient count...</p>
                   </div>
                 ) : recipientPreview && recipientPreview.total > 0 ? (
                   <div className="bg-purple-900/20 border border-purple-500/30 rounded p-3">
-                    <p className="text-sm text-white/90">
+                    <p className="text-sm text-foreground/90">
                       Will send to <strong className="text-purple-300 text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}
                     </p>
                     {Object.keys(recipientPreview.by_category).length > 0 && (
-                      <p className="text-xs text-white/60 mt-1">
+                      <p className="text-xs text-foreground/60 mt-1">
                         {Object.entries(recipientPreview.by_category).map(([cat, count]) =>
                           `${count} ${cat || 'Uncategorized'}`
                         ).join(', ')}
@@ -295,12 +295,12 @@ export function CreateBulletinModal({
             )}
 
             {/* Actions */}
-            <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+                className="bg-background/5 border-border text-foreground hover:bg-background/10"
                 disabled={isSubmitting}
               >
                 Cancel
@@ -308,7 +308,7 @@ export function CreateBulletinModal({
               <Button
                 type="submit"
                 disabled={isSubmitting || !subject.trim() || !body.trim() || (sendEmail && recipientPreview?.total === 0)}
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                className="voxxy-btn-cta-pink"
               >
                 {isSubmitting ? 'Posting...' : 'Post to Bulletin'}
               </Button>
@@ -320,20 +320,20 @@ export function CreateBulletinModal({
       {/* Confirmation Modal */}
       {showConfirmModal && recipientPreview && (
         <Dialog open={showConfirmModal} onOpenChange={() => setShowConfirmModal(false)}>
-          <DialogContent className="max-w-md bg-gradient-to-b from-[#2a1f3d] to-[#1f1530] border-purple-500/20">
-            <DialogTitle className="text-xl font-bold text-white">
+          <DialogContent className="max-w-md voxxy-gradient-card-deep border-purple-500/20">
+            <DialogTitle className="text-xl font-bold text-foreground">
               Send Bulletin Email?
             </DialogTitle>
 
             <div className="space-y-4 pt-4">
-              <p className="text-white/80">
+              <p className="text-foreground/80">
                 This will send an email to <strong className="text-purple-300 text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}.
               </p>
 
               {Object.keys(recipientPreview.by_category).length > 0 && (
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-xs text-white/60 mb-2">Breakdown by category:</p>
-                  <ul className="text-sm text-white/80 space-y-1">
+                <div className="bg-background/5 rounded-lg p-3 border border-border">
+                  <p className="text-xs text-foreground/60 mb-2">Breakdown by category:</p>
+                  <ul className="text-sm text-foreground/80 space-y-1">
                     {Object.entries(recipientPreview.by_category).map(([cat, count]) => (
                       <li key={cat}>• {count} {cat || 'Uncategorized'}</li>
                     ))}
@@ -342,9 +342,9 @@ export function CreateBulletinModal({
               )}
 
               {Object.keys(recipientPreview.by_status).length > 0 && (
-                <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-                  <p className="text-xs text-white/60 mb-2">Breakdown by status:</p>
-                  <ul className="text-sm text-white/80 space-y-1">
+                <div className="bg-background/5 rounded-lg p-3 border border-border">
+                  <p className="text-xs text-foreground/60 mb-2">Breakdown by status:</p>
+                  <ul className="text-sm text-foreground/80 space-y-1">
                     {Object.entries(recipientPreview.by_status).map(([status, count]) => (
                       <li key={status} className="capitalize">• {count} {status}</li>
                     ))}
@@ -357,7 +357,7 @@ export function CreateBulletinModal({
                   type="button"
                   variant="outline"
                   onClick={() => setShowConfirmModal(false)}
-                  className="flex-1 bg-white/5 border-white/20 text-white hover:bg-white/10"
+                  className="flex-1 bg-background/5 border-border text-foreground hover:bg-background/10"
                   disabled={isSubmitting}
                 >
                   Cancel
@@ -366,7 +366,7 @@ export function CreateBulletinModal({
                   type="button"
                   onClick={submitBulletin}
                   disabled={isSubmitting}
-                  className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
+                  className="flex-1 voxxy-btn-cta-pink"
                 >
                   {isSubmitting ? 'Sending...' : 'Confirm & Send'}
                 </Button>

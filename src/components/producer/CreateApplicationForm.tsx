@@ -123,15 +123,15 @@ export default function CreateApplicationForm({
       <div className="mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-colors"
+          className="flex items-center gap-2 text-foreground/60 hover:text-foreground mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back
         </button>
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           {existingApplication ? 'Edit Application' : 'Create Application'}
         </h1>
-        <p className="text-white/60">
+        <p className="text-foreground/60">
           {existingApplication ? 'Update your vendor application form' : 'Set up your vendor application form'}
         </p>
       </div>
@@ -139,12 +139,12 @@ export default function CreateApplicationForm({
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Application Details */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
-          <h2 className="text-xl font-semibold text-white mb-4">Application Details</h2>
+        <div className="bg-background/5 border border-border rounded-lg p-6">
+          <h2 className="text-xl font-semibold text-foreground mb-4">Application Details</h2>
 
           {/* Application Name */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Application Name
             </label>
             <input
@@ -152,14 +152,14 @@ export default function CreateApplicationForm({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Vendor Application - Winter Market 2025"
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
               required
             />
           </div>
 
           {/* Description */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Description
             </label>
             <textarea
@@ -169,20 +169,20 @@ export default function CreateApplicationForm({
 
 Example: We're seeking talented vendors for our Winter Market. Booth fee is $150. Looking for artisans, food vendors, and crafters who align with our community-focused mission..."
               rows={6}
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors resize-none"
             />
           </div>
 
           {/* Booth Price */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Booth Price *
             </label>
-            <p className="text-white/50 text-sm mb-2">
+            <p className="text-foreground/50 text-sm mb-2">
               Price vendors will pay for this booth type
             </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/60">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60">
                 $
               </span>
               <input
@@ -197,7 +197,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                   })
                 }
                 placeholder="150.00"
-                className="w-full pl-8 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full pl-8 pr-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
                 required
               />
             </div>
@@ -205,10 +205,10 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
 
           {/* Install Date */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Install Date (Optional)
             </label>
-            <p className="text-white/50 text-sm mb-2">
+            <p className="text-foreground/50 text-sm mb-2">
               When vendors should arrive to set up their booth
             </p>
             <input
@@ -217,14 +217,14 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               onChange={(e) =>
                 setFormData({ ...formData, install_date: e.target.value })
               }
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
             />
           </div>
 
           {/* Install Times */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Install Start Time
               </label>
               <input
@@ -233,11 +233,11 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 onChange={(e) =>
                   setFormData({ ...formData, install_start_time: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Install End Time
               </label>
               <input
@@ -246,17 +246,17 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 onChange={(e) =>
                   setFormData({ ...formData, install_end_time: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
               />
             </div>
           </div>
 
           {/* Payment Link */}
           <div className="mb-4">
-            <label className="block text-sm font-medium text-white mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Payment Link (Optional)
             </label>
-            <p className="text-white/50 text-sm mb-2">
+            <p className="text-foreground/50 text-sm mb-2">
               URL where vendors can pay for this booth type
             </p>
             <input
@@ -266,17 +266,17 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 setFormData({ ...formData, payment_link: e.target.value })
               }
               placeholder="https://example.com/pay"
-              className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
             />
           </div>
 
           {/* Event Info (Read-only) */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/60 mb-2">
+              <label className="block text-sm font-medium text-foreground dark:text-foreground/60 mb-2">
                 Event Date
               </label>
-              <div className="px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white/80">
+              <div className="px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground/80">
                 {event.event_date
                   ? formatEventDate(event.event_date, 'MMMM d, yyyy')
                   : 'Not set'}
@@ -284,10 +284,10 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-white/60 mb-2">
+              <label className="block text-sm font-medium text-foreground dark:text-foreground/60 mb-2">
                 Location
               </label>
-              <div className="px-4 py-3 rounded-lg bg-white/5 border border-white/10 text-white/80">
+              <div className="px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground/80">
                 {event.location || 'Not set'}
               </div>
             </div>
@@ -295,11 +295,11 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
         </div>
 
         {/* Application Tags */}
-        <div className="bg-white/5 border border-white/10 rounded-lg p-6">
+        <div className="bg-background/5 border border-border rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-xl font-semibold text-white">Application Tags (Optional)</h2>
+            <h2 className="text-xl font-semibold text-foreground">Application Tags (Optional)</h2>
           </div>
-          <p className="text-sm text-white/60 mb-4">
+          <p className="text-sm text-foreground/60 mb-4">
             Add tags to help categorize this application type
           </p>
 
@@ -316,12 +316,12 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 }
               }}
               placeholder="e.g., handmade, food, jewelry"
-              className="flex-1 px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-purple-500 transition-colors"
+              className="flex-1 px-4 py-2 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg flex items-center gap-2"
+              className="px-4 py-2 rounded-lg voxxy-btn-cta transition-all shadow-lg flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
               Add Tag
@@ -330,9 +330,9 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
 
           {/* Tags List */}
           {tags.length === 0 ? (
-            <div className="text-center py-8 border-2 border-dashed border-white/10 rounded-lg">
-              <p className="text-white/40 text-sm">No tags added yet</p>
-              <p className="text-white/30 text-xs mt-1">
+            <div className="text-center py-8 border-2 border-dashed border-border rounded-lg">
+              <p className="text-foreground/40 text-sm">No tags added yet</p>
+              <p className="text-foreground/30 text-xs mt-1">
                 Tags help categorize and organize applications
               </p>
             </div>
@@ -341,13 +341,13 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-white text-sm"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-sm"
                 >
                   <span>{tag}</span>
                   <button
                     type="button"
                     onClick={() => handleRemoveTag(tag)}
-                    className="text-white/70 hover:text-white transition-colors"
+                    className="text-foreground/70 hover:text-foreground transition-colors"
                   >
                     <X className="w-3 h-3" />
                   </button>
@@ -369,14 +369,14 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
           <button
             type="button"
             onClick={onBack}
-            className="flex-1 px-6 py-3 rounded-lg border border-white/20 text-white hover:bg-white/5 transition-all"
+            className="flex-1 px-6 py-3 rounded-lg border border-border text-foreground hover:bg-background/5 transition-all"
           >
             Cancel
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white hover:from-purple-700 hover:to-blue-600 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? 'Saving...'

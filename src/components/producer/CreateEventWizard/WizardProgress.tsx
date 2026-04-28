@@ -21,7 +21,7 @@ export default function WizardProgress({
     <div className="mb-8">
       {/* Mobile: Simple text indicator */}
       <div className="md:hidden text-center mb-4">
-        <p className="text-white/60 text-sm">
+        <p className="text-foreground/60 text-sm">
           Step {currentStep} of 4: {STEP_LABELS[currentStep - 1]}
         </p>
       </div>
@@ -44,10 +44,10 @@ export default function WizardProgress({
                   transition-all duration-300
                   ${
                     current
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg scale-110'
+                      ? 'voxxy-btn-cta shadow-lg scale-110'
                       : completed
-                      ? 'bg-white/20 text-white hover:bg-white/30'
-                      : 'bg-white/5 text-white/40'
+                      ? 'bg-background/20 text-foreground hover:bg-background/30'
+                      : 'bg-background/5 text-foreground/40'
                   }
                   ${clickable ? 'cursor-pointer' : 'cursor-not-allowed'}
                 `}
@@ -63,7 +63,7 @@ export default function WizardProgress({
               <div className="ml-3 flex-1">
                 <p
                   className={`text-sm font-medium transition-colors ${
-                    current ? 'text-white' : completed ? 'text-white/80' : 'text-white/40'
+                    current ? 'text-foreground' : completed ? 'text-foreground/80' : 'text-foreground/40'
                   }`}
                 >
                   {STEP_LABELS[index]}
@@ -75,7 +75,7 @@ export default function WizardProgress({
                 <div className="flex-1 h-0.5 mx-4">
                   <div
                     className={`h-full transition-all duration-300 ${
-                      completed ? 'bg-white/30' : 'bg-white/10'
+                      completed ? 'bg-background/30' : 'bg-background/10'
                     }`}
                   />
                 </div>

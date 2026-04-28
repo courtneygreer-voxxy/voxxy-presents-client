@@ -62,7 +62,7 @@ export default function SimsLoadingScreen({ message }: SimsLoadingScreenProps) {
     <div className="flex flex-col items-center justify-center py-12 px-6">
       <div className="w-full max-w-md space-y-6">
         {/* Progress Bar */}
-        <div className="relative w-full h-3 bg-white/10 rounded-full overflow-hidden">
+        <div className="relative w-full h-3 bg-background/10 rounded-full overflow-hidden">
           <div
             className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
@@ -74,7 +74,7 @@ export default function SimsLoadingScreen({ message }: SimsLoadingScreenProps) {
 
         {/* Loading Message */}
         <div className="text-center">
-          <p className="text-white/90 text-lg font-medium animate-pulse">
+          <p className="text-foreground/90 text-lg font-medium animate-pulse">
             {currentMessage}
           </p>
         </div>

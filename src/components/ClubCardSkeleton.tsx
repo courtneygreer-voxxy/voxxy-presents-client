@@ -6,23 +6,23 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
  */
 export function ClubCardSkeleton() {
   return (
-    <Card className="bg-white/10 backdrop-blur-sm border border-white/20 overflow-hidden">
+    <Card className="bg-background/10 backdrop-blur-sm border border-border overflow-hidden">
       <CardHeader className="space-y-2">
         {/* Club name skeleton */}
-        <div className="h-6 bg-white/20 rounded animate-pulse w-3/4" />
+        <div className="h-6 bg-background/20 rounded animate-pulse w-3/4" />
         {/* Club slug skeleton */}
-        <div className="h-4 bg-white/20 rounded animate-pulse w-1/2" />
+        <div className="h-4 bg-background/20 rounded animate-pulse w-1/2" />
       </CardHeader>
       <CardContent className="space-y-3">
         {/* Description line 1 */}
-        <div className="h-4 bg-white/20 rounded animate-pulse w-full" />
+        <div className="h-4 bg-background/20 rounded animate-pulse w-full" />
         {/* Description line 2 */}
-        <div className="h-4 bg-white/20 rounded animate-pulse w-5/6" />
+        <div className="h-4 bg-background/20 rounded animate-pulse w-5/6" />
 
         {/* Stats/buttons area */}
         <div className="flex gap-2 mt-4">
-          <div className="h-8 bg-white/20 rounded animate-pulse flex-1" />
-          <div className="h-8 bg-white/20 rounded animate-pulse flex-1" />
+          <div className="h-8 bg-background/20 rounded animate-pulse flex-1" />
+          <div className="h-8 bg-background/20 rounded animate-pulse flex-1" />
         </div>
       </CardContent>
     </Card>

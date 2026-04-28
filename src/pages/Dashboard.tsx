@@ -16,6 +16,13 @@ import { EmailConfirmationDialog } from '@/components/producer/EmailConfirmation
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import AdminPanel from '@/components/admin/AdminPanel';
 import { GuidebookModal } from '@/components/shared/GuidebookModal';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 type NavItem = 'admin' | 'events' | 'network' | 'email-templates' | 'settings';
 type EventsView = 'list' | 'create' | 'edit' | 'command-center' | 'empty';
@@ -687,7 +694,7 @@ export default function ProducerDashboard() {
             <p className="text-sm text-red-400 mb-3">{error}</p>
             <button
               onClick={() => organization && fetchEvents(organization.slug)}
-              className="px-3 py-1.5 text-sm rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-smooth"
+              className="px-3 py-1.5 text-sm rounded-lg voxxy-btn-solid transition-smooth"
             >
               Retry
             </button>
@@ -812,7 +819,7 @@ export default function ProducerDashboard() {
       {/* Mobile Menu Backdrop */}
       {isMobileMenuOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -820,21 +827,22 @@ export default function ProducerDashboard() {
       {/* Left Sidebar */}
       <aside className={`
         w-[180px]
-        bg-[#0f0820] flex flex-col transition-all duration-300
+        bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300
+        border-r border-sidebar-border
         fixed lg:relative inset-y-0 left-0 z-50
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         {/* Sidebar Header */}
-        <div className="p-3 border-b border-white/10">
+        <div className="p-3 border-b border-sidebar-border">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <span className="text-lg font-bold text-white tracking-wider block mb-0.5">VOXXY</span>
-              <p className="text-[10px] text-white/60">{isAdmin ? 'Admin Portal' : 'Event Producer'}</p>
+              <span className="text-lg font-bold text-sidebar-foreground tracking-wider block mb-0.5">VOXXY</span>
+              <p className="text-[10px] text-sidebar-foreground/70">{isAdmin ? 'Admin Portal' : 'Event Producer'}</p>
             </div>
             {/* Mobile Close Button */}
             <button
               onClick={() => setIsMobileMenuOpen(false)}
-              className="lg:hidden text-white/70 hover:text-white p-0.5"
+              className="lg:hidden text-sidebar-foreground/80 hover:text-sidebar-foreground p-0.5"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -853,7 +861,7 @@ export default function ProducerDashboard() {
                   setCommandCenterTab('details');
                   setIsMobileMenuOpen(false);
                 }}
-                className="w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-white/30 text-white hover:bg-white/5 hover:border-white/50 mb-2"
+                className="voxxy-hover-row w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-smooth border border-sidebar-border text-sidebar-foreground hover:bg-sidebar-accent hover:border-ring/40 mb-2"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Events
@@ -877,11 +885,11 @@ export default function ProducerDashboard() {
                       setIsMobileMenuOpen(false);
                     }}
                     className={`
-                      w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
+                      voxxy-hover-row w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
                       text-xs font-medium transition-smooth
                       ${isActive
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
-                        : 'text-white/70 hover:text-white hover:bg-white/5'
+                        ? 'voxxy-nav-tab-active shadow-lg'
+                        : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                       }
                     `}
                   >
@@ -914,8 +922,8 @@ export default function ProducerDashboard() {
                     w-full flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg
                     text-xs font-medium transition-smooth
                     ${isActive
-                      ? 'bg-gradient-to-r from-purple-600 to-blue-500 text-white shadow-lg'
-                      : 'text-white/70 hover:text-white hover:bg-white/5'
+                      ? 'voxxy-nav-tab-active shadow-lg'
+                      : 'text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent'
                     }
                   `}
                 >
@@ -928,19 +936,19 @@ export default function ProducerDashboard() {
         </nav>
 
         {/* Sidebar Footer - Organization & User Profile */}
-        <div className="border-t border-white/10">
+        <div className="border-t border-sidebar-border">
           {/* Organization Info */}
           {organization && (
-            <div className="p-2 border-b border-white/10">
+            <div className="p-2 border-b border-sidebar-border">
               <div className="flex items-center gap-1.5">
-                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-purple-600 to-blue-500 flex items-center justify-center flex-shrink-0">
-                  <Building2 className="w-3 h-3 text-white" />
+                <div className="w-6 h-6 rounded-md voxxy-accent-tile flex items-center justify-center flex-shrink-0">
+                  <Building2 className="w-3 h-3" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-white truncate">
+                  <p className="text-xs font-medium text-sidebar-foreground truncate">
                     {organization.name}
                   </p>
-                  <p className="text-[10px] text-white/60">Organization</p>
+                  <p className="text-[10px] text-sidebar-foreground/70">Organization</p>
                 </div>
               </div>
             </div>
@@ -950,14 +958,14 @@ export default function ProducerDashboard() {
           <div className="p-2">
             <div className="flex items-center justify-between">
               <div className="flex-1 min-w-0">
-                <p className="text-xs font-medium text-white truncate">
+                <p className="text-xs font-medium text-sidebar-foreground truncate">
                   {userProfile?.name || userProfile?.email}
                 </p>
-                <p className="text-[10px] text-white/60">{isAdmin ? 'Admin' : 'Producer'}</p>
+                <p className="text-[10px] text-sidebar-foreground/70">{isAdmin ? 'Admin' : 'Producer'}</p>
               </div>
               <button
                 onClick={handleLogout}
-                className="p-1 rounded-md text-white/60 hover:text-white hover:bg-white/5 transition-smooth"
+                className="p-1 rounded-md text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-smooth"
                 title="Sign Out"
               >
                 <LogOut className="w-3 h-3" />
@@ -970,14 +978,14 @@ export default function ProducerDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="bg-[#0f0820] border-b border-white/10 pt-3">
+        <header className="bg-sidebar text-sidebar-foreground border-b border-sidebar-border pt-3">
           {/* Top row - Always visible */}
           <div className="flex items-center justify-between px-3 pb-3">
             <div className="flex items-center gap-3">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden text-white/70 hover:text-white"
+                className="lg:hidden text-sidebar-foreground/80 hover:text-sidebar-foreground"
               >
                 <Menu className="w-4 h-4" />
               </button>
@@ -985,13 +993,13 @@ export default function ProducerDashboard() {
               {/* Title Section */}
               {eventsView === 'command-center' && selectedEvent ? (
                 <div>
-                  <h2 className="text-sm font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+                  <h2 className="text-sm font-bold gradient-text">
                     Command Center
                   </h2>
-                  <p className="text-xs text-white/60 mt-0.5">{selectedEvent.title}</p>
+                  <p className="text-xs text-sidebar-foreground/70 mt-0.5">{selectedEvent.title}</p>
                 </div>
               ) : (
-                <h2 className="text-sm text-white font-semibold">
+                <h2 className="text-sm text-sidebar-foreground font-semibold">
                   {getPageTitle()}
                 </h2>
               )}
@@ -1003,7 +1011,7 @@ export default function ProducerDashboard() {
               {activeNav === 'events' && eventsView === 'list' && (
                 <button
                   onClick={() => setEventsView('create')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-blue-500 text-white font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Create New Event</span>
@@ -1014,7 +1022,7 @@ export default function ProducerDashboard() {
               {/* Help/Guide Button - Always visible */}
               <button
                 onClick={() => setGuidebookOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white text-xs font-medium rounded-full shadow-lg shadow-purple-500/25 transition-all hover:scale-105"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 text-foreground border border-violet-200/80 hover:bg-violet-200/80 dark:bg-primary dark:border-transparent dark:text-primary-foreground dark:hover:bg-primary/90 text-xs font-medium rounded-full shadow-md shadow-violet-200/40 dark:shadow-primary/20 transition-all hover:scale-105"
                 title="Open guide"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
@@ -1028,27 +1036,27 @@ export default function ProducerDashboard() {
             <div className="px-3 pb-3 space-y-2">
               {/* Search Bar */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                 <input
                   type="text"
                   placeholder="Search events..."
                   value={eventsSearchTerm}
                   onChange={(e) => setEventsSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
               </div>
 
               {/* Filter Pills & Controls */}
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Status Filter Buttons */}
-                {['Live', 'Draft', 'Past'].map(status => (
+                {['Live', 'Draft', 'Cancelled', 'Past'].map(status => (
                   <button
                     key={status}
                     onClick={() => setEventsStatusFilter(eventsStatusFilter === status ? null : status)}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
                       eventsStatusFilter === status
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+                        ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
+                        : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
                     }`}
                   >
                     {status}
@@ -1056,26 +1064,27 @@ export default function ProducerDashboard() {
                 ))}
 
                 {/* Divider */}
-                <div className="w-px h-5 bg-white/10 mx-1" />
+                <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Sort Dropdown */}
-                <select
-                  value={eventsSortBy}
-                  onChange={(e) => setEventsSortBy(e.target.value as 'date' | 'status' | 'name')}
-                  className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-xs text-white focus:outline-none focus:ring-2 focus:ring-purple-500"
-                >
-                  <option value="date">Sort by Date</option>
-                  <option value="name">Sort by Name</option>
-                  <option value="status">Sort by Status</option>
-                </select>
+                <Select value={eventsSortBy} onValueChange={(value) => setEventsSortBy(value as 'date' | 'status' | 'name')}>
+                  <SelectTrigger className="h-8 w-[140px] rounded-lg border border-input bg-background px-3 text-xs text-foreground focus:ring-2 focus:ring-ring">
+                    <SelectValue placeholder="Sort by Date" />
+                  </SelectTrigger>
+                  <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                    <SelectItem value="date" className="text-xs focus:bg-background/10">Sort by Date</SelectItem>
+                    <SelectItem value="name" className="text-xs focus:bg-background/10">Sort by Name</SelectItem>
+                    <SelectItem value="status" className="text-xs focus:bg-background/10">Sort by Status</SelectItem>
+                  </SelectContent>
+                </Select>
 
                 {/* Show Past Toggle */}
                 <button
                   onClick={() => setEventsShowPast(!eventsShowPast)}
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     eventsShowPast
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-white/5 text-white/60 hover:text-white border border-white/10'
+                      ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
+                      : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
                   }`}
                 >
                   {eventsShowPast ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -1087,7 +1096,7 @@ export default function ProducerDashboard() {
 
           {/* Network Page Controls - Tabs (shown only on network page) */}
           {activeNav === 'network' && (
-            <div className="flex items-center gap-2 border-b border-white/10 px-3">
+            <div className="flex items-center gap-2 border-b border-sidebar-border px-3">
               {([
                 { id: 'contacts' as NetworkTab, label: 'All Contacts' },
                 { id: 'lists' as NetworkTab, label: 'Lists', icon: Filter },
@@ -1099,13 +1108,13 @@ export default function ProducerDashboard() {
                     key={tab.id}
                     onClick={() => setNetworkTab(tab.id)}
                     className={`flex items-center gap-2 px-4 py-2.5 text-xs font-medium transition-all relative ${
-                      networkTab === tab.id ? 'text-white' : 'text-white/60 hover:text-white'
+                      networkTab === tab.id ? 'text-sidebar-foreground' : 'text-sidebar-foreground/70 hover:text-sidebar-foreground'
                     }`}
                   >
                     {Icon && <Icon className="w-3.5 h-3.5" />}
                     {tab.label}
                     {networkTab === tab.id && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-purple-600 to-blue-500" />
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 [background-image:var(--voxxy-grad-nav-tab-active)]" />
                     )}
                   </button>
                 );
@@ -1116,7 +1125,7 @@ export default function ProducerDashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto pt-2" data-onboarding="events-content">
+        <main className="flex-1 overflow-auto pt-2 bg-background text-foreground" data-onboarding="events-content">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} onStartGuide={() => setGuidebookOpen(true)} />
           ) : activeNav === 'events' ? (
@@ -1135,7 +1144,7 @@ export default function ProducerDashboard() {
                 />
               ) : (
                 <div className="flex items-center justify-center py-8">
-                  <p className="text-xs text-white/60">Loading organization...</p>
+                  <p className="text-xs text-foreground/60">Loading organization...</p>
                 </div>
               )}
             </div>
@@ -1163,7 +1172,7 @@ export default function ProducerDashboard() {
             </div>
           ) : (
             <div className="p-3 md:p-4">
-              <div className="text-white/40 text-center mt-12">
+              <div className="text-foreground/40 text-center mt-12">
                 <p className="text-xs">{activeNav} content coming soon...</p>
               </div>
             </div>

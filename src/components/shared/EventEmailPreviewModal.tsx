@@ -29,6 +29,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
+import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import EmailFooterCard from '@/components/shared/EmailFooterCard';
 
 // Flexible email type that works with both ScheduledEmail and EmailTemplateItem
@@ -201,11 +202,11 @@ export default function EventEmailPreviewModal({
 
   if (!email) return null;
 
-  const statusColor = {
-    sent: 'bg-green-500/20 border-green-500/30 text-green-400',
-    scheduled: 'bg-blue-500/20 border-blue-500/30 text-blue-400',
-    pending: 'bg-yellow-500/20 border-yellow-500/30 text-yellow-400',
-    sending: 'bg-purple-500/20 border-purple-500/30 text-purple-400',
+  const statusVariant: Record<string, BadgeVariant> = {
+    sent: 'tintGreen',
+    scheduled: 'tintBlue',
+    pending: 'tintYellow',
+    sending: 'tintPurple',
   };
 
   const statusLabel = {
@@ -217,9 +218,9 @@ export default function EventEmailPreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-white">
+          <DialogTitle className="flex items-center gap-3 text-foreground">
             <Mail className="w-5 h-5 text-purple-400" />
             <span>Email Preview</span>
           </DialogTitle>
@@ -227,15 +228,15 @@ export default function EventEmailPreviewModal({
 
         <div className="space-y-6">
           {/* Top Section: Trigger Type & Scheduled Send Date */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+          <div className="bg-background/5 rounded-lg p-4 border border-border">
             <div className="flex flex-wrap items-center gap-4">
               {/* Trigger */}
               {email.trigger_type && (
                 <div className="flex items-center gap-2">
                   <Mail className="w-4 h-4 text-purple-400" />
                   <div>
-                    <p className="text-xs text-white/60">Trigger Type</p>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-xs text-foreground/60">Trigger Type</p>
+                    <p className="text-sm font-medium text-foreground">
                       {formatTrigger(email.trigger_type, email.trigger_value)}
                     </p>
                   </div>
@@ -247,8 +248,8 @@ export default function EventEmailPreviewModal({
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-purple-400" />
                   <div>
-                    <p className="text-xs text-white/60">Scheduled For</p>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-xs text-foreground/60">Scheduled For</p>
+                    <p className="text-sm font-medium text-foreground">
                       {format(new Date(email.scheduled_for), 'MMM d, yyyy h:mm a')}
                     </p>
                   </div>
@@ -257,14 +258,12 @@ export default function EventEmailPreviewModal({
 
               {/* Status Badge */}
               {email.status && (
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-medium border ml-auto ${
-                    statusColor[email.status as keyof typeof statusColor] ||
-                    'bg-gray-500/20 border-gray-500/30 text-gray-400'
-                  }`}
+                <Badge
+                  variant={statusVariant[email.status] ?? 'tintMuted'}
+                  className="ml-auto px-3 py-1 text-xs font-medium"
                 >
                   {statusLabel[email.status as keyof typeof statusLabel] || email.status}
-                </span>
+                </Badge>
               )}
             </div>
 
@@ -283,7 +282,7 @@ export default function EventEmailPreviewModal({
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-12">
               <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
-              <p className="text-white/60">Loading preview...</p>
+              <p className="text-foreground/60">Loading preview...</p>
             </div>
           )}
 
@@ -299,22 +298,22 @@ export default function EventEmailPreviewModal({
             <div className="space-y-4">
               {/* Subject */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Subject
                 </label>
-                <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-                  <p className="text-white font-medium">{previewData.subject}</p>
+                <div className="bg-background/5 rounded-lg p-4 border border-border">
+                  <p className="text-foreground font-medium">{previewData.subject}</p>
                 </div>
               </div>
 
               {/* Message Body */}
               <div>
-                <label className="block text-xs font-semibold text-white/70 uppercase tracking-wide mb-2">
+                <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Message Body
                 </label>
-                <div className="bg-white/5 rounded-lg p-6 border border-white/10">
+                <div className="bg-background/5 rounded-lg p-6 border border-border">
                   <div
-                    className="email-preview-content"
+                    className="email-preview-content voxxy-rich-text-base"
                     dangerouslySetInnerHTML={{
                       __html: removeFooter(previewData.body)
                     }}
@@ -329,12 +328,12 @@ export default function EventEmailPreviewModal({
 
           {/* Bottom Section: Recipients */}
           {previewData && !isLoading && (
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
+            <div className="bg-background/5 rounded-lg p-4 border border-border">
               <div className="flex items-center gap-2">
                 <Users className="w-4 h-4 text-purple-400" />
                 <div>
-                  <p className="text-xs text-white/60">Recipients</p>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-xs text-foreground/60">Recipients</p>
+                  <p className="text-sm font-medium text-foreground">
                     {email.recipient_count
                       ? `${email.recipient_count} recipients`
                       : 'All Applicants'}
@@ -346,12 +345,12 @@ export default function EventEmailPreviewModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="flex items-center justify-end gap-3 pt-4 border-t border-white/10">
+        <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
           {onSendTest && !error && previewData && (
             <Button
               onClick={handleSendTest}
               variant="outline"
-              className="bg-white/5 border-white/20 text-white hover:bg-white/10"
+              className="bg-background/5 border-border text-foreground hover:bg-background/10"
             >
               <Send className="w-4 h-4 mr-2" />
               Test Email
@@ -359,7 +358,7 @@ export default function EventEmailPreviewModal({
           )}
           <Button
             onClick={onClose}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            className="voxxy-btn-solid"
           >
             Close
           </Button>

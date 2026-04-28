@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -22,12 +22,12 @@ export default function PrivacyPolicyPage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Privacy Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground">Privacy Policy</h1>
           <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+        <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This Privacy Policy explains what information we collect, how we use it, and how we protect it. We've included plain-language annotations in these highlighted boxes to help you understand each section. The annotations aren't part of the official policy.
           </p>
@@ -46,9 +46,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 1 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">1. Core Principles</h2>
+          <h2 className="text-2xl font-bold text-foreground">1. Core Principles</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               The short version: we don't sell your data, we only collect what we need, and we take protecting it seriously.
             </p>
@@ -77,9 +77,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 2 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">2. Our Role: Data Processor vs. Data Controller</h2>
+          <h2 className="text-2xl font-bold text-foreground">2. Our Role: Data Processor vs. Data Controller</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This is important: when event producers import their contact lists into Voxxy, we're processing that data on their behalf. The producer is responsible for having permission to share it with us.
             </p>
@@ -100,9 +100,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 3 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">3. Information We Collect</h2>
+          <h2 className="text-2xl font-bold text-foreground">3. Information We Collect</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We collect only what we need to run the platform. Here's exactly what that includes.
             </p>
@@ -110,7 +110,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-6 text-gray-700 leading-relaxed">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Information You Provide Directly</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Information You Provide Directly</h3>
 
               <p>
                 <strong>3.1 Customer Account Information.</strong> When you create an Account, we collect your business name, full name, email address, and phone number (optional). We use this information to set up and maintain your Account, communicate with you, and provide the Services.
@@ -127,9 +127,9 @@ export default function PrivacyPolicyPage() {
             </div>
 
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Information Collected Automatically</h3>
+              <h3 className="text-lg font-semibold text-foreground mb-3">Information Collected Automatically</h3>
 
-              <div className="bg-gray-100 border border-gray-200 rounded-lg p-6 mb-4">
+              <div className="bg-muted border border-border rounded-lg p-6 mb-4">
                 <p className="text-gray-700 leading-relaxed">
                   These are the technical details about our analytics tools. We want to implement a consent banner so you can opt in before any of this tracking begins.
                 </p>
@@ -168,9 +168,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 4 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">4. How We Use Your Information</h2>
+          <h2 className="text-2xl font-bold text-foreground">4. How We Use Your Information</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We use your information to run the platform and make it better. That's it.
             </p>
@@ -198,9 +198,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 5 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">5. How We Share Your Information</h2>
+          <h2 className="text-2xl font-bold text-foreground">5. How We Share Your Information</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We share your information only in limited, specific circumstances. We never sell it.
             </p>
@@ -230,9 +230,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 6 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">6. End User Information</h2>
+          <h2 className="text-2xl font-bold text-foreground">6. End User Information</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If you're an event producer using Voxxy, this section explains how we handle the contact data you import.
             </p>
@@ -256,9 +256,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 7 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">7. Data Protection</h2>
+          <h2 className="text-2xl font-bold text-foreground">7. Data Protection</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We take security seriously and use industry-standard measures to protect your data.
             </p>
@@ -273,9 +273,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 8 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">8. Data Retention</h2>
+          <h2 className="text-2xl font-bold text-foreground">8. Data Retention</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               We keep your data as long as you use the service. When you leave, we give you time to export it before deletion.
             </p>
@@ -296,9 +296,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 9 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">9. Your Rights</h2>
+          <h2 className="text-2xl font-bold text-foreground">9. Your Rights</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               You have rights over your data, including the ability to access, correct, and delete it.
             </p>
@@ -329,7 +329,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 10 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">10. International Data Transfers</h2>
+          <h2 className="text-2xl font-bold text-foreground">10. International Data Transfers</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -340,7 +340,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 11 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">11. Children's Privacy</h2>
+          <h2 className="text-2xl font-bold text-foreground">11. Children's Privacy</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -351,7 +351,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 12 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">12. Communications</h2>
+          <h2 className="text-2xl font-bold text-foreground">12. Communications</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -368,9 +368,9 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 13 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">13. California Privacy Rights</h2>
+          <h2 className="text-2xl font-bold text-foreground">13. California Privacy Rights</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If you're a California resident, you have additional rights under the CCPA/CPRA.
             </p>
@@ -388,7 +388,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 14 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">14. Modifications</h2>
+          <h2 className="text-2xl font-bold text-foreground">14. Modifications</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -399,7 +399,7 @@ export default function PrivacyPolicyPage() {
 
         {/* Section 15 */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">15. Contact Us</h2>
+          <h2 className="text-2xl font-bold text-foreground">15. Contact Us</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>

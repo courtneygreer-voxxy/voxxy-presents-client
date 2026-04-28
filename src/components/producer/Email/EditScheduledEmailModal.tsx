@@ -376,9 +376,9 @@ export default function EditScheduledEmailModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-[#0f0a1e] border-purple-500/20">
+      <DialogContent className="voxxy-modal-surface max-h-[90vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-3 text-white">
+          <DialogTitle className="flex items-center gap-3 text-foreground">
             <Type className="w-5 h-5 text-purple-400" />
             <span>Edit Email</span>
           </DialogTitle>
@@ -395,13 +395,13 @@ export default function EditScheduledEmailModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Email Name */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Email Name
             </label>
             <Input
               {...register('name')}
               disabled={isSent || isSaving}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-background/5 border-border text-foreground"
               placeholder="e.g., 1 Day Before Event"
             />
             {errors.name && (
@@ -410,15 +410,15 @@ export default function EditScheduledEmailModal({
           </div>
 
           {/* Timing Configuration */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10 space-y-4">
-            <h3 className="text-white font-medium flex items-center gap-2">
+          <div className="bg-background/5 rounded-lg p-4 border border-border space-y-4">
+            <h3 className="text-foreground font-medium flex items-center gap-2">
               <Clock className="w-4 h-4 text-purple-400" />
               Email Timing
             </h3>
 
             {/* Trigger Type */}
             <div>
-              <label className="block text-sm font-medium text-white/80 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 When to Send
               </label>
               <Select
@@ -426,15 +426,15 @@ export default function EditScheduledEmailModal({
                 onValueChange={(value) => setValue('trigger_type', value)}
                 disabled={isSent || isSaving}
               >
-                <SelectTrigger className="bg-white/5 border-white/10 text-white">
+                <SelectTrigger className="bg-background/5 border-border text-foreground">
                   <SelectValue placeholder="Select trigger type" />
                 </SelectTrigger>
-                <SelectContent className="bg-[#1a1333] border-purple-500/20">
+                <SelectContent className="voxxy-select-surface">
                   {TRIGGER_TYPES.map((type) => (
-                    <SelectItem key={type.value} value={type.value} className="text-white">
+                    <SelectItem key={type.value} value={type.value} className="text-foreground">
                       <div>
                         <div className="font-medium">{type.label}</div>
-                        <div className="text-xs text-white/60">{type.description}</div>
+                        <div className="text-xs text-foreground/60">{type.description}</div>
                       </div>
                     </SelectItem>
                   ))}
@@ -448,7 +448,7 @@ export default function EditScheduledEmailModal({
             {/* Trigger Value (Days) */}
             {selectedTriggerConfig?.requiresValue && (
               <div>
-                <label className="block text-sm font-medium text-white/80 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Number of Days
                 </label>
                 <Input
@@ -456,7 +456,7 @@ export default function EditScheduledEmailModal({
                   min="0"
                   {...register('trigger_value', { valueAsNumber: true })}
                   disabled={isSent || isSaving}
-                  className="bg-white/5 border-white/10 text-white"
+                  className="bg-background/5 border-border text-foreground"
                   placeholder="e.g., 1"
                 />
                 {errors.trigger_value && (
@@ -510,7 +510,7 @@ export default function EditScheduledEmailModal({
 
           {/* Subject Template with Variable Buttons */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Subject Line
             </label>
             <Input
@@ -530,7 +530,7 @@ export default function EditScheduledEmailModal({
               }}
               disabled={isSent || isSaving}
               onFocus={() => setActiveField('subject')}
-              className="bg-white/5 border-white/10 text-white"
+              className="bg-background/5 border-border text-foreground"
               placeholder="e.g., Reminder: [eventName] is Tomorrow!"
             />
             {errors.subject_template && (
@@ -539,7 +539,7 @@ export default function EditScheduledEmailModal({
 
             {/* Variable Buttons for Subject */}
             {activeField === 'subject' && !isSent && (
-              <div className="mt-3 p-3 bg-white/5 rounded-lg border border-purple-500/20">
+              <div className="mt-3 p-3 bg-background/5 rounded-lg border border-purple-500/20">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-4 h-4 text-purple-400" />
                   <span className="text-xs font-medium text-purple-300">Click to insert variables:</span>
@@ -550,7 +550,7 @@ export default function EditScheduledEmailModal({
                       key={variable.frontendVar}
                       type="button"
                       onClick={() => handleInsertVariable(variable.frontendVar, 'subject')}
-                      className="px-2 py-1 text-xs rounded-md bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border border-purple-500/30 transition-colors"
+                      className="px-2 py-1 text-xs rounded-md bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/30 transition-colors"
                       title={`${variable.description} (e.g., ${variable.example})`}
                     >
                       {variable.label}
@@ -563,7 +563,7 @@ export default function EditScheduledEmailModal({
 
           {/* Body Template with Variable Buttons */}
           <div>
-            <label className="block text-sm font-medium text-white/80 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Email Message
             </label>
             <Textarea
@@ -583,7 +583,7 @@ export default function EditScheduledEmailModal({
               }}
               disabled={isSent || isSaving}
               onFocus={() => setActiveField('body')}
-              className="bg-white/5 border-white/10 text-white min-h-[300px]"
+              className="bg-background/5 border-border text-foreground min-h-[300px]"
               placeholder="Write your email message here... Click variables below to insert."
             />
             {errors.body_template && (
@@ -592,7 +592,7 @@ export default function EditScheduledEmailModal({
 
             {/* Variable Buttons for Body - Organized by Category */}
             {activeField === 'body' && !isSent && (
-              <div className="mt-3 p-4 bg-white/5 rounded-lg border border-purple-500/20 space-y-4">
+              <div className="mt-3 p-4 bg-background/5 rounded-lg border border-purple-500/20 space-y-4">
                 <div className="flex items-center gap-2">
                   <Sparkles className="w-4 h-4 text-purple-400" />
                   <span className="text-xs font-medium text-purple-300">Click to insert variables:</span>
@@ -602,14 +602,14 @@ export default function EditScheduledEmailModal({
                 {variableGroups.map((group, index) => {
                   // Different color schemes for each group
                   const colorClasses = [
-                    'bg-pink-500/20 hover:bg-pink-500/30 text-pink-300 border-pink-500/30', // Vendor Details
-                    'bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border-blue-500/30', // Organization Details
-                    'bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/30' // Event Details
-                  ][index] || 'bg-purple-500/20 hover:bg-purple-500/30 text-purple-300 border-purple-500/30';
+                    'bg-pink-500/20 hover:bg-pink-500/30 text-rose-950 dark:text-pink-300 border-pink-500/30', // Vendor Details
+                    'bg-blue-500/20 hover:bg-blue-500/30 text-blue-950 dark:text-blue-300 border-blue-500/30', // Organization Details
+                    'bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border-purple-500/30' // Event Details
+                  ][index] || 'bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border-purple-500/30';
 
                   return (
                     <div key={group.label}>
-                      <h4 className="text-xs font-semibold text-white/60 mb-2 uppercase tracking-wide">{group.label}</h4>
+                      <h4 className="text-xs font-semibold text-foreground/60 mb-2 uppercase tracking-wide">{group.label}</h4>
                       <div className="flex flex-wrap gap-2">
                         {group.variables.map((variable) => (
                           <button
@@ -634,7 +634,7 @@ export default function EditScheduledEmailModal({
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Lock className="w-4 h-4 text-purple-400" />
-              <label className="block text-sm font-medium text-white/80">
+              <label className="block text-sm font-medium text-foreground/80">
                 Email Footer (Locked)
               </label>
             </div>
@@ -643,7 +643,7 @@ export default function EditScheduledEmailModal({
                 value={emailFooter}
                 disabled
                 readOnly
-                className="bg-white/5 border-purple-500/20 text-white/60 min-h-[120px] resize-none cursor-not-allowed opacity-60"
+                className="bg-background/5 border-purple-500/20 text-foreground/60 min-h-[120px] resize-none cursor-not-allowed opacity-60"
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                 <div className="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-500/40">
@@ -656,7 +656,7 @@ export default function EditScheduledEmailModal({
                 </div>
               </div>
             </div>
-            <p className="mt-2 text-xs text-white/50">
+            <p className="mt-2 text-xs text-foreground/50">
               The footer contains the unsubscribe link required by email regulations and cannot be edited.
             </p>
           </div>
@@ -688,20 +688,20 @@ export default function EditScheduledEmailModal({
           )}
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-white/10">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isSaving}
-              className="border-white/10 text-white hover:bg-white/5"
+              className="border-border text-foreground hover:bg-background/5"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               disabled={isSent || isSaving || validationErrors.length > 0 || !!dateError}
-              className="bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              className="voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSaving ? (
                 <>

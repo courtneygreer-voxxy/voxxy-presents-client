@@ -35,7 +35,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
                 className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 ${
                   activeTab === tab.id
                     ? 'border-purple-500 text-purple-400'
-                    : 'border-transparent text-white/60 hover:text-white/80'
+                    : 'border-transparent text-foreground/60 hover:text-foreground/80'
                 }`}
               >
                 <Icon className="w-4 h-4" />

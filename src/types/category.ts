@@ -5,6 +5,7 @@ export interface Category {
   description?: string;
   color?: string;
   icon?: string;
+  booth_price?: number;
   email_campaign_template_id?: number;
 
   // Default application values for pre-filling
@@ -31,8 +32,10 @@ export interface Category {
   };
   usage_stats?: {
     applications_count: number;
+    contacts_count: number;
     email_templates_count: number;
     scheduled_emails_count: number;
+    events_using_count: number;
   };
 }
 
@@ -41,6 +44,7 @@ export interface CreateCategoryData {
   description?: string;
   color?: string;
   icon?: string;
+  booth_price?: number;
 }
 
 export interface UpdateCategoryData {
@@ -48,4 +52,5 @@ export interface UpdateCategoryData {
   description?: string;
   color?: string;
   icon?: string;
+  booth_price?: number;
 }

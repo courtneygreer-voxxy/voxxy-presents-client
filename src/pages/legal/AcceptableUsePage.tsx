@@ -14,7 +14,7 @@ export default function AcceptableUsePage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
+          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -22,12 +22,12 @@ export default function AcceptableUsePage() {
 
         {/* Header */}
         <div className="text-center space-y-4">
-          <h1 className="text-4xl font-bold text-gray-900">Acceptable Use Policy</h1>
+          <h1 className="text-4xl font-bold text-foreground">Acceptable Use Policy</h1>
           <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+        <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This Acceptable Use Policy sets the ground rules for using Voxxy Presents. It protects everyone on the platform — you, your vendors, your attendees, and us. The annotations in these highlighted boxes aren't part of the official policy but are here to help you understand each section.
           </p>
@@ -49,9 +49,9 @@ export default function AcceptableUsePage() {
 
         {/* Email and Communications Abuse */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Email and Communications Abuse</h2>
+          <h2 className="text-2xl font-bold text-foreground">Email and Communications Abuse</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               This is our "kill switch" section. Because Voxxy sends automated emails on your behalf, misusing those tools puts our entire platform at risk. Sending spam through Voxxy could get our email domain blacklisted, which would hurt every Customer on the platform.
             </p>
@@ -86,9 +86,9 @@ export default function AcceptableUsePage() {
 
         {/* Data and Privacy Abuse */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Data and Privacy Abuse</h2>
+          <h2 className="text-2xl font-bold text-foreground">Data and Privacy Abuse</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               You're responsible for treating your contacts' data with care. Don't use Voxxy to collect data you shouldn't have or share it with people who shouldn't see it.
             </p>
@@ -118,9 +118,9 @@ export default function AcceptableUsePage() {
 
         {/* Abusing and Disrupting the Services */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Abusing and Disrupting the Services</h2>
+          <h2 className="text-2xl font-bold text-foreground">Abusing and Disrupting the Services</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Don't try to break, hack, or reverse-engineer the platform.
             </p>
@@ -159,9 +159,9 @@ export default function AcceptableUsePage() {
 
         {/* Deception, Fraud, and Impersonation */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Deception, Fraud, and Impersonation</h2>
+          <h2 className="text-2xl font-bold text-foreground">Deception, Fraud, and Impersonation</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Be honest about who you are and what your events are. Don't misrepresent yourself to vendors or attendees.
             </p>
@@ -191,9 +191,9 @@ export default function AcceptableUsePage() {
 
         {/* Prohibited Content and Conduct */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Prohibited Content and Conduct</h2>
+          <h2 className="text-2xl font-bold text-foreground">Prohibited Content and Conduct</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               Keep it professional. The communications you send through Voxxy represent both your brand and ours.
             </p>
@@ -223,7 +223,7 @@ export default function AcceptableUsePage() {
 
         {/* Intellectual Property */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Intellectual Property</h2>
+          <h2 className="text-2xl font-bold text-foreground">Intellectual Property</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>You agree not to:</p>
@@ -243,7 +243,7 @@ export default function AcceptableUsePage() {
 
         {/* Legal Compliance */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Legal Compliance</h2>
+          <h2 className="text-2xl font-bold text-foreground">Legal Compliance</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>You agree not to:</p>
@@ -260,9 +260,9 @@ export default function AcceptableUsePage() {
 
         {/* Enforcement */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Enforcement</h2>
+          <h2 className="text-2xl font-bold text-foreground">Enforcement</h2>
 
-          <div className="bg-gray-100 border border-gray-200 rounded-lg p-6">
+          <div className="bg-muted border border-border rounded-lg p-6">
             <p className="text-gray-700 leading-relaxed">
               If you break these rules, we can take action — up to and including shutting down your account immediately. For most issues, we'll try to work with you first.
             </p>
@@ -290,7 +290,7 @@ export default function AcceptableUsePage() {
 
         {/* Reporting Violations */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Reporting Violations</h2>
+          <h2 className="text-2xl font-bold text-foreground">Reporting Violations</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
@@ -301,7 +301,7 @@ export default function AcceptableUsePage() {
 
         {/* Modifications */}
         <section className="space-y-4">
-          <h2 className="text-2xl font-bold text-gray-900">Modifications</h2>
+          <h2 className="text-2xl font-bold text-foreground">Modifications</h2>
 
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>

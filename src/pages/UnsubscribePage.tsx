@@ -118,7 +118,7 @@ export default function UnsubscribePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
         <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
       </div>
     );
@@ -126,19 +126,19 @@ export default function UnsubscribePage() {
 
   if (error || !context) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-white/5 border-white/10 backdrop-blur-sm">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
+        <Card className="max-w-md w-full bg-background/5 border-border backdrop-blur-sm">
           <CardHeader className="text-center">
             <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
-            <CardTitle className="text-white text-2xl">Link Not Valid</CardTitle>
-            <CardDescription className="text-white/60">
+            <CardTitle className="text-foreground text-2xl">Link Not Valid</CardTitle>
+            <CardDescription>
               {error || 'We could not validate this unsubscribe link.'}
             </CardDescription>
           </CardHeader>
           <CardContent className="flex justify-center pb-6">
             <Button
               onClick={() => navigate('/')}
-              className="bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white"
+              className="voxxy-btn-cta"
             >
               Go Home
             </Button>
@@ -150,18 +150,18 @@ export default function UnsubscribePage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-white/5 border-white/10 backdrop-blur-sm">
+      <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
+        <Card className="max-w-md w-full bg-background/5 border-border backdrop-blur-sm">
           <CardHeader className="text-center">
             <CheckCircle2 className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <CardTitle className="text-white text-2xl">Successfully Unsubscribed</CardTitle>
-            <CardDescription className="text-white/70 mt-2">
+            <CardTitle className="text-foreground text-2xl">Successfully Unsubscribed</CardTitle>
+            <CardDescription className="mt-2 text-base">
               {successMessage}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <p className="text-white/60 text-sm text-center">
+            <div className="bg-background/5 rounded-lg p-4 border border-border">
+              <p className="text-foreground/85 dark:text-foreground/65 text-sm text-center">
                 You will no longer receive the emails you selected to unsubscribe from.
               </p>
             </div>
@@ -179,11 +179,11 @@ export default function UnsubscribePage() {
                   onClick={handleResubscribe}
                   disabled={isResubscribing}
                   variant="outline"
-                  className="border-white/20 text-white hover:bg-white/10"
+                  className="border-border text-foreground hover:bg-background/10"
                 >
                   {isResubscribing ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin mr-2" />
                       Processing...
                     </>
                   ) : (
@@ -195,7 +195,7 @@ export default function UnsubscribePage() {
                 <Button
                   onClick={() => navigate('/')}
                   variant="ghost"
-                  className="text-white/60 hover:text-white hover:bg-white/5"
+                  className="text-foreground/60 hover:text-foreground hover:bg-background/5"
                 >
                   Go Home
                 </Button>
@@ -211,35 +211,35 @@ export default function UnsubscribePage() {
   const alreadyUnsubscribed = context.subscription_status.globally_unsubscribed;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820] flex items-center justify-center p-4">
-      <Card className="max-w-2xl w-full bg-white/5 border-white/10 backdrop-blur-sm">
-        <CardHeader className="text-center border-b border-white/10">
+    <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
+      <Card className="max-w-2xl w-full bg-background/5 border-border backdrop-blur-sm">
+        <CardHeader className="text-center border-b border-border">
           <MailX className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-          <CardTitle className="text-white text-2xl">Manage Email Preferences</CardTitle>
-          <CardDescription className="text-white/60 mt-2">
+          <CardTitle className="text-foreground text-2xl">Manage Email Preferences</CardTitle>
+          <CardDescription className="mt-2">
             Choose which emails you'd like to stop receiving
           </CardDescription>
         </CardHeader>
 
         <CardContent className="pt-6 space-y-6">
           {/* Email Context */}
-          <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-            <div className="flex items-center gap-2 text-white/90 mb-3">
+          <div className="bg-background/5 rounded-lg p-4 border border-border">
+            <div className="flex items-center gap-2 text-foreground/90 mb-3">
               <Mail className="w-5 h-5" />
               <span className="font-medium">Email Address</span>
             </div>
-            <p className="text-white/70">{context.email}</p>
+            <p className="text-foreground/70">{context.email}</p>
           </div>
 
           {/* Event Context (if available) */}
           {context.event && (
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex items-center gap-2 text-white/90 mb-3">
+            <div className="bg-background/5 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-foreground/90 mb-3">
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">Event</span>
               </div>
-              <p className="text-white/70 font-medium">{context.event.title}</p>
-              <p className="text-white/50 text-sm mt-1">
+              <p className="text-foreground/70 font-medium">{context.event.title}</p>
+              <p className="text-foreground/50 text-sm mt-1">
                 {formatDate(context.event.event_date)}
               </p>
             </div>
@@ -247,12 +247,12 @@ export default function UnsubscribePage() {
 
           {/* Organization Context (if available) */}
           {context.organization && (
-            <div className="bg-white/5 rounded-lg p-4 border border-white/10">
-              <div className="flex items-center gap-2 text-white/90 mb-3">
+            <div className="bg-background/5 rounded-lg p-4 border border-border">
+              <div className="flex items-center gap-2 text-foreground/90 mb-3">
                 <Building2 className="w-5 h-5" />
                 <span className="font-medium">Event Producer</span>
               </div>
-              <p className="text-white/70">{context.organization.name}</p>
+              <p className="text-foreground/70">{context.organization.name}</p>
             </div>
           )}
 
@@ -268,17 +268,17 @@ export default function UnsubscribePage() {
           {/* Unsubscribe Options */}
           {!alreadyUnsubscribed && (
             <div className="space-y-4">
-              <div className="text-white/90 font-medium">
+              <div className="text-foreground/90 font-medium">
                 What would you like to unsubscribe from?
               </div>
 
               <RadioGroup value={selectedScope} onValueChange={(value) => setSelectedScope(value as any)}>
                 {context.available_scopes.includes('event') && context.event && (
-                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="event" id="event" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
+                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-background/5 transition-colors">
+                    <RadioGroupItem value="event" id="event" className="mt-1 border-border text-primary data-[state=checked]:border-primary" />
                     <Label htmlFor="event" className="flex-1 cursor-pointer">
-                      <div className="text-white font-medium">This event only</div>
-                      <div className="text-white/60 text-sm mt-1">
+                      <div className="text-foreground font-medium">This event only</div>
+                      <div className="text-foreground/60 text-sm mt-1">
                         Unsubscribe from emails about {context.event.title}
                       </div>
                     </Label>
@@ -286,11 +286,11 @@ export default function UnsubscribePage() {
                 )}
 
                 {context.available_scopes.includes('organization') && context.organization && (
-                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="organization" id="organization" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
+                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-background/5 transition-colors">
+                    <RadioGroupItem value="organization" id="organization" className="mt-1 border-border text-primary data-[state=checked]:border-primary" />
                     <Label htmlFor="organization" className="flex-1 cursor-pointer">
-                      <div className="text-white font-medium">All emails from this producer</div>
-                      <div className="text-white/60 text-sm mt-1">
+                      <div className="text-foreground font-medium">All emails from this producer</div>
+                      <div className="text-foreground/60 text-sm mt-1">
                         Unsubscribe from all emails from {context.organization.name} (current and future events)
                       </div>
                     </Label>
@@ -298,11 +298,11 @@ export default function UnsubscribePage() {
                 )}
 
                 {context.available_scopes.includes('global') && (
-                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/10 hover:bg-white/5 transition-colors">
-                    <RadioGroupItem value="global" id="global" className="mt-1 border-white/60 text-yellow-400 data-[state=checked]:border-yellow-400" />
+                  <div className="flex items-start space-x-3 p-4 rounded-lg border border-border hover:bg-background/5 transition-colors">
+                    <RadioGroupItem value="global" id="global" className="mt-1 border-border text-primary data-[state=checked]:border-primary" />
                     <Label htmlFor="global" className="flex-1 cursor-pointer">
-                      <div className="text-white font-medium">All Voxxy Presents emails</div>
-                      <div className="text-white/60 text-sm mt-1">
+                      <div className="text-foreground font-medium">All Voxxy Presents emails</div>
+                      <div className="text-foreground/60 text-sm mt-1">
                         Unsubscribe from all emails from voxxypresents.com
                       </div>
                     </Label>
@@ -321,11 +321,11 @@ export default function UnsubscribePage() {
                 <Button
                   onClick={handleUnsubscribe}
                   disabled={isSubmitting}
-                  className="bg-gradient-to-r from-[#d946ef] via-[#a855f7] to-[#3b82f6] text-white px-8"
+                  className="voxxy-btn-cta px-8"
                 >
                   {isSubmitting ? (
                     <>
-                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                      <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin mr-2" />
                       Processing...
                     </>
                   ) : (

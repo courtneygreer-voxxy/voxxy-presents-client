@@ -29,8 +29,8 @@ export function CategoryFilterBar({
             className={`
               px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
               ${allSelected || noneSelected
-                ? 'border-purple-500 bg-purple-500/20 text-purple-200'
-                : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10'
+                ? 'border-purple-500 bg-purple-500/20 text-violet-950 dark:text-purple-200'
+                : 'border-border bg-background/5 text-foreground dark:text-foreground/60 hover:border-border hover:bg-background/10'
               }
             `}
           >
@@ -52,8 +52,8 @@ export function CategoryFilterBar({
                 relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
                 flex items-center gap-1.5
                 ${isSelected
-                  ? 'text-white shadow-lg'
-                  : 'border-white/10 bg-white/5 text-white/60 hover:border-white/20 hover:bg-white/10'
+                  ? 'text-foreground shadow-lg'
+                  : 'border-border bg-background/5 text-foreground dark:text-foreground/60 hover:border-border hover:bg-background/10'
                 }
               `}
               style={{
@@ -75,7 +75,7 @@ export function CategoryFilterBar({
 
       {/* Selected count indicator */}
       {!noneSelected && !allSelected && (
-        <div className="text-xs text-white/50">
+        <div className="text-xs text-foreground/85 dark:text-foreground/50">
           {selectedCategoryIds.length} of {categories.length} categories selected
         </div>
       )}

@@ -75,7 +75,7 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-purple-400 underline hover:text-purple-300',
+          class: 'text-violet-700 underline hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300',
           rel: 'noopener noreferrer',
           target: '_blank',
         },
@@ -84,7 +84,8 @@ export function RichTextEditor({
     content,
     editorProps: {
       attributes: {
-        class: 'prose prose-invert max-w-none focus:outline-none min-h-[400px] px-3 py-2 text-white',
+        class:
+          'prose prose-sm max-w-none voxxy-rich-text-base min-h-[400px] px-3 py-2 text-foreground focus:outline-none dark:prose-invert',
         placeholder,
       },
     },
@@ -146,8 +147,8 @@ export function RichTextEditor({
       className={`
         p-2 rounded transition-colors
         ${active
-          ? 'bg-purple-500/30 text-purple-300 border border-purple-500/40'
-          : 'hover:bg-white/10 text-white/70 hover:text-white border border-transparent'
+          ? 'bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/40'
+          : 'hover:bg-background/10 text-foreground/70 hover:text-foreground border border-transparent'
         }
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
       `}
@@ -236,9 +237,9 @@ export function RichTextEditor({
   const canInsert = linkMode === 'system' ? !!selectedSystemLink : !!customUrl;
 
   return (
-    <div className="border border-white/20 rounded-lg bg-white/5 overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-border bg-card/80 dark:bg-background/10">
       {/* Toolbar */}
-      <div className="flex items-center gap-1 p-2 border-b border-white/10 bg-black/20 flex-wrap">
+      <div className="voxxy-editor-chrome flex flex-wrap items-center gap-1 p-2">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive('bold')}
@@ -271,7 +272,7 @@ export function RichTextEditor({
           <Code className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-6 bg-white/20 mx-1" />
+        <div className="mx-1 h-6 w-px bg-border/70" />
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
@@ -289,7 +290,7 @@ export function RichTextEditor({
           <Heading2 className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-6 bg-white/20 mx-1" />
+        <div className="mx-1 h-6 w-px bg-border/70" />
 
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
@@ -307,7 +308,7 @@ export function RichTextEditor({
           <ListOrdered className="w-4 h-4" />
         </ToolbarButton>
 
-        <div className="w-px h-6 bg-white/20 mx-1" />
+        <div className="mx-1 h-6 w-px bg-border/70" />
 
         {/* Unified Insert Link Popover */}
         <Popover open={linkPopoverOpen} onOpenChange={handlePopoverOpen}>
@@ -319,8 +320,8 @@ export function RichTextEditor({
               className={`
                 px-2.5 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5
                 ${editor.isActive('link')
-                  ? 'bg-purple-500/30 text-purple-300 border border-purple-500/40'
-                  : 'bg-purple-600/80 hover:bg-purple-600 text-white border border-transparent'
+                  ? 'bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/40'
+                  : 'bg-violet-200/90 text-foreground hover:bg-violet-300/90 border border-violet-300/80 dark:bg-purple-600/80 dark:hover:bg-purple-600 dark:text-primary-foreground dark:border-transparent'
                 }
               `}
             >
@@ -331,18 +332,18 @@ export function RichTextEditor({
           <PopoverContent
             align="start"
             sideOffset={6}
-            className="w-80 bg-[#1a0f2e] border-purple-500/30 p-0 shadow-2xl"
+            className="voxxy-select-surface w-80 p-0 shadow-2xl"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
             <div className="p-4 space-y-4">
               <div>
-                <p className="text-sm font-semibold text-white">Insert Link</p>
-                <p className="text-xs text-white/50 mt-0.5">Add a clickable link to your email</p>
+                <p className="text-sm font-semibold text-foreground">Insert Link</p>
+                <p className="mt-0.5 text-xs text-muted-foreground">Add a clickable link to your email</p>
               </div>
 
               {/* Display Text */}
               <div>
-                <label className="block text-xs font-medium text-white/70 mb-1.5">
+                <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
                   Display Text
                 </label>
                 <input
@@ -350,19 +351,19 @@ export function RichTextEditor({
                   value={displayText}
                   onChange={(e) => setDisplayText(e.target.value)}
                   placeholder="e.g., Apply Now"
-                  className="w-full px-3 py-2 text-sm bg-white/5 border border-white/20 rounded-md text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+                  className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
                 />
               </div>
 
               {/* Mode Toggle */}
-              <div className="flex gap-1 p-1 bg-white/5 rounded-lg">
+              <div className="flex gap-1 rounded-lg bg-muted/70 p-1 dark:bg-background/20">
                 <button
                   type="button"
                   onClick={() => setLinkMode('system')}
                   className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                     linkMode === 'system'
-                      ? 'bg-purple-600 text-white shadow-sm'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-purple-600 dark:text-primary-foreground'
+                      : 'text-foreground/60 hover:bg-background/40 hover:text-foreground dark:hover:bg-background/10'
                   }`}
                 >
                   System Link
@@ -372,8 +373,8 @@ export function RichTextEditor({
                   onClick={() => setLinkMode('custom')}
                   className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                     linkMode === 'custom'
-                      ? 'bg-purple-600 text-white shadow-sm'
-                      : 'text-white/60 hover:text-white hover:bg-white/5'
+                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-purple-600 dark:text-primary-foreground'
+                      : 'text-foreground/60 hover:bg-background/40 hover:text-foreground dark:hover:bg-background/10'
                   }`}
                 >
                   Custom URL
@@ -390,13 +391,13 @@ export function RichTextEditor({
                       onClick={() => handleSystemLinkChange(option.variable)}
                       className={`w-full px-3 py-2 text-left rounded-md transition-all flex items-center justify-between ${
                         selectedSystemLink === option.variable
-                          ? 'bg-purple-600/30 border border-purple-500/50'
-                          : 'bg-white/5 border border-transparent hover:bg-white/10 hover:border-white/10'
+                          ? 'bg-violet-200/60 border border-violet-400/50 dark:bg-purple-600/30 dark:border-purple-500/50'
+                          : 'bg-background/40 border border-transparent hover:bg-background/70 hover:border-border dark:bg-background/5 dark:hover:bg-background/10'
                       }`}
                     >
                       <div>
-                        <span className="text-sm font-medium text-white block">{option.label}</span>
-                        <span className="text-[10px] text-white/40">{option.defaultText}</span>
+                        <span className="text-sm font-medium text-foreground block">{option.label}</span>
+                        <span className="text-[10px] text-muted-foreground">{option.defaultText}</span>
                       </div>
                       {selectedSystemLink === option.variable && (
                         <div className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />
@@ -409,7 +410,7 @@ export function RichTextEditor({
               {/* Custom URL Input */}
               {linkMode === 'custom' && (
                 <div>
-                  <label className="block text-xs font-medium text-white/70 mb-1.5">
+                  <label className="block text-xs font-medium text-foreground dark:text-foreground/70 mb-1.5">
                     URL
                   </label>
                   <input
@@ -417,7 +418,7 @@ export function RichTextEditor({
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
                     placeholder="https://example.com"
-                    className="w-full px-3 py-2 text-sm bg-white/5 border border-white/20 rounded-md text-white placeholder:text-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+                    className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
                   />
                 </div>
               )}
@@ -427,7 +428,7 @@ export function RichTextEditor({
                 <button
                   type="button"
                   onClick={() => { setLinkPopoverOpen(false); resetPopoverState(); }}
-                  className="flex-1 px-3 py-2 text-xs font-medium text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-md transition-all"
+                  className="flex-1 rounded-md bg-muted/60 px-3 py-2 text-xs font-medium text-foreground/60 transition-all hover:bg-muted hover:text-foreground dark:bg-background/5 dark:hover:bg-background/10"
                 >
                   Cancel
                 </button>
@@ -437,8 +438,8 @@ export function RichTextEditor({
                   disabled={!canInsert}
                   className={`flex-1 px-3 py-2 text-xs font-medium rounded-md transition-all ${
                     canInsert
-                      ? 'bg-purple-600 hover:bg-purple-500 text-white'
-                      : 'bg-white/5 text-white/30 cursor-not-allowed'
+                      ? 'voxxy-btn-solid'
+                      : 'bg-muted/60 text-muted-foreground cursor-not-allowed dark:bg-background/5'
                   }`}
                 >
                   Insert Link
@@ -457,7 +458,7 @@ export function RichTextEditor({
           </ToolbarButton>
         )}
 
-        <div className="w-px h-6 bg-white/20 mx-1" />
+        <div className="w-px h-6 bg-background/20 mx-1" />
 
         <ToolbarButton
           onClick={() => editor.chain().focus().undo().run()}

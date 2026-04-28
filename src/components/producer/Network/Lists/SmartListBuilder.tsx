@@ -145,24 +145,24 @@ export default function SmartListBuilder({
 
     return (
       <div>
-        <label className="block text-sm font-medium text-white mb-1.5 flex items-center gap-2">
+        <label className="block text-sm font-medium text-foreground mb-1.5 flex items-center gap-2">
           {icon} {label}
         </label>
         <div className="relative">
           <button
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : dropdownKey)}
-            className="w-full px-3 py-2.5 text-sm rounded-lg bg-white/10 border border-white/20 text-left flex items-center justify-between hover:bg-white/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           >
-            <span className={selectedItems.length > 0 ? 'text-white' : 'text-white/40'}>
+            <span className={selectedItems.length > 0 ? 'text-foreground' : 'text-foreground/75 dark:text-foreground/40'}>
               {selectedItems.length > 0
                 ? `${selectedItems.length} selected`
                 : `All ${label.toLowerCase()}...`}
             </span>
-            <ChevronDown className={`w-4 h-4 text-white/50 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+            <ChevronDown className={`w-4 h-4 text-foreground/65 dark:text-foreground/50 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </button>
           {isOpen && items.length > 0 && (
-            <div className="absolute z-20 left-0 right-0 mt-1 bg-gray-900 border border-white/20 rounded-lg shadow-xl max-h-48 overflow-y-auto">
+            <div className="absolute z-20 left-0 right-0 mt-1 bg-muted border border-border rounded-lg shadow-xl max-h-48 overflow-y-auto">
               {items.map(item => {
                 const itemSelected = selectedItems.includes(item);
                 return (
@@ -170,14 +170,14 @@ export default function SmartListBuilder({
                     key={item}
                     type="button"
                     onClick={() => onToggle(item)}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-white/10 transition-colors"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-background/10 transition-colors"
                   >
                     <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                      itemSelected ? 'bg-purple-500 border-purple-500' : 'border-white/30'
+                      itemSelected ? 'bg-purple-500 border-purple-500' : 'border-border'
                     }`}>
-                      {itemSelected && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+                      {itemSelected && <Check className="w-3 h-3 text-foreground" strokeWidth={3} />}
                     </div>
-                    <span className={`truncate ${itemSelected ? 'text-white' : 'text-white/70'}`}>{item}</span>
+                    <span className={`truncate ${itemSelected ? 'text-foreground' : 'text-foreground/70'}`}>{item}</span>
                   </button>
                 );
               })}
@@ -204,12 +204,12 @@ export default function SmartListBuilder({
     <div className="space-y-4">
       {/* Matching Count Preview */}
       {matchingCount !== null && (
-        <div className="flex items-center gap-2 text-sm bg-white/5 rounded-lg px-4 py-2.5 border border-white/10">
+        <div className="flex items-center gap-2 text-sm bg-background/5 rounded-lg px-4 py-2.5 border border-border">
           <Users className="w-4 h-4 text-purple-400" />
-          <span className="text-white/60">Matching:</span>
-          <span className="font-semibold text-white">
+          <span className="text-foreground/85 dark:text-foreground/60">Matching:</span>
+          <span className="font-semibold text-foreground">
             {loadingCount ? (
-              <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin ml-1" />
+              <span className="inline-block w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin ml-1" />
             ) : (
               `${matchingCount} ${matchingCount === 1 ? 'contact' : 'contacts'}`
             )}
@@ -225,7 +225,7 @@ export default function SmartListBuilder({
         filters.categories,
         handleToggleCategory,
         'categories',
-        'bg-blue-500/15 text-blue-300 border border-blue-500/30',
+        'bg-blue-500/15 text-blue-950 dark:text-blue-300 border border-blue-500/30',
       )}
 
       {renderFilterDropdown(
@@ -235,7 +235,7 @@ export default function SmartListBuilder({
         filters.locations,
         handleToggleLocation,
         'locations',
-        'bg-purple-500/15 text-purple-300 border border-purple-500/30',
+        'bg-purple-500/15 text-violet-950 dark:text-purple-300 border border-purple-500/30',
       )}
 
       {availableFilters.tags.length > 0 && renderFilterDropdown(
@@ -245,7 +245,7 @@ export default function SmartListBuilder({
         filters.tags,
         handleToggleTag,
         'tags',
-        'bg-green-500/15 text-green-300 border border-green-500/30',
+        'bg-green-500/15 text-emerald-950 dark:text-green-300 border border-green-500/30',
       )}
     </div>
   );

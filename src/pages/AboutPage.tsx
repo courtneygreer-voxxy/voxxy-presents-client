@@ -14,7 +14,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a0b2e] via-[#2d1b4e] to-[#0f172a] relative overflow-hidden">
+    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
       <Navigation activePage="about" />
 
       {/* Hero Section */}
@@ -22,13 +22,13 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-radial from-voxxy-purple-brand/15 via-transparent to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
-          <h1 className="text-[52px] md:text-[56px] font-display font-bold leading-[1.1] text-white mb-5 tracking-tight">
+          <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
             Community is built{" "}
             <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">
               in person
             </em>
           </h1>
-          <p className="text-[18px] leading-relaxed text-white/65 max-w-[700px] mx-auto mb-0">
+          <p className="mx-auto mb-0 max-w-[700px] text-[18px] leading-relaxed text-white/65">
             Voxxy exists because we believe the best communities are formed face-to-face — at art markets, pop-ups, and the events that give neighborhoods their identity.
           </p>
 
@@ -42,11 +42,11 @@ export default function AboutPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-[100px] px-6 md:px-12 bg-white">
+      <section className="bg-[#faf9fc] py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
             <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Our Story</div>
-            <h2 className="text-[42px] font-display font-bold leading-tight text-gray-900 mb-6">Built by producers, for producers</h2>
+            <h2 className="mb-6 text-[42px] font-display font-bold leading-tight text-slate-950">Built by producers, for producers</h2>
           </div>
 
           {/* Story Content with Image Grid */}
@@ -68,20 +68,20 @@ export default function AboutPage() {
               <img
                 src="/screenshots/event-photo.png"
                 alt="Vibrant art market event with vendors and attendees"
-                className="rounded-xl shadow-lg border border-gray-200 w-full h-[300px] object-cover"
+                className="h-[300px] w-full rounded-xl border border-slate-200 shadow-lg object-cover"
                 loading="lazy"
               />
               <div className="grid grid-cols-2 gap-4">
                 <img
                   src="/screenshots/event-photo-1.png"
                   alt="Brooklyn art market with vendors"
-                  className="rounded-xl shadow-lg border border-gray-200 w-full h-[180px] object-cover"
+                  className="h-[180px] w-full rounded-xl border border-slate-200 shadow-lg object-cover"
                   loading="lazy"
                 />
                 <img
                   src="/screenshots/event-photo-2.png"
                   alt="Outdoor market vendors setup"
-                  className="rounded-xl shadow-lg border border-gray-200 w-full h-[180px] object-cover"
+                  className="h-[180px] w-full rounded-xl border border-slate-200 shadow-lg object-cover"
                   loading="lazy"
                 />
               </div>
@@ -89,30 +89,30 @@ export default function AboutPage() {
           </div>
 
           {/* Values Grid */}
-          <div className="grid md:grid-cols-2 gap-6 max-w-[900px] mx-auto pt-12 border-t border-gray-200">
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <h4 className="text-[18px] font-bold text-gray-900 mb-2">🤝 Community First</h4>
+          <div className="mx-auto grid max-w-[900px] gap-6 border-t border-slate-200 pt-12 md:grid-cols-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">🤝 Community First</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
                 Everything we build starts with the question: does this help people connect in real life?
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <h4 className="text-[18px] font-bold text-gray-900 mb-2">⚡ Simplicity Over Features</h4>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">⚡ Simplicity Over Features</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
                 We'd rather do 5 things perfectly than 50 things poorly. Our competitors have feature bloat. We have focus.
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <h4 className="text-[18px] font-bold text-gray-900 mb-2">🌍 Representation Matters</h4>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">🌍 Representation Matters</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
                 We're committed to supporting underrepresented communities in events and tech. That's not a talking point — it's our founding story.
               </p>
             </div>
 
-            <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-              <h4 className="text-[18px] font-bold text-gray-900 mb-2">🛠️ Built by Producers</h4>
+            <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">🛠️ Built by Producers</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
                 We produce events alongside our customers. We don't just build tools — we use them every week.
               </p>
@@ -122,17 +122,17 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-6 md:px-12 bg-gradient-to-r from-purple-600/20 to-indigo-600/20 border-y border-white/10">
+      <section className="border-y border-white/10 bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-24 px-6 md:px-12">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-[42px] md:text-[48px] font-display font-bold text-white mb-6">
+          <h2 className="mb-6 text-[42px] font-display font-bold text-white md:text-[48px]">
             Want to learn more?
           </h2>
-          <p className="text-[18px] text-white/70 mb-10">
+          <p className="mb-10 text-[18px] text-white/70">
             We'd love to hear about your events.
           </p>
           <TrackedLink
             to="/contact"
-            className="inline-flex items-center px-8 py-4 bg-white text-voxxy-purple-brand hover:bg-gray-100 transition-all text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl"
+            className="inline-flex items-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl"
             trackingData={{
               link_text: 'Get in Touch',
               destination_page: 'Contact',

@@ -207,14 +207,14 @@ export default function EmailTestingPanel() {
     <div className="p-4 lg:p-6">
       <div className="max-w-6xl mx-auto space-y-4 lg:space-y-6">
         {/* Header Section */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
+        <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4 lg:p-6">
           <div className="flex items-center gap-3 lg:gap-4 mb-4">
-            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-purple-600 to-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Mail className="h-5 w-5 lg:h-6 lg:w-6 text-white" />
+            <div className="w-10 h-10 lg:w-12 lg:h-12 voxxy-accent-tile rounded-lg flex items-center justify-center flex-shrink-0">
+              <Mail className="h-5 w-5 lg:h-6 lg:w-6 text-foreground" />
             </div>
             <div>
-              <h1 className="text-xl lg:text-2xl font-bold text-white">Email Testing Dashboard</h1>
-              <p className="text-sm lg:text-base text-gray-300">Test all 17 Voxxy Presents emails</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-foreground">Email Testing Dashboard</h1>
+              <p className="text-sm lg:text-base text-muted-foreground">Test all 17 Voxxy Presents emails</p>
             </div>
           </div>
 
@@ -224,10 +224,10 @@ export default function EmailTestingPanel() {
               <AlertCircle className="h-5 w-5 text-blue-300 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
                 <p className="text-sm text-gray-200">
-                  <strong className="text-white">Test Email Recipient:</strong>{' '}
+                  <strong className="text-foreground">Test Email Recipient:</strong>{' '}
                   <span className="text-blue-300 font-semibold">{testEmail}</span>
                 </p>
-                <p className="text-xs text-gray-300 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   All test emails will be sent to your admin email address only. This cannot be changed for security reasons.
                 </p>
               </div>
@@ -258,27 +258,27 @@ export default function EmailTestingPanel() {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gradient-to-br from-purple-600/20 to-purple-600/10 backdrop-blur-sm border border-purple-400/30 rounded-lg p-4">
-            <div className="text-3xl font-bold text-white">17</div>
+            <div className="text-3xl font-bold text-foreground">17</div>
             <div className="text-sm text-purple-200">Total Emails</div>
           </div>
           <div className="bg-gradient-to-br from-pink-600/20 to-pink-600/10 backdrop-blur-sm border border-pink-400/30 rounded-lg p-4">
-            <div className="text-3xl font-bold text-white">7</div>
+            <div className="text-3xl font-bold text-foreground">7</div>
             <div className="text-sm text-pink-200">Scheduled Emails</div>
           </div>
           <div className="bg-gradient-to-br from-blue-600/20 to-blue-600/10 backdrop-blur-sm border border-blue-400/30 rounded-lg p-4">
-            <div className="text-3xl font-bold text-white">10</div>
+            <div className="text-3xl font-bold text-foreground">10</div>
             <div className="text-sm text-blue-200">Transactional Emails</div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
-          <h3 className="text-lg font-semibold text-white mb-4">Actions</h3>
+        <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4 lg:p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Actions</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Button
               onClick={handleSendAllEmails}
               disabled={sendingAll}
-              className="bg-gradient-to-r from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 text-white border-0 h-auto py-3"
+              className="voxxy-btn-cta border-0 h-auto py-3"
             >
               {sendingAll ? (
                 <>
@@ -296,7 +296,7 @@ export default function EmailTestingPanel() {
             <Button
               onClick={handleSendScheduledEmails}
               disabled={sendingScheduled}
-              className="bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-700 hover:to-purple-600 text-white border-0 h-auto py-3"
+              className="bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-700 hover:to-purple-600 text-foreground border-0 h-auto py-3"
             >
               {sendingScheduled ? (
                 <>
@@ -315,7 +315,7 @@ export default function EmailTestingPanel() {
               onClick={handleSetupTestData}
               disabled={settingUpData}
               variant="outline"
-              className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/15 h-auto py-3"
+              className="bg-background/10 backdrop-blur-sm border border-border text-foreground hover:bg-background/15 h-auto py-3"
             >
               {settingUpData ? (
                 <>
@@ -334,7 +334,7 @@ export default function EmailTestingPanel() {
               onClick={handleCleanupTestData}
               disabled={cleaningData}
               variant="outline"
-              className="bg-white/10 backdrop-blur-sm border border-red-400/30 text-red-300 hover:bg-red-500/20 h-auto py-3"
+              className="bg-background/10 backdrop-blur-sm border border-red-400/30 text-red-300 hover:bg-red-500/20 h-auto py-3"
             >
               {cleaningData ? (
                 <>
@@ -353,13 +353,13 @@ export default function EmailTestingPanel() {
 
         {/* Email Categories */}
         {categories.map((category, index) => (
-          <div key={index} className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 lg:p-6">
+          <div key={index} className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-4 lg:p-6">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-white">{category.name}</h3>
-                <p className="text-sm text-gray-300 mt-1">{category.description}</p>
+                <h3 className="text-lg font-semibold text-foreground">{category.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1">{category.description}</p>
               </div>
-              <Badge className="bg-white/10 backdrop-blur-sm border border-white/20 text-white">
+              <Badge className="bg-background/10 backdrop-blur-sm border border-border text-foreground">
                 {category.count} emails
               </Badge>
             </div>
@@ -368,15 +368,15 @@ export default function EmailTestingPanel() {
               {category.emails.map((email, emailIndex) => (
                 <div
                   key={emailIndex}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-4 hover:bg-white/10 transition-colors group"
+                  className="bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 hover:bg-background/10 transition-colors group"
                 >
                   <div className="flex items-start gap-2">
                     <div className={`w-8 h-8 rounded-lg bg-gradient-to-r ${getCategoryColor(index)} flex items-center justify-center flex-shrink-0`}>
-                      <Mail className="h-4 w-4 text-white" />
+                      <Mail className="h-4 w-4 text-foreground" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-semibold text-white truncate">{email.name}</h4>
-                      <p className="text-xs text-gray-400 italic mt-1 truncate">
+                      <h4 className="text-sm font-semibold text-foreground truncate">{email.name}</h4>
+                      <p className="text-xs text-muted-foreground italic mt-1 truncate">
                         {email.subject}
                       </p>
                     </div>
@@ -385,7 +385,7 @@ export default function EmailTestingPanel() {
                     onClick={() => handlePreviewEmail(email.name, index, emailIndex)}
                     size="sm"
                     variant="outline"
-                    className="w-full mt-3 bg-white/5 border-white/20 text-white hover:bg-white/10 text-xs"
+                    className="w-full mt-3 bg-background/5 border-border text-foreground hover:bg-background/10 text-xs"
                   >
                     <Eye className="h-3 w-3 mr-1" />
                     Preview

@@ -24,11 +24,11 @@ interface ViewApplicationSubmissionsProps {
 }
 
 const STATUS_COLORS = {
-  pending: 'bg-blue-500/20 text-blue-400',
-  approved: 'bg-green-500/20 text-green-400',
-  rejected: 'bg-red-500/20 text-red-400',
-  waitlist: 'bg-yellow-500/20 text-yellow-400',
-  confirmed: 'bg-purple-500/20 text-purple-400',
+  pending: 'bg-blue-500/20 text-blue-950 dark:text-blue-400',
+  approved: 'bg-green-500/20 text-emerald-900 dark:text-green-400',
+  rejected: 'bg-red-500/20 text-red-950 dark:text-red-400',
+  waitlist: 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400',
+  confirmed: 'bg-purple-500/20 text-violet-950 dark:text-purple-400',
 };
 
 const STATUS_LABELS = {
@@ -129,7 +129,7 @@ export default function ViewApplicationSubmissions({
           <p className="text-red-400 mb-4">{error}</p>
           <button
             onClick={fetchSubmissions}
-            className="px-4 py-2 rounded-lg bg-purple-600 text-white hover:bg-purple-700 transition-colors"
+            className="px-4 py-2 rounded-lg voxxy-btn-solid transition-colors"
           >
             Retry
           </button>
@@ -144,21 +144,21 @@ export default function ViewApplicationSubmissions({
       <div className="mb-6">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-white/60 hover:text-white mb-4 transition-colors"
+          className="flex items-center gap-2 text-foreground/60 hover:text-foreground mb-4 transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Command Center
         </button>
-        <h1 className="text-3xl font-bold text-white mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           {application.name}
         </h1>
-        <p className="text-white/60">Review and manage applicants</p>
+        <p className="text-foreground/60">Review and manage applicants</p>
       </div>
 
       {/* Filters */}
       <div className="mb-6">
         <div className="flex flex-wrap gap-2">
-          <span className="text-white/60 text-sm self-center mr-2">Filter by Status:</span>
+          <span className="text-foreground dark:text-foreground/60 text-sm self-center mr-2">Filter by Status:</span>
 
           {/* Status Filters */}
           {Object.entries(STATUS_LABELS).map(([status, label]) => (
@@ -167,8 +167,8 @@ export default function ViewApplicationSubmissions({
               onClick={() => setSelectedStatus(selectedStatus === status ? null : status)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 selectedStatus === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white/10 text-white/80 hover:bg-white/20'
+                  ? 'bg-blue-600 text-foreground'
+                  : 'bg-background/10 text-foreground/90 dark:text-foreground/80 hover:bg-background/20'
               }`}
             >
               {label}
@@ -178,13 +178,13 @@ export default function ViewApplicationSubmissions({
           {selectedStatus && (
             <button
               onClick={() => setSelectedStatus(null)}
-              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-all"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium bg-red-500/20 text-red-950 dark:text-red-400 hover:bg-red-500/30 transition-all"
             >
               Clear Filter
             </button>
           )}
 
-          <span className="text-white/60 text-sm self-center ml-auto">
+          <span className="text-foreground/85 dark:text-foreground/60 text-sm self-center ml-auto">
             Showing {filteredSubmissions.length} of {submissions.length}
           </span>
         </div>
@@ -192,35 +192,35 @@ export default function ViewApplicationSubmissions({
 
       {/* Submissions Table */}
       {filteredSubmissions.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-lg">
-          <p className="text-white/60">
+        <div className="text-center py-20 bg-background/5 border border-border rounded-lg">
+          <p className="text-foreground/80 dark:text-foreground/60">
             {submissions.length === 0
               ? 'No submissions yet'
               : 'No submissions match the selected filters'}
           </p>
         </div>
       ) : (
-        <div className="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+        <div className="bg-background/5 border border-border rounded-lg overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10 bg-white/5">
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-white">
+                <tr className="border-b border-border bg-background/5">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
                     Name
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-white">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
                     Category
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-white">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
                     Email
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-white">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
                     Status
                   </th>
-                  <th className="text-left px-6 py-4 text-sm font-semibold text-white">
+                  <th className="text-left px-6 py-4 text-sm font-semibold text-foreground">
                     Submitted
                   </th>
-                  <th className="text-right px-6 py-4 text-sm font-semibold text-white">
+                  <th className="text-right px-6 py-4 text-sm font-semibold text-foreground">
                     Actions
                   </th>
                 </tr>
@@ -229,32 +229,32 @@ export default function ViewApplicationSubmissions({
                 {filteredSubmissions.map((submission) => (
                   <tr
                     key={submission.id}
-                    className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                    className="border-b border-border hover:bg-background/5 transition-colors"
                   >
                     <td className="px-6 py-4">
-                      <p className="text-white font-medium">{submission.contact_name || submission.business_name}</p>
+                      <p className="text-foreground font-medium">{submission.contact_name || submission.business_name}</p>
                       {submission.business_name && submission.contact_name && (
-                        <p className="text-white/60 text-xs">{submission.business_name}</p>
+                        <p className="text-foreground/60 text-xs">{submission.business_name}</p>
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-purple-400">
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-violet-950 dark:text-purple-400">
                         {submission.vendor_category}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-white/80">{submission.email}</td>
+                    <td className="px-6 py-4 text-foreground/80">{submission.email}</td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-2 py-1 rounded text-xs font-medium ${
                           STATUS_COLORS[submission.status as keyof typeof STATUS_COLORS] ||
-                          'bg-gray-500/20 text-gray-400'
+                          'bg-muted/20 text-muted-foreground'
                         }`}
                       >
                         {STATUS_LABELS[submission.status as keyof typeof STATUS_LABELS] ||
                           submission.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-white/60 text-sm">
+                    <td className="px-6 py-4 text-foreground/60 text-sm">
                       {formatDate(submission.created_at)}
                     </td>
                     <td className="px-6 py-4">
@@ -265,21 +265,21 @@ export default function ViewApplicationSubmissions({
                           <>
                             <button
                               onClick={() => handleUpdateStatus(submission.id, 'approved')}
-                              className="p-1.5 rounded bg-green-600 text-white hover:bg-green-700 transition-colors"
+                              className="p-1.5 rounded bg-green-600 text-primary-foreground hover:bg-green-700 transition-colors"
                               title="Approve"
                             >
                               <Check className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(submission.id, 'waitlist')}
-                              className="p-1.5 rounded bg-yellow-600 text-white hover:bg-yellow-700 transition-colors"
+                              className="p-1.5 rounded bg-yellow-600 text-foreground hover:bg-yellow-700 transition-colors"
                               title="Waitlist"
                             >
                               <Clock className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleUpdateStatus(submission.id, 'rejected')}
-                              className="p-1.5 rounded bg-red-600 text-white hover:bg-red-700 transition-colors"
+                              className="p-1.5 rounded bg-red-600 text-destructive-foreground hover:bg-red-700 transition-colors"
                               title="Reject"
                             >
                               <X className="w-4 h-4" />
@@ -294,7 +294,7 @@ export default function ViewApplicationSubmissions({
                                 e.target.value as 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed'
                               )
                             }
-                            className="px-3 py-1.5 rounded bg-white/10 text-white text-sm border border-white/20 hover:bg-white/20 transition-colors"
+                            className="px-3 py-1.5 rounded bg-background/10 text-foreground text-sm border border-border hover:bg-background/20 transition-colors"
                           >
                             <option value="pending">Pending</option>
                             <option value="approved">Approved</option>

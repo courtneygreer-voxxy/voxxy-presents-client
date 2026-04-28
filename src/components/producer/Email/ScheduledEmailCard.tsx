@@ -85,7 +85,7 @@ export default function ScheduledEmailCard({
           ? 'bg-red-500/10 text-red-400'
           : isScheduled
           ? 'bg-blue-500/10 text-blue-400'
-          : 'bg-gray-500/10 text-gray-400'
+          : 'bg-muted/10 text-muted-foreground'
       }`}
     >
       {email.status.charAt(0).toUpperCase() + email.status.slice(1)}
@@ -94,22 +94,22 @@ export default function ScheduledEmailCard({
 
   return (
     <div
-      className={`bg-white/5 rounded-xl border border-white/10 p-5 transition-all ${
+      className={`bg-background/5 rounded-xl border border-border p-5 transition-all ${
         isClickable
-          ? 'hover:bg-white/[0.08] hover:border-purple-500/30 cursor-pointer group'
-          : 'hover:bg-white/[0.07]'
+          ? 'hover:bg-background/[0.08] hover:border-purple-500/30 cursor-pointer group'
+          : 'hover:bg-background/[0.07]'
       }`}
       onClick={handleCardClick}
     >
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className={`text-white font-medium truncate ${isClickable ? 'group-hover:text-purple-300 transition-colors' : ''}`}>
+            <h3 className={`text-foreground font-medium truncate ${isClickable ? 'group-hover:text-purple-300 transition-colors' : ''}`}>
               {email.name}
             </h3>
             {statusBadge}
             {isClickable && (
-              <Edit2 className="w-3.5 h-3.5 text-white/40 group-hover:text-purple-400 transition-colors" />
+              <Edit2 className="w-3.5 h-3.5 text-foreground/40 group-hover:text-purple-400 transition-colors" />
             )}
           </div>
 
@@ -123,11 +123,11 @@ export default function ScheduledEmailCard({
             </div>
           )}
 
-          <p className="text-white/60 text-sm line-clamp-2 mb-3">
+          <p className="text-foreground/60 text-sm line-clamp-2 mb-3">
             {backendToFrontend(email.subject_template || '')}
           </p>
 
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/50">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-foreground/50">
             {scheduledDate && (
               <div className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" />
@@ -159,7 +159,7 @@ export default function ScheduledEmailCard({
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <button
-                className="p-2 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-all"
+                className="p-2 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/5 transition-all"
                 disabled={isProcessing}
                 onClick={(e) => e.stopPropagation()} // Prevent card click when clicking dropdown
               >

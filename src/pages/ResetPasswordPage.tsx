@@ -88,9 +88,9 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="dark voxxy-public-page min-h-screen flex">
       {/* Left Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#a855f7] via-[#ec4899] to-[#3b82f6] relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 voxxy-gradient-hero-split relative overflow-hidden">
         {/* Animated Background Pattern */}
         <div
           className="absolute inset-0 opacity-10"
@@ -99,10 +99,10 @@ export default function ResetPasswordPage() {
           }}
         />
 
-        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-white">
+        <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <Lock className="h-20 w-20 mb-6" />
           <h1 className="text-4xl font-bold mb-4">Reset Password</h1>
-          <p className="text-xl text-center text-purple-100 max-w-md">
+          <p className="voxxy-auth-hero-copy max-w-md text-center text-xl">
             {!success
               ? "Create a new secure password for your Voxxy account"
               : "Your password has been reset successfully!"
@@ -112,7 +112,7 @@ export default function ResetPasswordPage() {
       </div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 bg-[#0f0b1f] relative overflow-hidden">
+      <div className="w-full lg:w-1/2 voxxy-auth-panel relative overflow-hidden">
         {/* Subtle Background Pattern */}
         <div
           className="absolute inset-0 opacity-[0.3] lg:opacity-10"
@@ -125,19 +125,19 @@ export default function ResetPasswordPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Lock className="h-16 w-16 mx-auto text-pink-400 mb-4" />
-              <h1 className="text-3xl font-bold text-white">Reset Password</h1>
+              <Lock className="voxxy-auth-accent mx-auto mb-4 h-16 w-16" />
+              <h1 className="text-3xl font-bold text-foreground">Reset Password</h1>
             </div>
 
-            <Card className="w-full bg-white/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="voxxy-auth-card w-full">
               <CardHeader className="text-center">
                 <div className="flex items-center justify-center gap-2 mb-3">
-                  <Lock className="h-6 w-6 text-pink-400" />
-                  <CardTitle className="text-2xl font-bold text-white">
+                  <Lock className="voxxy-auth-accent h-6 w-6" />
+                  <CardTitle className="text-2xl font-bold text-foreground">
                     {!success ? 'Reset Your Password' : 'Password Reset Successful!'}
                   </CardTitle>
                 </div>
-                <CardDescription className="text-gray-300">
+                <CardDescription>
                   {!success
                     ? 'Create a new secure password for your account'
                     : "You'll be redirected to login in a few seconds..."
@@ -152,7 +152,7 @@ export default function ResetPasswordPage() {
                       <Alert className="bg-red-500/20 border-red-500 border-2 mb-6 shadow-lg">
                         <AlertDescription className="flex items-start gap-3">
                           <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
-                          <div className="text-white font-medium">{error}</div>
+                          <div className="text-foreground font-medium">{error}</div>
                         </AlertDescription>
                       </Alert>
                     )}
@@ -164,8 +164,8 @@ export default function ResetPasswordPage() {
                           <div className="flex items-start gap-3">
                             <AlertCircle className="h-5 w-5 text-red-400 flex-shrink-0 mt-0.5" />
                             <div>
-                              <div className="text-white font-medium mb-2">Password Requirements:</div>
-                              <ul className="text-red-400 text-sm space-y-1">
+                              <div className="text-foreground font-medium mb-2">Password Requirements:</div>
+                                <ul className="space-y-1 text-sm text-red-700 dark:text-red-300">
                                 {passwordErrors.map((err, index) => (
                                   <li key={index}>• {err}</li>
                                 ))}
@@ -179,23 +179,23 @@ export default function ResetPasswordPage() {
                     <form onSubmit={handleSubmit} className="space-y-4">
                       {/* New Password Field */}
                       <div className="space-y-2">
-                        <Label htmlFor="password" className="text-white">New Password</Label>
+                        <Label htmlFor="password" className="text-foreground">New Password</Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="password"
                             type={showPassword ? 'text' : 'password'}
                             placeholder="Enter your new password"
                             value={password}
                             onChange={(e) => handleInputChange('password', e.target.value)}
-                            className="pl-10 pr-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                            className="voxxy-input-frost pl-10 pr-10"
                             disabled={loading || !token}
                             autoFocus
                           />
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             disabled={loading || !token}
                           >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -205,22 +205,22 @@ export default function ResetPasswordPage() {
 
                       {/* Confirm Password Field */}
                       <div className="space-y-2">
-                        <Label htmlFor="confirmPassword" className="text-white">Confirm New Password</Label>
+                        <Label htmlFor="confirmPassword" className="text-foreground">Confirm New Password</Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                           <Input
                             id="confirmPassword"
                             type={showConfirmPassword ? 'text' : 'password'}
                             placeholder="Confirm your new password"
                             value={confirmPassword}
                             onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                            className="pl-10 pr-10 bg-white/5 border-purple-500/30 text-white placeholder-gray-400 focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                            className="voxxy-input-frost pl-10 pr-10"
                             disabled={loading || !token}
                           />
                           <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
                             disabled={loading || !token}
                           >
                             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -232,7 +232,7 @@ export default function ResetPasswordPage() {
                       <Button
                         type="submit"
                         disabled={loading || !token}
-                        className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)]"
+                        className="w-full voxxy-btn-cta font-semibold shadow-md dark:shadow-[0_0_20px_rgba(236,72,153,0.5)]"
                       >
                         {loading ? (
                           <>
@@ -247,12 +247,12 @@ export default function ResetPasswordPage() {
 
                     {/* Request New Link */}
                     <div className="mt-6 text-center">
-                      <p className="text-gray-300 text-sm mb-2">
+                      <p className="text-muted-foreground text-sm mb-2">
                         Link expired or invalid?
                       </p>
                       <button
                         onClick={() => navigate('/forgot-password')}
-                        className="text-pink-400 hover:text-pink-300 text-sm font-medium transition-colors"
+                        className="voxxy-auth-link text-sm font-medium transition-colors"
                         disabled={loading}
                       >
                         Request New Reset Link
@@ -265,7 +265,7 @@ export default function ResetPasswordPage() {
                     <Alert className="bg-green-500/20 border-green-500 border-2 mb-6 shadow-lg">
                       <AlertDescription className="flex items-start gap-3">
                         <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0 mt-0.5" />
-                        <div className="text-white font-medium">
+                        <div className="text-foreground font-medium">
                           Your password has been updated successfully. You can now sign in with your new password.
                         </div>
                       </AlertDescription>
@@ -274,7 +274,7 @@ export default function ResetPasswordPage() {
                     {/* Sign In Button */}
                     <Button
                       onClick={() => navigate('/login/club-owner')}
-                      className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-blue-500 hover:from-purple-600 hover:via-pink-600 hover:to-blue-600 text-white font-semibold shadow-[0_0_20px_rgba(236,72,153,0.5)]"
+                      className="w-full voxxy-btn-cta font-semibold shadow-md dark:shadow-[0_0_20px_rgba(236,72,153,0.5)]"
                     >
                       Go to Sign In
                     </Button>

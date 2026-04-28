@@ -123,36 +123,41 @@
 
 /* Core Glass Modal System */
 .glass-modal {
-  @apply bg-white/15 backdrop-blur-md border-white/30 text-white shadow-2xl shadow-black/50;
+  @apply bg-background/15 backdrop-blur-md border-foreground/30 text-foreground shadow-2xl shadow-black/50;
 }
 
+/* Kept in sync with `src/index.css` .glass-card */
 .glass-card {
-  @apply bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg;
+  @apply backdrop-blur-sm border border-border rounded-lg;
+  background-image: linear-gradient(to bottom, hsl(270 20% 98%), hsl(265 18% 96%));
+}
+.dark .glass-card {
+  background-image: linear-gradient(to bottom, #322848, #261c38);
 }
 
 .glass-input {
-  @apply bg-white/10 border-white/20 text-white placeholder-gray-400;
+  @apply bg-background/10 border-foreground/20 text-foreground placeholder:text-muted-foreground;
   @apply focus:border-purple-400 focus:ring-purple-400/20;
 }
 
 .glass-button-primary {
-  @apply bg-purple-600 hover:bg-purple-700 text-white !important;
+  @apply bg-purple-600 hover:bg-purple-700 text-primary-foreground !important;
 }
 
 .glass-button-secondary {
-  @apply bg-white/10 border-white/20 text-white hover:bg-white/20;
+  @apply bg-background/10 border-foreground/20 text-foreground hover:bg-background/20;
 }
 
 .glass-button-outline {
-  @apply bg-white/10 backdrop-blur-sm border border-white/20 text-white;
-  @apply hover:bg-white/15 hover:border-white/30;
+  @apply bg-background/10 backdrop-blur-sm border border-foreground/20 text-foreground;
+  @apply hover:bg-background/15 hover:border-foreground/30;
 }
 
 /* Global Component Overrides for Admin Dark Theme */
 .admin-dark {
   /* Badge components - force purple/white theme */
   .bg-purple-600 {
-    @apply !bg-purple-600 !text-white !important;
+    @apply !bg-purple-600 !text-primary-foreground !important;
   }
   
   /* All buttons default to glass styling */
@@ -184,53 +189,53 @@
   
   /* Popover components */
   [data-radix-popover-content] {
-    @apply glass-modal border-white/30;
+    @apply glass-modal border-foreground/30;
   }
   
   /* Dropdown components */
   [data-radix-dropdown-menu-content] {
-    @apply glass-modal border-white/30;
+    @apply glass-modal border-foreground/30;
   }
   
   /* Badge component overrides */
   [class*="Badge"] {
     /* Status badges */
     &[class*="bg-red"] {
-      @apply !bg-white !text-purple-600 !border-purple-600 !border !important;
+      @apply !bg-primary-foreground !text-primary !border-primary !border !important;
     }
     
     &[class*="bg-purple"] {
-      @apply !bg-purple-600 !text-white !important;
+      @apply !bg-purple-600 !text-primary-foreground !important;
     }
     
     /* Default badge styling */
     &:not([class*="bg-"]) {
-      @apply bg-white/10 text-white border-white/20 border;
+      @apply bg-background/10 text-foreground border-foreground/20 border;
     }
   }
   
   /* Tab components */
   [data-radix-tabs-trigger] {
-    @apply text-gray-400 hover:text-white !bg-transparent;
-    @apply data-[state=active]:!bg-white/20 data-[state=active]:!text-white;
+    @apply text-muted-foreground hover:text-foreground !bg-transparent;
+    @apply data-[state=active]:!bg-background/20 data-[state=active]:!text-foreground;
   }
   
   /* Table components */
   table {
-    @apply text-white;
+    @apply text-foreground;
   }
   
   th {
-    @apply text-white border-white/20;
+    @apply text-foreground border-foreground/20;
   }
   
   td {
-    @apply text-gray-300 border-white/10;
+    @apply text-muted-foreground border-border;
   }
   
   /* Alert components */
   [class*="alert"]:not([class*="bg-"]) {
-    @apply glass-card border-white/20;
+    @apply glass-card border-foreground/20;
   }
   
   /* Select components */
@@ -239,7 +244,7 @@
   }
   
   [data-radix-select-content] {
-    @apply glass-modal border-white/30;
+    @apply glass-modal border-foreground/30;
   }
 }
 
@@ -248,12 +253,12 @@
   /* SOLD OUT badges */
   &.bg-red-600, 
   &[class*="bg-red"] {
-    @apply !bg-white !text-purple-600 !border-purple-600 !border !important;
+    @apply !bg-primary-foreground !text-primary !border-primary !border !important;
   }
   
   /* PRESALE badges */
   &.bg-purple-600,
   &[class*="bg-purple"] {
-    @apply !bg-purple-600 !text-white !important;
+    @apply !bg-purple-600 !text-primary-foreground !important;
   }
 }
