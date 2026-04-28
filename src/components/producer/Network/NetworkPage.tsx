@@ -8,6 +8,7 @@ import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
 import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
+import SmartListBuilder from './Lists/SmartListBuilder';
 import { BulkActionToolbar } from './BulkActionToolbar';
 import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
@@ -181,6 +182,17 @@ export default function NetworkPage({
   const [showSaveInput, setShowSaveInput] = useState(false);
   const [listName, setListName] = useState('');
   const [savingList, setSavingList] = useState(false);
+
+  // Create smart list modal state
+  const [isCreatingList, setIsCreatingList] = useState(false);
+  const [createListName, setCreateListName] = useState('');
+  const [createListDescription, setCreateListDescription] = useState('');
+  const [createListFilters, setCreateListFilters] = useState<{
+    categories?: string[];
+    locations?: string[];
+    tags?: string[];
+  }>({});
+  const [savingCreateList, setSavingCreateList] = useState(false);
 
   // Pagination states
   const [currentPage, setCurrentPage] = useState(1);
@@ -530,6 +542,42 @@ export default function NetworkPage({
     }
   };
 
+  const handleStartCreateList = () => {
+    setIsCreatingList(true);
+    setCreateListName('');
+    setCreateListDescription('');
+    setCreateListFilters({});
+  };
+
+  const handleCancelCreateList = () => {
+    setIsCreatingList(false);
+    setCreateListName('');
+    setCreateListDescription('');
+    setCreateListFilters({});
+  };
+
+  const handleSaveCreateList = async () => {
+    if (!createListName.trim()) return;
+    setSavingCreateList(true);
+    try {
+      await contactListsApi.create(organizationId, {
+        name: createListName.trim(),
+        description: createListDescription.trim() || undefined,
+        list_type: 'smart',
+        filters: createListFilters,
+      });
+      setIsCreatingList(false);
+      setCreateListName('');
+      setCreateListDescription('');
+      setCreateListFilters({});
+      onTabChange?.('lists');
+    } catch (err: any) {
+      alert(err.message || 'Failed to create list');
+    } finally {
+      setSavingCreateList(false);
+    }
+  };
+
   // Loading state
   if (loading && contacts.length === 0 && activeTab === 'contacts') {
     return (
@@ -613,13 +661,20 @@ export default function NetworkPage({
                 />
               </div>
 
-              {/* Import CSV & Add Contact Buttons */}
+              {/* Import CSV, Create List & Add Contact Buttons */}
               <button
                 onClick={() => setShowCSVUploadModal(true)}
                 className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
               >
                 <Upload className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">Import CSV</span>
+              </button>
+              <button
+                onClick={handleStartCreateList}
+                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
+              >
+                <Filter className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Create List</span>
               </button>
               <button
                 onClick={() => setShowAddModal(true)}
@@ -1023,6 +1078,89 @@ export default function NetworkPage({
               >
                 {editingCategory ? 'Save Changes' : 'Add Category'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create Smart List Modal */}
+      {isCreatingList && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
+            {/* Modal Header */}
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
+              <button
+                onClick={handleCancelCreateList}
+                className="text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5">
+              {/* List Name */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                <input
+                  type="text"
+                  value={createListName}
+                  onChange={(e) => setCreateListName(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="List name"
+                  autoFocus
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                <textarea
+                  value={createListDescription}
+                  onChange={(e) => setCreateListDescription(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  rows={2}
+                  placeholder="Description (optional)"
+                />
+              </div>
+
+              {/* Filters */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                <SmartListBuilder
+                  organizationId={organizationId}
+                  filters={createListFilters}
+                  onFiltersChange={setCreateListFilters}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleCancelCreateList}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCreateList}
+                  disabled={savingCreateList || !createListName.trim()}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                >
+                  {savingCreateList ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Create List
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

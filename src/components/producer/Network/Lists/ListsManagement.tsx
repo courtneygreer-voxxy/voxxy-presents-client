@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save } from 'lucide-react';
+import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save, Plus } from 'lucide-react';
 import { contactListsApi, ContactList } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 import SmartListBuilder from './SmartListBuilder';
@@ -24,6 +24,17 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     tags?: string[];
   }>({});
   const [savingEdit, setSavingEdit] = useState(false);
+
+  // Create list state
+  const [isCreating, setIsCreating] = useState(false);
+  const [createName, setCreateName] = useState('');
+  const [createDescription, setCreateDescription] = useState('');
+  const [createFilters, setCreateFilters] = useState<{
+    categories?: string[];
+    locations?: string[];
+    tags?: string[];
+  }>({});
+  const [savingCreate, setSavingCreate] = useState(false);
 
   useEffect(() => {
     fetchLists();
@@ -88,6 +99,42 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
     }
   };
 
+  const handleStartCreate = () => {
+    setIsCreating(true);
+    setCreateName('');
+    setCreateDescription('');
+    setCreateFilters({});
+  };
+
+  const handleCancelCreate = () => {
+    setIsCreating(false);
+    setCreateName('');
+    setCreateDescription('');
+    setCreateFilters({});
+  };
+
+  const handleSaveCreate = async () => {
+    if (!createName.trim()) return;
+    setSavingCreate(true);
+    try {
+      const newList = await contactListsApi.create(organizationId, {
+        name: createName.trim(),
+        description: createDescription.trim() || undefined,
+        list_type: 'smart',
+        filters: createFilters,
+      });
+      setLists(prev => [newList, ...prev]);
+      setIsCreating(false);
+      setCreateName('');
+      setCreateDescription('');
+      setCreateFilters({});
+    } catch (err: any) {
+      alert(err.message || 'Failed to create list');
+    } finally {
+      setSavingCreate(false);
+    }
+  };
+
   // Loading state
   if (loading) {
     return (
@@ -120,39 +167,140 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
   // Empty state
   if (lists.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-center max-w-md">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
-            <Filter className="w-8 h-8 text-foreground/40" />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground mb-2">
-            No Saved Lists Yet
-          </h3>
-          <p className="text-foreground/50 text-sm mb-4">
-            Use the filters on the All Contacts tab to find the contacts you need, then save the filter combination as a reusable list.
-          </p>
-          <div className="voxxy-surface-subtle rounded-lg p-4 text-left">
-            <p className="text-foreground/70 text-xs font-medium mb-2">How it works:</p>
-            <ol className="text-foreground/50 text-xs space-y-1.5 list-decimal list-inside">
-              <li>Go to the All Contacts tab</li>
-              <li>Select filters for locations, categories, or tags</li>
-              <li>Click "Save as List" to save the filter combination</li>
-              <li>Use saved lists to quickly invite contacts to events</li>
-            </ol>
+      <>
+        <div className="flex flex-col items-center justify-center py-12">
+          <div className="text-center max-w-md">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
+              <Filter className="w-8 h-8 text-foreground/40" />
+            </div>
+            <h3 className="text-lg font-semibold text-foreground mb-2">
+              No Saved Lists Yet
+            </h3>
+            <p className="text-foreground/50 text-sm mb-4">
+              Create a smart list with filter combinations or use the filters on the All Contacts tab and save them as a reusable list.
+            </p>
+            <button
+              onClick={handleStartCreate}
+              className="mb-4 flex items-center gap-2 px-5 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all mx-auto"
+            >
+              <Plus className="w-4 h-4" />
+              Create Smart List
+            </button>
+            <div className="voxxy-surface-subtle rounded-lg p-4 text-left">
+              <p className="text-foreground/70 text-xs font-medium mb-2">How it works:</p>
+              <ol className="text-foreground/50 text-xs space-y-1.5 list-decimal list-inside">
+                <li>Create a list with custom filters or from the All Contacts tab</li>
+                <li>Select filters for locations, categories, or tags</li>
+                <li>Save the filter combination with a name</li>
+                <li>Use saved lists to quickly invite contacts to events</li>
+              </ol>
+            </div>
           </div>
         </div>
-      </div>
+
+        {/* Create List Modal */}
+        {isCreating && (
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+            <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
+              {/* Modal Header */}
+              <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+                <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
+                <button
+                  onClick={handleCancelCreate}
+                  className="text-foreground/60 hover:text-foreground transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Modal Body */}
+              <div className="p-6 space-y-5">
+                {/* List Name */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                  <input
+                    type="text"
+                    value={createName}
+                    onChange={(e) => setCreateName(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    placeholder="List name"
+                    autoFocus
+                  />
+                </div>
+
+                {/* Description */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                  <textarea
+                    value={createDescription}
+                    onChange={(e) => setCreateDescription(e.target.value)}
+                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                    rows={2}
+                    placeholder="Description (optional)"
+                  />
+                </div>
+
+                {/* Filters */}
+                <div>
+                  <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                  <SmartListBuilder
+                    organizationId={organizationId}
+                    filters={createFilters}
+                    onFiltersChange={setCreateFilters}
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={handleCancelCreate}
+                    className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveCreate}
+                    disabled={savingCreate || !createName.trim()}
+                    className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  >
+                    {savingCreate ? (
+                      <>
+                        <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+                        Creating...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-4 h-4" />
+                        Create List
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     );
   }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h3 className="text-lg font-semibold text-foreground mb-1">Saved Lists</h3>
-        <p className="text-sm text-foreground/60">
-          {lists.length} {lists.length === 1 ? 'list' : 'lists'} saved
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-foreground mb-1">Saved Lists</h3>
+          <p className="text-sm text-foreground/60">
+            {lists.length} {lists.length === 1 ? 'list' : 'lists'} saved
+          </p>
+        </div>
+        <button
+          onClick={handleStartCreate}
+          className="flex items-center gap-2 px-4 py-2.5 voxxy-btn-cta text-sm font-semibold rounded-lg hover:shadow-lg hover:scale-105 transition-all"
+        >
+          <Plus className="w-4 h-4" />
+          Create Smart List
+        </button>
       </div>
 
       {/* Lists Table */}
@@ -366,6 +514,89 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                     <>
                       <Save className="w-4 h-4" />
                       Save Changes
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create List Modal */}
+      {isCreating && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
+            {/* Modal Header */}
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+              <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
+              <button
+                onClick={handleCancelCreate}
+                className="text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-5">
+              {/* List Name */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">List Name</label>
+                <input
+                  type="text"
+                  value={createName}
+                  onChange={(e) => setCreateName(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  placeholder="List name"
+                  autoFocus
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-1.5">Description (optional)</label>
+                <textarea
+                  value={createDescription}
+                  onChange={(e) => setCreateDescription(e.target.value)}
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  rows={2}
+                  placeholder="Description (optional)"
+                />
+              </div>
+
+              {/* Filters */}
+              <div>
+                <label className="block text-sm font-medium text-foreground dark:text-foreground/90 mb-2">Filters</label>
+                <SmartListBuilder
+                  organizationId={organizationId}
+                  filters={createFilters}
+                  onFiltersChange={setCreateFilters}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleCancelCreate}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveCreate}
+                  disabled={savingCreate || !createName.trim()}
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                >
+                  {savingCreate ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="w-4 h-4" />
+                      Create List
                     </>
                   )}
                 </button>
