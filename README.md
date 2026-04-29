@@ -2,52 +2,70 @@
 
 **Modern event management and vendor coordination for venues, markets, and festivals.**
 
-**Latest Updates**: Email sequence management system with template cloning, full-screen email editor with variable insertion and live preview, and email date calculation fixes (March 2026).
+**Repository:** [Voxxy-AI/voxxy-presents-client](https://github.com/Voxxy-AI/voxxy-presents-client)
 
 ---
 
-## 🚀 Deployment & Branch Strategy
+## Deployment & Branch Strategy
 
-### Production Environment
-- **Platform:** Firebase Hosting
-- **Branch:** `main`
-- **URL:** https://voxxypresents.com
-- **Build:** Automated via GitHub Actions on push to main
-- **CI Status:** ✅ Passing (Production CI/CD workflow)
+### Active Branches
 
-### Staging Environment
-- **Branch:** `staging`
-- **Testing:** Pre-production feature testing
-- **Status:** Currently in sync with main and develop
+| Branch | Environment | URL | Auto-deploy |
+|--------|-------------|-----|-------------|
+| `main` | Production | https://voxxypresents.com | Yes — on merge via Render |
+| `staging` | Pre-production | Render staging service | Yes — on merge via Render |
 
-### Development Environment
-- **Branch:** `develop`
-- **Purpose:** Active development and feature integration
-- **Status:** Currently in sync with main and staging
+> `develop` was retired in April 2026 during the org transfer to Voxxy-AI.
 
-### Branch Workflow
+---
+
+## Team Swim Lanes — How We Ship Code
+
+Every change follows this path. **No direct pushes to `staging` or `main`.**
+
 ```
-feature/branch → develop → staging → main (production)
+  Your local branch
+         |
+         | git push origin <branch>
+         ↓
+  Open PR → staging
+         |
+         | CI must pass (typecheck + lint + build)
+         | Self-merge allowed after green CI
+         ↓
+      staging  ──→  Render staging deploy (automatic)
+         |
+         | Manual QA / smoke test on staging
+         | Open PR → main
+         | Requires at least 1 review + green CI
+         ↓
+        main  ──→  Render production deploy (automatic)
 ```
 
-**Current Branch Status (March 2026):**
-- Backend upgraded to Ruby 3.3.6 and Rails 7.2.3
-- Email sequence management system deployed to staging
-- Last feature: Email template editor & sequence cloning (staging)
-- Last staging merge: March 5, 2026
-- Production deploy: Pending validation on staging
+### Branch Naming Conventions
 
-### Deployment Process
-1. Develop features in `feature/*` branches
-2. Merge to `develop` for integration testing
-3. Merge to `staging` for pre-production validation
-4. Merge to `main` for production deployment
-5. GitHub Actions automatically builds and deploys to Firebase
+Always branch off `staging`. Use one of these prefixes:
+
+| Prefix | When to use | Example |
+|--------|-------------|---------|
+| `feature/` | New functionality | `feature/email-unsubscribe-flow` |
+| `fix/` | Bug fix (non-urgent) | `fix/contact-upload-validation` |
+| `hotfix/` | Urgent production fix | `hotfix/broken-go-live-button` |
+| `chore/` | Maintenance, refactors, tooling | `chore/remove-legacy-tests` |
+| `release/` | Release preparation | `release/v2.1.0` |
+
+### PR Rules (enforced by branch protection)
+
+- PRs into `staging`: CI must pass. Self-merge allowed.
+- PRs into `main`: CI must pass + minimum 1 approving review required.
+- Never force-push to `staging` or `main`.
+- Delete your branch after it merges.
 
 ### CI/CD Status
-- **GitHub Actions:** ✅ All workflows passing
-- **CodeQL Security:** ✅ Enabled and passing
-- **Production Deploy:** Automatic on push to main
+
+- **GitHub Actions:** Runs on every PR into `staging` and `main`
+- **Checks:** TypeScript typecheck → ESLint → Vite build
+- **Production Deploy:** Automatic via Render on merge to `main`
 - **Build Time:** ~1.5 minutes average
 
 ---
@@ -77,8 +95,8 @@ feature/branch → develop → staging → main (production)
 - **Linting:** ESLint
 - **Type Checking:** TypeScript 5
 - **Code Quality:** Prettier
-- **Testing:** (TBD - Vitest/Jest)
-- **CI/CD:** GitHub Actions
+- **Testing:** Being rebuilt — see CI strategy docs (coming soon)
+- **CI/CD:** GitHub Actions (typecheck + lint + build on every PR)
 
 ---
 
@@ -97,12 +115,6 @@ npm run dev
 ### Build
 ```bash
 npm run build
-```
-
-### Deploy
-```bash
-# Production (main branch only)
-firebase deploy --only hosting
 ```
 
 ---
@@ -241,7 +253,7 @@ firebase deploy --only hosting
 
 ## 🌐 API Integration
 
-**Backend Repository:** [voxxy-rails-react](https://github.com/beaulazear/voxxy-rails-react)
+**Backend Repository:** [voxxy-rails-react](https://github.com/Voxxy-AI/voxxy-rails-react)
 
 **API Base URL:**
 - Production: `https://www.voxxyai.com/api/v1/presents`
@@ -263,12 +275,11 @@ POST   /email_campaign_templates/:id/clone  # Clone template
 
 ## 📚 Documentation
 
-- **[Email Sequence System](https://github.com/beaulazear/voxxy-rails-react/blob/main/docs/EMAIL_SEQUENCE_SYSTEM.md)** - Complete email management guide
-- **[Ruby Upgrade Plan](https://github.com/beaulazear/voxxy-rails-react/blob/main/RUBY_UPGRADE_PLAN.md)** - Backend upgrade documentation
-- **[Deployment Guide](README_DEPLOY.md)** - Firebase deployment instructions
+- **[Email Sequence System](https://github.com/Voxxy-AI/voxxy-rails-react/blob/main/docs/EMAIL_SEQUENCE_SYSTEM.md)** - Complete email management guide
+- **[Ruby Upgrade Plan](https://github.com/Voxxy-AI/voxxy-rails-react/blob/main/RUBY_UPGRADE_PLAN.md)** - Backend upgrade documentation
 
 ---
 
-**Built with ❤️ by the Voxxy team**
+**Built with love by the Voxxy team**
 
-Last updated: March 5, 2026 - Email sequence management system and template editor
+Last updated: April 28, 2026 — Org transfer to Voxxy-AI, branch strategy updated, legacy tests removed
