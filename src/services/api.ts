@@ -916,11 +916,12 @@ export const registrationsApi = {
   /**
    * Update registration (producer/venue owner only)
    * PATCH /api/v1/presents/registrations/:id
+   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status).
    */
   async update(registrationId: number, data: Partial<{
     vendor_category: string
     payment_status: 'pending' | 'paid' | 'confirmed' | 'overdue'
-    status: string
+    status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed' | 'cancelled' | string
     name: string
     phone: string
   }>) {
