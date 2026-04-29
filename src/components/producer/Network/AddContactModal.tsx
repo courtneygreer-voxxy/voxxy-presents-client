@@ -4,7 +4,7 @@ import { vendorContactsApi, categoriesApi, VendorContact } from '@/services/api'
 import type { Category } from '@/types/category';
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
 import SuccessMessage from '@/components/ui/SuccessMessage';
-import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface AddContactModalProps {
   organizationId: number;
@@ -350,9 +350,15 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                         </div>
                         <span
                           className={`inline-flex items-center gap-1.5 rounded px-1.5 py-0.5 text-sm ${
-                            formData.categories.includes(category.name) ? 'text-foreground font-semibold' : 'text-foreground/70 bg-background/5 font-medium'
+                            formData.categories.includes(category.name)
+                              ? 'category-sequence-badge font-semibold'
+                              : 'text-foreground/70 bg-background/5 font-medium'
                           }`}
-                          style={formData.categories.includes(category.name) ? getCategoryBadgeStyle(category.color) : undefined}
+                          style={
+                            formData.categories.includes(category.name)
+                              ? getCategorySequenceBadgeStyle(category.color)
+                              : undefined
+                          }
                         >
                           {category.icon && <span>{category.icon}</span>}
                           {category.name}
@@ -375,8 +381,8 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                   return (
                     <span
                       key={cat}
-                      className="px-2 py-0.5 rounded text-xs flex items-center gap-1.5 text-foreground font-semibold"
-                      style={getCategoryBadgeStyle(categoryColor)}
+                      className="category-sequence-badge px-2 py-0.5 rounded text-xs flex items-center gap-1.5 font-semibold"
+                      style={getCategorySequenceBadgeStyle(categoryColor)}
                     >
                       {category?.icon && <span className="text-[10px]">{category.icon}</span>}
                       {cat}

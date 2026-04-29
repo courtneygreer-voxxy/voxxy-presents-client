@@ -1,5 +1,5 @@
 import { Category } from '@/types/category';
-import { getCategoryBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
 
 interface CategoryBadgeProps {
   category: Category | null;
@@ -50,12 +50,14 @@ export function CategoryBadge({
         ${size === 'sm' ? 'px-2 py-0.5 text-xs' : ''}
         ${size === 'md' ? 'px-2.5 py-1 text-sm' : ''}
         ${size === 'lg' ? 'px-3 py-1.5 text-base' : ''}
-        ${variant === 'default' ? 'text-foreground' : 'border text-foreground'}
+        ${variant === 'default' ? 'category-sequence-badge' : 'border text-foreground'}
         ${onClick ? 'cursor-pointer hover:opacity-80 transition-smooth' : ''}
         ${className}
       `}
       style={{
-        ...(variant === 'default' ? getCategoryBadgeStyle(badgeColor) : { color: badgeColor }),
+        ...(variant === 'default'
+          ? getCategorySequenceBadgeStyle(badgeColor)
+          : { color: badgeColor }),
         borderColor: variant === 'outline' ? badgeColor : undefined,
       }}
       onClick={onClick}

@@ -30,7 +30,7 @@ const GUIDE_PAGES: GuidePage[] = [
             { icon: Calendar, label: 'Events', desc: 'Create & manage markets' },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-background/5 border border-border">
-              <Icon className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+              <Icon className="w-4 h-4 text-purple-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">{label}</p>
                 <p className="text-[11px] text-foreground/50">{desc}</p>
@@ -74,7 +74,7 @@ const GUIDE_PAGES: GuidePage[] = [
           </li>
         </ol>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-          <p className="text-[11px] text-blue-300">
+          <p className="text-[11px] text-blue-900 dark:text-blue-300">
             <strong>Tip:</strong> If you're migrating from a Google Sheet, export
             it as CSV first — the importer handles most common column names
             automatically.
@@ -101,7 +101,7 @@ const GUIDE_PAGES: GuidePage[] = [
             'View their event history and application status',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
@@ -127,7 +127,7 @@ const GUIDE_PAGES: GuidePage[] = [
         </p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-purple-300 mb-1">Smart Lists</p>
+            <p className="text-xs font-semibold text-violet-900 dark:text-purple-300 mb-1">Smart Lists</p>
             <p className="text-[11px] text-foreground/60">
               Auto-update based on rules you set (e.g. "all contacts tagged
               'returning vendor'"). Members update automatically as contacts
@@ -135,7 +135,7 @@ const GUIDE_PAGES: GuidePage[] = [
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-blue-300 mb-1">Manual Lists</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Manual Lists</p>
             <p className="text-[11px] text-foreground/60">
               Hand-pick specific contacts. Great for VIP vendors, priority
               invites, or custom groups that don't follow a pattern.
@@ -163,7 +163,7 @@ const GUIDE_PAGES: GuidePage[] = [
         <p>They are used in three key places:</p>
         <div className="space-y-2">
           <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
-            <Calendar className="w-4 h-4 text-green-400 mt-0.5 flex-shrink-0" />
+            <Calendar className="w-4 h-4 text-green-700 dark:text-green-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-foreground">Event Creation</p>
               <p className="text-[11px] text-foreground/60">
@@ -174,7 +174,7 @@ const GUIDE_PAGES: GuidePage[] = [
             </div>
           </div>
           <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
-            <Users className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
+            <Users className="w-4 h-4 text-blue-700 dark:text-blue-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-foreground">Contact Assignments</p>
               <p className="text-[11px] text-foreground/60">
@@ -184,7 +184,7 @@ const GUIDE_PAGES: GuidePage[] = [
             </div>
           </div>
           <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
-            <Mail className="w-4 h-4 text-purple-400 mt-0.5 flex-shrink-0" />
+            <Mail className="w-4 h-4 text-purple-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-foreground">Targeted Emails</p>
               <p className="text-[11px] text-foreground/60">
@@ -223,7 +223,7 @@ const GUIDE_PAGES: GuidePage[] = [
           wizard, in the contact editor, and in email targeting options.
         </p>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-          <p className="text-[11px] text-blue-300">
+          <p className="text-[11px] text-blue-900 dark:text-blue-300">
             <strong>Tip:</strong> Keep category names short and consistent. They
             appear on public application forms, so "Food & Beverage" reads better
             than "food_vendors_category_1".
@@ -249,11 +249,11 @@ const GUIDE_PAGES: GuidePage[] = [
         </p>
         <div className="space-y-1.5">
           {[
-            { label: 'Event Announcements', desc: 'Invitations and application opens', color: 'text-purple-300' },
-            { label: 'Application Updates', desc: 'Approvals, rejections, waitlist notices', color: 'text-pink-300' },
-            { label: 'Payment Reminders', desc: 'Booth fees, deadlines, and overdue alerts', color: 'text-blue-300' },
-            { label: 'Event Countdown', desc: 'Setup instructions and final reminders', color: 'text-green-300' },
-            { label: 'Post-Event', desc: 'Thank you notes and follow-ups', color: 'text-yellow-300' },
+            { label: 'Event Announcements', desc: 'Invitations and application opens', color: 'text-violet-900 dark:text-purple-300' },
+            { label: 'Application Updates', desc: 'Approvals, rejections, waitlist notices', color: 'text-rose-900 dark:text-pink-300' },
+            { label: 'Payment Reminders', desc: 'Booth fees, deadlines, and overdue alerts', color: 'text-blue-900 dark:text-blue-300' },
+            { label: 'Event Countdown', desc: 'Setup instructions and final reminders', color: 'text-emerald-900 dark:text-green-300' },
+            { label: 'Post-Event', desc: 'Thank you notes and follow-ups', color: 'text-amber-950 dark:text-yellow-300' },
           ].map(({ label, desc, color }) => (
             <div key={label} className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-background/5">
               <span className={`text-xs font-semibold ${color}`}>{label}</span>
@@ -274,14 +274,14 @@ const GUIDE_PAGES: GuidePage[] = [
         <p>Every email has a <strong>trigger</strong> that determines when it sends:</p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-green-300 mb-1">Event-Based (Instant)</p>
+            <p className="text-xs font-semibold text-emerald-900 dark:text-green-300 mb-1">Event-Based (Instant)</p>
             <p className="text-[11px] text-foreground/60">
               Send immediately when something happens — a vendor applies, gets
               approved, makes a payment, or you post a bulletin.
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-blue-300 mb-1">Time-Based (Scheduled)</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Time-Based (Scheduled)</p>
             <p className="text-[11px] text-foreground/60">
               Send on a specific date — like 7 days before the event, on the
               payment deadline, or 3 days after the event. All scheduled
@@ -307,7 +307,7 @@ const GUIDE_PAGES: GuidePage[] = [
         <p>Emails can target all vendors or just specific categories:</p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
-            <p className="text-xs font-semibold text-purple-300 mb-1">Universal Emails</p>
+            <p className="text-xs font-semibold text-violet-900 dark:text-purple-300 mb-1">Universal Emails</p>
             <p className="text-[11px] text-foreground/60">
               Sent to <em>every</em> vendor regardless of category. Use these
               for event-wide announcements, general reminders, and post-event
@@ -315,7 +315,7 @@ const GUIDE_PAGES: GuidePage[] = [
             </p>
           </div>
           <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-            <p className="text-xs font-semibold text-blue-300 mb-1">Category-Specific Emails</p>
+            <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-1">Category-Specific Emails</p>
             <p className="text-[11px] text-foreground/60">
               Sent only to vendors in a particular category. Perfect for
               tailored setup instructions, category-specific pricing, or
@@ -324,7 +324,7 @@ const GUIDE_PAGES: GuidePage[] = [
           </div>
         </div>
         <div className="p-2.5 rounded-lg bg-yellow-500/10 border border-yellow-500/20">
-          <p className="text-[11px] text-yellow-300">
+          <p className="text-[11px] text-amber-950 dark:text-yellow-300">
             <strong>Note:</strong> Invitation and announcement emails are always
             universal — category targeting becomes available for emails sent
             after a vendor applies.
@@ -360,7 +360,7 @@ const GUIDE_PAGES: GuidePage[] = [
             { tag: '[installDate]', desc: 'Setup date' },
           ].map(({ tag, desc }) => (
             <div key={tag} className="flex items-center gap-2 px-2 py-1.5 rounded bg-background/5">
-              <code className="text-[10px] text-purple-300 font-mono">{tag}</code>
+              <code className="text-[10px] text-violet-900 dark:text-purple-300 font-mono">{tag}</code>
               <span className="text-[10px] text-foreground/40">{desc}</span>
             </div>
           ))}
@@ -465,13 +465,13 @@ const GUIDE_PAGES: GuidePage[] = [
             'Send test emails to yourself before going live',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
         </ul>
         <div className="p-2.5 rounded-lg bg-blue-500/10 border border-blue-500/20">
-          <p className="text-[11px] text-blue-300">
+          <p className="text-[11px] text-blue-900 dark:text-blue-300">
             <strong>Tip:</strong> Check the <strong>Audit Log</strong> after
             sending to track deliveries, bounces, and opens. You can retry
             failed sends with one click.
@@ -506,7 +506,7 @@ const GUIDE_PAGES: GuidePage[] = [
             'Post-event thank you messages',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
@@ -563,7 +563,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
         <div className="hidden sm:flex flex-col w-44 bg-background/5 border-r border-border py-4">
           <div className="px-4 mb-4">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-purple-400" />
+              <BookOpen className="w-4 h-4 text-purple-700 dark:text-purple-400" />
               <span className="text-xs font-bold text-foreground tracking-wide">GUIDE</span>
             </div>
           </div>
@@ -599,7 +599,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div>
-              <p className="text-[10px] text-purple-400 font-semibold uppercase tracking-wider mb-0.5">
+              <p className="text-[10px] text-purple-800 dark:text-purple-400 font-semibold uppercase tracking-wider mb-0.5">
                 {page.section}
               </p>
               <h2 className="text-base font-bold text-foreground">{page.title}</h2>
@@ -641,7 +641,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   key={i}
                   onClick={() => setPageIndex(i)}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    i === pageIndex ? 'bg-purple-400' : 'bg-background/15 hover:bg-background/30'
+                    i === pageIndex ? 'bg-purple-600 dark:bg-purple-400' : 'bg-background/15 hover:bg-background/30'
                   }`}
                 />
               ))}
