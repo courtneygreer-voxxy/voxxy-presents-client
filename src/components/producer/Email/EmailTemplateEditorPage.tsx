@@ -469,6 +469,7 @@ export function EmailTemplateEditorPage({
                   onChange={(html) => setFormData(prev => ({ ...prev, body_template: html }))}
                   onEditorReady={setBodyEditor}
                   placeholder="Write your email content here..."
+                  isBlastEmail={formData.category === 'event_announcements'}
                 />
               </div>
             </div>

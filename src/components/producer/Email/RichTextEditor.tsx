@@ -38,6 +38,7 @@ interface RichTextEditorProps {
   onBlur?: () => void;
   onEditorReady?: (editor: Editor) => void;
   placeholder?: string;
+  isBlastEmail?: boolean; // Whether this is a blast/announcement email (recipients haven't applied yet)
 }
 
 // Default display text for system link variables
@@ -49,6 +50,7 @@ const SYSTEM_LINK_DEFAULTS: Record<string, string> = {
   '[invitationLink]': 'View Invitation',
   '[bulletinLink]': 'View Bulletin',
   '[eventOptOutLink]': 'Decline Invitation',
+  '[unsubscribeLink]': 'Unsubscribe',
 };
 
 export function RichTextEditor({
@@ -58,6 +60,7 @@ export function RichTextEditor({
   onBlur,
   onEditorReady,
   placeholder = 'Write your email message here...',
+  isBlastEmail = false,
 }: RichTextEditorProps) {
   const [linkPopoverOpen, setLinkPopoverOpen] = useState(false);
   const [linkMode, setLinkMode] = useState<'system' | 'custom'>('system');
@@ -108,20 +111,19 @@ export function RichTextEditor({
     }
   }, [editor, content]);
 
-  // Build system link options from EMAIL_VARIABLES (excluding unsubscribe — it's in the locked footer)
+  // Build system link options from EMAIL_VARIABLES
   const systemLinkOptions = useMemo(() => {
     return EMAIL_VARIABLES
       .filter(v =>
-        (v.category === 'computed' || v.frontendVar === '[categoryPaymentLink]') &&
-        v.frontendVar !== '[unsubscribeLink]' &&
-        v.frontendVar !== '[applicationCode]'
+        v.category === 'links' && // Show all link variables
+        (!isBlastEmail || v.worksInInvitations) // Filter out post-application variables for blast emails
       )
       .map(v => ({
         variable: v.frontendVar,
         label: v.label,
         defaultText: SYSTEM_LINK_DEFAULTS[v.frontendVar] || 'Click Here',
       }));
-  }, []);
+  }, [isBlastEmail]);
 
   if (!editor) return null;
 

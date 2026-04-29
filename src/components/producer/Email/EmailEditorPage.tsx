@@ -963,6 +963,7 @@ export function EmailEditorPage({
                 onFocus={() => focusField('body')}
                 onBlur={() => blurField('body')}
                 placeholder="Write your email message here... Use the toolbar to format text and click variables on the right to insert."
+                isBlastEmail={BLAST_TRIGGER_TYPES.has(triggerType)}
               />
             </div>
 
@@ -1288,7 +1289,7 @@ export function EmailEditorPage({
               <div className="space-y-1">
                 <p className="mb-2 text-[10px] leading-relaxed text-muted-foreground">
                   Click a tag to insert it at your cursor position
-                  {email?.email_template_item?.category === 'event_announcements' && (
+                  {BLAST_TRIGGER_TYPES.has(triggerType) && (
                     <span className="mt-1 block text-amber-700 dark:text-yellow-400/80">
                       Note: Some variables are disabled for announcement emails (greyed out) — recipients haven't applied yet
                     </span>
@@ -1321,8 +1322,8 @@ export function EmailEditorPage({
                 {filteredVariables ? (
                   <div className="space-y-0.5">
                     {filteredVariables.map((variable) => {
-                      const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
-                      const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
+                      const isBlastEmail = BLAST_TRIGGER_TYPES.has(triggerType);
+                      const isDisabled = isBlastEmail && !variable.worksInInvitations;
 
                       return (
                         <button
@@ -1365,8 +1366,8 @@ export function EmailEditorPage({
                         </h4>
                         <div className="space-y-0.5">
                           {group.variables.map((variable) => {
-                            const isAnnouncementEmail = email?.email_template_item?.category === 'event_announcements';
-                            const isDisabled = isAnnouncementEmail && !variable.worksInInvitations;
+                            const isBlastEmail = BLAST_TRIGGER_TYPES.has(triggerType);
+                            const isDisabled = isBlastEmail && !variable.worksInInvitations;
 
                             return (
                               <button
