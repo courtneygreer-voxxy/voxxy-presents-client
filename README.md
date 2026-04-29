@@ -12,14 +12,14 @@
 
 | Branch | Environment | URL | Auto-deploy |
 |--------|-------------|-----|-------------|
-| `main` | Production | https://voxxypresents.com | Yes — on merge via Render |
-| `staging` | Pre-production | Render staging service | Yes — on merge via Render |
+| `main` | Production | https://voxxypresents.com | Yes -- on merge via Render |
+| `staging` | Pre-production | Render staging service | Yes -- on merge via Render |
 
 > `develop` was retired in April 2026 during the org transfer to Voxxy-AI.
 
 ---
 
-## Team Swim Lanes — How We Ship Code
+## Team Swim Lanes -- How We Ship Code
 
 Every change follows this path. **No direct pushes to `staging` or `main`.**
 
@@ -27,19 +27,19 @@ Every change follows this path. **No direct pushes to `staging` or `main`.**
   Your local branch
          |
          | git push origin <branch>
-         ↓
-  Open PR → staging
+         v
+  Open PR -> staging
          |
-         | CI must pass (typecheck + lint + build)
+         | CI must pass (typecheck + lint + test + build)
          | Self-merge allowed after green CI
-         ↓
-      staging  ──→  Render staging deploy (automatic)
+         v
+      staging  -->  Render staging deploy (automatic)
          |
          | Manual QA / smoke test on staging
-         | Open PR → main
+         | Open PR -> main
          | Requires at least 1 review + green CI
-         ↓
-        main  ──→  Render production deploy (automatic)
+         v
+        main  -->  Render production deploy (automatic)
 ```
 
 ### Branch Naming Conventions
@@ -61,50 +61,42 @@ Always branch off `staging`. Use one of these prefixes:
 - Never force-push to `staging` or `main`.
 - Delete your branch after it merges.
 
-### CI/CD Status
-
-- **GitHub Actions:** Runs on every PR into `staging` and `main`
-- **Checks:** TypeScript typecheck → ESLint → Vite build
-- **Production Deploy:** Automatic via Render on merge to `main`
-- **Build Time:** ~1.5 minutes average
-
 ---
 
-## 🏗️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework:** React 18 + TypeScript
-- **Build Tool:** Vite 4
+- **Build Tool:** Vite 6
 - **Styling:** Tailwind CSS 3
-- **UI Components:** Radix UI, Lucide Icons, Sonner (toasts)
-- **State Management:** React Query (TanStack Query)
+- **UI Components:** Radix UI (shadcn/ui), Lucide Icons, Sonner (toasts)
+- **State Management:** React Context API
+- **Forms:** React Hook Form + Zod validation
 - **Rich Text Editing:** TipTap (email editor)
-- **Date Handling:** date-fns
-- **Charts:** Recharts
-- **Authentication:** Firebase Auth
+- **Authentication:** JWT (Rails backend)
 - **Error Monitoring:** Sentry
+- **Analytics:** Mixpanel (production only)
 
-### Backend
-- **API:** Rails 7.2.3 + Ruby 3.3.6
-- **Database:** PostgreSQL 14+
+### Backend (separate repo)
+- **API:** Rails 7.2 + Ruby 3.3
+- **Database:** PostgreSQL
 - **Email:** SendGrid with automated campaigns
 - **Background Jobs:** Sidekiq + Redis
-- **Hosting:** Render.com (backend), Firebase Hosting (frontend)
+- **Hosting:** Render.com
 
-### Development Tools
-- **Linting:** ESLint
-- **Type Checking:** TypeScript 5
-- **Code Quality:** Prettier
-- **Testing:** Being rebuilt — see CI strategy docs (coming soon)
-- **CI/CD:** GitHub Actions (typecheck + lint + build on every PR)
+### Testing
+- **Runner:** Vitest 3 + jsdom
+- **Component Testing:** @testing-library/react
+- **CI:** GitHub Actions (typecheck + lint + **test** + build on every PR)
+- **Roadmap:** [docs/TESTING_ROADMAP.md](docs/TESTING_ROADMAP.md)
 
 ---
 
-## 🛠️ Development
+## Development
 
 ### Prerequisites
 - Node.js 18+
-- npm or yarn
+- npm
 
 ### Setup
 ```bash
@@ -112,174 +104,65 @@ npm install
 npm run dev
 ```
 
-### Build
+### Commands
 ```bash
-npm run build
+npm run dev           # Start dev server (http://localhost:5173)
+npm run build         # Build for production
+npm run test          # Run tests in watch mode
+npm run test:run      # Run tests once (CI mode)
+npm run typecheck     # Type checking
+npm run lint          # Linting
+npm run preview       # Preview production build
 ```
 
 ---
 
-## ✨ Recent Features (March 2026)
-
-### Email Sequence Management System
-- **Template Library** - Browse and manage email campaign templates
-- **Clone & Customize** - Duplicate system templates and create custom sequences
-- **Full-Screen Editor** - Rich text email editor with formatting controls
-- **Variable Insertion** - 30+ dynamic variables with click-to-insert
-- **Live Preview** - Preview emails with sample data before sending
-- **Trigger Configuration** - Set up automated email schedules
-- **Filter Criteria** - Target specific vendor groups
-- **Client-Side Validation** - Prevent duplicate names and invalid data
-
-### Email Date Calculation Fixes
-- Fixed timezone issues with event countdown emails
-- Corrected application/payment deadline trigger calculations
-- Accurate "days before/after" date calculations using `parseISO`
-
-### UI/UX Improvements
-- Replaced browser popups with styled modal dialogs
-- Toast notifications for user feedback (Sonner)
-- Dark-themed email preview panels
-- Proper paragraph spacing and header styling in previews
-- Events navigation always returns to list view
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
-├── components/
-│   ├── producer/
-│   │   ├── Email/
-│   │   │   ├── TemplateLibraryPage.tsx      # Browse/clone templates
-│   │   │   ├── TemplateBuilderPage.tsx      # Create/edit sequences
-│   │   │   ├── EmailTemplateEditorPage.tsx  # Full-screen editor
-│   │   │   └── CommandCenter.tsx             # Event email management
-│   │   ├── CreateEventWizard/
-│   │   │   └── steps/
-│   │   │       └── Step4AutoMessages.tsx     # Email schedule preview
-│   │   ├── ProducerDashboard.tsx             # Main producer UI
-│   │   └── ...
-│   ├── vendor/                                # Vendor portal components
-│   └── shared/                                # Reusable components
-├── services/
-│   ├── emailTemplateApi.ts                    # Email template API client
-│   ├── api.ts                                 # Main API client
-│   └── ...
-├── types/
-│   ├── email.ts                               # Email type definitions
-│   └── ...
-├── pages/                                     # Route pages
-└── index.css                                  # Global styles + email preview CSS
+  components/
+    producer/       # Event mgmt, email automation, applicants, network, payments
+    vendor/         # Vendor portal components
+    admin/          # Email testing, sequence mgr, bug reports
+    auth/           # Login, signup, protected routes
+    ui/             # shadcn/Radix components
+    shared/         # Cross-role components
+  services/
+    api.ts          # Central API client (~3000 lines)
+    stripeService.ts
+    eventPortalService.ts
+    googlePlacesService.ts
+  contexts/
+    AuthContext.tsx  # Central auth state + role helpers
+  pages/            # Route-level components (36+)
+  hooks/            # useAuth, useEmailNotifications, etc.
+  types/            # TypeScript type definitions
+  utils/            # Helpers (date, email variables, validation, cache)
+  test/             # Test setup and smoke tests
+  config/
+    environments.ts # Dev/staging/prod config
 ```
 
 ---
 
-## 🧪 Key Features
+## API Integration
 
-### Event Management
-- **4-step event creation wizard** with:
-  - Step 1: Event details (date, location, deadlines)
-  - Step 2: Category selection with **smart pre-fill** from previous events
-  - Step 3: Contact invitation with **immediate import** and multi-select
-  - Step 4: Email sequence configuration (Universal or Category-Specific)
-- Category-based vendor applications with customizable pricing
-- **Smart category defaults** from organization history
-- Budget tracking and line items
-- Custom vendor categories with **email template assignments**
-- Application and payment deadline management
+**Backend Repository:** [Voxxy-AI/voxxy-rails-react](https://github.com/Voxxy-AI/voxxy-rails-react)
 
-### Email Automation
-- 40+ pre-built email templates
-- Custom email sequence builder with **visual editor**
-- **Universal Sequence** option (default) - same emails for all vendor categories
-- **Category-Specific Sequences** - custom templates per vendor type
-- Automated trigger-based scheduling
-- Variable interpolation (event, vendor, portal data)
-- SendGrid delivery tracking
-- Email preview with sample data
-- **Email template count** display per category
-- Smart send date calculations based on event dates
-
-### Vendor Portal
-- Unique token-based access
-- Application submission
-- Status tracking
-- Payment integration (Stripe - planned)
-- Profile management
-
-### Producer Dashboard
-- Event overview and statistics
-- Vendor CRM
-- Email campaign management
-- Registration approval workflow
-- Budget tracking
-
-### Admin Features
-- User management
-- System email template management
-- Organization oversight
-- Platform analytics
+All API endpoints are namespaced under `/api/v1/presents/`.
 
 ---
 
-## 🔧 Development Commands
+## Documentation
 
-```bash
-# Install dependencies
-npm install
-
-# Start dev server (http://localhost:5173)
-npm run dev
-
-# Type checking
-npm run type-check
-
-# Linting
-npm run lint
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Deploy to Firebase
-firebase deploy --only hosting
-```
+- [Testing Roadmap](docs/TESTING_ROADMAP.md) -- testing strategy and progress
+- [Architecture](docs/architecture/) -- system design, API config, role mapping
+- [Deployment](docs/deployment/) -- Render config, environment setup
+- [Email System](docs/email-system/) -- templates, variables, automation pipeline
+- [Development](docs/development/) -- branching strategy, runbook, tracking plan
+- [Design](docs/design/) -- styling guide, design system
 
 ---
 
-## 🌐 API Integration
-
-**Backend Repository:** [voxxy-rails-react](https://github.com/Voxxy-AI/voxxy-rails-react)
-
-**API Base URL:**
-- Production: `https://www.voxxyai.com/api/v1/presents`
-- Staging: `https://voxxy-rails-react.onrender.com/api/v1/presents`
-
-**Key Endpoints:**
-```
-GET    /events                            # List events
-POST   /events                            # Create event
-GET    /events/:slug                      # Get event details
-PATCH  /events/:slug                      # Update event
-GET    /events/:slug/registrations        # Get vendor applications
-PATCH  /registrations/:id                 # Approve/reject application
-GET    /email_campaign_templates          # List email sequences
-POST   /email_campaign_templates/:id/clone  # Clone template
-```
-
----
-
-## 📚 Documentation
-
-- **[Email Sequence System](https://github.com/Voxxy-AI/voxxy-rails-react/blob/main/docs/EMAIL_SEQUENCE_SYSTEM.md)** - Complete email management guide
-- **[Ruby Upgrade Plan](https://github.com/Voxxy-AI/voxxy-rails-react/blob/main/RUBY_UPGRADE_PLAN.md)** - Backend upgrade documentation
-
----
-
-**Built with love by the Voxxy team**
-
-Last updated: April 28, 2026 — Org transfer to Voxxy-AI, branch strategy updated, legacy tests removed
+Last updated: April 28, 2026
