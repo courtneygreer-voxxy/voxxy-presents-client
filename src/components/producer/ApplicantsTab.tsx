@@ -18,11 +18,14 @@ import {
   DollarSign,
   ArrowLeftRight,
   MailX,
+  Pencil,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { toast } from 'sonner';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
+import { EditVendorDetailsModal } from './EditVendorDetailsModal';
+import { Button } from '@/components/ui/button';
 import { DebugPanel } from './DebugPanel';
 import { Badge, type BadgeVariant } from '@/components/ui/badge';
 import {
@@ -115,6 +118,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     newPaymentStatus: 'paid' | 'pending';
   } | null>(null);
 
+  const [showEditVendorModal, setShowEditVendorModal] = useState(false);
+
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } =
     useEmailNotifications();
@@ -122,6 +127,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   useEffect(() => {
     fetchApplicants();
   }, [eventSlug]);
+
+  useEffect(() => {
+    setShowEditVendorModal(false);
+  }, [selectedApplicant?.id]);
 
   const fetchApplicants = async () => {
     try {
@@ -580,6 +589,16 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
   };
 
+  const handleEditVendorSaved = (applicantId: string, patch: { contact_name: string; phone: string }) => {
+    toast.success('Vendor details updated');
+    setApplicants((prev) =>
+      prev.map((a) => (a.id === applicantId ? { ...a, contact_name: patch.contact_name, phone: patch.phone } : a))
+    );
+    setSelectedApplicant((prev) =>
+      prev && prev.id === applicantId ? { ...prev, contact_name: patch.contact_name, phone: patch.phone } : prev
+    );
+  };
+
   const getPaymentBadge = (paymentStatus?: string) => {
     switch (paymentStatus) {
       case 'paid':
@@ -829,8 +848,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             <div className="px-3 md:px-4 pb-4">
               {/* Detail Header */}
               <div className="glass-card voxxy-hover-panel p-4 mb-3">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
+                <div className="flex items-start justify-between gap-2 mb-4">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1 flex-wrap">
                       <h2 className="text-lg font-bold text-foreground">{selectedApplicant.contact_name || selectedApplicant.business_name}</h2>
                       {selectedApplicant.is_returning && (
@@ -867,6 +886,18 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       {getStatusBadge(selectedApplicant.status).label}
                     </Badge>
                   </div>
+                  {selectedApplicant.registrationId && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="shrink-0 h-8 text-xs border-border bg-background/5 hover:bg-background/10"
+                      onClick={() => setShowEditVendorModal(true)}
+                    >
+                      <Pencil className="w-3.5 h-3.5 mr-1.5" />
+                      Edit details
+                    </Button>
+                  )}
                 </div>
 
                 {/* Contact Info Grid */}
@@ -1236,6 +1267,21 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           )}
         </div>
       </div>
+
+      {selectedApplicant?.registrationId && (
+        <EditVendorDetailsModal
+          open={showEditVendorModal}
+          onOpenChange={setShowEditVendorModal}
+          applicantId={selectedApplicant.id}
+          registrationId={selectedApplicant.registrationId}
+          initialContactName={
+            selectedApplicant.contact_name || selectedApplicant.business_name || ''
+          }
+          initialPhone={selectedApplicant.phone || ''}
+          emailReadOnly={selectedApplicant.email}
+          onSaved={handleEditVendorSaved}
+        />
+      )}
 
       {/* Email Notification Dialog */}
       <EmailConfirmationDialog
