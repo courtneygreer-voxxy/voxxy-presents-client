@@ -1,104 +1,46 @@
 # Voxxy Presents Documentation
 
-**Last Updated**: November 22, 2025
-**Current Version**: 3.0
-**Status**: Rails API Migration Complete
+**Last Updated**: April 28, 2026
 
 ---
 
-## 📁 Documentation Structure
+## For New Engineers
 
-### Active Development
-- **[v3-migration/](./v3-migration/)** - V3.0 database refactoring and migration docs
-- **[phase-reports/](./phase-reports/)** - Daily progress reports and phase completions
-- **[development/](./development/)** - Developer guides and technical documentation
-- **[deployment/](./deployment/)** - Deployment guides and checklists
-
-### Reference Documentation
-- **[design/](./design/)** - Design specs and mockups
-- **[projects/](./projects/)** - Individual project documentation
-- **[releases/](./releases/)** - Release notes and changelogs
+1. Start with the [main README](../README.md) for setup, branch strategy, and project structure
+2. Read [CONTRIBUTING.md](./CONTRIBUTING.md) for how we ship code
+3. Review the [Testing Roadmap](./TESTING_ROADMAP.md) for testing expectations
 
 ---
 
-## 🚀 Quick Links for New Engineers
+## Documentation Index
 
-### Getting Started
-1. [Project Handoff](./PROJECT_HANDOFF.md) - Overview for new team members
-2. [V3.0 Technical Requirements](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md) - Current project spec
-3. [Phase 1 Day 1 Report](./phase-reports/PHASE-1-DAY-1-COMPLETE.md) - What's been completed
-4. [Contributing Guide](./CONTRIBUTING.md) - How to contribute
+### Engineering Process
+- **[TESTING_ROADMAP.md](./TESTING_ROADMAP.md)** -- Testing strategy, task tracker, and progress
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** -- Development workflow and release process
 
-### Current Work (Phase 1)
-- **Status**: Day 1 Complete ✅, Day 2 Starting
-- **Focus**: Two-sided marketplace (Producers ↔ Vendors)
-- **Latest**: [Phase Reports](./phase-reports/)
-- **Migration Docs**: [V3 Migration Guide](./v3-migration/)
+### Architecture & Development
+- **[architecture/](./architecture/)** -- System design, API config, role mapping, implementation patterns
+- **[development/](./development/)** -- Branching strategy, runbook, backend email setup, tracking plan
 
-### Architecture & Design
-- [Project V2 Architecture](./PROJECT-V2-ARCHITECTURE.md) - System architecture
-- [User Flow Test Plan](./USER_FLOW_TEST_PLAN.md) - Testing documentation
-- [Deployment Guide](./deployment/DEPLOYMENT.md) - How to deploy
+### Deployment
+- **[deployment/](./deployment/)** -- Render config, environment setup, platform integration
 
----
+### Features
+- **[email-system/](./email-system/)** -- Email automation, templates, variables, editor guides
+- **[features/](./features/)** -- Smart lists, payment deadlines, landing page
+- **[design/](./design/)** -- Glass modal design system, styling specs
 
-## 📊 Current Project Status
-
-### Phase 1: Core Marketplace (Target: Friday)
-- [x] **Day 1** - Database refactoring ✅
-- [ ] **Day 2** - Vendor discovery (In Progress)
-- [ ] **Day 3** - Application system
-- [ ] **Day 4** - Command center + testing
-
-### V3.0 Migration Progress
-- ✅ Security fixes (Phase 0)
-- ✅ Role refactoring (organizer→producer, venue_owner→vendor)
-- ✅ Beta approval removed
-- ✅ Signup flows updated
-- ✅ Production migration executed (4 users)
-
-See [Phase Reports](./phase-reports/) for detailed daily updates.
+### Reference
+- **[releases/](./releases/)** -- Version release notes (v1.5 through v1.9)
+- **[v3-migration/](./v3-migration/)** -- Historical V3 migration docs (completed)
+- **[demo-data/](./demo-data/)** -- Demo seed data for QA
+- **[projects/](./projects/)** -- Project-level docs (RSVP security)
+- **[archive/](./archive/)** -- Completed phase reports, one-time fix docs, historical audits
 
 ---
 
-## 📝 Key Documents by Role
-
-### For Product Managers
-- [V3.0 Technical Requirements](./v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md)
-- [Project Status](./project-status.md)
-- [Landing Pages Copy](./landing-pages-copy.md)
-
-### For Developers
-- [V3 Migration Docs](./v3-migration/)
-- [Development Guides](./development/)
-- [Phase Reports](./phase-reports/)
-- [Deprecations List](./v3-migration/DEPRECATIONS.md)
-
-### For DevOps
-- [Deployment Guide](./deployment/DEPLOYMENT.md)
-- [Deployment Checklist](./v3-migration/DEPLOYMENT-CHECKLIST-V3.md)
-- [Phase 0 Security Fixes](./phase-reports/PHASE_0_SECURITY_FIXES_COMPLETE.md)
-
----
-
-## 🔗 External Resources
+## External Resources
 
 - **Production**: https://www.voxxypresents.com
-- **API (Production)**: https://www.heyvoxxy.com/api
-- **API (Development)**: https://www.voxxyai.com/api
-- **GitHub Client**: https://github.com/courtneygreer-voxxy/voxxy-presents-client
-- **GitHub API**: https://github.com/courtneygreer-voxxy/voxxy-presents-api
-
----
-
-## 📞 Contact
-
-For questions about documentation:
-- Check [Phase Reports](./phase-reports/) for latest updates
-- Review [V3 Migration Docs](./v3-migration/) for technical details
-- See [Project Handoff](./PROJECT_HANDOFF.md) for context
-
----
-
-**Maintained by**: Development Team
-**Next Review**: After Phase 1 completion
+- **GitHub (Frontend)**: https://github.com/Voxxy-AI/voxxy-presents-client
+- **GitHub (Backend)**: https://github.com/Voxxy-AI/voxxy-rails-react
