@@ -17,8 +17,8 @@
  *    - Save button disabled when validation errors exist
  *
  * 3. Timezone-Aware Scheduling
- *    - Emails always send at 8:00 AM in user's local timezone
- *    - Automatic UTC conversion for backend storage
+ *    - Emails always send at 8:00 AM in organization's timezone
+ *    - Backend handles timezone conversion using organization.timezone setting
  *    - Preview shows "New scheduled time if saved" based on trigger settings
  *    - Recalculates preview date when trigger type/value changes
  *
@@ -52,7 +52,7 @@ import { logger } from '@/utils/logger';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { X, Save, Loader2, Calendar, Clock, Type, AlignLeft, Sparkles, Globe, Lock } from 'lucide-react';
-import { format, addDays, subDays, parseISO } from 'date-fns';
+import { DateTime } from 'luxon';
 import type { ScheduledEmail, UpdateEmailRequest, TriggerType } from '@/types/email';
 import {
   EMAIL_VARIABLES,
@@ -65,7 +65,7 @@ import {
   validateEmailContent,
   type ValidationResult,
 } from '@/utils/emailVariables';
-import { getEightAmLocalAsUTC, getTimezoneInfo, formatDateWithTimezone } from '@/utils/timezone';
+import { formatDateWithTimezone } from '@/utils/timezone';
 import { splitEmailBody, joinEmailBody, htmlFooterToPlain, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
 import {
   Dialog,
@@ -130,8 +130,6 @@ export default function EditScheduledEmailModal({
   const [dateError, setDateError] = useState<string | null>(null);
   const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content (plain text)
 
-  // Get timezone info for display
-  const timezoneInfo = getTimezoneInfo();
 
   // Refs for textareas to handle cursor position
   const subjectRef = useRef<HTMLInputElement>(null);
@@ -165,10 +163,11 @@ export default function EditScheduledEmailModal({
     if (!eventData) return null;
 
     try {
-      let baseDate: Date;
-      const triggerTime = getEightAmLocalAsUTC(); // Always 8:00 AM local
+      let baseDate: DateTime;
 
       // Determine base date based on trigger type
+      // IMPORTANT: Parse as UTC to match backend behavior for date-only fields
+      // This prevents timezone shifting issues and ensures consistent calculations
       switch (triggerType) {
         case 'days_before_event':
         case 'days_after_event':
@@ -177,7 +176,7 @@ export default function EditScheduledEmailModal({
           if (!eventData.dates?.start) {
             return null;
           }
-          baseDate = parseISO(eventData.dates.start);
+          baseDate = DateTime.fromISO(eventData.dates.start, { zone: 'utc' });
           break;
 
         case 'days_before_deadline':
@@ -185,7 +184,7 @@ export default function EditScheduledEmailModal({
           if (!eventData.application_deadline) {
             return null;
           }
-          baseDate = parseISO(eventData.application_deadline);
+          baseDate = DateTime.fromISO(eventData.application_deadline, { zone: 'utc' });
           break;
 
         case 'days_before_payment_deadline':
@@ -194,7 +193,7 @@ export default function EditScheduledEmailModal({
           if (!eventData.payment_deadline) {
             return null;
           }
-          baseDate = parseISO(eventData.payment_deadline);
+          baseDate = DateTime.fromISO(eventData.payment_deadline, { zone: 'utc' });
           break;
 
         case 'on_bulletin_post':
@@ -205,20 +204,28 @@ export default function EditScheduledEmailModal({
           return null;
       }
 
-      // Calculate offset based on trigger type and value
-      let scheduledDate: Date;
+      // Validate parsed date
+      if (!baseDate.isValid) {
+        logger.error('Invalid base date', { triggerType, baseDate: baseDate.invalidReason });
+        return null;
+      }
+
+      // Calculate offset based on trigger type and value using timezone-aware arithmetic
+      let scheduledDate: DateTime;
       const days = triggerValue || 0;
 
       switch (triggerType) {
         case 'days_before_event':
         case 'days_before_deadline':
         case 'days_before_payment_deadline':
-          scheduledDate = subDays(baseDate, days);
+          // Use Luxon's minus() for timezone-safe date arithmetic
+          scheduledDate = baseDate.minus({ days });
           break;
 
         case 'days_after_event':
         case 'days_after_payment_deadline':
-          scheduledDate = addDays(baseDate, days);
+          // Use Luxon's plus() for timezone-safe date arithmetic
+          scheduledDate = baseDate.plus({ days });
           break;
 
         case 'on_event_date':
@@ -231,8 +238,9 @@ export default function EditScheduledEmailModal({
           return null;
       }
 
-      // Set time to 8:00 AM local (already handled by timezone utils)
-      return scheduledDate;
+      // Convert Luxon DateTime back to JavaScript Date for compatibility with existing code
+      // The time component (8:00 AM local) is handled by the timezone utils when saving
+      return scheduledDate.toJSDate();
     } catch (error) {
       logger.error('Error calculating preview date', { error });
       return null;
@@ -332,8 +340,10 @@ export default function EditScheduledEmailModal({
       // Subject stays as plain text
       const backendSubject = data.subject_template;
 
-      // Automatically set trigger_time to 8:00 AM in user's local timezone (converted to UTC)
-      const triggerTimeUtc = getEightAmLocalAsUTC();
+      // IMPORTANT: Send plain "08:00" to backend (not UTC-converted)
+      // Backend will handle timezone conversion using organization's timezone
+      // This prevents double timezone conversion bugs
+      const triggerTime = "08:00";
 
       const updateData: UpdateEmailRequest = {
         name: data.name,
@@ -341,7 +351,7 @@ export default function EditScheduledEmailModal({
         body_template: fullHtmlBody,       // HTML with [eventName] format + footer
         trigger_type: data.trigger_type as TriggerType,
         trigger_value: data.trigger_value,
-        trigger_time: triggerTimeUtc,      // Automatically set to 8:00 AM local (in UTC)
+        trigger_time: triggerTime,         // Plain "08:00" - backend handles timezone
       };
 
       await onSave(email.id, updateData);
@@ -471,10 +481,10 @@ export default function EditScheduledEmailModal({
                 <Globe className="w-4 h-4 text-blue-400 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-blue-300 text-sm font-medium">
-                    Send Time: {timezoneInfo.eightAmLocal}
+                    Send Time: 8:00 AM
                   </p>
                   <p className="text-blue-300/60 text-xs mt-1">
-                    All emails send at 8:00 AM in your timezone ({timezoneInfo.timezone})
+                    All emails send at 8:00 AM in your organization's timezone
                   </p>
                 </div>
               </div>
