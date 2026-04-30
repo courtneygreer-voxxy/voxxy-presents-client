@@ -39,7 +39,7 @@ import {
   getGroupedVariablesForUI,
 } from '@/utils/emailVariables';
 import { splitEmailBody, joinEmailBody, STANDARD_EMAIL_FOOTER } from '@/utils/emailFooter';
-import { getEightAmLocalAsUTC, formatDateWithTimezone } from '@/utils/timezone';
+import { formatDateWithTimezone } from '@/utils/timezone';
 import { logger } from '@/utils/logger';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -59,7 +59,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { addDays, subDays, parseISO } from 'date-fns';
+import { DateTime } from 'luxon';
 import { useToast } from '@/hooks/use-toast';
 import { scheduledEmailsApi } from '@/services/api';
 import { DebugPanel } from '../DebugPanel';
@@ -345,18 +345,28 @@ export function EmailEditorPage({
     if (!eventData?.start_date || !triggerType) return null;
 
     try {
-      const eventDate = parseISO(eventData.start_date);
+      // Parse as UTC to match backend behavior for date-only fields
+      // This prevents timezone shifting and ensures consistent calculations
+      const eventDate = DateTime.fromISO(eventData.start_date, { zone: 'utc' });
+
+      if (!eventDate.isValid) {
+        logger.error('Invalid event date', { startDate: eventData.start_date, reason: eventDate.invalidReason });
+        return null;
+      }
+
       let scheduledDate = eventDate;
 
       switch (triggerType) {
         case 'days_before_event':
         case 'days_before_deadline':
         case 'days_before_payment_deadline':
-          scheduledDate = subDays(eventDate, triggerValue || 0);
+          // Use Luxon's minus() for timezone-safe date arithmetic
+          scheduledDate = eventDate.minus({ days: triggerValue || 0 });
           break;
         case 'days_after_event':
         case 'days_after_payment_deadline':
-          scheduledDate = addDays(eventDate, triggerValue || 0);
+          // Use Luxon's plus() for timezone-safe date arithmetic
+          scheduledDate = eventDate.plus({ days: triggerValue || 0 });
           break;
         case 'on_event_date':
         case 'on_application_open':
@@ -366,8 +376,10 @@ export function EmailEditorPage({
           break;
       }
 
-      return formatDateWithTimezone(scheduledDate);
+      // Convert Luxon DateTime to JavaScript Date for formatDateWithTimezone
+      return formatDateWithTimezone(scheduledDate.toJSDate());
     } catch (error) {
+      logger.error('Error calculating preview date', { error });
       return null;
     }
   };
@@ -527,7 +539,8 @@ export function EmailEditorPage({
       const fullBodyTemplate = joinEmailBody(data.body_template, emailFooter);
       const convertedBody = frontendToBackend(fullBodyTemplate);
 
-      const trigger_time = getEightAmLocalAsUTC();
+      // Send plain "08:00" to backend - backend handles timezone conversion
+      const trigger_time = "08:00";
 
       // Determine category_id: null if blast trigger type, otherwise use selection
       const effectiveCategoryId = BLAST_TRIGGER_TYPES.has(data.trigger_type) ? null : selectedCategoryId;
