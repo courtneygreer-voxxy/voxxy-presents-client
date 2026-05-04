@@ -222,7 +222,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           existing.is_returning = contact.source === 'returning' || contact.source === 'past_event';
           // Prefer registration data (event-specific) over vendor_contact data (global)
           existing.producer_notes = existing.producer_notes || contact.notes;
-          existing.tags = contact.tags || [];
+          existing.tags = (existing.tags && existing.tags.length > 0) ? existing.tags : (contact.tags || []);
           existing.location = existing.location || contact.location;
           existing.invitationId = invitation.id;
           // Merge social media - prefer application data but fall back to contact data

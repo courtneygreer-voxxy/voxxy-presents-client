@@ -94,12 +94,13 @@ export function EditVendorDetailsModal({
     setFormError(null);
     setSaving(true);
     try {
+      // Send all fields to API, including empty values (to allow clearing)
       await registrationsApi.update(registrationId, {
         name: name.trim(),
         phone: phone.trim(),
-        location: location.trim() || undefined,
-        producer_notes: producerNotes.trim() || undefined,
-        tags: tags.length > 0 ? tags : undefined,
+        location: location.trim(),
+        producer_notes: producerNotes.trim(),
+        tags: tags,
       });
       onSaved(applicantId, {
         contact_name: name.trim(),

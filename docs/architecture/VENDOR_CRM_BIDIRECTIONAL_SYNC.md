@@ -665,4 +665,199 @@ tail -f log/development.log | grep "Synced registration"
 
 ---
 
+## Bug Fixes & Edge Cases
+
+### Critical Bug Fixes (May 4, 2026)
+
+#### 1. Tags Merge Priority Fixed
+
+**Issue:** Tags were unconditionally overwritten with contact tags, violating "prefer registration data" principle.
+
+**Before:**
+```typescript
+existing.tags = contact.tags || [];
+```
+
+**After:**
+```typescript
+existing.tags = (existing.tags && existing.tags.length > 0) ? existing.tags : (contact.tags || []);
+```
+
+**Impact:** Registration tags now take priority. Contact tags only used as fallback when registration has no tags.
+
+---
+
+#### 2. Empty String Handling in Sync
+
+**Issue:** Empty strings (`""`) overwrote valid vendor_contact data because Ruby treats `""` as truthy.
+
+**Before:**
+```ruby
+# This would overwrite vendor_contact.phone with "" if registration.phone = ""
+phone: phone.nil? ? vendor_contact.phone : phone
+```
+
+**After:**
+```ruby
+# Using .presence to handle blank values correctly
+phone: phone.presence || vendor_contact.phone
+```
+
+**Impact:** Empty registration values no longer clear global vendor_contact data. The `.presence` method returns `nil` for blank values, causing fallback to vendor_contact data.
+
+**Behavior Matrix:**
+
+| Registration Value | VendorContact Value | Result |
+|-------------------|---------------------|--------|
+| `"555-1234"` | `"555-9999"` | `"555-1234"` ✅ (registration wins) |
+| `""` | `"555-9999"` | `"555-9999"` ✅ (keeps contact) |
+| `nil` | `"555-9999"` | `"555-9999"` ✅ (keeps contact) |
+| `["Tag1"]` | `["Tag2"]` | `["Tag1"]` ✅ (registration wins) |
+| `[]` | `["Tag2"]` | `["Tag2"]` ✅ (keeps contact) |
+| `nil` | `["Tag2"]` | `["Tag2"]` ✅ (keeps contact) |
+
+---
+
+#### 3. Clearing Fields API/State Divergence
+
+**Issue:** Frontend sent `undefined` to API when clearing fields (stripped by JSON.stringify), but updated local state with empty values, causing UI/backend divergence.
+
+**Before:**
+```typescript
+await registrationsApi.update(registrationId, {
+  location: location.trim() || undefined,  // undefined gets stripped!
+  tags: tags.length > 0 ? tags : undefined
+});
+onSaved(applicantId, {
+  location: location.trim(),  // Empty string sent to UI state
+  tags: tags                   // Empty array sent to UI state
+});
+```
+
+**After:**
+```typescript
+// Send all fields including empty values
+await registrationsApi.update(registrationId, {
+  location: location.trim(),  // Empty string sent to API
+  producer_notes: producerNotes.trim(),
+  tags: tags
+});
+```
+
+**Impact:** UI and backend stay in sync. User can clear fields and values remain cleared after page reload.
+
+---
+
+#### 4. API Backwards Compatibility
+
+**Issue:** VendorContactSerializer changed `name` to `contact_name`, breaking existing frontend code expecting `vendor_contact.name`.
+
+**Before:**
+```ruby
+{
+  contact_name: @vendor_contact.name  # Only this
+}
+```
+
+**After:**
+```ruby
+{
+  name: @vendor_contact.name,         # Backwards compatible
+  contact_name: @vendor_contact.name  # Also included
+}
+```
+
+**Impact:** Both `vendor_contact.name` and `vendor_contact.contact_name` work, maintaining backwards compatibility.
+
+---
+
+### Edge Cases Handled
+
+#### E1: Empty Registration Fields Don't Clear Global Data
+
+**Scenario:** Producer clears location on event-specific registration.
+
+**Expected Behavior:**
+1. Registration location becomes `""` ✅
+2. VendorContact location keeps original value (e.g., "San Francisco") ✅
+3. UI shows empty location for this event ✅
+4. Next event vendor applies to inherits "San Francisco" from VendorContact ✅
+
+**Rationale:** Event-specific empty values represent "not set for this event", not "delete globally".
+
+---
+
+#### E2: Registration Data Overrides Contact Data
+
+**Scenario:** VendorContact has phone "555-1111". Vendor applies with phone "555-2222".
+
+**Expected Behavior:**
+1. Registration shows "555-2222" ✅
+2. On edit, "555-2222" appears in form ✅
+3. If saved without changes, VendorContact phone becomes "555-2222" ✅
+
+**Rationale:** Registration data is event-specific and more recent, so it takes priority.
+
+---
+
+#### E3: Contact Without Registration
+
+**Scenario:** VendorContact invited but hasn't applied yet.
+
+**Expected Behavior:**
+1. Shows in "Invited" status ✅
+2. Displays contact data (tags, notes, location) ✅
+3. No registration-specific fields ✅
+4. Can edit contact (goes to Network tab) ✅
+
+---
+
+#### E4: Registration Without Contact
+
+**Scenario:** Vendor applies without being in Network CRM.
+
+**Expected Behavior:**
+1. Creates registration ✅
+2. Creates VendorContact via `create_or_update_vendor_contact` callback ✅
+3. Sync works normally after contact created ✅
+
+---
+
+#### E5: Special Characters in Tags
+
+**Tested:** Tags with special characters: `["Food & Beverage", "20% Discount", "VIP★"]`
+
+**Result:** ✅ Saved and displayed correctly. JSONB handles UTF-8 and special chars.
+
+---
+
+#### E6: Very Long Notes (1000+ characters)
+
+**Result:** ✅ TEXT column handles unlimited length. UI displays in scrollable textarea.
+
+---
+
+### Important Notes
+
+**Why Empty Values Don't Clear:**
+
+The sync is designed for **bidirectional enhancement**, not **destructive updates**:
+
+- **VendorContact** = Global vendor profile (permanent)
+- **Registration** = Event-specific snapshot (temporary)
+
+An empty event-specific value means "not provided for this event", NOT "delete from vendor profile".
+
+**Example:**
+- Vendor applies to Event A with location "Brooklyn"
+- VendorContact.location becomes "Brooklyn"
+- Vendor applies to Event B without location
+- Event B registration.location = `nil` or `""`
+- VendorContact.location stays "Brooklyn" (not cleared!)
+- Next vendor applies to Event C → inherits "Brooklyn"
+
+This prevents accidental data loss from incomplete event applications.
+
+---
+
 **End of Documentation**

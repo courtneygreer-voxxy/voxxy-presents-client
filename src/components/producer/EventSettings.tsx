@@ -247,10 +247,14 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       // Close modal
       setShowCancelModal(false);
 
-      // Update local status to reflect the change
-      if (event.status) {
-        event.status.status = 'cancelled';
+      // Notify parent to refresh event data from backend
+      // The backend has already updated the status to 'cancelled' via sendCancellationEmails,
+      // so this onUpdate call will fetch the fresh data and update parent component state
+      if (onUpdate) {
+        await onUpdate(event.namespaced_slug || event.slug, { status: 'cancelled' });
       }
+
+      // Update local UI state (provides immediate feedback while parent refreshes)
       setEventStatus('cancelled');
       setEventJustCancelled(true); // Mark as cancelled in this session
 
