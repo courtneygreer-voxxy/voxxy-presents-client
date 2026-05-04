@@ -519,7 +519,7 @@ export default function ProducerDashboard() {
 
         try {
           const emailResult = await eventsApi.generateEmails(newEvent.slug);
-          console.log(`✅ Generated ${emailResult.emails_count} scheduled emails`);
+          // console.log(`✅ Generated ${emailResult.emails_count} scheduled emails`);
 
           if (emailResult.warnings && emailResult.warnings.length > 0) {
             console.warn('Email generation warnings:', emailResult.warnings);
@@ -571,11 +571,11 @@ export default function ProducerDashboard() {
     try {
       console.log('Updating event:', eventSlug);
       const response = await eventsApi.update(eventSlug, eventData);
-      console.log('Event updated successfully', response);
+      // console.log('Event updated successfully', response);
 
       // Check if backend is requesting email notification confirmation
       if (response?.email_notification) {
-        console.log('Email notification required:', response.email_notification);
+        // console.log('Email notification required:', response.email_notification);
         handleEmailNotification(response.email_notification, eventSlug);
       }
 

@@ -8,6 +8,7 @@ import { EmailAutomationTab } from './Email';
 interface Event {
   id: number;
   slug: string;
+  namespaced_slug?: string;
   title: string;
   description?: string;
   event_date?: string;
@@ -63,9 +64,9 @@ export default function CommandCenter({ event, onBack, activeTab, onTabChange, o
           />
         );
       case 'applicants':
-        return <ApplicantsTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
+        return <ApplicantsTab eventSlug={event.namespaced_slug || event.slug} event={event} isAdmin={isAdmin} />;
       case 'emails':
-        return <EmailAutomationTab eventSlug={event.slug} event={event} isAdmin={isAdmin} />;
+        return <EmailAutomationTab eventSlug={event.namespaced_slug || event.slug} event={event} isAdmin={isAdmin} />;
       case 'settings':
         return (
           <EventSettings
