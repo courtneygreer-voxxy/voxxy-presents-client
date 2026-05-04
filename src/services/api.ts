@@ -916,7 +916,7 @@ export const registrationsApi = {
   /**
    * Update registration (producer/venue owner only)
    * PATCH /api/v1/presents/registrations/:id
-   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status).
+   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags).
    */
   async update(registrationId: number, data: Partial<{
     vendor_category: string
@@ -926,6 +926,7 @@ export const registrationsApi = {
     phone: string
     location: string
     producer_notes: string
+    tags: string[]
   }>) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',

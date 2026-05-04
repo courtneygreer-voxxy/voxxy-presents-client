@@ -8,6 +8,7 @@ import { EmailAutomationTab } from './Email';
 interface Event {
   id: number;
   slug: string;
+  namespaced_slug?: string;
   title: string;
   description?: string;
   event_date?: string;
