@@ -590,13 +590,19 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     }
   };
 
-  const handleEditVendorSaved = (applicantId: string, patch: { contact_name: string; phone: string }) => {
+  const handleEditVendorSaved = (applicantId: string, patch: {
+    contact_name: string;
+    phone: string;
+    location?: string;
+    producer_notes?: string;
+    tags?: string[];
+  }) => {
     toast.success('Vendor details updated');
     setApplicants((prev) =>
-      prev.map((a) => (a.id === applicantId ? { ...a, contact_name: patch.contact_name, phone: patch.phone } : a))
+      prev.map((a) => (a.id === applicantId ? { ...a, ...patch } : a))
     );
     setSelectedApplicant((prev) =>
-      prev && prev.id === applicantId ? { ...prev, contact_name: patch.contact_name, phone: patch.phone } : prev
+      prev && prev.id === applicantId ? { ...prev, ...patch } : prev
     );
   };
 
@@ -973,6 +979,33 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     </Select>
                   )}
                 </div>
+
+                {/* Tags from Network CRM */}
+                {selectedApplicant.tags && selectedApplicant.tags.length > 0 && (
+                  <div className="mb-3">
+                    <p className="text-[10px] text-foreground/60 mb-2">Tags</p>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedApplicant.tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Producer Notes */}
+                {selectedApplicant.producer_notes && (
+                  <div className="mb-3">
+                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                    <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
+                      <p className="text-xs text-foreground/80 whitespace-pre-wrap">{selectedApplicant.producer_notes}</p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Social & Links */}
@@ -1279,6 +1312,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
             selectedApplicant.contact_name || selectedApplicant.business_name || ''
           }
           initialPhone={selectedApplicant.phone || ''}
+          initialLocation={selectedApplicant.location}
+          initialProducerNotes={selectedApplicant.producer_notes}
+          initialTags={selectedApplicant.tags}
           emailReadOnly={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
         />

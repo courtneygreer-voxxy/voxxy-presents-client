@@ -11,7 +11,7 @@ Voxxy Presents is an **event management and vendor coordination platform** that 
 
 ### Producer Workflow
 ```
-Sign Up (producer role) 
+Sign Up (producer role)
   → Auto-create organization
   → Create event via wizard (4 steps)
     - Basic info + dates
@@ -21,6 +21,7 @@ Sign Up (producer role)
   → Manage vendor applications
   → View submitted vendors
   → Accept/reject vendors
+  → Edit vendor details (syncs with Network CRM)
 ```
 
 ### Vendor Workflow
@@ -107,6 +108,9 @@ src/
 | `pages/ProducerDashboard.tsx` | Main producer dashboard |
 | `components/producer/CreateEventWizard/` | Event creation flow |
 | `components/producer/Network/` | Vendor contacts management |
+| `components/producer/ApplicantsTab.tsx` | Vendors & Applicants tab with CRM merge |
+| `components/producer/EditVendorDetailsModal.tsx` | Edit vendor details with bidirectional sync |
+| `docs/architecture/VENDOR_CRM_BIDIRECTIONAL_SYNC.md` | Complete CRM sync architecture |
 
 ## Current Features
 
@@ -117,9 +121,10 @@ src/
 - Vendors can apply for vendor opportunities
 - Application tracking by ticket code
 - Admin dashboard
+- Smart CRM merge (Network ↔ Vendors bidirectional sync)
 
 ### Feature Status
-- **Complete**: Auth, event creation, vendor applications, tracking
+- **Complete**: Auth, event creation, vendor applications, tracking, CRM sync
 - **In Progress**: Event invitation system (frontend complete, awaiting backend)
 - **Planned**: Email notifications, advanced analytics
 
