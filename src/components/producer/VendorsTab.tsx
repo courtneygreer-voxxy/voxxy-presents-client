@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Building2, Mail, Phone, Globe, Instagram, Music, Link as LinkIcon, Star, Search, ArrowUpDown, ChevronDown, ChevronRight } from 'lucide-react';
-import { vendorApplicationsApi } from '@/services/api';
+import { Building2, Mail, Phone, Globe, Instagram, Music, Link as LinkIcon, Star, Search, ArrowUpDown, ChevronDown, ChevronRight, MapPin, FileText, Edit2, X } from 'lucide-react';
+import { vendorApplicationsApi, registrationsApi } from '@/services/api';
+import { toast } from 'sonner';
 
 interface VendorSubmission {
   id: number;
@@ -17,6 +18,8 @@ interface VendorSubmission {
   tiktok_handle?: string;
   portfolio?: string;
   payment_status?: 'paid' | 'pending' | 'unpaid';
+  location?: string;
+  producer_notes?: string;
   vendor_application: {
     id: number;
     name: string;
@@ -43,6 +46,14 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
   // Multi-select state
   const [selectedVendors, setSelectedVendors] = useState<Set<number>>(new Set());
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
+
+  // Edit modal state
+  const [editingVendor, setEditingVendor] = useState<VendorSubmission | null>(null);
+  const [editFormData, setEditFormData] = useState<{
+    location: string;
+    producer_notes: string;
+  }>({ location: '', producer_notes: '' });
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetchVendors();
@@ -106,6 +117,49 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
         return { label: 'Pending', color: 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400' };
       default:
         return { label: 'Pending', color: 'bg-muted/20 text-muted-foreground' };
+    }
+  };
+
+  const handleEditVendor = (vendor: VendorSubmission) => {
+    setEditingVendor(vendor);
+    setEditFormData({
+      location: vendor.location || '',
+      producer_notes: vendor.producer_notes || '',
+    });
+  };
+
+  const handleCloseEditModal = () => {
+    setEditingVendor(null);
+    setEditFormData({ location: '', producer_notes: '' });
+    setSaving(false);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingVendor) return;
+
+    try {
+      setSaving(true);
+      await registrationsApi.update(editingVendor.id, {
+        location: editFormData.location.trim() || undefined,
+        producer_notes: editFormData.producer_notes.trim() || undefined,
+      });
+
+      // Update local state
+      setVendors((prev) =>
+        prev.map((v) =>
+          v.id === editingVendor.id
+            ? { ...v, location: editFormData.location, producer_notes: editFormData.producer_notes }
+            : v
+        )
+      );
+
+      toast.success('Vendor details updated successfully');
+      handleCloseEditModal();
+    } catch (err: any) {
+      console.error('Failed to update vendor:', err);
+      toast.error(err.message || 'Failed to update vendor details');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -432,6 +486,17 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                   {/* Expanded Details */}
                   {isExpanded && (
                     <div className="px-6 py-4 bg-background/5 border-b border-border">
+                      {/* Edit Button */}
+                      <div className="flex justify-end mb-3 pl-14">
+                        <button
+                          onClick={() => handleEditVendor(vendor)}
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-background/10 hover:bg-background/20 text-foreground text-xs font-medium border border-border transition-colors"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                          Edit Details
+                        </button>
+                      </div>
+
                       <div className="grid grid-cols-2 gap-6 pl-14">
                         {/* Left Column */}
                         <div className="space-y-3">
@@ -479,6 +544,20 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-400">
                               {vendor.vendor_category}
                             </span>
+                          </div>
+
+                          <div>
+                            <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-1">
+                              Location
+                            </p>
+                            {vendor.location ? (
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-3.5 h-3.5 text-foreground/60" />
+                                <p className="text-sm text-foreground">{vendor.location}</p>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-foreground/40">—</p>
+                            )}
                           </div>
                         </div>
 
@@ -566,11 +645,120 @@ export default function VendorsTab({ eventSlug }: VendorsTabProps) {
                           </div>
                         </div>
                       </div>
+
+                      {/* Producer Notes - Full Width */}
+                      {vendor.producer_notes && (
+                        <div className="mt-4 pl-14">
+                          <p className="text-xs font-semibold text-foreground/60 uppercase tracking-wider mb-2 flex items-center gap-2">
+                            <FileText className="w-3.5 h-3.5" />
+                            Producer Notes
+                          </p>
+                          <p className="text-sm text-foreground/80 bg-background/5 rounded-lg p-3 border border-border">
+                            {vendor.producer_notes}
+                          </p>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* Edit Vendor Modal */}
+      {editingVendor && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-lg w-full shadow-2xl">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-6 border-b border-border">
+              <h3 className="text-lg font-semibold text-foreground">
+                Edit Vendor Details
+              </h3>
+              <button
+                onClick={handleCloseEditModal}
+                className="p-1 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
+                disabled={saving}
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-sm font-medium text-foreground/80 mb-1">
+                  {editingVendor.contact_name || editingVendor.business_name}
+                </p>
+                <p className="text-xs text-foreground/60">{editingVendor.email}</p>
+              </div>
+
+              {/* Location Field */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Location
+                </label>
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
+                  <input
+                    type="text"
+                    value={editFormData.location}
+                    onChange={(e) =>
+                      setEditFormData((prev) => ({ ...prev, location: e.target.value }))
+                    }
+                    placeholder="e.g., Portland, OR"
+                    className="w-full pl-10 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                    disabled={saving}
+                  />
+                </div>
+              </div>
+
+              {/* Producer Notes Field */}
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">
+                  Producer Notes
+                </label>
+                <textarea
+                  value={editFormData.producer_notes}
+                  onChange={(e) =>
+                    setEditFormData((prev) => ({ ...prev, producer_notes: e.target.value }))
+                  }
+                  placeholder="Add notes about this vendor..."
+                  rows={4}
+                  className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
+                  disabled={saving}
+                />
+                <p className="mt-1 text-xs text-foreground/50">
+                  Internal notes visible only to you
+                </p>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 p-6 border-t border-border">
+              <button
+                onClick={handleCloseEditModal}
+                className="px-4 py-2 rounded-lg border border-border text-foreground hover:bg-background/5 transition-colors text-sm font-medium"
+                disabled={saving}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                className="px-4 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  'Save Changes'
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

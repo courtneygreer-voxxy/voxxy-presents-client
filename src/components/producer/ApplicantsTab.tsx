@@ -220,9 +220,10 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           const existing = emailMap.get(email)!;
           existing.source = 'contact';
           existing.is_returning = contact.source === 'returning' || contact.source === 'past_event';
-          existing.producer_notes = contact.notes || existing.producer_notes;
+          // Prefer registration data (event-specific) over vendor_contact data (global)
+          existing.producer_notes = existing.producer_notes || contact.notes;
           existing.tags = contact.tags || [];
-          existing.location = contact.location || existing.location;
+          existing.location = existing.location || contact.location;
           existing.invitationId = invitation.id;
           // Merge social media - prefer application data but fall back to contact data
           existing.instagram_handle = existing.instagram_handle || contact.instagram_handle;

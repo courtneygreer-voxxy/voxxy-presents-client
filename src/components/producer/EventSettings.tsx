@@ -209,7 +209,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       try {
         setSavingStatus(true);
         // Fetch recipient count before showing dialog
-        const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/check_cancellation_impact`, {
+        const response = await fetch(`/api/v1/presents/events/${encodeURIComponent(event.namespaced_slug || event.slug)}/email_notifications/check_cancellation_impact`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       setSavingStatus(true);
       // Convert "live" to "published" for backend compatibility
       const backendStatus = eventStatus === 'live' ? 'published' : eventStatus;
-      await onUpdate(event.slug, { status: backendStatus });
+      await onUpdate(event.namespaced_slug || event.slug, { status: backendStatus });
       alert('Event status updated successfully!');
     } catch (err) {
       console.error('Failed to save event status:', err);
@@ -258,10 +258,10 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
     try {
       // Save status to 'cancelled' AND send emails together
-      await onUpdate(event.slug, { status: 'cancelled' });
+      await onUpdate(event.namespaced_slug || event.slug, { status: 'cancelled' });
 
       // Send cancellation emails with confirmation
-      const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/send_cancellation`, {
+      const response = await fetch(`/api/v1/presents/events/${encodeURIComponent(event.namespaced_slug || event.slug)}/email_notifications/send_cancellation`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
