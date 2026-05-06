@@ -37,7 +37,7 @@ export default function PrivacyPolicyPage() {
         <div className="space-y-4 text-gray-700 leading-relaxed">
           <p>
             Thanks for using Voxxy Presents! This Privacy Policy describes what information we collect and how it's used and shared. Any capitalized terms not defined in this Privacy Policy have the meanings set forth in our{' '}
-            <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
+            <a href="/legal/terms" className="text-primary hover:text-primary underline">
               Terms of Service
             </a>
             . If you don't agree with the terms of this Privacy Policy, you may not access or use the Services. If you have any questions, contact us at team@voxxypresents.com.
@@ -154,7 +154,7 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p>
                 <strong>3.7 Cookies and Similar Technologies.</strong> We use cookies and similar technologies to remember your preferences, keep you safe, and improve the Services. For detailed information about the specific cookies we use and how to manage them, please see our{' '}
-                <a href="/legal/cookies" className="text-purple-600 hover:text-purple-700 underline">
+                <a href="/legal/cookies" className="text-primary hover:text-primary underline">
                   Cookie Policy
                 </a>
                 .
@@ -407,7 +407,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-purple-600 hover:text-purple-700 underline">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary underline">team@voxxypresents.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

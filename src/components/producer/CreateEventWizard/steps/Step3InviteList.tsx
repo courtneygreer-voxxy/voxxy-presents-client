@@ -372,7 +372,7 @@ export default function Step3InviteList({
               <label
                 className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                   inviteAllSelected
-                    ? 'bg-purple-500/20 border-purple-500/40'
+                    ? 'bg-primary/20 border-primary/40'
                     : 'bg-background/5 border-border hover:bg-background/10'
                 }`}
               >
@@ -380,10 +380,10 @@ export default function Step3InviteList({
                   type="checkbox"
                   checked={inviteAllSelected}
                   onChange={handleToggleInviteAll}
-                  className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  className="w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                 />
                 <div className="flex-1 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-400" />
+                  <Users className="w-4 h-4 text-primary" />
                   <span className="text-sm font-medium text-foreground">Invite All Contacts</span>
                 </div>
                 <div className="text-xs text-foreground/60">
@@ -397,7 +397,7 @@ export default function Step3InviteList({
                   key={list.id}
                   className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                     selectedListIds.includes(list.id)
-                      ? 'bg-purple-500/20 border-purple-500/40'
+                      ? 'bg-primary/20 border-primary/40'
                       : 'bg-background/5 border-border hover:bg-background/10'
                   }`}
                 >
@@ -405,7 +405,7 @@ export default function Step3InviteList({
                     type="checkbox"
                     checked={selectedListIds.includes(list.id)}
                     onChange={() => handleToggleList(list.id)}
-                    className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                    className="w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                   />
                   <div className="flex-1">
                     <div className="text-sm font-medium text-foreground">{list.name}</div>
@@ -540,7 +540,7 @@ export default function Step3InviteList({
                         type="checkbox"
                         checked={selectedContactIds.length === paginatedContacts.length && paginatedContacts.length > 0}
                         onChange={handleSelectAll}
-                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                       />
                     </div>
                     <div>Status</div>
@@ -565,7 +565,7 @@ export default function Step3InviteList({
                     // Determine background color based on selection and unsubscribe status
                     let bgClass = '';
                     if (isSelected) {
-                      bgClass = 'bg-purple-500/10';
+                      bgClass = 'bg-primary/10';
                     } else if (isUnsubscribed) {
                       bgClass = 'bg-red-500/5';
                     }
@@ -581,7 +581,7 @@ export default function Step3InviteList({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelect(contact.id)}
-                            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                             onClick={(e) => e.stopPropagation()}
                           />
                         </div>
@@ -660,7 +660,7 @@ export default function Step3InviteList({
                               {contact.tags.slice(0, 2).map((tag) => (
                                 <span
                                   key={tag}
-                                  className="px-1 py-0.5 text-[9px] bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded"
+                                  className="px-1 py-0.5 text-[9px] bg-primary/20 text-violet-950 dark:text-primary rounded"
                                 >
                                   {tag}
                                 </span>

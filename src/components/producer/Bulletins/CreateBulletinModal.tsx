@@ -144,7 +144,7 @@ export function CreateBulletinModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleClose}>
-        <DialogContent className="max-w-2xl voxxy-gradient-card-deep border-purple-500/20 p-0 max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl voxxy-gradient-card-deep border-primary/20 p-0 max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-border">
             <DialogTitle className="text-2xl font-bold text-foreground">
@@ -155,7 +155,7 @@ export function CreateBulletinModal({
           {/* Producer Info */}
           <div className="px-6 pt-4">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center">
                 <span className="text-foreground font-bold text-lg">
                   {userProfile?.name ? getInitials(userProfile.name) : 'GG'}
                 </span>
@@ -175,7 +175,7 @@ export function CreateBulletinModal({
               placeholder="Subject or title for your message..."
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-purple-500/50"
+              className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-primary/50"
               autoFocus
             />
 
@@ -186,7 +186,7 @@ export function CreateBulletinModal({
                 value={body}
                 onChange={(e) => setBody(e.target.value)}
                 rows={10}
-                className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-purple-500/50 resize-none"
+                className="bg-background/5 border-border text-foreground placeholder:text-foreground/40 focus:border-primary/50 resize-none"
               />
               <p className="text-xs text-foreground/50">
                 You can format your message with:
@@ -211,9 +211,9 @@ export function CreateBulletinModal({
             </div>
 
             {/* Send Email Option */}
-            <div className="flex items-center justify-between p-3 bg-purple-500/10 rounded-lg border border-purple-500/30">
+            <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg border border-primary/30">
               <div className="flex items-center gap-2">
-                <Mail className="w-4 h-4 text-purple-400" />
+                <Mail className="w-4 h-4 text-primary" />
                 <div>
                   <p className="text-sm font-medium text-foreground">Send as Email</p>
                   <p className="text-xs text-foreground/60">Email vendors with this bulletin</p>
@@ -261,13 +261,13 @@ export function CreateBulletinModal({
 
                 {/* Recipient Preview */}
                 {loadingPreview ? (
-                  <div className="bg-purple-900/20 border border-purple-500/30 rounded p-3 text-center">
+                  <div className="bg-primary/20/20 border border-primary/30 rounded p-3 text-center">
                     <p className="text-sm text-foreground/60">Loading recipient count...</p>
                   </div>
                 ) : recipientPreview && recipientPreview.total > 0 ? (
-                  <div className="bg-purple-900/20 border border-purple-500/30 rounded p-3">
+                  <div className="bg-primary/20/20 border border-primary/30 rounded p-3">
                     <p className="text-sm text-foreground/90">
-                      Will send to <strong className="text-purple-300 text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}
+                      Will send to <strong className="text-primary text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}
                     </p>
                     {Object.keys(recipientPreview.by_category).length > 0 && (
                       <p className="text-xs text-foreground/60 mt-1">
@@ -320,14 +320,14 @@ export function CreateBulletinModal({
       {/* Confirmation Modal */}
       {showConfirmModal && recipientPreview && (
         <Dialog open={showConfirmModal} onOpenChange={() => setShowConfirmModal(false)}>
-          <DialogContent className="max-w-md voxxy-gradient-card-deep border-purple-500/20">
+          <DialogContent className="max-w-md voxxy-gradient-card-deep border-primary/20">
             <DialogTitle className="text-xl font-bold text-foreground">
               Send Bulletin Email?
             </DialogTitle>
 
             <div className="space-y-4 pt-4">
               <p className="text-foreground/80">
-                This will send an email to <strong className="text-purple-300 text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}.
+                This will send an email to <strong className="text-primary text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}.
               </p>
 
               {Object.keys(recipientPreview.by_category).length > 0 && (

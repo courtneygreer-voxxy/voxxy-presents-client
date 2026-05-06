@@ -68,7 +68,7 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
               <div 
                 className={`relative overflow-hidden rounded-lg border-2 transition-all ${
                   currentImage === image.url 
-                    ? 'border-purple-400 ring-2 ring-purple-400/30' 
+                    ? 'border-primary ring-2 ring-primary/30' 
                     : 'border-border hover:border-primary/50'
                 }`}
                 onClick={() => onImageSelect(image.url)}
@@ -79,8 +79,8 @@ export function HeaderImageSelector({ currentImage, onImageSelect }: HeaderImage
                   className="w-full h-24 object-cover"
                 />
                 {currentImage === image.url && (
-                  <div className="absolute inset-0 bg-purple-500/30 flex items-center justify-center">
-                    <Check className="h-6 w-6 text-purple-400 bg-background/20 backdrop-blur-sm rounded-full p-1" />
+                  <div className="absolute inset-0 bg-primary/30 flex items-center justify-center">
+                    <Check className="h-6 w-6 text-primary bg-background/20 backdrop-blur-sm rounded-full p-1" />
                   </div>
                 )}
               </div>

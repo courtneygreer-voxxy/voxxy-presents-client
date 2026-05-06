@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mail, ArrowLeft, AlertCircle, CheckCircle, Loader2 } from 'lucide-react'
 import { authApi, ApiError } from '@/services/api'
 import { validateEmail } from '@/utils/validation'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function ForgotPasswordPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
   const [email, setEmail] = useState('')
   const [error, setError] = useState('')

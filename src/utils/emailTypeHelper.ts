@@ -9,27 +9,27 @@ export const getEmailTypeInfo = (triggerType: string) => {
     // Event Announcements (purple) - Sent to invitations/contacts (people who haven't applied)
     'on_invitation_send': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
     'days_before_deadline': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
     'days_after_deadline': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
     'on_bulletin_post': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
     'on_event_update': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
     'on_event_cancel': {
       label: 'Event Announcement',
-      color: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30'
+      color: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30'
     },
 
     // Application Updates (pink) - Sent to registrations (people who already applied)

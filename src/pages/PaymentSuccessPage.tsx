@@ -5,8 +5,10 @@ import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Loader2, Sparkles, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/contexts/AuthContext"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PaymentSuccessPage() {
+  useForceTheme('dark')
   const [searchParams] = useSearchParams()
   const sessionId = searchParams.get('session_id')
   const navigate = useNavigate()

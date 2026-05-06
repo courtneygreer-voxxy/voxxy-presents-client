@@ -94,7 +94,7 @@ export default function AdminUnsubscribesPage() {
       case 'event':
         return 'bg-blue-500/20 border-blue-400/30 text-blue-950 dark:text-blue-300'
       case 'organization':
-        return 'bg-purple-500/20 border-purple-400/30 text-violet-950 dark:text-purple-300'
+        return 'bg-primary/20 border-primary/30 text-violet-950 dark:text-primary'
       case 'global':
         return 'bg-red-500/20 border-red-400/30 text-red-950 dark:text-red-300'
       default:
@@ -247,7 +247,7 @@ export default function AdminUnsubscribesPage() {
               {/* Unsubscribe List */}
               {loading ? (
                 <div className="text-center py-12">
-                  <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto" />
+                  <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto" />
                   <p className="text-muted-foreground mt-4">Loading unsubscribes...</p>
                 </div>
               ) : error ? (
@@ -342,7 +342,7 @@ export default function AdminUnsubscribesPage() {
                             {unsub.organization && (
                               <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-3">
                                 <h5 className="text-sm font-semibold text-foreground flex items-center gap-2 mb-2">
-                                  <Building2 className="h-4 w-4 text-purple-300" />
+                                  <Building2 className="h-4 w-4 text-primary" />
                                   Organization
                                 </h5>
                                 <div className="space-y-1 text-sm">

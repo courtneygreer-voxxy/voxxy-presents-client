@@ -7,6 +7,7 @@ import { TrackedLink } from "@/components/analytics/TrackedLink"
 import { TrackedButton } from "@/components/analytics/TrackedButton"
 import { analytics } from "@/lib/analytics"
 import { useFormTracking } from "@/hooks/useFormTracking"
+import { useForceTheme } from '@/hooks/useForceTheme'
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 import { ArrowRight, CheckCircle, Mail, MessageCircle, Instagram } from "lucide-react"
@@ -55,11 +56,12 @@ interface ContactFormData {
 }
 
 export default function HomePage() {
+  useForceTheme('dark')
   const { isAuthenticated, isProducer } = useAuth()
   const problemCardClass =
     'rounded-2xl border border-slate-200/80 bg-white p-8 shadow-[0_18px_40px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-1 hover:border-violet-200 hover:shadow-[0_22px_48px_rgba(15,23,42,0.08)]'
   const problemIconClass =
-    'mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-fuchsia-100 bg-[linear-gradient(135deg,#faf5ff_0%,#f5f3ff_100%)] text-2xl shadow-sm'
+    'mb-5 flex h-12 w-12 items-center justify-center rounded-xl border border-voxxy-pink-light/30 bg-[linear-gradient(135deg,#faf5ff_0%,#f5f3ff_100%)] text-2xl shadow-sm'
 
   // Helper function to scroll to contact section
   const scrollToContact = useCallback(() => {
@@ -180,24 +182,24 @@ export default function HomePage() {
   }
 
   return (
-    <div className="dark voxxy-public-page relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="dark voxxy-public-page relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="home" />
 
       {/* Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 pt-32 pb-20">
-        <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/12 via-purple-600/8 to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-pink/12 via-voxxy-purple-brand/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             {/* Hero Content */}
             <div>
-              <div className="inline-flex items-center gap-2 bg-fuchsia-500/15 border border-fuchsia-400/25 px-4 py-1.5 rounded-full mb-6">
+              <div className="inline-flex items-center gap-2 bg-voxxy-pink/15 border border-voxxy-pink/25 px-4 py-1.5 rounded-full mb-6">
                 <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
-                <span className="text-[13px] font-semibold text-purple-200">Now Live — Accepting Event Producers</span>
+                <span className="text-[13px] font-semibold text-primary">Now Live — Accepting Event Producers</span>
               </div>
 
               <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-                The Operating System for <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Recurring Event Producers</em>
+                The Operating System for <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">Recurring Event Producers</em>
               </h1>
 
               <p className="mb-9 max-w-[500px] text-[18px] leading-relaxed text-white/68">
@@ -206,7 +208,7 @@ export default function HomePage() {
 
               <div className="flex gap-4 flex-wrap">
                 <TrackedButton
-                  className="inline-flex items-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-fuchsia-500/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+                  className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
                   trackingData={{
                     button_text: 'Request Access',
                     button_location: 'hero',
@@ -220,7 +222,7 @@ export default function HomePage() {
                   </a>
                 </TrackedButton>
                 <TrackedButton
-                  className="inline-flex items-center rounded-xl border border-white/12 bg-white/8 px-8 py-4 text-[16px] font-medium text-white transition-all hover:border-fuchsia-400/30 hover:bg-white/12"
+                  className="inline-flex items-center rounded-xl border border-white/12 bg-white/8 px-8 py-4 text-[16px] font-medium text-white transition-all hover:border-voxxy-pink/30 hover:bg-white/12"
                   trackingData={{
                     button_text: 'See How It Works',
                     button_location: 'hero',
@@ -238,7 +240,7 @@ export default function HomePage() {
 
             {/* Hero Screenshot */}
             <div className="transform perspective-1000 hover:scale-[1.02] transition-transform duration-500">
-              <div className="bg-gradient-to-br from-purple-900/40 to-purple-800/40 rounded-2xl border border-voxxy-purple-brand/20 p-6 shadow-2xl">
+              <div className="bg-gradient-to-br from-[#221469]/40 to-[#54309F]/40 rounded-2xl border border-voxxy-purple-brand/20 p-6 voxxy-image-elevated">
                 <div className="flex items-center gap-2 mb-5">
                   <div className="w-2.5 h-2.5 rounded-full bg-red-400"></div>
                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
@@ -252,7 +254,7 @@ export default function HomePage() {
                 <img
                   src="/screenshots/hero-dashboard.png"
                   alt="Voxxy Presents dashboard showing event management, vendor applications, and automated workflows"
-                  className="rounded-2xl shadow-2xl border border-fuchsia-500/20"
+                  className="rounded-2xl shadow-2xl border border-voxxy-pink/20"
                   loading="eager"
                 />
               </div>
@@ -304,7 +306,7 @@ export default function HomePage() {
       <section ref={featuresRef} className="py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-fuchsia-400 mb-4">The Platform</div>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-pink mb-4">The Platform</div>
             <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">One place for everything</h2>
             <p className="max-w-[600px] text-[18px] text-white/60">
               Replace disconnected tools with a single platform built for how you actually run events.
@@ -319,13 +321,13 @@ export default function HomePage() {
                 Application confirmations, approval notices, payment reminders, event-day details — all sent automatically from one branded email thread. Vendors always know where they stand. You never have to write the same email twice.
               </p>
               <div className="flex gap-2 flex-wrap">
-                <span className="rounded-full border border-purple-400/20 bg-purple-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-purple-100">
+                <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
                   Automated Sequences
                 </span>
-                <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">
+                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">
                   Branded Emails
                 </span>
-                <span className="rounded-full border border-purple-400/20 bg-purple-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-purple-100">
+                <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
                   Zero Manual Follow-Up
                 </span>
               </div>
@@ -333,7 +335,7 @@ export default function HomePage() {
             <img
               src="/screenshots/email-flows.png"
               alt="Automated email sequences for vendor communication showing approval notices and payment reminders"
-              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+              className="rounded-2xl shadow-xl border border-voxxy-pink/20"
               loading="lazy"
             />
           </div>
@@ -346,16 +348,16 @@ export default function HomePage() {
                 Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. Your best vendors are always one search away.
               </p>
               <div className="flex gap-2 flex-wrap">
-                <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">Vendor CRM</span>
-                <span className="rounded-full border border-purple-400/20 bg-purple-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-purple-100">Performance Tracking</span>
-                <span className="rounded-full border border-fuchsia-400/20 bg-fuchsia-500/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">CSV Import</span>
+                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">Vendor CRM</span>
+                <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">Performance Tracking</span>
+                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">CSV Import</span>
               </div>
             </div>
             <div className="md:order-1">
               <img
                 src="/screenshots/vendor-crm.png"
                 alt="Vendor CRM showing contact management, tags, ratings, and performance tracking across events"
-                className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+                className="rounded-2xl shadow-xl border border-voxxy-pink/20"
                 loading="lazy"
               />
             </div>
@@ -364,7 +366,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <TrackedLink
               to="/features"
-              className="inline-flex items-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-fuchsia-500/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+              className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
               trackingData={{
                 link_text: 'See All Features',
                 destination_page: 'Features',
@@ -391,21 +393,21 @@ export default function HomePage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-fuchsia-500 text-2xl font-display font-bold text-white">1</div>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-voxxy-pink text-2xl font-display font-bold text-white">1</div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Create your event</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
                 Set up your event details, application form, and vendor categories. Import existing vendor lists via CSV if you have them.
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-pink-500 text-2xl font-display font-bold text-white">2</div>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-voxxy-pink to-pink-500 text-2xl font-display font-bold text-white">2</div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Open applications</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
                 Share your application link. Vendors apply with portfolios and details. Review and approve with side-by-side comparison tools.
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-purple-600 text-2xl font-display font-bold text-white">3</div>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-primary text-2xl font-display font-bold text-white">3</div>
               <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Coordinate and grow</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
                 Automated emails handle the logistics. Vendor CRM tracks relationships across events. Your community grows with every show.
@@ -417,7 +419,7 @@ export default function HomePage() {
 
       {/* Traction / Testimonial */}
       <section className="py-[100px] px-6 md:px-12 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/10 via-transparent to-transparent opacity-40"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-pink/10 via-transparent to-transparent opacity-40"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="mb-14">
@@ -428,7 +430,7 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid items-center gap-12 rounded-2xl border border-fuchsia-400/15 bg-white/8 p-10 backdrop-blur-sm md:grid-cols-2">
+          <div className="grid items-center gap-12 rounded-2xl border border-voxxy-pink/15 bg-white/8 p-10 backdrop-blur-sm md:grid-cols-2">
             <div>
               <p className="mb-6 text-[20px] italic leading-relaxed text-white/85">
                 "We've grown from one market every other month to two markets a month with Voxxy. The automation freed us up to focus on bringing more vendors and revenue to Brooklyn. Game changer."
@@ -444,7 +446,7 @@ export default function HomePage() {
             <img
               src="/screenshots/event-photo.png"
               alt="Vibrant art market event with vendors and attendees"
-              className="rounded-2xl shadow-xl border border-fuchsia-500/20"
+              className="rounded-2xl shadow-xl border border-voxxy-pink/20"
               loading="lazy"
             />
           </div>
@@ -480,7 +482,7 @@ export default function HomePage() {
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/6">
-                    <Mail className="w-5 h-5 text-fuchsia-400" />
+                    <Mail className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
                     <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">EMAIL</div>
@@ -492,7 +494,7 @@ export default function HomePage() {
 
                 <div className="flex items-start gap-4">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/6">
-                    <MessageCircle className="w-5 h-5 text-fuchsia-400" />
+                    <MessageCircle className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
                     <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">COMMUNITY</div>
@@ -504,7 +506,7 @@ export default function HomePage() {
 
                 <div className="flex items-start gap-4">
                   <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/6">
-                    <Instagram className="w-5 h-5 text-fuchsia-400" />
+                    <Instagram className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
                     <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">SOCIAL</div>
@@ -519,7 +521,7 @@ export default function HomePage() {
             {/* Right Column - Form */}
             <div>
               {isSubmitted ? (
-                <div className="rounded-2xl border border-fuchsia-400/15 bg-white/6 p-10 text-center backdrop-blur-xl">
+                <div className="rounded-2xl border border-voxxy-pink/15 bg-white/6 p-10 text-center backdrop-blur-xl">
                   <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="h-8 w-8 text-green-300" />
                   </div>
@@ -529,7 +531,7 @@ export default function HomePage() {
                   </p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-fuchsia-400/15 bg-white/6 p-8 backdrop-blur-xl">
+                <div className="rounded-2xl border border-voxxy-pink/15 bg-white/6 p-8 backdrop-blur-xl">
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Name and Email Row */}
                     <div className="grid md:grid-cols-2 gap-4">
@@ -539,7 +541,7 @@ export default function HomePage() {
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
                         required
-                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-fuchsia-400/40 focus:bg-white/10"
+                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
                       />
                       <input
                         id="email"
@@ -548,7 +550,7 @@ export default function HomePage() {
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         required
-                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-fuchsia-400/40 focus:bg-white/10"
+                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
                       />
                     </div>
 
@@ -558,7 +560,7 @@ export default function HomePage() {
                       placeholder="Event name (if you have one)"
                       value={formData.eventName}
                       onChange={(e) => handleInputChange('eventName', e.target.value)}
-                      className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-fuchsia-400/40 focus:bg-white/10"
+                      className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
                     />
 
                     {/* Message */}
@@ -569,7 +571,7 @@ export default function HomePage() {
                       onChange={(e) => handleInputChange('message', e.target.value)}
                       required
                       rows={5}
-                      className="min-h-[80px] w-full resize-none rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-fuchsia-400/40 focus:bg-white/10"
+                      className="min-h-[80px] w-full resize-none rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
                     />
 
                     {submissionError && (
@@ -582,7 +584,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex w-full items-center justify-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-4 text-[15px] font-semibold text-white shadow-md shadow-fuchsia-500/20 transition-all hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex w-full items-center justify-center rounded-xl voxxy-btn-brand px-8 py-4 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {isSubmitting ? 'Sending...' : 'Send Message'}
                       {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}

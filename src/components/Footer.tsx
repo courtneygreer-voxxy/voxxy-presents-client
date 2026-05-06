@@ -2,14 +2,14 @@ import { Link } from 'react-router-dom'
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 border-t border-white/10 bg-[#13081f] py-12 text-white">
+    <footer className="relative z-10 border-t border-white/10 voxxy-gradient-marketing-hero py-12 text-white">
       <div className="container mx-auto max-w-6xl px-6">
         {/* Main Footer Content */}
         <div className="grid md:grid-cols-12 gap-8 md:gap-12">
           {/* Brand Column - Takes more space like header logo */}
           <div className="md:col-span-5">
             <span className="mb-4 block text-2xl font-bold tracking-wider text-white md:text-3xl">VOXXY</span>
-            <p className="leading-relaxed text-white/70">
+            <p className="leading-relaxed text-white/80">
               Event infrastructure for recurring event producers.
               Focus on creating experiences, we'll handle the vendor coordination.
             </p>
@@ -22,12 +22,12 @@ export default function Footer() {
               <h4 className="mb-3 text-[15px] font-semibold text-white">Product</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/features" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/features" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     For Artists
                   </Link>
                 </li>
                 <li>
-                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <a href="https://apps.apple.com/us/app/voxxy/id6746337878" target="_blank" rel="noopener noreferrer" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Voxxy Mobile
                   </a>
                 </li>
@@ -39,17 +39,17 @@ export default function Footer() {
               <h4 className="mb-3 text-[15px] font-semibold text-white">Company</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/about" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/about" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     About Us
                   </Link>
                 </li>
                 <li>
-                  <Link to="/help" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/help" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Help Center
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contact" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/contact" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Contact
                   </Link>
                 </li>
@@ -61,22 +61,22 @@ export default function Footer() {
               <h4 className="mb-3 text-[15px] font-semibold text-white">Legal</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link to="/legal/terms" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/legal/terms" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Terms
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/privacy" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/legal/privacy" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Privacy
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/acceptable-use" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/legal/acceptable-use" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Acceptable Use
                   </Link>
                 </li>
                 <li>
-                  <Link to="/legal/cookies" className="text-[14px] text-white/70 transition-colors hover:text-fuchsia-300">
+                  <Link to="/legal/cookies" className="text-[14px] text-white/80 transition-colors hover:text-voxxy-pink-light">
                     Cookies
                   </Link>
                 </li>

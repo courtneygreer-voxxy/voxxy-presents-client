@@ -203,7 +203,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
               {/* Modal Header */}
-              <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+              <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
                 <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
                 <button
                   onClick={handleCancelCreate}
@@ -222,7 +222,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                     type="text"
                     value={createName}
                     onChange={(e) => setCreateName(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                     placeholder="List name"
                     autoFocus
                   />
@@ -234,7 +234,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   <textarea
                     value={createDescription}
                     onChange={(e) => setCreateDescription(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                    className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                     rows={2}
                     placeholder="Description (optional)"
                   />
@@ -261,7 +261,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   <button
                     onClick={handleSaveCreate}
                     disabled={savingCreate || !createName.trim()}
-                    className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                    className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                   >
                     {savingCreate ? (
                       <>
@@ -334,7 +334,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 {/* Name */}
                 <td className="px-4 py-3">
                   <div className="flex items-center gap-2">
-                    <Filter className="w-4 h-4 text-purple-400 flex-shrink-0" />
+                    <Filter className="w-4 h-4 text-primary flex-shrink-0" />
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-foreground truncate">
                         {list.name}
@@ -361,7 +361,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                       )}
                       {list.filters.locations && list.filters.locations.length > 0 && (
                         list.filters.locations.map(loc => (
-                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-purple-500/15 text-violet-950 dark:text-purple-300 rounded">
+                          <span key={loc} className="text-xs px-1.5 py-0.5 bg-primary/15 text-violet-950 dark:text-primary rounded">
                             {loc}
                           </span>
                         ))
@@ -446,7 +446,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Edit List</h2>
               <button
                 onClick={handleCancelEdit}
@@ -465,7 +465,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   type="text"
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="List name"
                 />
               </div>
@@ -476,7 +476,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 <textarea
                   value={editDescription}
                   onChange={(e) => setEditDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                   rows={2}
                   placeholder="Description (optional)"
                 />
@@ -503,7 +503,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 <button
                   onClick={handleSaveEdit}
                   disabled={savingEdit || !editName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {savingEdit ? (
                     <>
@@ -528,7 +528,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
               <button
                 onClick={handleCancelCreate}
@@ -547,7 +547,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                   type="text"
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="List name"
                   autoFocus
                 />
@@ -559,7 +559,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 <textarea
                   value={createDescription}
                   onChange={(e) => setCreateDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                   rows={2}
                   placeholder="Description (optional)"
                 />
@@ -586,7 +586,7 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                 <button
                   onClick={handleSaveCreate}
                   disabled={savingCreate || !createName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {savingCreate ? (
                     <>

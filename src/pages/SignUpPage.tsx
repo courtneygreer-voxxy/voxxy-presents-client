@@ -6,8 +6,10 @@ import { Separator } from '@/components/ui/separator'
 import { ArrowLeft, Sparkles } from 'lucide-react'
 import { UnifiedSignUpForm } from '@/components/auth/UnifiedSignUpForm'
 import { usePageTracking } from '@/hooks/usePageTracking'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function SignUpPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
 
   // Scroll to top on page load
@@ -45,7 +47,7 @@ export default function SignUpPage() {
           <div className="text-center space-y-6">
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
             <h1 className="text-5xl font-bold mb-4">Join Voxxy Presents</h1>
-            <p className="text-xl text-purple-100 max-w-md">
+            <p className="text-xl text-white/80 max-w-md">
               Start managing your events, building your community, and growing your business with Voxxy Presents
             </p>
           </div>
@@ -77,11 +79,11 @@ export default function SignUpPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Sparkles className="h-16 w-16 mx-auto text-purple-400 mb-4" />
+              <Sparkles className="h-16 w-16 mx-auto text-primary mb-4" />
               <h1 className="text-3xl font-bold text-foreground">Join Voxxy Presents</h1>
             </div>
 
-            <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-foreground">Join Voxxy Presents</CardTitle>
                 <CardDescription>
@@ -100,7 +102,7 @@ export default function SignUpPage() {
                   <Separator className="bg-background/20 mb-4" />
                   <p className="text-muted-foreground text-sm text-center">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-purple-400 hover:text-purple-300 font-medium">
+                    <Link to="/login" className="text-primary hover:text-primary font-medium">
                       Sign in here
                     </Link>
                   </p>

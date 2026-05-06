@@ -90,7 +90,7 @@ export function DebugPanel() {
   const getRoleColor = (role?: string) => {
     switch (role) {
       // V3.0 Roles
-      case 'admin': return 'bg-purple-100 text-purple-800'
+      case 'admin': return 'bg-primary/10 text-slate-800'
       case 'producer': return 'bg-green-100 text-green-800'
       case 'venue_owner': return 'bg-green-100 text-green-800' // Maps to Producer
       case 'vendor': return 'bg-blue-100 text-blue-800'
@@ -262,7 +262,7 @@ export function DebugPanel() {
                     disabled={isSwitchingRole || userProfile.role === 'admin'}
                     size="sm"
                     variant="outline"
-                    className={`h-7 text-xs ${userProfile.role === 'admin' ? 'bg-purple-900/50 border-purple-500' : 'border-purple-500/50 text-purple-400 hover:bg-purple-900/30'}`}
+                    className={`h-7 text-xs ${userProfile.role === 'admin' ? 'bg-primary/20/50 border-primary' : 'border-primary/50 text-primary hover:bg-primary/20/30'}`}
                   >
                     👑 Admin
                   </Button>

@@ -23,7 +23,7 @@ interface EmailSequenceEditorOverlayProps {
 
 // Category display order and labels
 const SEQUENCE_CATEGORIES = [
-  { key: 'event_announcements', label: 'Event Announcements', icon: Megaphone, color: 'text-purple-400', bg: 'bg-purple-500/20' },
+  { key: 'event_announcements', label: 'Event Announcements', icon: Megaphone, color: 'text-primary', bg: 'bg-primary/20' },
   { key: 'application_updates', label: 'Application Updates', icon: FileText, color: 'text-pink-400', bg: 'bg-pink-500/20' },
   { key: 'payment_reminders', label: 'Payment Reminders', icon: CreditCard, color: 'text-blue-400', bg: 'bg-blue-500/20' },
   { key: 'event_countdown', label: 'Event Countdown', icon: Calendar, color: 'text-green-400', bg: 'bg-green-500/20' },
@@ -289,8 +289,8 @@ export default function EmailSequenceEditorOverlay({
 
   const isSent = selectedEmail?.status === 'sent';
   const isCustomEmail = selectedEmail ? isCustomCountdown(selectedEmail.trigger_type) : false;
-  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-purple-500/25 hover:bg-purple-500/10 focus-visible:border-purple-500/45 focus-visible:bg-purple-500/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:hover:border-purple-400/20 dark:hover:bg-purple-500/12 dark:focus-visible:border-purple-400/35 dark:focus-visible:bg-purple-500/18 dark:focus-visible:ring-purple-400/25';
-  const activeNavItemClass = 'border border-purple-500/45 bg-purple-500/18 shadow-sm dark:border-purple-400/28 dark:bg-purple-500/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
+  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-primary/25 hover:bg-primary/10 focus-visible:border-primary/45 focus-visible:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:hover:border-primary/20 dark:hover:bg-primary/12 dark:focus-visible:border-primary/35 dark:focus-visible:bg-primary/18 dark:focus-visible:ring-primary/25';
+  const activeNavItemClass = 'border border-primary/45 bg-primary/18 shadow-sm dark:border-primary/28 dark:bg-primary/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
   const detailWellClass = 'voxxy-surface-subtle rounded-lg p-3';
   const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500/50';
 
@@ -313,7 +313,7 @@ export default function EmailSequenceEditorOverlay({
               </Button>
               <div className="h-5 w-px bg-border" />
               <div className="flex items-center gap-2">
-                <Mail className="w-5 h-5 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Mail className="w-5 h-5 shrink-0 text-primary dark:text-primary" />
                 <div>
                   <h1 className="text-base font-semibold text-foreground">Email Sequence Editor</h1>
                   {eventData?.title && (
@@ -351,7 +351,7 @@ export default function EmailSequenceEditorOverlay({
                 {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                 {/* <button
                   onClick={() => onCreateEmail(null)}
-                  className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-violet-950 dark:text-purple-400 hover:bg-purple-500/30 transition-all inline-flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg bg-primary/20 border border-primary/40 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all inline-flex items-center gap-2"
                 >
                   <Plus className="w-4 h-4" />
                   Add First Email
@@ -370,7 +370,7 @@ export default function EmailSequenceEditorOverlay({
                   {/* TEMPORARILY HIDDEN - Will be re-enabled later */}
                   {/* <button
                     onClick={() => onCreateEmail(selectedEmail?.category_id || null)}
-                    className="rounded p-1 text-violet-700 transition-all hover:bg-purple-500/20 hover:text-violet-800 dark:text-purple-400"
+                    className="rounded p-1 text-violet-700 transition-all hover:bg-primary/20 hover:text-violet-800 dark:text-primary"
                     title="Add reminder email"
                   >
                     <Plus className="w-4 h-4" />
@@ -441,7 +441,7 @@ export default function EmailSequenceEditorOverlay({
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <Mail className="h-4 w-4 shrink-0 text-purple-700 dark:text-purple-400" />
+                          <Mail className="h-4 w-4 shrink-0 text-primary dark:text-primary" />
                           <h3 className="text-base font-semibold text-foreground truncate">
                             {selectedEmail.name}
                           </h3>
@@ -455,14 +455,14 @@ export default function EmailSequenceEditorOverlay({
                                   <Tooltip.Trigger asChild>
                                     <button
                                       type="button"
-                                      className="text-purple-700 transition-colors hover:text-purple-900 dark:text-purple-300 dark:hover:text-purple-200"
+                                      className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary"
                                     >
                                       <HelpCircle className="h-3.5 w-3.5" />
                                     </button>
                                   </Tooltip.Trigger>
                                   <Tooltip.Portal>
                                     <Tooltip.Content
-                                      className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                                      className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-primary/30 shadow-xl max-w-xs z-50"
                                       sideOffset={5}
                                     >
                                       This is a time-based reminder that was added to this event's sequence.
@@ -524,7 +524,7 @@ export default function EmailSequenceEditorOverlay({
                         </button>
                         <button
                           onClick={() => onEditEmail(selectedEmail)}
-                          className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-violet-950 dark:text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
+                          className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all text-sm flex items-center gap-1.5"
                         >
                           {isSent ? <Eye className="w-3.5 h-3.5" /> : <Edit2 className="w-3.5 h-3.5" />}
                           {isSent ? 'View' : 'Edit'}

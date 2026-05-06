@@ -148,7 +148,7 @@ export default function LocationAutocomplete({
           placeholder={placeholder}
           className={`w-full px-3 py-2 pl-8 text-sm rounded-lg bg-background/10 border ${
             error ? 'border-red-500' : 'border-border'
-          } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+          } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
         />
 
         {/* Icon */}
@@ -175,7 +175,7 @@ export default function LocationAutocomplete({
               onMouseEnter={() => setSelectedIndex(index)}
               className={`w-full text-left px-3 py-2 transition-colors border-b border-border last:border-b-0 ${
                 index === selectedIndex
-                  ? 'bg-purple-500/20 text-foreground'
+                  ? 'bg-primary/20 text-foreground'
                   : 'text-foreground/90 hover:bg-background/5'
               }`}
             >

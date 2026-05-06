@@ -151,7 +151,7 @@ export default function EventbriteConnection({
               value={apiToken}
               onChange={(e) => setApiToken(e.target.value)}
               placeholder="Enter your Eventbrite private token"
-              className="w-full px-4 py-2.5 rounded-xl bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 focus:bg-background/15 transition-all"
+              className="w-full px-4 py-2.5 rounded-xl bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 focus:bg-background/15 transition-all"
               disabled={isLoading}
             />
             <p className="mt-2 text-sm text-foreground/60">
@@ -160,7 +160,7 @@ export default function EventbriteConnection({
                 href="https://www.eventbrite.com/account-settings/apps"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-purple-400 hover:text-purple-300 hover:underline"
+                className="text-primary hover:text-primary hover:underline"
               >
                 Eventbrite Account Settings
               </a>
@@ -170,7 +170,7 @@ export default function EventbriteConnection({
           <button
             onClick={handleConnect}
             disabled={isLoading || !apiToken.trim()}
-            className="w-full px-6 py-3 voxxy-btn-cta rounded-xl hover:shadow-lg hover:shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
+            className="w-full px-6 py-3 voxxy-btn-cta rounded-xl hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold"
           >
             {isLoading ? 'Connecting...' : 'Connect Eventbrite'}
           </button>

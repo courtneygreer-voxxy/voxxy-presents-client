@@ -27,8 +27,10 @@ import { eventsApi, vendorApplicationsApi, bulletinsApi } from '@/services/api';
 import type { EventPortalData } from '@/types/eventPortal';
 import type { Bulletin } from '@/types/bulletin';
 import { formatDistanceToNow } from 'date-fns';
+import { useForceTheme } from '@/hooks/useForceTheme';
 
 export default function VendorEventPortalPage() {
+  useForceTheme('dark');
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isAuthenticated: isLoggedIn, isProducer, isAdmin } = useAuth();
@@ -353,7 +355,7 @@ export default function VendorEventPortalPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your.email@example.com"
-                    className="w-full px-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 text-foreground placeholder:text-muted-foreground"
+                    className="w-full px-4 py-2 bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-foreground placeholder:text-muted-foreground"
                     required
                     autoFocus
                   />
@@ -402,7 +404,7 @@ export default function VendorEventPortalPage() {
     return (
       <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-purple-500" />
+          <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Loading event details...</p>
         </div>
       </div>
@@ -440,9 +442,9 @@ export default function VendorEventPortalPage() {
         <div className="max-w-4xl mx-auto px-6 py-12">
           {/* Producer Preview Banner */}
           {isProducerPreview && (
-            <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-3 mb-6 flex items-center gap-2">
-              <Eye className="w-4 h-4 text-purple-400 flex-shrink-0" />
-              <p className="text-sm text-purple-200">
+            <div className="bg-primary/20 border border-primary/30 rounded-lg p-3 mb-6 flex items-center gap-2">
+              <Eye className="w-4 h-4 text-primary flex-shrink-0" />
+              <p className="text-sm text-primary">
                 <span className="font-semibold">Producer Preview</span> — This is how vendors see your event portal.
               </p>
             </div>
@@ -468,7 +470,7 @@ export default function VendorEventPortalPage() {
                 {event.organization.email ? (
                   <a
                     href={`mailto:${event.organization.email}`}
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary text-sm"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -507,9 +509,9 @@ export default function VendorEventPortalPage() {
       <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16 py-8">
         {/* Producer Preview Banner */}
         {isProducerPreview && (
-          <div className="bg-purple-600/20 border border-purple-500/30 rounded-lg p-3 mb-6 flex items-center gap-2">
-            <Eye className="w-4 h-4 text-purple-400 flex-shrink-0" />
-            <p className="text-sm text-purple-200">
+          <div className="bg-primary/20 border border-primary/30 rounded-lg p-3 mb-6 flex items-center gap-2">
+            <Eye className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-sm text-primary">
               <span className="font-semibold">Producer Preview</span> — This is how vendors see your event portal.
             </p>
           </div>
@@ -550,7 +552,7 @@ export default function VendorEventPortalPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
             {event.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                <MapPin className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Location</p>
                   <p className="text-muted-foreground">{event.venue}</p>
@@ -561,7 +563,7 @@ export default function VendorEventPortalPage() {
 
             {event.age_restriction && (
               <div className="flex items-start gap-3">
-                <Users className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                <Users className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Age Restriction</p>
                   <p className="text-muted-foreground">{event.age_restriction}</p>
@@ -571,7 +573,7 @@ export default function VendorEventPortalPage() {
 
             {event.payment_deadline && (
               <div className="flex items-start gap-3">
-                <DollarSign className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                <DollarSign className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Payment Deadline</p>
                   <p className="text-muted-foreground">{formatDate(event.payment_deadline)}</p>
@@ -581,14 +583,14 @@ export default function VendorEventPortalPage() {
 
             {event.ticket_url && (
               <div className="flex items-start gap-3">
-                <ExternalLink className="h-5 w-5 text-purple-400 mt-1 flex-shrink-0" />
+                <ExternalLink className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
                 <div>
                   <p className="font-semibold">Event Tickets</p>
                   <a
                     href={event.ticket_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-purple-400 hover:text-purple-300 underline text-sm"
+                    className="text-primary hover:text-primary underline text-sm"
                   >
                     View Ticket Page
                   </a>
@@ -623,7 +625,7 @@ export default function VendorEventPortalPage() {
                   <div
                     key={bulletin.id}
                     className={`voxxy-gradient-card-deep rounded-lg p-4 md:p-6 border ${
-                      bulletin.pinned ? 'border-purple-500' : 'border-border'
+                      bulletin.pinned ? 'border-primary' : 'border-border'
                     }`}
                   >
                     {/* Header */}
@@ -637,7 +639,7 @@ export default function VendorEventPortalPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="text-sm md:text-base text-foreground font-semibold">{bulletin.subject}</h3>
                           {bulletin.pinned && (
-                            <Pin className="w-3 h-3 md:w-4 md:h-4 text-purple-400 fill-purple-400 flex-shrink-0" />
+                            <Pin className="w-3 h-3 md:w-4 md:h-4 text-primary fill-primary flex-shrink-0" />
                           )}
                         </div>
                         <p className="text-muted-foreground text-xs md:text-sm">
@@ -687,7 +689,7 @@ export default function VendorEventPortalPage() {
                     </div>
                     {category.booth_price && (
                       <div className="flex items-center justify-between md:block md:text-right">
-                        <p className="text-xl md:text-2xl font-bold text-purple-400">
+                        <p className="text-xl md:text-2xl font-bold text-primary">
                           {formatPrice(category.booth_price)}
                         </p>
                         {category.payment_link && (

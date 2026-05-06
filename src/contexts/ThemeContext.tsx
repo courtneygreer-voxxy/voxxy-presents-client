@@ -88,12 +88,17 @@ export function restoreDashboardThemePreference() {
 type ThemeContextValue = {
   theme: Theme
   setTheme: (theme: Theme) => void
+  setForcedTheme: (theme: Theme | null) => void
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null)
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readStoredTheme)
+  const [forcedTheme, setForcedThemeState] = useState<Theme | null>(null)
+
+  // The effective theme is the forced theme if set, otherwise the user preference
+  const effectiveTheme = forcedTheme ?? theme
 
   useLayoutEffect(() => {
     externalSetTheme = setThemeState
@@ -103,21 +108,29 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useLayoutEffect(() => {
-    applyThemeToDocument(theme)
-    persistActiveTheme(theme)
-  }, [theme])
+    applyThemeToDocument(effectiveTheme)
+    // Only persist when not forced (user preference changes)
+    if (forcedTheme === null) {
+      persistActiveTheme(effectiveTheme)
+    }
+  }, [effectiveTheme, forcedTheme])
 
   const setTheme = useCallback((next: Theme) => {
     persistDashboardTheme(next)
     setThemeState(next)
   }, [])
 
+  const setForcedTheme = useCallback((next: Theme | null) => {
+    setForcedThemeState(next)
+  }, [])
+
   const value = useMemo(
     () => ({
-      theme,
+      theme: effectiveTheme,
       setTheme,
+      setForcedTheme,
     }),
-    [theme, setTheme]
+    [effectiveTheme, setTheme, setForcedTheme]
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>

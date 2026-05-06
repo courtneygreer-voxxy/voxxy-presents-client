@@ -76,9 +76,9 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
   const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
   const [testEmailAddress, setTestEmailAddress] = useState('');
   const [isSendingTest, setIsSendingTest] = useState(false);
-  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-purple-500/25 hover:bg-purple-500/10 focus-visible:border-purple-500/45 focus-visible:bg-purple-500/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500/30 dark:hover:border-purple-400/20 dark:hover:bg-purple-500/12 dark:focus-visible:border-purple-400/35 dark:focus-visible:bg-purple-500/18 dark:focus-visible:ring-purple-400/25';
-  const activeNavItemClass = 'border border-purple-500/45 bg-purple-500/18 shadow-sm dark:border-purple-400/28 dark:bg-purple-500/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
-  const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500/40';
+  const navItemClass = 'w-full rounded-lg border border-transparent px-3 py-2 text-left transition-all hover:border-primary/25 hover:bg-primary/10 focus-visible:border-primary/45 focus-visible:bg-primary/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/30 dark:hover:border-primary/20 dark:hover:bg-primary/12 dark:focus-visible:border-primary/35 dark:focus-visible:bg-primary/18 dark:focus-visible:ring-primary/25';
+  const activeNavItemClass = 'border border-primary/45 bg-primary/18 shadow-sm dark:border-primary/28 dark:bg-primary/20 dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03)]';
+  const modalInputClass = 'voxxy-input-frost w-full rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary/40';
 
   useEffect(() => {
     if (templateId) {
@@ -547,7 +547,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
               </Button>
               <div className="h-5 w-px bg-border" />
               <div className="flex items-center gap-2">
-                <Mail className="h-5 w-5 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Mail className="h-5 w-5 shrink-0 text-primary dark:text-primary" />
                 <div>
                   <h1 className="text-base font-semibold text-foreground">
                     {template ? (isSystemDefault ? 'View Sequence' : 'Edit Sequence') : 'New Sequence'}
@@ -646,7 +646,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
             <p className="text-foreground/60 text-sm">Loading sequence...</p>
           </div>
         )}
@@ -712,7 +712,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="e.g., Summer Festival Campaign"
-                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50 dark:bg-background/10"
+                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 dark:bg-background/10"
                       disabled={!canEdit}
                       maxLength={100}
                     />
@@ -729,7 +729,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                       value={description}
                       onChange={(e) => setDescription(e.target.value)}
                       placeholder="Describe when to use this template..."
-                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 disabled:opacity-50 dark:bg-background/10"
+                      className="w-full rounded border border-border bg-card/80 px-2 py-1.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50 disabled:opacity-50 dark:bg-background/10"
                       disabled={!canEdit}
                       maxLength={500}
                     />
@@ -748,7 +748,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                   {canEdit && (
                     <button
                       onClick={() => handleOpenCreateEditor()}
-                      className="px-4 py-2 rounded-lg bg-purple-500/20 border border-purple-500/40 text-violet-950 dark:text-purple-400 hover:bg-purple-500/30 transition-all text-sm inline-flex items-center gap-2"
+                      className="px-4 py-2 rounded-lg bg-primary/20 border border-primary/40 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all text-sm inline-flex items-center gap-2"
                     >
                       <Plus className="w-4 h-4" />
                       Add First Email
@@ -768,7 +768,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                         {canEdit && (
                           <button
                             onClick={() => handleOpenCreateEditor()}
-                            className="rounded p-1 text-violet-700 transition-all hover:bg-purple-500/20 hover:text-violet-800 dark:text-purple-400"
+                            className="rounded p-1 text-violet-700 transition-all hover:bg-primary/20 hover:text-violet-800 dark:text-primary"
                             title="Add reminder email"
                           >
                             <Plus className="w-4 h-4" />
@@ -832,7 +832,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-1">
-                                <Mail className="h-4 w-4 flex-shrink-0 text-violet-700 dark:text-purple-400" />
+                                <Mail className="h-4 w-4 flex-shrink-0 text-violet-700 dark:text-primary" />
                                 <h3 className="text-base font-semibold text-foreground truncate">
                                   {selectedEmail.name}
                                 </h3>
@@ -840,19 +840,19 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                   const isReminder = isCustomReminder(selectedEmail.trigger_type);
                                   return isReminder ? (
                                     <div className="flex items-center gap-1">
-                                      <span className="flex-shrink-0 rounded border border-purple-400/40 bg-purple-500/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-violet-950 dark:text-purple-200">
+                                      <span className="flex-shrink-0 rounded border border-primary/40 bg-primary/30 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-violet-950 dark:text-primary">
                                         Reminder
                                       </span>
                                       <Tooltip.Provider delayDuration={200}>
                                         <Tooltip.Root>
                                           <Tooltip.Trigger asChild>
-                                            <button className="text-purple-700 transition-colors hover:text-purple-900 dark:text-purple-300 dark:hover:text-purple-200">
+                                            <button className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary">
                                               <HelpCircle className="w-3.5 h-3.5" />
                                             </button>
                                           </Tooltip.Trigger>
                                           <Tooltip.Portal>
                                             <Tooltip.Content
-                                              className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                                              className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-primary/30 shadow-xl max-w-xs z-50"
                                               sideOffset={5}
                                             >
                                               This is a time-based reminder that was added to this event's sequence.
@@ -918,7 +918,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                   </button>
                                   <button
                                     onClick={() => handleEditEmail(selectedEmail)}
-                                    className="px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-500/20 text-violet-950 dark:text-purple-300 hover:bg-purple-500/30 transition-all text-sm flex items-center gap-1.5"
+                                    className="px-3 py-1.5 rounded-lg border border-primary/40 bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all text-sm flex items-center gap-1.5"
                                   >
                                     <Edit className="w-3.5 h-3.5" />
                                     Edit
@@ -1166,7 +1166,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
       {/* Test Email Dialog */}
       {showTestEmailDialog && selectedEmail && (
         <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="voxxy-modal-surface max-w-md w-full rounded-xl border border-purple-500/30 p-6 shadow-2xl">
+          <div className="voxxy-modal-surface max-w-md w-full rounded-xl border border-primary/30 p-6 shadow-2xl">
             {/* Header */}
             <div className="flex items-start gap-3 mb-4">
               <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/20">

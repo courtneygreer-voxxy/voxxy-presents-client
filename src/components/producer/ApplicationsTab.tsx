@@ -114,7 +114,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
   if (loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -228,7 +228,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                               href={application.payment_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-purple-400 hover:text-purple-300 underline break-all"
+                              className="text-primary hover:text-primary underline break-all"
                             >
                               {application.payment_link}
                             </a>
@@ -246,7 +246,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                               {application.application_tags.split(',').map((tag, idx) => (
                                 <span
                                   key={idx}
-                                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-xs"
+                                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-foreground text-xs"
                                 >
                                   {tag.trim()}
                                 </span>
@@ -267,14 +267,14 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                       {/* Preview Message */}
                       <div className="bg-black/20 rounded-lg p-3 mb-3 border border-border">
                         <p className="text-xs text-foreground/50 mb-1">Preview:</p>
-                        <p className="text-sm text-purple-300">
+                        <p className="text-sm text-primary">
                           Apply to {application.name} - {event.title}
                         </p>
                       </div>
                       
                       {/* URL */}
                       <div className="flex items-center gap-2">
-                        <code className="flex-1 text-sm text-purple-300 font-mono bg-black/30 px-3 py-2 rounded overflow-x-auto">
+                        <code className="flex-1 text-sm text-primary font-mono bg-black/30 px-3 py-2 rounded overflow-x-auto">
                           {application.shareable_url}
                         </code>
                         <button

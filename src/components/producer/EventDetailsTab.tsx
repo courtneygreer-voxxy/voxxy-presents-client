@@ -250,11 +250,11 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
         {/* Total Applicants Card */}
         <div
           onClick={() => onNavigateToTab?.('applicants')}
-          className="voxxy-gradient-panel rounded-xl p-5 border border-purple-500/20 hover:border-purple-500/40 transition-all group cursor-pointer"
+          className="voxxy-gradient-panel rounded-xl p-5 border border-primary/20 hover:border-primary/40 transition-all group cursor-pointer"
         >
           <div className="flex items-start justify-between mb-3">
-            <div className="p-3 rounded-lg bg-purple-500/20">
-              <Users className="w-6 h-6 text-purple-400" />
+            <div className="p-3 rounded-lg bg-primary/20">
+              <Users className="w-6 h-6 text-primary" />
             </div>
             <ArrowRight className="w-5 h-5 text-foreground/40 group-hover:text-foreground/60 transition-colors" />
           </div>
@@ -317,14 +317,14 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
         {/* Copy Link Button */}
         <button
           onClick={handleCopyUrl}
-          className="flex items-center justify-between p-4 voxxy-gradient-panel rounded-xl border border-purple-500/20 hover:border-purple-500/40 transition-all group"
+          className="flex items-center justify-between p-4 voxxy-gradient-panel rounded-xl border border-primary/20 hover:border-primary/40 transition-all group"
         >
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-lg bg-purple-500/20 group-hover:bg-purple-500/30 transition-colors">
+            <div className="p-2.5 rounded-lg bg-primary/20 group-hover:bg-primary/30 transition-colors">
               {copied ? (
                 <Check className="w-5 h-5 text-green-400" />
               ) : (
-                <Copy className="w-5 h-5 text-purple-400" />
+                <Copy className="w-5 h-5 text-primary" />
               )}
             </div>
             <div className="text-left">
@@ -399,7 +399,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
             </div>
           )}
 
-          <div className="voxxy-gradient-panel rounded-xl p-6 border border-purple-500/20 space-y-6">
+          <div className="voxxy-gradient-panel rounded-xl p-6 border border-primary/20 space-y-6">
             {/* Event Name */}
             <div>
               <label className="block text-foreground/90 font-medium mb-2">Event Name *</label>
@@ -407,7 +407,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                 type="text"
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -418,7 +418,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary resize-none"
               />
             </div>
 
@@ -431,7 +431,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   value={formData.venue}
                   onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
                   placeholder="e.g., Brooklyn Steel"
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -441,7 +441,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
                   placeholder="e.g., Brooklyn, NY"
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -455,7 +455,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="date"
                   value={formData.event_date}
                   onChange={(e) => setFormData({ ...formData, event_date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -465,7 +465,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="date"
                   value={formData.event_end_date}
                   onChange={(e) => setFormData({ ...formData, event_end_date: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -478,7 +478,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="time"
                   value={formData.start_time}
                   onChange={(e) => setFormData({ ...formData, start_time: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -487,7 +487,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="time"
                   value={formData.end_time}
                   onChange={(e) => setFormData({ ...formData, end_time: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -500,7 +500,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                 value={formData.age_restriction}
                 onChange={(e) => setFormData({ ...formData, age_restriction: e.target.value })}
                 placeholder="e.g., All Ages, 18+, 21+"
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -512,7 +512,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                 value={formData.ticket_link}
                 onChange={(e) => setFormData({ ...formData, ticket_link: e.target.value })}
                 placeholder="https://example.com/tickets"
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
@@ -525,7 +525,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="date"
                   value={formData.application_deadline}
                   onChange={(e) => setFormData({ ...formData, application_deadline: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
               <div>
@@ -535,7 +535,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   type="date"
                   value={formData.payment_deadline}
                   onChange={(e) => setFormData({ ...formData, payment_deadline: e.target.value })}
-                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>
             </div>
@@ -547,7 +547,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
       {!isEditing && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Basic Info Card */}
-          <div className="voxxy-gradient-panel rounded-xl p-6 border border-purple-500/20 space-y-4">
+          <div className="voxxy-gradient-panel rounded-xl p-6 border border-primary/20 space-y-4">
             <h3 className="text-lg font-semibold text-foreground mb-4">Basic Information</h3>
 
             <div>
@@ -606,7 +606,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   href={event.ticket_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-purple-400 hover:text-purple-300 underline break-all"
+                  className="text-primary hover:text-primary underline break-all"
                 >
                   {event.ticket_link}
                 </a>

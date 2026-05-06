@@ -218,10 +218,10 @@ export default function EventEmailPreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-primary/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="w-5 h-5 text-primary" />
             <span>Email Preview</span>
           </DialogTitle>
         </DialogHeader>
@@ -233,7 +233,7 @@ export default function EventEmailPreviewModal({
               {/* Trigger */}
               {email.trigger_type && (
                 <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-purple-400" />
+                  <Mail className="w-4 h-4 text-primary" />
                   <div>
                     <p className="text-xs text-foreground/60">Trigger Type</p>
                     <p className="text-sm font-medium text-foreground">
@@ -246,7 +246,7 @@ export default function EventEmailPreviewModal({
               {/* Scheduled Send Date */}
               {email.scheduled_for && (
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-purple-400" />
+                  <Calendar className="w-4 h-4 text-primary" />
                   <div>
                     <p className="text-xs text-foreground/60">Scheduled For</p>
                     <p className="text-sm font-medium text-foreground">
@@ -281,7 +281,7 @@ export default function EventEmailPreviewModal({
           {/* Loading State */}
           {isLoading && (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
               <p className="text-foreground/60">Loading preview...</p>
             </div>
           )}
@@ -330,7 +330,7 @@ export default function EventEmailPreviewModal({
           {previewData && !isLoading && (
             <div className="bg-background/5 rounded-lg p-4 border border-border">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-purple-400" />
+                <Users className="w-4 h-4 text-primary" />
                 <div>
                   <p className="text-xs text-foreground/60">Recipients</p>
                   <p className="text-sm font-medium text-foreground">

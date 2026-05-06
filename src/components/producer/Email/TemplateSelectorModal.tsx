@@ -77,7 +77,7 @@ export default function TemplateSelectorModal({
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="w-5 h-5 text-primary" />
             Choose Email Campaign Template
           </DialogTitle>
           <DialogDescription>
@@ -88,7 +88,7 @@ export default function TemplateSelectorModal({
         <div className="flex-1 overflow-y-auto py-4">
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
               <p className="text-foreground/60">Loading templates...</p>
             </div>
           ) : error ? (
@@ -117,7 +117,7 @@ export default function TemplateSelectorModal({
                     onClick={() => setSelectedId(template.id)}
                     className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                       isSelected
-                        ? 'border-purple-500 bg-purple-500/10'
+                        ? 'border-primary bg-primary/10'
                         : 'border-border bg-background/5 hover:border-border hover:bg-background/[0.07]'
                     }`}
                   >
@@ -152,7 +152,7 @@ export default function TemplateSelectorModal({
                       </div>
                       <div className={`flex-shrink-0 ml-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                         isSelected
-                          ? 'border-purple-500 bg-purple-500'
+                          ? 'border-primary bg-primary/50'
                           : 'border-border'
                       }`}>
                         {isSelected && <Check className="w-3 h-3 text-foreground" />}

@@ -68,7 +68,7 @@ export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowD
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
-              <MessageCircle className="h-5 w-5 text-purple-600" />
+              <MessageCircle className="h-5 w-5 text-primary" />
               Quick Question
             </DialogTitle>
             <Button

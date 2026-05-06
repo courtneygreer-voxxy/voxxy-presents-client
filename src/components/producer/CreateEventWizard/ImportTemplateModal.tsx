@@ -85,7 +85,7 @@ export default function ImportTemplateModal({
                     onClick={() => handleSelectTemplate(template)}
                     className={`w-full text-left p-4 rounded-lg border transition-all ${
                       currentTemplateId === template.id
-                        ? 'bg-purple-500/20 border-purple-500/40'
+                        ? 'bg-primary/20 border-primary/40'
                         : 'bg-background/5 border-border hover:bg-background/10'
                     }`}
                   >
@@ -96,7 +96,7 @@ export default function ImportTemplateModal({
                             {template.name}
                           </h3>
                           {template.is_default && (
-                            <span className="px-2 py-0.5 bg-purple-500/30 text-violet-950 dark:text-purple-300 text-xs font-medium rounded border border-purple-500/50">
+                            <span className="px-2 py-0.5 bg-primary/30 text-violet-950 dark:text-primary text-xs font-medium rounded border border-primary/50">
                               DEFAULT
                             </span>
                           )}
@@ -125,7 +125,7 @@ export default function ImportTemplateModal({
                         onClick={() => handleSelectTemplate(template)}
                         className={`w-full text-left p-4 rounded-lg border transition-all ${
                           currentTemplateId === template.id
-                            ? 'bg-purple-500/20 border-purple-500/40'
+                            ? 'bg-primary/20 border-primary/40'
                             : 'bg-background/5 border-border hover:bg-background/10'
                         }`}
                       >

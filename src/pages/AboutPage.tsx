@@ -5,8 +5,10 @@ import { usePageTracking } from '@/hooks/usePageTracking'
 import { TrackedLink } from '@/components/analytics/TrackedLink'
 import Navigation from '@/components/Navigation'
 import Footer from '@/components/Footer'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function AboutPage() {
+  useForceTheme('dark')
   usePageTracking('About')
 
   useEffect(() => {
@@ -14,7 +16,7 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="about" />
 
       {/* Hero Section */}
@@ -24,7 +26,7 @@ export default function AboutPage() {
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
           <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
             Community is built{" "}
-            <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">
+            <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
               in person
             </em>
           </h1>
@@ -34,9 +36,9 @@ export default function AboutPage() {
 
           {/* Divider */}
           <div className="mt-9 flex items-center justify-center">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
-            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-voxxy-pink/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-voxxy-pink/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-voxxy-pink/40"></div>
           </div>
         </div>
       </section>
@@ -122,7 +124,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="border-y border-white/10 bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-24 px-6 md:px-12">
+      <section className="border-y border-white/10 voxxy-gradient-marketing-hero py-24 px-6 md:px-12">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="mb-6 text-[42px] font-display font-bold text-white md:text-[48px]">
             Want to learn more?
@@ -132,7 +134,7 @@ export default function AboutPage() {
           </p>
           <TrackedLink
             to="/contact"
-            className="inline-flex items-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl"
+            className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl"
             trackingData={{
               link_text: 'Get in Touch',
               destination_page: 'Contact',

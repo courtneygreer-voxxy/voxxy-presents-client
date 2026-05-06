@@ -2,7 +2,7 @@ export const EMAIL_HISTORY_ICON_CLASS = 'text-foreground/40 dark:text-foreground
 export const EMAIL_HISTORY_SUBJECT_CLASS = 'text-foreground/80 dark:text-foreground/70';
 export const EMAIL_HISTORY_META_CLASS = 'text-foreground/55 dark:text-foreground/40';
 export const EMAIL_HISTORY_RETRY_CLASS =
-  'text-violet-700 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300';
+  'text-violet-700 hover:text-violet-800 dark:text-primary dark:hover:text-primary';
 
 const EMAIL_DELIVERY_STATUS_CLASS_MAP: Record<string, string> = {
   delivered: 'text-emerald-700 dark:text-green-400',

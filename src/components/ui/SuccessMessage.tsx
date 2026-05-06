@@ -50,7 +50,7 @@ export default function SuccessMessage({
             className="absolute -top-2 -right-2 w-6 h-6 text-yellow-400 animate-spin-slow"
           />
           <Sparkles
-            className="absolute -bottom-2 -left-2 w-5 h-5 text-purple-400 animate-spin-slow"
+            className="absolute -bottom-2 -left-2 w-5 h-5 text-primary animate-spin-slow"
             style={{ animationDelay: '0.5s' }}
           />
         </div>
@@ -70,7 +70,7 @@ export default function SuccessMessage({
           {[...Array(5)].map((_, i) => (
             <div
               key={i}
-              className="w-1.5 h-1.5 rounded-full bg-purple-400 animate-confetti"
+              className="w-1.5 h-1.5 rounded-full bg-primary animate-confetti"
               style={{
                 animationDelay: `${i * 0.1}s`,
                 animationDuration: `${1 + Math.random()}s`,

@@ -71,7 +71,7 @@ export function EmailAuditFilters({
     onFiltersChange({});
   };
 
-  const inputClasses = "w-full px-3 py-2 bg-background/5 border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all cursor-pointer hover:bg-background/10";
+  const inputClasses = "w-full px-3 py-2 bg-background/5 border border-border rounded-lg text-foreground text-xs focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all cursor-pointer hover:bg-background/10";
 
   // Format the date range display text
   const dateRangeLabel = () => {
@@ -99,7 +99,7 @@ export function EmailAuditFilters({
           onChange={(e) =>
             onFiltersChange({ ...filters, search: e.target.value || undefined })
           }
-          className="w-full pl-9 pr-4 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+          className="w-full pl-9 pr-4 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
         />
       </div>
 

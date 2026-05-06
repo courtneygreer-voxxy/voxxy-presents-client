@@ -19,7 +19,7 @@ export function PreviewBadge({ variant = 'preview', size = 'sm', className }: Pr
         }
       case 'beta':
         return {
-          className: 'bg-purple-100 text-purple-800 hover:bg-purple-200',
+          className: 'bg-primary/10 text-slate-800 hover:bg-primary/20',
           icon: <TestTube className="h-3 w-3 mr-1" />,
           text: 'Beta'
         }

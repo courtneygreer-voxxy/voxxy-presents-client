@@ -78,7 +78,7 @@ export function RichTextEditor({
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {
-          class: 'text-violet-700 underline hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300',
+          class: 'text-violet-700 underline hover:text-violet-800 dark:text-primary dark:hover:text-primary',
           rel: 'noopener noreferrer',
           target: '_blank',
         },
@@ -149,7 +149,7 @@ export function RichTextEditor({
       className={`
         p-2 rounded transition-colors
         ${active
-          ? 'bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/40'
+          ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
           : 'hover:bg-background/10 text-foreground/70 hover:text-foreground border border-transparent'
         }
         ${disabled ? 'opacity-30 cursor-not-allowed' : 'cursor-pointer'}
@@ -322,8 +322,8 @@ export function RichTextEditor({
               className={`
                 px-2.5 py-1.5 rounded text-xs font-medium transition-all flex items-center gap-1.5
                 ${editor.isActive('link')
-                  ? 'bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/40'
-                  : 'bg-violet-200/90 text-foreground hover:bg-violet-300/90 border border-violet-300/80 dark:bg-purple-600/80 dark:hover:bg-purple-600 dark:text-primary-foreground dark:border-transparent'
+                  ? 'bg-primary/30 text-violet-950 dark:text-primary border border-primary/40'
+                  : 'bg-violet-200/90 text-foreground hover:bg-violet-300/90 border border-violet-300/80 dark:bg-primary/80 dark:hover:bg-primary dark:text-primary-foreground dark:border-transparent'
                 }
               `}
             >
@@ -353,7 +353,7 @@ export function RichTextEditor({
                   value={displayText}
                   onChange={(e) => setDisplayText(e.target.value)}
                   placeholder="e.g., Apply Now"
-                  className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+                  className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                 />
               </div>
 
@@ -364,7 +364,7 @@ export function RichTextEditor({
                   onClick={() => setLinkMode('system')}
                   className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                     linkMode === 'system'
-                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-purple-600 dark:text-primary-foreground'
+                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-primary dark:text-primary-foreground'
                       : 'text-foreground/60 hover:bg-background/40 hover:text-foreground dark:hover:bg-background/10'
                   }`}
                 >
@@ -375,7 +375,7 @@ export function RichTextEditor({
                   onClick={() => setLinkMode('custom')}
                   className={`flex-1 px-3 py-1.5 text-xs font-medium rounded-md transition-all ${
                     linkMode === 'custom'
-                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-purple-600 dark:text-primary-foreground'
+                      ? 'bg-violet-200 text-foreground shadow-sm dark:bg-primary dark:text-primary-foreground'
                       : 'text-foreground/60 hover:bg-background/40 hover:text-foreground dark:hover:bg-background/10'
                   }`}
                 >
@@ -393,7 +393,7 @@ export function RichTextEditor({
                       onClick={() => handleSystemLinkChange(option.variable)}
                       className={`w-full px-3 py-2 text-left rounded-md transition-all flex items-center justify-between ${
                         selectedSystemLink === option.variable
-                          ? 'bg-violet-200/60 border border-violet-400/50 dark:bg-purple-600/30 dark:border-purple-500/50'
+                          ? 'bg-violet-200/60 border border-violet-400/50 dark:bg-primary/30 dark:border-primary/50'
                           : 'bg-background/40 border border-transparent hover:bg-background/70 hover:border-border dark:bg-background/5 dark:hover:bg-background/10'
                       }`}
                     >
@@ -402,7 +402,7 @@ export function RichTextEditor({
                         <span className="text-[10px] text-muted-foreground">{option.defaultText}</span>
                       </div>
                       {selectedSystemLink === option.variable && (
-                        <div className="w-2 h-2 rounded-full bg-purple-400 flex-shrink-0" />
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0" />
                       )}
                     </button>
                   ))}
@@ -420,7 +420,7 @@ export function RichTextEditor({
                     value={customUrl}
                     onChange={(e) => setCustomUrl(e.target.value)}
                     placeholder="https://example.com"
-                    className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/30"
+                    className="voxxy-input-well w-full rounded-md px-3 py-2 text-sm text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30"
                   />
                 </div>
               )}

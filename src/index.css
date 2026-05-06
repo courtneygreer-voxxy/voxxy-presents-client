@@ -9,22 +9,22 @@
 
   .marketing-card.border-2.pricing-card:hover,
   .marketing-card-accent.border-2.pricing-card:hover {
-    border-color: #d946ef;
+    border-color: #af3cda;
   }
 
   .gradient-text {
-    background: linear-gradient(to right, #c084fc, #f472b6);
+    background: linear-gradient(to right, #cc30e8, #9054e3);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .shadow-glow {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+    box-shadow: 0 0 20px rgba(144, 84, 227, 0.5);
   }
 
   .shadow-glow-intense {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.7);
+    box-shadow: 0 0 20px rgba(144, 84, 227, 0.7);
   }
 
   .transition-smooth {
@@ -40,19 +40,19 @@
     --card-foreground: 260 32% 14%;
     --popover: 0 0% 100%;
     --popover-foreground: 260 32% 14%;
-    --primary: 270 82% 52%;
+    --primary: 250 68% 25%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 270 18% 94%;
-    --secondary-foreground: 260 28% 22%;
-    --muted: 270 14% 93%;
+    --secondary: 259 18% 94%;
+    --secondary-foreground: 250 28% 22%;
+    --muted: 262 14% 93%;
     --muted-foreground: 260 12% 40%;
-    --accent: 330 70% 94%;
-    --accent-foreground: 330 55% 32%;
+    --accent: 310 70% 94%;
+    --accent-foreground: 310 55% 32%;
     --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 98%;
     --border: 260 14% 88%;
     --input: 260 14% 88%;
-    --ring: 270 82% 52%;
+    --ring: 250 68% 25%;
     --chart-1: 270 70% 50%;
     --chart-2: 200 70% 45%;
     --chart-3: 30 80% 48%;
@@ -61,12 +61,12 @@
     --radius: 0.5rem;
     --sidebar-background: 270 25% 97%;
     --sidebar-foreground: 260 28% 18%;
-    --sidebar-primary: 270 82% 52%;
+    --sidebar-primary: 250 68% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 16% 92%;
-    --sidebar-accent-foreground: 260 28% 18%;
-    --sidebar-border: 260 14% 88%;
-    --sidebar-ring: 270 82% 52%;
+    --sidebar-accent: 259 16% 92%;
+    --sidebar-accent-foreground: 250 28% 18%;
+    --sidebar-border: 250 14% 88%;
+    --sidebar-ring: 250 68% 25%;
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -116,21 +116,21 @@
     );
     --voxxy-grad-nav: linear-gradient(
       to right,
-      hsl(275 32% 96% / 0.94),
-      hsl(270 28% 95% / 0.94)
+      rgba(218, 207, 231, 0.94),
+      rgba(152, 51, 214, 0.6)
     );
     --voxxy-grad-cta: linear-gradient(
-      to right,
-      hsl(270 38% 88%),
-      hsl(285 36% 90%),
-      hsl(210 38% 91%)
+      to bottom,
+      rgba(218, 207, 231, 0.49),
+      rgba(152, 51, 214, 0.49)
     );
     --voxxy-grad-cta-pink: linear-gradient(
       to right,
       hsl(285 38% 88%),
-      hsl(330 42% 90%),
-      hsl(210 38% 91%)
+      hsl(310 42% 90%),
+      hsl(262 38% 91%)
     );
+    --voxxy-grad-brand: linear-gradient(to right, #cc30e8, #af3cda, #9054e3, #651ae9);
     --voxxy-grad-modal-header: linear-gradient(to right, hsl(var(--muted)), hsl(270 22% 96%));
     --voxxy-grad-nav-tab-active: linear-gradient(to right, hsl(270 36% 86%), hsl(217 40% 88%));
     --voxxy-grad-editor-chrome: linear-gradient(
@@ -167,47 +167,47 @@
 
     --voxxy-shadow-soft: 0 8px 18px rgb(15 23 42 / 0.04);
     --voxxy-shadow-marketing: 0 10px 30px rgb(15 23 42 / 0.08);
-    --voxxy-shadow-marketing-accent: 0 16px 40px rgb(217 70 239 / 0.12);
+    --voxxy-shadow-marketing-accent: 0 16px 40px rgb(144 84 227 / 0.15);
   }
 
   .dark {
-    --background: 252 65% 14%;
+    --background: 255 58% 18%;
     --foreground: 210 40% 98%;
     --card: 260 36% 18%;
     --card-foreground: 0 0% 98%;
     --popover: 260 40% 15%;
     --popover-foreground: 0 0% 98%;
-    --primary: 270 91% 65%;
+    --primary: 262 72% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 260 30% 20%;
+    --secondary: 262 30% 20%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 330 81% 60%;
+    --muted: 250 33% 17%;
+    --muted-foreground: 240 16% 47%;
+    --accent: 310 81% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 100% / 0.1;
     --input: 260 20% 25%;
-    --ring: 270 91% 65%;
+    --ring: 262 72% 61%;
     --chart-1: 270 70% 60%;
     --chart-2: 200 70% 55%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 260 40% 11%;
+    --sidebar-background: 258 55% 16%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 270 91% 65%;
+    --sidebar-primary: 262 72% 61%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 35% 15%;
+    --sidebar-accent: 262 35% 15%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 260 20% 20%;
-    --sidebar-ring: 270 91% 65%;
+    --sidebar-border: 262 20% 20%;
+    --sidebar-ring: 262 72% 61%;
 
-    --voxxy-grad-body: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
+    --voxxy-grad-body: linear-gradient(to bottom, #221469 0%, #54309F 50%, #54309F 100%);
     --voxxy-grad-page: var(--voxxy-grad-body);
     --voxxy-grad-page-alt: var(--voxxy-grad-body);
-    --voxxy-grad-page-cool: linear-gradient(to bottom right, #221238, #181028);
+    --voxxy-grad-page-cool: linear-gradient(to bottom, #221469 0%, #3a2080 50%, #3a2080 100%);
     --voxxy-grad-editor: linear-gradient(to bottom right, #151028, #221a38, #151028);
     --voxxy-grad-panel: linear-gradient(to bottom right, #221838, #181222);
     --voxxy-grad-card-deep: linear-gradient(to bottom, #322848, #261c38);
@@ -222,17 +222,18 @@
       rgb(72 50 110 / 0.95),
       rgb(50 38 90 / 0.95)
     );
-    --voxxy-grad-hero-split: linear-gradient(to bottom right, #a855f7, #ec4899, #3b82f6);
-    --voxxy-grad-admin: linear-gradient(to bottom right, #120a1c, #221238, #181022);
-    --voxxy-grad-nav: linear-gradient(to right, rgb(34 18 56 / 0.95), rgb(52 37 88 / 0.95));
-    --voxxy-grad-cta: linear-gradient(to right, hsl(270 55% 48%), hsl(217 78% 52%));
-    --voxxy-grad-cta-pink: linear-gradient(to right, hsl(270 55% 48%), hsl(330 70% 55%));
+    --voxxy-grad-hero-split: linear-gradient(to bottom right, #cc30e8, #9054e3, #651ae9);
+    --voxxy-grad-admin: linear-gradient(to bottom, #1a1050 0%, #3a2080 50%, #3a2080 100%);
+    --voxxy-grad-nav: linear-gradient(to right, rgba(34, 20, 105, 0.95), rgba(84, 48, 159, 0.95));
+    --voxxy-grad-cta: linear-gradient(to right, #af3cda, #651ae9);
+    --voxxy-grad-cta-pink: linear-gradient(to right, #cc30e8, #9054e3);
+    --voxxy-grad-brand: linear-gradient(to right, #cc30e8, #af3cda, #9054e3, #651ae9);
     --voxxy-grad-modal-header: linear-gradient(
       to right,
       rgb(88 28 135 / 0.92),
       rgb(30 58 138 / 0.92)
     );
-    --voxxy-grad-nav-tab-active: linear-gradient(to right, #7c3aed, #3b82f6);
+    --voxxy-grad-nav-tab-active: linear-gradient(to right, #af3cda, #651ae9);
     --voxxy-grad-editor-chrome: linear-gradient(
       to right,
       rgb(46 32 74 / 0.86),
@@ -337,7 +338,10 @@
   }
 
   .glass-card:hover {
-    @apply border-foreground/20 dark:border-purple-400/35;
+    @apply border-foreground/20;
+  }
+  .dark .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.35);
   }
 
   .event-list-card {
@@ -366,7 +370,7 @@
   .dark .marketing-card-accent.border-2 {
     background-image: var(--voxxy-marketing-card-accent-bg);
     background-color: rgb(250 245 255);
-    border-color: rgb(217 70 239 / 0.42);
+    border-color: rgb(175 60 218 / 0.42);
     box-shadow: var(--voxxy-shadow-marketing-accent);
     backdrop-filter: none;
     color: rgb(15 23 42);
@@ -406,7 +410,8 @@
   }
 
   .voxxy-application-highlight {
-    @apply rounded-lg border border-purple-500/30;
+    @apply rounded-lg border;
+    border-color: hsl(var(--primary) / 0.3);
     background-image: var(--voxxy-grad-application-highlight);
   }
 
@@ -452,12 +457,12 @@
     background-color: hsl(270 34% 82%);
   }
   .dark .voxxy-btn-solid {
-    background-color: #9333ea;
+    background-color: #9054e3;
     color: hsl(var(--primary-foreground));
     border-color: transparent;
   }
   .dark .voxxy-btn-solid:hover {
-    background-color: #7e22ce;
+    background-color: #7b45d1;
   }
 
   .voxxy-accent-tile {
@@ -465,7 +470,7 @@
     color: hsl(var(--foreground));
   }
   .dark .voxxy-accent-tile {
-    background-color: #9333ea;
+    background-color: #9054e3;
     background-image: none;
     color: hsl(var(--primary-foreground));
   }
@@ -494,7 +499,7 @@
     @apply bg-background;
   }
   .dark .voxxy-auth-panel {
-    background-color: #0f0b1f;
+    background: linear-gradient(to bottom, #1a1050, #2a1870);
   }
 
   .voxxy-auth-card {
@@ -704,6 +709,26 @@
   .dark .voxxy-table-inline-field {
     background-color: rgb(56 41 88 / 0.76);
     border-color: var(--voxxy-dark-border-subtle);
+  }
+
+  /* —— Brand & marketing —— */
+  .voxxy-gradient-marketing-hero {
+    background: linear-gradient(to bottom, #221469 0%, #3a2080 50%, #54309F 100%);
+  }
+
+  .voxxy-btn-brand {
+    background-image: var(--voxxy-grad-brand);
+    color: hsl(var(--primary-foreground));
+    border: 1px solid transparent;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .voxxy-btn-brand:hover {
+    filter: brightness(1.08);
+  }
+
+  .voxxy-image-elevated {
+    box-shadow: 0 20px 60px rgba(101, 26, 233, 0.25), 0 0 40px rgba(204, 48, 232, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 

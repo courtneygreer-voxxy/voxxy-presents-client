@@ -41,7 +41,7 @@ export function CategoryBadge({
   }
 
   // Get badge color from category or use default
-  const badgeColor = category.color || '#8B5CF6'; // Default purple
+  const badgeColor = category.color || '#9054e3'; // Default purple
 
   return (
     <span

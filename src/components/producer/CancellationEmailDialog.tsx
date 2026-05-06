@@ -40,7 +40,7 @@ export function CancellationEmailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-[#1e1536] border-white/10 text-white max-w-md">
+      <DialogContent className="voxxy-surface-elevated border-white/10 text-white max-w-md">
         <DialogHeader>
           <div className="flex items-center justify-between mb-2">
             <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center">
@@ -72,7 +72,7 @@ export function CancellationEmailDialog({
           {/* Recipient Count */}
           <div className="bg-white/5 rounded-lg p-4 border border-white/10">
             <div className="flex items-center gap-3">
-              <Mail className="w-5 h-5 text-purple-400" />
+              <Mail className="w-5 h-5 text-primary" />
               <div>
                 <p className="text-sm text-white/60">Recipients</p>
                 <p className="font-semibold text-white">

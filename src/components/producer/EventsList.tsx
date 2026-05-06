@@ -144,7 +144,7 @@ export default function EventsList({
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -191,23 +191,23 @@ export default function EventsList({
                     )}
 
                     {/* Event Meta — muted copy + brighter purple icons (restores tinted dark look) */}
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground/60 dark:text-purple-300/85">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground/60 dark:text-primary/85">
                       <div className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                        <Calendar className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                         <span>{formatEventDateDisplay(event)}</span>
                       </div>
                       {event.location && (
                         <>
-                          <span className="text-foreground/30 dark:text-purple-400/35">•</span>
+                          <span className="text-foreground/30 dark:text-primary/35">•</span>
                           <div className="flex items-center gap-1">
-                            <MapPin className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                            <MapPin className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                             <span>{event.location}</span>
                           </div>
                         </>
                       )}
-                      <span className="text-foreground/30 dark:text-purple-400/35">•</span>
+                      <span className="text-foreground/30 dark:text-primary/35">•</span>
                       <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3 shrink-0 text-purple-600 dark:text-purple-400" />
+                        <Users className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                         <span>{applicantCount} applicants</span>
                       </div>
                     </div>
@@ -217,7 +217,7 @@ export default function EventsList({
                   <div className="flex gap-2">
                     <button
                       onClick={() => onCommandCenter(event.slug)}
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-sm whitespace-nowrap"
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-primary/30 transition-smooth text-sm whitespace-nowrap"
                     >
                       Command Center
                     </button>

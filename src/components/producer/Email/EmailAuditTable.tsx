@@ -46,8 +46,8 @@ function SortIcon({
 }) {
   if (sortColumn !== column) return <ChevronsUpDown className="w-3 h-3 opacity-40" />;
   return sortDirection === 'asc'
-    ? <ChevronUp className="w-3 h-3 text-purple-400" />
-    : <ChevronDown className="w-3 h-3 text-purple-400" />;
+    ? <ChevronUp className="w-3 h-3 text-primary" />
+    : <ChevronDown className="w-3 h-3 text-primary" />;
 }
 
 const STATUS_COLOR_VARIANT: Record<

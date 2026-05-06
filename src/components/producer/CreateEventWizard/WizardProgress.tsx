@@ -3,9 +3,11 @@ import { WizardProgressProps } from './types';
 
 const STEP_LABELS = [
   'Event Details',
-  'Application Details',
+  'Applicant Categories',
+  'Payment Config',
+  'Email Customization',
   'Invite List',
-  'Email Sequences',
+  'Review Details',
 ];
 
 export default function WizardProgress({
@@ -22,13 +24,13 @@ export default function WizardProgress({
       {/* Mobile: Simple text indicator */}
       <div className="md:hidden text-center mb-4">
         <p className="text-foreground/60 text-sm">
-          Step {currentStep} of 4: {STEP_LABELS[currentStep - 1]}
+          Step {currentStep} of 6: {STEP_LABELS[currentStep - 1]}
         </p>
       </div>
 
       {/* Desktop: Visual progress indicator */}
       <div className="hidden md:flex items-center justify-between max-w-4xl mx-auto">
-        {[1, 2, 3, 4].map((step, index) => {
+        {[1, 2, 3, 4, 5, 6].map((step, index) => {
           const completed = isStepCompleted(step);
           const current = isStepCurrent(step);
           const clickable = isStepClickable(step);
@@ -71,7 +73,7 @@ export default function WizardProgress({
               </div>
 
               {/* Connector Line */}
-              {index < 3 && (
+              {index < 5 && (
                 <div className="flex-1 h-0.5 mx-4">
                   <div
                     className={`h-full transition-all duration-300 ${

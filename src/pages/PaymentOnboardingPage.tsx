@@ -17,8 +17,10 @@ import {
 import { useAuth } from "@/contexts/AuthContext"
 import { stripeService } from "@/services/stripeService"
 import { useNavigate } from "react-router-dom"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PaymentOnboardingPage() {
+  useForceTheme('dark')
   const { userProfile, signOut } = useAuth()
   const [isRedirecting, setIsRedirecting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -80,7 +82,7 @@ export default function PaymentOnboardingPage() {
     <div className="dark voxxy-public-page min-h-screen voxxy-gradient-page-alt relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 -left-4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
+        <div className="absolute top-0 -left-4 w-72 h-72 bg-primary/50 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob"></div>
         <div className="absolute top-0 -right-4 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-8 left-20 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-blob animation-delay-4000"></div>
       </div>
@@ -90,7 +92,7 @@ export default function PaymentOnboardingPage() {
 
           {/* Welcome Header */}
           <div className="text-center space-y-4">
-            <Badge className="border border-purple-400/30 bg-purple-500/20 px-4 py-2 text-sm font-medium text-violet-950 dark:text-purple-300">
+            <Badge className="border border-primary/30 bg-primary/20 px-4 py-2 text-sm font-medium text-violet-950 dark:text-primary">
               <Sparkles className="h-4 w-4 mr-2" />
               Producer Account Setup
             </Badge>
@@ -108,10 +110,10 @@ export default function PaymentOnboardingPage() {
           </div>
 
           {/* Main Pricing Card */}
-          <Card className="bg-background/10 backdrop-blur-md border-2 border-purple-400/30 shadow-2xl">
+          <Card className="bg-background/10 backdrop-blur-md border-2 border-primary/30 shadow-2xl">
             <CardHeader className="text-center pb-6 space-y-2">
               <div className="flex justify-center mb-4">
-                <div className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-full p-4">
+                <div className="bg-gradient-to-r from-primary to-pink-500 rounded-full p-4">
                   <Users className="h-12 w-12 text-foreground" />
                 </div>
               </div>
@@ -135,8 +137,8 @@ export default function PaymentOnboardingPage() {
                     key={index}
                     className="flex items-start gap-3 bg-background/5 backdrop-blur-sm border border-border rounded-lg p-4 hover:bg-background/10 transition-colors"
                   >
-                    <div className="rounded-lg bg-purple-500/20 p-2 flex-shrink-0">
-                      <feature.icon className="h-5 w-5 text-purple-300" />
+                    <div className="rounded-lg bg-primary/20 p-2 flex-shrink-0">
+                      <feature.icon className="h-5 w-5 text-primary" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-foreground text-sm mb-1">

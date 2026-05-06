@@ -10,8 +10,10 @@ import { useAuth } from "@/contexts/AuthContext"
 import { authApi, organizationsApi, ApiError } from '@/services/api'
 import { Separator } from "@/components/ui/separator"
 import { stripeService } from '@/services/stripeService'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function BetaPendingPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
   const { userProfile, signOut, refreshUserProfile, isProducer, isEmailVerified, isPaid } = useAuth()
 
@@ -222,7 +224,7 @@ export default function BetaPendingPage() {
 
       <div className="relative z-10 flex items-center justify-center min-h-screen py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-2xl w-full">
-          <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/20 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+          <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/20 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
             <CardHeader className="text-center relative pt-12 pb-6">
               <Button
                 onClick={() => navigate('/')}
@@ -235,7 +237,7 @@ export default function BetaPendingPage() {
               </Button>
 
               <CardTitle className="text-3xl font-bold text-foreground mb-3">
-                Welcome to <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">Voxxy</span>
+                Welcome to <span className="bg-gradient-to-r from-primary via-voxxy-pink to-primary bg-clip-text text-transparent">Voxxy</span>
               </CardTitle>
               <CardDescription className="text-base">
                 Complete the steps below to finish setting up your account
@@ -283,7 +285,7 @@ export default function BetaPendingPage() {
 
               {isProducer && isLoadingOrg && (
                 <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <Loader2 className="h-5 w-5 animate-spin text-purple-400 mx-auto" />
+                  <Loader2 className="h-5 w-5 animate-spin text-primary mx-auto" />
                   <p className="text-sm text-gray-400 mt-2">Loading organization details...</p>
                 </div>
               )}
@@ -298,7 +300,7 @@ export default function BetaPendingPage() {
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-muted-foreground">Role</span>
-                      <span className="text-purple-300 font-semibold">
+                      <span className="text-primary font-semibold">
                         {userProfile.role === 'venue_owner' || userProfile.role === 'producer'
                           ? 'Producer / Venue Owner'
                           : userProfile.role?.replace('_', ' ').toUpperCase()}
@@ -465,7 +467,7 @@ export default function BetaPendingPage() {
                     {/* Header */}
                     <div className="text-center mb-8">
                       <div className="flex items-center justify-center gap-2 mb-4">
-                        <Sparkles className="h-6 w-6 text-purple-400" />
+                        <Sparkles className="h-6 w-6 text-primary" />
                         <h4 className="text-2xl font-bold text-foreground">Start Your Producer Account</h4>
                       </div>
                       <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
@@ -474,7 +476,7 @@ export default function BetaPendingPage() {
                     </div>
 
                     {/* Main Payment Card */}
-                    <Card className="bg-background/10 backdrop-blur-md border-2 border-purple-400 shadow-2xl max-w-4xl mx-auto">
+                    <Card className="bg-background/10 backdrop-blur-md border-2 border-primary shadow-2xl max-w-4xl mx-auto">
                       <CardHeader className="text-center pb-6 space-y-4">
                         <div className="flex justify-center mb-4">
                           <div className="voxxy-accent-tile rounded-full p-4">
@@ -501,8 +503,8 @@ export default function BetaPendingPage() {
                               key={index}
                               className="flex items-start gap-3 p-4 bg-background/5 rounded-lg border border-border hover:bg-background/10 hover:border-primary/40 transition-colors"
                             >
-                              <div className="bg-purple-500/20 rounded-full p-2 flex-shrink-0">
-                                <feature.icon className="h-5 w-5 text-purple-300" />
+                              <div className="bg-primary/20 rounded-full p-2 flex-shrink-0">
+                                <feature.icon className="h-5 w-5 text-primary" />
                               </div>
                               <div>
                                 <h5 className="text-foreground font-semibold text-sm mb-1">
@@ -551,7 +553,7 @@ export default function BetaPendingPage() {
                                 onClick={handleStartPayment}
                                 disabled={isProcessingPayment}
                                 size="lg"
-                                className="w-full h-14 text-lg font-bold voxxy-btn-cta-pink shadow-md shadow-purple-500/15 hover:shadow-lg dark:shadow-purple-500/30 dark:hover:shadow-xl transition-all"
+                                className="w-full h-14 text-lg font-bold voxxy-btn-cta-pink shadow-md shadow-primary/15 hover:shadow-lg dark:shadow-primary/30 dark:hover:shadow-xl transition-all"
                               >
                                 {isProcessingPayment ? (
                                   <>

@@ -63,10 +63,10 @@ export default function EmailPreviewModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-primary/20">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="w-5 h-5 text-primary" />
             <span>Email Preview</span>
           </DialogTitle>
         </DialogHeader>
@@ -75,7 +75,7 @@ export default function EmailPreviewModal({
           {/* Loading State */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
               <p className="text-foreground/60">Loading preview...</p>
             </div>
           ) : emailHtml ? (

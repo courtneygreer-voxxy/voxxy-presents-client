@@ -63,7 +63,7 @@ function ListDropdown({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 pl-3 pr-2.5 py-2 border rounded-lg text-sm transition-colors whitespace-nowrap ${
           selectedListIds.length > 0
-            ? 'border-purple-500/40 bg-purple-500/15 text-violet-800 dark:text-purple-200'
+            ? 'border-primary/40 bg-primary/15 text-violet-800 dark:text-primary'
             : 'bg-background/5 border-border text-foreground hover:bg-background/10'
         }`}
       >
@@ -99,7 +99,7 @@ function ListDropdown({
                     <div
                       className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
                         selectedListIds.includes(list.id)
-                          ? 'bg-purple-500 border-purple-500'
+                          ? 'bg-primary/50 border-primary'
                           : 'border-border'
                       }`}
                     >
@@ -480,7 +480,7 @@ export default function GoLiveInvitationEditor({
         <button
           type="button"
           onClick={() => setShowAddEmailRow(true)}
-          className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 text-sm font-medium rounded-lg transition-colors border border-purple-500/30 whitespace-nowrap"
+          className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary text-sm font-medium rounded-lg transition-colors border border-primary/30 whitespace-nowrap"
         >
           <Plus className="w-4 h-4" />
           Add Email
@@ -491,7 +491,7 @@ export default function GoLiveInvitationEditor({
       <div className="px-5 py-2 border-b border-border flex items-center justify-between flex-shrink-0 text-xs">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <Users className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+            <Users className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
             <span className="text-foreground">
               <span className="font-medium">{invitedContactIds.length}</span>
               <span className="text-muted-foreground"> selected out of </span>
@@ -544,7 +544,7 @@ export default function GoLiveInvitationEditor({
 
       {/* ── Add email row (conditional) ── */}
       {showAddEmailRow && (
-        <div className="px-5 py-2.5 border-b border-border bg-purple-500/5 flex-shrink-0">
+        <div className="px-5 py-2.5 border-b border-border bg-primary/5 flex-shrink-0">
           <div className="flex items-center gap-3">
             <input
               type="text"
@@ -565,7 +565,7 @@ export default function GoLiveInvitationEditor({
             <select
               value={newEmailData.type}
               onChange={(e) => setNewEmailData((prev) => ({ ...prev, type: e.target.value }))}
-              className="px-3 py-1.5 bg-background/5 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-purple-500"
+              className="px-3 py-1.5 bg-background/5 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
             >
               <option value="vendor">Vendor</option>
               <option value="partner">Partner</option>
@@ -606,7 +606,7 @@ export default function GoLiveInvitationEditor({
                   type="checkbox"
                   checked={allFilteredSelected && filteredContacts.length > 0}
                   onChange={handleSelectAll}
-                  className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                 />
               </div>
               <button
@@ -646,7 +646,7 @@ export default function GoLiveInvitationEditor({
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="mt-3 text-purple-400 hover:text-purple-300 text-sm transition-colors"
+                  className="mt-3 text-primary hover:text-primary text-sm transition-colors"
                 >
                   Clear search
                 </button>
@@ -663,7 +663,7 @@ export default function GoLiveInvitationEditor({
                     onClick={() => handleToggleContact(contact.id)}
                     className={`voxxy-table-row grid grid-cols-[36px,1fr,1fr,1.5fr,80px] gap-2 px-4 py-2 items-center text-xs last:border-0 cursor-pointer ${
                       isSelected
-                        ? 'bg-purple-500/10 hover:bg-purple-500/15'
+                        ? 'bg-primary/10 hover:bg-primary/15'
                         : isUnsubscribed
                           ? 'bg-red-500/5 hover:bg-red-500/10'
                           : 'voxxy-table-row-hover'
@@ -676,7 +676,7 @@ export default function GoLiveInvitationEditor({
                         checked={isSelected}
                         onChange={() => handleToggleContact(contact.id)}
                         onClick={(e) => e.stopPropagation()}
-                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                       />
                     </div>
 

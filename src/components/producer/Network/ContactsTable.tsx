@@ -40,7 +40,7 @@ export default function ContactsTable({
               type="checkbox"
               checked={allSelected}
               onChange={onSelectAll}
-              className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+              className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
               title={allSelected ? 'Deselect all' : 'Select all'}
             />
           </div>

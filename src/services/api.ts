@@ -728,6 +728,8 @@ export const eventsApi = {
     invitation_list_ids: number[]
     invitation_contact_ids: number[]
     invitation_excluded_ids: number[]
+    vendor_fee_currency: string
+    payment_engines: any[]
   }>) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}`, {
       method: 'PATCH',
@@ -916,7 +918,7 @@ export const registrationsApi = {
   /**
    * Update registration (producer/venue owner only)
    * PATCH /api/v1/presents/registrations/:id
-   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags).
+   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags, instagram_handle, tiktok_handle, website).
    */
   async update(registrationId: number, data: Partial<{
     vendor_category: string
@@ -927,6 +929,9 @@ export const registrationsApi = {
     location: string
     producer_notes: string
     tags: string[]
+    instagram_handle: string
+    tiktok_handle: string
+    website: string
   }>) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',
@@ -1019,6 +1024,8 @@ export const vendorApplicationsApi = {
     install_end_time: string
     payment_link: string
     application_tags: string
+    payment_prices: any[]
+    payment_engines: any[]
   }>) {
     return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
       method: 'PATCH',
@@ -1936,6 +1943,10 @@ export interface VendorContact {
   tiktok_handle?: string
   website?: string
   featured?: boolean
+  // Payment information (TODO: Backend migration needed for these fields)
+  eventbrite_email?: string
+  venmo_handle?: string
+  paypal_email?: string
   created_at: string
   updated_at: string
   unsubscribe_status?: {
@@ -2256,6 +2267,10 @@ export const vendorContactsApi = {
     tiktok_handle?: string
     website?: string
     featured?: boolean
+    // TODO: Backend migration needed - silently dropped until then
+    eventbrite_email?: string
+    venmo_handle?: string
+    paypal_email?: string
   }): Promise<VendorContact> {
     // Backend expects FLAT structure for create (not nested)
     const backendData = {

@@ -119,7 +119,7 @@ export default function UnsubscribePage() {
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -214,7 +214,7 @@ export default function UnsubscribePage() {
     <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-4">
       <Card className="max-w-2xl w-full bg-background/5 border-border backdrop-blur-sm">
         <CardHeader className="text-center border-b border-border">
-          <MailX className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+          <MailX className="w-12 h-12 text-primary mx-auto mb-4" />
           <CardTitle className="text-foreground text-2xl">Manage Email Preferences</CardTitle>
           <CardDescription className="mt-2">
             Choose which emails you'd like to stop receiving

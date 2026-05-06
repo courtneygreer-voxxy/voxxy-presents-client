@@ -152,7 +152,7 @@ export default function CreateApplicationForm({
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               placeholder="e.g., Vendor Application - Winter Market 2025"
-              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
               required
             />
           </div>
@@ -169,7 +169,7 @@ export default function CreateApplicationForm({
 
 Example: We're seeking talented vendors for our Winter Market. Booth fee is $150. Looking for artisans, food vendors, and crafters who align with our community-focused mission..."
               rows={6}
-              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors resize-none"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
             />
           </div>
 
@@ -197,7 +197,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                   })
                 }
                 placeholder="150.00"
-                className="w-full pl-8 pr-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full pl-8 pr-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                 required
               />
             </div>
@@ -217,7 +217,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               onChange={(e) =>
                 setFormData({ ...formData, install_date: e.target.value })
               }
-              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
@@ -233,7 +233,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 onChange={(e) =>
                   setFormData({ ...formData, install_start_time: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
             <div>
@@ -246,7 +246,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 onChange={(e) =>
                   setFormData({ ...formData, install_end_time: e.target.value })
                 }
-                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:border-primary transition-colors"
               />
             </div>
           </div>
@@ -266,7 +266,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 setFormData({ ...formData, payment_link: e.target.value })
               }
               placeholder="https://example.com/pay"
-              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+              className="w-full px-4 py-3 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
           </div>
 
@@ -316,7 +316,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
                 }
               }}
               placeholder="e.g., handmade, food, jewelry"
-              className="flex-1 px-4 py-2 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+              className="flex-1 px-4 py-2 rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
             />
             <button
               type="button"
@@ -341,7 +341,7 @@ Example: We're seeking talented vendors for our Winter Market. Booth fee is $150
               {tags.map((tag, index) => (
                 <div
                   key={index}
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-sm"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/20 border border-primary/30 text-foreground text-sm"
                 >
                   <span>{tag}</span>
                   <button

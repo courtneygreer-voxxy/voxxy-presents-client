@@ -51,17 +51,17 @@ export default function EventPaymentSettings({
     cn(
       'flex-1 rounded-xl border-2 p-4 text-left transition-all',
       selected
-        ? 'border-violet-300 bg-violet-50 text-slate-950 dark:border-purple-500 dark:bg-purple-500/20 dark:text-foreground'
+        ? 'border-violet-300 bg-violet-50 text-slate-950 dark:border-primary dark:bg-primary/20 dark:text-foreground'
         : 'border-border bg-background/50 text-foreground/70 hover:bg-accent/50 hover:text-foreground dark:bg-transparent'
     );
   const accentIconClass =
-    'rounded-lg border border-violet-200 bg-violet-50 p-2 dark:border-transparent dark:bg-purple-500/20';
+    'rounded-lg border border-violet-200 bg-violet-50 p-2 dark:border-transparent dark:bg-primary/20';
   const secondaryIconButtonClass =
-    'rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-800 transition-colors hover:bg-violet-100 disabled:opacity-50 dark:border-transparent dark:bg-purple-500/20 dark:text-purple-400 dark:hover:bg-purple-500/30';
+    'rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-800 transition-colors hover:bg-violet-100 disabled:opacity-50 dark:border-transparent dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30';
   const subtleLinkClass =
-    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-purple-400 dark:hover:text-purple-300';
+    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-primary dark:hover:text-primary';
   const syncMetricClass =
-    'rounded-lg border border-violet-200/70 bg-white/85 px-3 py-3 shadow-sm dark:border-purple-500/20 dark:bg-background/10';
+    'rounded-lg border border-violet-200/70 bg-white/85 px-3 py-3 shadow-sm dark:border-primary/20 dark:bg-background/10';
 
   const [integration, setIntegration] = useState<PaymentIntegration | null>(null);
   const [eventbriteEvents, setEventbriteEvents] = useState<EventbriteEvent[]>([]);
@@ -330,7 +330,7 @@ export default function EventPaymentSettings({
         <div className={cn(panelClass, 'space-y-6')}>
           <div className="flex items-center gap-3">
             <div className={accentIconClass}>
-              <DollarSign className="h-5 w-5 text-violet-700 dark:text-purple-400" />
+              <DollarSign className="h-5 w-5 text-violet-700 dark:text-primary" />
             </div>
             <div>
               <h3 className={sectionHeadingClass}>Enable Payment Syncing</h3>
@@ -466,7 +466,7 @@ export default function EventPaymentSettings({
                 <h3 className={sectionHeadingClass}>Payment Syncing Enabled</h3>
                 <div className="mt-1 flex items-center gap-2">
                   <span className="text-sm text-muted-foreground">Status</span>
-                  <span className="rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-[11px] font-semibold capitalize tracking-wide text-violet-900 dark:border-purple-500/30 dark:bg-purple-500/15 dark:text-purple-200">
+                  <span className="rounded-full border border-violet-200 bg-violet-50 px-2.5 py-0.5 text-[11px] font-semibold capitalize tracking-wide text-violet-900 dark:border-primary/30 dark:bg-primary/15 dark:text-primary">
                     {integration.sync_status}
                   </span>
                 </div>
@@ -510,7 +510,7 @@ export default function EventPaymentSettings({
                   <button
                     onClick={handleStartEditUrl}
                     disabled={isLoading}
-                    className="p-1 text-violet-700 transition-colors hover:text-violet-900 disabled:opacity-50 dark:text-purple-400 dark:hover:text-purple-300"
+                    className="p-1 text-violet-700 transition-colors hover:text-violet-900 disabled:opacity-50 dark:text-primary dark:hover:text-primary"
                     title="Edit ticket link"
                   >
                     <Edit2 className="w-4 h-4" />
@@ -576,24 +576,24 @@ export default function EventPaymentSettings({
           </div>
 
           {integration.latest_sync_log && (
-            <div className="rounded-lg border border-violet-200/80 bg-violet-50 p-4 dark:border-purple-500/20 dark:bg-purple-500/10">
-              <h4 className="mb-2 font-medium text-sm text-violet-950 dark:text-purple-200">Latest Sync Results</h4>
+            <div className="rounded-lg border border-violet-200/80 bg-violet-50 p-4 dark:border-primary/20 dark:bg-primary/10">
+              <h4 className="mb-2 font-medium text-sm text-violet-950 dark:text-primary">Latest Sync Results</h4>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div className={syncMetricClass}>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Transactions</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-purple-200">
+                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.transactions_fetched}
                   </p>
                 </div>
                 <div className={syncMetricClass}>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Matched</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-purple-200">
+                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.contacts_matched}
                   </p>
                 </div>
                 <div className={syncMetricClass}>
                   <p className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Updated</p>
-                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-purple-200">
+                  <p className="mt-1 text-base font-semibold text-slate-900 dark:text-primary">
                     {integration.latest_sync_log.registrations_updated}
                   </p>
                 </div>

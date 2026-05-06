@@ -53,6 +53,7 @@ import { useFormTracking } from "@/hooks/useFormTracking"
 import { analytics } from "@/lib/analytics"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 interface BetaFormData {
   name: string
@@ -61,6 +62,7 @@ interface BetaFormData {
 }
 
 export default function ContactPage() {
+  useForceTheme('dark')
   // Scroll to top on page load
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -139,14 +141,14 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="contact" />
 
       {/* Hero Section */}
       <section className="relative py-24 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="mb-8">
-            <div className="inline-flex items-center rounded-full border border-purple-400/30 bg-purple-500/20 px-4 py-2 text-sm font-medium text-purple-200 backdrop-blur-sm">
+            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/20 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm">
               <Sparkles className="h-4 w-4 mr-2" />
               Join the Pilot Program
             </div>
@@ -154,7 +156,7 @@ export default function ContactPage() {
 
           <h1 className="mb-8 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
             Request{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cc30e8] to-[#9054e3]">
               Pilot Access
             </span>
           </h1>
@@ -215,7 +217,7 @@ export default function ContactPage() {
                 <p className="mb-6 text-slate-600">
                   We'll review your application and get back to you within 2-3 business days.
                 </p>
-                <Button className="border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 text-white hover:-translate-y-0.5 hover:brightness-105" asChild>
+                <Button className="voxxy-btn-brand text-white hover:-translate-y-0.5 hover:brightness-105" asChild>
                   <Link to="/">Return to Home</Link>
                 </Button>
               </CardContent>
@@ -236,7 +238,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={(e) => handleInputChange('name', e.target.value)}
                     required
-                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
+                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-primary/50 focus:bg-white"
                   />
 
                   <Input
@@ -246,7 +248,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
                     required
-                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
+                    className="h-12 border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-primary/50 focus:bg-white"
                   />
 
                   <Textarea
@@ -256,7 +258,7 @@ export default function ContactPage() {
                     onChange={(e) => handleInputChange('message', e.target.value)}
                     required
                     rows={6}
-                    className="resize-none border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-purple-400/50 focus:bg-white"
+                    className="resize-none border-slate-200 bg-white text-base text-slate-950 placeholder:text-slate-400 transition-all focus:border-primary/50 focus:bg-white"
                   />
 
                   {submissionError && (
@@ -268,7 +270,7 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="h-12 w-full border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+                    className="h-12 w-full voxxy-btn-brand text-base font-semibold text-white shadow-md transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
                   >
                     {isSubmitting ? 'Submitting...' : 'Request Pilot Access'}
                     {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}
@@ -281,7 +283,7 @@ export default function ContactPage() {
       </section>
 
       {/* Vendor Coming Soon */}
-      <section className="relative z-10 border-y border-white/10 bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-24">
+      <section className="relative z-10 border-y border-white/10 voxxy-gradient-marketing-hero py-24">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <div className="flex justify-center mb-6">
             <div className="inline-flex items-center rounded-full border border-blue-400/30 bg-blue-500/20 px-4 py-2 text-sm font-medium text-blue-200 backdrop-blur-sm">

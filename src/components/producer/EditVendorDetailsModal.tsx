@@ -25,6 +25,9 @@ export interface EditVendorDetailsModalProps {
   initialLocation?: string;
   initialProducerNotes?: string;
   initialTags?: string[];
+  initialInstagramHandle?: string;
+  initialTiktokHandle?: string;
+  initialWebsite?: string;
   /** Shown read-only — not in Rails `update_params` */
   emailReadOnly: string;
   onSaved: (applicantId: string, patch: {
@@ -33,6 +36,9 @@ export interface EditVendorDetailsModalProps {
     location?: string;
     producer_notes?: string;
     tags?: string[];
+    instagram_handle?: string;
+    tiktok_handle?: string;
+    website?: string;
   }) => void;
 }
 
@@ -46,6 +52,9 @@ export function EditVendorDetailsModal({
   initialLocation,
   initialProducerNotes,
   initialTags,
+  initialInstagramHandle,
+  initialTiktokHandle,
+  initialWebsite,
   emailReadOnly,
   onSaved,
 }: EditVendorDetailsModalProps) {
@@ -55,6 +64,9 @@ export function EditVendorDetailsModal({
   const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '');
   const [tags, setTags] = useState<string[]>(initialTags || []);
   const [tagInput, setTagInput] = useState('');
+  const [instagramHandle, setInstagramHandle] = useState(initialInstagramHandle || '');
+  const [tiktokHandle, setTiktokHandle] = useState(initialTiktokHandle || '');
+  const [website, setWebsite] = useState(initialWebsite || '');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -66,9 +78,12 @@ export function EditVendorDetailsModal({
       setProducerNotes(initialProducerNotes || '');
       setTags(initialTags || []);
       setTagInput('');
+      setInstagramHandle(initialInstagramHandle || '');
+      setTiktokHandle(initialTiktokHandle || '');
+      setWebsite(initialWebsite || '');
       setFormError(null);
     }
-  }, [open, initialContactName, initialPhone, initialLocation, initialProducerNotes, initialTags]);
+  }, [open, initialContactName, initialPhone, initialLocation, initialProducerNotes, initialTags, initialInstagramHandle, initialTiktokHandle, initialWebsite]);
 
   const handleAddTag = () => {
     const trimmedTag = tagInput.trim();
@@ -101,6 +116,9 @@ export function EditVendorDetailsModal({
         location: location.trim(),
         producer_notes: producerNotes.trim(),
         tags: tags,
+        instagram_handle: instagramHandle.trim(),
+        tiktok_handle: tiktokHandle.trim(),
+        website: website.trim(),
       });
       onSaved(applicantId, {
         contact_name: name.trim(),
@@ -108,6 +126,9 @@ export function EditVendorDetailsModal({
         location: location.trim(),
         producer_notes: producerNotes.trim(),
         tags: tags,
+        instagram_handle: instagramHandle.trim(),
+        tiktok_handle: tiktokHandle.trim(),
+        website: website.trim(),
       });
       onOpenChange(false);
     } catch (err) {
@@ -183,6 +204,48 @@ export function EditVendorDetailsModal({
                 placeholder="e.g., Brooklyn, NY"
               />
             </div>
+            {/* Social Media */}
+            <div className="pt-1 border-t border-border">
+              <p className="text-xs font-medium text-foreground/70 mb-2">Social & Links</p>
+              <div className="space-y-2">
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-vendor-instagram" className="text-xs text-foreground/80">
+                    Instagram
+                  </Label>
+                  <Input
+                    id="edit-vendor-instagram"
+                    value={instagramHandle}
+                    onChange={(e) => setInstagramHandle(e.target.value)}
+                    className="bg-background/5 border-border text-xs"
+                    placeholder="@handle"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-vendor-tiktok" className="text-xs text-foreground/80">
+                    TikTok
+                  </Label>
+                  <Input
+                    id="edit-vendor-tiktok"
+                    value={tiktokHandle}
+                    onChange={(e) => setTiktokHandle(e.target.value)}
+                    className="bg-background/5 border-border text-xs"
+                    placeholder="@handle"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="edit-vendor-website" className="text-xs text-foreground/80">
+                    Website
+                  </Label>
+                  <Input
+                    id="edit-vendor-website"
+                    value={website}
+                    onChange={(e) => setWebsite(e.target.value)}
+                    className="bg-background/5 border-border text-xs"
+                    placeholder="https://example.com"
+                  />
+                </div>
+              </div>
+            </div>
             <div className="space-y-1.5">
               <Label htmlFor="edit-vendor-tags" className="text-xs text-foreground/80">
                 Tags
@@ -193,13 +256,13 @@ export function EditVendorDetailsModal({
                     {tags.map((tag, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary dark:text-primary border border-primary/20"
                       >
                         {tag}
                         <button
                           type="button"
                           onClick={() => handleRemoveTag(tag)}
-                          className="hover:text-purple-800 dark:hover:text-purple-200"
+                          className="hover:text-slate-800 dark:hover:text-primary"
                         >
                           <X className="w-3 h-3" />
                         </button>

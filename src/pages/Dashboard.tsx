@@ -445,7 +445,8 @@ export default function ProducerDashboard() {
         age_restriction: wizardState.eventDetails.age_restriction || undefined,
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
-        payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
+        payment_deadline: wizardState.paymentConfiguration.payment_deadline || undefined,
+        vendor_fee_currency: wizardState.paymentConfiguration.currency || 'USD',
         email_campaign_template_id: templateId || undefined,
         use_category_templates: wizardState.automaticMessages.use_category_templates || false,
         use_universal_category_template: wizardState.automaticMessages.use_universal_category_template || false,
@@ -464,13 +465,20 @@ export default function ProducerDashboard() {
 
       // Step 2: Batch create vendor applications with all application fields
       if (wizardState.applicationDetails.applications.length > 0) {
-        setCreationProgress('Setting up vendor applications...');
+        setCreationProgress('Setting up applicant categories...');
 
         const applicationPromises = wizardState.applicationDetails.applications.map((app) => {
+          // Derive booth_price from payment_prices for backward compat
+          const boothEntry = app.payment_prices?.find(p => p.type === 'booth_price');
+          const effectiveBoothPrice = boothEntry?.amount || app.booth_price;
+
           return vendorApplicationsApi.create(newEvent.slug, {
             name: app.name,
             description: app.description || undefined,
-            booth_price: app.booth_price,
+            booth_price: effectiveBoothPrice,
+            // TODO: Backend needs payment_prices (jsonb) and payment_engines (jsonb) columns
+            // payment_prices: app.payment_prices,
+            // payment_engines: app.payment_engines,
             category_id: app.category_id || undefined,
             install_date: app.install_date || undefined,
             install_start_time: app.install_start_time || undefined,
@@ -682,7 +690,7 @@ export default function ProducerDashboard() {
     if (loadingOrg || loadingEvents) {
       return (
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       );
     }
@@ -827,7 +835,7 @@ export default function ProducerDashboard() {
       {/* Left Sidebar */}
       <aside className={`
         w-[180px]
-        bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300
+        bg-sidebar dark:bg-sidebar/80 dark:backdrop-blur-sm text-sidebar-foreground flex flex-col transition-all duration-300
         border-r border-sidebar-border
         fixed lg:relative inset-y-0 left-0 z-50
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -978,7 +986,7 @@ export default function ProducerDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="bg-sidebar text-sidebar-foreground border-b border-sidebar-border pt-3">
+        <header className="bg-sidebar dark:bg-sidebar/80 dark:backdrop-blur-sm text-sidebar-foreground border-b border-sidebar-border pt-3">
           {/* Top row - Always visible */}
           <div className="flex items-center justify-between px-3 pb-3">
             <div className="flex items-center gap-3">
@@ -1011,7 +1019,7 @@ export default function ProducerDashboard() {
               {activeNav === 'events' && eventsView === 'list' && (
                 <button
                   onClick={() => setEventsView('create')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-primary/30 transition-smooth text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Create New Event</span>
@@ -1125,7 +1133,7 @@ export default function ProducerDashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto pt-2 bg-background text-foreground" data-onboarding="events-content">
+        <main className="flex-1 overflow-auto pt-2 bg-background dark:bg-transparent text-foreground" data-onboarding="events-content">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} onStartGuide={() => setGuidebookOpen(true)} />
           ) : activeNav === 'events' ? (

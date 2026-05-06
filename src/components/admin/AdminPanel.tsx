@@ -144,7 +144,7 @@ export default function AdminPanel({
       case 'consumer':
         return 'bg-amber-500/20 border-amber-400/30 text-amber-950 dark:text-amber-300';
       case 'admin':
-        return 'bg-purple-500/20 border-purple-400/30 text-violet-950 dark:text-purple-300';
+        return 'bg-primary/20 border-primary/30 text-violet-950 dark:text-primary';
       default:
         return 'bg-muted/20 border-border/30 text-muted-foreground';
     }
@@ -185,7 +185,7 @@ export default function AdminPanel({
     <div className="p-4 lg:p-6">
       <div className="max-w-7xl mx-auto space-y-4 lg:space-y-6">
         {/* Header Section - Terminal Style */}
-        <div className="rounded-lg border-2 border-purple-500/50 bg-card/90 p-4 shadow-lg shadow-purple-500/20 backdrop-blur-sm dark:bg-black/40 lg:p-6">
+        <div className="rounded-lg border-2 border-primary/50 bg-card/90 p-4 shadow-lg shadow-primary/20 backdrop-blur-sm dark:bg-black/40 lg:p-6">
           {/* Header removed - now in Dashboard.tsx header */}
           <div className="flex items-center justify-end gap-3 lg:gap-4">
             <Button
@@ -331,7 +331,7 @@ export default function AdminPanel({
                 </div>
                 <div className="rounded border border-cyan-500/30 bg-card/95 p-3 dark:bg-black/60">
                   <div className="text-cyan-400/60 mb-1">org.slug</div>
-                  <div className="text-purple-300 font-bold text-sm break-all">{organization.slug}</div>
+                  <div className="text-primary font-bold text-sm break-all">{organization.slug}</div>
                 </div>
                 <div className="rounded border border-cyan-500/30 bg-card/95 p-3 dark:bg-black/60">
                   <div className="text-cyan-400/60 mb-1">org.name</div>
@@ -377,10 +377,10 @@ export default function AdminPanel({
 
         {/* Analytics Section */}
         {loadingAnalytics ? (
-          <div className="rounded-lg border-2 border-purple-500/50 bg-card/90 p-6 shadow-lg shadow-purple-500/20 backdrop-blur-sm dark:bg-black/40">
+          <div className="rounded-lg border-2 border-primary/50 bg-card/90 p-6 shadow-lg shadow-primary/20 backdrop-blur-sm dark:bg-black/40">
             <div className="flex items-center justify-center gap-3 min-h-[200px]">
-              <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
-              <p className="text-purple-300 font-mono text-sm">LOADING_ANALYTICS...</p>
+              <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+              <p className="text-primary font-mono text-sm">LOADING_ANALYTICS...</p>
             </div>
           </div>
         ) : analyticsError ? (
@@ -429,7 +429,7 @@ export default function AdminPanel({
                 </div>
                 <div className="rounded border border-green-500/30 bg-card/95 p-3 dark:bg-black/60">
                   <div className="text-green-400/60 font-mono text-[10px] mb-1">events.past</div>
-                  <div className="text-purple-300 font-bold text-2xl font-mono">{analytics.events.past}</div>
+                  <div className="text-primary font-bold text-2xl font-mono">{analytics.events.past}</div>
                   <div className="text-green-300/60 font-mono text-[9px] mt-1">
                     historical
                   </div>
@@ -461,7 +461,7 @@ export default function AdminPanel({
                 </div>
                 <div className="rounded border border-green-500/30 bg-card/95 p-3 dark:bg-black/60">
                   <div className="text-green-400/60 font-mono text-[10px] mb-1">registrations.total</div>
-                  <div className="text-purple-300 font-bold text-2xl font-mono">{analytics.registrations.total}</div>
+                  <div className="text-primary font-bold text-2xl font-mono">{analytics.registrations.total}</div>
                   <div className="text-green-300/60 font-mono text-[9px] mt-1">
                     all time
                   </div>
@@ -491,16 +491,16 @@ export default function AdminPanel({
 
             {/* Top Event Creators - Leaderboard */}
             {analytics.topEventCreators && analytics.topEventCreators.length > 0 && (
-              <div className="rounded-lg border-2 border-purple-500/50 bg-card/90 p-4 shadow-lg shadow-purple-500/20 backdrop-blur-sm dark:bg-black/40 lg:p-6">
+              <div className="rounded-lg border-2 border-primary/50 bg-card/90 p-4 shadow-lg shadow-primary/20 backdrop-blur-sm dark:bg-black/40 lg:p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-purple-500/20 border border-purple-400/50 rounded flex items-center justify-center">
-                    <TrendingUp className="h-5 w-5 text-purple-300" />
+                  <div className="w-10 h-10 bg-primary/20 border border-primary/50 rounded flex items-center justify-center">
+                    <TrendingUp className="h-5 w-5 text-primary" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-purple-300 font-mono flex items-center gap-2">
+                    <h2 className="text-base font-bold text-primary font-mono flex items-center gap-2">
                       <span className="text-green-400">{'>'}</span> TOP_EVENT_CREATORS
                     </h2>
-                    <p className="text-xs text-purple-400/60 font-mono">system.admin.leaderboard</p>
+                    <p className="text-xs text-primary/60 font-mono">system.admin.leaderboard</p>
                   </div>
                 </div>
 
@@ -508,7 +508,7 @@ export default function AdminPanel({
                   {analytics.topEventCreators.map((creator, index) => (
                     <div
                       key={creator.id}
-                      className="rounded border border-purple-500/30 bg-card/95 p-3 transition-colors hover:border-purple-500/50 dark:bg-black/60"
+                      className="rounded border border-primary/30 bg-card/95 p-3 transition-colors hover:border-primary/50 dark:bg-black/60"
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3">
@@ -516,18 +516,18 @@ export default function AdminPanel({
                             index === 0 ? 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-300 border-2 border-yellow-400/50' :
                             index === 1 ? 'bg-muted/20 text-muted-foreground border-2 border-border/50' :
                             index === 2 ? 'bg-amber-600/20 text-amber-950 dark:text-amber-400 border-2 border-amber-500/50' :
-                            'bg-purple-500/20 text-violet-950 dark:text-purple-300 border border-purple-400/50'
+                            'bg-primary/20 text-violet-950 dark:text-primary border border-primary/50'
                           }`}>
                             #{index + 1}
                           </div>
                           <div>
                             <div className="text-foreground font-mono text-sm font-bold">{creator.name}</div>
-                            <div className="text-purple-300/60 font-mono text-xs">{creator.email}</div>
+                            <div className="text-primary/60 font-mono text-xs">{creator.email}</div>
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-yellow-300 font-mono font-bold text-lg">{creator.events_count}</div>
-                          <div className="text-purple-300/60 font-mono text-[10px]">events</div>
+                          <div className="text-primary/60 font-mono text-[10px]">events</div>
                         </div>
                       </div>
                     </div>
@@ -574,7 +574,7 @@ export default function AdminPanel({
                             }`}>
                               {event.published ? 'PUBLISHED' : 'DRAFT'}
                             </div>
-                            <div className="px-2 py-1 bg-purple-500/20 border border-purple-400/50 rounded text-violet-950 dark:text-purple-300 font-mono text-[9px]">
+                            <div className="px-2 py-1 bg-primary/20 border border-primary/50 rounded text-violet-950 dark:text-primary font-mono text-[9px]">
                               {event.vendor_applications_count} applications
                             </div>
                             <div className="px-2 py-1 bg-blue-500/20 border border-blue-400/50 rounded text-blue-950 dark:text-blue-300 font-mono text-[9px]">
@@ -725,7 +725,7 @@ export default function AdminPanel({
                                     {org.subscription.plan && (
                                       <div className="col-span-2">
                                         <span className="text-cyan-400/60">plan:</span>
-                                        <span className="ml-2 text-purple-300 font-bold">
+                                        <span className="ml-2 text-primary font-bold">
                                           {org.subscription.plan}
                                         </span>
                                       </div>

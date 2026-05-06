@@ -25,14 +25,14 @@ interface Step4AutoMessagesProps {
 
 // Category display names and order
 const CATEGORY_CONFIG: Record<EmailCategory, { label: string; order: number }> = {
-  pre_application: { label: 'Event Announcements', order: 1 },
+  pre_application: { label: 'Art Call', order: 1 },
   application: { label: 'Application Updates', order: 2 },
   payment: { label: 'Payment Reminders', order: 3 },
   pre_event: { label: 'Event Countdown', order: 4 },
   event_day: { label: 'Event Day', order: 5 },
   post_event: { label: 'Post Event', order: 6 },
   system: { label: 'Automatic System Emails', order: 7 },
-  event_announcements: { label: 'Event Announcements', order: 1 },
+  event_announcements: { label: 'Art Call', order: 1 },
   application_updates: { label: 'Application Updates', order: 2 },
   payment_reminders: { label: 'Payment Reminders', order: 3 },
   event_countdown: { label: 'Event Countdown', order: 4 },
@@ -257,8 +257,9 @@ export default function Step4AutoMessages({
       const templates = await emailCampaignTemplatesApi.getAll();
       setAllTemplates(templates);
 
-      // Find and set universal template
-      const universal = templates.find((t) => t.template_type === 'category' && t.is_universal === true);
+      // Find and set universal template (prefer is_universal, fall back to first category template)
+      const universal = templates.find((t) => t.template_type === 'category' && t.is_universal === true)
+        || templates.find((t) => t.template_type === 'category');
       if (universal) {
         setUniversalTemplate(universal);
         // Initialize universal template ID in parent if not set
@@ -320,10 +321,10 @@ export default function Step4AutoMessages({
         {/* Header */}
         <div className="mb-4">
           <h2 className="text-xl font-bold text-foreground mb-1">
-            Email Sequences
+            Email Customization
           </h2>
           <p className="text-sm text-foreground/60">
-            Configure automated emails for your event and vendor communications.
+            Configure automated emails for your event and applicant communications.
           </p>
         </div>
 
@@ -331,7 +332,7 @@ export default function Step4AutoMessages({
         <div className="voxxy-surface-subtle mb-4 rounded-lg p-4">
           <h3 className="text-sm font-semibold text-foreground mb-2">Event-Wide Sequence</h3>
           <p className="text-xs text-foreground/50 mb-3">
-            Emails sent to all vendors (invitations, updates, cancellations, deadlines)
+            Emails sent to all applicants (invitations, updates, cancellations, deadlines)
           </p>
 
           <div className="space-y-2">
@@ -382,7 +383,7 @@ export default function Step4AutoMessages({
                     {selectedTemplate?.id === template.id && (
                       <div className="mt-2 rounded border border-blue-300/60 bg-blue-50 p-2 dark:border-blue-500/20 dark:bg-blue-500/10">
                         <div className="text-xs text-blue-900 dark:text-blue-300">
-                          {emailItems.length} emails • Sent to all vendors
+                          {emailItems.length} emails • Sent to all applicants
                         </div>
                       </div>
                     )}
@@ -395,9 +396,9 @@ export default function Step4AutoMessages({
         {/* Category Email Strategy - Only show if event has categories */}
         {eventCategories.length > 0 && selectedTemplate && universalTemplate && (
           <div className="voxxy-surface-subtle mb-4 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-2">Vendor Category Sequences</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-2">Applicant Category Sequences</h3>
             <p className="text-xs text-foreground/50 mb-3">
-              Vendor emails during application, payment, and countdown phases
+              Applicant emails during application, payment, and countdown phases
             </p>
 
             <div className="space-y-2">
@@ -405,7 +406,7 @@ export default function Step4AutoMessages({
               <label
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   useUniversalCategoryTemplate
-                    ? 'border-purple-500/50 bg-purple-500/10'
+                    ? 'border-primary/50 bg-primary/10'
                     : 'border-border hover:bg-accent/40 dark:hover:bg-background/10'
                 }`}
               >
@@ -417,13 +418,13 @@ export default function Step4AutoMessages({
                     onUseUniversalCategoryTemplateChange?.(true);
                     onUseCategoryTemplatesChange?.(false);
                   }}
-                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-foreground">Universal Sequence</span>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-300">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-primary/20 text-violet-950 dark:text-primary">
                         DEFAULT
                       </span>
                       <span className="text-[10px] text-foreground/40">
@@ -436,22 +437,22 @@ export default function Step4AutoMessages({
                         e.stopPropagation();
                         handleOpenSequenceList('category');
                       }}
-                      className="flex items-center gap-1 rounded border border-purple-500/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-purple-500/10 hover:text-violet-950 dark:text-purple-300 dark:hover:text-purple-200"
+                      className="flex items-center gap-1 rounded border border-primary/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-primary/10 hover:text-violet-950 dark:text-primary dark:hover:text-primary"
                     >
                       <Eye className="w-3 h-3" />
                       Preview
                     </button>
                   </div>
                   <p className="text-xs text-foreground/50 mt-1">
-                    Same content for all vendors • Simplifies management when content doesn't need to vary by vendor type
+                    Same content for all applicants • Simplifies management when content doesn't need to vary by category
                   </p>
 
                   {useUniversalCategoryTemplate && (
-                    <div className="mt-2 rounded border border-purple-300/50 bg-violet-50 p-2 dark:border-purple-500/20 dark:bg-purple-500/10">
-                      <div className="mb-1.5 text-xs text-violet-950 dark:text-purple-300">
+                    <div className="mt-2 rounded border border-primary/50/50 bg-violet-50 p-2 dark:border-primary/20 dark:bg-primary/10">
+                      <div className="mb-1.5 text-xs text-violet-950 dark:text-primary">
                         {universalTemplate.name}
                       </div>
-                      <div className="text-[10px] text-violet-800/75 dark:text-purple-200/70">
+                      <div className="text-[10px] text-violet-800/75 dark:text-primary/70">
                         {universalTemplate?.email_count || 0} emails • Shared by all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'}
                       </div>
                     </div>
@@ -463,7 +464,7 @@ export default function Step4AutoMessages({
               <label
                 className={`flex items-start gap-2.5 p-2.5 rounded-lg border cursor-pointer transition-all ${
                   !useUniversalCategoryTemplate
-                    ? 'border-purple-500/50 bg-purple-500/10'
+                    ? 'border-primary/50 bg-primary/10'
                     : 'border-border hover:bg-accent/40 dark:hover:bg-background/10'
                 }`}
               >
@@ -475,7 +476,7 @@ export default function Step4AutoMessages({
                     onUseUniversalCategoryTemplateChange?.(false);
                     onUseCategoryTemplatesChange?.(true);
                   }}
-                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0"
+                  className="mt-0.5 w-4 h-4 border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
@@ -499,24 +500,24 @@ export default function Step4AutoMessages({
                         e.stopPropagation();
                         handleOpenSequenceList('category');
                       }}
-                      className="flex items-center gap-1 rounded border border-purple-500/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-purple-500/10 hover:text-violet-950 dark:text-purple-300 dark:hover:text-purple-200"
+                      className="flex items-center gap-1 rounded border border-primary/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-primary/10 hover:text-violet-950 dark:text-primary dark:hover:text-primary"
                     >
                       <Eye className="w-3 h-3" />
                       Preview
                     </button>
                   </div>
                   <p className="text-xs text-foreground/50 mt-1">
-                    Customize content per vendor type (each category uses its own template)
+                    Customize content per applicant category (each category uses its own template)
                   </p>
 
                   {!useUniversalCategoryTemplate && categoryTemplatesAvailable.length > 0 && (
-                    <div className="mt-2 p-2 rounded bg-purple-500/10 border border-purple-500/20">
+                    <div className="mt-2 p-2 rounded bg-primary/10 border border-primary/20">
                       <div className="space-y-1">
                         {categoryTemplatesAvailable.map(({ category, hasTemplate, template }) => (
                           <div key={category.id} className="flex items-center gap-1.5 text-[11px]">
                             <span
                               className="w-1.5 h-1.5 rounded-full"
-                              style={{ backgroundColor: category.color || '#8B5CF6' }}
+                              style={{ backgroundColor: category.color || '#9054e3' }}
                             />
                             <span
                               className="category-sequence-badge inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-bold"
@@ -526,7 +527,7 @@ export default function Step4AutoMessages({
                               {category.name}
                             </span>
                             <span className="text-foreground/30">→</span>
-                            <span className="truncate text-violet-900 dark:text-purple-300">
+                            <span className="truncate text-violet-900 dark:text-primary">
                               {hasTemplate ? template?.name : 'Default'}
                             </span>
                             <span className="text-foreground/40">
@@ -581,9 +582,9 @@ export default function Step4AutoMessages({
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${sequenceListType === 'event' ? 'bg-blue-400' : 'bg-purple-400'}`} />
+                  <div className={`w-2 h-2 rounded-full ${sequenceListType === 'event' ? 'bg-blue-400' : 'bg-primary'}`} />
                   <h3 className="text-lg font-semibold text-foreground">
-                    {sequenceListType === 'event' ? 'Event-Wide Emails' : 'Vendor Category Emails'}
+                    {sequenceListType === 'event' ? 'Event-Wide Emails' : 'Applicant Category Emails'}
                   </h3>
                   <span className="text-sm text-foreground/40">
                     ({sequenceListType === 'event'
@@ -633,16 +634,6 @@ export default function Step4AutoMessages({
                               {sendDate && ` • ${sendDate}`}
                             </div>
                           </div>
-                          <button
-                            onClick={() => {
-                              handlePreviewEmail(email);
-                              setIsSequenceListModalOpen(false);
-                            }}
-                            className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
-                            title="Preview email"
-                          >
-                            <Eye className="w-3.5 h-3.5" />
-                          </button>
                         </div>
                       );
                     })}
@@ -653,7 +644,7 @@ export default function Step4AutoMessages({
                   {useUniversalCategoryTemplate ? (
                     // Universal template - show once
                     <div>
-                      <div className="mb-2 px-1 text-xs font-medium text-violet-900 dark:text-purple-300">
+                      <div className="mb-2 px-1 text-xs font-medium text-violet-900 dark:text-primary">
                         {universalTemplate?.name} (sent to all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'})
                       </div>
                       <div className="space-y-1">
@@ -673,7 +664,7 @@ export default function Step4AutoMessages({
                                 className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                               >
                                 <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
-                                <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />
+                                <Mail className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
                                   <div className="text-sm text-foreground font-medium">{email.name}</div>
                                   <div className="text-xs text-foreground/50 mt-0.5">
@@ -681,16 +672,6 @@ export default function Step4AutoMessages({
                                     {sendDate && ` • ${sendDate}`}
                                   </div>
                                 </div>
-                                <button
-                                  onClick={() => {
-                                    handlePreviewEmail(email);
-                                    setIsSequenceListModalOpen(false);
-                                  }}
-                                  className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
-                                  title="Preview email"
-                                >
-                                  <Eye className="w-3.5 h-3.5" />
-                                </button>
                               </div>
                             );
                           })}
@@ -705,7 +686,7 @@ export default function Step4AutoMessages({
 
                       return (
                         <div key={cat.id}>
-                          <div className="mb-2 flex items-center gap-2 px-1 text-xs font-medium text-violet-900 dark:text-purple-300">
+                          <div className="mb-2 flex items-center gap-2 px-1 text-xs font-medium text-violet-900 dark:text-primary">
                             <span>{cat.icon && `${cat.icon} `}{cat.name}</span>
                             <span className="text-foreground/30">→</span>
                             <span className="text-foreground/50">{template?.name || 'Default'}</span>
@@ -727,7 +708,7 @@ export default function Step4AutoMessages({
                                     className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                                   >
                                     <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
-                                    <Mail className="w-3.5 h-3.5 text-purple-400/60 flex-shrink-0" />
+                                    <Mail className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
                                       <div className="text-sm text-foreground font-medium">{email.name}</div>
                                       <div className="text-xs text-foreground/50 mt-0.5">
@@ -735,16 +716,6 @@ export default function Step4AutoMessages({
                                         {sendDate && ` • ${sendDate}`}
                                       </div>
                                     </div>
-                                    <button
-                                      onClick={() => {
-                                        handlePreviewEmail(email);
-                                        setIsSequenceListModalOpen(false);
-                                      }}
-                                      className="p-1.5 rounded text-foreground/40 hover:text-foreground hover:bg-background/10 transition-all flex-shrink-0"
-                                      title="Preview email"
-                                    >
-                                      <Eye className="w-3.5 h-3.5" />
-                                    </button>
                                   </div>
                                 );
                               })}
@@ -772,7 +743,7 @@ export default function Step4AutoMessages({
 
       {/* Admin Debug Panel */}
       <DebugPanel
-        title="Step 4: Email Sequences"
+        title="Step 4: Email Customization"
         data={{
           selectedTemplateId,
           selectedTemplate,

@@ -49,8 +49,8 @@ export function BulkActionToolbar({
         {/* Left: Selection info */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-purple-500/30 flex items-center justify-center">
-              <Users className="w-4 h-4 text-purple-300" />
+            <div className="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center">
+              <Users className="w-4 h-4 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">
@@ -71,7 +71,7 @@ export function BulkActionToolbar({
             <select
               value={selectedCategoryId || ''}
               onChange={(e) => setSelectedCategoryId(e.target.value ? Number(e.target.value) : null)}
-              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 cursor-pointer"
+              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
               disabled={loading}
             >
               <option value="">Select category...</option>
@@ -105,7 +105,7 @@ export function BulkActionToolbar({
                 }
               }}
               placeholder="City, State..."
-              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 w-40"
+              className="px-3 py-2 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary w-40"
               disabled={loading}
             />
 

@@ -14,13 +14,13 @@ const config: Config = {
   			'voxxy-purple': {
   				deep: '#1a0b2e',
   				mid: '#2d1b4e',
-  				brand: '#a855f7',
-  				light: '#c084fc',
+  				brand: '#9054e3',
+  				light: '#cc30e8',
   			},
   			'voxxy-pink': {
-  				DEFAULT: '#e879f9',
-  				deep: '#c026d3',
-  				light: '#f0abfc',
+  				DEFAULT: '#cc30e8',
+  				deep: '#af3cda',
+  				light: '#d95ef0',
   			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',

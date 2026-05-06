@@ -54,7 +54,7 @@ export function BulletinCard({
 
   return (
     <div className={`voxxy-gradient-card-deep rounded-lg p-6 border ${
-      bulletin.pinned ? 'border-purple-500' : 'border-border'
+      bulletin.pinned ? 'border-primary' : 'border-border'
     }`}>
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
@@ -68,7 +68,7 @@ export function BulletinCard({
             <div className="flex items-center gap-2">
               <h3 className="text-foreground font-semibold">{bulletin.subject}</h3>
               {bulletin.pinned && (
-                <Pin className="w-4 h-4 text-purple-400 fill-purple-400" />
+                <Pin className="w-4 h-4 text-primary fill-primary" />
               )}
             </div>
             <p className="text-muted-foreground text-sm">
@@ -87,11 +87,11 @@ export function BulletinCard({
               disabled={isTogglingPin}
               className={`${
                 bulletin.pinned
-                  ? 'text-purple-400 hover:text-purple-300'
+                  ? 'text-primary hover:text-primary'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Pin className={`w-4 h-4 ${bulletin.pinned ? 'fill-purple-400' : ''}`} />
+              <Pin className={`w-4 h-4 ${bulletin.pinned ? 'fill-primary' : ''}`} />
             </Button>
             <Button
               variant="ghost"
@@ -129,7 +129,7 @@ export function BulletinCard({
           <span>{bulletin.view_count} views</span>
         </div>
         {bulletin.read_by_current_user && (
-          <div className="text-purple-400">
+          <div className="text-primary">
             ✓ Read
           </div>
         )}

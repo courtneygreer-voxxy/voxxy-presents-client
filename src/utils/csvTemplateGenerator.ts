@@ -9,7 +9,10 @@ export function generateCSVTemplate(): string {
     'website',
     'location',
     'tags',
-    'notes'
+    'notes',
+    'eventbrite_email',
+    'venmo_handle',
+    'paypal_email'
   ];
 
   const exampleRows = [
@@ -23,7 +26,10 @@ export function generateCSVTemplate(): string {
       website: 'https://sarahceramics.com',
       location: 'San Francisco, CA',
       tags: 'art,local',
-      notes: 'Met at Spring Market 2024'
+      notes: 'Met at Spring Market 2024',
+      eventbrite_email: 'sarah@ceramics.com',
+      venmo_handle: '@sarahceramics',
+      paypal_email: ''
     },
     {
       name: 'John Davidson',
@@ -35,7 +41,10 @@ export function generateCSVTemplate(): string {
       website: 'https://johnstacos.com',
       location: 'Oakland, CA',
       tags: 'food,catering',
-      notes: 'Interested in summer events'
+      notes: 'Interested in summer events',
+      eventbrite_email: '',
+      venmo_handle: '',
+      paypal_email: 'john@paypal.com'
     }
   ];
 

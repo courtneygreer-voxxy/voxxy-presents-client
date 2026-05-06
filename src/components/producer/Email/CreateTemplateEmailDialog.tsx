@@ -131,7 +131,7 @@ export function CreateTemplateEmailDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-purple-500/20">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto voxxy-gradient-page-cool border-primary/20">
         <DialogHeader>
           <DialogTitle className="text-foreground text-xl">Add Email to Template</DialogTitle>
           <p className="text-foreground/60 text-sm">
