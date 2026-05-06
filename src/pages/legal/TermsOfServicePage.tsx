@@ -37,15 +37,15 @@ export default function TermsOfServicePage() {
         <div className="space-y-4 text-gray-700 leading-relaxed">
           <p>
             These Terms of Service ("Terms") cover your use of and access to the platform, tools, features, and services (collectively, the "Services") provided by Voxxy AI, Inc., a Delaware corporation (together with its officers, directors, employees, agents, subsidiaries and affiliates, "Voxxy," "we," "us," or "our"). Our{' '}
-            <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+            <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
               Privacy Policy
             </a>{' '}
             explains what personal information we collect and how it's used and shared, our{' '}
-            <a href="/legal/acceptable-use" className="text-primary hover:text-primary underline">
+            <a href="/legal/acceptable-use" className="text-primary hover:text-primary/70 underline transition-colors">
               Acceptable Use Policy
             </a>{' '}
             outlines your responsibilities when using the Services, and our{' '}
-            <a href="/legal/cookies" className="text-primary hover:text-primary underline">
+            <a href="/legal/cookies" className="text-primary hover:text-primary/70 underline transition-colors">
               Cookie Policy
             </a>{' '}
             explains how we use cookies and similar technologies.
@@ -296,7 +296,7 @@ export default function TermsOfServicePage() {
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
               Our{' '}
-              <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+              <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                 Privacy Policy
               </a>{' '}
               explains how we collect, use, and share information. By using the Services, you agree to our collection, use, and sharing of information as set forth in the Privacy Policy. Because Voxxy acts as a data processor for End User data you import, the Privacy Policy also describes our obligations in that capacity.

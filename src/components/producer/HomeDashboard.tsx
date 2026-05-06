@@ -448,7 +448,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
               <button
                 onClick={() => onNavigateToTab?.('emails')}
-                className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+                className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
               >
                 View All →
               </button>
@@ -493,7 +493,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {bulletins.length > 3 && (
                   <button
                     onClick={() => setShowAllBulletins(!showAllBulletins)}
-                    className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+                    className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                   >
                     {showAllBulletins ? 'Show Less' : 'View All →'}
                   </button>
@@ -587,7 +587,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
             <button
               onClick={() => onNavigateToTab?.('settings')}
-              className="flex items-center gap-1 text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+              className="flex items-center gap-1 text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
             >
               <Edit2 className="w-3 h-3" />
               Edit
@@ -696,7 +696,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   {!isEditingTicketLink && (
                     <button
                       onClick={handleStartEditTicketLink}
-                      className="p-0.5 text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+                      className="p-0.5 text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                       title="Edit ticket link"
                     >
                       <Edit2 className="w-3 h-3" />
@@ -740,7 +740,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                         href={event.ticket_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="break-all text-xs text-primary underline transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+                        className="break-all text-xs text-primary underline transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                       >
                         {event.ticket_link}
                       </a>

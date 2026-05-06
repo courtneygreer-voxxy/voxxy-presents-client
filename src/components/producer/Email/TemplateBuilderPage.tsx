@@ -843,7 +843,7 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
                                       <Tooltip.Provider delayDuration={200}>
                                         <Tooltip.Root>
                                           <Tooltip.Trigger asChild>
-                                            <button className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary">
+                                            <button className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70">
                                               <HelpCircle className="w-3.5 h-3.5" />
                                             </button>
                                           </Tooltip.Trigger>

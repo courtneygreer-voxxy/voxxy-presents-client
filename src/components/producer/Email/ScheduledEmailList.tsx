@@ -277,7 +277,7 @@ export default function ScheduledEmailList({
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="text-sm text-primary hover:text-primary"
+            className="text-sm text-primary hover:text-primary/70 transition-colors"
           >
             Clear search
           </button>
@@ -348,7 +348,7 @@ export default function ScheduledEmailList({
               setSearchQuery('');
               setStatusFilter('all');
             }}
-            className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary"
+            className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 transition-colors"
           >
             Clear all filters
           </button>

@@ -102,7 +102,7 @@ export default function SignUpPage() {
                   <Separator className="bg-background/20 mb-4" />
                   <p className="text-muted-foreground text-sm text-center">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-primary hover:text-primary font-medium">
+                    <Link to="/login" className="text-primary hover:text-primary/70 font-medium transition-colors">
                       Sign in here
                     </Link>
                   </p>

@@ -223,7 +223,7 @@ export default function BugReportsTab() {
                                 href={report.error_context.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-primary hover:text-primary flex items-center gap-1"
+                                className="text-sm text-primary hover:text-primary/70 flex items-center gap-1 transition-colors"
                               >
                                 {report.error_context.url}
                                 <ExternalLink className="w-3 h-3" />

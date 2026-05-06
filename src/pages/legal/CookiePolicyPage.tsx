@@ -37,7 +37,7 @@ export default function CookiePolicyPage() {
         <div className="space-y-4 text-gray-700 leading-relaxed">
           <p>
             This Cookie Policy describes how Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") uses cookies and similar technologies when you use the Voxxy Presents platform and visit our websites (collectively, the "Services"). Any capitalized terms not defined in this Cookie Policy have the meanings set forth in our{' '}
-            <a href="/legal/terms" className="text-primary hover:text-primary underline">
+            <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
               Terms of Service
             </a>
             . If you have any questions about this Cookie Policy, contact us at team@voxxypresents.com.
@@ -227,7 +227,7 @@ export default function CookiePolicyPage() {
             </p>
             <p>
               <strong>We do not sell your data.</strong> As stated in our{' '}
-              <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+              <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                 Privacy Policy
               </a>
               , we do not sell or share your personal information with third parties for their marketing purposes.
@@ -279,7 +279,7 @@ export default function CookiePolicyPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary underline">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary/70 underline transition-colors">team@voxxypresents.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

@@ -919,7 +919,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     <p className="text-[10px] text-foreground/60 mb-1">Email</p>
                     <a
                       href={`mailto:${selectedApplicant.email}`}
-                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary transition-smooth"
+                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                     >
                       <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{selectedApplicant.email}</span>
@@ -930,7 +930,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <p className="text-[10px] text-foreground/60 mb-1">Phone</p>
                       <a
                         href={`tel:${selectedApplicant.phone}`}
-                        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary transition-smooth"
+                        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                       >
                         <Phone className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{selectedApplicant.phone}</span>

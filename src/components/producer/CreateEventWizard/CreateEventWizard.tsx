@@ -237,12 +237,16 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
   };
 
   const handleSubmit = async () => {
-    // Validate critical steps before submission
-    if (!validateStep1() || !validateStep2() || !validateStep3()) {
-      // Jump to first failing step
-      if (!validateStep1()) {
+    // Validate each step once, capturing the results to avoid double side-effects
+    const step1Valid = validateStep1();
+    const step2Valid = validateStep2();
+    const step3Valid = validateStep3();
+
+    if (!step1Valid || !step2Valid || !step3Valid) {
+      // Jump to first failing step (errors already set by the validate call above)
+      if (!step1Valid) {
         setWizardState((prev) => ({ ...prev, currentStep: 1 }));
-      } else if (!validateStep2()) {
+      } else if (!step2Valid) {
         setWizardState((prev) => ({ ...prev, currentStep: 2 }));
       } else {
         setWizardState((prev) => ({ ...prev, currentStep: 3 }));

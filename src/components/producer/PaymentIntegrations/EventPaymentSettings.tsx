@@ -59,7 +59,7 @@ export default function EventPaymentSettings({
   const secondaryIconButtonClass =
     'rounded-lg border border-violet-200 bg-violet-50 p-2 text-violet-800 transition-colors hover:bg-violet-100 disabled:opacity-50 dark:border-transparent dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30';
   const subtleLinkClass =
-    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-primary dark:hover:text-primary';
+    'text-xs text-violet-700 hover:text-violet-900 hover:underline dark:text-primary dark:hover:text-primary/70 transition-colors';
   const syncMetricClass =
     'rounded-lg border border-violet-200/70 bg-white/85 px-3 py-3 shadow-sm dark:border-primary/20 dark:bg-background/10';
 
@@ -510,7 +510,7 @@ export default function EventPaymentSettings({
                   <button
                     onClick={handleStartEditUrl}
                     disabled={isLoading}
-                    className="p-1 text-violet-700 transition-colors hover:text-violet-900 disabled:opacity-50 dark:text-primary dark:hover:text-primary"
+                    className="p-1 text-violet-700 transition-colors hover:text-violet-900 disabled:opacity-50 dark:text-primary dark:hover:text-primary/70"
                     title="Edit ticket link"
                   >
                     <Edit2 className="w-4 h-4" />

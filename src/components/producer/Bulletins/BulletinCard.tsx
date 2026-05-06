@@ -87,7 +87,7 @@ export function BulletinCard({
               disabled={isTogglingPin}
               className={`${
                 bulletin.pinned
-                  ? 'text-primary hover:text-primary'
+                  ? 'text-primary hover:text-primary/70'
                   : 'text-muted-foreground hover:text-foreground'
               }`}
             >

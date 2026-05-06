@@ -731,7 +731,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             {(searchQuery || activeFilters.length > 0) && (
               <button
                 onClick={() => { setSearchQuery(''); setActiveFilters([]); }}
-                className="text-sm text-primary hover:text-primary"
+                className="text-sm text-primary hover:text-primary/70 transition-colors"
               >
                 Clear search
               </button>

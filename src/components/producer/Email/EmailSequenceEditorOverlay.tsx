@@ -455,7 +455,7 @@ export default function EmailSequenceEditorOverlay({
                                   <Tooltip.Trigger asChild>
                                     <button
                                       type="button"
-                                      className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary"
+                                      className="text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                                     >
                                       <HelpCircle className="h-3.5 w-3.5" />
                                     </button>

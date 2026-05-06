@@ -30,7 +30,7 @@ export default function MobileEULAPage() {
         <div className="bg-muted border border-border rounded-lg p-6">
           <p className="text-gray-700 leading-relaxed">
             This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy Presents web platform, see our{' '}
-            <a href="/legal/terms" className="text-primary hover:text-primary underline">
+            <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
               Terms of Service
             </a>
             . The annotations in these highlighted boxes aren't part of the official EULA but are here to help you understand each section.
@@ -44,7 +44,7 @@ export default function MobileEULAPage() {
           </p>
           <p>
             This EULA incorporates by reference our{' '}
-            <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+            <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
               Privacy Policy
             </a>
             , which explains how we collect, use, and protect your personal information. Any capitalized terms not defined in this EULA have the meanings set forth in our Privacy Policy. If you have any questions about this EULA, contact us at team@voxxypresents.com.
@@ -106,7 +106,7 @@ export default function MobileEULAPage() {
             </p>
             <p>
               <strong>4.2 Contact Access.</strong> If you grant the App permission to access your device's contacts, we may use this information to help you discover which of your contacts are attending events or to facilitate social features within the App. You can revoke this permission at any time through your device settings. See our{' '}
-              <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+              <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                 Privacy Policy
               </a>{' '}
               for details on how we handle contact information.
@@ -116,14 +116,14 @@ export default function MobileEULAPage() {
             </p>
             <p>
               <strong>4.4 AI-Powered Features.</strong> The App includes AI-powered features (such as personalized event recommendations and a conversational assistant) to help you discover events that match your interests. When you interact with AI-powered features, your inputs (such as dining preferences, event interests, and questions you ask) may be processed by OpenAI's services under their data processing terms. We do not share personally identifiable information with OpenAI unless necessary to provide the service you requested. See our{' '}
-              <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+              <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                 Privacy Policy
               </a>{' '}
               for more details.
             </p>
             <p>
               <strong>4.5 Acceptable Use.</strong> You agree to use the App in compliance with all applicable laws and regulations and in a manner consistent with our{' '}
-              <a href="/legal/acceptable-use" className="text-primary hover:text-primary underline">
+              <a href="/legal/acceptable-use" className="text-primary hover:text-primary/70 underline transition-colors">
                 Acceptable Use Policy
               </a>
               . You may not use the App to transmit, distribute, or store material that is unlawful, harmful, threatening, abusive, harassing, defamatory, or otherwise objectionable.
@@ -332,7 +332,7 @@ export default function MobileEULAPage() {
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
               <strong>14.1 Entire Agreement.</strong> This EULA, together with our{' '}
-              <a href="/legal/privacy" className="text-primary hover:text-primary underline">
+              <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                 Privacy Policy
               </a>
               , constitutes the entire agreement between you and Voxxy regarding the App and supersedes all prior agreements and understandings.
@@ -365,7 +365,7 @@ export default function MobileEULAPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary underline">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary/70 underline transition-colors">team@voxxypresents.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

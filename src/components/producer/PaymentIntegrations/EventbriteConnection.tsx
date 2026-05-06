@@ -160,7 +160,7 @@ export default function EventbriteConnection({
                 href="https://www.eventbrite.com/account-settings/apps"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-primary hover:text-primary hover:underline"
+                className="text-primary hover:text-primary/70 hover:underline transition-colors"
               >
                 Eventbrite Account Settings
               </a>

@@ -261,11 +261,11 @@ export function CreateBulletinModal({
 
                 {/* Recipient Preview */}
                 {loadingPreview ? (
-                  <div className="bg-primary/20/20 border border-primary/30 rounded p-3 text-center">
+                  <div className="bg-primary/10 border border-primary/30 rounded p-3 text-center">
                     <p className="text-sm text-foreground/60">Loading recipient count...</p>
                   </div>
                 ) : recipientPreview && recipientPreview.total > 0 ? (
-                  <div className="bg-primary/20/20 border border-primary/30 rounded p-3">
+                  <div className="bg-primary/10 border border-primary/30 rounded p-3">
                     <p className="text-sm text-foreground/90">
                       Will send to <strong className="text-primary text-lg">{recipientPreview.total}</strong> vendor{recipientPreview.total !== 1 ? 's' : ''}
                     </p>

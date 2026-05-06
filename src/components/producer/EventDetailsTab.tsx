@@ -606,7 +606,7 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
                   href={event.ticket_link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:text-primary underline break-all"
+                  className="text-primary hover:text-primary/70 underline break-all transition-colors"
                 >
                   {event.ticket_link}
                 </a>

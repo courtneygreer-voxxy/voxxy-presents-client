@@ -23,7 +23,7 @@ export default function EmailFooterCard({ organizationEmail = '[organizationEmai
             <span className="text-primary font-medium">{organizationEmail}</span>
           </span>
           <span className="block mb-2">
-            <a href="#" className="text-primary hover:text-primary underline">
+            <a href="#" className="text-primary hover:text-primary/70 underline transition-colors">
               Unsubscribe from these emails
             </a>
           </span>

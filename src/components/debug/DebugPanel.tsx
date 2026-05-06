@@ -262,7 +262,7 @@ export function DebugPanel() {
                     disabled={isSwitchingRole || userProfile.role === 'admin'}
                     size="sm"
                     variant="outline"
-                    className={`h-7 text-xs ${userProfile.role === 'admin' ? 'bg-primary/20/50 border-primary' : 'border-primary/50 text-primary hover:bg-primary/20/30'}`}
+                    className={`h-7 text-xs ${userProfile.role === 'admin' ? 'bg-primary/30 border-primary' : 'border-primary/50 text-primary hover:bg-primary/20'}`}
                   >
                     👑 Admin
                   </Button>

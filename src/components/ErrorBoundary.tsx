@@ -146,7 +146,7 @@ class ErrorBoundary extends Component<Props, State> {
                 If this problem persists, contact us at{' '}
                 <a
                   href="mailto:team@voxxypresents.com"
-                  className="text-primary hover:text-primary underline"
+                  className="text-primary hover:text-primary/70 underline transition-colors"
                 >
                   team@voxxypresents.com
                 </a>

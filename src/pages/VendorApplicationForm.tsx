@@ -468,7 +468,7 @@ export default function VendorApplicationForm() {
                 {event.organization.email ? (
                   <a
                     href={`mailto:${event.organization.email}`}
-                    className="inline-flex items-center gap-2 text-primary hover:text-primary text-sm"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/70 text-sm transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -774,14 +774,14 @@ export default function VendorApplicationForm() {
                     I agree to the{' '}
                     <a
                       href="/legal/privacy"
-                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
                     >
                       Privacy Policy
                     </a>{' '}
                     and{' '}
                     <a
                       href="/legal/acceptable-use"
-                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
                     >
                       Acceptable Use Policy
                     </a>{' '}

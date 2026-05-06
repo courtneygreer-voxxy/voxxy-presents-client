@@ -228,7 +228,7 @@ export default function ApplicationsTab({ eventSlug, event }: ApplicationsTabPro
                               href={application.payment_link}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-primary hover:text-primary underline break-all"
+                              className="text-primary hover:text-primary/70 underline break-all transition-colors"
                             >
                               {application.payment_link}
                             </a>

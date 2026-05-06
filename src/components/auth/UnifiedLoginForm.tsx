@@ -169,7 +169,7 @@ export function UnifiedLoginForm({
               <button
                 type="button"
                 onClick={onForgotPassword}
-                className="text-primary hover:text-primary text-sm transition-colors"
+                className="text-primary hover:text-primary/70 text-sm transition-colors"
                 disabled={isSubmitting}
               >
                 Forgot password?
@@ -273,7 +273,7 @@ export function UnifiedLoginForm({
               Don't have an account?{' '}
               <button
                 onClick={onSwitchToSignUp}
-                className="text-primary hover:text-primary font-medium transition-colors"
+                className="text-primary hover:text-primary/70 font-medium transition-colors"
                 disabled={isSubmitting}
               >
                 Sign up here

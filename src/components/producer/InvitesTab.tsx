@@ -728,7 +728,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                           <div>
                             <p className="text-[10px] text-foreground/60 mb-0.5">Email</p>
-                            <a href={`mailto:${row.email}`} className="text-sm text-primary hover:text-primary flex items-center gap-1.5">
+                            <a href={`mailto:${row.email}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
                               <Mail className="w-3.5 h-3.5" />
                               {row.email}
                             </a>
@@ -737,7 +737,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {row.phone && (
                             <div>
                               <p className="text-[10px] text-foreground/60 mb-0.5">Phone</p>
-                              <a href={`tel:${row.phone}`} className="text-sm text-primary hover:text-primary flex items-center gap-1.5">
+                              <a href={`tel:${row.phone}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
                                 <Phone className="w-3.5 h-3.5" />
                                 {row.phone}
                               </a>
@@ -1016,7 +1016,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                     setEditingNotesId(row.id);
                                     setNotesEditValue(row.producerNotes || '');
                                   }}
-                                  className="text-primary hover:text-primary"
+                                  className="text-primary hover:text-primary/70 transition-colors"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                 </button>

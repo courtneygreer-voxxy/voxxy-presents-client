@@ -804,7 +804,7 @@ export default function NetworkPage({
               {!showSaveInput ? (
                 <button
                   onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary/70 text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save as List
@@ -838,7 +838,7 @@ export default function NetworkPage({
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
               </p>
-              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary text-sm underline">
+              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 text-sm underline transition-colors">
                 Clear all filters
               </button>
             </div>

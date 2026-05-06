@@ -124,7 +124,7 @@ export default function ListSelector({
               </span>
               <button
                 onClick={handleSelectAll}
-                className="text-xs text-primary hover:text-primary font-medium transition-colors"
+                className="text-xs text-primary hover:text-primary/70 font-medium transition-colors"
               >
                 {selectedListIds.length === lists.length ? 'Deselect All' : 'Select All'}
               </button>

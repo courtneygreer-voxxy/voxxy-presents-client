@@ -646,7 +646,7 @@ export default function GoLiveInvitationEditor({
                 <button
                   type="button"
                   onClick={() => setSearchTerm('')}
-                  className="mt-3 text-primary hover:text-primary text-sm transition-colors"
+                  className="mt-3 text-primary hover:text-primary/70 text-sm transition-colors"
                 >
                   Clear search
                 </button>

@@ -129,7 +129,7 @@ export default function PaymentCanceledPage() {
                   Having trouble? Contact us at{' '}
                   <a
                     href="mailto:support@voxxypresents.com"
-                    className="text-primary hover:text-primary underline"
+                    className="text-primary hover:text-primary/70 underline transition-colors"
                   >
                     support@voxxypresents.com
                   </a>

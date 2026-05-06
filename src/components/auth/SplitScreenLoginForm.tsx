@@ -330,7 +330,7 @@ export function SplitScreenLoginForm({
                   className={`w-full ${
                     activeType === 'club-owner'
                       ? 'bg-violet-100 text-foreground border border-violet-200 hover:bg-violet-200 dark:border-transparent dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/80'
-                      : 'bg-violet-100 text-foreground border border-violet-200 hover:bg-violet-200 dark:border-transparent dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/80'
+                      : 'bg-sky-100 text-foreground border border-sky-200 hover:bg-sky-200 dark:border-transparent dark:bg-sky-600 dark:text-white dark:hover:bg-sky-500'
                   }`}
                 >
                   {isSubmitting || loading ? (
