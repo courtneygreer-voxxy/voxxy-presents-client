@@ -197,7 +197,7 @@ export default function EmailRow({
         )}
         <div className="flex-1 min-w-0">
           <div
-            className={`truncate font-medium ${email.overdue ? 'text-red-600 dark:text-red-400' : 'text-foreground'} ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
+            className={`truncate font-medium ${email.overdue ? 'text-red-600 dark:text-red-400' : 'text-foreground'} ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-primary' : ''}`}
             onClick={(e) => {
               if (onEdit) {
                 e.stopPropagation();
@@ -212,7 +212,7 @@ export default function EmailRow({
 
       {/* Subject */}
       <div
-        className={`truncate text-foreground/75 ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-purple-300' : ''}`}
+        className={`truncate text-foreground/75 ${onEdit ? 'cursor-pointer transition-colors hover:text-violet-700 dark:hover:text-primary' : ''}`}
         title={backendToFrontend(email.subject_template || '')}
         onClick={(e) => {
           if (onEdit) {

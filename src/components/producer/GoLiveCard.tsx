@@ -117,10 +117,10 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   // Confirmation dialog
   if (showConfirm) {
     return (
-      <div className="voxxy-gradient-panel rounded-xl border-2 border-purple-500/30 p-5">
+      <div className="voxxy-gradient-panel rounded-xl border-2 border-primary/30 p-5">
         <div className="mb-3 flex items-start justify-between">
-          <div className="rounded-lg bg-purple-500/20 p-3">
-            <AlertCircle className="h-6 w-6 text-violet-800 dark:text-purple-400" />
+          <div className="rounded-lg bg-primary/20 p-3">
+            <AlertCircle className="h-6 w-6 text-violet-800 dark:text-primary" />
           </div>
         </div>
         <div className="mb-3">
@@ -129,13 +129,13 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           <ul className="space-y-1 text-xs text-muted-foreground">
             {hasInvitations && (
               <li className="flex items-center gap-1.5">
-                <Send className="h-3 w-3 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Send className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                 Send {invitationCount} invitation{invitationCount !== 1 ? 's' : ''}
               </li>
             )}
             {hasScheduledEmails && (
               <li className="flex items-center gap-1.5">
-                <Mail className="h-3 w-3 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Mail className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                 Activate scheduled emails
               </li>
             )}

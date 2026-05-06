@@ -12,42 +12,26 @@ interface Step2Props extends WizardStepProps {
 }
 
 /**
- * Step2ApplicationDetails - Category selection and booth configuration
+ * Step2ApplicationDetails - Applicant category selection and details
  *
- * Second step of the event creation wizard. Allows producers to select vendor
- * categories and configure booth pricing with smart pre-fill from previous events.
+ * Second step of the event creation wizard. Allows producers to select applicant
+ * categories and configure details with smart pre-fill from previous events.
+ * Pricing/payment configuration has moved to Step 3 (PaymentConfig).
  *
  * Features:
- * - Select vendor categories from organization's saved categories
- * - **Smart Pre-fill**: Auto-populates booth pricing and details from previous events
+ * - Select applicant categories from organization's saved categories
+ * - **Smart Pre-fill**: Auto-populates details from previous events
  * - Shows "Pre-filled from [Event Name]" indicator when using defaults
  * - One-click to clear pre-filled data
  * - Inline category creation without leaving wizard
- * - Configure booth price, description, install times, payment links per category
- * - Application deadline and payment deadline configuration
+ * - Configure description, install times, and tags per category
+ * - Application deadline configuration
  * - Dev mode prefill for testing
- *
- * Smart Pre-fill Logic:
- * - Uses category.default_booth_price if available
- * - Shows category.last_used_event_name as source
- * - Pre-fills install times, payment links, tags from category defaults
- * - NO API call needed - uses cached category data from initial fetch
  *
  * Validation Rules:
  * - Application deadline required (must be before event date)
  * - At least 1 category required
  * - Each category must have unique name
- * - Booth price must be greater than $0 per category
- *
- * @param {Step2Props} props - Wizard state and organization context
- * @param {WizardState} props.wizardState - Current wizard state
- * @param {Function} props.updateWizardState - Function to update wizard state
- * @param {number} props.organizationId - Current organization ID
- * @param {Record<string, string>} props.errors - Validation errors
- * @param {Function} props.setErrors - Function to set validation errors
- * @param {boolean} props.isAdmin - Whether user is admin (shows debug panel)
- *
- * @returns {JSX.Element} Step 2 form with category selection and configuration
  */
 export default function Step2ApplicationDetails({
   wizardState,
@@ -135,16 +119,24 @@ export default function Step2ApplicationDetails({
           category_icon: category.icon,
           category_email_campaign_template_id: category.email_campaign_template_id,
           name: category.name,
-          booth_price: boothPrice,
+          booth_price: boothPrice, // Kept for backward compat with backend
           description: description,
           install_date: installDateDefault,
           install_start_time: category.default_install_start_time || '',
           install_end_time: category.default_install_end_time || '',
-          payment_link: category.default_payment_link || '',
+          payment_link: category.default_payment_link || '', // Legacy, now per-engine in Step 3
           application_tags: category.default_application_tags || [],
           // Track where pre-filled data came from (only for smart defaults, not manual values)
           prefilled_from_event: usingSmartDefaults ? category.last_used_event_name : undefined,
           prefilled_from_event_id: usingSmartDefaults ? category.last_used_event_id : undefined,
+          // Payment config initialized for Step 3
+          payment_prices: [{
+            type: 'booth_price',
+            label: 'Booth Fee',
+            amount: boothPrice,
+            is_percentage: false,
+          }],
+          payment_engines: [],
         });
       }
     }
@@ -210,18 +202,18 @@ export default function Step2ApplicationDetails({
     }
   };
 
-  // Handle deadline changes
-  const handleDeadlineChange = (field: 'application_deadline' | 'payment_deadline', value: string) => {
+  // Handle application deadline change
+  const handleDeadlineChange = (value: string) => {
     updateWizardState({
       eventDetails: {
         ...eventDetails,
-        [field]: value,
+        application_deadline: value,
       },
     });
 
-    if (errors[field]) {
+    if (errors.application_deadline) {
       const newErrors = { ...errors };
-      delete newErrors[field];
+      delete newErrors.application_deadline;
       setErrors(newErrors);
     }
   };
@@ -288,6 +280,8 @@ export default function Step2ApplicationDetails({
             application_tags: [],
             prefilled_from_event: undefined,
             prefilled_from_event_id: undefined,
+            payment_prices: [{ type: 'booth_price' as const, label: 'Booth Fee', amount: 0, is_percentage: false }],
+            payment_engines: [],
           }
         : a
     );
@@ -341,24 +335,35 @@ export default function Step2ApplicationDetails({
     installDate.setDate(eventDate.getDate() - 1);
 
     // Create applications for test categories
+    const boothPrices = [350, 200, 500];
     const sampleApplications: ApplicationRow[] = createdCategories.map((cat, idx) => ({
       id: crypto.randomUUID(),
       category_id: cat.id,
       category_name: cat.name,
       name: cat.name,
-      booth_price: [350, 200, 500][idx] || 200,
+      booth_price: boothPrices[idx] || 200,
       description: ['Full food service booth', 'Standard 10x10 booth', 'Premium corner booth'][idx] || '',
       install_date: installDate.toISOString().split('T')[0],
       install_start_time: '08:00',
       install_end_time: '10:00',
       payment_link: '',
       application_tags: [],
+      payment_prices: [{
+        type: 'booth_price' as const,
+        label: 'Booth Fee',
+        amount: boothPrices[idx] || 200,
+        is_percentage: false,
+      }],
+      payment_engines: [],
     }));
 
     updateWizardState({
       eventDetails: {
         ...eventDetails,
         application_deadline: applicationDeadline.toISOString().split('T')[0],
+      },
+      paymentConfiguration: {
+        ...wizardState.paymentConfiguration,
         payment_deadline: paymentDeadline.toISOString().split('T')[0],
       },
       applicationDetails: {
@@ -373,15 +378,15 @@ export default function Step2ApplicationDetails({
     <div className="space-y-4">
       {/* DEV: Prefill Button */}
       {isDevOrStaging() && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-          <div className="flex items-center justify-between">
+        <div className="rounded-lg border border-amber-400/60 bg-amber-50 p-3 dark:border-yellow-500/35 dark:bg-yellow-500/10">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-xs text-yellow-200/90 font-medium">Dev Mode</span>
+              <Zap className="w-4 h-4 text-amber-700 dark:text-yellow-400 shrink-0" />
+              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">Dev Mode</span>
             </div>
             <button
               onClick={handlePrefill}
-              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30"
+              className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors border border-amber-600/40 bg-amber-100 text-amber-950 hover:bg-amber-200/90 dark:border-yellow-500/40 dark:bg-yellow-500/20 dark:text-yellow-100 dark:hover:bg-yellow-500/30"
             >
               Prefill Test Data
             </button>
@@ -389,44 +394,12 @@ export default function Step2ApplicationDetails({
         </div>
       )}
 
-      <div className="bg-background/5 backdrop-blur-sm rounded-xl p-5 border border-border space-y-4">
+      <div className="space-y-4">
         <div className="mb-3">
-          <h2 className="text-base font-semibold text-foreground">Application Categories</h2>
+          <h2 className="text-base font-semibold text-foreground">Applicant Categories</h2>
           <p className="text-foreground/60 text-xs mt-0.5">
-            Choose vendor categories and configure pricing for each
+            Choose applicant categories and configure details for each. Pricing is set in the next step.
           </p>
-        </div>
-
-        {/* Deadlines */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-              Application Deadline *
-            </label>
-            <input
-              type="date"
-              value={eventDetails.application_deadline}
-              onChange={(e) => handleDeadlineChange('application_deadline', e.target.value)}
-              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
-                errors.application_deadline ? 'border-red-500' : 'border-border'
-              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
-            />
-            {errors.application_deadline && (
-              <p className="mt-1 text-xs text-red-500">{errors.application_deadline}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-              Payment Due Date
-            </label>
-            <input
-              type="date"
-              value={eventDetails.payment_deadline || ''}
-              onChange={(e) => handleDeadlineChange('payment_deadline', e.target.value)}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-            />
-          </div>
         </div>
 
         {/* Category List */}
@@ -456,7 +429,7 @@ export default function Step2ApplicationDetails({
             <>
               {/* New Category Form */}
               {isCreatingCategory && (
-                <div className="mb-3 p-3 bg-background/5 rounded-lg border border-purple-500/30">
+                <div className="mb-3 p-3 bg-background/5 rounded-lg border border-primary/30">
                   <div className="flex gap-2">
                     <input
                       type="text"
@@ -478,7 +451,7 @@ export default function Step2ApplicationDetails({
                       }}
                       placeholder="Enter category name (e.g., Food Vendor, Artist)"
                       autoFocus
-                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-purple-500 transition-all"
+                      className="flex-1 px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:border-primary transition-all"
                     />
                     <button
                       type="button"
@@ -518,7 +491,7 @@ export default function Step2ApplicationDetails({
                         className={`
                           relative px-4 py-3 rounded-lg border-2 transition-all text-left
                           ${isSelected
-                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                            ? 'border-primary bg-primary/20 shadow-lg shadow-primary/20'
                             : 'border-border bg-background/5 hover:border-border hover:bg-background/10'
                           }
                         `}
@@ -528,7 +501,7 @@ export default function Step2ApplicationDetails({
                             <div className="flex items-center gap-2 mb-1">
                               <div
                                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"
-                                style={{ backgroundColor: category.color || '#8B5CF6' }}
+                                style={{ backgroundColor: category.color || '#9054e3' }}
                               />
                               {category.icon && (
                                 <span className="text-lg">{category.icon}</span>
@@ -605,30 +578,6 @@ export default function Step2ApplicationDetails({
                     </div>
                   )}
 
-                  {/* Booth Price */}
-                  <div>
-                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-                      Booth Price *
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 text-sm">$</span>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={app.booth_price || ''}
-                        onChange={(e) => handleApplicationChange(app.id, 'booth_price', parseFloat(e.target.value) || 0)}
-                        placeholder="150.00"
-                        className={`w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-background/10 border ${
-                          errors[`application_${app.id}_booth_price`] ? 'border-red-500' : 'border-border'
-                        } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all`}
-                      />
-                    </div>
-                    {errors[`application_${app.id}_booth_price`] && (
-                      <p className="mt-1 text-xs text-red-500">{errors[`application_${app.id}_booth_price`]}</p>
-                    )}
-                  </div>
-
                   {/* Description */}
                   <div>
                     <label className="block text-xs text-foreground/80 font-medium mb-1.5">
@@ -639,7 +588,7 @@ export default function Step2ApplicationDetails({
                       onChange={(e) => handleApplicationChange(app.id, 'description', e.target.value)}
                       placeholder="Describe this booth type..."
                       rows={2}
-                      className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all resize-none"
+                      className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary transition-all resize-none"
                     />
                   </div>
 
@@ -653,7 +602,7 @@ export default function Step2ApplicationDetails({
                         type="date"
                         value={app.install_date || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_date', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
                     <div>
@@ -664,7 +613,7 @@ export default function Step2ApplicationDetails({
                         type="time"
                         value={app.install_start_time || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_start_time', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
                     <div>
@@ -675,23 +624,9 @@ export default function Step2ApplicationDetails({
                         type="time"
                         value={app.install_end_time || ''}
                         onChange={(e) => handleApplicationChange(app.id, 'install_end_time', e.target.value)}
-                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                        className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                       />
                     </div>
-                  </div>
-
-                  {/* Payment Link */}
-                  <div>
-                    <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-                      Payment Link (Optional)
-                    </label>
-                    <input
-                      type="url"
-                      value={app.payment_link || ''}
-                      onChange={(e) => handleApplicationChange(app.id, 'payment_link', e.target.value)}
-                      placeholder="https://example.com/pay"
-                      className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
-                    />
                   </div>
 
                   {/* Tags */}
@@ -713,7 +648,7 @@ export default function Step2ApplicationDetails({
                             }
                           }}
                           placeholder="e.g., handmade, food"
-                          className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-all"
+                          className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                         />
                       </div>
                       <button
@@ -731,7 +666,7 @@ export default function Step2ApplicationDetails({
                         {app.application_tags.map((tag, idx) => (
                           <div
                             key={idx}
-                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-sm"
+                            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/20 border border-primary/30 text-foreground text-sm"
                           >
                             <Tag className="w-3 h-3" />
                             <span>{tag}</span>
@@ -756,7 +691,7 @@ export default function Step2ApplicationDetails({
 
       {/* Debug Panel */}
       <DebugPanel
-        title="Step 2: Application Categories"
+        title="Step 2: Applicant Categories"
         data={{
           categories,
           selectedCategoryIds,

@@ -96,7 +96,7 @@ export default function ScheduledEmailCard({
     <div
       className={`bg-background/5 rounded-xl border border-border p-5 transition-all ${
         isClickable
-          ? 'hover:bg-background/[0.08] hover:border-purple-500/30 cursor-pointer group'
+          ? 'hover:bg-background/[0.08] hover:border-primary/30 cursor-pointer group'
           : 'hover:bg-background/[0.07]'
       }`}
       onClick={handleCardClick}
@@ -104,12 +104,12 @@ export default function ScheduledEmailCard({
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className={`text-foreground font-medium truncate ${isClickable ? 'group-hover:text-purple-300 transition-colors' : ''}`}>
+            <h3 className={`text-foreground font-medium truncate ${isClickable ? 'group-hover:text-primary transition-colors' : ''}`}>
               {email.name}
             </h3>
             {statusBadge}
             {isClickable && (
-              <Edit2 className="w-3.5 h-3.5 text-foreground/40 group-hover:text-purple-400 transition-colors" />
+              <Edit2 className="w-3.5 h-3.5 text-foreground/40 group-hover:text-primary transition-colors" />
             )}
           </div>
 

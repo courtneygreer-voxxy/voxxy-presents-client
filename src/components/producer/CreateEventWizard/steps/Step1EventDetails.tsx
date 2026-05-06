@@ -125,9 +125,6 @@ export default function Step1EventDetails({
     const applicationDeadline = new Date(eventDate);
     applicationDeadline.setDate(eventDate.getDate() - 14); // 2 weeks before event
 
-    const paymentDeadline = new Date(eventDate);
-    paymentDeadline.setDate(eventDate.getDate() - 7); // 1 week before event
-
     updateWizardState({
       eventDetails: {
         ...eventDetails,
@@ -142,7 +139,6 @@ export default function Step1EventDetails({
         age_restriction: 'All Ages',
         ticket_link: 'https://www.example.com/tickets/brooklyn-market',
         application_deadline: applicationDeadline.toISOString().split('T')[0],
-        payment_deadline: paymentDeadline.toISOString().split('T')[0],
       },
     });
 
@@ -160,17 +156,17 @@ export default function Step1EventDetails({
     <div className="space-y-4">
       {/* DEV/ADMIN: Prefill Button */}
       {(isDevOrStaging() || isAdmin) && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-          <div className="flex items-center justify-between">
+        <div className="rounded-lg border border-amber-400/60 bg-amber-50 p-3 dark:border-yellow-500/35 dark:bg-yellow-500/10">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-xs text-yellow-200/90 font-medium">
+              <Zap className="w-4 h-4 text-amber-700 dark:text-yellow-400 shrink-0" />
+              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">
                 {isDevOrStaging() ? 'Dev Mode' : 'Admin Mode'}
               </span>
             </div>
             <button
               onClick={handlePrefill}
-              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30 hover:border-yellow-500/50"
+              className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors border border-amber-600/40 bg-amber-100 text-amber-950 hover:bg-amber-200/90 dark:border-yellow-500/40 dark:bg-yellow-500/20 dark:text-yellow-100 dark:hover:bg-yellow-500/30"
             >
               Prefill Test Data
             </button>
@@ -178,7 +174,7 @@ export default function Step1EventDetails({
         </div>
       )}
 
-      <div className="bg-background/5 backdrop-blur-sm rounded-xl p-5 border border-border space-y-4">
+      <div className="space-y-4">
         <div className="mb-3">
           <h2 className="text-base font-semibold text-foreground">Event Details</h2>
           <p className="text-foreground/60 text-xs mt-0.5">
@@ -199,7 +195,7 @@ export default function Step1EventDetails({
             placeholder="e.g., Downtown Art Market"
             className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
               errors.title ? 'border-red-500' : 'border-border'
-            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
           />
           {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
         </div>
@@ -293,7 +289,7 @@ export default function Step1EventDetails({
               onChange={(e) => handleChange('event_date', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
                 errors.event_date ? 'border-red-500' : 'border-border'
-              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
             {errors.event_date && (
               <p className="mt-1 text-xs text-red-500">{errors.event_date}</p>
@@ -312,7 +308,7 @@ export default function Step1EventDetails({
               onChange={(e) => handleChange('event_end_date', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
                 errors.event_end_date ? 'border-red-500' : 'border-border'
-              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
             {errors.event_end_date && (
               <p className="mt-1 text-xs text-red-500">{errors.event_end_date}</p>
@@ -333,7 +329,7 @@ export default function Step1EventDetails({
               onChange={(e) => handleChange('start_time', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
                 errors.start_time ? 'border-red-500' : 'border-border'
-              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
             {errors.start_time && (
               <p className="mt-1 text-xs text-red-500">{errors.start_time}</p>
@@ -351,7 +347,7 @@ export default function Step1EventDetails({
               onChange={(e) => handleChange('end_time', e.target.value)}
               className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
                 errors.end_time ? 'border-red-500' : 'border-border'
-              } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+              } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
             />
             {errors.end_time && (
               <p className="mt-1 text-xs text-red-500">{errors.end_time}</p>
@@ -375,7 +371,7 @@ export default function Step1EventDetails({
             placeholder="e.g., All Ages, 18+, 21+"
             className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
               errors.age_restriction ? 'border-red-500' : 'border-border'
-            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
           />
           {errors.age_restriction && (
             <p className="mt-1 text-xs text-red-500">{errors.age_restriction}</p>
@@ -398,10 +394,32 @@ export default function Step1EventDetails({
             placeholder="https://example.com/tickets"
             className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
               errors.ticket_link ? 'border-red-500' : 'border-border'
-            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all`}
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
           />
           {errors.ticket_link && (
             <p className="mt-1 text-xs text-red-500">{errors.ticket_link}</p>
+          )}
+        </div>
+
+        {/* Application Deadline */}
+        <div>
+          <label htmlFor="application_deadline" className="block text-xs text-foreground/80 font-medium mb-1.5">
+            Application Deadline *
+          </label>
+          <p className="text-foreground/50 text-xs mb-1.5">
+            Last date for applicants to submit their applications
+          </p>
+          <input
+            id="application_deadline"
+            type="date"
+            value={eventDetails.application_deadline}
+            onChange={(e) => handleChange('application_deadline', e.target.value)}
+            className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
+              errors.application_deadline ? 'border-red-500' : 'border-border'
+            } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all`}
+          />
+          {errors.application_deadline && (
+            <p className="mt-1 text-xs text-red-500">{errors.application_deadline}</p>
           )}
         </div>
 
@@ -421,7 +439,7 @@ export default function Step1EventDetails({
             rows={2}
             className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border ${
               errors.description ? 'border-red-500' : 'border-border'
-            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all resize-none`}
+            } text-foreground placeholder:text-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all resize-none`}
           />
           {errors.description && (
             <p className="mt-1 text-xs text-red-500">{errors.description}</p>

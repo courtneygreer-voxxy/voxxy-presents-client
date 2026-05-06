@@ -183,7 +183,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
         {/* Loading State */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+            <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
             <p className="text-foreground/60 text-sm">Loading sequences...</p>
           </div>
         )}
@@ -233,7 +233,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
               <div className="flex items-center justify-between mb-2">
                 <div>
                   <h2 className="text-base font-semibold text-foreground flex items-center gap-2">
-                    <Mail className="w-4 h-4 text-purple-400" />
+                    <Mail className="w-4 h-4 text-primary" />
                     Event Sequences
                   </h2>
                 </div>
@@ -319,7 +319,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
             {loadingCategories ? (
               <div className="flex items-center justify-center py-6">
-                <Loader2 className="w-6 h-6 text-purple-400 animate-spin" />
+                <Loader2 className="w-6 h-6 text-primary animate-spin" />
               </div>
             ) : (
               <div className="voxxy-table-shell divide-y divide-border dark:divide-white/6">
@@ -368,7 +368,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                         ) : (
                           <button
                             onClick={() => handleCreateCategoryTemplate(category)}
-                            className="px-3 py-1.5 rounded text-xs bg-purple-500/20 border border-purple-500/40 text-violet-950 dark:text-purple-400 hover:bg-purple-500/30 transition-all flex items-center gap-1.5"
+                            className="px-3 py-1.5 rounded text-xs bg-primary/20 border border-primary/40 text-violet-950 dark:text-primary hover:bg-primary/30 transition-all flex items-center gap-1.5"
                           >
                             <Plus className="w-3 h-3" />
                             Create
@@ -396,7 +396,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
             <div className="mt-8">
               <div className="mb-3">
                 <h2 className="text-base font-semibold text-foreground flex items-center gap-2 mb-1">
-                  <Mail className="w-4 h-4 text-purple-400" />
+                  <Mail className="w-4 h-4 text-primary" />
                   Universal Category Sequence
                 </h2>
                 <p className="text-foreground/60 text-xs">
@@ -406,11 +406,11 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
 
               <div className="voxxy-table-shell">
                 <div className="voxxy-table-row voxxy-table-row-hover flex items-center gap-3 px-4 py-3 last:border-0">
-                  <Mail className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                  <Mail className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-foreground font-medium">{universalTemplate.name}</span>
-                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-purple-500/20 text-violet-950 dark:text-purple-300">
+                      <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-primary/20 text-violet-950 dark:text-primary">
                         UNIVERSAL
                       </span>
                     </div>
@@ -500,7 +500,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                     setCloneError(null); // Clear error when user types
                   }}
                   placeholder="Enter sequence name"
-                  className="w-full px-3 py-2 rounded-lg bg-background/5 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-3 py-2 rounded-lg bg-background/5 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
                   autoFocus
                 />
               </div>
@@ -514,7 +514,7 @@ export default function TemplateLibraryPage({ onNavigateToBuilder, onBack }: Tem
                   onChange={(e) => setCloneDescription(e.target.value)}
                   placeholder="Enter sequence description"
                   rows={3}
-                  className="w-full px-3 py-2 rounded-lg bg-background/5 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
+                  className="w-full px-3 py-2 rounded-lg bg-background/5 border border-border text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
                 />
               </div>
             </div>

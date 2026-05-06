@@ -36,9 +36,9 @@ export default function ApplicationConfirmationPage() {
 
           {/* Application Code */}
           {applicationCode && (
-            <div className="bg-purple-500/10 dark:bg-purple-900/20 border border-purple-500/30 rounded-lg p-6 mb-8">
+            <div className="bg-primary/10 dark:bg-primary/20/20 border border-primary/30 rounded-lg p-6 mb-8">
               <p className="text-sm text-foreground/70 mb-2">Your Application Code</p>
-              <p className="text-2xl font-mono font-bold text-violet-900 dark:text-purple-300 tracking-wider">
+              <p className="text-2xl font-mono font-bold text-violet-900 dark:text-primary tracking-wider">
                 {applicationCode}
               </p>
               <p className="text-xs text-foreground/40 mt-2">
@@ -50,12 +50,12 @@ export default function ApplicationConfirmationPage() {
           {/* What's Next */}
           <div className="bg-background/5 border border-border rounded-lg p-6 mb-8 text-left">
             <h2 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-              <Mail className="w-5 h-5 text-violet-700 dark:text-purple-400" />
+              <Mail className="w-5 h-5 text-violet-700 dark:text-primary" />
               What Happens Next?
             </h2>
             <ul className="space-y-3 text-foreground/80">
               <li className="flex items-start gap-3">
-                <span className="inline-block w-6 h-6 rounded-full bg-purple-500/20 text-violet-950 dark:text-purple-300 text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   1
                 </span>
                 <span>
@@ -63,7 +63,7 @@ export default function ApplicationConfirmationPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="inline-block w-6 h-6 rounded-full bg-purple-500/20 text-violet-950 dark:text-purple-300 text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   2
                 </span>
                 <span>
@@ -71,7 +71,7 @@ export default function ApplicationConfirmationPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="inline-block w-6 h-6 rounded-full bg-purple-500/20 text-violet-950 dark:text-purple-300 text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="inline-block w-6 h-6 rounded-full bg-primary/20 text-violet-950 dark:text-primary text-sm font-medium flex items-center justify-center flex-shrink-0 mt-0.5">
                   3
                 </span>
                 <span>

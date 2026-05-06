@@ -205,7 +205,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               placeholder="e.g., Downtown Art Market"
               className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                 errors.title ? 'border-red-500' : 'border-border'
-              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
             />
             {errors.title && (
               <p className="mt-1 text-sm text-red-400">{errors.title}</p>
@@ -225,7 +225,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               rows={4}
               className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                 errors.description ? 'border-red-500' : 'border-border'
-              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none`}
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none`}
             />
             {errors.description && (
               <p className="mt-1 text-sm text-red-400">{errors.description}</p>
@@ -247,7 +247,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 onChange={(e) => handleChange('event_date', e.target.value)}
                 className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                   errors.event_date ? 'border-red-500' : 'border-border'
-                } text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                } text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {errors.event_date && (
                 <p className="mt-1 text-sm text-red-400">{errors.event_date}</p>
@@ -265,7 +265,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 type="date"
                 value={formData.event_end_date}
                 onChange={(e) => handleChange('event_end_date', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -282,7 +282,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 type="time"
                 value={formData.start_time}
                 onChange={(e) => handleChange('start_time', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
@@ -296,7 +296,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 type="time"
                 value={formData.end_time}
                 onChange={(e) => handleChange('end_time', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -314,7 +314,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 value={formData.venue}
                 onChange={(e) => handleChange('venue', e.target.value)}
                 placeholder="e.g., Brooklyn Steel"
-                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
@@ -331,7 +331,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
                 placeholder="e.g., Brooklyn, NY"
                 className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                   errors.location ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {errors.location && (
                 <p className="mt-1 text-sm text-red-400">{errors.location}</p>
@@ -350,7 +350,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               value={formData.age_restriction}
               onChange={(e) => handleChange('age_restriction', e.target.value)}
               placeholder="e.g., All Ages, 18+, 21+"
-              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
 
@@ -365,7 +365,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               value={formData.ticket_link}
               onChange={(e) => handleChange('ticket_link', e.target.value)}
               placeholder="https://example.com/tickets"
-              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
 
@@ -379,7 +379,7 @@ export default function EditEventForm({ event, onCancel, onUpdate, onDelete }: E
               type="date"
               value={formData.application_deadline}
               onChange={(e) => handleChange('application_deadline', e.target.value)}
-              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+              className="w-full px-4 py-3 rounded-lg bg-background/5 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
           </div>
         </div>

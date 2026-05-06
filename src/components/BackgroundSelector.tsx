@@ -57,19 +57,19 @@ export function BackgroundSelector({ currentBackground, onBackgroundSelect }: Ba
             key={option.id}
             className={`cursor-pointer transition-all hover:scale-105 !bg-background/5 backdrop-blur-sm border-2 ${
               currentBackground === option.id 
-                ? '!border-purple-400 !bg-purple-500/20' 
-                : '!border-border hover:!border-purple-400/50'
+                ? '!border-primary !bg-primary/20' 
+                : '!border-border hover:!border-primary/50'
             }`}
             onClick={() => onBackgroundSelect(option.id)}
           >
             <CardContent className="p-4">
               <div className="flex items-start justify-between mb-2">
                 <div className="flex items-center gap-2">
-                  <Palette className="h-4 w-4 text-purple-400" />
+                  <Palette className="h-4 w-4 text-primary" />
                   <h4 className="font-medium text-foreground text-sm">{option.name}</h4>
                 </div>
                 {currentBackground === option.id && (
-                  <Check className="h-4 w-4 text-purple-400" />
+                  <Check className="h-4 w-4 text-primary" />
                 )}
               </div>
               
@@ -99,13 +99,13 @@ function getPreviewClasses(backgroundId: string): string {
     case 'stars':
       return 'bg-muted relative'
     case 'gradient-purple':
-      return 'bg-gradient-to-br from-purple-600 to-blue-800'
+      return 'bg-gradient-to-br from-primary to-blue-800'
     case 'gradient-sunset':
-      return 'bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600'
+      return 'bg-gradient-to-br from-orange-500 via-voxxy-pink to-primary'
     case 'minimal-grid':
       return 'bg-muted bg-[radial-gradient(circle,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[length:20px_20px]'
     case 'abstract-waves':
-      return 'bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600'
+      return 'bg-gradient-to-br from-indigo-600 via-primary to-pink-600'
     default:
       return 'bg-muted'
   }

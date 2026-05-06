@@ -146,8 +146,8 @@ export default function EmailTemplateItemEditor({
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-purple-500/20 flex items-center justify-center">
-              <Mail className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center">
+              <Mail className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h2 className="text-xl font-bold text-foreground">Edit Email</h2>
@@ -192,7 +192,7 @@ export default function EmailTemplateItemEditor({
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 placeholder="e.g., Welcome Email"
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
                 maxLength={100}
               />
             </div>
@@ -206,7 +206,7 @@ export default function EmailTemplateItemEditor({
                 id="category"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 {CATEGORY_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -227,7 +227,7 @@ export default function EmailTemplateItemEditor({
                 value={formData.subject_template}
                 onChange={(e) => setFormData({ ...formData, subject_template: e.target.value })}
                 placeholder="e.g., Welcome to [eventName]!"
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
                 maxLength={200}
               />
               <p className="mt-1 text-xs text-foreground/40">
@@ -274,7 +274,7 @@ export default function EmailTemplateItemEditor({
                 id="trigger-type"
                 value={formData.trigger_type}
                 onChange={(e) => setFormData({ ...formData, trigger_type: e.target.value })}
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 {TRIGGER_TYPE_OPTIONS.map((opt) => (
                   <option key={opt.value} value={opt.value}>
@@ -297,7 +297,7 @@ export default function EmailTemplateItemEditor({
                   max="365"
                   value={formData.trigger_value}
                   onChange={(e) => setFormData({ ...formData, trigger_value: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                  className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
                 />
               </div>
             )}
@@ -313,7 +313,7 @@ export default function EmailTemplateItemEditor({
                 type="time"
                 value={formData.trigger_time?.slice(0, 5) || '09:00'}
                 onChange={(e) => setFormData({ ...formData, trigger_time: e.target.value + ':00' })}
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               />
             </div>
           </div>
@@ -346,7 +346,7 @@ export default function EmailTemplateItemEditor({
                           setFilterStatus(filterStatus.filter((s) => s !== status));
                         }
                       }}
-                      className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
+                      className="w-4 h-4 rounded border-border bg-background/5 text-primary focus:ring-primary/50"
                     />
                     <span className="text-sm text-foreground capitalize">{status}</span>
                   </label>
@@ -372,7 +372,7 @@ export default function EmailTemplateItemEditor({
                           setFilterPaymentStatus(filterPaymentStatus.filter((s) => s !== status));
                         }
                       }}
-                      className="w-4 h-4 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
+                      className="w-4 h-4 rounded border-border bg-background/5 text-primary focus:ring-primary/50"
                     />
                     <span className="text-sm text-foreground capitalize">{status}</span>
                   </label>
@@ -389,7 +389,7 @@ export default function EmailTemplateItemEditor({
                 id="vendor-category"
                 value={filterVendorCategory}
                 onChange={(e) => setFilterVendorCategory(e.target.value)}
-                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
               >
                 <option value="">All Categories</option>
                 <option value="Artist">Artist</option>
@@ -405,7 +405,7 @@ export default function EmailTemplateItemEditor({
                 type="checkbox"
                 checked={formData.enabled_by_default}
                 onChange={(e) => setFormData({ ...formData, enabled_by_default: e.target.checked })}
-                className="w-5 h-5 rounded border-border bg-background/5 text-purple-600 focus:ring-purple-500/50"
+                className="w-5 h-5 rounded border-border bg-background/5 text-primary focus:ring-primary/50"
               />
               <span className="text-sm text-foreground">
                 Enabled by default when creating new events

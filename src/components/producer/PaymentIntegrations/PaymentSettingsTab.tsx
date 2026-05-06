@@ -24,7 +24,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
   return (
     <div className="p-3 md:p-4 space-y-6">
       {/* Tabs */}
-      <div className="border-b border-purple-500/20">
+      <div className="border-b border-primary/20">
         <div className="flex gap-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -34,7 +34,7 @@ export default function PaymentSettingsTab({ eventSlug, organizationId, event, i
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 font-medium transition-all border-b-2 ${
                   activeTab === tab.id
-                    ? 'border-purple-500 text-purple-400'
+                    ? 'border-primary text-primary'
                     : 'border-transparent text-foreground/60 hover:text-foreground/80'
                 }`}
               >

@@ -34,7 +34,7 @@ export function PreviewDisclaimerModal({
             {isPreview ? (
               <Eye className="h-12 w-12 text-blue-500" />
             ) : (
-              <TestTube className="h-12 w-12 text-purple-500" />
+              <TestTube className="h-12 w-12 text-primary" />
             )}
           </div>
           <DialogTitle className="flex items-center justify-center gap-2">
@@ -43,7 +43,7 @@ export function PreviewDisclaimerModal({
               variant="secondary" 
               className={isPreview 
                 ? "bg-blue-100 text-blue-800" 
-                : "bg-purple-100 text-purple-800"
+                : "bg-primary/10 text-slate-800"
               }
             >
               {isPreview ? 'Preview' : 'Beta'}
@@ -84,7 +84,7 @@ export function PreviewDisclaimerModal({
             ) : (
               <>
                 <div className="flex items-start gap-2 mb-3">
-                  <Info className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                  <Info className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
                   <div className="text-sm">
                     <strong>What is Beta Mode?</strong>
                     <p className="text-gray-600 mt-1">
@@ -94,9 +94,9 @@ export function PreviewDisclaimerModal({
                   </div>
                 </div>
                 
-                <div className="bg-purple-50 p-3 rounded-lg mb-3">
-                  <h4 className="font-medium text-purple-900 mb-2">Beta features include:</h4>
-                  <ul className="text-sm text-purple-800 space-y-1">
+                <div className="bg-primary/5 p-3 rounded-lg mb-3">
+                  <h4 className="font-medium text-slate-900 mb-2">Beta features include:</h4>
+                  <ul className="text-sm text-slate-800 space-y-1">
                     <li>• Enhanced connection flow testing</li>
                     <li>• Advanced data import options</li>
                     <li>• Priority feedback channel</li>

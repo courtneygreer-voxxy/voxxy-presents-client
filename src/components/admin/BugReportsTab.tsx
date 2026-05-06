@@ -67,7 +67,7 @@ export default function BugReportsTab() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -94,8 +94,8 @@ export default function BugReportsTab() {
         <div className="bg-background/10 backdrop-blur-sm border border-border rounded-lg p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-lg flex items-center justify-center">
-                <Bug className="h-6 w-6 text-purple-300" />
+              <div className="w-12 h-12 bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-lg flex items-center justify-center">
+                <Bug className="h-6 w-6 text-primary" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Bug Reports</h1>
@@ -142,12 +142,12 @@ export default function BugReportsTab() {
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       isAutoReported
                         ? 'bg-red-500/20 border border-red-400/30'
-                        : 'bg-purple-500/20 border border-purple-400/30'
+                        : 'bg-primary/20 border border-primary/30'
                     }`}>
                       {isAutoReported ? (
                         <AlertCircle className="w-5 h-5 text-red-400" />
                       ) : (
-                        <Bug className="w-5 h-5 text-purple-400" />
+                        <Bug className="w-5 h-5 text-primary" />
                       )}
                     </div>
 
@@ -159,7 +159,7 @@ export default function BugReportsTab() {
                             {report.error_context?.errorMessage || report.bug_description || 'Bug Report'}
                           </h3>
                           {report.error_context?.componentName && (
-                            <p className="text-xs text-purple-300 mt-1">
+                            <p className="text-xs text-primary mt-1">
                               {report.error_context.componentName}
                             </p>
                           )}
@@ -223,7 +223,7 @@ export default function BugReportsTab() {
                                 href={report.error_context.url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1"
+                                className="text-sm text-primary hover:text-primary/70 flex items-center gap-1 transition-colors"
                               >
                                 {report.error_context.url}
                                 <ExternalLink className="w-3 h-3" />

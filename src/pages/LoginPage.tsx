@@ -10,6 +10,7 @@ import { ArrowLeft, Sparkles, Eye, EyeOff, Loader2, Mail, Lock, AlertCircle } fr
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/utils/validation'
 import { usePageTracking } from '@/hooks/usePageTracking'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 interface FormData {
   email: string
@@ -23,6 +24,7 @@ interface FormErrors {
 }
 
 export default function LoginPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
   const { signIn, loading, error, clearError } = useAuth()
   const [formData, setFormData] = useState<FormData>({
@@ -117,13 +119,15 @@ export default function LoginPage() {
 
     try {
       const { authApi } = await import('@/services/api')
+      // devLogin() calls POST /dev_login which returns a token and saves it
       const data = await authApi.devLogin()
 
-      // Manually trigger sign in flow
-      await signIn({ email: data.email, password: 'test123' })
+      // Token is already saved by devLogin(). Now use the regular login
+      // with the seed password to go through the normal auth flow.
+      await signIn({ email: data.email, password: 'password123' })
     } catch (err) {
       console.error('Dev login error:', err)
-      setErrors({ submit: 'Dev login failed' })
+      setErrors({ submit: 'Dev login failed. Is the Rails server running on port 3001 with seed data?' })
     } finally {
       setIsSubmitting(false)
     }
@@ -145,7 +149,7 @@ export default function LoginPage() {
           <div className="text-center space-y-6">
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
             <h1 className="text-5xl font-bold mb-4">Welcome Back</h1>
-            <p className="text-xl text-purple-100 max-w-md">
+            <p className="text-xl text-white/80 max-w-md">
               Sign in to manage your events, engage your community, and grow with Voxxy Presents
             </p>
           </div>
@@ -177,11 +181,11 @@ export default function LoginPage() {
           <div className="max-w-md w-full space-y-8">
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
-              <Sparkles className="h-16 w-16 mx-auto text-purple-400 mb-4" />
+              <Sparkles className="h-16 w-16 mx-auto text-primary mb-4" />
               <h1 className="text-3xl font-bold text-foreground">Welcome Back</h1>
             </div>
 
-            <Card className="w-full bg-background/5 backdrop-blur-xl border border-purple-500/30 shadow-[0_0_50px_rgba(168,85,247,0.3)]">
+            <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-foreground">Sign In</CardTitle>
                 <CardDescription>
@@ -213,7 +217,7 @@ export default function LoginPage() {
                         placeholder="Enter your email"
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
-                        className="pl-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        className="pl-10 bg-background/5 border-primary/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                         disabled={isSubmitting}
                       />
                     </div>
@@ -243,7 +247,7 @@ export default function LoginPage() {
                         placeholder="Enter your password"
                         value={formData.password}
                         onChange={(e) => handleInputChange('password', e.target.value)}
-                        className="pl-10 pr-10 bg-background/5 border-purple-500/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
+                        className="pl-10 pr-10 bg-background/5 border-primary/30 text-foreground placeholder:text-muted-foreground focus:border-pink-400 focus:ring-2 focus:ring-pink-400/20"
                         disabled={isSubmitting}
                       />
                       <button

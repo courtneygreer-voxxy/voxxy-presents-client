@@ -53,7 +53,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const requiredHeaders = ['name', 'email'];
-  const optionalHeaders = ['phone', 'business_name', 'instagram_handle', 'tiktok_handle', 'website', 'location', 'tags'];
+  const optionalHeaders = ['phone', 'business_name', 'instagram_handle', 'tiktok_handle', 'website', 'location', 'tags', 'eventbrite_email', 'venmo_handle', 'paypal_email'];
   const allExpectedHeaders = [...requiredHeaders, ...optionalHeaders];
   const hiddenPreviewColumns = ['notes', 'featured', 'status', 'job_title', 'job title'];
 
@@ -233,10 +233,10 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       <div
         onDrop={handleFileDrop}
         onDragOver={(e) => e.preventDefault()}
-        className="border-2 border-dashed border-purple-500/40 bg-background/5 rounded-lg p-6 text-center hover:border-purple-500 hover:bg-background/10 transition-all cursor-pointer"
+        className="border-2 border-dashed border-primary/40 bg-background/5 rounded-lg p-6 text-center hover:border-primary hover:bg-background/10 transition-all cursor-pointer"
         onClick={() => fileInputRef.current?.click()}
       >
-        <Upload className="mx-auto h-8 w-8 text-purple-400" />
+        <Upload className="mx-auto h-8 w-8 text-primary" />
         <p className="mt-1.5 text-xs text-foreground/80">
           Drag and drop your CSV file here, or click to browse
         </p>
@@ -256,8 +256,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
   const renderFileSelectedState = () => (
     <div className="space-y-3">
       {/* File Info */}
-      <div className="flex items-center gap-2 px-3 py-2 bg-background/5 border border-purple-500/20 rounded-lg">
-        <FileText className="h-3.5 w-3.5 text-purple-400 shrink-0" />
+      <div className="flex items-center gap-2 px-3 py-2 bg-background/5 border border-primary/20 rounded-lg">
+        <FileText className="h-3.5 w-3.5 text-primary shrink-0" />
         <span className="text-xs text-foreground/90 truncate">
           <strong>{selectedFile?.name}</strong> — {previewData?.totalRows} contacts
         </span>
@@ -267,8 +267,8 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
       {(() => {
         const visibleHeaders = previewData?.headers.filter(h => !hiddenPreviewColumns.includes(h.toLowerCase())) || [];
         return (
-          <div className="border border-purple-500/20 rounded-lg overflow-hidden bg-background/5">
-            <div className="bg-purple-500/10 px-3 py-1.5 border-b border-purple-500/20">
+          <div className="border border-primary/20 rounded-lg overflow-hidden bg-background/5">
+            <div className="bg-primary/10 px-3 py-1.5 border-b border-primary/20">
               <h4 className="text-[11px] font-medium text-foreground/70 uppercase tracking-wide">Preview (first 10 rows)</h4>
             </div>
             <div className="overflow-x-auto max-h-[40vh]">
@@ -278,7 +278,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
                     {visibleHeaders.map((header) => (
                       <th
                         key={header}
-                        className="px-2 py-1 text-left font-medium text-foreground/80 border-b border-purple-500/20 whitespace-nowrap"
+                        className="px-2 py-1 text-left font-medium text-foreground/80 border-b border-primary/20 whitespace-nowrap"
                       >
                         <div className="flex items-center gap-1">
                           <span className="truncate max-w-[100px]" title={header}>
@@ -294,7 +294,7 @@ export function CSVUploadModal({ open, onClose, onSuccess }: CSVUploadModalProps
                 </thead>
                 <tbody>
                   {previewData?.rows.map((row, idx) => (
-                    <tr key={idx} className="border-b border-purple-500/10 hover:bg-background/5">
+                    <tr key={idx} className="border-b border-primary/10 hover:bg-background/5">
                       {visibleHeaders.map((header) => (
                         <td key={header} className="px-2 py-1 text-foreground/60">
                           <div className="truncate max-w-[150px]" title={row[header] || ''}>

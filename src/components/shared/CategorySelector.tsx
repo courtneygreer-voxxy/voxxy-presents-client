@@ -101,7 +101,7 @@ export function CategorySelector({
       <div
         className={`
           min-h-[42px] px-3 py-2 rounded-lg border
-          ${disabled ? 'bg-background/5 cursor-not-allowed' : 'voxxy-surface-elevated cursor-pointer hover:border-purple-500/50'}
+          ${disabled ? 'bg-background/5 cursor-not-allowed' : 'voxxy-surface-elevated cursor-pointer hover:border-primary/50'}
           border-border transition-smooth
         `}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -140,7 +140,7 @@ export function CategorySelector({
               placeholder="Search categories..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="voxxy-input-well w-full rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/50"
+              className="voxxy-input-well w-full rounded-lg px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
               autoFocus
             />
           </div>
@@ -157,7 +157,7 @@ export function CategorySelector({
                       onClick={() => handleSelect(category.id)}
                       className={`
                         w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-smooth
-                        ${isSelected ? 'bg-purple-600/20 text-foreground' : 'text-foreground/70 hover:bg-background/5 hover:text-foreground'}
+                        ${isSelected ? 'bg-primary/20 text-foreground' : 'text-foreground/70 hover:bg-background/5 hover:text-foreground'}
                       `}
                     >
                       <div className="flex items-center gap-2">
@@ -169,7 +169,7 @@ export function CategorySelector({
                         )}
                       </div>
                       {isSelected && (
-                        <span className="text-violet-700 dark:text-purple-400 text-xs">✓</span>
+                        <span className="text-violet-700 dark:text-primary text-xs">✓</span>
                       )}
                     </button>
                   );
@@ -191,7 +191,7 @@ export function CategorySelector({
                   placeholder="New category name"
                   value={newCategoryName || searchQuery}
                   onChange={(e) => setNewCategoryName(e.target.value)}
-                  className="flex-1 px-3 py-2 voxxy-input-well rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500/50"
+                  className="flex-1 px-3 py-2 voxxy-input-well rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
                       e.preventDefault();

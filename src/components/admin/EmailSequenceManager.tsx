@@ -209,7 +209,7 @@ export default function EmailSequenceManager({ onPreviewEmail }: EmailSequenceMa
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -249,9 +249,9 @@ export default function EmailSequenceManager({ onPreviewEmail }: EmailSequenceMa
             >
               <div className="flex items-center gap-3">
                 {isExpanded ? (
-                  <ChevronDown className="w-5 h-5 text-purple-400" />
+                  <ChevronDown className="w-5 h-5 text-primary" />
                 ) : (
-                  <ChevronRight className="w-5 h-5 text-purple-400" />
+                  <ChevronRight className="w-5 h-5 text-primary" />
                 )}
                 <div className="text-left">
                   <div className="flex items-center gap-2">

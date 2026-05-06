@@ -75,14 +75,14 @@ function FilterDropdown({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
-            ? 'bg-purple-500/20 text-violet-950 border border-purple-500/40 dark:text-purple-300 dark:border-purple-500/30'
+            ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
             : 'bg-background/5 text-foreground dark:text-foreground/60 hover:text-foreground border border-border hover:bg-background/10'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
         <span>{field.label}</span>
         {selectedValues.length > 0 && (
-          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-primary-foreground text-[10px] font-bold rounded-full">
+          <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
             {selectedValues.length}
           </span>
         )}
@@ -98,7 +98,7 @@ function FilterDropdown({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full px-2.5 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500"
+                className="w-full px-2.5 py-1.5 bg-background/5 border border-border rounded text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
                 autoFocus
               />
             </div>
@@ -116,7 +116,7 @@ function FilterDropdown({
                   <div
                     className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       selectedValues.includes(option)
-                        ? 'bg-purple-500 border-purple-500'
+                        ? 'bg-primary/50 border-primary'
                         : 'border-border'
                     }`}
                   >
@@ -188,7 +188,7 @@ export function SearchFilterBar({
           onChange={(e) => onSearchChange(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && onSearchSubmit?.()}
           placeholder={searchPlaceholder}
-          className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all"
+          className="w-full pl-10 pr-3 py-2.5 bg-background/5 border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all"
         />
       </div>
 

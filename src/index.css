@@ -9,22 +9,22 @@
 
   .marketing-card.border-2.pricing-card:hover,
   .marketing-card-accent.border-2.pricing-card:hover {
-    border-color: #d946ef;
+    border-color: #af3cda;
   }
 
   .gradient-text {
-    background: linear-gradient(to right, #c084fc, #f472b6);
+    background: linear-gradient(to right, #cc30e8, #9054e3);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
   }
 
   .shadow-glow {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5);
+    box-shadow: 0 0 20px rgba(144, 84, 227, 0.5);
   }
 
   .shadow-glow-intense {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.7);
+    box-shadow: 0 0 20px rgba(144, 84, 227, 0.7);
   }
 
   .transition-smooth {
@@ -40,19 +40,19 @@
     --card-foreground: 260 32% 14%;
     --popover: 0 0% 100%;
     --popover-foreground: 260 32% 14%;
-    --primary: 270 82% 52%;
+    --primary: 250 68% 25%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 270 18% 94%;
-    --secondary-foreground: 260 28% 22%;
-    --muted: 270 14% 93%;
+    --secondary: 259 18% 94%;
+    --secondary-foreground: 250 28% 22%;
+    --muted: 262 14% 93%;
     --muted-foreground: 260 12% 40%;
-    --accent: 330 70% 94%;
-    --accent-foreground: 330 55% 32%;
+    --accent: 310 70% 94%;
+    --accent-foreground: 310 55% 32%;
     --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 98%;
     --border: 260 14% 88%;
     --input: 260 14% 88%;
-    --ring: 270 82% 52%;
+    --ring: 250 68% 25%;
     --chart-1: 270 70% 50%;
     --chart-2: 200 70% 45%;
     --chart-3: 30 80% 48%;
@@ -61,12 +61,12 @@
     --radius: 0.5rem;
     --sidebar-background: 270 25% 97%;
     --sidebar-foreground: 260 28% 18%;
-    --sidebar-primary: 270 82% 52%;
+    --sidebar-primary: 250 68% 25%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 270 16% 92%;
-    --sidebar-accent-foreground: 260 28% 18%;
-    --sidebar-border: 260 14% 88%;
-    --sidebar-ring: 270 82% 52%;
+    --sidebar-accent: 259 16% 92%;
+    --sidebar-accent-foreground: 250 28% 18%;
+    --sidebar-border: 250 14% 88%;
+    --sidebar-ring: 250 68% 25%;
 
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
@@ -116,21 +116,21 @@
     );
     --voxxy-grad-nav: linear-gradient(
       to right,
-      hsl(275 32% 96% / 0.94),
-      hsl(270 28% 95% / 0.94)
+      rgba(218, 207, 231, 0.94),
+      rgba(152, 51, 214, 0.6)
     );
     --voxxy-grad-cta: linear-gradient(
-      to right,
-      hsl(270 38% 88%),
-      hsl(285 36% 90%),
-      hsl(210 38% 91%)
+      to bottom,
+      rgba(218, 207, 231, 0.49),
+      rgba(152, 51, 214, 0.49)
     );
     --voxxy-grad-cta-pink: linear-gradient(
       to right,
       hsl(285 38% 88%),
-      hsl(330 42% 90%),
-      hsl(210 38% 91%)
+      hsl(310 42% 90%),
+      hsl(262 38% 91%)
     );
+    --voxxy-grad-brand: linear-gradient(to right, #cc30e8, #af3cda, #9054e3, #651ae9);
     --voxxy-grad-modal-header: linear-gradient(to right, hsl(var(--muted)), hsl(270 22% 96%));
     --voxxy-grad-nav-tab-active: linear-gradient(to right, hsl(270 36% 86%), hsl(217 40% 88%));
     --voxxy-grad-editor-chrome: linear-gradient(
@@ -167,47 +167,47 @@
 
     --voxxy-shadow-soft: 0 8px 18px rgb(15 23 42 / 0.04);
     --voxxy-shadow-marketing: 0 10px 30px rgb(15 23 42 / 0.08);
-    --voxxy-shadow-marketing-accent: 0 16px 40px rgb(217 70 239 / 0.12);
+    --voxxy-shadow-marketing-accent: 0 16px 40px rgb(144 84 227 / 0.15);
   }
 
   .dark {
-    --background: 252 65% 14%;
+    --background: 255 58% 18%;
     --foreground: 210 40% 98%;
     --card: 260 36% 18%;
     --card-foreground: 0 0% 98%;
     --popover: 260 40% 15%;
     --popover-foreground: 0 0% 98%;
-    --primary: 270 91% 65%;
+    --primary: 262 72% 61%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 260 30% 20%;
+    --secondary: 262 30% 20%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 16% 47%;
-    --accent: 330 81% 60%;
+    --muted: 250 33% 17%;
+    --muted-foreground: 240 16% 47%;
+    --accent: 310 81% 60%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 0 0% 100% / 0.1;
     --input: 260 20% 25%;
-    --ring: 270 91% 65%;
+    --ring: 262 72% 61%;
     --chart-1: 270 70% 60%;
     --chart-2: 200 70% 55%;
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --sidebar-background: 260 40% 11%;
+    --sidebar-background: 258 55% 16%;
     --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 270 91% 65%;
+    --sidebar-primary: 262 72% 61%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 260 35% 15%;
+    --sidebar-accent: 262 35% 15%;
     --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 260 20% 20%;
-    --sidebar-ring: 270 91% 65%;
+    --sidebar-border: 262 20% 20%;
+    --sidebar-ring: 262 72% 61%;
 
-    --voxxy-grad-body: linear-gradient(to bottom right, #1f1036, #342558, #141d34);
+    --voxxy-grad-body: linear-gradient(to bottom, #221469 0%, #54309f 30%, #bd2dcf 100%);
     --voxxy-grad-page: var(--voxxy-grad-body);
     --voxxy-grad-page-alt: var(--voxxy-grad-body);
-    --voxxy-grad-page-cool: linear-gradient(to bottom right, #221238, #181028);
+    --voxxy-grad-page-cool: var(--voxxy-grad-body);
     --voxxy-grad-editor: linear-gradient(to bottom right, #151028, #221a38, #151028);
     --voxxy-grad-panel: linear-gradient(to bottom right, #221838, #181222);
     --voxxy-grad-card-deep: linear-gradient(to bottom, #322848, #261c38);
@@ -222,17 +222,18 @@
       rgb(72 50 110 / 0.95),
       rgb(50 38 90 / 0.95)
     );
-    --voxxy-grad-hero-split: linear-gradient(to bottom right, #a855f7, #ec4899, #3b82f6);
-    --voxxy-grad-admin: linear-gradient(to bottom right, #120a1c, #221238, #181022);
-    --voxxy-grad-nav: linear-gradient(to right, rgb(34 18 56 / 0.95), rgb(52 37 88 / 0.95));
-    --voxxy-grad-cta: linear-gradient(to right, hsl(270 55% 48%), hsl(217 78% 52%));
-    --voxxy-grad-cta-pink: linear-gradient(to right, hsl(270 55% 48%), hsl(330 70% 55%));
+    --voxxy-grad-hero-split: linear-gradient(to bottom right, #cc30e8, #9054e3, #651ae9);
+    --voxxy-grad-admin: linear-gradient(to bottom, #1a1050 0%, #3a2080 50%, #3a2080 100%);
+    --voxxy-grad-nav: linear-gradient(to right, rgba(34, 20, 105, 0.95), rgba(84, 48, 159, 0.95));
+    --voxxy-grad-cta: linear-gradient(to right, #af3cda, #651ae9);
+    --voxxy-grad-cta-pink: linear-gradient(to right, #cc30e8, #9054e3);
+    --voxxy-grad-brand: linear-gradient(to right, #cc30e8, #af3cda, #9054e3, #651ae9);
     --voxxy-grad-modal-header: linear-gradient(
       to right,
       rgb(88 28 135 / 0.92),
       rgb(30 58 138 / 0.92)
     );
-    --voxxy-grad-nav-tab-active: linear-gradient(to right, #7c3aed, #3b82f6);
+    --voxxy-grad-nav-tab-active: var(--voxxy-grad-cta);
     --voxxy-grad-editor-chrome: linear-gradient(
       to right,
       rgb(46 32 74 / 0.86),
@@ -266,7 +267,18 @@
     --voxxy-dark-auth-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
     --voxxy-hover-panel-border: rgb(196 181 253 / 0.28);
     --voxxy-hover-row-border: rgb(196 181 253 / 0.24);
-    --voxxy-nav-tab-shadow: 0 4px 14px rgb(124 58 237 / 0.3);
+    /* Match CTA depth (shadow-primary/30) */
+    --voxxy-nav-tab-shadow: 0 10px 28px hsl(var(--primary) / 0.32);
+
+    /* Input field surfaces — lifted charcoal, distinct from glass-card bg */
+    --voxxy-input-frost-bg: rgb(52 36 80 / 0.82);
+    --voxxy-input-frost-bg-focus: rgb(60 42 92 / 0.90);
+    --voxxy-input-frost-border: rgb(255 255 255 / 0.18);
+    --voxxy-input-frost-border-focus: hsl(262 72% 72% / 0.7);
+    --voxxy-input-frost-ring: hsl(262 72% 72% / 0.28);
+
+    /* Viewport-relative height for fixed body + marketing gradients (short screens) */
+    --voxxy-body-gradient-paint-height: 185vh;
   }
 
   * {
@@ -280,13 +292,20 @@
     font-size: 13px;
   }
 
+  /* Stretch dark page gradient past one viewport so short screens don’t compress color stops */
+  html.dark body {
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
   html:not(.dark) select option {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
 
   .dark select option {
-    background-color: hsl(var(--card));
+    background-color: rgb(52 36 80);
     color: hsl(var(--card-foreground));
   }
 }
@@ -313,6 +332,10 @@
     background-image: var(--voxxy-grad-panel);
   }
 
+  .dark .voxxy-gradient-panel {
+    box-shadow: var(--voxxy-dark-inset-line), var(--voxxy-dark-drop-shadow-sm);
+  }
+
   .voxxy-gradient-card-deep {
     background-image: var(--voxxy-grad-card-deep);
   }
@@ -337,7 +360,10 @@
   }
 
   .glass-card:hover {
-    @apply border-foreground/20 dark:border-purple-400/35;
+    @apply border-foreground/20;
+  }
+  .dark .glass-card:hover {
+    border-color: hsl(var(--primary) / 0.35);
   }
 
   .event-list-card {
@@ -366,7 +392,7 @@
   .dark .marketing-card-accent.border-2 {
     background-image: var(--voxxy-marketing-card-accent-bg);
     background-color: rgb(250 245 255);
-    border-color: rgb(217 70 239 / 0.42);
+    border-color: rgb(175 60 218 / 0.42);
     box-shadow: var(--voxxy-shadow-marketing-accent);
     backdrop-filter: none;
     color: rgb(15 23 42);
@@ -406,8 +432,15 @@
   }
 
   .voxxy-application-highlight {
-    @apply rounded-lg border border-purple-500/30;
+    @apply rounded-lg border;
+    border-color: hsl(var(--primary) / 0.3);
     background-image: var(--voxxy-grad-application-highlight);
+  }
+
+  .dark .voxxy-application-highlight {
+    background-color: rgb(31 22 52 / 0.92);
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: var(--voxxy-dark-inset-line), 0 12px 32px rgb(0 0 0 / 0.25);
   }
 
   /* —— Buttons & CTAs —— */
@@ -421,7 +454,7 @@
   }
   .dark .voxxy-btn-cta {
     color: hsl(var(--primary-foreground));
-    border-color: transparent;
+    border: none;
   }
   .dark .voxxy-btn-cta:hover {
     filter: brightness(1.06);
@@ -452,12 +485,12 @@
     background-color: hsl(270 34% 82%);
   }
   .dark .voxxy-btn-solid {
-    background-color: #9333ea;
+    background-color: #9054e3;
     color: hsl(var(--primary-foreground));
     border-color: transparent;
   }
   .dark .voxxy-btn-solid:hover {
-    background-color: #7e22ce;
+    background-color: #7b45d1;
   }
 
   .voxxy-accent-tile {
@@ -465,7 +498,7 @@
     color: hsl(var(--foreground));
   }
   .dark .voxxy-accent-tile {
-    background-color: #9333ea;
+    background-color: #9054e3;
     background-image: none;
     color: hsl(var(--primary-foreground));
   }
@@ -483,18 +516,32 @@
   /* —— Surfaces, chrome & inputs —— */
   .voxxy-nav-surface {
     background: var(--voxxy-grad-nav);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .voxxy-gradient-modal-header {
     background: var(--voxxy-grad-modal-header);
   }
 
+  /* Nav CTA link — plain text, gradient text on hover/active */
+  .voxxy-nav-cta-link {
+    color: rgb(255 255 255 / 0.82);
+  }
+  .voxxy-nav-cta-link:hover,
+  .voxxy-nav-cta-link:focus-visible {
+    background-image: var(--voxxy-grad-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-color: rgb(255 255 255 / 0.07);
+  }
+
   .voxxy-auth-panel {
     @apply bg-background;
   }
   .dark .voxxy-auth-panel {
-    background-color: #0f0b1f;
+    background: linear-gradient(to bottom, #1a1050, #2a1870);
   }
 
   .voxxy-auth-card {
@@ -644,16 +691,46 @@
     background-color: hsl(var(--background) / 0.9);
   }
   .dark .voxxy-input-frost {
-    background-color: rgb(50 36 78 / 0.82);
-    border-color: var(--voxxy-dark-border-subtle);
-    box-shadow: var(--voxxy-dark-inset-line);
+    background-color: var(--voxxy-input-frost-bg);
+    border-color: var(--voxxy-input-frost-border);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
   }
   .voxxy-input-frost:focus {
-    @apply bg-background outline-none;
+    @apply outline-none;
+    background-color: hsl(var(--background));
     border-color: hsl(270 91% 65% / 0.5);
   }
   .dark .voxxy-input-frost:focus {
-    background-color: rgb(60 44 92 / 0.9);
+    background-color: var(--voxxy-input-frost-bg-focus);
+    border-color: var(--voxxy-input-frost-border-focus);
+    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+
+  /* —— Prefixed input group (e.g. "https://" or "instagram.com/") —— */
+  .voxxy-input-frost-group {
+    @apply flex rounded-lg overflow-hidden border border-border transition-all;
+    background-color: hsl(var(--background) / 0.9);
+  }
+  .voxxy-input-frost-group:focus-within {
+    border-color: hsl(270 91% 65% / 0.5);
+  }
+  .dark .voxxy-input-frost-group {
+    background-color: var(--voxxy-input-frost-bg);
+    border-color: var(--voxxy-input-frost-border);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  .dark .voxxy-input-frost-group:focus-within {
+    background-color: var(--voxxy-input-frost-bg-focus);
+    border-color: var(--voxxy-input-frost-border-focus);
+    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  .voxxy-input-frost-prefix {
+    @apply flex items-center px-2.5 border-r border-border text-muted-foreground text-sm whitespace-nowrap select-none;
+    background-color: hsl(var(--muted) / 0.6);
+  }
+  .dark .voxxy-input-frost-prefix {
+    background-color: rgb(255 255 255 / 0.05);
+    border-color: var(--voxxy-input-frost-border);
   }
 
   /* —— Tables —— */
@@ -704,6 +781,96 @@
   .dark .voxxy-table-inline-field {
     background-color: rgb(56 41 88 / 0.76);
     border-color: var(--voxxy-dark-border-subtle);
+  }
+
+  .voxxy-contact-form-shell {
+    @apply rounded-2xl backdrop-blur-xl;
+    background-color: rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.32);
+    box-shadow:
+      0 25px 50px -12px rgb(0 0 0 / 0.4),
+      0 12px 24px -8px rgb(0 0 0 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
+  .voxxy-input-public-dark {
+    @apply w-full rounded-lg px-4 py-3 text-[15px] text-white outline-none transition-all duration-200;
+    background-color: rgb(255 255 255 / 0.14);
+    border: 1px solid rgb(255 255 255 / 0.24);
+  }
+
+  .voxxy-input-public-dark::placeholder {
+    color: rgb(255 255 255 / 0.42);
+  }
+
+  .voxxy-input-public-dark:focus {
+    border-color: rgb(255 255 255 / 0.48);
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.28);
+    background-color: rgb(255 255 255 / 0.17);
+  }
+
+  /** Hero secondary CTA — glassmorphic on dark gradient backgrounds */
+  .voxxy-btn-public-secondary {
+    background-color: rgb(255 255 255 / 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(255 255 255 / 0.22);
+    color: rgb(255 255 255 / 0.95);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.14),
+      0 4px 16px rgb(0 0 0 / 0.12);
+    transition: all 0.2s ease;
+  }
+
+  .voxxy-btn-public-secondary:hover {
+    background-color: rgb(255 255 255 / 0.14);
+    border-color: rgb(255 255 255 / 0.35);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 0 24px rgb(144 84 227 / 0.30),
+      0 8px 24px rgb(0 0 0 / 0.18);
+  }
+
+  .voxxy-btn-public-secondary:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px rgb(255 255 255 / 0.35),
+      0 0 20px rgb(144 84 227 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
+  /* —— Brand & marketing —— */
+  /* Same source + paint geometry as html.dark body so landing matches producer dashboard */
+  .voxxy-gradient-marketing-hero {
+    background: var(--voxxy-grad-body);
+  }
+
+  html.dark .voxxy-gradient-marketing-hero {
+    background-attachment: fixed;
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
+  html.dark .voxxy-gradient-page-cool {
+    background-attachment: fixed;
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
+  .voxxy-btn-brand {
+    background-image: var(--voxxy-grad-brand);
+    color: hsl(var(--primary-foreground));
+    border: none;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .voxxy-btn-brand:hover {
+    filter: brightness(1.08);
+  }
+
+  .voxxy-image-elevated {
+    box-shadow: 0 20px 60px rgba(101, 26, 233, 0.25), 0 0 40px rgba(204, 48, 232, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 

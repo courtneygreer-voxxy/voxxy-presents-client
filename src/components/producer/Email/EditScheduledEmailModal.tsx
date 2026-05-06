@@ -389,7 +389,7 @@ export default function EditScheduledEmailModal({
       <DialogContent className="voxxy-modal-surface max-h-[90vh] max-w-5xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
-            <Type className="w-5 h-5 text-purple-400" />
+            <Type className="w-5 h-5 text-primary" />
             <span>Edit Email</span>
           </DialogTitle>
         </DialogHeader>
@@ -422,7 +422,7 @@ export default function EditScheduledEmailModal({
           {/* Timing Configuration */}
           <div className="bg-background/5 rounded-lg p-4 border border-border space-y-4">
             <h3 className="text-foreground font-medium flex items-center gap-2">
-              <Clock className="w-4 h-4 text-purple-400" />
+              <Clock className="w-4 h-4 text-primary" />
               Email Timing
             </h3>
 
@@ -549,10 +549,10 @@ export default function EditScheduledEmailModal({
 
             {/* Variable Buttons for Subject */}
             {activeField === 'subject' && !isSent && (
-              <div className="mt-3 p-3 bg-background/5 rounded-lg border border-purple-500/20">
+              <div className="mt-3 p-3 bg-background/5 rounded-lg border border-primary/20">
                 <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-xs font-medium text-purple-300">Click to insert variables:</span>
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-medium text-primary">Click to insert variables:</span>
                 </div>
                 <div className="flex flex-wrap gap-2">
                   {EMAIL_VARIABLES.map((variable) => (
@@ -560,7 +560,7 @@ export default function EditScheduledEmailModal({
                       key={variable.frontendVar}
                       type="button"
                       onClick={() => handleInsertVariable(variable.frontendVar, 'subject')}
-                      className="px-2 py-1 text-xs rounded-md bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border border-purple-500/30 transition-colors"
+                      className="px-2 py-1 text-xs rounded-md bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary border border-primary/30 transition-colors"
                       title={`${variable.description} (e.g., ${variable.example})`}
                     >
                       {variable.label}
@@ -602,10 +602,10 @@ export default function EditScheduledEmailModal({
 
             {/* Variable Buttons for Body - Organized by Category */}
             {activeField === 'body' && !isSent && (
-              <div className="mt-3 p-4 bg-background/5 rounded-lg border border-purple-500/20 space-y-4">
+              <div className="mt-3 p-4 bg-background/5 rounded-lg border border-primary/20 space-y-4">
                 <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-purple-400" />
-                  <span className="text-xs font-medium text-purple-300">Click to insert variables:</span>
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-medium text-primary">Click to insert variables:</span>
                 </div>
 
                 {/* Render grouped variables */}
@@ -614,8 +614,8 @@ export default function EditScheduledEmailModal({
                   const colorClasses = [
                     'bg-pink-500/20 hover:bg-pink-500/30 text-rose-950 dark:text-pink-300 border-pink-500/30', // Vendor Details
                     'bg-blue-500/20 hover:bg-blue-500/30 text-blue-950 dark:text-blue-300 border-blue-500/30', // Organization Details
-                    'bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border-purple-500/30' // Event Details
-                  ][index] || 'bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 border-purple-500/30';
+                    'bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary border-primary/30' // Event Details
+                  ][index] || 'bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary border-primary/30';
 
                   return (
                     <div key={group.label}>
@@ -643,7 +643,7 @@ export default function EditScheduledEmailModal({
           {/* Locked Footer Section */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Lock className="w-4 h-4 text-purple-400" />
+              <Lock className="w-4 h-4 text-primary" />
               <label className="block text-sm font-medium text-foreground/80">
                 Email Footer (Locked)
               </label>
@@ -653,13 +653,13 @@ export default function EditScheduledEmailModal({
                 value={emailFooter}
                 disabled
                 readOnly
-                className="bg-background/5 border-purple-500/20 text-foreground/60 min-h-[120px] resize-none cursor-not-allowed opacity-60"
+                className="bg-background/5 border-primary/20 text-foreground/60 min-h-[120px] resize-none cursor-not-allowed opacity-60"
               />
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                <div className="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full border border-purple-500/40">
+                <div className="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full border border-primary/40">
                   <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-purple-300" />
-                    <span className="text-sm text-purple-300 font-medium">
+                    <Lock className="w-4 h-4 text-primary" />
+                    <span className="text-sm text-primary font-medium">
                       Footer is locked to ensure unsubscribe link is always present
                     </span>
                   </div>

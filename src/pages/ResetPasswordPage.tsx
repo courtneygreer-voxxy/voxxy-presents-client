@@ -8,8 +8,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Lock, AlertCircle, CheckCircle, Loader2, Eye, EyeOff } from 'lucide-react'
 import { authApi, ApiError } from '@/services/api'
 import { validatePassword } from '@/utils/validation'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function ResetPasswordPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const token = searchParams.get('token')

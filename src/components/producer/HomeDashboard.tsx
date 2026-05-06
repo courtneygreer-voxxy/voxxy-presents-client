@@ -296,7 +296,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -341,8 +341,8 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               {/* Applied */}
               <div className={`${commandPanelClass} p-3.5`}>
                 <div className="flex items-center gap-2">
-                  <div className="p-2 rounded-lg bg-purple-500/20">
-                    <ClipboardList className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                  <div className="p-2 rounded-lg bg-primary/20">
+                    <ClipboardList className="w-4 h-4 text-primary dark:text-primary" />
                   </div>
                   <div className="flex-1">
                     <p className="text-2xl font-bold text-foreground">{stats.applied}</p>
@@ -443,12 +443,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                <Mail className="h-4 w-4 text-primary dark:text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Upcoming Emails</h3>
               </div>
               <button
                 onClick={() => onNavigateToTab?.('emails')}
-                className="text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
               >
                 View All →
               </button>
@@ -485,7 +485,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
           <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Megaphone className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                <Megaphone className="w-4 h-4 text-primary dark:text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Bulletin Board</h3>
                 <span className="text-[10px] text-foreground/40">({bulletins.length})</span>
               </div>
@@ -493,7 +493,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 {bulletins.length > 3 && (
                   <button
                     onClick={() => setShowAllBulletins(!showAllBulletins)}
-                    className="text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                    className="text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                   >
                     {showAllBulletins ? 'Show Less' : 'View All →'}
                   </button>
@@ -525,10 +525,10 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                     key={bulletin.id}
                     className={`rounded-xl border p-3 transition-smooth ${
                       bulletin.pinned
-                        ? 'voxxy-surface-subtle border-purple-500/40 dark:border-purple-400/24'
+                        ? 'voxxy-surface-subtle border-primary/40 dark:border-primary/24'
                         : 'voxxy-surface-subtle'
                     } ${
-                      bulletin.pinned ? 'dark:border-purple-400/28' : ''
+                      bulletin.pinned ? 'dark:border-primary/28' : ''
                     }`}
                   >
                     {/* Header */}
@@ -546,7 +546,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                             {bulletin.subject}
                           </h4>
                           {bulletin.pinned && (
-                            <Pin className="h-3 w-3 shrink-0 fill-purple-700 text-purple-700 dark:fill-purple-400 dark:text-purple-400" />
+                            <Pin className="h-3 w-3 shrink-0 fill-primary text-primary dark:fill-primary dark:text-primary" />
                           )}
                         </div>
                         <p className="text-[10px] text-muted-foreground">
@@ -582,12 +582,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         <div className={`${commandPanelClass} p-3.5`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+                <Calendar className="w-4 h-4 text-primary dark:text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Event Details</h3>
               </div>
             <button
               onClick={() => onNavigateToTab?.('settings')}
-              className="flex items-center gap-1 text-xs text-purple-700 transition-smooth hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+              className="flex items-center gap-1 text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
             >
               <Edit2 className="w-3 h-3" />
               Edit
@@ -696,7 +696,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   {!isEditingTicketLink && (
                     <button
                       onClick={handleStartEditTicketLink}
-                      className="p-0.5 text-purple-700 transition-colors hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                      className="p-0.5 text-primary transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                       title="Edit ticket link"
                     >
                       <Edit2 className="w-3 h-3" />
@@ -711,7 +711,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       value={editedTicketLink}
                       onChange={(e) => setEditedTicketLink(e.target.value)}
                       placeholder="https://..."
-                      className="voxxy-input-frost w-full rounded-lg px-2 py-1 text-xs focus:border-transparent focus:ring-1 focus:ring-purple-500"
+                      className="voxxy-input-frost w-full rounded-lg px-2 py-1 text-xs focus:border-transparent focus:ring-1 focus:ring-primary"
                     />
                     {ticketLinkError && (
                       <p className="text-[10px] text-red-400">{ticketLinkError}</p>
@@ -740,7 +740,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                         href={event.ticket_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="break-all text-xs text-purple-700 underline transition-colors hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-300"
+                        className="break-all text-xs text-primary underline transition-colors hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
                       >
                         {event.ticket_link}
                       </a>
@@ -780,7 +780,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
+                <Globe className="w-3.5 h-3.5 text-primary dark:text-primary" />
                 <span>Application Page</span>
               </div>
               <ExternalLink className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60" />
@@ -793,7 +793,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               className={sideLinkClass}
             >
               <div className="flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-purple-700 dark:text-purple-400" />
+                <Globe className="w-3.5 h-3.5 text-primary dark:text-primary" />
                 <span>Vendor Portal</span>
               </div>
               <ExternalLink className="w-3 h-3 text-foreground/40 group-hover:text-foreground/60" />

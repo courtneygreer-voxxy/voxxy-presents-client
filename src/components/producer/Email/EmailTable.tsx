@@ -25,8 +25,8 @@ interface EmailTableProps {
 function SortIcon({ column, sortColumn, sortDirection }: { column: SortColumn; sortColumn?: SortColumn | null; sortDirection?: SortDirection }) {
   if (sortColumn !== column) return <ChevronsUpDown className="h-3 w-3 text-foreground/45 dark:text-foreground/40" />;
   return sortDirection === 'asc'
-    ? <ChevronUp className="h-3 w-3 text-violet-700 dark:text-purple-400" />
-    : <ChevronDown className="h-3 w-3 text-violet-700 dark:text-purple-400" />;
+    ? <ChevronUp className="h-3 w-3 text-violet-700 dark:text-primary" />
+    : <ChevronDown className="h-3 w-3 text-violet-700 dark:text-primary" />;
 }
 
 // Check if email is a system email (matches backend SYSTEM_TRIGGERS)
@@ -178,22 +178,22 @@ export default function EmailTable({
           <>
             <button
               onClick={() => setIsRemindersCollapsed(!isRemindersCollapsed)}
-              className="w-full bg-purple-500/10 hover:bg-purple-500/15 border-b border-purple-500/30 px-4 py-2 transition-colors"
+              className="w-full bg-primary/10 hover:bg-primary/15 border-b border-primary/30 px-4 py-2 transition-colors"
             >
               <div className="flex items-center gap-2">
                 {isRemindersCollapsed ? (
-                  <ChevronDown className="h-4 w-4 text-violet-700 dark:text-purple-300" />
+                  <ChevronDown className="h-4 w-4 text-violet-700 dark:text-primary" />
                 ) : (
-                  <ChevronUp className="h-4 w-4 text-violet-700 dark:text-purple-300" />
+                  <ChevronUp className="h-4 w-4 text-violet-700 dark:text-primary" />
                 )}
-                <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700 dark:text-purple-300">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-violet-700 dark:text-primary">
                   Reminders ({reminderEmails.length})
                 </h3>
                 <Tooltip.Provider delayDuration={200}>
                   <Tooltip.Root>
                     <Tooltip.Trigger asChild>
                       <div
-                        className="text-violet-700 transition-colors hover:text-violet-900 dark:text-purple-300 dark:hover:text-purple-200"
+                        className="text-violet-700 transition-colors hover:text-violet-900 dark:text-primary dark:hover:text-primary"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <HelpCircle className="w-3.5 h-3.5" />
@@ -201,7 +201,7 @@ export default function EmailTable({
                     </Tooltip.Trigger>
                     <Tooltip.Portal>
                       <Tooltip.Content
-                        className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-purple-400/30 shadow-xl max-w-xs z-50"
+                        className="bg-muted text-foreground text-xs px-3 py-2 rounded-lg border border-primary/30 shadow-xl max-w-xs z-50"
                         sideOffset={5}
                       >
                         Time-based reminders that were added to this event's sequence.

@@ -77,7 +77,7 @@ export default function SaveAsTemplateDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            <Save className="w-5 h-5 text-purple-400" />
+            <Save className="w-5 h-5 text-primary" />
             Save as Reusable Template
           </DialogTitle>
           <DialogDescription>
@@ -97,7 +97,7 @@ export default function SaveAsTemplateDialog({
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g., Summer Festival Campaign"
-              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
               disabled={isSaving}
               maxLength={100}
             />
@@ -114,7 +114,7 @@ export default function SaveAsTemplateDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe when to use this template..."
               rows={3}
-              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 resize-none"
+              className="w-full px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
               disabled={isSaving}
               maxLength={500}
             />

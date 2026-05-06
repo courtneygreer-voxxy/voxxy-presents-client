@@ -129,7 +129,7 @@ export default function RecipientsModal({
       <DialogContent className="voxxy-modal-surface flex max-h-[85vh] max-w-3xl flex-col overflow-hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3 text-foreground">
-            <Mail className="w-5 h-5 text-purple-400" />
+            <Mail className="w-5 h-5 text-primary" />
             <span>Email Recipients</span>
           </DialogTitle>
         </DialogHeader>
@@ -156,7 +156,7 @@ export default function RecipientsModal({
           {/* Loading State */}
           {loading && (
             <div className="flex flex-col items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+              <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
               <p className="text-foreground/60 text-sm">Loading recipients...</p>
             </div>
           )}
@@ -210,7 +210,7 @@ export default function RecipientsModal({
                           <div className="min-w-0">
                             <a
                               href={`mailto:${recipient.email}`}
-                              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block"
+                              className="text-foreground/70 hover:text-primary transition-colors truncate block"
                               onClick={(e) => e.stopPropagation()}
                             >
                               {recipient.email}

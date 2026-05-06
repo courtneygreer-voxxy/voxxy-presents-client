@@ -29,8 +29,8 @@ export function CategoryFilterBar({
             className={`
               px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
               ${allSelected || noneSelected
-                ? 'border-purple-500 bg-purple-500/20 text-violet-950 dark:text-purple-200'
-                : 'border-border bg-background/5 text-foreground dark:text-foreground/60 hover:border-border hover:bg-background/10'
+                ? 'border-primary bg-primary/20 text-violet-950 dark:text-primary shadow-sm'
+                : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
               }
             `}
           >
@@ -41,7 +41,7 @@ export function CategoryFilterBar({
         {/* Individual Category Buttons */}
         {categories.map((category) => {
           const isSelected = selectedCategoryIds.includes(category.id);
-          const badgeColor = category.color || '#8B5CF6';
+          const badgeColor = category.color || '#9054e3';
 
           return (
             <button
@@ -52,8 +52,8 @@ export function CategoryFilterBar({
                 relative px-3 py-1.5 rounded-lg text-xs font-medium transition-all border-2
                 flex items-center gap-1.5
                 ${isSelected
-                  ? 'text-foreground shadow-lg'
-                  : 'border-border bg-background/5 text-foreground dark:text-foreground/60 hover:border-border hover:bg-background/10'
+                  ? 'text-foreground shadow-md'
+                  : 'border-border/80 bg-card/80 dark:bg-card/40 text-foreground dark:text-foreground/70 hover:border-primary/40 hover:bg-primary/10 shadow-sm'
                 }
               `}
               style={{

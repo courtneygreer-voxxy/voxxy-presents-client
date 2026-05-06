@@ -776,7 +776,7 @@ export function EmailEditorPage({
               onClick={() => setShowPreview(!showPreview)}
               variant="outline"
               size="sm"
-              className={`h-9 border-border ${showPreview ? 'bg-violet-100 text-foreground hover:bg-violet-200 dark:bg-purple-500/20 dark:text-primary-foreground dark:hover:bg-purple-500/30' : 'bg-card/80 text-foreground hover:bg-muted/70 dark:bg-background/5 dark:hover:bg-background/10'}`}
+              className={`h-9 border-border ${showPreview ? 'bg-violet-100 text-foreground hover:bg-violet-200 dark:bg-primary/20 dark:text-primary-foreground dark:hover:bg-primary/30' : 'bg-card/80 text-foreground hover:bg-muted/70 dark:bg-background/5 dark:hover:bg-background/10'}`}
             >
               {showPreview ? (
                 <>
@@ -983,21 +983,21 @@ export function EmailEditorPage({
             {/* Locked Footer Section */}
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <Lock className="w-4 h-4 text-purple-400" />
+                <Lock className="w-4 h-4 text-primary" />
                 <label className="block text-xs font-medium text-foreground/70">
                   Email Footer (Locked)
                 </label>
               </div>
               <div className="relative">
-                <div className="min-h-[120px] rounded-lg border border-purple-500/20 bg-card/80 p-4 opacity-60 pointer-events-none dark:bg-background/5">
+                <div className="min-h-[120px] rounded-lg border border-primary/20 bg-card/80 p-4 opacity-60 pointer-events-none dark:bg-background/5">
                   <div
                     className="text-xs text-foreground/80"
                     dangerouslySetInnerHTML={{ __html: emailFooter }}
                   />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="flex items-center gap-2 rounded-full border border-purple-500/20 bg-card/95 px-3 py-1.5 backdrop-blur-sm dark:border-purple-500/30 dark:bg-background/80">
-                    <Lock className="w-3.5 h-3.5 text-purple-400" />
+                  <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-card/95 px-3 py-1.5 backdrop-blur-sm dark:border-primary/30 dark:bg-background/80">
+                    <Lock className="w-3.5 h-3.5 text-primary" />
                     <span className="text-xs text-foreground/90">
                       Footer is locked to ensure unsubscribe link is always present
                     </span>
@@ -1018,7 +1018,7 @@ export function EmailEditorPage({
           {/* Preview Header */}
           <div className="voxxy-editor-chrome flex min-h-[60px] items-center px-12 py-3">
             <h3 className="text-sm font-medium text-foreground flex items-center gap-2">
-              <Eye className="w-4 h-4 text-purple-400" />
+              <Eye className="w-4 h-4 text-primary" />
               Live Preview
             </h3>
           </div>
@@ -1031,7 +1031,7 @@ export function EmailEditorPage({
                 <label className="block text-xs font-semibold text-foreground dark:text-foreground/70 uppercase tracking-wide mb-2">
                   Subject
                 </label>
-                <div className="rounded-lg border border-purple-500/20 bg-card/85 p-4 dark:bg-background/10">
+                <div className="rounded-lg border border-primary/20 bg-card/85 p-4 dark:bg-background/10">
                   <div
                     className="text-foreground font-medium text-sm"
                     dangerouslySetInnerHTML={{
@@ -1056,7 +1056,7 @@ export function EmailEditorPage({
                     </ul>
                   </div>
                 )}
-                <div className="rounded-lg border border-purple-500/20 bg-card/85 p-6 dark:bg-background/10">
+                <div className="rounded-lg border border-primary/20 bg-card/85 p-6 dark:bg-background/10">
                   {body ? (
                     <div
                       className="email-preview-content voxxy-rich-text-base"
@@ -1073,10 +1073,10 @@ export function EmailEditorPage({
               </div>
 
               {/* Preview Footer (Locked) */}
-              <div className="bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg p-4">
+              <div className="bg-gradient-to-br from-primary/10 to-pink-500/10 border border-primary/20 rounded-lg p-4">
                 <div className="flex items-center gap-1.5 mb-2">
-                  <Lock className="w-3 h-3 text-purple-400" />
-                  <p className="text-[10px] text-purple-400 font-semibold uppercase tracking-wide">
+                  <Lock className="w-3 h-3 text-primary" />
+                  <p className="text-[10px] text-primary font-semibold uppercase tracking-wide">
                     Email Footer (Locked)
                   </p>
                 </div>
@@ -1119,7 +1119,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+                <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
                 <span>Trigger Settings</span>
               </div>
               {triggerSettingsOpen ? (
@@ -1194,8 +1194,8 @@ export function EmailEditorPage({
                 )}
 
                 {previewDate && (
-                  <div className="p-2.5 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-lg">
-                    <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-purple-400/80">Scheduled for:</p>
+                  <div className="p-2.5 bg-gradient-to-br from-primary/10 to-pink-500/10 border border-primary/20 rounded-lg">
+                    <p className="mb-0.5 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-primary/80">Scheduled for:</p>
                     <p className="text-xs text-foreground font-medium">{previewDate}</p>
                   </div>
                 )}
@@ -1210,7 +1210,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Users className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+                <Users className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
                 <span>Audience</span>
               </div>
               {recipientsOpen ? (
@@ -1280,7 +1280,7 @@ export function EmailEditorPage({
               className="flex items-center justify-between w-full mb-2"
             >
               <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+                <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
                 <span>Available tags</span>
               </div>
               {availableTagsOpen ? (
@@ -1316,7 +1316,7 @@ export function EmailEditorPage({
                     placeholder="Search tags..."
                     value={tagSearch}
                     onChange={(e) => setTagSearch(e.target.value)}
-                    className="w-full rounded border border-border bg-background/5 py-1.5 pl-7 pr-7 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                    className="w-full rounded border border-border bg-background/5 py-1.5 pl-7 pr-7 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
                   />
                   {tagSearch && (
                     <button
@@ -1348,7 +1348,7 @@ export function EmailEditorPage({
                           className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                             isDisabled
                               ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
-                              : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
+                              : 'text-foreground hover:bg-gradient-to-r hover:from-primary/20 hover:to-blue-500/20 hover:border-primary/40 border-border bg-background/5 group'
                           }`}
                           title={
                             isDisabled
@@ -1356,12 +1356,12 @@ export function EmailEditorPage({
                               : variable.description
                           }
                         >
-                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                          <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-primary dark:group-hover:text-primary'}`} />
                           <span className="flex-1 text-left truncate">{variable.label}</span>
                           <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                             isDisabled
                               ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
-                              : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
+                              : 'bg-violet-100 text-violet-700 dark:bg-primary/10 dark:text-primary'
                           }`}>
                             {variable.frontendVar.replace('[', '').replace(']', '')}
                           </span>
@@ -1374,7 +1374,7 @@ export function EmailEditorPage({
                   <div className="space-y-3">
                     {getGroupedVariablesForUI().map((group) => (
                       <div key={group.label}>
-                        <h4 className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-purple-400">
+                        <h4 className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-primary">
                           {group.label}
                         </h4>
                         <div className="space-y-0.5">
@@ -1392,7 +1392,7 @@ export function EmailEditorPage({
                                 className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                                   isDisabled
                                     ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
-                                    : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
+                                    : 'text-foreground hover:bg-gradient-to-r hover:from-primary/20 hover:to-blue-500/20 hover:border-primary/40 border-border bg-background/5 group'
                                 }`}
                                 title={
                                   isDisabled
@@ -1400,12 +1400,12 @@ export function EmailEditorPage({
                                     : variable.description
                                 }
                               >
-                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-primary dark:group-hover:text-primary'}`} />
                                 <span className="flex-1 text-left truncate">{variable.label}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                                   isDisabled
                                     ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
-                                    : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
+                                    : 'bg-violet-100 text-violet-700 dark:bg-primary/10 dark:text-primary'
                                 }`}>
                                   {variable.frontendVar.replace('[', '').replace(']', '')}
                                 </span>
@@ -1428,10 +1428,10 @@ export function EmailEditorPage({
 
       {/* Test Email Dialog */}
       <Dialog open={showTestEmailDialog} onOpenChange={setShowTestEmailDialog}>
-        <DialogContent className="sm:max-w-md voxxy-gradient-page-cool border-purple-500/20">
+        <DialogContent className="sm:max-w-md voxxy-gradient-page-cool border-primary/20">
           <DialogHeader>
             <DialogTitle className="text-foreground flex items-center gap-2">
-              <Send className="w-5 h-5 text-purple-400" />
+              <Send className="w-5 h-5 text-primary" />
               Send Test Email
             </DialogTitle>
             <DialogDescription className="text-foreground/60">

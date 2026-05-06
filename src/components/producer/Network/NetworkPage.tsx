@@ -59,14 +59,14 @@ function FilterDropdownButton({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
-            ? 'bg-purple-500/20 text-violet-950 border border-purple-500/40 dark:text-purple-300 dark:border-purple-500/30'
-            : 'bg-card/80 text-foreground dark:bg-background/10 dark:text-foreground/70 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-background/15'
+            ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+            : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
         <span>{field.label}</span>
         {selectedValues.length > 0 && (
-          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-primary-foreground text-[10px] font-bold rounded-full">
+          <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
             {selectedValues.length}
           </span>
         )}
@@ -82,7 +82,7 @@ function FilterDropdownButton({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/40 dark:bg-background/10"
+                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 dark:bg-background/10"
                 autoFocus
               />
             </div>
@@ -100,7 +100,7 @@ function FilterDropdownButton({
                   <div
                     className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       selectedValues.includes(option)
-                        ? 'bg-purple-500 border-purple-500'
+                        ? 'bg-primary/50 border-primary'
                         : 'border-border'
                     }`}
                   >
@@ -154,6 +154,8 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const actionsMenuRef = useRef<HTMLDivElement>(null);
 
   // SearchFilterBar state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -220,6 +222,17 @@ export default function NetworkPage({
     { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
   ];
 
+  // Close actions menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        setActionsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   // Fetch filter options from backend on mount
   useEffect(() => {
     const loadFilterOptions = async () => {
@@ -261,6 +274,7 @@ export default function NetworkPage({
     try {
       setLoading(true);
       setError(null);
+      setViewingManualList(null);
 
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
@@ -296,6 +310,32 @@ export default function NetworkPage({
       setCurrentPage(page);
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewManualList = async (listId: number, listName: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setActiveFilters([]);
+      setSearchTerm('');
+      setViewingManualList({ id: listId, name: listName });
+
+      const response = await contactListsApi.getContacts(listId);
+      setContacts(response.vendor_contacts || []);
+      setPaginationMeta({
+        current_page: 1,
+        per_page: response.vendor_contacts?.length || 0,
+        total_count: response.vendor_contacts?.length || 0,
+        total_pages: 1,
+      });
+      setCurrentPage(1);
+      onTabChange?.('contacts');
+    } catch (err: any) {
+      setError(err.message || 'Failed to load list contacts');
       setContacts([]);
     } finally {
       setLoading(false);
@@ -418,8 +458,12 @@ export default function NetworkPage({
     }
   };
 
+  // Manual list viewing state
+  const [viewingManualList, setViewingManualList] = useState<{ id: number; name: string } | null>(null);
+
   const clearAllFilters = () => {
     setActiveFilters([]);
+    setViewingManualList(null);
     setShowSaveInput(false);
     setListName('');
   };
@@ -657,33 +701,46 @@ export default function NetworkPage({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                className="w-full rounded-lg border border-border bg-card/80 py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                className="voxxy-input-frost w-full rounded-lg py-2.5 pl-10 pr-3 text-sm focus:ring-2 focus:ring-ring/40"
                 />
               </div>
 
-              {/* Import CSV, Create List & Add Contact Buttons */}
-              <button
-                onClick={() => setShowCSVUploadModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Import CSV</span>
-              </button>
-              <button
-                onClick={handleStartCreateList}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Filter className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Create List</span>
-              </button>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Add Contact</span>
-                <span className="sm:hidden">Add</span>
-              </button>
+              {/* Actions dropdown */}
+              <div className="relative" ref={actionsMenuRef}>
+                <button
+                  onClick={() => setActionsMenuOpen(prev => !prev)}
+                  className="flex items-center gap-1.5 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Actions</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${actionsMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {actionsMenuOpen && (
+                  <div className="voxxy-select-surface absolute right-0 top-full mt-1 z-50 w-48 rounded-lg shadow-xl overflow-hidden">
+                    <button
+                      onClick={() => { setShowAddModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Add Contact
+                    </button>
+                    <button
+                      onClick={() => { handleStartCreateList(); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Filter className="w-3.5 h-3.5" />
+                      Create List
+                    </button>
+                    <button
+                      onClick={() => { setShowCSVUploadModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Import CSV
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Filter Dropdowns Row */}
@@ -724,13 +781,30 @@ export default function NetworkPage({
             )}
           </div>
 
+          {/* Manual List Banner */}
+          {viewingManualList && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/15 border border-purple-500/30 rounded-lg">
+              <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <span className="text-sm text-foreground/80">
+                Viewing list: <span className="font-semibold text-foreground">{viewingManualList.name}</span>
+              </span>
+              <button
+                onClick={() => { setViewingManualList(null); fetchContacts(1); }}
+                className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+            </div>
+          )}
+
           {/* Save as List (when filters active) */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2">
               {!showSaveInput ? (
                 <button
                   onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 hover:text-violet-900 dark:text-purple-300 dark:hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/40 dark:border-purple-500/30"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary/70 text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save as List
@@ -743,7 +817,7 @@ export default function NetworkPage({
                     onChange={(e) => setListName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
                     placeholder="List name..."
-                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-background/10"
+                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
                     autoFocus
                   />
                   <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors">
@@ -759,12 +833,12 @@ export default function NetworkPage({
           )}
 
           {/* No results */}
-          {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
+          {contacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
             <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
-                {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
+                {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
               </p>
-              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm underline">
+              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 text-sm underline transition-colors">
                 Clear all filters
               </button>
             </div>
@@ -813,6 +887,7 @@ export default function NetworkPage({
         <ListsManagement
           organizationId={organizationId}
           onViewList={(filters) => {
+            setViewingManualList(null);
             const newFilters: ActiveFilter[] = [];
             if (filters.locations?.length) newFilters.push({ fieldKey: 'location', values: filters.locations });
             if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
@@ -820,6 +895,7 @@ export default function NetworkPage({
             setActiveFilters(newFilters);
             onTabChange?.('contacts');
           }}
+          onViewManualList={handleViewManualList}
         />
       )}
 
@@ -858,7 +934,7 @@ export default function NetworkPage({
                     className="group relative rounded-lg border border-border bg-card hover:shadow-md transition-all overflow-hidden"
                     style={{
                       borderLeftWidth: '4px',
-                      borderLeftColor: category.color || '#8B5CF6',
+                      borderLeftColor: category.color || '#9054e3',
                     }}
                   >
                     {/* Header Section */}
@@ -993,7 +1069,7 @@ export default function NetworkPage({
                   value={categoryFormData.name}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
-                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background/10"
                   autoFocus
                 />
               </div>
@@ -1015,7 +1091,7 @@ export default function NetworkPage({
                       }
                     }}
                     placeholder="#FF6B6B"
-                    className="flex-1 rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                    className="flex-1 rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background/10"
                     maxLength={7}
                   />
                 </div>
@@ -1027,7 +1103,7 @@ export default function NetworkPage({
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Describe this category..."
                   rows={3}
-                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10 resize-none"
+                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background/10 resize-none"
                 />
                 <p className="mt-1 text-xs text-foreground/50">Internal notes about this vendor category</p>
               </div>
@@ -1042,7 +1118,7 @@ export default function NetworkPage({
                     value={categoryFormData.booth_price || ''}
                     onChange={(e) => setCategoryFormData(prev => ({ ...prev, booth_price: parseFloat(e.target.value) || 0 }))}
                     placeholder="150.00"
-                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-card/80 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-card/80 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background/10"
                   />
                 </div>
                 <p className="mt-1 text-xs text-foreground/50">Pre-fills booth price when creating events with this category</p>
@@ -1088,7 +1164,7 @@ export default function NetworkPage({
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
               <button
                 onClick={handleCancelCreateList}
@@ -1107,7 +1183,7 @@ export default function NetworkPage({
                   type="text"
                   value={createListName}
                   onChange={(e) => setCreateListName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="List name"
                   autoFocus
                 />
@@ -1119,7 +1195,7 @@ export default function NetworkPage({
                 <textarea
                   value={createListDescription}
                   onChange={(e) => setCreateListDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                   rows={2}
                   placeholder="Description (optional)"
                 />
@@ -1146,7 +1222,7 @@ export default function NetworkPage({
                 <button
                   onClick={handleSaveCreateList}
                   disabled={savingCreateList || !createListName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {savingCreateList ? (
                     <>

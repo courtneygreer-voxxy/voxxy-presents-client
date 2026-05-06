@@ -445,7 +445,8 @@ export default function ProducerDashboard() {
         age_restriction: wizardState.eventDetails.age_restriction || undefined,
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
-        payment_deadline: wizardState.eventDetails.payment_deadline || undefined,
+        payment_deadline: wizardState.paymentConfiguration.payment_deadline || undefined,
+        vendor_fee_currency: wizardState.paymentConfiguration.currency || 'USD',
         email_campaign_template_id: templateId || undefined,
         use_category_templates: wizardState.automaticMessages.use_category_templates || false,
         use_universal_category_template: wizardState.automaticMessages.use_universal_category_template || false,
@@ -464,13 +465,20 @@ export default function ProducerDashboard() {
 
       // Step 2: Batch create vendor applications with all application fields
       if (wizardState.applicationDetails.applications.length > 0) {
-        setCreationProgress('Setting up vendor applications...');
+        setCreationProgress('Setting up applicant categories...');
 
         const applicationPromises = wizardState.applicationDetails.applications.map((app) => {
+          // Derive booth_price from payment_prices for backward compat
+          const boothEntry = app.payment_prices?.find(p => p.type === 'booth_price');
+          const effectiveBoothPrice = boothEntry?.amount || app.booth_price;
+
           return vendorApplicationsApi.create(newEvent.slug, {
             name: app.name,
             description: app.description || undefined,
-            booth_price: app.booth_price,
+            booth_price: effectiveBoothPrice,
+            // TODO: Backend needs payment_prices (jsonb) and payment_engines (jsonb) columns
+            // payment_prices: app.payment_prices,
+            // payment_engines: app.payment_engines,
             category_id: app.category_id || undefined,
             install_date: app.install_date || undefined,
             install_start_time: app.install_start_time || undefined,
@@ -682,7 +690,7 @@ export default function ProducerDashboard() {
     if (loadingOrg || loadingEvents) {
       return (
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+          <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       );
     }
@@ -827,7 +835,7 @@ export default function ProducerDashboard() {
       {/* Left Sidebar */}
       <aside className={`
         w-[180px]
-        bg-sidebar text-sidebar-foreground flex flex-col transition-all duration-300
+        bg-sidebar dark:bg-sidebar/80 dark:backdrop-blur-sm text-sidebar-foreground flex flex-col transition-all duration-300
         border-r border-sidebar-border
         fixed lg:relative inset-y-0 left-0 z-50
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
@@ -978,14 +986,15 @@ export default function ProducerDashboard() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col w-full lg:w-auto">
         {/* Top Navbar */}
-        <header className="bg-sidebar text-sidebar-foreground border-b border-sidebar-border pt-3">
+        <header className="bg-sidebar dark:bg-sidebar/80 dark:backdrop-blur-sm text-sidebar-foreground border-b border-sidebar-border pt-3">
           {/* Top row - Always visible */}
           <div className="flex items-center justify-between px-3 pb-3">
             <div className="flex items-center gap-3">
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                className="lg:hidden rounded-md p-2 text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/80 transition-smooth"
+                aria-label="Open menu"
               >
                 <Menu className="w-4 h-4" />
               </button>
@@ -1011,7 +1020,7 @@ export default function ProducerDashboard() {
               {activeNav === 'events' && eventsView === 'list' && (
                 <button
                   onClick={() => setEventsView('create')}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-purple-500/30 transition-smooth text-xs"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg voxxy-btn-cta font-medium hover:shadow-lg hover:shadow-primary/30 transition-smooth text-xs"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">Create New Event</span>
@@ -1022,7 +1031,7 @@ export default function ProducerDashboard() {
               {/* Help/Guide Button - Always visible */}
               <button
                 onClick={() => setGuidebookOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 text-foreground border border-violet-200/80 hover:bg-violet-200/80 dark:bg-primary dark:border-transparent dark:text-primary-foreground dark:hover:bg-primary/90 text-xs font-medium rounded-full shadow-md shadow-violet-200/40 dark:shadow-primary/20 transition-all hover:scale-105"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 bg-white/10 border border-white/20 dark:border-white/15 text-foreground dark:text-white/85 backdrop-blur-sm hover:bg-white/[0.18] hover:border-white/30 shadow-sm"
                 title="Open guide"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
@@ -1042,7 +1051,7 @@ export default function ProducerDashboard() {
                   placeholder="Search events..."
                   value={eventsSearchTerm}
                   onChange={(e) => setEventsSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
+                  className="voxxy-input-frost w-full pl-9 pr-3 py-2 rounded-lg text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
               </div>
 
@@ -1053,10 +1062,10 @@ export default function ProducerDashboard() {
                   <button
                     key={status}
                     onClick={() => setEventsStatusFilter(eventsStatusFilter === status ? null : status)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap border shadow-sm ${
                       eventsStatusFilter === status
-                        ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
-                        : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
+                        ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:shadow-primary/25'
+                        : 'bg-muted/75 text-muted-foreground hover:text-foreground border-primary/15 dark:border-primary/25 dark:bg-muted/50 dark:hover:bg-muted/70'
                     }`}
                   >
                     {status}
@@ -1068,7 +1077,7 @@ export default function ProducerDashboard() {
 
                 {/* Sort Dropdown */}
                 <Select value={eventsSortBy} onValueChange={(value) => setEventsSortBy(value as 'date' | 'status' | 'name')}>
-                  <SelectTrigger className="h-8 w-[140px] rounded-lg border border-input bg-background px-3 text-xs text-foreground focus:ring-2 focus:ring-ring">
+                  <SelectTrigger className="h-8 w-[140px] rounded-lg voxxy-input-frost px-3 text-xs focus:ring-2 focus:ring-ring">
                     <SelectValue placeholder="Sort by Date" />
                   </SelectTrigger>
                   <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -1081,10 +1090,10 @@ export default function ProducerDashboard() {
                 {/* Show Past Toggle */}
                 <button
                   onClick={() => setEventsShowPast(!eventsShowPast)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border shadow-sm ${
                     eventsShowPast
-                      ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
-                      : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
+                      ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:shadow-primary/25'
+                      : 'bg-muted/75 text-muted-foreground hover:text-foreground border-primary/15 dark:border-primary/25 dark:bg-muted/50 dark:hover:bg-muted/70'
                   }`}
                 >
                   {eventsShowPast ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
@@ -1125,7 +1134,7 @@ export default function ProducerDashboard() {
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 overflow-auto pt-2 bg-background text-foreground" data-onboarding="events-content">
+        <main className="flex-1 overflow-auto pt-2 bg-background dark:bg-transparent text-foreground" data-onboarding="events-content">
           {activeNav === 'settings' ? (
             <SettingsPage onBack={() => setActiveNav('events')} onStartGuide={() => setGuidebookOpen(true)} />
           ) : activeNav === 'events' ? (

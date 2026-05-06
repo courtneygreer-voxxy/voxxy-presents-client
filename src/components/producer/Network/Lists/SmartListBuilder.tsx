@@ -152,7 +152,7 @@ export default function SmartListBuilder({
           <button
             type="button"
             onClick={() => setOpenDropdown(isOpen ? null : dropdownKey)}
-            className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+            className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <span className={selectedItems.length > 0 ? 'text-foreground' : 'text-foreground/75 dark:text-foreground/40'}>
               {selectedItems.length > 0
@@ -173,7 +173,7 @@ export default function SmartListBuilder({
                     className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-background/10 transition-colors"
                   >
                     <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                      itemSelected ? 'bg-purple-500 border-purple-500' : 'border-border'
+                      itemSelected ? 'bg-primary/50 border-primary' : 'border-border'
                     }`}>
                       {itemSelected && <Check className="w-3 h-3 text-foreground" strokeWidth={3} />}
                     </div>
@@ -205,7 +205,7 @@ export default function SmartListBuilder({
       {/* Matching Count Preview */}
       {matchingCount !== null && (
         <div className="flex items-center gap-2 text-sm bg-background/5 rounded-lg px-4 py-2.5 border border-border">
-          <Users className="w-4 h-4 text-purple-400" />
+          <Users className="w-4 h-4 text-primary" />
           <span className="text-foreground/85 dark:text-foreground/60">Matching:</span>
           <span className="font-semibold text-foreground">
             {loadingCount ? (
@@ -220,7 +220,7 @@ export default function SmartListBuilder({
       {/* Filter Dropdowns */}
       {renderFilterDropdown(
         'Categories',
-        <Tag className="w-4 h-4 text-purple-400" />,
+        <Tag className="w-4 h-4 text-primary" />,
         availableFilters.categories,
         filters.categories,
         handleToggleCategory,
@@ -230,17 +230,17 @@ export default function SmartListBuilder({
 
       {renderFilterDropdown(
         'Locations',
-        <MapPin className="w-4 h-4 text-purple-400" />,
+        <MapPin className="w-4 h-4 text-primary" />,
         availableFilters.locations,
         filters.locations,
         handleToggleLocation,
         'locations',
-        'bg-purple-500/15 text-violet-950 dark:text-purple-300 border border-purple-500/30',
+        'bg-primary/15 text-violet-950 dark:text-primary border border-primary/30',
       )}
 
       {availableFilters.tags.length > 0 && renderFilterDropdown(
         'Tags',
-        <Tag className="w-4 h-4 text-purple-400" />,
+        <Tag className="w-4 h-4 text-primary" />,
         availableFilters.tags,
         filters.tags,
         handleToggleTag,

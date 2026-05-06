@@ -222,8 +222,8 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         <div className={sectionShell}>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <span className="text-sm font-semibold text-foreground">Appearance</span>
-              <p className="text-xs text-muted-foreground">Switch between light and dark theme</p>
+              <span className="text-sm font-semibold text-foreground">Dashboard Appearance</span>
+              <p className="text-xs text-muted-foreground">Switch between light and dark theme for your dashboard</p>
             </div>
             <div className="flex gap-2">
               <button
@@ -372,7 +372,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                 <div
                   className={cn(
                     'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',
-                    'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-purple-950/35 dark:to-fuchsia-950/25 dark:backdrop-blur-sm'
+                    'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm'
                   )}
                 >
                   <div className="flex flex-1 items-start justify-between gap-4">
@@ -641,7 +641,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         </button>
 
         {/* Danger Zone */}
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+        <div className="rounded-lg border border-destructive/40 bg-card dark:bg-card/90 p-4">
           <div className="flex items-start gap-3 mb-3">
             <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
             <div className="flex-1">

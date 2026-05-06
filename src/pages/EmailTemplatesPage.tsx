@@ -451,7 +451,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
             <div className="flex items-start justify-between gap-6">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
-                  <Send className="w-5 h-5 text-purple-400" />
+                  <Send className="w-5 h-5 text-primary" />
                   <h3 className="text-lg font-bold text-foreground">Test This Sequence</h3>
                   <Badge variant="tintPurple" className="rounded px-2 py-1 text-xs">
                     Admin Only
@@ -461,7 +461,7 @@ export default function EmailTemplatesPage({ organizationId }: EmailTemplatesPag
                   Send all emails from this sequence to your email for testing.
                   {testEmail && (
                     <span className="block mt-1">
-                      Test emails will be sent to: <span className="font-mono text-purple-400">{testEmail}</span>
+                      Test emails will be sent to: <span className="font-mono text-primary">{testEmail}</span>
                     </span>
                   )}
                 </p>

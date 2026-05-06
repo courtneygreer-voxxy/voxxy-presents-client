@@ -161,15 +161,15 @@ export function SplitScreenLoginForm({
       <div
         className={`relative flex-1 transition-all duration-500 cursor-pointer ${
           activeType === 'club-owner'
-            ? 'flex-[2] bg-gradient-to-br from-purple-600/40 to-pink-600/40'
+            ? 'flex-[2] bg-gradient-to-br from-primary/40 to-pink-600/40'
             : 'bg-background/5 hover:bg-background/10'
         }`}
         onClick={() => setActiveType('club-owner')}
       >
         <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 text-center">
           <div className="mb-8">
-            <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Users className="h-10 w-10 text-violet-700 dark:text-purple-300" />
+            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <Users className="h-10 w-10 text-violet-700 dark:text-primary" />
             </div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Club Owners</h2>
             <p className="text-muted-foreground text-lg">Create unforgettable events</p>
@@ -179,7 +179,7 @@ export function SplitScreenLoginForm({
             <div className="space-y-4 mb-8 animate-in fade-in-50 duration-300">
               {clubFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 text-foreground/90">
-                  <feature.icon className="h-5 w-5 flex-shrink-0 text-violet-700 dark:text-purple-300" />
+                  <feature.icon className="h-5 w-5 flex-shrink-0 text-violet-700 dark:text-primary" />
                   <span>{feature.text}</span>
                 </div>
               ))}
@@ -205,15 +205,15 @@ export function SplitScreenLoginForm({
       <div
         className={`relative flex-1 transition-all duration-500 cursor-pointer ${
           activeType === 'venue-owner'
-            ? 'flex-[2] bg-gradient-to-br from-blue-600/40 to-teal-600/40'
+            ? 'flex-[2] bg-gradient-to-br from-primary/40 to-purple-600/40'
             : 'bg-background/5 hover:bg-background/10'
         }`}
         onClick={() => setActiveType('venue-owner')}
       >
         <div className="relative z-10 h-full flex flex-col justify-center items-center p-8 text-center">
           <div className="mb-8">
-            <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-              <Building2 className="h-10 w-10 text-blue-700 dark:text-blue-300" />
+            <div className="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
+              <Building2 className="h-10 w-10 text-purple-700 dark:text-purple-300" />
             </div>
             <h2 className="text-3xl font-bold text-foreground mb-2">Venue Owners</h2>
             <p className="text-muted-foreground text-lg">Monetize your space</p>
@@ -223,7 +223,7 @@ export function SplitScreenLoginForm({
             <div className="space-y-4 mb-8 animate-in fade-in-50 duration-300">
               {venueFeatures.map((feature, index) => (
                 <div key={index} className="flex items-center space-x-3 text-foreground/90">
-                  <feature.icon className="h-5 w-5 flex-shrink-0 text-blue-700 dark:text-blue-300" />
+                  <feature.icon className="h-5 w-5 flex-shrink-0 text-purple-700 dark:text-purple-300" />
                   <span>{feature.text}</span>
                 </div>
               ))}
@@ -246,12 +246,12 @@ export function SplitScreenLoginForm({
               <CardTitle className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
                 {activeType === 'club-owner' ? (
                   <>
-                    <Users className="h-6 w-6 text-violet-700 dark:text-purple-300" />
+                    <Users className="h-6 w-6 text-violet-700 dark:text-primary" />
                     Club Owner Login
                   </>
                 ) : (
                   <>
-                    <Building2 className="h-6 w-6 text-blue-700 dark:text-blue-300" />
+                    <Building2 className="h-6 w-6 text-purple-700 dark:text-purple-300" />
                     Venue Owner Login
                   </>
                 )}
@@ -329,8 +329,8 @@ export function SplitScreenLoginForm({
                   disabled={isSubmitting || loading}
                   className={`w-full ${
                     activeType === 'club-owner'
-                      ? 'bg-violet-100 text-foreground border border-violet-200 hover:bg-violet-200 dark:border-transparent dark:bg-purple-600 dark:text-primary-foreground dark:hover:bg-purple-700'
-                      : 'bg-sky-100 text-foreground border border-sky-200 hover:bg-sky-200 dark:border-transparent dark:bg-blue-600 dark:text-primary-foreground dark:hover:bg-blue-700'
+                      ? 'bg-violet-100 text-foreground border border-violet-200 hover:bg-violet-200 dark:border-transparent dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/80'
+                      : 'bg-sky-100 text-foreground border border-sky-200 hover:bg-sky-200 dark:border-transparent dark:bg-sky-600 dark:text-white dark:hover:bg-sky-500'
                   }`}
                 >
                   {isSubmitting || loading ? (

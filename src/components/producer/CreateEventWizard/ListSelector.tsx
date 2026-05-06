@@ -94,7 +94,7 @@ export default function ListSelector({
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          <Filter className="w-5 h-5 text-purple-400" />
+          <Filter className="w-5 h-5 text-primary" />
           <div>
             <h3 className="text-sm font-semibold text-foreground">Use Saved Lists</h3>
             <p className="text-xs text-foreground/50">
@@ -124,7 +124,7 @@ export default function ListSelector({
               </span>
               <button
                 onClick={handleSelectAll}
-                className="text-xs text-purple-400 hover:text-purple-300 font-medium transition-colors"
+                className="text-xs text-primary hover:text-primary/70 font-medium transition-colors"
               >
                 {selectedListIds.length === lists.length ? 'Deselect All' : 'Select All'}
               </button>
@@ -143,7 +143,7 @@ export default function ListSelector({
                     w-full p-3 rounded-lg border transition-all text-left
                     ${
                       isSelected
-                        ? 'bg-purple-500/20 border-purple-500/50'
+                        ? 'bg-primary/20 border-primary/50'
                         : 'bg-background/5 border-border hover:bg-background/10 hover:border-border'
                     }
                   `}
@@ -153,7 +153,7 @@ export default function ListSelector({
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 mt-0.5 ${
                         isSelected
-                          ? 'bg-purple-500 border-purple-500'
+                          ? 'bg-primary/50 border-primary'
                           : 'border-border'
                       }`}
                     >
@@ -165,7 +165,7 @@ export default function ListSelector({
                     {/* List Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <Filter className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
+                        <Filter className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                         <h4 className="text-sm font-medium text-foreground truncate">
                           {list.name}
                         </h4>
@@ -223,9 +223,9 @@ export default function ListSelector({
           {/* Summary */}
           {selectedLists.length > 0 && (
             <div className="pt-3 border-t border-border">
-              <div className="bg-purple-500/10 rounded-lg p-3 border border-purple-500/20">
+              <div className="bg-primary/10 rounded-lg p-3 border border-primary/20">
                 <div className="flex items-center gap-2 text-sm">
-                  <Users className="w-4 h-4 text-purple-400" />
+                  <Users className="w-4 h-4 text-primary" />
                   <span className="text-foreground/90">
                     Approximately <strong className="text-foreground">{totalContactsFromLists}</strong>{' '}
                     contacts from {selectedLists.length}{' '}

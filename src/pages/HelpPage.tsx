@@ -6,8 +6,10 @@ import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function HelpPage() {
+  useForceTheme('dark')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   // Scroll to top on page load
@@ -53,7 +55,7 @@ export default function HelpPage() {
   ]
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="help" />
 
       {/* Hero Section */}
@@ -62,7 +64,7 @@ export default function HelpPage() {
 
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
           <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-            We're here to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">help</em>
+            We're here to <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">help</em>
           </h1>
           <p className="mx-auto mb-0 max-w-[700px] text-[18px] leading-relaxed text-white/65">
             Real humans, fast responses. Whether you need onboarding support or have a quick question, we've got you.
@@ -70,9 +72,9 @@ export default function HelpPage() {
 
           {/* Divider */}
           <div className="mt-9 flex items-center justify-center">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
-            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-voxxy-pink/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-voxxy-pink/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-voxxy-pink/40"></div>
           </div>
         </div>
       </section>
@@ -151,10 +153,10 @@ export default function HelpPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-[100px] px-6 md:px-12">
+      <section className="voxxy-gradient-marketing-hero py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[900px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-purple-400 mb-4">FAQ</div>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-primary mb-4">FAQ</div>
             <h2 className="text-[42px] font-display font-bold leading-tight text-white">Common questions</h2>
           </div>
 
@@ -170,7 +172,7 @@ export default function HelpPage() {
                 >
                   <span className="pr-4 text-[16px] font-semibold text-white">{faq.question}</span>
                   <ChevronDown
-                    className={`h-5 w-5 text-purple-400 flex-shrink-0 transition-transform ${
+                    className={`h-5 w-5 text-primary flex-shrink-0 transition-transform ${
                       openFaq === index ? 'rotate-180' : ''
                     }`}
                   />

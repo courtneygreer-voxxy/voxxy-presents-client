@@ -109,8 +109,8 @@ export default function BulkEmailModal({
         {/* Header */}
         <div className="sticky top-0 bg-muted border-b border-border p-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <Mail className="w-5 h-5 text-purple-400" />
+            <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+              <Mail className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-foreground">Send Email</h2>
@@ -179,7 +179,7 @@ export default function BulkEmailModal({
               disabled={isSending}
               className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                 errors.subject ? 'border-red-500' : 'border-border'
-              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all disabled:opacity-50`}
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-50`}
             />
             {errors.subject && (
               <p className="mt-1 text-sm text-red-400">{errors.subject}</p>
@@ -200,7 +200,7 @@ export default function BulkEmailModal({
               disabled={isSending}
               className={`w-full px-4 py-3 rounded-lg bg-background/5 border ${
                 errors.message ? 'border-red-500' : 'border-border'
-              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none disabled:opacity-50`}
+              } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all resize-none disabled:opacity-50`}
             />
             {errors.message && (
               <p className="mt-1 text-sm text-red-400">{errors.message}</p>

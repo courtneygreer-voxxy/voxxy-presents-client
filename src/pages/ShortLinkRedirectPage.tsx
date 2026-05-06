@@ -82,7 +82,7 @@ export default function ShortLinkRedirectPage() {
   return (
     <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center p-6">
       <div className="text-center">
-        <div className="w-16 h-16 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin mx-auto mb-4" />
+        <div className="w-16 h-16 border-4 border-primary/30 border-t-primary rounded-full animate-spin mx-auto mb-4" />
         <p className="text-foreground/60">Loading application...</p>
       </div>
     </div>

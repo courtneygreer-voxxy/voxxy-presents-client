@@ -37,7 +37,7 @@ export default function AcceptableUsePage() {
         <div className="space-y-4 text-gray-700 leading-relaxed">
           <p>
             This Acceptable Use Policy ("AUP") outlines prohibited conduct in connection with the Services provided by Voxxy AI, Inc. Any capitalized terms not defined in this AUP have the meanings set forth in our{' '}
-            <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
+            <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
               Terms of Service
             </a>
             . If you have any questions about this AUP, contact us at team@voxxypresents.com.
@@ -306,7 +306,7 @@ export default function AcceptableUsePage() {
           <div className="space-y-4 text-gray-700 leading-relaxed">
             <p>
               We may modify this AUP from time to time and will post the most current version on our site. If a modification meaningfully reduces your rights, we'll notify you in accordance with the procedures set forth in our{' '}
-              <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
                 Terms of Service
               </a>
               .

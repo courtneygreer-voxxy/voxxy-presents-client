@@ -13,8 +13,10 @@ import { useSectionTracking } from "@/hooks/useSectionTracking"
 import { TrackedLink } from "@/components/analytics/TrackedLink"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function FeaturesPage() {
+  useForceTheme('dark')
   useEffect(() => {
     window.scrollTo(0, 0)
   }, [])
@@ -32,17 +34,17 @@ export default function FeaturesPage() {
   })
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="features" />
 
       {/* Hero Section */}
       <section className="relative pt-[140px] pb-16 px-6 md:px-12">
-        <div className="absolute inset-0 bg-gradient-radial from-fuchsia-500/12 via-purple-600/8 to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-radial from-voxxy-pink/12 via-voxxy-purple-brand/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="text-center max-w-[800px] mx-auto">
             <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-              Everything you need to <em className="not-italic bg-gradient-to-r from-purple-400 via-pink-400 to-purple-300 bg-clip-text text-transparent">run better events</em>
+              Everything you need to <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">run better events</em>
             </h1>
 
             <p className="mx-auto mb-0 max-w-[600px] text-[18px] leading-relaxed text-white/65">
@@ -52,9 +54,9 @@ export default function FeaturesPage() {
 
           {/* Divider */}
           <div className="mt-16 flex items-center justify-center">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
-            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-voxxy-pink/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-voxxy-pink/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-voxxy-pink/40"></div>
           </div>
         </div>
       </section>
@@ -213,8 +215,8 @@ export default function FeaturesPage() {
         <div className="container mx-auto max-w-[1200px]">
           <div className="max-w-[800px] mx-auto">
             <div className="flex items-center justify-center mb-6">
-              <div className="w-16 h-16 bg-fuchsia-500/15 rounded-full flex items-center justify-center">
-                <Shield className="h-8 w-8 text-fuchsia-400" />
+              <div className="w-16 h-16 bg-voxxy-pink/15 rounded-full flex items-center justify-center">
+                <Shield className="h-8 w-8 text-voxxy-pink" />
               </div>
             </div>
 
@@ -232,28 +234,28 @@ export default function FeaturesPage() {
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Never sell your data</strong>
                     <span className="text-white/60"> to third parties without explicit consent</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Generate immediate safety reviews</strong>
                     <span className="text-white/60"> for all applications</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Always have human support</strong>
                     <span className="text-white/60"> available for any safety concerns</span>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-6 w-6 text-fuchsia-400 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="h-6 w-6 text-voxxy-pink flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="text-white">Transparent about data usage</strong>
                     <span className="text-white/60"> — you always know what we do with your information</span>
@@ -280,7 +282,7 @@ export default function FeaturesPage() {
           </p>
           <TrackedLink
             to="/#contact"
-            className="inline-flex items-center rounded-xl border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-8 py-[18px] text-lg font-semibold text-white shadow-md shadow-fuchsia-500/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+            className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-[18px] text-lg font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
             trackingData={{
               link_text: 'Request Access',
               destination_page: 'Contact',

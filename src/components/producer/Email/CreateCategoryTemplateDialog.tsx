@@ -85,10 +85,10 @@ export function CreateCategoryTemplateDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg voxxy-gradient-page-cool border-purple-500/20">
+      <DialogContent className="max-w-lg voxxy-gradient-page-cool border-primary/20">
         <DialogHeader>
           <DialogTitle className="text-foreground text-xl flex items-center gap-2">
-            <Tag className="w-5 h-5 text-purple-400" />
+            <Tag className="w-5 h-5 text-primary" />
             Create Template for{' '}
             <span
               className="category-sequence-badge inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md text-base font-semibold"
@@ -134,14 +134,14 @@ export function CreateCategoryTemplateDialog({
                     onClick={() => setSelectedTemplateId(template.id)}
                     className={`w-full p-3 rounded-lg border transition-all text-left ${
                       selectedTemplateId === template.id
-                        ? 'bg-purple-500/20 border-purple-500/50'
+                        ? 'bg-primary/20 border-primary/50'
                         : 'bg-background/5 border-border hover:bg-background/10'
                     }`}
                   >
                     <div className="flex items-start gap-3">
                       <div className={`w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 ${
                         selectedTemplateId === template.id
-                          ? 'border-purple-400 bg-purple-400'
+                          ? 'border-primary bg-primary'
                           : 'border-border'
                       }`}>
                         {selectedTemplateId === template.id && (

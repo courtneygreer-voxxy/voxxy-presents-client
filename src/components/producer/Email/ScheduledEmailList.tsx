@@ -29,8 +29,8 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: 
   pre_application: {
     label: 'Event Announcements',
     icon: Megaphone,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-500/20'
+    color: 'text-primary',
+    bgColor: 'bg-primary/20'
   },
   application: {
     label: 'Application Updates',
@@ -71,8 +71,8 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: 
   event_announcements: {
     label: 'Event Announcements',
     icon: Megaphone,
-    color: 'text-purple-400',
-    bgColor: 'bg-purple-500/20'
+    color: 'text-primary',
+    bgColor: 'bg-primary/20'
   },
   application_updates: {
     label: 'Application Updates',
@@ -247,7 +247,7 @@ export default function ScheduledEmailList({
             placeholder="Search emails..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+            className="w-full pl-10 pr-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
           />
         </div>
 
@@ -257,7 +257,7 @@ export default function ScheduledEmailList({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as FilterType)}
-            className="px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50 cursor-pointer"
+            className="px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
           >
             {FILTER_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>
@@ -277,7 +277,7 @@ export default function ScheduledEmailList({
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="text-sm text-purple-400 hover:text-purple-300"
+            className="text-sm text-primary hover:text-primary/70 transition-colors"
           >
             Clear search
           </button>
@@ -293,7 +293,7 @@ export default function ScheduledEmailList({
             const isExpanded = expandedCategories.has(category as EmailCategory);
 
             return (
-              <div key={category} className="glass-card overflow-hidden rounded-xl border border-purple-500/20">
+              <div key={category} className="glass-card overflow-hidden rounded-xl border border-primary/20">
                 {/* Category Header */}
                 <button
                   onClick={() => toggleCategory(category as EmailCategory)}
@@ -348,7 +348,7 @@ export default function ScheduledEmailList({
               setSearchQuery('');
               setStatusFilter('all');
             }}
-            className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300"
+            className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 transition-colors"
           >
             Clear all filters
           </button>

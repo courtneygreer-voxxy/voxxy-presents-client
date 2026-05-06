@@ -77,12 +77,12 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           Get QR Code
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md bg-card border-border text-card-foreground dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-purple-900/95 dark:to-gray-900/95 dark:backdrop-blur-xl dark:border-2 dark:border-purple-400/50">
+      <DialogContent className="sm:max-w-md bg-card border-border text-card-foreground dark:bg-gradient-to-br dark:from-gray-900/95 dark:via-primary/20 dark:to-gray-900/95 dark:backdrop-blur-xl dark:border-2 dark:border-primary/50">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+          <DialogTitle className="text-2xl font-bold text-center bg-gradient-to-r from-primary via-voxxy-pink to-primary bg-clip-text text-transparent">
             Subscriber QR Code
           </DialogTitle>
-          <p className="text-muted-foreground dark:text-purple-200 text-center text-sm">
+          <p className="text-muted-foreground dark:text-primary text-center text-sm">
             Scan to subscribe to {organizationName}
           </p>
         </DialogHeader>
@@ -101,28 +101,28 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           </div>
 
           {/* Instructions */}
-          <div className="bg-purple-500/10 rounded-lg p-4 border border-purple-400/20">
-            <p className="text-sm text-purple-200 text-center">
+          <div className="bg-primary/10 rounded-lg p-4 border border-primary/20">
+            <p className="text-sm text-primary text-center">
               📱 Pull this up on your phone at events and let guests scan to subscribe instantly!
             </p>
           </div>
 
           {/* Link Display */}
           <div className="space-y-2">
-            <label className="text-sm text-purple-300 font-semibold">Subscription Link:</label>
+            <label className="text-sm text-primary font-semibold">Subscription Link:</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={subscribeUrl}
                 readOnly
-                className="flex-1 bg-background/10 border border-purple-400/30 rounded px-3 py-2 text-sm text-foreground"
+                className="flex-1 bg-background/10 border border-primary/30 rounded px-3 py-2 text-sm text-foreground"
                 onClick={(e) => e.currentTarget.select()}
               />
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleCopyLink}
-                className="bg-background/10 border-purple-400/30 text-foreground hover:bg-background/20"
+                className="bg-background/10 border-primary/30 text-foreground hover:bg-background/20"
               >
                 {copied ? (
                   <CheckCircle className="h-4 w-4 text-green-400" />
@@ -152,7 +152,7 @@ export function SubscriberQRModal({ organizationSlug, organizationName }: Subscr
           </div>
 
           {/* Tips */}
-          <div className="text-xs text-purple-300 space-y-1">
+          <div className="text-xs text-primary space-y-1">
             <p>💡 <strong>Tip:</strong> Download and print this for your venue</p>
             <p>📲 <strong>Mobile:</strong> Save this page as a bookmark for quick access</p>
           </div>

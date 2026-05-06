@@ -19,6 +19,7 @@ import {
   ArrowLeftRight,
   MailX,
   Pencil,
+  Copy,
 } from 'lucide-react';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { toast } from 'sonner';
@@ -66,6 +67,7 @@ interface Applicant {
   portfolio_images?: string[];
   producer_notes?: string;
   tags?: string[];
+  application_code?: string;
   email_unsubscribed?: boolean;
   unsubscribe_status?: {
     is_unsubscribed: boolean;
@@ -199,6 +201,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
           unsubscribe_status: submission.email_unsubscribed ? {
             is_unsubscribed: true,
@@ -596,6 +599,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     location?: string;
     producer_notes?: string;
     tags?: string[];
+    instagram_handle?: string;
+    tiktok_handle?: string;
+    website?: string;
   }) => {
     toast.success('Vendor details updated');
     setApplicants((prev) =>
@@ -671,7 +677,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -717,14 +723,14 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
             </div>
 
             {/* Status & Category Filters */}
             <div className="space-y-1.5">
               <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
-                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -740,7 +746,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               </Select>
               {uniqueCategories.length > 0 && (
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -788,8 +794,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       onClick={() => setSelectedApplicant(applicant)}
                       className={`w-full p-2 rounded-lg text-left transition-smooth ${
                         isSelected
-                          ? 'bg-purple-600/20 border border-purple-500/50'
-                          : 'voxxy-hover-row bg-background/5 border border-border hover:bg-background/10 hover:border-border'
+                          ? 'bg-primary/20 border border-primary/50'
+                          : 'voxxy-hover-row bg-card/70 dark:bg-card/50 border border-border backdrop-blur-sm'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
@@ -913,7 +919,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     <p className="text-[10px] text-foreground/60 mb-1">Email</p>
                     <a
                       href={`mailto:${selectedApplicant.email}`}
-                      className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                     >
                       <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{selectedApplicant.email}</span>
@@ -924,7 +930,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <p className="text-[10px] text-foreground/60 mb-1">Phone</p>
                       <a
                         href={`tel:${selectedApplicant.phone}`}
-                        className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                       >
                         <Phone className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{selectedApplicant.phone}</span>
@@ -947,6 +953,27 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <span>{formatDate(selectedApplicant.created_at)}</span>
                     </div>
                   </div>
+                  {selectedApplicant.application_code && (
+                    <div>
+                      <p className="text-[10px] text-foreground/60 mb-1">App Code</p>
+                      <div className="flex items-center gap-1.5">
+                        <code className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded">
+                          {selectedApplicant.application_code}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedApplicant.application_code!);
+                            toast.success('Code copied');
+                          }}
+                          className="p-1 rounded hover:bg-background/10 text-foreground/40 hover:text-foreground transition-colors"
+                          title="Copy code"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Category */}
@@ -962,7 +989,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       onValueChange={(value) => requestCategoryChange(selectedApplicant, value)}
                       disabled={isUpdatingCategory}
                     >
-                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50">
+                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50">
                         <SelectValue placeholder={selectedApplicant.vendor_category} />
                       </SelectTrigger>
                       <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -988,7 +1015,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       {selectedApplicant.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary dark:text-primary border border-primary/20"
                         >
                           {tag}
                         </span>
@@ -998,85 +1025,91 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 )}
 
                 {/* Producer Notes */}
-                {selectedApplicant.producer_notes && (
-                  <div className="mb-3">
-                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                <div className="mb-3">
+                  <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                  {selectedApplicant.producer_notes ? (
                     <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
                       <p className="text-xs text-foreground/80 whitespace-pre-wrap">{selectedApplicant.producer_notes}</p>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-xs text-foreground/40 italic px-3 py-2">No notes yet. Click &quot;Edit details&quot; to add.</p>
+                  )}
+                </div>
               </div>
 
               {/* Social & Links */}
               <div className="glass-card voxxy-hover-panel p-3 mb-3">
                 <h3 className="text-sm font-semibold text-foreground mb-3">Social & Links</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedApplicant.instagram_handle && (
-                    <a
-                      href={
-                        selectedApplicant.instagram_handle.startsWith('http')
-                          ? selectedApplicant.instagram_handle
-                          : `https://instagram.com/${selectedApplicant.instagram_handle.replace('@', '')}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Instagram className="w-4 h-4" />
-                      <span>Instagram</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.tiktok_handle && (
-                    <a
-                      href={
-                        selectedApplicant.tiktok_handle.startsWith('http')
-                          ? selectedApplicant.tiktok_handle
-                          : `https://tiktok.com/@${selectedApplicant.tiktok_handle.replace('@', '')}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Music className="w-4 h-4" />
-                      <span>TikTok</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.portfolio && (
-                    <a
-                      href={
-                        selectedApplicant.portfolio.startsWith('http')
-                          ? selectedApplicant.portfolio
-                          : `https://${selectedApplicant.portfolio}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      <span>Portfolio</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.website && (
-                    <a
-                      href={
-                        selectedApplicant.website.startsWith('http')
-                          ? selectedApplicant.website
-                          : `https://${selectedApplicant.website}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Globe className="w-4 h-4" />
-                      <span>Website</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                </div>
+                {(selectedApplicant.instagram_handle || selectedApplicant.tiktok_handle || selectedApplicant.portfolio || selectedApplicant.website) ? (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedApplicant.instagram_handle && (
+                      <a
+                        href={
+                          selectedApplicant.instagram_handle.startsWith('http')
+                            ? selectedApplicant.instagram_handle
+                            : `https://instagram.com/${selectedApplicant.instagram_handle.replace('@', '')}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Instagram className="w-4 h-4" />
+                        <span>{selectedApplicant.instagram_handle}</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.tiktok_handle && (
+                      <a
+                        href={
+                          selectedApplicant.tiktok_handle.startsWith('http')
+                            ? selectedApplicant.tiktok_handle
+                            : `https://tiktok.com/@${selectedApplicant.tiktok_handle.replace('@', '')}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Music className="w-4 h-4" />
+                        <span>{selectedApplicant.tiktok_handle}</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.portfolio && (
+                      <a
+                        href={
+                          selectedApplicant.portfolio.startsWith('http')
+                            ? selectedApplicant.portfolio
+                            : `https://${selectedApplicant.portfolio}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        <span>Portfolio</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.website && (
+                      <a
+                        href={
+                          selectedApplicant.website.startsWith('http')
+                            ? selectedApplicant.website
+                            : `https://${selectedApplicant.website}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Globe className="w-4 h-4" />
+                        <span>Website</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-foreground/40 italic">No social links added yet. Click &quot;Edit details&quot; to add.</p>
+                )}
               </div>
 
               {/* Portfolio Images */}
@@ -1106,7 +1139,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   <h3 className="text-sm font-semibold text-foreground mb-3">Status & Actions</h3>
                   {updatingId === selectedApplicant.id ? (
                     <div className="flex items-center justify-center py-2">
-                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
                   ) : selectedApplicant.status === 'pending' ? (
                     <div className="flex justify-end gap-2">
@@ -1153,7 +1186,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             }
                           }}
                         >
-                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50">
+                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-primary/50">
                             <SelectValue placeholder={`Keep as ${getStatusBadge(selectedApplicant.status).label}`} />
                           </SelectTrigger>
                           <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -1209,7 +1242,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
                   {loadingEmailHistory ? (
                     <div className="flex items-center justify-center py-4">
-                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
                   ) : emailHistoryData.length > 0 ? (
                     <div className="divide-y divide-border">
@@ -1315,6 +1348,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           initialLocation={selectedApplicant.location}
           initialProducerNotes={selectedApplicant.producer_notes}
           initialTags={selectedApplicant.tags}
+          initialInstagramHandle={selectedApplicant.instagram_handle}
+          initialTiktokHandle={selectedApplicant.tiktok_handle}
+          initialWebsite={selectedApplicant.website}
           emailReadOnly={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
         />
@@ -1380,7 +1416,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               <p className="text-xs text-foreground/60">
                 {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
               </p>
-              <p className="text-xs text-purple-400">
+              <p className="text-xs text-primary">
                 {pendingStatusChange.applicant.vendor_category}
               </p>
             </div>
@@ -1416,8 +1452,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-md w-full p-6 space-y-4">
             {/* Header */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/20">
-                <ArrowLeftRight className="w-5 h-5 text-purple-400" />
+              <div className="p-2 rounded-lg bg-primary/20">
+                <ArrowLeftRight className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">

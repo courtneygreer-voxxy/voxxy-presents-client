@@ -18,14 +18,14 @@ const badgeVariants = cva(
 
         /* Tinted status / filter pills — single source for light + dark contrast */
         tintPurple:
-          "border-purple-500/30 bg-purple-500/20 text-violet-950 dark:text-purple-400",
+          "border-primary/30 bg-primary/20 text-violet-950 dark:text-primary",
         tintPurpleSoft:
-          "border-purple-500/30 bg-purple-500/10 text-violet-950 dark:text-purple-400",
+          "border-primary/30 bg-primary/10 text-violet-950 dark:text-primary",
         tintPurpleFaint:
-          "border-purple-400/20 bg-purple-500/15 text-violet-950 dark:text-purple-300",
+          "border-primary/20 bg-primary/15 text-violet-950 dark:text-primary",
 
         tintFuchsiaFaint:
-          "border-fuchsia-400/20 bg-fuchsia-500/15 text-fuchsia-950 dark:text-fuchsia-300",
+          "border-voxxy-pink/20 bg-voxxy-pink/15 text-voxxy-pink-deep dark:text-voxxy-pink-light",
 
         tintBlue:
           "border-blue-500/30 bg-blue-500/20 text-blue-950 dark:text-blue-400",
