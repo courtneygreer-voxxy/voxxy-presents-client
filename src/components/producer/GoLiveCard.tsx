@@ -26,11 +26,11 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
   useEffect(() => {
     const newIsLive = event.status?.is_live || false;
-    console.log('🔄 [GoLiveCard] Event status changed:', {
-      slug: event.slug,
-      isLive: newIsLive,
-      status: event.status
-    });
+    // console.log('🔄 [GoLiveCard] Event status changed:', {
+    //   slug: event.slug,
+    //   isLive: newIsLive,
+    //   status: event.status
+    // });
     setIsLive(newIsLive);
   }, [event, event.status?.is_live]);
 

@@ -106,8 +106,10 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
         const vendorApplications = await vendorApplicationsApi.getByEvent(eventSlug);
 
         // Extract unique category_ids from vendor applications
+        // Safety check: ensure vendorApplications is an array
+        const apps = Array.isArray(vendorApplications) ? vendorApplications : [];
         const usedCategoryIds = new Set(
-          vendorApplications
+          apps
             .map((app: any) => app.category_id)
             .filter((id: number | null) => id !== null)
         );
@@ -153,7 +155,9 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       // Fetch scheduled emails
       const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
 
-      setEmails(scheduledEmailsData);
+      // Safety check: ensure scheduledEmailsData is an array
+      const emailsArray = Array.isArray(scheduledEmailsData) ? scheduledEmailsData : [];
+      setEmails(emailsArray);
       setLastRefreshTime(new Date());
     } catch (err: any) {
       logger.error('Failed to load emails', { eventSlug, error: err });

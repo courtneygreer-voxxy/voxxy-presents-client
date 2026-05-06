@@ -9,6 +9,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { X } from 'lucide-react';
 import { registrationsApi, ApiError } from '@/services/api';
 
 export interface EditVendorDetailsModalProps {
@@ -20,9 +22,18 @@ export interface EditVendorDetailsModalProps {
   /** Maps to Rails registration `name` (contact name) */
   initialContactName: string;
   initialPhone: string;
+  initialLocation?: string;
+  initialProducerNotes?: string;
+  initialTags?: string[];
   /** Shown read-only — not in Rails `update_params` */
   emailReadOnly: string;
-  onSaved: (applicantId: string, patch: { contact_name: string; phone: string }) => void;
+  onSaved: (applicantId: string, patch: {
+    contact_name: string;
+    phone: string;
+    location?: string;
+    producer_notes?: string;
+    tags?: string[];
+  }) => void;
 }
 
 export function EditVendorDetailsModal({
@@ -32,11 +43,18 @@ export function EditVendorDetailsModal({
   registrationId,
   initialContactName,
   initialPhone,
+  initialLocation,
+  initialProducerNotes,
+  initialTags,
   emailReadOnly,
   onSaved,
 }: EditVendorDetailsModalProps) {
   const [name, setName] = useState(initialContactName);
   const [phone, setPhone] = useState(initialPhone);
+  const [location, setLocation] = useState(initialLocation || '');
+  const [producerNotes, setProducerNotes] = useState(initialProducerNotes || '');
+  const [tags, setTags] = useState<string[]>(initialTags || []);
+  const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -44,20 +62,53 @@ export function EditVendorDetailsModal({
     if (open) {
       setName(initialContactName);
       setPhone(initialPhone || '');
+      setLocation(initialLocation || '');
+      setProducerNotes(initialProducerNotes || '');
+      setTags(initialTags || []);
+      setTagInput('');
       setFormError(null);
     }
-  }, [open, initialContactName, initialPhone]);
+  }, [open, initialContactName, initialPhone, initialLocation, initialProducerNotes, initialTags]);
+
+  const handleAddTag = () => {
+    const trimmedTag = tagInput.trim();
+    if (trimmedTag && !tags.includes(trimmedTag)) {
+      setTags([...tags, trimmedTag]);
+      setTagInput('');
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  const handleTagInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleAddTag();
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setFormError(null);
     setSaving(true);
     try {
+      // Send all fields to API, including empty values (to allow clearing)
       await registrationsApi.update(registrationId, {
         name: name.trim(),
         phone: phone.trim(),
+        location: location.trim(),
+        producer_notes: producerNotes.trim(),
+        tags: tags,
       });
-      onSaved(applicantId, { contact_name: name.trim(), phone: phone.trim() });
+      onSaved(applicantId, {
+        contact_name: name.trim(),
+        phone: phone.trim(),
+        location: location.trim(),
+        producer_notes: producerNotes.trim(),
+        tags: tags,
+      });
       onOpenChange(false);
     } catch (err) {
       if (err instanceof ApiError && err.errors?.length) {
@@ -79,7 +130,7 @@ export function EditVendorDetailsModal({
           <DialogHeader>
             <DialogTitle className="text-foreground">Edit vendor details</DialogTitle>
             <p className="text-xs text-foreground/60 pt-1">
-              Contact name and phone can be updated. Status, category, and payment use their existing controls.
+              Update contact info, location, tags, and producer notes. Status, category, and payment use their existing controls.
             </p>
           </DialogHeader>
           <div className="space-y-3 py-2">
@@ -119,6 +170,79 @@ export function EditVendorDetailsModal({
                 autoComplete="tel"
                 placeholder="Optional"
               />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-vendor-location" className="text-xs text-foreground/80">
+                Location
+              </Label>
+              <Input
+                id="edit-vendor-location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="bg-background/5 border-border text-xs"
+                placeholder="e.g., Brooklyn, NY"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-vendor-tags" className="text-xs text-foreground/80">
+                Tags
+              </Label>
+              <div className="space-y-2">
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {tags.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                      >
+                        {tag}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="hover:text-purple-800 dark:hover:text-purple-200"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex gap-2">
+                  <Input
+                    id="edit-vendor-tags"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={handleTagInputKeyDown}
+                    className="bg-background/5 border-border text-xs"
+                    placeholder="Type tag and press Enter"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleAddTag}
+                    disabled={!tagInput.trim()}
+                    className="border-border text-xs"
+                  >
+                    Add
+                  </Button>
+                </div>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-vendor-notes" className="text-xs text-foreground/80">
+                Producer Notes
+              </Label>
+              <Textarea
+                id="edit-vendor-notes"
+                value={producerNotes}
+                onChange={(e) => setProducerNotes(e.target.value)}
+                className="bg-background/5 border-border text-xs min-h-[80px]"
+                placeholder="Internal notes about this vendor..."
+              />
+              <p className="text-[10px] text-foreground/50">
+                Notes are only visible to you
+              </p>
             </div>
             {formError && (
               <p className="text-xs text-red-400 rounded-lg border border-red-500/30 bg-red-500/10 px-2 py-1.5">

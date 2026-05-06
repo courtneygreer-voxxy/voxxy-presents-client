@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle } from 'lucide-react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
-import { vendorApplicationsApi, registrationsApi, eventInvitationsApi } from '@/services/api';
+import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, eventsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
 import { cn } from '@/lib/utils';
-import { CancellationEmailDialog } from './CancellationEmailDialog';
+import { toast } from 'sonner';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 
 interface Event {
   id: number;
@@ -129,8 +130,10 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
   // Display "live" when event is live (is_live=true), otherwise show the actual status
   const [eventStatus, setEventStatus] = useState<string>(getCurrentStatusForUI());
   const [savingStatus, setSavingStatus] = useState(false);
-  const [showCancellationDialog, setShowCancellationDialog] = useState(false);
-  const [emailNotification, setEmailNotification] = useState<any>(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancellingEvent, setCancellingEvent] = useState(false);
+  const [recipientCount, setRecipientCount] = useState(0);
+  const [eventJustCancelled, setEventJustCancelled] = useState(false);
 
   useEffect(() => {
     fetchApplications();
@@ -200,40 +203,20 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
   const handleSaveEventStatus = async () => {
     if (!onUpdate) {
-      alert('Event status will be saved');
+      toast.error('Unable to update event status');
       return;
     }
 
-    // Special handling for cancellation - show dialog BEFORE saving
+    // Special handling for cancellation - show confirmation modal
     if (eventStatus === 'cancelled' && event.status?.status !== 'cancelled') {
       try {
-        setSavingStatus(true);
-        // Fetch recipient count before showing dialog
-        const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/check_cancellation_impact`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to check cancellation impact');
-        }
-
-        const data = await response.json();
-
-        // Store recipient count and show dialog
-        setEmailNotification({
-          type: 'event_canceled',
-          recipient_count: data.recipient_count || 0,
-        });
-        setShowCancellationDialog(true);
+        // Fetch recipient count for the modal
+        const data = await eventsApi.checkCancellationImpact(event.namespaced_slug || event.slug);
+        setRecipientCount(data.recipient_count || 0);
+        setShowCancelModal(true);
       } catch (err) {
         console.error('Failed to check cancellation impact:', err);
-        alert('Failed to prepare cancellation. Please try again.');
-      } finally {
-        setSavingStatus(false);
+        toast.error('Failed to prepare cancellation');
       }
       return;
     }
@@ -243,48 +226,46 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       setSavingStatus(true);
       // Convert "live" to "published" for backend compatibility
       const backendStatus = eventStatus === 'live' ? 'published' : eventStatus;
-      await onUpdate(event.slug, { status: backendStatus });
-      alert('Event status updated successfully!');
+      await onUpdate(event.namespaced_slug || event.slug, { status: backendStatus });
+      toast.success('Event status updated');
     } catch (err) {
       console.error('Failed to save event status:', err);
-      alert('Failed to save event status. Please try again.');
+      toast.error('Failed to save event status');
     } finally {
       setSavingStatus(false);
     }
   };
 
-  const handleSendCancellationEmails = async () => {
-    if (!emailNotification || !onUpdate) return;
-
+  const handleConfirmCancellation = async () => {
     try {
-      // Save status to 'cancelled' AND send emails together
-      await onUpdate(event.slug, { status: 'cancelled' });
+      setCancellingEvent(true);
+      setSavingStatus(true);
 
-      // Send cancellation emails with confirmation
-      const response = await fetch(`/api/v1/presents/events/${event.slug}/email_notifications/send_cancellation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
-        },
-        body: JSON.stringify({ confirmed: true }),
-      });
+      // Send cancellation emails - backend will also update status to 'cancelled'
+      const result = await eventsApi.sendCancellationEmails(event.namespaced_slug || event.slug);
 
-      if (!response.ok) {
-        throw new Error('Failed to send cancellation emails');
+      // Close modal
+      setShowCancelModal(false);
+
+      // Notify parent to refresh event data from backend
+      // The backend has already updated the status to 'cancelled' via sendCancellationEmails,
+      // so this onUpdate call will fetch the fresh data and update parent component state
+      if (onUpdate) {
+        await onUpdate(event.namespaced_slug || event.slug, { status: 'cancelled' });
       }
 
-      const result = await response.json();
+      // Update local UI state (provides immediate feedback while parent refreshes)
+      setEventStatus('cancelled');
+      setEventJustCancelled(true); // Mark as cancelled in this session
 
-      alert(`Event cancelled successfully! Cancellation emails sent to ${result.sent_count} vendors.`);
-
-      // Close dialog and reset state
-      setShowCancellationDialog(false);
-      setEmailNotification(null);
+      // Show success toast
+      toast.success(`Event cancelled. ${result.sent_count} vendor${result.sent_count !== 1 ? 's' : ''} notified.`);
     } catch (err) {
       console.error('Failed to cancel event:', err);
-      alert('Failed to cancel event and send emails. Please try again.');
-      throw err;
+      toast.error('Failed to cancel event');
+    } finally {
+      setCancellingEvent(false);
+      setSavingStatus(false);
     }
   };
 
@@ -609,13 +590,13 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                   <div className="flex gap-3">
                     <button
                       onClick={handleSaveEventStatus}
-                      disabled={savingStatus || eventStatus === getCurrentStatusForUI()}
+                      disabled={savingStatus || cancellingEvent || eventJustCancelled || eventStatus === getCurrentStatusForUI()}
                       className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      {savingStatus ? (
+                      {savingStatus || cancellingEvent ? (
                         <>
                           <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Saving...
+                          {cancellingEvent ? 'Cancelling...' : 'Saving...'}
                         </>
                       ) : (
                         <>
@@ -1270,16 +1251,17 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
         isAdmin={isAdmin}
       />
 
-      {/* Cancellation Email Dialog */}
-      <CancellationEmailDialog
-        isOpen={showCancellationDialog}
-        onClose={() => {
-          setShowCancellationDialog(false);
-          setEmailNotification(null);
-        }}
-        onConfirm={handleSendCancellationEmails}
-        recipientCount={emailNotification?.recipient_count || 0}
-        eventTitle={event.title}
+      {/* Cancellation Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showCancelModal}
+        onClose={() => setShowCancelModal(false)}
+        onConfirm={handleConfirmCancellation}
+        title="Cancel Event"
+        description={`Are you sure you want to cancel this event? This will send a cancellation email to ${recipientCount} registered vendor${recipientCount !== 1 ? 's' : ''}.`}
+        confirmText="Yes, Cancel Event"
+        cancelText="No, Keep Event"
+        isDestructive={true}
+        isLoading={cancellingEvent}
       />
     </div>
   );

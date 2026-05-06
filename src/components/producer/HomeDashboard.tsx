@@ -108,11 +108,11 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
   // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
   useEffect(() => {
     const newIsLive = event.status?.is_live || false;
-    console.log('🔄 [HomeDashboard] Event status changed:', {
-      slug: event.slug,
-      isLive: newIsLive,
-      status: event.status
-    });
+    // console.log('🔄 [HomeDashboard] Event status changed:', {
+    //   slug: event.slug,
+    //   isLive: newIsLive,
+    //   status: event.status
+    // });
     setIsLive(newIsLive);
   }, [event, event.status?.is_live]);
 

@@ -191,8 +191,22 @@ fetch(`${API_BASE_URL}/v1/presents/organizations`)
 | GET | `/v1/presents/events/:slug/registrations` | List event registrations | ✅ Yes (owner) |
 | POST | `/v1/presents/events/:slug/registrations` | Create registration (vendor submit) | ❌ Public |
 | GET | `/v1/presents/registrations/:id` | Get registration by ID | ✅ Yes (owner/submitter) |
-| PATCH | `/v1/presents/registrations/:id` | Update registration status | ✅ Yes (owner) |
+| PATCH | `/v1/presents/registrations/:id` | Update registration (syncs with Network CRM) | ✅ Yes (owner) |
 | GET | `/v1/presents/registrations/track/:ticket_code` | Track by ticket code | ❌ Public |
+| GET | `/v1/presents/registrations/:id/email_history` | Get all email deliveries | ✅ Yes (owner) |
+
+**Update Parameters (PATCH):**
+- `name` - Vendor contact name (syncs to Network)
+- `phone` - Vendor phone number (syncs to Network)
+- `status` - Application status (pending, approved, rejected, waitlist)
+- `vendor_category` - Vendor category/type
+- `payment_status` - Payment status (pending, paid, confirmed, overdue)
+- `location` - Vendor location (syncs to Network)
+- `producer_notes` - Internal producer notes (syncs to Network)
+- `tags` - Array of tags for categorization (syncs to Network)
+
+**Bidirectional Sync Behavior:**
+When you update `name`, `phone`, `location`, `producer_notes`, or `tags` on a registration, these changes automatically sync back to the vendor's Network CRM contact record. This keeps event-specific and global vendor data in sync.
 
 ---
 
@@ -413,8 +427,9 @@ end
 - [Rails API Documentation](../voxxy-rails/config/routes.rb)
 - [Frontend API Service](./src/services/api.ts)
 - [Environment Configuration](./src/config/environments.ts)
+- [Vendor CRM Bidirectional Sync](./VENDOR_CRM_BIDIRECTIONAL_SYNC.md) - Complete sync architecture
 
 ---
 
-**Last Updated:** 2025-11-22
-**Version:** 2.1.0 (Documentation Consolidation)
+**Last Updated:** 2026-05-04
+**Version:** 2.2.0 (Added CRM Bidirectional Sync)
