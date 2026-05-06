@@ -364,20 +364,20 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-2">
+    <div className="max-w-5xl mx-auto px-4 pt-2">
       {/* Back Button */}
       <button
         onClick={onCancel}
-        className="flex items-center gap-2 text-foreground/70 hover:text-foreground mb-6 transition-colors"
+        className="flex items-center gap-1.5 text-foreground/60 hover:text-foreground mb-2 transition-colors text-xs"
       >
-        <ArrowLeft className="w-4 h-4" />
+        <ArrowLeft className="w-3.5 h-3.5" />
         Back to Events
       </button>
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">Create New Event</h1>
-        <p className="text-foreground/60">
+      <div className="mb-2 flex items-baseline gap-3">
+        <h1 className="text-xl font-bold text-foreground">Create New Event</h1>
+        <p className="text-foreground/50 text-xs">
           Follow the steps to set up your event and applicant categories
         </p>
       </div>
@@ -391,13 +391,13 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
 
       {/* Submit Error Display */}
       {errors.submit && (
-        <div className="mb-6 p-4 rounded-lg bg-red-500/10 border border-red-500/30">
-          <p className="text-red-400 text-sm">{errors.submit}</p>
+        <div className="mb-3 p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+          <p className="text-red-400 text-xs">{errors.submit}</p>
         </div>
       )}
 
       {/* Current Step Content */}
-      <div className="glass-card p-5 md:p-6">
+      <div className="glass-card p-4 md:p-5">
         {renderCurrentStep()}
       </div>
 

@@ -593,7 +593,7 @@ export default function VendorApplicationForm() {
         </div>
 
         {/* Application Form */}
-        <div className="bg-card/90 dark:bg-card/60 backdrop-blur-sm border border-border shadow-sm rounded-lg p-4 md:p-5">
+        <div className="rounded-xl border border-white/15 bg-card/90 shadow-lg backdrop-blur-md dark:bg-card/70 dark:border-white/12 p-4 md:p-5">
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Your Information */}
@@ -610,7 +610,7 @@ export default function VendorApplicationForm() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Your full name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                     required
                   />
                 </div>
@@ -625,7 +625,7 @@ export default function VendorApplicationForm() {
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                   />
                 </div>
 
@@ -639,7 +639,7 @@ export default function VendorApplicationForm() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="your@email.com"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                     required
                   />
                 </div>
@@ -654,7 +654,7 @@ export default function VendorApplicationForm() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                   />
                 </div>
               </div>
@@ -674,10 +674,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Link to your work <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-primary transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">https://</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">https://</div>
                     <input
                       type="text"
                       value={formData.website}
@@ -693,10 +691,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Instagram
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-primary transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">instagram.com/</div>
                     <input
                       type="text"
                       value={formData.instagram_handle}
@@ -715,10 +711,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     TikTok
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-primary transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">tiktok.com/@</div>
                     <input
                       type="text"
                       value={formData.tiktok_handle}
@@ -734,10 +728,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Facebook
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-primary transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">facebook.com/</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">facebook.com/</div>
                     <input
                       type="text"
                       value={formData.facebook_handle}
@@ -760,7 +752,7 @@ export default function VendorApplicationForm() {
                 onChange={(e) => setFormData({ ...formData, note_to_host: e.target.value })}
                 placeholder="Tell the event organizer about your products, experience, or anything else you'd like them to know..."
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
+                className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40 resize-none"
               />
             </div>
 

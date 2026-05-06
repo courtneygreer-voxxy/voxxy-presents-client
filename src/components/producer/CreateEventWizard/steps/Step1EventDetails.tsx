@@ -156,17 +156,17 @@ export default function Step1EventDetails({
     <div className="space-y-4">
       {/* DEV/ADMIN: Prefill Button */}
       {(isDevOrStaging() || isAdmin) && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-          <div className="flex items-center justify-between">
+        <div className="rounded-lg border border-amber-400/60 bg-amber-50 p-3 dark:border-yellow-500/35 dark:bg-yellow-500/10">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-xs text-yellow-200/90 font-medium">
+              <Zap className="w-4 h-4 text-amber-700 dark:text-yellow-400 shrink-0" />
+              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">
                 {isDevOrStaging() ? 'Dev Mode' : 'Admin Mode'}
               </span>
             </div>
             <button
               onClick={handlePrefill}
-              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30 hover:border-yellow-500/50"
+              className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors border border-amber-600/40 bg-amber-100 text-amber-950 hover:bg-amber-200/90 dark:border-yellow-500/40 dark:bg-yellow-500/20 dark:text-yellow-100 dark:hover:bg-yellow-500/30"
             >
               Prefill Test Data
             </button>

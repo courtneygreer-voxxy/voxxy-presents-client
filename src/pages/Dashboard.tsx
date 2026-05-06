@@ -993,7 +993,8 @@ export default function ProducerDashboard() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(true)}
-                className="lg:hidden text-sidebar-foreground/80 hover:text-sidebar-foreground"
+                className="lg:hidden rounded-md p-2 text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent/80 transition-smooth"
+                aria-label="Open menu"
               >
                 <Menu className="w-4 h-4" />
               </button>
@@ -1030,7 +1031,7 @@ export default function ProducerDashboard() {
               {/* Help/Guide Button - Always visible */}
               <button
                 onClick={() => setGuidebookOpen(true)}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-violet-100 text-foreground border border-violet-200/80 hover:bg-violet-200/80 dark:bg-primary dark:border-transparent dark:text-primary-foreground dark:hover:bg-primary/90 text-xs font-medium rounded-full shadow-md shadow-violet-200/40 dark:shadow-primary/20 transition-all hover:scale-105"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all hover:scale-105 bg-white/10 border border-white/20 dark:border-white/15 text-foreground dark:text-white/85 backdrop-blur-sm hover:bg-white/[0.18] hover:border-white/30 shadow-sm"
                 title="Open guide"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
@@ -1050,7 +1051,7 @@ export default function ProducerDashboard() {
                   placeholder="Search events..."
                   value={eventsSearchTerm}
                   onChange={(e) => setEventsSearchTerm(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 bg-background border border-input rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
+                  className="voxxy-input-frost w-full pl-9 pr-3 py-2 rounded-lg text-xs placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/50"
                 />
               </div>
 
@@ -1061,10 +1062,10 @@ export default function ProducerDashboard() {
                   <button
                     key={status}
                     onClick={() => setEventsStatusFilter(eventsStatusFilter === status ? null : status)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all whitespace-nowrap border shadow-sm ${
                       eventsStatusFilter === status
-                        ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
-                        : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
+                        ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:shadow-primary/25'
+                        : 'bg-muted/75 text-muted-foreground hover:text-foreground border-primary/15 dark:border-primary/25 dark:bg-muted/50 dark:hover:bg-muted/70'
                     }`}
                   >
                     {status}
@@ -1076,7 +1077,7 @@ export default function ProducerDashboard() {
 
                 {/* Sort Dropdown */}
                 <Select value={eventsSortBy} onValueChange={(value) => setEventsSortBy(value as 'date' | 'status' | 'name')}>
-                  <SelectTrigger className="h-8 w-[140px] rounded-lg border border-input bg-background px-3 text-xs text-foreground focus:ring-2 focus:ring-ring">
+                  <SelectTrigger className="h-8 w-[140px] rounded-lg voxxy-input-frost px-3 text-xs focus:ring-2 focus:ring-ring">
                     <SelectValue placeholder="Sort by Date" />
                   </SelectTrigger>
                   <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -1089,10 +1090,10 @@ export default function ProducerDashboard() {
                 {/* Show Past Toggle */}
                 <button
                   onClick={() => setEventsShowPast(!eventsShowPast)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all border shadow-sm ${
                     eventsShowPast
-                      ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground'
-                      : 'bg-muted/60 text-muted-foreground hover:text-foreground border border-border'
+                      ? 'bg-violet-200 text-foreground dark:bg-primary dark:text-primary-foreground dark:border-transparent dark:shadow-primary/25'
+                      : 'bg-muted/75 text-muted-foreground hover:text-foreground border-primary/15 dark:border-primary/25 dark:bg-muted/50 dark:hover:bg-muted/70'
                   }`}
                 >
                   {eventsShowPast ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}

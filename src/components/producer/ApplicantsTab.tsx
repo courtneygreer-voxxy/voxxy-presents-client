@@ -795,7 +795,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       className={`w-full p-2 rounded-lg text-left transition-smooth ${
                         isSelected
                           ? 'bg-primary/20 border border-primary/50'
-                          : 'voxxy-hover-row bg-background/5 border border-border hover:bg-background/10 hover:border-border'
+                          : 'voxxy-hover-row bg-card/70 dark:bg-card/50 border border-border backdrop-blur-sm'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">

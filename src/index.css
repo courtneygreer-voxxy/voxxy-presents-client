@@ -204,10 +204,10 @@
     --sidebar-border: 262 20% 20%;
     --sidebar-ring: 262 72% 61%;
 
-    --voxxy-grad-body: linear-gradient(to bottom, #221469 0%, #54309F 50%, #54309F 100%);
+    --voxxy-grad-body: linear-gradient(to bottom, #221469 0%, #54309f 30%, #bd2dcf 100%);
     --voxxy-grad-page: var(--voxxy-grad-body);
     --voxxy-grad-page-alt: var(--voxxy-grad-body);
-    --voxxy-grad-page-cool: linear-gradient(to bottom, #221469 0%, #3a2080 50%, #3a2080 100%);
+    --voxxy-grad-page-cool: var(--voxxy-grad-body);
     --voxxy-grad-editor: linear-gradient(to bottom right, #151028, #221a38, #151028);
     --voxxy-grad-panel: linear-gradient(to bottom right, #221838, #181222);
     --voxxy-grad-card-deep: linear-gradient(to bottom, #322848, #261c38);
@@ -233,7 +233,7 @@
       rgb(88 28 135 / 0.92),
       rgb(30 58 138 / 0.92)
     );
-    --voxxy-grad-nav-tab-active: linear-gradient(to right, #af3cda, #651ae9);
+    --voxxy-grad-nav-tab-active: var(--voxxy-grad-cta);
     --voxxy-grad-editor-chrome: linear-gradient(
       to right,
       rgb(46 32 74 / 0.86),
@@ -267,7 +267,18 @@
     --voxxy-dark-auth-shadow: 0 24px 48px rgb(0 0 0 / 0.45);
     --voxxy-hover-panel-border: rgb(196 181 253 / 0.28);
     --voxxy-hover-row-border: rgb(196 181 253 / 0.24);
-    --voxxy-nav-tab-shadow: 0 4px 14px rgb(124 58 237 / 0.3);
+    /* Match CTA depth (shadow-primary/30) */
+    --voxxy-nav-tab-shadow: 0 10px 28px hsl(var(--primary) / 0.32);
+
+    /* Input field surfaces — lifted charcoal, distinct from glass-card bg */
+    --voxxy-input-frost-bg: rgb(52 36 80 / 0.82);
+    --voxxy-input-frost-bg-focus: rgb(60 42 92 / 0.90);
+    --voxxy-input-frost-border: rgb(255 255 255 / 0.18);
+    --voxxy-input-frost-border-focus: hsl(262 72% 72% / 0.7);
+    --voxxy-input-frost-ring: hsl(262 72% 72% / 0.28);
+
+    /* Viewport-relative height for fixed body + marketing gradients (short screens) */
+    --voxxy-body-gradient-paint-height: 185vh;
   }
 
   * {
@@ -281,13 +292,20 @@
     font-size: 13px;
   }
 
+  /* Stretch dark page gradient past one viewport so short screens don’t compress color stops */
+  html.dark body {
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
   html:not(.dark) select option {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
   }
 
   .dark select option {
-    background-color: hsl(var(--card));
+    background-color: rgb(52 36 80);
     color: hsl(var(--card-foreground));
   }
 }
@@ -312,6 +330,10 @@
 
   .voxxy-gradient-panel {
     background-image: var(--voxxy-grad-panel);
+  }
+
+  .dark .voxxy-gradient-panel {
+    box-shadow: var(--voxxy-dark-inset-line), var(--voxxy-dark-drop-shadow-sm);
   }
 
   .voxxy-gradient-card-deep {
@@ -415,6 +437,12 @@
     background-image: var(--voxxy-grad-application-highlight);
   }
 
+  .dark .voxxy-application-highlight {
+    background-color: rgb(31 22 52 / 0.92);
+    border-color: hsl(var(--primary) / 0.5);
+    box-shadow: var(--voxxy-dark-inset-line), 0 12px 32px rgb(0 0 0 / 0.25);
+  }
+
   /* —— Buttons & CTAs —— */
   .voxxy-btn-cta {
     background-image: var(--voxxy-grad-cta);
@@ -426,7 +454,7 @@
   }
   .dark .voxxy-btn-cta {
     color: hsl(var(--primary-foreground));
-    border-color: transparent;
+    border: none;
   }
   .dark .voxxy-btn-cta:hover {
     filter: brightness(1.06);
@@ -488,11 +516,25 @@
   /* —— Surfaces, chrome & inputs —— */
   .voxxy-nav-surface {
     background: var(--voxxy-grad-nav);
-    backdrop-filter: blur(12px);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
   }
 
   .voxxy-gradient-modal-header {
     background: var(--voxxy-grad-modal-header);
+  }
+
+  /* Nav CTA link — plain text, gradient text on hover/active */
+  .voxxy-nav-cta-link {
+    color: rgb(255 255 255 / 0.82);
+  }
+  .voxxy-nav-cta-link:hover,
+  .voxxy-nav-cta-link:focus-visible {
+    background-image: var(--voxxy-grad-brand);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-color: rgb(255 255 255 / 0.07);
   }
 
   .voxxy-auth-panel {
@@ -649,16 +691,46 @@
     background-color: hsl(var(--background) / 0.9);
   }
   .dark .voxxy-input-frost {
-    background-color: rgb(50 36 78 / 0.82);
-    border-color: var(--voxxy-dark-border-subtle);
-    box-shadow: var(--voxxy-dark-inset-line);
+    background-color: var(--voxxy-input-frost-bg);
+    border-color: var(--voxxy-input-frost-border);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
   }
   .voxxy-input-frost:focus {
-    @apply bg-background outline-none;
+    @apply outline-none;
+    background-color: hsl(var(--background));
     border-color: hsl(270 91% 65% / 0.5);
   }
   .dark .voxxy-input-frost:focus {
-    background-color: rgb(60 44 92 / 0.9);
+    background-color: var(--voxxy-input-frost-bg-focus);
+    border-color: var(--voxxy-input-frost-border-focus);
+    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+
+  /* —— Prefixed input group (e.g. "https://" or "instagram.com/") —— */
+  .voxxy-input-frost-group {
+    @apply flex rounded-lg overflow-hidden border border-border transition-all;
+    background-color: hsl(var(--background) / 0.9);
+  }
+  .voxxy-input-frost-group:focus-within {
+    border-color: hsl(270 91% 65% / 0.5);
+  }
+  .dark .voxxy-input-frost-group {
+    background-color: var(--voxxy-input-frost-bg);
+    border-color: var(--voxxy-input-frost-border);
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  .dark .voxxy-input-frost-group:focus-within {
+    background-color: var(--voxxy-input-frost-bg-focus);
+    border-color: var(--voxxy-input-frost-border-focus);
+    box-shadow: 0 0 0 3px var(--voxxy-input-frost-ring), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  }
+  .voxxy-input-frost-prefix {
+    @apply flex items-center px-2.5 border-r border-border text-muted-foreground text-sm whitespace-nowrap select-none;
+    background-color: hsl(var(--muted) / 0.6);
+  }
+  .dark .voxxy-input-frost-prefix {
+    background-color: rgb(255 255 255 / 0.05);
+    border-color: var(--voxxy-input-frost-border);
   }
 
   /* —— Tables —— */
@@ -711,15 +783,85 @@
     border-color: var(--voxxy-dark-border-subtle);
   }
 
+  .voxxy-contact-form-shell {
+    @apply rounded-2xl backdrop-blur-xl;
+    background-color: rgb(255 255 255 / 0.1);
+    border: 1px solid rgb(255 255 255 / 0.32);
+    box-shadow:
+      0 25px 50px -12px rgb(0 0 0 / 0.4),
+      0 12px 24px -8px rgb(0 0 0 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
+  .voxxy-input-public-dark {
+    @apply w-full rounded-lg px-4 py-3 text-[15px] text-white outline-none transition-all duration-200;
+    background-color: rgb(255 255 255 / 0.14);
+    border: 1px solid rgb(255 255 255 / 0.24);
+  }
+
+  .voxxy-input-public-dark::placeholder {
+    color: rgb(255 255 255 / 0.42);
+  }
+
+  .voxxy-input-public-dark:focus {
+    border-color: rgb(255 255 255 / 0.48);
+    box-shadow: 0 0 0 2px rgb(255 255 255 / 0.28);
+    background-color: rgb(255 255 255 / 0.17);
+  }
+
+  /** Hero secondary CTA — glassmorphic on dark gradient backgrounds */
+  .voxxy-btn-public-secondary {
+    background-color: rgb(255 255 255 / 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgb(255 255 255 / 0.22);
+    color: rgb(255 255 255 / 0.95);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.14),
+      0 4px 16px rgb(0 0 0 / 0.12);
+    transition: all 0.2s ease;
+  }
+
+  .voxxy-btn-public-secondary:hover {
+    background-color: rgb(255 255 255 / 0.14);
+    border-color: rgb(255 255 255 / 0.35);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      0 0 24px rgb(144 84 227 / 0.30),
+      0 8px 24px rgb(0 0 0 / 0.18);
+  }
+
+  .voxxy-btn-public-secondary:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px rgb(255 255 255 / 0.35),
+      0 0 20px rgb(144 84 227 / 0.25),
+      inset 0 1px 0 rgb(255 255 255 / 0.14);
+  }
+
   /* —— Brand & marketing —— */
+  /* Same source + paint geometry as html.dark body so landing matches producer dashboard */
   .voxxy-gradient-marketing-hero {
-    background: linear-gradient(to bottom, #221469 0%, #3a2080 50%, #54309F 100%);
+    background: var(--voxxy-grad-body);
+  }
+
+  html.dark .voxxy-gradient-marketing-hero {
+    background-attachment: fixed;
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
+  }
+
+  html.dark .voxxy-gradient-page-cool {
+    background-attachment: fixed;
+    background-size: 100% var(--voxxy-body-gradient-paint-height);
+    background-repeat: no-repeat;
+    background-position: top center;
   }
 
   .voxxy-btn-brand {
     background-image: var(--voxxy-grad-brand);
     color: hsl(var(--primary-foreground));
-    border: 1px solid transparent;
+    border: none;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
   .voxxy-btn-brand:hover {

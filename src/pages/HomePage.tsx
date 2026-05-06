@@ -208,7 +208,7 @@ export default function HomePage() {
 
               <div className="flex gap-4 flex-wrap">
                 <TrackedButton
-                  className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+                  className="h-auto inline-flex items-center rounded-xl voxxy-btn-brand px-6 py-3 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
                   trackingData={{
                     button_text: 'Request Access',
                     button_location: 'hero',
@@ -222,7 +222,7 @@ export default function HomePage() {
                   </a>
                 </TrackedButton>
                 <TrackedButton
-                  className="inline-flex items-center rounded-xl border border-white/12 bg-white/8 px-8 py-4 text-[16px] font-medium text-white transition-all hover:border-voxxy-pink/30 hover:bg-white/12"
+                  className="h-auto voxxy-btn-public-secondary inline-flex items-center rounded-xl px-6 py-3 text-[15px] font-semibold transition-all hover:-translate-y-0.5"
                   trackingData={{
                     button_text: 'See How It Works',
                     button_location: 'hero',
@@ -366,7 +366,7 @@ export default function HomePage() {
           <div className="text-center mt-12">
             <TrackedLink
               to="/features"
-              className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-[16px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
+              className="inline-flex items-center rounded-xl voxxy-btn-brand px-6 py-3 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-lg"
               trackingData={{
                 link_text: 'See All Features',
                 destination_page: 'Features',
@@ -521,7 +521,7 @@ export default function HomePage() {
             {/* Right Column - Form */}
             <div>
               {isSubmitted ? (
-                <div className="rounded-2xl border border-voxxy-pink/15 bg-white/6 p-10 text-center backdrop-blur-xl">
+                <div className="voxxy-contact-form-shell p-10 text-center">
                   <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="h-8 w-8 text-green-300" />
                   </div>
@@ -531,7 +531,7 @@ export default function HomePage() {
                   </p>
                 </div>
               ) : (
-                <div className="rounded-2xl border border-voxxy-pink/15 bg-white/6 p-8 backdrop-blur-xl">
+                <div className="voxxy-contact-form-shell p-8">
                   <form onSubmit={handleSubmit} className="space-y-5">
                     {/* Name and Email Row */}
                     <div className="grid md:grid-cols-2 gap-4">
@@ -541,7 +541,7 @@ export default function HomePage() {
                         value={formData.name}
                         onChange={(e) => handleInputChange('name', e.target.value)}
                         required
-                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
+                        className="voxxy-input-public-dark h-12"
                       />
                       <input
                         id="email"
@@ -550,7 +550,7 @@ export default function HomePage() {
                         value={formData.email}
                         onChange={(e) => handleInputChange('email', e.target.value)}
                         required
-                        className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
+                        className="voxxy-input-public-dark h-12"
                       />
                     </div>
 
@@ -560,7 +560,7 @@ export default function HomePage() {
                       placeholder="Event name (if you have one)"
                       value={formData.eventName}
                       onChange={(e) => handleInputChange('eventName', e.target.value)}
-                      className="h-12 w-full rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
+                      className="voxxy-input-public-dark h-12"
                     />
 
                     {/* Message */}
@@ -571,7 +571,7 @@ export default function HomePage() {
                       onChange={(e) => handleInputChange('message', e.target.value)}
                       required
                       rows={5}
-                      className="min-h-[80px] w-full resize-none rounded-lg border border-white/10 bg-white/8 px-4 py-3 text-[15px] text-white placeholder:text-white/35 outline-none transition-all duration-200 focus:border-voxxy-pink/40 focus:bg-white/10"
+                      className="voxxy-input-public-dark min-h-[120px] resize-none"
                     />
 
                     {submissionError && (
@@ -584,7 +584,7 @@ export default function HomePage() {
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="inline-flex w-full items-center justify-center rounded-xl voxxy-btn-brand px-8 py-4 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
+                      className="inline-flex w-full items-center justify-center rounded-xl voxxy-btn-brand px-6 py-3 text-[15px] font-semibold text-white shadow-md shadow-primary/20 transition-all hover:brightness-105 hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-40"
                     >
                       {isSubmitting ? 'Sending...' : 'Send Message'}
                       {!isSubmitting && <ArrowRight className="ml-2 h-5 w-5" />}

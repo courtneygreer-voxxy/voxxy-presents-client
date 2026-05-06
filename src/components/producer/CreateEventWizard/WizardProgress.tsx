@@ -10,6 +10,8 @@ const STEP_LABELS = [
   'Review Details',
 ];
 
+const STEP_SHORT = ['Details', 'Categories', 'Payment', 'Email', 'Invites', 'Review'];
+
 export default function WizardProgress({
   currentStep,
   completedSteps,
@@ -18,73 +20,91 @@ export default function WizardProgress({
   const isStepCompleted = (step: number) => completedSteps.includes(step);
   const isStepCurrent = (step: number) => currentStep === step;
   const isStepClickable = (step: number) => isStepCompleted(step) || isStepCurrent(step);
+  const totalSteps = STEP_LABELS.length;
+  const fillRatio =
+    totalSteps <= 1 ? 0 : Math.min(1, Math.max(0, (currentStep - 1) / (totalSteps - 1)));
 
   return (
-    <div className="mb-8">
-      {/* Mobile: Simple text indicator */}
-      <div className="md:hidden text-center mb-4">
-        <p className="text-foreground/60 text-sm">
-          Step {currentStep} of 6: {STEP_LABELS[currentStep - 1]}
+    <div className="mb-3 max-w-5xl mx-auto">
+      <div className="md:hidden text-center mb-2">
+        <p className="text-foreground/60 text-xs">
+          Step {currentStep} of {totalSteps}: {STEP_LABELS[currentStep - 1]}
         </p>
       </div>
 
-      {/* Desktop: Visual progress indicator */}
-      <div className="hidden md:flex items-center justify-between max-w-4xl mx-auto">
-        {[1, 2, 3, 4, 5, 6].map((step, index) => {
-          const completed = isStepCompleted(step);
-          const current = isStepCurrent(step);
-          const clickable = isStepClickable(step);
+      <div className="hidden md:block">
+        <div className="flex items-center justify-between gap-3 mb-1.5">
+          <p className="text-[10px] font-medium text-foreground/60">
+            Step {currentStep} of {totalSteps}
+          </p>
+          <p className="text-[10px] text-foreground/45 truncate max-w-[55%] text-right">
+            {STEP_LABELS[currentStep - 1]}
+          </p>
+        </div>
 
-          return (
-            <div key={step} className="flex items-center flex-1">
-              {/* Step Circle */}
+        {/* Track — uses muted in light mode so the unfilled portion is visible; dark gets the translucent body bg */}
+        <div
+          className="relative h-1.5 rounded-full overflow-hidden border bg-muted/60 border-border dark:bg-background/25 dark:border-white/10"
+          aria-hidden
+        >
+          <div
+            className="absolute inset-y-0 left-0 rounded-full motion-safe:transition-[width] motion-safe:duration-500 ease-out shadow-sm shadow-primary/35"
+            style={{
+              width: `${fillRatio * 100}%`,
+              backgroundImage: 'var(--voxxy-grad-brand)',
+            }}
+          />
+        </div>
+
+        <div className="mt-2 flex justify-between gap-1">
+          {[1, 2, 3, 4, 5, 6].map((step) => {
+            const completed = isStepCompleted(step);
+            const current = isStepCurrent(step);
+            const clickable = isStepClickable(step);
+            const idx = step - 1;
+
+            return (
               <button
+                key={step}
+                type="button"
                 onClick={() => clickable && onStepClick(step)}
                 disabled={!clickable}
+                title={STEP_LABELS[idx]}
                 className={`
-                  relative flex items-center justify-center w-10 h-10 rounded-full
-                  transition-all duration-300
-                  ${
-                    current
-                      ? 'voxxy-btn-cta shadow-lg scale-110'
-                      : completed
-                      ? 'bg-background/20 text-foreground hover:bg-background/30'
-                      : 'bg-background/5 text-foreground/40'
-                  }
-                  ${clickable ? 'cursor-pointer' : 'cursor-not-allowed'}
+                  flex min-w-0 flex-1 flex-col items-center gap-0.5 rounded-md px-0.5 py-0.5 transition-all duration-200
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1
+                  ${clickable ? 'cursor-pointer hover:bg-muted/50 dark:hover:bg-background/10' : 'cursor-not-allowed opacity-50'}
                 `}
               >
-                {completed && !current ? (
-                  <Check className="w-5 h-5" />
-                ) : (
-                  <span className="font-semibold">{step}</span>
-                )}
-              </button>
-
-              {/* Step Label */}
-              <div className="ml-3 flex-1">
-                <p
-                  className={`text-sm font-medium transition-colors ${
-                    current ? 'text-foreground' : completed ? 'text-foreground/80' : 'text-foreground/40'
+                <span
+                  className={`
+                    flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold transition-all
+                    ${
+                      current
+                        ? 'bg-primary text-primary-foreground ring-2 ring-primary/40 ring-offset-1 ring-offset-background scale-105'
+                        : completed
+                          ? 'bg-primary/20 text-primary dark:bg-primary/25 dark:text-foreground'
+                          : 'bg-muted text-muted-foreground dark:bg-background/15 dark:text-foreground/35'
+                    }
+                  `}
+                >
+                  {completed && !current ? <Check className="w-3 h-3" /> : step}
+                </span>
+                <span
+                  className={`hidden lg:block text-[9px] font-medium leading-tight text-center truncate w-full max-w-[5rem] ${
+                    current
+                      ? 'text-foreground'
+                      : completed
+                        ? 'text-foreground/80 dark:text-foreground/75'
+                        : 'text-muted-foreground dark:text-foreground/40'
                   }`}
                 >
-                  {STEP_LABELS[index]}
-                </p>
-              </div>
-
-              {/* Connector Line */}
-              {index < 5 && (
-                <div className="flex-1 h-0.5 mx-4">
-                  <div
-                    className={`h-full transition-all duration-300 ${
-                      completed ? 'bg-background/30' : 'bg-background/10'
-                    }`}
-                  />
-                </div>
-              )}
-            </div>
-          );
-        })}
+                  {STEP_SHORT[idx]}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

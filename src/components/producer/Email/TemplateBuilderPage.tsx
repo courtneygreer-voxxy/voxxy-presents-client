@@ -615,18 +615,6 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
 
       {/* Main Content Area */}
       <div className="flex-1 overflow-auto px-6 py-4">
-        {/* System Sequence Info */}
-        {isSystemDefault && (
-          <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
-            <div>
-              <p className="text-blue-400 text-xs">
-                This is a read-only system sequence. Clone it from the Email Sequences page to create a customizable copy.
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* Creating New Sequence Info */}
         {createFromDefault && !template && (
           <div className="mb-4 p-3 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-start gap-2">
@@ -669,7 +657,16 @@ export default function TemplateBuilderPage({ templateId, createFromDefault, onB
         {!isLoading && (
           <div className="space-y-4">
             {/* Sequence Details - Compact */}
-            <div className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-border bg-background/[0.02]'}`}>
+            <div className={`p-3 rounded-lg border ${isCategoryTemplate || isSystemDefault ? 'border-blue-500/20 bg-blue-500/5' : 'border-border bg-background/[0.02]'}`} role={isSystemDefault ? 'region' : undefined} aria-label={isSystemDefault ? 'Sequence details' : undefined}>
+              {isSystemDefault && (
+                <div className="flex items-start gap-2 pb-2 mb-2 border-b border-blue-500/20" role="note">
+                  <AlertCircle className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" aria-hidden />
+                  <p className="text-blue-400 text-xs leading-snug">
+                    <span className="font-semibold text-blue-300">Read-only system sequence.</span>{' '}
+                    Clone it from the Email Sequences page to create a customizable copy.
+                  </p>
+                </div>
+              )}
               {isCategoryTemplate ? (
                 // Information card for category templates
                 <div className="space-y-1.5">

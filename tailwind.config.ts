@@ -10,6 +10,10 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		fontFamily: {
+			/** Public nav wordmark: Montserrat Black Italic */
+			'nav-logo': ['"Montserrat"', '"Barlow Condensed"', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+		},
   		colors: {
   			'voxxy-purple': {
   				deep: '#1a0b2e',

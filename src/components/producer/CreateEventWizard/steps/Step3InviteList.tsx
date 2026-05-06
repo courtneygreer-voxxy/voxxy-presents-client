@@ -534,7 +534,7 @@ export default function Step3InviteList({
               <div className="overflow-x-auto">
                 {/* Table Header */}
                 <div className="voxxy-table-header">
-                  <div className="voxxy-table-header-row grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
+                  <div className="voxxy-table-header-row grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
@@ -573,7 +573,7 @@ export default function Step3InviteList({
                     return (
                       <div
                         key={contact.id}
-                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
+                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">

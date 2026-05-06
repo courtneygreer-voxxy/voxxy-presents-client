@@ -7,9 +7,10 @@ import SmartListBuilder from './SmartListBuilder';
 interface ListsManagementProps {
   organizationId: number;
   onViewList?: (filters: { locations?: string[]; categories?: string[]; tags?: string[] }) => void;
+  onViewManualList?: (listId: number, listName: string) => void;
 }
 
-export default function ListsManagement({ organizationId, onViewList }: ListsManagementProps) {
+export default function ListsManagement({ organizationId, onViewList, onViewManualList }: ListsManagementProps) {
   const [lists, setLists] = useState<ContactList[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -411,11 +412,13 @@ export default function ListsManagement({ organizationId, onViewList }: ListsMan
                       onClick={() => {
                         if (list.filters && onViewList) {
                           onViewList(list.filters);
+                        } else if (list.list_type === 'manual' && onViewManualList) {
+                          onViewManualList(list.id, list.name);
                         }
                       }}
                       className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
-                      title="View filtered contacts"
-                      disabled={!list.filters}
+                      title={list.list_type === 'manual' ? 'View list contacts' : 'View filtered contacts'}
+                      disabled={!list.filters && list.list_type !== 'manual'}
                     >
                       <Eye className="w-3.5 h-3.5" />
                     </button>

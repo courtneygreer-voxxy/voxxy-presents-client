@@ -60,7 +60,7 @@ function FilterDropdownButton({
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
             ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
-            : 'bg-card/80 text-foreground dark:bg-background/10 dark:text-foreground/70 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-background/15'
+            : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
@@ -154,6 +154,8 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const actionsMenuRef = useRef<HTMLDivElement>(null);
 
   // SearchFilterBar state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -220,6 +222,17 @@ export default function NetworkPage({
     { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
   ];
 
+  // Close actions menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        setActionsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
   // Fetch filter options from backend on mount
   useEffect(() => {
     const loadFilterOptions = async () => {
@@ -261,6 +274,7 @@ export default function NetworkPage({
     try {
       setLoading(true);
       setError(null);
+      setViewingManualList(null);
 
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
@@ -296,6 +310,32 @@ export default function NetworkPage({
       setCurrentPage(page);
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewManualList = async (listId: number, listName: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setActiveFilters([]);
+      setSearchTerm('');
+      setViewingManualList({ id: listId, name: listName });
+
+      const response = await contactListsApi.getContacts(listId);
+      setContacts(response.vendor_contacts || []);
+      setPaginationMeta({
+        current_page: 1,
+        per_page: response.vendor_contacts?.length || 0,
+        total_count: response.vendor_contacts?.length || 0,
+        total_pages: 1,
+      });
+      setCurrentPage(1);
+      onTabChange?.('contacts');
+    } catch (err: any) {
+      setError(err.message || 'Failed to load list contacts');
       setContacts([]);
     } finally {
       setLoading(false);
@@ -418,8 +458,12 @@ export default function NetworkPage({
     }
   };
 
+  // Manual list viewing state
+  const [viewingManualList, setViewingManualList] = useState<{ id: number; name: string } | null>(null);
+
   const clearAllFilters = () => {
     setActiveFilters([]);
+    setViewingManualList(null);
     setShowSaveInput(false);
     setListName('');
   };
@@ -657,33 +701,46 @@ export default function NetworkPage({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                className="w-full rounded-lg border border-border bg-card/80 py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/50 dark:bg-background/10"
+                className="voxxy-input-frost w-full rounded-lg py-2.5 pl-10 pr-3 text-sm focus:ring-2 focus:ring-ring/40"
                 />
               </div>
 
-              {/* Import CSV, Create List & Add Contact Buttons */}
-              <button
-                onClick={() => setShowCSVUploadModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Import CSV</span>
-              </button>
-              <button
-                onClick={handleStartCreateList}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Filter className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Create List</span>
-              </button>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Add Contact</span>
-                <span className="sm:hidden">Add</span>
-              </button>
+              {/* Actions dropdown */}
+              <div className="relative" ref={actionsMenuRef}>
+                <button
+                  onClick={() => setActionsMenuOpen(prev => !prev)}
+                  className="flex items-center gap-1.5 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Actions</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${actionsMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {actionsMenuOpen && (
+                  <div className="voxxy-select-surface absolute right-0 top-full mt-1 z-50 w-48 rounded-lg shadow-xl overflow-hidden">
+                    <button
+                      onClick={() => { setShowAddModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Add Contact
+                    </button>
+                    <button
+                      onClick={() => { handleStartCreateList(); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Filter className="w-3.5 h-3.5" />
+                      Create List
+                    </button>
+                    <button
+                      onClick={() => { setShowCSVUploadModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Import CSV
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Filter Dropdowns Row */}
@@ -724,6 +781,23 @@ export default function NetworkPage({
             )}
           </div>
 
+          {/* Manual List Banner */}
+          {viewingManualList && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/15 border border-purple-500/30 rounded-lg">
+              <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <span className="text-sm text-foreground/80">
+                Viewing list: <span className="font-semibold text-foreground">{viewingManualList.name}</span>
+              </span>
+              <button
+                onClick={() => { setViewingManualList(null); fetchContacts(1); }}
+                className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+            </div>
+          )}
+
           {/* Save as List (when filters active) */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2">
@@ -759,10 +833,10 @@ export default function NetworkPage({
           )}
 
           {/* No results */}
-          {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
+          {contacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
             <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
-                {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
+                {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
               </p>
               <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary text-sm underline">
                 Clear all filters
@@ -813,6 +887,7 @@ export default function NetworkPage({
         <ListsManagement
           organizationId={organizationId}
           onViewList={(filters) => {
+            setViewingManualList(null);
             const newFilters: ActiveFilter[] = [];
             if (filters.locations?.length) newFilters.push({ fieldKey: 'location', values: filters.locations });
             if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
@@ -820,6 +895,7 @@ export default function NetworkPage({
             setActiveFilters(newFilters);
             onTabChange?.('contacts');
           }}
+          onViewManualList={handleViewManualList}
         />
       )}
 

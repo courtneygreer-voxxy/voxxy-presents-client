@@ -238,7 +238,7 @@ export default function PublicEventDetailPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Main Card Container */}
-        <div className="voxxy-gradient-panel border border-border rounded-lg p-4 md:p-5">
+        <div className="voxxy-gradient-panel rounded-2xl border border-white/15 p-5 ring-1 ring-white/10 md:p-6">
           {/* Event Title and Location */}
           <div className="mb-4">
             <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent mb-1">

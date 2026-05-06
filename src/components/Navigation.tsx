@@ -11,8 +11,8 @@ export default function Navigation({ activePage }: NavigationProps) {
 
   const getLinkClass = (page: string) => {
     return activePage === page
-      ? "font-medium text-white bg-white/15 px-3 py-1.5 rounded-md"
-      : "text-white/80 hover:text-white hover:bg-white/10 px-3 py-1.5 rounded-md transition-all"
+      ? "font-medium text-white bg-white/15 px-3 py-2 rounded-md"
+      : "text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md transition-all"
   }
 
   const getMobileLinkClass = (page: string) => {
@@ -22,12 +22,17 @@ export default function Navigation({ activePage }: NavigationProps) {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/10 voxxy-nav-surface px-6 py-1 md:px-12">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-white/15 voxxy-nav-surface px-6 py-3 md:px-12">
       <div className="container mx-auto max-w-[1200px]">
         <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link to="/" className="flex items-center -my-3">
-            <img src="/voxxylogo.png" alt="Voxxy" className="h-20 md:h-24 w-auto" />
+          <Link
+            to="/"
+            className="flex items-center py-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 focus-visible:ring-offset-2 focus-visible:ring-offset-transparent rounded-md"
+            aria-label="Voxxy home"
+          >
+            <span className="font-nav-logo text-xl font-black italic tracking-[0.08em] text-white uppercase md:text-[1.65rem] leading-none">
+              VOXXY
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
@@ -46,7 +51,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/#contact"
-              className="rounded-lg voxxy-btn-brand px-6 py-3 text-[14px] font-semibold shadow-[0_10px_30px_rgba(144,84,227,0.22)] transition-all hover:-translate-y-0.5"
+              className="voxxy-nav-cta-link text-[14px] font-semibold px-3 py-2 rounded-md transition-all"
             >
               Contact Us
             </Link>
@@ -96,7 +101,7 @@ export default function Navigation({ activePage }: NavigationProps) {
             </Link>
             <Link
               to="/#contact"
-              className="block rounded-lg voxxy-btn-brand px-6 py-3 text-center font-semibold shadow-[0_10px_30px_rgba(144,84,227,0.22)]"
+              className="block voxxy-nav-cta-link text-center text-[14px] font-semibold px-3 py-2 rounded-md transition-all"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact Us

@@ -641,7 +641,7 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         </button>
 
         {/* Danger Zone */}
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4">
+        <div className="rounded-lg border border-destructive/40 bg-card dark:bg-card/90 p-4">
           <div className="flex items-start gap-3 mb-3">
             <AlertTriangle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
             <div className="flex-1">

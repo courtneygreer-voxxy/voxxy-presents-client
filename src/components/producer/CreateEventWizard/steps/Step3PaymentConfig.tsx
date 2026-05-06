@@ -205,15 +205,15 @@ export default function Step3PaymentConfig({
     <div className="space-y-4">
       {/* DEV: Prefill Button */}
       {!standalone && isDevOrStaging() && (
-        <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
-          <div className="flex items-center justify-between">
+        <div className="rounded-lg border border-amber-400/60 bg-amber-50 p-3 dark:border-yellow-500/35 dark:bg-yellow-500/10">
+          <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <Zap className="w-4 h-4 text-yellow-400" />
-              <span className="text-xs text-yellow-200/90 font-medium">Dev Mode</span>
+              <Zap className="w-4 h-4 text-amber-700 dark:text-yellow-400 shrink-0" />
+              <span className="text-xs font-medium text-amber-950 dark:text-yellow-200">Dev Mode</span>
             </div>
             <button
               onClick={handlePrefill}
-              className="px-3 py-1.5 text-xs font-medium bg-yellow-500/20 hover:bg-yellow-500/30 text-yellow-200 rounded-md transition-colors border border-yellow-500/30"
+              className="px-3 py-1.5 text-xs font-medium rounded-md transition-colors border border-amber-600/40 bg-amber-100 text-amber-950 hover:bg-amber-200/90 dark:border-yellow-500/40 dark:bg-yellow-500/20 dark:text-yellow-100 dark:hover:bg-yellow-500/30"
             >
               Prefill Payment Data
             </button>
@@ -311,7 +311,7 @@ export default function Step3PaymentConfig({
       {applicationDetails.applications.map((app) => (
         <div
           key={app.id}
-          className="bg-background/5 backdrop-blur-sm rounded-xl p-5 border border-border space-y-4"
+          className="bg-background/5 rounded-xl p-5 border border-border space-y-4 overflow-visible"
         >
           {/* Category Header */}
           <div className="flex items-center gap-2 pb-3 border-b border-border">
@@ -343,7 +343,7 @@ export default function Step3PaymentConfig({
                     <Plus className="w-3.5 h-3.5" />
                     Add Fee Type
                   </button>
-                  <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded-lg shadow-xl z-10 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded-lg shadow-xl z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                     {getAvailablePriceTypes(app).map(pt => (
                       <button
                         key={pt.value}

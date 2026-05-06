@@ -5,6 +5,7 @@ import type { Category } from '@/types/category';
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
 import SuccessMessage from '@/components/ui/SuccessMessage';
 import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { cn } from '@/lib/utils';
 
 interface AddContactModalProps {
   organizationId: number;
@@ -18,6 +19,13 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
   const [organizationCategories, setOrganizationCategories] = useState<Category[]>([]);
+
+  const contactFieldClass = (field?: string) =>
+    cn(
+      'voxxy-input-frost w-full px-3 py-2.5 text-sm rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-all',
+      field && errors[field] && 'border-red-500 ring-1 ring-red-500/35'
+    );
+
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
@@ -150,7 +158,36 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
         onClose();
       }, 2000);
     } catch (error: any) {
-      setErrors({ submit: error.message || 'Failed to create contact' });
+      const newErrors: Record<string, string> = {};
+      const serverErrors: string[] = error.errors || [];
+
+      // Map backend validation errors to specific form fields
+      for (const msg of serverErrors) {
+        const lower = msg.toLowerCase();
+        if (lower.includes('email')) {
+          newErrors.email = msg;
+        } else if (lower.includes('phone')) {
+          newErrors.phone = msg;
+        } else if (lower.includes('name')) {
+          newErrors.contact_name = msg;
+        } else if (lower.includes('website') || lower.includes('url')) {
+          newErrors.website = msg;
+        } else if (lower.includes('instagram')) {
+          newErrors.instagram_handle = msg;
+        } else if (lower.includes('tiktok')) {
+          newErrors.tiktok_handle = msg;
+        } else {
+          // Catch-all for unmapped errors
+          newErrors.submit = newErrors.submit ? `${newErrors.submit}; ${msg}` : msg;
+        }
+      }
+
+      // Fallback if no server errors were parsed
+      if (Object.keys(newErrors).length === 0) {
+        newErrors.submit = error.message || 'Failed to create contact';
+      }
+
+      setErrors(newErrors);
     } finally {
       setIsSubmitting(false);
     }
@@ -198,9 +235,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.contact_name}
                 onChange={(e) => handleChange('contact_name', e.target.value)}
                 placeholder="John Smith"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.contact_name ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
+                className={contactFieldClass('contact_name')}
               />
               {errors.contact_name && (
                 <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
@@ -217,7 +252,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.business_name}
                 onChange={(e) => handleChange('business_name', e.target.value)}
                 placeholder="Smith's Ceramics"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
 
@@ -231,9 +266,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="john@example.com"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.email ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
+                className={contactFieldClass('email')}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-400">{errors.email}</p>
@@ -253,8 +286,11 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="(555) 123-4567"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass('phone')}
               />
+              {errors.phone && (
+                <p className="mt-1 text-xs text-red-400">{errors.phone}</p>
+              )}
             </div>
 
             <div>
@@ -267,7 +303,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="Search city, state, zip..."
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
           </div>
@@ -284,8 +320,11 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.instagram_handle}
                 onChange={(e) => handleChange('instagram_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass('instagram_handle')}
               />
+              {errors.instagram_handle && (
+                <p className="mt-1 text-xs text-red-400">{errors.instagram_handle}</p>
+              )}
             </div>
 
             <div>
@@ -298,8 +337,11 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.tiktok_handle}
                 onChange={(e) => handleChange('tiktok_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass('tiktok_handle')}
               />
+              {errors.tiktok_handle && (
+                <p className="mt-1 text-xs text-red-400">{errors.tiktok_handle}</p>
+              )}
             </div>
 
             <div>
@@ -312,9 +354,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.website}
                 onChange={(e) => handleChange('website', e.target.value)}
                 placeholder="https://..."
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.website ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
+                className={contactFieldClass('website')}
               />
               {errors.website && (
                 <p className="mt-1 text-xs text-red-400">{errors.website}</p>
@@ -334,7 +374,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.eventbrite_email}
                 onChange={(e) => handleChange('eventbrite_email', e.target.value)}
                 placeholder="artist@email.com"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
 
@@ -348,7 +388,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.venmo_handle}
                 onChange={(e) => handleChange('venmo_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
 
@@ -361,8 +401,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 type="email"
                 value={formData.paypal_email}
                 onChange={(e) => handleChange('paypal_email', e.target.value)}
-                placeholder="artist@paypal.com"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
           </div>
@@ -376,7 +415,10 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
               <button
                 type="button"
                 onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className={cn(
+                  contactFieldClass(),
+                  'text-left flex items-center justify-between hover:brightness-105'
+                )}
               >
                 <span className={formData.categories.length > 0 ? 'text-foreground' : 'text-foreground/40'}>
                   {formData.categories.length > 0
@@ -467,7 +509,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                     }
                   }}
                   placeholder="Add tag..."
-                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                  className={cn(contactFieldClass(), 'flex-1')}
                 />
                 <button
                   type="button"
@@ -530,7 +572,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Add notes..."
               rows={3}
-              className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
+              className={cn(contactFieldClass(), 'resize-none min-h-[100px]')}
             />
           </div>
 
