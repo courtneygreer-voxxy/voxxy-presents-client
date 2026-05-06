@@ -261,6 +261,7 @@ export default function NetworkPage({
     try {
       setLoading(true);
       setError(null);
+      setViewingManualList(null);
 
       const response = await vendorContactsApi.getAll(organizationId, {
         search: searchTerm || undefined,
@@ -296,6 +297,32 @@ export default function NetworkPage({
       setCurrentPage(page);
     } catch (err: any) {
       setError(err.message || 'Failed to load contacts');
+      setContacts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleViewManualList = async (listId: number, listName: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      setActiveFilters([]);
+      setSearchTerm('');
+      setViewingManualList({ id: listId, name: listName });
+
+      const response = await contactListsApi.getContacts(listId);
+      setContacts(response.vendor_contacts || []);
+      setPaginationMeta({
+        current_page: 1,
+        per_page: response.vendor_contacts?.length || 0,
+        total_count: response.vendor_contacts?.length || 0,
+        total_pages: 1,
+      });
+      setCurrentPage(1);
+      onTabChange?.('contacts');
+    } catch (err: any) {
+      setError(err.message || 'Failed to load list contacts');
       setContacts([]);
     } finally {
       setLoading(false);
@@ -418,8 +445,12 @@ export default function NetworkPage({
     }
   };
 
+  // Manual list viewing state
+  const [viewingManualList, setViewingManualList] = useState<{ id: number; name: string } | null>(null);
+
   const clearAllFilters = () => {
     setActiveFilters([]);
+    setViewingManualList(null);
     setShowSaveInput(false);
     setListName('');
   };
@@ -724,6 +755,23 @@ export default function NetworkPage({
             )}
           </div>
 
+          {/* Manual List Banner */}
+          {viewingManualList && (
+            <div className="flex items-center gap-2 px-3 py-2 bg-purple-500/15 border border-purple-500/30 rounded-lg">
+              <Users className="w-4 h-4 text-purple-400 flex-shrink-0" />
+              <span className="text-sm text-foreground/80">
+                Viewing list: <span className="font-semibold text-foreground">{viewingManualList.name}</span>
+              </span>
+              <button
+                onClick={() => { setViewingManualList(null); fetchContacts(1); }}
+                className="ml-auto flex items-center gap-1 text-xs text-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="w-3.5 h-3.5" />
+                Clear
+              </button>
+            </div>
+          )}
+
           {/* Save as List (when filters active) */}
           {hasActiveFilters && (
             <div className="flex items-center gap-2">
@@ -759,10 +807,10 @@ export default function NetworkPage({
           )}
 
           {/* No results */}
-          {contacts.length === 0 && (searchTerm || hasActiveFilters) && (
+          {contacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
             <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
-                {searchTerm ? `No contacts found for "${searchTerm}"` : 'No contacts match the selected filters'}
+                {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
               </p>
               <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm underline">
                 Clear all filters
@@ -813,6 +861,7 @@ export default function NetworkPage({
         <ListsManagement
           organizationId={organizationId}
           onViewList={(filters) => {
+            setViewingManualList(null);
             const newFilters: ActiveFilter[] = [];
             if (filters.locations?.length) newFilters.push({ fieldKey: 'location', values: filters.locations });
             if (filters.categories?.length) newFilters.push({ fieldKey: 'category', values: filters.categories });
@@ -820,6 +869,7 @@ export default function NetworkPage({
             setActiveFilters(newFilters);
             onTabChange?.('contacts');
           }}
+          onViewManualList={handleViewManualList}
         />
       )}
 
