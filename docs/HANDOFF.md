@@ -228,6 +228,49 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ### 🟡 BUG 5: LegalLayout Uses Inline Hex Gradient (RL-001 / RL-002)
 
+---
+
+### 🟡 BUG 6: Vendor Portal — Dark Mode Colours Need Adjustment (RL-001)
+
+**Symptom**: The vendor portal page canvas and hero overlay use raw hex dark-mode gradients (`#120b1c`, `#1a1228`) that need to be tuned to match the central dark mode style guide.
+
+**Fix needed**: Align gradient stops in `VendorPortalPageCanvas.tsx` and `VendorEventPortalPage.tsx` (hero overlay) with the `--voxxy-*` dark palette or extract to a shared CSS class.
+
+**Files**:
+- `src/components/vendor-portal/VendorPortalPageCanvas.tsx`
+- `src/pages/VendorEventPortalPage.tsx` (hero overlay ~line 376)
+
+---
+
+### 🟡 BUG 7: Vendor Portal — FAQ Section Is Hardcoded (Hide Until Editable)
+
+**Symptom**: The `VendorPortalFaq` component renders hardcoded FAQ content. There is no producer-facing UI to create or edit FAQ entries yet.
+
+**Decision pending**: Should FAQ editing live in the **Create Event Wizard** or in the **Event Settings / Command Center**? Until decided and built, the FAQ section should be hidden from the portal.
+
+**Fix needed**: Conditionally hide `<VendorPortalFaq />` render in `VendorEventPortalPage.tsx` (e.g. behind a feature flag or simply comment out) until the editing flow is implemented.
+
+**Files**:
+- `src/pages/VendorEventPortalPage.tsx`
+- `src/components/vendor-portal/VendorPortalFaq.tsx`
+
+---
+
+### 🟡 BUG 8: Vendor Portal — Hero Banner Image Upload Not Persisting
+
+**Symptom**: Producers can pick a hero banner image via the uploader UI, but the image is only held in local state (preview URL). It is not saved to the backend — there is no attachment endpoint or model field for it yet.
+
+**Fix needed (backend + frontend)**:
+1. Backend: Add an Active Storage attachment (e.g. `has_one_attached :portal_banner`) to the Event model, expose an upload endpoint.
+2. Frontend: POST the selected file to the new endpoint on save, load the persisted URL on portal render instead of relying on local blob preview.
+
+**Files**:
+- `src/pages/VendorEventPortalPage.tsx` (banner state + upload handlers)
+- `src/components/vendor-portal/VendorPortalHero.tsx` (displays banner)
+- Backend: Event model + controller (TBD)
+
+---
+
 **Symptom**: `LegalLayout.tsx` line 25 uses `style={{ background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 40%, #f0f4ff 100%)' }}` — raw hex values and inline style.
 
 **Context**: This is intentional for the forced-light legal pages (`useForceTheme('light')`). Standard dark-mode tokens don't apply here. Low priority but should be extracted to a CSS class (e.g. `voxxy-legal-bg`) in `src/index.css` for consistency.
