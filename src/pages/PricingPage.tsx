@@ -1,20 +1,13 @@
 import React, { useEffect } from 'react'
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   Check,
   ArrowRight,
-  Sparkles,
-  Users,
-  Zap,
-  Shield
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { useSectionTracking } from "@/hooks/useSectionTracking"
-import { analytics } from "@/lib/analytics"
-import { TrackedButton } from "@/components/analytics/TrackedButton"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
 import { useForceTheme } from '@/hooks/useForceTheme'
@@ -99,9 +92,9 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
 
@@ -145,9 +138,9 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
 
@@ -184,9 +177,9 @@ export default function PricingPage() {
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -202,12 +195,10 @@ export default function PricingPage() {
           <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-white/70">
             Join event producers who are scaling their recurring events with Voxxy
           </p>
-          <Button size="lg" className="voxxy-btn-brand font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl" asChild>
-            <Link to="/#contact">
-              Request Access
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          <Link to="/#contact" className="voxxy-btn-brand inline-flex items-center justify-center rounded-lg px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl">
+            Request Access
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </div>
       </section>
 

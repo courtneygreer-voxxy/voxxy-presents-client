@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -23,21 +23,21 @@ export default function PrivacyPolicyPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Privacy Policy</h1>
-          <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-muted border border-border rounded-lg p-6">
-          <p className="text-gray-700 leading-relaxed">
+        <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+          <p className="text-slate-700 leading-relaxed">
             This Privacy Policy explains what information we collect, how we use it, and how we protect it. We've included plain-language annotations in these highlighted boxes to help you understand each section. The annotations aren't part of the official policy.
           </p>
         </div>
 
         {/* Introduction */}
-        <div className="space-y-4 text-gray-700 leading-relaxed">
+        <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
             Thanks for using Voxxy Presents! This Privacy Policy describes what information we collect and how it's used and shared. Any capitalized terms not defined in this Privacy Policy have the meanings set forth in our{' '}
-            <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
+            <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
             . If you don't agree with the terms of this Privacy Policy, you may not access or use the Services. If you have any questions, contact us at team@voxxypresents.com.
@@ -48,13 +48,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">1. Core Principles</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               The short version: we don't sell your data, we only collect what we need, and we take protecting it seriously.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               When it comes to your personal information, we believe in transparency, not surprises. Before we get into the details, here are our core privacy principles:
             </p>
@@ -79,13 +79,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">2. Our Role: Data Processor vs. Data Controller</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               This is important: when event producers import their contact lists into Voxxy, we're processing that data on their behalf. The producer is responsible for having permission to share it with us.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>2.1 Voxxy as Data Controller.</strong> When you create a Customer account with Voxxy Presents, we act as the data controller for the information you provide directly to us (such as your account registration details, billing information, and communications with us). We determine how and why this data is processed.
             </p>
@@ -102,13 +102,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">3. Information We Collect</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We collect only what we need to run the platform. Here's exactly what that includes.
             </p>
           </div>
 
-          <div className="space-y-6 text-gray-700 leading-relaxed">
+          <div className="space-y-6 text-foreground/80 leading-relaxed">
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-3">Information You Provide Directly</h3>
 
@@ -129,8 +129,8 @@ export default function PrivacyPolicyPage() {
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-3">Information Collected Automatically</h3>
 
-              <div className="bg-muted border border-border rounded-lg p-6 mb-4">
-                <p className="text-gray-700 leading-relaxed">
+              <div className="bg-white border border-violet-100 rounded-lg p-6 mb-4 shadow-sm">
+                <p className="text-slate-700 leading-relaxed">
                   These are the technical details about our analytics tools. We want to implement a consent banner so you can opt in before any of this tracking begins.
                 </p>
               </div>
@@ -154,7 +154,7 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p>
                 <strong>3.7 Cookies and Similar Technologies.</strong> We use cookies and similar technologies to remember your preferences, keep you safe, and improve the Services. For detailed information about the specific cookies we use and how to manage them, please see our{' '}
-                <a href="/legal/cookies" className="text-primary hover:text-primary/70 underline transition-colors">
+                <a href="/legal/cookies" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                   Cookie Policy
                 </a>
                 .
@@ -170,13 +170,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">4. How We Use Your Information</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We use your information to run the platform and make it better. That's it.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>We use the information we collect for the following purposes:</p>
             <p>
               <strong>4.1 Providing the Services.</strong> To set up and maintain your Account, process your transactions, deliver automated email workflows, manage End User contacts, and otherwise provide the features and functionality of the Services.
@@ -200,13 +200,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">5. How We Share Your Information</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We share your information only in limited, specific circumstances. We never sell it.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>5.1 Service Providers.</strong> We use trusted third-party service providers to help us provide, improve, and protect the Services. These include Stripe (payment processing), Mixpanel (analytics), Sentry (error monitoring), and Cloudflare (security and performance). These providers may access or process your information only for the purposes we've authorized, and we require them to provide at least the same level of protection for your information as described in this Privacy Policy.
             </p>
@@ -232,13 +232,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">6. End User Information</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               If you're an event producer using Voxxy, this section explains how we handle the contact data you import.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>6.1 Collection and Processing.</strong> Customers may import End User contact information into the Services, including business names, full names, email addresses, phone numbers, social media links, and website links. We process this information solely on behalf of and at the direction of the Customer, in our capacity as a data processor.
             </p>
@@ -258,13 +258,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">7. Data Protection</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We take security seriously and use industry-standard measures to protect your data.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               While no service is completely secure, we are dedicated to keeping your information safe. We employ security measures including encryption of data in transit (HTTPS/TLS), access controls limiting who within our organization can access personal data, regular security monitoring through Sentry and Cloudflare, and secure payment processing through Stripe's PCI DSS-compliant infrastructure. We do not store payment card data on our servers.
             </p>
@@ -275,13 +275,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">8. Data Retention</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We keep your data as long as you use the service. When you leave, we give you time to export it before deletion.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>8.1 Customer Data.</strong> We retain your personal information for as long as we need it to provide the Services to you. Upon termination of your Account, we will retain your Customer Data for thirty (30) days to allow you to export it, after which it may be deleted. We may retain certain information as required by law, to protect our rights, resolve disputes, or enforce our agreements.
             </p>
@@ -298,13 +298,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">9. Your Rights</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               You have rights over your data, including the ability to access, correct, and delete it.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>Depending on your location, you may have the following rights regarding your personal information:</p>
             <p>
               <strong>9.1 Access and Portability.</strong> You may request a copy of the personal information we maintain about you. Customers may export their Customer Data from the Services at any time during their subscription.
@@ -331,7 +331,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">10. International Data Transfers</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               Information that you submit through the Services may be transferred to and processed in countries other than where you live, including the United States, where our servers are located. By using the Services, you acknowledge and consent to such transfers. We require our third-party service providers to provide at least the same level of protection for your information as described in this Privacy Policy.
             </p>
@@ -342,7 +342,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">11. Children's Privacy</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               The Services are not directed at individuals under the age of 18. We do not knowingly collect personal information from anyone under 18. All Account holders must be at least 18 years old. If we learn that we have collected personal information from a person under 18, we will take steps to delete that information promptly. If you believe we have collected information from a person under 18, please contact us at team@voxxypresents.com.
             </p>
@@ -353,7 +353,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">12. Communications</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>12.1 Service Communications.</strong> We may send you service-related announcements and transactional emails related to your Account and your use of the Services. These communications are necessary for the operation of the Services and cannot be opted out of while your Account is active.
             </p>
@@ -370,13 +370,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">13. California Privacy Rights</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               If you're a California resident, you have additional rights under the CCPA/CPRA.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               If you are a California resident, the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA) provide you with additional rights regarding your personal information. These include the right to know what personal information we collect, the right to request deletion, the right to opt out of the sale or sharing of personal information (which we do not engage in), and the right to non-discrimination for exercising your privacy rights.
             </p>
@@ -390,7 +390,7 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">14. Modifications</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               We may modify this Privacy Policy from time to time and will always post the most current version on our site. If a modification meaningfully reduces your rights, we'll notify you by email or by displaying a prominent notice within the Services at least thirty (30) days before the changes take effect. By continuing to use the Services after modifications come into effect, you agree to be bound by the modified Privacy Policy.
             </p>
@@ -401,13 +401,13 @@ export default function PrivacyPolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">15. Contact Us</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               If you have any questions, concerns, or requests regarding this Privacy Policy or our data practices, please contact us at:
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-primary hover:text-primary/70 underline transition-colors">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@voxxypresents.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

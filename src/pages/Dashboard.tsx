@@ -878,7 +878,7 @@ export default function ProducerDashboard() {
               {/* Command Center Tabs */}
               {[
                 { id: 'details' as CommandCenterTab, label: 'Home', icon: Info },
-                { id: 'applicants' as CommandCenterTab, label: 'Vendors', icon: ClipboardList },
+                { id: 'applicants' as CommandCenterTab, label: 'Applicants', icon: ClipboardList },
                 { id: 'emails' as CommandCenterTab, label: 'Mail', icon: Mail },
                 { id: 'settings' as CommandCenterTab, label: 'Settings', icon: Settings },
               ].map((tab) => {

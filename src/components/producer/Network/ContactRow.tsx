@@ -34,7 +34,7 @@ export default function ContactRow({
   return (
     <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
       <div
-        className={`grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
+        className={`grid grid-cols-[28px,minmax(120px,1fr),minmax(100px,1fr),minmax(120px,1fr),100px,100px,90px,70px,minmax(80px,1fr),60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
       >
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
@@ -58,6 +58,28 @@ export default function ContactRow({
 
         <div className="min-w-0">
           <div className="text-foreground/70 truncate">{contact.business_name || '—'}</div>
+        </div>
+
+        {/* Email — fixed 140px, truncated */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-1">
+            <a
+              href={`mailto:${contact.email}`}
+              className="text-foreground/70 hover:text-primary transition-colors truncate block"
+              onClick={(e) => e.stopPropagation()}
+              title={contact.email}
+            >
+              {contact.email}
+            </a>
+            {contact.unsubscribe_status?.is_unsubscribed && (
+              <div
+                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30"
+                title={`Unsubscribed (${contact.unsubscribe_status.scope || 'unknown'})`}
+              >
+                <MailX className="w-3 h-3" />
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="min-w-0">
@@ -139,26 +161,6 @@ export default function ContactRow({
           {!contact.instagram_handle && !contact.tiktok_handle && !contact.website && (
             <span className="text-foreground/40">—</span>
           )}
-        </div>
-
-        <div className="min-w-0">
-          <div className="flex items-center gap-1">
-            <a
-              href={`mailto:${contact.email}`}
-              className="text-foreground/70 hover:text-primary transition-colors truncate block flex-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {contact.email}
-            </a>
-            {contact.unsubscribe_status?.is_unsubscribed && (
-              <div
-                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30"
-                title={`Unsubscribed (${contact.unsubscribe_status.scope || 'unknown'})`}
-              >
-                <MailX className="w-3 h-3" />
-              </div>
-            )}
-          </div>
         </div>
 
         <div className="min-w-0">

@@ -4,6 +4,16 @@ This directory contains comprehensive documentation about the Voxxy Presents Rea
 
 ## Documentation Files
 
+### Session Guide — READ EVERY SESSION
+
+#### 0. **SESSION_GUIDE.md** — READ THIS FIRST
+   - Master bootstrap document for coding sessions and AI agents
+   - Rules & Learnings (growing anti-pattern list with IDs)
+   - Rebase workflow and test commands (SESSION_START mode)
+   - Pre-PR validation checklist (PRE_PR mode)
+   - Extended doc references by topic
+   - **Read this at the START of every session and BEFORE every PR**
+
 ### Core Architecture & Auth Documentation
 
 #### 1. **ARCHITECTURE_SUMMARY.md** (19 KB) - START HERE

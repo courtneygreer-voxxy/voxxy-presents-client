@@ -383,16 +383,16 @@ export default function PublicEventDetailPage() {
         )}
         </div>
 
-        {/* Powered by Voxxy Presents */}
+        {/* Powered by VOXXY */}
         <div className="mt-6 pt-6 border-t border-border">
           <div className="flex items-center justify-center gap-2 text-foreground/40 text-xs">
-            <span>Powered by</span>
+            <span>powered by</span>
             <img
               src="/VoxxyTriangle.svg"
               alt="Voxxy"
               className="w-4 h-4 opacity-60"
             />
-            <span className="font-semibold">Voxxy Presents</span>
+            <span className="font-semibold">VOXXY</span>
           </div>
         </div>
       </div>
