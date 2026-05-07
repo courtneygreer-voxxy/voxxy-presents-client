@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Lock,
   Search,
+  Mail,
 } from 'lucide-react';
 import type { EmailTemplateItem } from '@/types/email';
 import {
@@ -40,6 +41,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RichTextEditor } from './RichTextEditor';
+import { EmailHtmlPreviewModal } from './EmailHtmlPreviewModal';
 
 interface EmailTemplateEditorPageProps {
   item: EmailTemplateItem | null;
@@ -137,6 +139,7 @@ export function EmailTemplateEditorPage({
   const [tagSearch, setTagSearch] = useState('');
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showHtmlPreview, setShowHtmlPreview] = useState(false);
   const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content
 
   const subjectRef = useRef<HTMLInputElement>(null);
@@ -385,8 +388,17 @@ export function EmailTemplateEditorPage({
                 className="px-3 py-2 rounded-lg border border-border text-foreground/70 hover:text-foreground hover:border-border transition-all flex items-center gap-2"
               >
                 {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                {showPreview ? 'Hide' : 'Show'} Preview
+                {showPreview ? 'Hide' : 'Show'} Sidebar Preview
               </button>
+              {!isCreateMode && item?.id && (
+                <button
+                  onClick={() => setShowHtmlPreview(true)}
+                  className="px-3 py-2 rounded-lg bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Preview Email
+                </button>
+              )}
               <Button
                 onClick={handleSave}
                 disabled={isSaving || validationErrors.length > 0 || !!duplicateTriggerWarning}
@@ -729,6 +741,18 @@ export function EmailTemplateEditorPage({
           </div>
         )}
       </div>
+
+      {/* HTML Preview Modal */}
+      {!isCreateMode && item?.id && (
+        <EmailHtmlPreviewModal
+          open={showHtmlPreview}
+          onClose={() => setShowHtmlPreview(false)}
+          previewUrl={`/v1/presents/email_campaign_templates/${templateId}/preview/${item.id}.html`}
+          subject={formData.subject_template}
+          title={`Preview: ${item.name || 'Email Template'}`}
+          apiMethod="GET"
+        />
+      )}
     </div>
   );
 }
