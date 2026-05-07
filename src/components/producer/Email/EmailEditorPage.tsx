@@ -28,6 +28,7 @@ import {
   Search,
   X,
   Trash2,
+  Mail,
 } from 'lucide-react';
 import type { ScheduledEmail, UpdateEmailRequest, CreateScheduledEmailRequest, TriggerType } from '@/types/email';
 import type { Category } from '@/types/category';
@@ -63,6 +64,7 @@ import { DateTime } from 'luxon';
 import { useToast } from '@/hooks/use-toast';
 import { scheduledEmailsApi } from '@/services/api';
 import { DebugPanel } from '../DebugPanel';
+import { EmailHtmlPreviewModal } from './EmailHtmlPreviewModal';
 
 interface EmailEditorPageProps {
   email: ScheduledEmail | null;
@@ -177,6 +179,7 @@ export function EmailEditorPage({
   const [availableTagsOpen, setAvailableTagsOpen] = useState(true);
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showHtmlPreview, setShowHtmlPreview] = useState(false);
   const [showTestEmailDialog, setShowTestEmailDialog] = useState(false);
   const [tagSearch, setTagSearch] = useState('');
   const [testEmailAddress, setTestEmailAddress] = useState('');
@@ -790,6 +793,17 @@ export function EmailEditorPage({
                 </>
               )}
             </Button>
+            {!isCreateMode && email?.id && (
+              <Button
+                onClick={() => setShowHtmlPreview(true)}
+                variant="default"
+                size="sm"
+                className="h-9 bg-primary/90 hover:bg-primary text-primary-foreground"
+              >
+                <Mail className="w-3.5 h-3.5 mr-1.5" />
+                Preview Email
+              </Button>
+            )}
             {!isCreateMode && (
               <Button
                 onClick={() => setShowTestEmailDialog(true)}
@@ -1511,6 +1525,18 @@ export function EmailEditorPage({
           isAdmin={isAdmin}
         />
       </div>
+
+      {/* HTML Preview Modal */}
+      {!isCreateMode && email?.id && (
+        <EmailHtmlPreviewModal
+          open={showHtmlPreview}
+          onClose={() => setShowHtmlPreview(false)}
+          previewUrl={`/v1/presents/events/${eventSlug}/scheduled_emails/${email.id}/preview.html`}
+          subject={subject}
+          title={`Preview: ${email.name || 'Email'}`}
+          apiMethod="POST"
+        />
+      )}
     </div>
   );
 }
