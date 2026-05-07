@@ -41,6 +41,7 @@ export default function Step3PaymentConfig({
   standalone = false,
 }: Step3Props) {
   const { applicationDetails, paymentConfiguration } = wizardState;
+  const [openFeeDropdown, setOpenFeeDropdown] = useState<string | null>(null);
 
   const currencySymbol = SUPPORTED_CURRENCIES.find(c => c.code === paymentConfiguration.currency)?.symbol || '$';
 
@@ -75,9 +76,6 @@ export default function Step3PaymentConfig({
   const addPaymentPrice = (appId: string, type: PaymentPriceType) => {
     const app = applicationDetails.applications.find(a => a.id === appId);
     if (!app) return;
-
-    // Don't add duplicate types
-    if (app.payment_prices.some(p => p.type === type)) return;
 
     const priceType = PAYMENT_PRICE_TYPES.find(p => p.value === type);
     const newEntry: PaymentPriceEntry = {
@@ -141,13 +139,10 @@ export default function Step3PaymentConfig({
     }
   };
 
-  // ─── Available Price Types (not yet added, excluding custom) ───────
+  // ─── Available Price Types (all types, multiples allowed) ───────────
 
-  const getAvailablePriceTypes = (app: ApplicationRow) => {
-    const usedTypes = app.payment_prices.map(p => p.type);
-    return PAYMENT_PRICE_TYPES.filter(
-      pt => pt.value !== 'custom' && !usedTypes.includes(pt.value)
-    );
+  const getAvailablePriceTypes = () => {
+    return PAYMENT_PRICE_TYPES.filter(pt => pt.value !== 'custom');
   };
 
   // ─── Dev Prefill ─────────────────────────────────────────────────────
@@ -257,7 +252,22 @@ export default function Step3PaymentConfig({
             <input
               type="date"
               value={paymentConfiguration.payment_deadline || ''}
-              onChange={(e) => updatePaymentConfig({ payment_deadline: e.target.value })}
+              onChange={(e) => {
+                const newDeadline = e.target.value;
+                updatePaymentConfig({ payment_deadline: newDeadline });
+                if (newDeadline) {
+                  const d = new Date(newDeadline);
+                  d.setDate(d.getDate() - 1);
+                  const earlyBirdDefault = d.toISOString().split('T')[0];
+                  applicationDetails.applications.forEach((app) => {
+                    app.payment_prices.forEach((entry, idx) => {
+                      if (entry.type === 'early_bird_price' && !entry.early_bird_deadline) {
+                        updatePaymentPrice(app.id, idx, { early_bird_deadline: earlyBirdDefault });
+                      }
+                    });
+                  });
+                }
+              }}
               className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
             />
           </div>
@@ -333,31 +343,35 @@ export default function Step3PaymentConfig({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs text-foreground/80 font-medium">Fee Types</label>
-              {/* Add Payment Type Dropdown */}
-              {getAvailablePriceTypes(app).length > 0 && (
-                <div className="relative group">
-                  <button
-                    type="button"
-                    className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-colors flex items-center gap-1.5"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    Add Fee Type
-                  </button>
-                  <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded-lg shadow-xl z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
-                    {getAvailablePriceTypes(app).map(pt => (
-                      <button
-                        key={pt.value}
-                        type="button"
-                        onClick={() => addPaymentPrice(app.id, pt.value)}
-                        className="w-full text-left px-4 py-2.5 hover:bg-background/20 first:rounded-t-lg last:rounded-b-lg transition-colors"
-                      >
-                        <p className="text-sm font-medium text-foreground">{pt.label}</p>
-                        <p className="text-xs text-foreground/50">{pt.description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Add Payment Type Dropdown — click-based, allows multiples */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setOpenFeeDropdown(openFeeDropdown === app.id ? null : app.id)}
+                  className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-colors flex items-center gap-1.5"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  Add Fee Type
+                </button>
+                {openFeeDropdown === app.id && (
+                  <>
+                    <div className="fixed inset-0 z-[90]" onClick={() => setOpenFeeDropdown(null)} />
+                    <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
+                      {getAvailablePriceTypes().map(pt => (
+                        <button
+                          key={pt.value}
+                          type="button"
+                          onClick={() => { addPaymentPrice(app.id, pt.value); setOpenFeeDropdown(null); }}
+                          className="w-full text-left px-4 py-2.5 hover:bg-background/10 transition-colors"
+                        >
+                          <p className="text-sm font-medium text-foreground">{pt.label}</p>
+                          <p className="text-xs text-foreground/50">{pt.description}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
 
             {/* Payment Price Entries */}

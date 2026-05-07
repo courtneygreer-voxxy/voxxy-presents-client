@@ -146,30 +146,29 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-card text-card-foreground rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-primary/20 shadow-2xl">
+    <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="voxxy-modal-surface rounded-xl w-full max-w-2xl max-h-[82vh] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-foreground">Edit Contact</h2>
-              <p className="text-foreground/50 text-xs mt-0.5">{contact.contact_name}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-foreground/60 hover:text-foreground transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Edit Contact</h2>
+            <p className="text-foreground/50 text-[11px] mt-0.5">{contact.contact_name}</p>
           </div>
+          <button
+            onClick={onClose}
+            className="text-foreground/60 hover:text-foreground transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-w-5xl mx-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {/* Row 1: Full Name, Business Name, Email */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="contact_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="contact_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -187,7 +186,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="business_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="business_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Business Name
               </label>
               <input
@@ -200,7 +199,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="email" className="block text-xs font-medium text-foreground/70 mb-1">
                 Email <span className="text-red-400">*</span>
               </label>
               <input
@@ -221,7 +220,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Row 2: Phone, Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="phone" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="phone" className="block text-xs font-medium text-foreground/70 mb-1">
                 Phone
               </label>
               <input
@@ -234,7 +233,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="location" className="block text-xs font-medium text-foreground/70 mb-1">
                 Location
               </label>
               <input
@@ -301,7 +300,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Payment Information */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="eventbrite_email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="eventbrite_email" className="block text-xs font-medium text-foreground/70 mb-1">
                 Eventbrite Email
               </label>
               <input
@@ -315,7 +314,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="venmo_handle" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="venmo_handle" className="block text-xs font-medium text-foreground/70 mb-1">
                 Venmo Handle
               </label>
               <input
@@ -329,7 +328,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="paypal_email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="paypal_email" className="block text-xs font-medium text-foreground/70 mb-1">
                 PayPal Email
               </label>
               <input
@@ -345,7 +344,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
 
           {/* Categories */}
           <div>
-            <label className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+            <label className="block text-xs font-medium text-foreground/70 mb-1">
               Categories
             </label>
             <div className="relative" ref={categoryDropdownRef}>
@@ -632,24 +631,25 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+        </div>
+          {/* Footer */}
+          <div className="px-5 py-3 border-t border-border flex justify-end gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-background/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg voxxy-btn-cta transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+                  <span className="w-3 h-3 border-2 border-border border-t-primary rounded-full animate-spin" />
                   Saving...
                 </span>
               ) : (

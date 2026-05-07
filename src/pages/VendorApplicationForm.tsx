@@ -829,16 +829,16 @@ export default function VendorApplicationForm() {
           </form>
         </div>
 
-        {/* Powered by Voxxy Presents */}
+        {/* Powered by VOXXY */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex items-center justify-center gap-2 text-foreground/55 dark:text-foreground/40 text-sm">
-            <span>Powered by</span>
+            <span>powered by</span>
             <img
               src="/VoxxyTriangle.svg"
               alt="Voxxy"
               className="w-4 h-4 opacity-60"
             />
-            <span className="font-semibold">Voxxy Presents</span>
+            <span className="font-semibold">VOXXY</span>
           </div>
         </div>
       </div>

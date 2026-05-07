@@ -34,7 +34,7 @@ export default function ContactsTable({
     <div className="voxxy-table-shell">
       {/* Table Header - Condensed view for all screen sizes */}
       <div className="voxxy-table-header">
-        <div className="voxxy-table-header-row grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
+        <div className="voxxy-table-header-row grid grid-cols-[28px,minmax(120px,1fr),minmax(100px,1fr),minmax(120px,1fr),100px,100px,90px,70px,minmax(80px,1fr),60px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
           <div className="flex items-center justify-center">
             <input
               type="checkbox"
@@ -46,11 +46,11 @@ export default function ContactsTable({
           </div>
           <div>Name</div>
           <div>Business</div>
+          <div>Email</div>
           <div>Location</div>
           <div>Phone</div>
           <div>Category</div>
           <div>Social</div>
-          <div>Email</div>
           <div>Tags</div>
           <div className="text-right">Actions</div>
         </div>

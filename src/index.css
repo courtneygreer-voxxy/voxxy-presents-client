@@ -504,7 +504,7 @@
   }
 
   .voxxy-nav-tab-active {
-    background-image: var(--voxxy-grad-nav-tab-active);
+    background-image: var(--voxxy-grad-cta);
     color: hsl(var(--foreground));
     box-shadow: 0 4px 14px hsl(270 45% 35% / 0.1);
   }

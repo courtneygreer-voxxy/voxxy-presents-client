@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Tag, Zap, Plus, X } from 'lucide-react';
-import { WizardStepProps, ApplicationRow } from '../types';
+import { WizardStepProps, ApplicationRow, PaymentPriceType } from '../types';
 import { Category } from '@/types/category';
 import { categoriesApi } from '@/services/api';
 import { CategoryBadge } from '@/components/shared/CategoryBadge';
@@ -130,12 +130,20 @@ export default function Step2ApplicationDetails({
           prefilled_from_event: usingSmartDefaults ? category.last_used_event_name : undefined,
           prefilled_from_event_id: usingSmartDefaults ? category.last_used_event_id : undefined,
           // Payment config initialized for Step 3
-          payment_prices: [{
-            type: 'booth_price',
-            label: 'Booth Fee',
-            amount: boothPrice,
-            is_percentage: false,
-          }],
+          // If category has saved payment_preferences, use them as the starting point
+          payment_prices: (category.payment_preferences && category.payment_preferences.length > 0)
+            ? category.payment_preferences.map(pref => ({
+                type: pref.type as PaymentPriceType,
+                label: pref.label,
+                amount: pref.amount,
+                is_percentage: pref.is_percentage,
+              }))
+            : [{
+                type: 'booth_price' as PaymentPriceType,
+                label: 'Booth Fee',
+                amount: boothPrice,
+                is_percentage: false,
+              }],
           payment_engines: [],
         });
       }
