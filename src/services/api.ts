@@ -132,7 +132,16 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         errors: errorData.errors
       })
 
-      const errorMessage = errorData.message || errorData.error || `API request failed (${response.status})`
+      // Build error message - prioritize specific validation errors from errors array
+      let errorMessage: string
+      if (errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+        // If we have specific validation errors, use the first one as the main message
+        errorMessage = errorData.errors[0]
+      } else {
+        // Fallback to message/error field or generic message
+        errorMessage = errorData.message || errorData.error || `API request failed: ${response.status}`
+      }
+
       throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
