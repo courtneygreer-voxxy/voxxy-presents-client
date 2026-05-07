@@ -151,12 +151,37 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ---
 
+### 🟡 BUG 4: EditContactModal Inputs Missing `voxxy-input-frost` Class (RL-010)
+
+**Symptom**: All 12+ input fields in `EditContactModal` use raw inline styling (`bg-background/10 border border-border ...`) instead of the standard `voxxy-input-frost` class required for producer-app forms.
+
+**Fix needed**: Replace the raw input className pattern with `voxxy-input-frost` across all `<input>` and `<textarea>` elements in the modal.
+
+**Files**:
+- `src/components/producer/Network/EditContactModal.tsx`
+
+---
+
+### 🟡 BUG 5: LegalLayout Uses Inline Hex Gradient (RL-001 / RL-002)
+
+**Symptom**: `LegalLayout.tsx` line 25 uses `style={{ background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 40%, #f0f4ff 100%)' }}` — raw hex values and inline style.
+
+**Context**: This is intentional for the forced-light legal pages (`useForceTheme('light')`). Standard dark-mode tokens don't apply here. Low priority but should be extracted to a CSS class (e.g. `voxxy-legal-bg`) in `src/index.css` for consistency.
+
+**Files**:
+- `src/components/legal/LegalLayout.tsx`
+- `src/index.css` (target for new class)
+
+---
+
 ## Before Opening the PR to Main
 
 - [ ] Resolve Bug 1 (verify API serialises `payment_preferences`)
 - [ ] Resolve Bug 2 (enforce single-instance for non-early-bird types in wizard + category modal)
+- [ ] Resolve Bug 4 (EditContactModal inputs → `voxxy-input-frost`)
+- [ ] Resolve Bug 5 (LegalLayout inline hex gradient → CSS class)
 - [ ] Confirm `bin/rails db:migrate` has been run on staging DB
-- [ ] Run all unit tests: `npm run test:run` — expect 62 passing
+- [ ] Run all unit tests: `npm run test:run` — expect 83 passing
 - [ ] Smoke test: add a category with mixed fee types, create an event with that category, confirm Step 3 pre-populates correctly
 - [ ] Verify legal pages look correct in both dark and light system theme
 - [ ] Verify pricing page "Request Access" buttons render at proper size
@@ -165,7 +190,7 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ## Test Coverage
 
-All 62 frontend unit tests pass on this branch. Key test files:
+All 83 frontend unit tests pass on this branch (after rebase onto staging which added API error handling + email preview tests). Key test files:
 
 | File | Coverage |
 |---|---|
