@@ -15,6 +15,8 @@ export interface EventDetails {
   title: string;
   slug: string;
   description: string;
+  /** Event poster / hero image URL when provided by API or mocks */
+  poster_url?: string | null;
   status?: string;
   dates: {
     event_date: string;

@@ -49,14 +49,14 @@
 | RL-010 | All producer-app form fields must use `voxxy-input-frost` class. Do not use raw shadcn Input styling. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5 |
 | RL-011 | New Voxxy-specific CSS utility classes must be prefixed with `voxxy-` and defined in `@layer components` in `src/index.css`. | [STYLE_GUIDE.md](./STYLE_GUIDE.md) §5 |
 | RL-012 | Modals should use standardised shell: `max-w-2xl max-h-[82vh]` with gradient header and scrollable body, unless a wider size is justified. | [GLASS_MODAL_DESIGN_SYSTEM.md](./design/GLASS_MODAL_DESIGN_SYSTEM.md) |
-| RL-013 | When removing a duplicate guard (like fee-type dedup), check if it should be narrowed rather than fully removed. Only `early_bird_price` allows multiples. | [HANDOFF.md](./HANDOFF.md) Bug 2 |
+| RL-013 | When removing a duplicate guard (like fee-type dedup), check if it should be narrowed rather than fully removed. Only `early_bird_price` allows multiples. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 2 |
 
 ### Backend Rules
 
 | ID | Rule | Source |
 |------|------|--------|
-| RL-014 | Always run `bin/rails db:migrate` after pulling changes. Pending migrations block login and API calls. | [HANDOFF.md](./HANDOFF.md) Bug 3 |
-| RL-015 | When adding a new model attribute, update BOTH `strong_params` (permit) AND the serialiser method. Missing serialiser output is a silent bug. | [HANDOFF.md](./HANDOFF.md) Bug 1 |
+| RL-014 | Always run `bin/rails db:migrate` after pulling changes. Pending migrations block login and API calls. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 3 |
+| RL-015 | When adding a new model attribute, update BOTH `strong_params` (permit) AND the serialiser method. Missing serialiser output is a silent bug. | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Bug 1 |
 | RL-016 | Sidekiq workers run on a 5-minute cron cycle. Test email jobs with `EmailSenderWorker.new.perform` in rails console rather than waiting for cron. | Backend email docs |
 | RL-017 | Verify SendGrid template IDs match between environments. Staging and production use different template sets. | Backend email docs |
 | RL-018 | Use FactoryBot for test data in RSpec. Never create records with raw `Model.create!` in specs. | Backend TESTING.md |
@@ -159,7 +159,7 @@ fi
 # ── Frontend ──
 cd ~/Development/voxxy-presents-client
 npm run test:run
-# Expected: 62+ tests passing (see HANDOFF.md for current count)
+# Expected: 62+ tests passing (see KNOWN_BUGS.md for current count)
 ```
 
 ```bash
@@ -176,7 +176,7 @@ Based on your task, read the relevant docs from the **Extended Doc References** 
 
 At minimum, always read:
 - This file (you are reading it now)
-- [docs/HANDOFF.md](./HANDOFF.md) — Current sprint status and known bugs
+- [docs/KNOWN_BUGS.md](./KNOWN_BUGS.md) — Current sprint status and known bugs
 
 ### Step 4: Produce bootstrap summary
 
@@ -225,7 +225,7 @@ bundle exec rspec           # Tests
 
 ### Step 4: Check the HANDOFF known bugs list
 
-Read [docs/HANDOFF.md](./HANDOFF.md) "Known Bugs" section.
+Read [docs/KNOWN_BUGS.md](./KNOWN_BUGS.md) "Known Bugs" section.
 - If your PR resolves any listed bug, note it in the summary and in the PR description.
 - If your PR introduces changes that interact with a known bug, flag the risk.
 
@@ -262,15 +262,15 @@ Read only the docs relevant to your current task.
 | **Auth** | [ARCHITECTURE_SUMMARY.md §1](./architecture/ARCHITECTURE_SUMMARY.md), [AUTH_QUICK_REFERENCE.md](./guides/AUTH_QUICK_REFERENCE.md) | Auth changes, protected routes |
 | **API** | [API_CONFIGURATION.md](./architecture/API_CONFIGURATION.md), `src/services/api.ts` | New endpoints, API changes |
 | **Email System** | [EMAIL_DOCUMENTATION_INDEX.md](./email-system/EMAIL_DOCUMENTATION_INDEX.md) | Any email work |
-| **Events / Wizard** | [HANDOFF.md](./HANDOFF.md), Step2/Step3 source files | Event creation changes |
-| **Network / CRM** | [HANDOFF.md](./HANDOFF.md) Network section | Contact management work |
+| **Events / Wizard** | [KNOWN_BUGS.md](./KNOWN_BUGS.md), Step2/Step3 source files | Event creation changes |
+| **Network / CRM** | [KNOWN_BUGS.md](./KNOWN_BUGS.md) Network section | Contact management work |
 | **Payments** | [PAYMENT_DEADLINE_FEATURE.md](./features/PAYMENT_DEADLINE_FEATURE.md), [PAYMENT_SYSTEM.md](./PAYMENT_SYSTEM.md) | Payment config |
 | **Testing** | [TESTING_ROADMAP.md](./TESTING_ROADMAP.md), `vitest.config.ts` | Adding tests, CI changes |
 | **Git / Release** | [CONTRIBUTING.md](./CONTRIBUTING.md), [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) | Branch management, PRs |
 | **Deployment** | [DEPLOYMENT.md](./deployment/DEPLOYMENT.md), [RUNBOOK.md](./development/RUNBOOK.md) | Deployment issues |
 | **Backend** | `../voxxy-rails-react/docs/README.md`, [LOCAL_DEVELOPMENT_GUIDE.md (backend)](../voxxy-rails-react/docs/development/LOCAL_DEVELOPMENT_GUIDE.md) | Backend changes |
 | **Roles / Permissions** | [ROLE_MAPPING.md](./architecture/ROLE_MAPPING.md) | Role-based features |
-| **Current Sprint** | [HANDOFF.md](./HANDOFF.md) | **Always read this** |
+| **Current Sprint** | [KNOWN_BUGS.md](./KNOWN_BUGS.md) | **Always read this** |
 
 ### Key Source Files
 
@@ -362,12 +362,12 @@ After completing SESSION_START mode, output this:
 - Frontend: <N> passed, <N> failed | SKIPPED (conflict blocks tests)
 - Backend: <N> examples passed, <N> failed | N/A
 
-### Known Bugs (from HANDOFF.md)
+### Known Bugs (from KNOWN_BUGS.md)
 - [ ] BUG 1: <one-line summary>
 - [ ] BUG 2: <one-line summary>
 
 ### Context Loaded
-- Read: SESSION_GUIDE.md, HANDOFF.md
+- Read: SESSION_GUIDE.md, KNOWN_BUGS.md
 - Also read: <additional docs relevant to task>
 
 ### Ready to Code
