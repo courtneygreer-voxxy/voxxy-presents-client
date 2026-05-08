@@ -64,22 +64,42 @@ This document is intended for the next developer (or agent) picking up this work
 
 ## Known Bugs — Must Resolve Before Merging to Main
 
-### 🔴 BUG 1: Wizard Shows Booth Fee Instead of Saved Preferences
+### 🔴 BUG 1: Payment Preferences Never Persist to Vendor Applications (4-Layer Failure)
 
-**Symptom**: When creating a new event and selecting a category that has saved `payment_preferences`, Step 3 of the wizard still shows only "Booth Fee" instead of the saved preferences.
+**Symptom**: When saving payment preferences to a category (e.g. Booth Fee + Early Bird + Jury Fee), the wizard always falls back to showing only "Booth Fee". The category modal saves preferences correctly, but they're lost when creating vendor applications during event creation.
 
-**Root cause**: The pre-fill logic in `Step2ApplicationDetails` reads `category.payment_preferences`, but the API response from `/organizations/:id/categories` may not be returning the new `payment_preferences` field yet. The backend migration may need to be run (`bin/rails db:migrate`) and the serialiser output should be verified to confirm `payment_preferences` is included.
+**5 Whys Root Cause**:
+1. Step 2 reads `category.payment_preferences` and populates `app.payment_prices` correctly ✅
+2. But `Dashboard.tsx` lines 481–482 are **commented out** — `payment_prices` is never sent to the API
+3. The TODO says "Backend needs payment_prices (jsonb) columns" — backend isn't ready
+4. `vendor_applications` table has no `payment_prices` JSONB column, strong params don't permit it
+5. The category-level feature was built but the **downstream consumer** (vendor applications) was never wired up
 
-**How to verify**:
-1. Run `bin/rails db:migrate` in `voxxy-rails-react`.
-2. In `CategoriesController#serialize_category`, confirm `payment_preferences: category.payment_preferences || []` is present.
-3. Add a category with payment preferences via the Network UI.
-4. Check the API response at `/api/v1/presents/organizations/:id/categories` and confirm `payment_preferences` is included.
-5. Create a new event with that category; Step 3 should pre-populate.
+**Failure chain** (all 4 layers must be fixed):
 
-**Files**:
-- `voxxy-rails-react/app/controllers/api/v1/presents/categories_controller.rb` — `serialize_category`
-- `src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx` — lines ~132–145
+| Layer | File | Issue |
+|-------|------|-------|
+| Frontend call | `src/pages/Dashboard.tsx:481-482` | `payment_prices` commented out in `vendorApplicationsApi.create()` call |
+| API type | `src/services/api.ts:1001-1018` | `vendorApplicationsApi.create()` signature missing `payment_prices` (but `update()` has it) |
+| Backend params | `voxxy-rails-react/.../vendor_applications_controller.rb:155-169` | `vendor_application_params` doesn't permit `payment_prices` |
+| Database | `voxxy-rails-react/db/schema.rb` | `vendor_applications` table missing `payment_prices` JSONB column |
+
+**3 Proposed Fixes** (ranked by scope):
+
+**Fix A — Full pipeline (recommended):**
+1. Migration: add `payment_prices` and `payment_engines` JSONB columns to `vendor_applications`
+2. Backend: permit in strong params + serialize in response
+3. Frontend: uncomment Dashboard.tsx lines 481-482, add fields to `create()` type signature
+
+**Fix B — Read-through from category (lighter):**
+- Skip storing on vendor_applications entirely
+- Have Step 2/Step 3 always read `category.payment_preferences` from the category API
+- Trade-off: payment prices can't diverge per-application within a category
+
+**Fix C — Frontend-only workaround (temporary):**
+- Store payment_prices in local wizard state and pass through the wizard steps
+- Don't persist to backend — only use for display during event creation
+- Trade-off: data lost on page refresh, not available outside wizard
 
 ---
 
@@ -162,6 +182,50 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ---
 
+### 🔴 BUG 9: Payment Email Scheduling Fails on Event Creation ("Scheduled for can't be blank")
+
+**Symptom**: Creating an event with a universal email sequence produces 3 errors:
+```
+"Failed to create '1 Day Before Payment Due': Scheduled for can't be blank"
+"Failed to create 'Payment Due Today': Scheduled for can't be blank"
+"Failed to create 'Payment Overdue': Scheduled for can't be blank"
+```
+
+**5 Whys Root Cause**:
+1. `ScheduledEmail` model validates `scheduled_for` presence for non-event-triggered emails
+2. `EmailScheduleCalculator` returns `nil` for payment emails because `event.payment_deadline` is `nil`
+3. The calculator early-returns: `return nil unless event.payment_deadline`
+4. `payment_deadline` is optional in Step 3 — users can create events without setting it
+5. But the 3 payment email templates are `enabled_by_default: true` in seeds — they always try to schedule, even when there's no deadline to calculate from
+
+**Connected to Bug 1**: The payment feature was partially built. `payment_deadline` was made optional for flexible pricing, but the email templates that depend on it were never updated.
+
+**Files**:
+- `voxxy-rails-react/app/services/email_schedule_calculator.rb:110-128` — returns nil when deadline missing
+- `voxxy-rails-react/app/services/scheduled_email_generator.rb:36-222` — generates all enabled templates
+- `voxxy-rails-react/app/models/scheduled_email.rb:15-16` — validates `scheduled_for` presence
+- `voxxy-rails-react/db/seeds/email_campaign_templates.rb:410-511` — 3 payment templates enabled by default
+- `src/components/producer/CreateEventWizard/steps/Step3PaymentConfig.tsx:252-272` — optional deadline field
+
+**3 Proposed Fixes** (ranked):
+
+**Fix A — Guard in generator (recommended, lowest risk):**
+- In `ScheduledEmailGenerator`, skip payment-trigger emails when `event.payment_deadline` is blank
+- Add: `next if item.trigger_type.include?('payment') && event.payment_deadline.blank?`
+- No schema changes, no frontend changes, backwards-compatible
+
+**Fix B — Make payment_deadline required when payment emails are enabled:**
+- Frontend: validate that `payment_deadline` is set in Step 3 if any payment fee types exist
+- Backend: add conditional validation on Event model
+- Trade-off: forces users to set a deadline, may not match all workflows
+
+**Fix C — Change payment emails to event-triggered:**
+- Mark the 3 payment templates as `event_triggered` instead of time-based
+- Create them with `scheduled_for: nil` and calculate later when `payment_deadline` is set
+- Trade-off: requires new trigger mechanism, more complex
+
+---
+
 ### 🟡 BUG 5: LegalLayout Uses Inline Hex Gradient (RL-001 / RL-002)
 
 **Symptom**: `LegalLayout.tsx` line 25 uses `style={{ background: 'linear-gradient(160deg, #f5f3ff 0%, #ede9fe 40%, #f0f4ff 100%)' }}` — raw hex values and inline style.
@@ -176,15 +240,20 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ## Before Opening the PR to Main
 
-- [ ] Resolve Bug 1 (verify API serialises `payment_preferences`)
+- [ ] Resolve Bug 1 (payment preferences 4-layer fix: migration + params + API type + uncomment Dashboard)
 - [ ] Resolve Bug 2 (enforce single-instance for non-early-bird types in wizard + category modal)
 - [ ] Resolve Bug 4 (EditContactModal inputs → `voxxy-input-frost`)
 - [ ] Resolve Bug 5 (LegalLayout inline hex gradient → CSS class)
+- [ ] Resolve Bug 6 (Vendor portal dark mode colours → align with style guide)
+- [ ] Resolve Bug 7 (Hide hardcoded FAQ section until editing UI is built)
+- [ ] Resolve Bug 8 (Hero banner upload — backend attachment + frontend persistence)
+- [ ] Resolve Bug 9 (Payment email scheduling — guard in generator when deadline is blank)
 - [ ] Confirm `bin/rails db:migrate` has been run on staging DB
 - [ ] Run all unit tests: `npm run test:run` — expect 83 passing
 - [ ] Smoke test: add a category with mixed fee types, create an event with that category, confirm Step 3 pre-populates correctly
 - [ ] Verify legal pages look correct in both dark and light system theme
 - [ ] Verify pricing page "Request Access" buttons render at proper size
+- [ ] Retro: review all Sentry alerts for related regressions
 
 ---
 

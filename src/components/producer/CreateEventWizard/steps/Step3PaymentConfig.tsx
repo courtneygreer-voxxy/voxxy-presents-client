@@ -139,10 +139,20 @@ export default function Step3PaymentConfig({
     }
   };
 
-  // ─── Available Price Types (all types, multiples allowed) ───────────
+  // ─── Available Price Types (with limits) ────────────────────────────
+  // Max 3 early birds, max 1 of each other type per category
 
-  const getAvailablePriceTypes = () => {
-    return PAYMENT_PRICE_TYPES.filter(pt => pt.value !== 'custom');
+  const getAvailablePriceTypes = (appId: string) => {
+    const app = applicationDetails.applications.find(a => a.id === appId);
+    const existing = app?.payment_prices || [];
+
+    return PAYMENT_PRICE_TYPES.filter(pt => {
+      if (pt.value === 'custom') return false;
+
+      const count = existing.filter(p => p.type === pt.value).length;
+      if (pt.value === 'early_bird_price') return count < 3;
+      return count < 1;
+    });
   };
 
   // ─── Dev Prefill ─────────────────────────────────────────────────────
@@ -247,7 +257,7 @@ export default function Step3PaymentConfig({
           {/* Payment Deadline */}
           <div>
             <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-              Payment Deadline
+              Payment Deadline <span className="text-red-400">*</span>
             </label>
             <input
               type="date"
@@ -268,8 +278,13 @@ export default function Step3PaymentConfig({
                   });
                 }
               }}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                errors.payment_deadline ? 'border-red-500' : 'border-border'
+              }`}
             />
+            {errors.payment_deadline && (
+              <p className="mt-1 text-xs text-red-400">{errors.payment_deadline}</p>
+            )}
           </div>
         </div>
 
@@ -357,17 +372,23 @@ export default function Step3PaymentConfig({
                   <>
                     <div className="fixed inset-0 z-[90]" onClick={() => setOpenFeeDropdown(null)} />
                     <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
-                      {getAvailablePriceTypes().map(pt => (
-                        <button
-                          key={pt.value}
-                          type="button"
-                          onClick={() => { addPaymentPrice(app.id, pt.value); setOpenFeeDropdown(null); }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-background/10 transition-colors"
-                        >
-                          <p className="text-sm font-medium text-foreground">{pt.label}</p>
-                          <p className="text-xs text-foreground/50">{pt.description}</p>
-                        </button>
-                      ))}
+                      {getAvailablePriceTypes(app.id).length === 0 ? (
+                        <div className="px-4 py-3 text-xs text-foreground/50">
+                          All fee types have been added.
+                        </div>
+                      ) : (
+                        getAvailablePriceTypes(app.id).map(pt => (
+                          <button
+                            key={pt.value}
+                            type="button"
+                            onClick={() => { addPaymentPrice(app.id, pt.value); setOpenFeeDropdown(null); }}
+                            className="w-full text-left px-4 py-2.5 hover:bg-background/10 transition-colors"
+                          >
+                            <p className="text-sm font-medium text-foreground">{pt.label}</p>
+                            <p className="text-xs text-foreground/50">{pt.description}</p>
+                          </button>
+                        ))
+                      )}
                     </div>
                   </>
                 )}

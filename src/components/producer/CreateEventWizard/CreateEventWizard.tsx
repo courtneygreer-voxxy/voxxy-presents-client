@@ -144,6 +144,11 @@ export default function CreateEventWizard({ onCancel, onSubmit, organizationId }
     const newErrors: Record<string, string> = {};
     const { applicationDetails, paymentConfiguration } = wizardState;
 
+    // Payment deadline is required for scheduled payment emails
+    if (!paymentConfiguration.payment_deadline) {
+      newErrors.payment_deadline = 'Payment deadline is required';
+    }
+
     // Validate each category has at least one payment type with amount > 0
     applicationDetails.applications.forEach((app) => {
       if (app.payment_prices.length === 0) {
