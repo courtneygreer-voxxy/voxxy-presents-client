@@ -372,17 +372,23 @@ export default function Step3PaymentConfig({
                   <>
                     <div className="fixed inset-0 z-[90]" onClick={() => setOpenFeeDropdown(null)} />
                     <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
-                      {getAvailablePriceTypes(app.id).map(pt => (
-                        <button
-                          key={pt.value}
-                          type="button"
-                          onClick={() => { addPaymentPrice(app.id, pt.value); setOpenFeeDropdown(null); }}
-                          className="w-full text-left px-4 py-2.5 hover:bg-background/10 transition-colors"
-                        >
-                          <p className="text-sm font-medium text-foreground">{pt.label}</p>
-                          <p className="text-xs text-foreground/50">{pt.description}</p>
-                        </button>
-                      ))}
+                      {getAvailablePriceTypes(app.id).length === 0 ? (
+                        <div className="px-4 py-3 text-xs text-foreground/50">
+                          All fee types have been added.
+                        </div>
+                      ) : (
+                        getAvailablePriceTypes(app.id).map(pt => (
+                          <button
+                            key={pt.value}
+                            type="button"
+                            onClick={() => { addPaymentPrice(app.id, pt.value); setOpenFeeDropdown(null); }}
+                            className="w-full text-left px-4 py-2.5 hover:bg-background/10 transition-colors"
+                          >
+                            <p className="text-sm font-medium text-foreground">{pt.label}</p>
+                            <p className="text-xs text-foreground/50">{pt.description}</p>
+                          </button>
+                        ))
+                      )}
                     </div>
                   </>
                 )}
