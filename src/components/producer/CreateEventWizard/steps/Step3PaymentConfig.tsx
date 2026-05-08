@@ -139,10 +139,20 @@ export default function Step3PaymentConfig({
     }
   };
 
-  // ─── Available Price Types (all types, multiples allowed) ───────────
+  // ─── Available Price Types (with limits) ────────────────────────────
+  // Max 3 early birds, max 1 of each other type per category
 
-  const getAvailablePriceTypes = () => {
-    return PAYMENT_PRICE_TYPES.filter(pt => pt.value !== 'custom');
+  const getAvailablePriceTypes = (appId: string) => {
+    const app = applicationDetails.applications.find(a => a.id === appId);
+    const existing = app?.payment_prices || [];
+
+    return PAYMENT_PRICE_TYPES.filter(pt => {
+      if (pt.value === 'custom') return false;
+
+      const count = existing.filter(p => p.type === pt.value).length;
+      if (pt.value === 'early_bird_price') return count < 3;
+      return count < 1;
+    });
   };
 
   // ─── Dev Prefill ─────────────────────────────────────────────────────
@@ -362,7 +372,7 @@ export default function Step3PaymentConfig({
                   <>
                     <div className="fixed inset-0 z-[90]" onClick={() => setOpenFeeDropdown(null)} />
                     <div className="absolute right-0 top-full mt-1 w-64 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
-                      {getAvailablePriceTypes().map(pt => (
+                      {getAvailablePriceTypes(app.id).map(pt => (
                         <button
                           key={pt.value}
                           type="button"

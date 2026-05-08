@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Calendar, Users, Settings, Building2, Menu, X, LogOut, Mail, Shield, ArrowLeft, Info, ClipboardList, Plus, Search, Eye, EyeOff, Filter, Tag, Upload, UserPlus, HelpCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi, adminApi } from '@/services/api';
+import { eventsApi, organizationsApi, vendorApplicationsApi, eventInvitationsApi, contactListsApi, emailCampaignTemplatesApi, adminApi, categoriesApi } from '@/services/api';
 import SettingsPage from './SettingsPage';
 import EventsEmptyState from '@/components/producer/EventsEmptyState';
 import { CreateEventWizard, WizardState } from '@/components/producer/CreateEventWizard';
@@ -446,6 +446,7 @@ export default function ProducerDashboard() {
         ticket_link: wizardState.eventDetails.ticket_link || undefined,
         application_deadline: wizardState.eventDetails.application_deadline,
         payment_deadline: wizardState.paymentConfiguration.payment_deadline || undefined,
+        payment_engines: wizardState.paymentConfiguration.payment_engines || [],
         vendor_fee_currency: wizardState.paymentConfiguration.currency || 'USD',
         email_campaign_template_id: templateId || undefined,
         use_category_templates: wizardState.automaticMessages.use_category_templates || false,
@@ -476,9 +477,8 @@ export default function ProducerDashboard() {
             name: app.name,
             description: app.description || undefined,
             booth_price: effectiveBoothPrice,
-            // TODO: Backend needs payment_prices (jsonb) and payment_engines (jsonb) columns
-            // payment_prices: app.payment_prices,
-            // payment_engines: app.payment_engines,
+            payment_prices: app.payment_prices,
+            payment_engines: app.payment_engines,
             category_id: app.category_id || undefined,
             install_date: app.install_date || undefined,
             install_start_time: app.install_start_time || undefined,
@@ -498,6 +498,24 @@ export default function ProducerDashboard() {
         if (failures.length > 0) {
           console.error(`${failures.length} applications failed to create:`, failures);
         }
+
+        // Write back payment_preferences to each category so they persist for next event
+        const categoryWriteBackPromises = wizardState.applicationDetails.applications
+          .filter(app => app.category_id && app.payment_prices?.length > 0)
+          .map(app => {
+            const preferences = app.payment_prices.map(p => ({
+              type: p.type,
+              label: p.label,
+              amount: p.amount,
+              is_percentage: p.is_percentage,
+            }));
+            return categoriesApi.update(app.category_id!, {
+              payment_preferences: preferences,
+              booth_price: app.booth_price,
+            });
+          });
+
+        await Promise.allSettled(categoryWriteBackPromises);
       }
 
       // Step 3: Save invitation data for "Go Live" later (don't send yet)

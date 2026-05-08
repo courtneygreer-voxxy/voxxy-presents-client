@@ -703,6 +703,7 @@ export const eventsApi = {
     use_category_templates?: boolean
     use_universal_category_template?: boolean
     universal_category_template_id?: number
+    payment_engines?: any[]
   }) {
     return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',
@@ -1010,6 +1011,8 @@ export const vendorApplicationsApi = {
     install_end_time?: string
     payment_link?: string
     application_tags?: string
+    payment_prices?: any[]
+    payment_engines?: any[]
   }) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`, {
       method: 'POST',
@@ -2824,6 +2827,11 @@ export const categoriesApi = {
     color?: string;
     icon?: string;
     booth_price?: number;
+    early_bird_price?: number;
+    early_bird_deadline?: string;
+    payment_deadline?: string;
+    deposit?: number;
+    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/organizations/${organizationId}/categories`,
@@ -2844,6 +2852,11 @@ export const categoriesApi = {
     color?: string;
     icon?: string;
     booth_price?: number;
+    early_bird_price?: number;
+    early_bird_deadline?: string;
+    payment_deadline?: string;
+    deposit?: number;
+    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/categories/${categoryId}`,
