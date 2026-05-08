@@ -711,7 +711,8 @@ export default function VendorEventPortalPage() {
           </VendorPortalSection>
         ) : null}
 
-        <VendorPortalFaq event={event} formatDate={formatDate} />
+        {/* FAQ section hidden until backend editing UI is built */}
+        {/* <VendorPortalFaq event={event} formatDate={formatDate} /> */}
 
         <VendorPortalSection
           title="Updates from the organizer"

@@ -1,10 +1,10 @@
-# Developer Handoff — UI Polish + Payment Preferences Sprint
+# Known Bugs & Issues
 
-> **Branch**: `feature/design-tweaks-and-applicants` → merge target: `staging`
-> **Date**: May 2026
-> **Backend branch**: `feature/category-payment-fields` in `voxxy-rails-react`
+> **Last updated**: May 8, 2026
+> **Frontend**: `voxxy-presents-client` (staging)
+> **Backend**: `voxxy-rails-react` (staging)
 
-This document is intended for the next developer (or agent) picking up this work. It summarises what was completed, what is partially working, and the known bugs that must be resolved **before merging to `main`**.
+Tracks known bugs, incomplete features, and issues to resolve before merging staging to `main`.
 
 ---
 
@@ -281,22 +281,51 @@ Covered by Bug 2 above — fix `getAvailablePriceTypes` to filter per-type.
 
 ---
 
-## Before Opening the PR to Main
+## Resolved (Merged to Staging)
 
-- [ ] Resolve Bug 1 (payment preferences 4-layer fix: migration + params + API type + uncomment Dashboard)
-- [ ] Resolve Bug 2 (enforce single-instance for non-early-bird types in wizard + category modal)
-- [ ] Resolve Bug 4 (EditContactModal inputs → `voxxy-input-frost`)
-- [ ] Resolve Bug 5 (LegalLayout inline hex gradient → CSS class)
-- [ ] Resolve Bug 6 (Vendor portal dark mode colours → align with style guide)
-- [ ] Resolve Bug 7 (Hide hardcoded FAQ section until editing UI is built)
-- [ ] Resolve Bug 8 (Hero banner upload — backend attachment + frontend persistence)
-- [ ] Resolve Bug 9 (Payment email scheduling — guard in generator when deadline is blank)
-- [ ] Confirm `bin/rails db:migrate` has been run on staging DB
-- [ ] Run all unit tests: `npm run test:run` — expect 83 passing
-- [ ] Smoke test: add a category with mixed fee types, create an event with that category, confirm Step 3 pre-populates correctly
+- [x] ~~Bug 1~~ — Payment preferences 4-layer fix (PR #105 backend + PR #87 frontend)
+- [x] ~~Bug 2~~ — Fee type limits enforced (max 3 early birds, 1 of each other)
+- [x] ~~Bug 3~~ — Pending migration resolved (migrations ran on staging)
+- [x] ~~Bug 7~~ — FAQ section hidden until backend editing UI exists
+- [x] ~~Bug 9~~ — Payment email scheduling fixed (`.to_date` + required deadline in wizard)
+
+---
+
+## Open Issues — Before Merging to Main
+
+- [ ] Bug 4 (EditContactModal inputs → `voxxy-input-frost`)
+- [ ] Bug 5 (LegalLayout inline hex gradient → CSS class)
+- [ ] Bug 6 (Vendor portal dark mode colours → align with style guide)
+- [ ] Bug 8 (Hero banner upload — backend attachment + frontend persistence)
+- [ ] Bug 10 (Vendor portal login page — verify auth path, unknown login page discovered)
+- [ ] Bug 11 (Vendor portal color theme — purple/gradient tones don't match producer app palette)
+- [ ] Smoke test: add a category with mixed fee types, create event, confirm Step 3 pre-populates
 - [ ] Verify legal pages look correct in both dark and light system theme
-- [ ] Verify pricing page "Request Access" buttons render at proper size
 - [ ] Retro: review all Sentry alerts for related regressions
+
+---
+
+### 🟡 BUG 10: Vendor Portal — Auth Path / Login Page Needs Verification
+
+**Symptom**: The portal has its own email-based login gate (`VendorEventPortalPage.tsx`). Need to verify this auth flow works correctly and doesn't conflict with the main app login. Confirm whether the portal login page is intentional or if vendors should use the standard auth flow.
+
+**Files**:
+- `src/pages/VendorEventPortalPage.tsx` (email gate ~line 369-451)
+- `src/services/eventPortalService.ts` (portal access verification)
+
+---
+
+### 🟡 BUG 11: Vendor Portal — Color Theme Mismatch
+
+**Symptom**: The event portal auth page, hero overlay, and section cards use purple/violet gradients and hex values (`#120b1c`, `#1a1228`) that don't match the central `--voxxy-*` token palette used in the producer app. The portal should feel like the same product.
+
+**Fix needed**: Audit all portal components against `STYLE_GUIDE.md` and replace raw hex values with CSS tokens or `voxxy-*` utility classes.
+
+**Files**:
+- `src/components/vendor-portal/VendorPortalPageCanvas.tsx`
+- `src/components/vendor-portal/VendorPortalHero.tsx`
+- `src/components/vendor-portal/VendorPortalSection.tsx`
+- `src/pages/VendorEventPortalPage.tsx`
 
 ---
 

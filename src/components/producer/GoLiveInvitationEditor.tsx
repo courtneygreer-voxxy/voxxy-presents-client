@@ -161,6 +161,9 @@ export default function GoLiveInvitationEditor({
   const [loadingListContacts, setLoadingListContacts] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // ── View mode: show only invited contacts by default ──
+  const [showAllContacts, setShowAllContacts] = useState(false);
+
   // ── Search, filter, sort, pagination ──
   const [searchTerm, setSearchTerm] = useState('');
   const [sortColumn, setSortColumn] = useState<'name' | 'email'>('name');
@@ -191,6 +194,12 @@ export default function GoLiveInvitationEditor({
   useEffect(() => {
     let filtered = contacts;
 
+    // When in "selected only" mode, show only invited contacts
+    if (!showAllContacts) {
+      const invitedSet = new Set(invitedContactIds);
+      filtered = filtered.filter((c) => invitedSet.has(c.id));
+    }
+
     // When lists are selected, show only contacts from those lists
     if (selectedListIds.length > 0 && listContacts.length > 0) {
       const listContactIdSet = new Set(listContacts.map((c) => c.id));
@@ -208,7 +217,7 @@ export default function GoLiveInvitationEditor({
       );
     }
     setFilteredContacts(filtered);
-  }, [contacts, searchTerm, selectedListIds, listContacts]);
+  }, [contacts, searchTerm, selectedListIds, listContacts, showAllContacts, invitedContactIds]);
 
   const handleSort = (column: 'name' | 'email') => {
     if (sortColumn === column) {
@@ -365,7 +374,7 @@ export default function GoLiveInvitationEditor({
   // ── Reset to page 1 when filters/search change ──
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedListIds, listContacts]);
+  }, [searchTerm, selectedListIds, listContacts, showAllContacts]);
 
   // ── Computed values ──
   const unsubscribedCount = contacts.filter(
@@ -460,11 +469,39 @@ export default function GoLiveInvitationEditor({
 
       {/* ── Toolbar ── */}
       <div className="px-5 py-3 border-b border-border flex items-center gap-3 flex-shrink-0">
-        <ListDropdown
-          organizationId={organizationId}
-          selectedListIds={selectedListIds}
-          onListsChange={setSelectedListIds}
-        />
+        {/* View toggle */}
+        <div className="flex rounded-lg border border-border overflow-hidden flex-shrink-0">
+          <button
+            type="button"
+            onClick={() => setShowAllContacts(false)}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              !showAllContacts
+                ? 'bg-primary/15 text-violet-800 dark:text-primary border-r border-primary/20'
+                : 'bg-background/5 text-foreground/60 hover:bg-background/10 border-r border-border'
+            }`}
+          >
+            Invited
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowAllContacts(true)}
+            className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+              showAllContacts
+                ? 'bg-primary/15 text-violet-800 dark:text-primary'
+                : 'bg-background/5 text-foreground/60 hover:bg-background/10'
+            }`}
+          >
+            All Contacts
+          </button>
+        </div>
+
+        {showAllContacts && (
+          <ListDropdown
+            organizationId={organizationId}
+            selectedListIds={selectedListIds}
+            onListsChange={setSelectedListIds}
+          />
+        )}
 
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -642,14 +679,31 @@ export default function GoLiveInvitationEditor({
           <div className="flex-1 overflow-y-auto">
             {sortedContacts.length === 0 ? (
               <div className="text-center py-16">
-                <p className="text-foreground/50 text-sm">No contacts match your search criteria</p>
-                <button
-                  type="button"
-                  onClick={() => setSearchTerm('')}
-                  className="mt-3 text-primary hover:text-primary/70 text-sm transition-colors"
-                >
-                  Clear search
-                </button>
+                {!showAllContacts && invitedContactIds.length === 0 ? (
+                  <>
+                    <Users className="mx-auto mb-3 h-8 w-8 text-foreground/20" />
+                    <p className="text-foreground/50 text-sm">No contacts selected yet</p>
+                    <button
+                      type="button"
+                      onClick={() => setShowAllContacts(true)}
+                      className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 voxxy-btn-solid rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add contacts
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-foreground/50 text-sm">No contacts match your search criteria</p>
+                    <button
+                      type="button"
+                      onClick={() => setSearchTerm('')}
+                      className="mt-3 text-primary hover:text-primary/70 text-sm transition-colors"
+                    >
+                      Clear search
+                    </button>
+                  </>
+                )}
               </div>
             ) : (
               paginatedContacts.map((contact) => {
