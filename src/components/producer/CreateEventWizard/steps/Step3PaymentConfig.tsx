@@ -247,7 +247,7 @@ export default function Step3PaymentConfig({
           {/* Payment Deadline */}
           <div>
             <label className="block text-xs text-foreground/80 font-medium mb-1.5">
-              Payment Deadline
+              Payment Deadline <span className="text-red-400">*</span>
             </label>
             <input
               type="date"
@@ -268,8 +268,13 @@ export default function Step3PaymentConfig({
                   });
                 }
               }}
-              className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all"
+              className={`w-full px-3 py-2 text-sm rounded-lg bg-background/10 border text-foreground focus:outline-none focus:ring-2 focus:ring-primary transition-all ${
+                errors.payment_deadline ? 'border-red-500' : 'border-border'
+              }`}
             />
+            {errors.payment_deadline && (
+              <p className="mt-1 text-xs text-red-400">{errors.payment_deadline}</p>
+            )}
           </div>
         </div>
 

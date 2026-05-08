@@ -68,27 +68,22 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">Perfect for new producers</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 10 events per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>10,000 vendor contacts</span>
+                      <span>10k vendor contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Automated email workflows</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Vendor CRM</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Email support</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
@@ -110,31 +105,22 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">For established producers</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 50 events per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>50,000 vendor contacts</span>
+                      <span>50k vendor contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Advanced email automation</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Vendor CRM with tagging</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Priority email support</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Custom branding</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
@@ -144,17 +130,16 @@ export default function PricingPage() {
               </CardContent>
             </Card>
 
-            {/* Enterprise Plan */}
+            {/* Pro Plan */}
             <Card className="marketing-card pricing-card flex flex-col border-2 border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Enterprise</CardTitle>
+                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Pro</CardTitle>
                 <div className="mb-2 text-4xl font-bold text-slate-950">$400</div>
                 <CardDescription className="text-slate-600">per month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">For large-scale operations</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Unlimited events</span>
@@ -165,15 +150,11 @@ export default function PricingPage() {
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>White-label email automation</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Advanced CRM & analytics</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Dedicated account manager</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>

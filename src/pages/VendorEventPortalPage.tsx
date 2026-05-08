@@ -333,7 +333,7 @@ export default function VendorEventPortalPage() {
   // Authentication Form
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black">
+      <div className="min-h-screen voxxy-gradient-page text-foreground">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-md mx-auto">
             <div className="text-center mb-8">
@@ -402,7 +402,7 @@ export default function VendorEventPortalPage() {
   // Loading state
   if (loading || !portalData) {
     return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page text-foreground flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Loading event details...</p>
@@ -414,7 +414,7 @@ export default function VendorEventPortalPage() {
   // Error state
   if (dataError) {
     return (
-      <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black flex items-center justify-center">
+      <div className="min-h-screen voxxy-gradient-page text-foreground flex items-center justify-center">
         <div className="max-w-md text-center">
           <AlertCircle className="h-12 w-12 mx-auto mb-4 text-red-500" />
           <h2 className="text-2xl font-bold mb-2">Error Loading Portal</h2>
@@ -438,7 +438,7 @@ export default function VendorEventPortalPage() {
   // Show cancellation message if event is cancelled
   if (event.status === 'cancelled') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-800 to-black text-white">
+      <div className="min-h-screen voxxy-gradient-page text-foreground">
         <div className="max-w-4xl mx-auto px-6 py-12">
           {/* Producer Preview Banner */}
           {isProducerPreview && (
@@ -505,7 +505,7 @@ export default function VendorEventPortalPage() {
 
   // Portal Dashboard
   return (
-    <div className="min-h-screen bg-background text-foreground dark:bg-gradient-to-b dark:from-gray-900 dark:via-gray-800 dark:to-black">
+    <div className="min-h-screen voxxy-gradient-page text-foreground">
       <div className="max-w-4xl mx-auto px-6 md:px-12 lg:px-16 py-8">
         {/* Producer Preview Banner */}
         {isProducerPreview && (

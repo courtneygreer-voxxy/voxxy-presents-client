@@ -394,23 +394,23 @@ export default function HomePage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-voxxy-pink text-2xl font-display font-bold text-white">1</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Create your event</h3>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Build your network</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Set up your event details, application form, and vendor categories. Import existing vendor lists via CSV if you have them.
+                Import vendor contacts via CSV or add them manually. Organize with categories, tags, and smart lists to keep your roster ready.
               </p>
             </div>
             <div className="text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-voxxy-pink to-pink-500 text-2xl font-display font-bold text-white">2</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Open applications</h3>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Launch your event</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Share your application link. Vendors apply with portfolios and details. Review and approve with side-by-side comparison tools.
+                Create events, open applications, and review vendors in table or focused view. Set payment preferences per category.
               </p>
             </div>
             <div className="text-center">
               <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-primary text-2xl font-display font-bold text-white">3</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Coordinate and grow</h3>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Automate everything</h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Automated emails handle the logistics. Vendor CRM tracks relationships across events. Your community grows with every show.
+                Email sequences handle confirmations, reminders, and payments. Vendors access their own event portal. Your CRM grows with every show.
               </p>
             </div>
           </div>
