@@ -89,15 +89,19 @@ export default function Step3InviteList({
     fetchLists();
   }, [organizationId]);
 
+  // PERFORMANCE FIX: Disabled to prevent double-fetching
+  // Contacts are now set directly in handleAutoImport instead of fetching twice
+  // This eliminates the second API call that was fetching the same data again
+  //
   // Load full contact details when we have IDs (and they've actually changed)
-  useEffect(() => {
-    if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
-      fetchContactDetails();
-    } else if (invitedContactIds.length === 0) {
-      setContacts([]);
-      fetchedIdsRef.current = '';
-    }
-  }, [invitedIdsKey, organizationId]);
+  // useEffect(() => {
+  //   if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
+  //     fetchContactDetails();
+  //   } else if (invitedContactIds.length === 0) {
+  //     setContacts([]);
+  //     fetchedIdsRef.current = '';
+  //   }
+  // }, [invitedIdsKey, organizationId]);
 
   const fetchLists = async () => {
     try {
@@ -180,6 +184,7 @@ export default function Step3InviteList({
         },
       });
       setContacts([]);
+      fetchedIdsRef.current = '';
       return;
     }
 
@@ -187,6 +192,7 @@ export default function Step3InviteList({
       setLoading(true);
 
       let contactIds: number[] = [];
+      let fetchedContacts: VendorContact[] = []; // Store full contact objects
 
       if (shouldInviteAll) {
         // Fetch all contacts
@@ -212,6 +218,7 @@ export default function Step3InviteList({
             allContacts = allContacts.concat(result?.vendor_contacts || []);
           }
         }
+        fetchedContacts = allContacts; // Store full objects
         contactIds = allContacts.map(c => c.id);
       } else if (selectedLists.length > 0) {
         // Fetch contacts from selected lists
@@ -239,20 +246,28 @@ export default function Step3InviteList({
         const allListContacts = listContactArrays.flat();
 
         // De-duplicate by contact ID
-        const uniqueContactIds = Array.from(
-          new Set(allListContacts.map(contact => contact.id))
-        );
+        const uniqueContactsMap = new Map<number, VendorContact>();
+        allListContacts.forEach(contact => {
+          if (!uniqueContactsMap.has(contact.id)) {
+            uniqueContactsMap.set(contact.id, contact);
+          }
+        });
 
-        contactIds = uniqueContactIds;
+        fetchedContacts = Array.from(uniqueContactsMap.values()); // Store full objects
+        contactIds = fetchedContacts.map(c => c.id);
       }
 
-      // Update wizard state immediately
+      // Update wizard state AND display contacts simultaneously
       updateWizardState({
         inviteList: {
           ...inviteList,
           invitedContactIds: contactIds,
         },
       });
+
+      // Set contacts immediately instead of waiting for useEffect
+      setContacts(fetchedContacts);
+      fetchedIdsRef.current = JSON.stringify(contactIds);
     } catch (err) {
       console.error('Failed to import contacts:', err);
     } finally {
@@ -289,14 +304,19 @@ export default function Step3InviteList({
   };
 
   const handleRemoveContact = (contactId: number) => {
+    const newContactIds = invitedContactIds.filter((id) => id !== contactId);
+
     updateWizardState({
       inviteList: {
         ...inviteList,
-        invitedContactIds: invitedContactIds.filter((id) => id !== contactId),
+        invitedContactIds: newContactIds,
       },
     });
-    // Remove from selection if it was selected
+
+    // Remove from contacts display and selection
+    setContacts((prev) => prev.filter((c) => c.id !== contactId));
     setSelectedContactIds((prev) => prev.filter((id) => id !== contactId));
+    fetchedIdsRef.current = JSON.stringify(newContactIds);
   };
 
   const handleToggleSelect = (contactId: number) => {
@@ -316,13 +336,19 @@ export default function Step3InviteList({
   };
 
   const handleDeleteSelected = () => {
+    const newContactIds = invitedContactIds.filter((id) => !selectedContactIds.includes(id));
+
     updateWizardState({
       inviteList: {
         ...inviteList,
-        invitedContactIds: invitedContactIds.filter((id) => !selectedContactIds.includes(id)),
+        invitedContactIds: newContactIds,
       },
     });
+
+    // Remove from contacts display
+    setContacts((prev) => prev.filter((c) => !selectedContactIds.includes(c.id)));
     setSelectedContactIds([]);
+    fetchedIdsRef.current = JSON.stringify(newContactIds);
   };
 
   // Filter contacts by search term
@@ -461,6 +487,7 @@ export default function Step3InviteList({
                   },
                 });
                 setContacts([]);
+                fetchedIdsRef.current = '';
               }}
               className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors flex items-center gap-2"
             >
