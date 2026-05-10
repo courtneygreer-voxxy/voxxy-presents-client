@@ -155,7 +155,7 @@ export default function GoLiveInvitationEditor({
 
   // ── Contact data ──
   const [contacts, setContacts] = useState<VendorContact[]>([]);
-  const [filteredContacts, setFilteredContacts] = useState<VendorContact[]>([]);
+  const [allContactIds, setAllContactIds] = useState<number[]>([]); // OPTIMIZATION: Store all IDs
   const [listContacts, setListContacts] = useState<VendorContact[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingListContacts, setLoadingListContacts] = useState(false);
@@ -170,16 +170,31 @@ export default function GoLiveInvitationEditor({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [currentPage, setCurrentPage] = useState(1);
 
+  // OPTIMIZATION: Backend pagination state
+  const [paginationMeta, setPaginationMeta] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_count: 0,
+    per_page: PAGE_SIZE,
+  });
+
   // ── Add email ──
   const [showAddEmailRow, setShowAddEmailRow] = useState(false);
   const [newEmailData, setNewEmailData] = useState({ name: '', email: '', type: 'vendor' });
   const [addingEmail, setAddingEmail] = useState(false);
   const [addEmailError, setAddEmailError] = useState<string | null>(null);
 
-  // ── Fetch all contacts ──
+  // OPTIMIZATION: Fetch contact IDs only, then paginate
   useEffect(() => {
-    if (organizationId) fetchContacts();
+    if (organizationId) fetchContactIds();
   }, [organizationId]);
+
+  // Fetch paginated contacts when IDs, filters, or page changes
+  useEffect(() => {
+    if (allContactIds.length > 0 || invitedContactIds.length > 0) {
+      fetchContactsPage(currentPage);
+    }
+  }, [allContactIds, currentPage, showAllContacts, invitedContactIds, selectedListIds]);
 
   // ── Fetch contacts from selected lists ──
   useEffect(() => {
@@ -190,34 +205,17 @@ export default function GoLiveInvitationEditor({
     }
   }, [selectedListIds, organizationId]);
 
-  // ── Filter contacts (lists act as a filter, search on top) ──
-  useEffect(() => {
-    let filtered = contacts;
-
-    // When in "selected only" mode, show only invited contacts
-    if (!showAllContacts) {
-      const invitedSet = new Set(invitedContactIds);
-      filtered = filtered.filter((c) => invitedSet.has(c.id));
-    }
-
-    // When lists are selected, show only contacts from those lists
-    if (selectedListIds.length > 0 && listContacts.length > 0) {
-      const listContactIdSet = new Set(listContacts.map((c) => c.id));
-      filtered = filtered.filter((c) => listContactIdSet.has(c.id));
-    }
-
-    if (searchTerm.trim()) {
-      const search = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (c) =>
-          c.contact_name.toLowerCase().includes(search) ||
-          c.business_name?.toLowerCase().includes(search) ||
-          c.email.toLowerCase().includes(search) ||
-          c.tags?.some((tag) => tag.toLowerCase().includes(search))
-      );
-    }
-    setFilteredContacts(filtered);
-  }, [contacts, searchTerm, selectedListIds, listContacts, showAllContacts, invitedContactIds]);
+  // OPTIMIZATION: Client-side filtering on current page only (fast since only 50 contacts)
+  const filteredContacts = contacts.filter((contact) => {
+    if (!searchTerm.trim()) return true;
+    const search = searchTerm.toLowerCase();
+    return (
+      contact.contact_name.toLowerCase().includes(search) ||
+      contact.business_name?.toLowerCase().includes(search) ||
+      contact.email.toLowerCase().includes(search) ||
+      contact.tags?.some((tag) => tag.toLowerCase().includes(search))
+    );
+  });
 
   const handleSort = (column: 'name' | 'email') => {
     if (sortColumn === column) {
@@ -228,7 +226,8 @@ export default function GoLiveInvitationEditor({
     }
   };
 
-  const fetchContacts = async () => {
+  // OPTIMIZATION: Fetch only contact IDs (fast!)
+  const fetchContactIds = async () => {
     if (!organizationId) {
       setError('Organization ID is required');
       setLoading(false);
@@ -238,24 +237,9 @@ export default function GoLiveInvitationEditor({
       setLoading(true);
       setError(null);
 
-      // Fetch page 1 to get total, then remaining pages in parallel
-      const perPage = 100;
-      const firstResponse = await vendorContactsApi.getAll(organizationId, { page: 1, per_page: perPage });
-      let allContacts = firstResponse?.vendor_contacts || [];
-      const totalPages = firstResponse?.meta?.total_pages || 1;
-
-      if (totalPages > 1) {
-        const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
-        const remainingResponses = await Promise.all(
-          remainingPages.map((p) => vendorContactsApi.getAll(organizationId, { page: p, per_page: perPage }))
-        );
-        for (const resp of remainingResponses) {
-          allContacts = [...allContacts, ...(resp?.vendor_contacts || [])];
-        }
-      }
-
-      setContacts(allContacts);
-      setFilteredContacts(allContacts);
+      // Fetch only IDs from backend (very fast)
+      const result = await vendorContactsApi.getAllIds(organizationId, {});
+      setAllContactIds(result.ids);
 
       // One-time: resolve any previously saved list IDs into invitedContactIds
       const draftListIds: number[] = event.invitation_draft?.list_ids || [];
@@ -273,9 +257,63 @@ export default function GoLiveInvitationEditor({
         });
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load contacts');
+      setError(err.message || 'Failed to load contact IDs');
+      setAllContactIds([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // OPTIMIZATION: Fetch one page of contacts at a time (backend pagination)
+  const fetchContactsPage = async (page: number) => {
+    if (!organizationId) return;
+
+    try {
+      setLoading(true);
+
+      // Determine which IDs to fetch based on mode
+      let idsToFetch: number[] = [];
+
+      if (!showAllContacts) {
+        // "Selected only" mode - show only invited contacts
+        idsToFetch = invitedContactIds;
+      } else {
+        // "Show all" mode - show all org contacts
+        idsToFetch = allContactIds;
+      }
+
+      // Apply list filter if lists are selected
+      if (selectedListIds.length > 0 && listContacts.length > 0) {
+        const listContactIdSet = new Set(listContacts.map((c) => c.id));
+        idsToFetch = idsToFetch.filter((id) => listContactIdSet.has(id));
+      }
+
+      if (idsToFetch.length === 0) {
+        setContacts([]);
+        setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: PAGE_SIZE });
+        setLoading(false);
+        return;
+      }
+
+      // Calculate pagination
+      const startIndex = (page - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      const pageIds = idsToFetch.slice(startIndex, endIndex);
+
+      // Fetch only this page's contacts
+      const response = await vendorContactsApi.getByIds(organizationId, pageIds, { per_page: PAGE_SIZE });
+      const contactsData = response?.vendor_contacts || [];
+
+      setContacts(contactsData);
+      setPaginationMeta({
+        current_page: page,
+        total_pages: Math.ceil(idsToFetch.length / PAGE_SIZE),
+        total_count: idsToFetch.length,
+        per_page: PAGE_SIZE,
+      });
+    } catch (err: any) {
+      console.error('Failed to fetch contacts page:', err);
       setContacts([]);
-      setFilteredContacts([]);
     } finally {
       setLoading(false);
     }
@@ -384,7 +422,7 @@ export default function GoLiveInvitationEditor({
   const allFilteredSelected =
     filteredContacts.length > 0 && filteredContacts.every((c) => invitedContactIds.includes(c.id));
 
-  // Sort: selected first, then by column
+  // OPTIMIZATION: Sort current page only (fast since only 50 contacts)
   const sortedContacts = [...filteredContacts].sort((a, b) => {
     const aSelected = invitedContactIds.includes(a.id) ? 0 : 1;
     const bSelected = invitedContactIds.includes(b.id) ? 0 : 1;
@@ -396,10 +434,7 @@ export default function GoLiveInvitationEditor({
     return sortDirection === 'asc' ? cmp : -cmp;
   });
 
-  // Paginate sorted contacts
-  const totalTablePages = Math.max(1, Math.ceil(sortedContacts.length / PAGE_SIZE));
-  const safePage = Math.min(currentPage, totalTablePages);
-  const paginatedContacts = sortedContacts.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const paginatedContacts = sortedContacts;
 
   // ── Guard states ──
   if (!organizationId) {
@@ -437,7 +472,7 @@ export default function GoLiveInvitationEditor({
           <p className="text-red-400 mb-4">{error}</p>
           <button
             type="button"
-            onClick={fetchContacts}
+            onClick={fetchContactIds}
             className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors"
           >
             Try Again
@@ -473,7 +508,10 @@ export default function GoLiveInvitationEditor({
         <div className="flex rounded-lg border border-border overflow-hidden flex-shrink-0">
           <button
             type="button"
-            onClick={() => setShowAllContacts(false)}
+            onClick={() => {
+              setShowAllContacts(false);
+              setCurrentPage(1); // Reset to page 1 when toggling
+            }}
             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
               !showAllContacts
                 ? 'bg-primary/15 text-violet-800 dark:text-primary border-r border-primary/20'
@@ -484,7 +522,10 @@ export default function GoLiveInvitationEditor({
           </button>
           <button
             type="button"
-            onClick={() => setShowAllContacts(true)}
+            onClick={() => {
+              setShowAllContacts(true);
+              setCurrentPage(1); // Reset to page 1 when toggling
+            }}
             className={`px-3 py-1.5 text-xs font-medium transition-colors ${
               showAllContacts
                 ? 'bg-primary/15 text-violet-800 dark:text-primary'
@@ -685,7 +726,10 @@ export default function GoLiveInvitationEditor({
                     <p className="text-foreground/50 text-sm">No contacts selected yet</p>
                     <button
                       type="button"
-                      onClick={() => setShowAllContacts(true)}
+                      onClick={() => {
+                        setShowAllContacts(true);
+                        setCurrentPage(1);
+                      }}
                       className="mt-3 inline-flex items-center gap-1.5 px-4 py-2 voxxy-btn-solid rounded-lg text-sm font-medium transition-colors"
                     >
                       <Plus className="w-4 h-4" />
@@ -787,24 +831,30 @@ export default function GoLiveInvitationEditor({
           Cancel
         </button>
 
-        {/* Pagination */}
-        {totalTablePages > 1 && (
+        {/* OPTIMIZATION: Backend Pagination */}
+        {paginationMeta.total_pages > 1 && (
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              disabled={safePage <= 1}
+              onClick={() => {
+                const newPage = Math.max(1, paginationMeta.current_page - 1);
+                setCurrentPage(newPage);
+              }}
+              disabled={paginationMeta.current_page <= 1}
               className="p-1.5 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="text-xs text-foreground/60 min-w-[80px] text-center">
-              Page {safePage} of {totalTablePages}
+              Page {paginationMeta.current_page} of {paginationMeta.total_pages}
             </span>
             <button
               type="button"
-              onClick={() => setCurrentPage((p) => Math.min(totalTablePages, p + 1))}
-              disabled={safePage >= totalTablePages}
+              onClick={() => {
+                const newPage = Math.min(paginationMeta.total_pages, paginationMeta.current_page + 1);
+                setCurrentPage(newPage);
+              }}
+              disabled={paginationMeta.current_page >= paginationMeta.total_pages}
               className="p-1.5 rounded-lg text-foreground/60 hover:text-foreground hover:bg-background/10 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="w-4 h-4" />

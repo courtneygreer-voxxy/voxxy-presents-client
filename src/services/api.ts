@@ -2654,6 +2654,86 @@ export const vendorContactsApi = {
       }
     )
   },
+
+  /**
+   * PHASE 3 OPTIMIZATION: Get specific vendor contacts by IDs
+   * GET /api/v1/presents/organizations/:organization_id/vendor_contacts/by_ids?ids=1,2,3
+   *
+   * More efficient than getAll when you only need specific contacts.
+   * Useful for selective loading, email preview, invitation editing, etc.
+   *
+   * @param organizationId - Organization ID
+   * @param contactIds - Array of contact IDs to fetch (max 1000)
+   * @param params - Optional pagination parameters
+   * @returns Promise with vendor contacts and pagination metadata
+   */
+  async getByIds(
+    organizationId: number,
+    contactIds: number[],
+    params?: {
+      page?: number
+      per_page?: number
+    }
+  ): Promise<VendorContactsListResponse> {
+    const queryParams = new URLSearchParams()
+
+    // Add comma-separated IDs
+    if (contactIds.length > 0) {
+      queryParams.append('ids', contactIds.join(','))
+    }
+
+    // Add pagination params
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
+
+    const queryString = queryParams.toString()
+    const endpoint = `/v1/presents/organizations/${organizationId}/vendor_contacts/by_ids${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetchApi<any>(endpoint)
+
+    // Use same mapping logic as getAll
+    const mapContact = (contact: any): VendorContact => {
+      const mapped: VendorContact = {
+        id: contact.id,
+        organization_id: contact.organization_id,
+        contact_name: contact.contact_name || contact.contact_info?.name || '',
+        business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+        job_title: contact.job_title || contact.contact_info?.job_title || undefined,
+        email: contact.email || contact.contact_info?.email || '',
+        phone: contact.phone || contact.contact_info?.phone || undefined,
+        location: contact.location || contact.contact_info?.location || undefined,
+        contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
+        status: contact.status || contact.crm_data?.status || 'new',
+        tags: contact.tags || contact.crm_data?.tags || [],
+        categories: contact.categories || contact.crm_data?.categories || [],
+        featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+        notes: contact.notes || contact.crm_data?.notes || undefined,
+        source: contact.source || contact.metadata?.source || 'manual',
+        source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
+        interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+        events_participated: contact.events_participated || 0,
+        last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+        imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
+        instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
+        tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
+        website: contact.website || contact.social?.website || undefined,
+        created_at: contact.created_at || contact.metadata?.created_at || '',
+        updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+        unsubscribe_status: contact.unsubscribe_status || undefined,
+      }
+      return mapped
+    }
+
+    return {
+      vendor_contacts: response.vendor_contacts?.map(mapContact) || [],
+      meta: response.meta || {
+        current_page: 1,
+        total_pages: 1,
+        total_count: response.vendor_contacts?.length || 0,
+        per_page: response.vendor_contacts?.length || 0,
+      },
+    }
+  },
 }
 
 // Event Invitations API
