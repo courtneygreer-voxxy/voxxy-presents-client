@@ -472,7 +472,7 @@ export default function GoLiveInvitationEditor({
           <p className="text-red-400 mb-4">{error}</p>
           <button
             type="button"
-            onClick={fetchContacts}
+            onClick={fetchContactIds}
             className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors"
           >
             Try Again
