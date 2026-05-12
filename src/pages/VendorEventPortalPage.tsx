@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import {
-  Calendar,
   MapPin,
   ExternalLink,
   DollarSign,
@@ -546,17 +545,6 @@ export default function VendorEventPortalPage() {
                   <p className="font-medium text-foreground">{event.venue}</p>
                   <p className="text-sm text-muted-foreground">{event.location}</p>
                   <VendorPortalLocationMap venue={event.venue} location={event.location} />
-                </div>
-              </div>
-            ) : null}
-            {event.application_deadline ? (
-              <div className="flex gap-3 px-4 py-3.5 md:px-5 md:py-4">
-                <Calendar className="mt-0.5 h-5 w-5 shrink-0 text-primary" aria-hidden />
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                    Apply by
-                  </p>
-                  <p className="font-medium text-foreground">{formatDate(event.application_deadline)}</p>
                 </div>
               </div>
             ) : null}
