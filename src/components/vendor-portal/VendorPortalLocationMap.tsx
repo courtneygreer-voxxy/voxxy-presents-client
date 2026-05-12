@@ -34,23 +34,23 @@ export function VendorPortalLocationMap({ venue, location }: { venue: string; lo
   return (
     <details
       ref={detailsRef}
-      className="group mt-3 rounded-xl border border-purple-200/50 bg-white/70 ring-1 ring-purple-500/[0.06] dark:border-purple-500/25 dark:bg-black/25 dark:ring-purple-400/10"
+      className="group mt-3 rounded-xl border border-white/10 bg-background/5 ring-1 ring-white/5"
     >
       <summary
         className={cn(
-          'flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-xs font-medium text-purple-950 transition-colors hover:bg-purple-500/[0.06] dark:text-purple-100 dark:hover:bg-white/[0.06]',
+          'flex cursor-pointer list-none items-center justify-between gap-2 px-3 py-2.5 text-xs font-medium text-foreground transition-colors hover:bg-white/[0.06]',
           '[&::-webkit-details-marker]:hidden'
         )}
       >
         <span>Show map</span>
         <ChevronDown
-          className="h-4 w-4 shrink-0 text-purple-600 opacity-80 transition-transform duration-200 group-open:rotate-180 dark:text-purple-300"
+          className="h-4 w-4 shrink-0 text-primary opacity-80 transition-transform duration-200 group-open:rotate-180"
           aria-hidden
         />
       </summary>
-      <div className="border-t border-purple-200/45 px-3 pb-3 pt-3 dark:border-purple-500/20">
+      <div className="border-t border-border px-3 pb-3 pt-3">
         {embedLoaded ? (
-          <div className="overflow-hidden rounded-lg border border-purple-200/40 bg-muted/30 shadow-inner dark:border-purple-500/20">
+          <div className="overflow-hidden rounded-lg border border-border bg-muted/30 shadow-inner">
             <iframe
               title={`Map: ${query}`}
               src={embedSrc}
@@ -65,7 +65,7 @@ export function VendorPortalLocationMap({ venue, location }: { venue: string; lo
           href={mapsSearchUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-purple-700 underline-offset-4 hover:underline dark:text-purple-300"
+          className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-primary underline-offset-4 hover:underline"
         >
           Open in Google Maps
           <ExternalLink className="h-3.5 w-3.5 opacity-80" aria-hidden />
