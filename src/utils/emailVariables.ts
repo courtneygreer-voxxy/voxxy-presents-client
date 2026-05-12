@@ -219,7 +219,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_name}}',
     category: 'organization',
     description: 'Your organization name',
-    example: 'Voxxy Presents',
+    example: 'Voxxy',
     worksInInvitations: true
   },
   {
@@ -228,7 +228,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_email}}',
     category: 'organization',
     description: 'Your contact email',
-    example: 'hello@voxxypresents.com',
+    example: 'hello@heyvoxxy.com',
     worksInInvitations: true
   },
 

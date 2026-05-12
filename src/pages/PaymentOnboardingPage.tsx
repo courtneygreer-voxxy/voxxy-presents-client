@@ -97,7 +97,7 @@ export default function PaymentOnboardingPage() {
               Producer Account Setup
             </Badge>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-              Welcome to Voxxy Presents
+              Welcome to Voxxy
             </h1>
             {userProfile?.name && (
               <p className="text-xl text-muted-foreground">

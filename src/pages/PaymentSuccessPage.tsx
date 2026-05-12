@@ -88,7 +88,7 @@ export default function PaymentSuccessPage() {
               </Badge>
 
               <CardTitle className="text-4xl font-bold text-foreground">
-                Welcome to Voxxy Presents!
+                Welcome to Voxxy!
               </CardTitle>
 
               <CardDescription className="text-lg text-foreground/85 dark:text-gray-200">

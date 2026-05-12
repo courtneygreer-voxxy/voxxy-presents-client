@@ -133,7 +133,7 @@ export default function ContactPage() {
       if (error instanceof EmailServiceError) {
         setSubmissionError(`Failed to submit: ${error.message}`)
       } else {
-        setSubmissionError('An unexpected error occurred. Please try again or email us at team@voxxypresents.com')
+        setSubmissionError('An unexpected error occurred. Please try again or email us at team@heyvoxxy.com')
       }
     } finally {
       setIsSubmitting(false)
@@ -176,7 +176,7 @@ export default function ContactPage() {
               <CheckCircle className="mt-1 h-6 w-6 flex-shrink-0 text-violet-700" />
               <div>
                 <h3 className="mb-1 text-lg font-semibold text-slate-950">Full Platform Access</h3>
-                <p className="text-slate-600">All Voxxy Presents features at $15/month</p>
+                <p className="text-slate-600">All Voxxy features at $15/month</p>
               </div>
             </div>
             <div className="flex items-start space-x-3">

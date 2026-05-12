@@ -216,7 +216,7 @@ export default function PublicEventDetailPage() {
                   <p className="text-sm text-white/60 italic">Contact information not available</p>
                 )}
                 <p className="text-xs text-white/50 mt-4">
-                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
                 </p>
               </div>
             )}

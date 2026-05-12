@@ -29,7 +29,7 @@ export default function MobileEULAPage() {
         {/* Annotation Box */}
         <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
           <p className="text-slate-700 leading-relaxed">
-            This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy Presents web platform, see our{' '}
+            This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy web platform, see our{' '}
             <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
@@ -47,7 +47,7 @@ export default function MobileEULAPage() {
             <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Privacy Policy
             </a>
-            , which explains how we collect, use, and protect your personal information. Any capitalized terms not defined in this EULA have the meanings set forth in our Privacy Policy. If you have any questions about this EULA, contact us at team@voxxypresents.com.
+            , which explains how we collect, use, and protect your personal information. Any capitalized terms not defined in this EULA have the meanings set forth in our Privacy Policy. If you have any questions about this EULA, contact us at team@heyvoxxy.com.
           </p>
         </div>
 
@@ -308,7 +308,7 @@ export default function MobileEULAPage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>13.1 Informal Resolution.</strong> If you have a dispute with Voxxy, you agree to first contact us at team@voxxypresents.com and attempt to resolve the dispute informally. We will attempt to resolve the dispute informally by contacting you via email. If a dispute is not resolved within thirty (30) days of submission, you or Voxxy may bring a formal proceeding.
+              <strong>13.1 Informal Resolution.</strong> If you have a dispute with Voxxy, you agree to first contact us at team@heyvoxxy.com and attempt to resolve the dispute informally. We will attempt to resolve the dispute informally by contacting you via email. If a dispute is not resolved within thirty (30) days of submission, you or Voxxy may bring a formal proceeding.
             </p>
             <p>
               <strong>13.2 Binding Arbitration.</strong> Except as provided below, you and Voxxy agree that any dispute, claim, or controversy arising out of or relating to this EULA or the App will be settled by binding arbitration administered by the American Arbitration Association ("AAA") in accordance with its Consumer Arbitration Rules. The arbitration will be conducted in New York, New York, or another mutually agreed upon location. Judgment on the arbitration award may be entered in any court having jurisdiction.
@@ -365,7 +365,7 @@ export default function MobileEULAPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@heyvoxxy.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@heyvoxxy.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

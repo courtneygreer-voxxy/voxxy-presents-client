@@ -46,9 +46,9 @@ export default function SignUpPage() {
         <div className="relative z-10 flex flex-col justify-center items-center w-full px-12 text-foreground">
           <div className="text-center space-y-6">
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
-            <h1 className="text-5xl font-bold mb-4">Join Voxxy Presents</h1>
+            <h1 className="text-5xl font-bold mb-4">Join Voxxy</h1>
             <p className="text-xl text-white/80 max-w-md">
-              Start managing your events, building your community, and growing your business with Voxxy Presents
+              Start managing your events, building your community, and growing your business with Voxxy
             </p>
           </div>
         </div>
@@ -80,12 +80,12 @@ export default function SignUpPage() {
             {/* Mobile Logo */}
             <div className="lg:hidden text-center mb-8">
               <Sparkles className="h-16 w-16 mx-auto text-primary mb-4" />
-              <h1 className="text-3xl font-bold text-foreground">Join Voxxy Presents</h1>
+              <h1 className="text-3xl font-bold text-foreground">Join Voxxy</h1>
             </div>
 
             <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
-                <CardTitle className="text-2xl font-bold text-foreground">Join Voxxy Presents</CardTitle>
+                <CardTitle className="text-2xl font-bold text-foreground">Join Voxxy</CardTitle>
                 <CardDescription>
                   Choose your account type to get started
                 </CardDescription>

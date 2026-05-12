@@ -87,7 +87,7 @@ export default function ApplicationConfirmationPage() {
               onClick={() => navigate('/')}
               className="px-8 py-3 rounded-lg voxxy-btn-cta font-semibold transition-all shadow-lg"
             >
-              Back to Voxxy Presents
+              Back to Voxxy
             </button>
           </div>
         </div>

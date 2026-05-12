@@ -174,7 +174,7 @@ export default function HomePage() {
       if (error instanceof EmailServiceError) {
         setSubmissionError(`Failed to submit: ${error.message}`)
       } else {
-        setSubmissionError('An unexpected error occurred. Please try again or email us at team@voxxypresents.com')
+        setSubmissionError('An unexpected error occurred. Please try again or email us at team@heyvoxxy.com')
       }
     } finally {
       setIsSubmitting(false)
@@ -253,7 +253,7 @@ export default function HomePage() {
                 </div>
                 <img
                   src="/screenshots/hero-dashboard.png"
-                  alt="Voxxy Presents dashboard showing event management, vendor applications, and automated workflows"
+                  alt="Voxxy dashboard showing event management, vendor applications, and automated workflows"
                   className="rounded-2xl shadow-2xl border border-voxxy-pink/20"
                   loading="eager"
                 />
@@ -486,8 +486,8 @@ export default function HomePage() {
                   </div>
                   <div>
                     <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">EMAIL</div>
-                    <a href="mailto:team@voxxypresents.com" className="text-[15px] text-white transition-colors hover:text-fuchsia-300">
-                      team@voxxypresents.com
+                    <a href="mailto:team@heyvoxxy.com" className="text-[15px] text-white transition-colors hover:text-fuchsia-300">
+                      team@heyvoxxy.com
                     </a>
                   </div>
                 </div>
@@ -593,8 +593,8 @@ export default function HomePage() {
                     {/* Bottom Email Link */}
                     <p className="text-center text-[13px] text-white/50">
                       Or email us directly at{' '}
-                      <a href="mailto:team@voxxypresents.com" className="text-white/70 underline transition-colors hover:text-fuchsia-300">
-                        team@voxxypresents.com
+                      <a href="mailto:team@heyvoxxy.com" className="text-white/70 underline transition-colors hover:text-fuchsia-300">
+                        team@heyvoxxy.com
                       </a>
                     </p>
                   </form>

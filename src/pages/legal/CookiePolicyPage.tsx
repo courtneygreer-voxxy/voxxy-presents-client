@@ -36,11 +36,11 @@ export default function CookiePolicyPage() {
         {/* Introduction */}
         <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
-            This Cookie Policy describes how Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") uses cookies and similar technologies when you use the Voxxy Presents platform and visit our websites (collectively, the "Services"). Any capitalized terms not defined in this Cookie Policy have the meanings set forth in our{' '}
+            This Cookie Policy describes how Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") uses cookies and similar technologies when you use the Voxxy platform and visit our websites (collectively, the "Services"). Any capitalized terms not defined in this Cookie Policy have the meanings set forth in our{' '}
             <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
-            . If you have any questions about this Cookie Policy, contact us at team@voxxypresents.com.
+            . If you have any questions about this Cookie Policy, contact us at team@heyvoxxy.com.
           </p>
         </div>
 
@@ -223,7 +223,7 @@ export default function CookiePolicyPage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>We do not run advertising on Voxxy Presents.</strong> We do not use advertising cookies, retargeting pixels, or partner with advertising networks to show you targeted ads on other websites. We do not share your browsing data with advertisers.
+              <strong>We do not run advertising on Voxxy.</strong> We do not use advertising cookies, retargeting pixels, or partner with advertising networks to show you targeted ads on other websites. We do not share your browsing data with advertisers.
             </p>
             <p>
               <strong>We do not sell your data.</strong> As stated in our{' '}
@@ -279,7 +279,7 @@ export default function CookiePolicyPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@heyvoxxy.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@heyvoxxy.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

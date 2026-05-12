@@ -28,7 +28,7 @@ export default function LegalLayout({ children }: LegalLayoutProps) {
         {/* Brand header */}
         <div className="container mx-auto max-w-6xl px-4 pt-4 pb-1 flex items-center gap-2">
           <img src="/VoxxyTriangle.svg" className="w-5 h-5" alt="Voxxy" />
-          <span className="gradient-text font-semibold text-sm tracking-wide">Voxxy Presents</span>
+          <span className="gradient-text font-semibold text-sm tracking-wide">Voxxy</span>
         </div>
 
         {/* Tab strip */}

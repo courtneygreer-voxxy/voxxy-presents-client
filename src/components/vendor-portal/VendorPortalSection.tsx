@@ -2,8 +2,7 @@ import { useId, type ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const shellClass =
-  'rounded-3xl border border-purple-200/35 bg-white shadow-sm shadow-purple-500/5 ring-1 ring-purple-500/[0.07] backdrop-blur-sm dark:border-purple-500/20 dark:bg-zinc-900/75 dark:shadow-black/30 dark:ring-purple-400/10';
+const shellClass = 'glass-card rounded-2xl';
 
 export function VendorPortalSection({
   title,
@@ -33,10 +32,10 @@ export function VendorPortalSection({
         <div className="flex items-start gap-3 md:gap-4">
           {Icon && (
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-purple-500/[0.11] ring-1 ring-purple-500/10 dark:bg-purple-500/[0.18] dark:ring-purple-400/15"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/[0.18] ring-1 ring-primary/15"
               aria-hidden
             >
-              <Icon className="h-5 w-5 text-purple-700 dark:text-purple-300" />
+              <Icon className="h-5 w-5 text-primary" />
             </div>
           )}
           <div className="min-w-0 flex-1">

@@ -243,7 +243,7 @@ export default function UnsubscribePage() {
             <Alert className="bg-yellow-500/10 border-yellow-500/20">
               <AlertCircle className="h-4 w-4 text-yellow-400" />
               <AlertDescription className="text-yellow-300/90">
-                You are already unsubscribed from all Voxxy Presents emails.
+                You are already unsubscribed from all Voxxy emails.
               </AlertDescription>
             </Alert>
           )}
@@ -282,7 +282,7 @@ export default function UnsubscribePage() {
                   <div className="flex items-start space-x-3 p-4 rounded-lg border border-white/12 hover:bg-white/5 transition-colors cursor-pointer">
                     <RadioGroupItem value="global" id="global" className="mt-1 border-white/40 text-primary data-[state=checked]:border-primary" />
                     <Label htmlFor="global" className="flex-1 cursor-pointer">
-                      <div className="text-white font-medium text-sm">All Voxxy Presents emails</div>
+                      <div className="text-white font-medium text-sm">All Voxxy emails</div>
                       <div className="text-white/55 text-xs mt-1">
                         Unsubscribe from all emails from voxxypresents.com
                       </div>
