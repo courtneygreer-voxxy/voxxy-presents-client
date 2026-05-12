@@ -6,16 +6,16 @@
  */
 
 // Standard footer template (HTML format)
-export const STANDARD_EMAIL_FOOTER = `<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0 20px 0;"/><p style="font-size: 12px; color: #888888;">Questions? Reply to this email or contact team@voxxypresents.com directly.</p><p style="font-size: 12px; color: #888888;"><a href="[unsubscribeLink]" style="color: #888888; text-decoration: underline;">Unsubscribe from these emails</a></p><p style="font-size: 12px; color: #aaaaaa;">Powered by Voxxy Presents</p>`;
+export const STANDARD_EMAIL_FOOTER = `<hr style="border: none; border-top: 1px solid #e0e0e0; margin: 30px 0 20px 0;"/><p style="font-size: 12px; color: #888888;">Questions? Reply to this email or contact team@heyvoxxy.com directly.</p><p style="font-size: 12px; color: #888888;"><a href="[unsubscribeLink]" style="color: #888888; text-decoration: underline;">Unsubscribe from these emails</a></p><p style="font-size: 12px; color: #aaaaaa;">Powered by Voxxy</p>`;
 
 // Plain text version of footer (for plain text editors)
 export const STANDARD_EMAIL_FOOTER_PLAIN = `---
 
-Questions? Reply to this email or contact team@voxxypresents.com directly.
+Questions? Reply to this email or contact team@heyvoxxy.com directly.
 
 Unsubscribe from these emails: [unsubscribeLink]
 
-Powered by Voxxy Presents`;
+Powered by Voxxy`;
 
 /**
  * Split email body into content and footer

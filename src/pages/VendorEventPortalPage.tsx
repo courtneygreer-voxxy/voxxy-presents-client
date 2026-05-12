@@ -255,7 +255,7 @@ export default function VendorEventPortalPage() {
         payment_deadline: '2026-06-01',
         organization: {
           id: 1,
-          name: 'Voxxy Presents',
+          name: 'Voxxy',
           slug: 'voxxy-presents',
         },
       },
@@ -491,7 +491,7 @@ export default function VendorEventPortalPage() {
                   <p className="text-sm italic text-muted-foreground">Contact information not available</p>
                 )}
                 <p className="mt-4 text-xs text-muted-foreground">
-                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
                 </p>
               </div>
             )}

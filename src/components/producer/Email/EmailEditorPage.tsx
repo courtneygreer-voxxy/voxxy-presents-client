@@ -654,7 +654,7 @@ export function EmailEditorPage({
       if (varName === '[eventTime]') return eventData?.start_time || 'Event Time';
       if (varName === '[eventDescription]') return eventData?.description || 'Event Description';
       if (varName === '[organizationName]') return eventData?.organization?.name || 'Organization Name';
-      if (varName === '[organizationEmail]') return eventData?.organization?.email || 'team@voxxypresents.com';
+      if (varName === '[organizationEmail]') return eventData?.organization?.email || 'team@heyvoxxy.com';
       if (varName === '[applicationDeadline]') return eventData?.application_deadline ? new Date(eventData.application_deadline).toLocaleDateString() : 'Application Deadline';
       if (varName === '[paymentDueDate]') return eventData?.payment_due_date ? new Date(eventData.payment_due_date).toLocaleDateString() : 'Payment Due Date';
       if (varName === '[boothPrice]') return eventData?.booth_price ? `$${eventData.booth_price}` : '$150.00';

@@ -1,4 +1,4 @@
-# Voxxy Presents - Ready for SEO indexing
+# Voxxy - Ready for SEO indexing
 # Note: index.html still has noindex tag - remove when ready to launch
 
 User-agent: *

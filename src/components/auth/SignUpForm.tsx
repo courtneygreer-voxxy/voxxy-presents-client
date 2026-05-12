@@ -140,7 +140,7 @@ export function SignUpForm({ onSuccess, onSwitchToLogin }: SignUpFormProps) {
       <CardHeader className="space-y-1">
         <CardTitle className="text-2xl font-bold text-center">Create Account</CardTitle>
         <CardDescription className="text-center">
-          Join Voxxy Presents to create and manage your club
+          Join Voxxy to create and manage your club
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

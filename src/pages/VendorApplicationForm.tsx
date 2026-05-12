@@ -436,7 +436,7 @@ export default function VendorApplicationForm() {
             onClick={() => navigate('/')}
             className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
-            Back to Voxxy Presents
+            Back to Voxxy
           </button>
         </div>
       </div>
@@ -479,7 +479,7 @@ export default function VendorApplicationForm() {
                   <p className="text-sm text-white/60 italic">Contact information not available</p>
                 )}
                 <p className="text-xs text-white/50 mt-4">
-                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
                 </p>
               </div>
             )}
