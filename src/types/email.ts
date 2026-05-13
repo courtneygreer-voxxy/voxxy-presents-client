@@ -257,7 +257,8 @@ export type RegistrationStatus =
   | 'confirmed'
   | 'waitlist'
   | 'rejected'
-  | 'cancelled';
+  | 'cancelled'
+  | 'opted_out';
 
 export type PaymentStatus =
   | 'paid'
