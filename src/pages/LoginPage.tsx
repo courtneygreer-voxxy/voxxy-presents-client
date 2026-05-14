@@ -150,7 +150,7 @@ export default function LoginPage() {
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
             <h1 className="text-5xl font-bold mb-4">Welcome Back</h1>
             <p className="text-xl text-white/80 max-w-md">
-              Sign in to manage your events, engage your community, and grow with Voxxy Presents
+              Sign in to manage your events, engage your community, and grow with Voxxy
             </p>
           </div>
         </div>

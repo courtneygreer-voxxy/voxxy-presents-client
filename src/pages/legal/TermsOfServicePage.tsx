@@ -29,7 +29,7 @@ export default function TermsOfServicePage() {
         {/* Annotation Box */}
         <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
           <p className="text-slate-700 leading-relaxed">
-            This page explains our Terms of Service, which contains important information about your legal rights. When you use Voxxy Presents, you're agreeing to these terms. To help make them easier to understand, we've included annotations in these highlighted boxes. The annotations aren't part of the official terms, but are intended to clarify key sections.
+            This page explains our Terms of Service, which contains important information about your legal rights. When you use Voxxy, you're agreeing to these terms. To help make them easier to understand, we've included annotations in these highlighted boxes. The annotations aren't part of the official terms, but are intended to clarify key sections.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>1.1 "Customer"</strong> means the event producer, organizer, or business entity that subscribes to the Services to manage their recurring events. The Customer is the contracting party who pays for and administers a Voxxy Presents account.
+              <strong>1.1 "Customer"</strong> means the event producer, organizer, or business entity that subscribes to the Services to manage their recurring events. The Customer is the contracting party who pays for and administers a Voxxy account.
             </p>
             <p>
               <strong>1.2 "End User"</strong> means any individual whose contact information is imported into the Services by a Customer, including without limitation artists, vendors, exhibitors, sponsors, attendees, or other event participants.
@@ -90,7 +90,7 @@ export default function TermsOfServicePage() {
 
           <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
             <p className="text-slate-700 leading-relaxed">
-              Make sure your account information is accurate and keep your account safe. You're responsible for your account and any activity on it. You need to be at least 18 years old to use Voxxy Presents.
+              Make sure your account information is accurate and keep your account safe. You're responsible for your account and any activity on it. You need to be at least 18 years old to use Voxxy.
             </p>
           </div>
 
@@ -116,13 +116,13 @@ export default function TermsOfServicePage() {
 
           <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
             <p className="text-slate-700 leading-relaxed">
-              Voxxy Presents is a software platform for managing recurring community events. We provide the tools — you run your events. We're not a co-organizer, venue, or event producer.
+              Voxxy is a software platform for managing recurring community events. We provide the tools — you run your events. We're not a co-organizer, venue, or event producer.
             </p>
           </div>
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>3.1 What We Provide.</strong> Voxxy Presents is a software-as-a-service (SaaS) platform that provides event management tools, including without limitation automated email workflows, contact management, and event coordination features for recurring community events such as art markets, pop-ups, and similar gatherings.
+              <strong>3.1 What We Provide.</strong> Voxxy is a software-as-a-service (SaaS) platform that provides event management tools, including without limitation automated email workflows, contact management, and event coordination features for recurring community events such as art markets, pop-ups, and similar gatherings.
             </p>
             <p>
               <strong>3.2 Software Only.</strong> Voxxy provides software tools only. We do not produce, host, organize, or operate Your Events. We are not a co-organizer, venue operator, or event producer. We have no control over and assume no responsibility for the quality, safety, legality, or any other aspect of Your Events. Any physical events managed using the Services are solely the responsibility of the Customer.
@@ -194,7 +194,7 @@ export default function TermsOfServicePage() {
 
           <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
             <p className="text-slate-700 leading-relaxed">
-              Voxxy Presents is a paid service. We'll bill you on a recurring basis through Stripe. You can cancel anytime, but refunds are at our discretion.
+              Voxxy is a paid service. We'll bill you on a recurring basis through Stripe. You can cancel anytime, but refunds are at our discretion.
             </p>
           </div>
 
@@ -402,13 +402,13 @@ export default function TermsOfServicePage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>15.1 Informal Resolution.</strong> Before filing a claim against Voxxy, you agree to try to resolve the dispute by first emailing team@voxxypresents.com with a description of your claim. We'll try to resolve the dispute informally. If we can't resolve it within thirty (30) days of our receipt of your email, you or Voxxy may then bring a formal proceeding.
+              <strong>15.1 Informal Resolution.</strong> Before filing a claim against Voxxy, you agree to try to resolve the dispute by first emailing team@heyvoxxy.com with a description of your claim. We'll try to resolve the dispute informally. If we can't resolve it within thirty (30) days of our receipt of your email, you or Voxxy may then bring a formal proceeding.
             </p>
             <p>
               <strong>15.2 Arbitration Agreement.</strong> You and Voxxy agree to resolve any claims arising from or relating to the Services or this Agreement through final and binding arbitration, except as set forth below. You and Voxxy expressly waive the right to trial by jury. Discovery and rights to appeal in arbitration are generally more limited than in a lawsuit. There is no judge or jury in arbitration, and court review of an arbitration award is limited.
             </p>
             <p>
-              <strong>15.3 Arbitration Opt-Out.</strong> You can decline the agreement to arbitrate by emailing team@voxxypresents.com within thirty (30) days of the date you first agree to this Agreement. Your email must be sent from the email address associated with your Account and must include your full name, business name, and a clear statement that you want to opt out of arbitration.
+              <strong>15.3 Arbitration Opt-Out.</strong> You can decline the agreement to arbitrate by emailing team@heyvoxxy.com within thirty (30) days of the date you first agree to this Agreement. Your email must be sent from the email address associated with your Account and must include your full name, business name, and a clear statement that you want to opt out of arbitration.
             </p>
             <p>
               <strong>15.4 Arbitration Procedures.</strong> Any arbitration will be administered by the American Arbitration Association ("AAA") under its Commercial Arbitration Rules. The arbitration will be conducted by a single arbitrator. The arbitration will take place in Wilmington, Delaware, or at another mutually agreed location.
@@ -458,10 +458,10 @@ export default function TermsOfServicePage() {
               <strong>16.5 Force Majeure.</strong> Neither party will be liable for any failure or delay in performing obligations under this Agreement when such failure or delay results from circumstances beyond the party's reasonable control, including without limitation acts of God, natural disasters, war, terrorism, pandemics, government orders, or interruptions in internet service or infrastructure.
             </p>
             <p>
-              <strong>16.6 Notices.</strong> Notices to Voxxy should be sent to team@voxxypresents.com. We may send notices to you via the email address associated with your Account. Notices are considered received when sent to the email address on file.
+              <strong>16.6 Notices.</strong> Notices to Voxxy should be sent to team@heyvoxxy.com. We may send notices to you via the email address associated with your Account. Notices are considered received when sent to the email address on file.
             </p>
             <p>
-              <strong>16.7 Contact Us.</strong> If you have any questions about these Terms, please contact us at team@voxxypresents.com.
+              <strong>16.7 Contact Us.</strong> If you have any questions about these Terms, please contact us at team@heyvoxxy.com.
             </p>
           </div>
         </section>

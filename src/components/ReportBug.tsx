@@ -81,7 +81,7 @@ export default function ReportBug({
       }, 2000);
     } catch (err: any) {
       console.error('Failed to submit bug report:', err);
-      setError('Failed to submit report. Please try again or contact team@voxxypresents.com');
+      setError('Failed to submit report. Please try again or contact team@heyvoxxy.com');
     } finally {
       setSubmitting(false);
     }
@@ -128,7 +128,7 @@ export default function ReportBug({
             <p className="text-xs text-muted-foreground">
               {autoShow
                 ? "We noticed you're having trouble. Help us fix it!"
-                : 'Help us improve Voxxy Presents'}
+                : 'Help us improve Voxxy'}
             </p>
           </div>
         </div>
@@ -231,10 +231,10 @@ export default function ReportBug({
           <p className="text-center text-xs text-foreground/50">
             Or email us directly at{' '}
             <a
-              href="mailto:team@voxxypresents.com"
+              href="mailto:team@heyvoxxy.com"
               className="text-primary hover:text-primary/70 underline transition-colors"
             >
-              team@voxxypresents.com
+              team@heyvoxxy.com
             </a>
           </p>
         </form>

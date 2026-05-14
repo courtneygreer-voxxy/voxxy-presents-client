@@ -214,7 +214,7 @@ export default function EmailTestingPanel() {
             </div>
             <div>
               <h1 className="text-xl lg:text-2xl font-bold text-foreground">Email Testing Dashboard</h1>
-              <p className="text-sm lg:text-base text-muted-foreground">Test all 17 Voxxy Presents emails</p>
+              <p className="text-sm lg:text-base text-muted-foreground">Test all 17 Voxxy emails</p>
             </div>
           </div>
 

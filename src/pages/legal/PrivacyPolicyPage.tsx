@@ -36,11 +36,11 @@ export default function PrivacyPolicyPage() {
         {/* Introduction */}
         <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
-            Thanks for using Voxxy Presents! This Privacy Policy describes what information we collect and how it's used and shared. Any capitalized terms not defined in this Privacy Policy have the meanings set forth in our{' '}
+            Thanks for using Voxxy! This Privacy Policy describes what information we collect and how it's used and shared. Any capitalized terms not defined in this Privacy Policy have the meanings set forth in our{' '}
             <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
-            . If you don't agree with the terms of this Privacy Policy, you may not access or use the Services. If you have any questions, contact us at team@voxxypresents.com.
+            . If you don't agree with the terms of this Privacy Policy, you may not access or use the Services. If you have any questions, contact us at team@heyvoxxy.com.
           </p>
         </div>
 
@@ -87,13 +87,13 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>2.1 Voxxy as Data Controller.</strong> When you create a Customer account with Voxxy Presents, we act as the data controller for the information you provide directly to us (such as your account registration details, billing information, and communications with us). We determine how and why this data is processed.
+              <strong>2.1 Voxxy as Data Controller.</strong> When you create a Customer account with Voxxy, we act as the data controller for the information you provide directly to us (such as your account registration details, billing information, and communications with us). We determine how and why this data is processed.
             </p>
             <p>
               <strong>2.2 Voxxy as Data Processor.</strong> When a Customer imports End User contact information into the Services (such as vendor lists, artist rosters, or attendee information), Voxxy acts as a data processor on behalf of that Customer. The Customer is the data controller for this information and is responsible for ensuring they have a lawful basis (such as prior consent) to share End User data with Voxxy. We process End User data only as directed by the Customer and in accordance with this Privacy Policy and our Terms of Service.
             </p>
             <p>
-              <strong>2.3 Data Processing Agreement.</strong> For Customers who require a formal Data Processing Agreement (DPA), particularly those with End Users located in the European Union or other jurisdictions requiring such agreements, please contact us at team@voxxypresents.com.
+              <strong>2.3 Data Processing Agreement.</strong> For Customers who require a formal Data Processing Agreement (DPA), particularly those with End Users located in the European Union or other jurisdictions requiring such agreements, please contact us at team@heyvoxxy.com.
             </p>
           </div>
         </section>
@@ -246,10 +246,10 @@ export default function PrivacyPolicyPage() {
               <strong>6.2 Customer Responsibilities.</strong> Customers are solely responsible for: (a) ensuring that they have obtained proper consent or have another lawful basis to share End User information with Voxxy; (b) complying with all applicable privacy laws and regulations, including the CAN-SPAM Act, GDPR (if applicable), and any applicable state privacy laws; (c) posting their own privacy policy that discloses their use of Voxxy as a service provider; and (d) honoring End User requests to opt out or have their information deleted.
             </p>
             <p>
-              <strong>6.3 End User Rights.</strong> If you are an End User whose information has been imported into Voxxy by an event producer, and you wish to access, correct, or delete your information, please contact the event producer directly. If you are unable to reach the event producer, you may contact us at team@voxxypresents.com and we will assist you in connecting with the appropriate Customer or, where required by law, take action on your request directly.
+              <strong>6.3 End User Rights.</strong> If you are an End User whose information has been imported into Voxxy by an event producer, and you wish to access, correct, or delete your information, please contact the event producer directly. If you are unable to reach the event producer, you may contact us at team@heyvoxxy.com and we will assist you in connecting with the appropriate Customer or, where required by law, take action on your request directly.
             </p>
             <p>
-              <strong>6.4 End User Payment Information.</strong> We do not collect or store End User payment information. Any payment processing for events is handled by the event producer's own payment arrangements, separate from the Voxxy Presents platform.
+              <strong>6.4 End User Payment Information.</strong> We do not collect or store End User payment information. Any payment processing for events is handled by the event producer's own payment arrangements, separate from the Voxxy platform.
             </p>
           </div>
         </section>
@@ -289,7 +289,7 @@ export default function PrivacyPolicyPage() {
               <strong>8.2 End User Data.</strong> We retain End User data for as long as the Customer's Account is active and the Customer has not deleted the data. Upon termination of the Customer's Account, End User data follows the same retention and deletion schedule as Customer Data.
             </p>
             <p>
-              <strong>8.3 Deletion Requests.</strong> You can request deletion of your personal information at any time by contacting us at team@voxxypresents.com. Please note that there may be a brief delay in deleting information from our servers and backup storage.
+              <strong>8.3 Deletion Requests.</strong> You can request deletion of your personal information at any time by contacting us at team@heyvoxxy.com. Please note that there may be a brief delay in deleting information from our servers and backup storage.
             </p>
           </div>
         </section>
@@ -313,7 +313,7 @@ export default function PrivacyPolicyPage() {
               <strong>9.2 Correction.</strong> You may update or correct your personal information by logging into the Services and updating your profile, or by contacting us.
             </p>
             <p>
-              <strong>9.3 Deletion.</strong> You may request deletion of your personal information by contacting us at team@voxxypresents.com or by deleting your Account. Certain information may be retained as described in Section 8.
+              <strong>9.3 Deletion.</strong> You may request deletion of your personal information by contacting us at team@heyvoxxy.com or by deleting your Account. Certain information may be retained as described in Section 8.
             </p>
             <p>
               <strong>9.4 Opt-Out of Marketing.</strong> You may opt out of receiving marketing or promotional communications by clicking the unsubscribe link in those communications or by contacting us. You will continue to receive service-related communications necessary for the operation of your Account.
@@ -322,7 +322,7 @@ export default function PrivacyPolicyPage() {
               <strong>9.5 Do Not Sell / Do Not Share.</strong> We do not sell or share your personal information as defined under the CCPA/CPRA. Because we do not engage in these activities, there is no need to submit a "Do Not Sell" request, but you may contact us at any time if you have questions.
             </p>
             <p>
-              <strong>9.6 GDPR Rights.</strong> If you are located in the European Economic Area, you may also have rights to restrict processing, object to processing, and lodge a complaint with a supervisory authority. To exercise any of these rights, contact us at team@voxxypresents.com.
+              <strong>9.6 GDPR Rights.</strong> If you are located in the European Economic Area, you may also have rights to restrict processing, object to processing, and lodge a complaint with a supervisory authority. To exercise any of these rights, contact us at team@heyvoxxy.com.
             </p>
           </div>
         </section>
@@ -344,7 +344,7 @@ export default function PrivacyPolicyPage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              The Services are not directed at individuals under the age of 18. We do not knowingly collect personal information from anyone under 18. All Account holders must be at least 18 years old. If we learn that we have collected personal information from a person under 18, we will take steps to delete that information promptly. If you believe we have collected information from a person under 18, please contact us at team@voxxypresents.com.
+              The Services are not directed at individuals under the age of 18. We do not knowingly collect personal information from anyone under 18. All Account holders must be at least 18 years old. If we learn that we have collected personal information from a person under 18, we will take steps to delete that information promptly. If you believe we have collected information from a person under 18, please contact us at team@heyvoxxy.com.
             </p>
           </div>
         </section>
@@ -358,7 +358,7 @@ export default function PrivacyPolicyPage() {
               <strong>12.1 Service Communications.</strong> We may send you service-related announcements and transactional emails related to your Account and your use of the Services. These communications are necessary for the operation of the Services and cannot be opted out of while your Account is active.
             </p>
             <p>
-              <strong>12.2 Marketing Communications.</strong> We may send you marketing or promotional communications about the Services. You can opt out of receiving these communications at any time by clicking the unsubscribe link in those emails or by contacting us at team@voxxypresents.com.
+              <strong>12.2 Marketing Communications.</strong> We may send you marketing or promotional communications about the Services. You can opt out of receiving these communications at any time by clicking the unsubscribe link in those emails or by contacting us at team@heyvoxxy.com.
             </p>
             <p>
               <strong>12.3 Customer-Directed Communications.</strong> The Services enable Customers to send automated email communications to their End Users. Voxxy sends these communications on behalf of and at the direction of the Customer. The Customer is responsible for the content and frequency of these communications and for compliance with applicable email marketing laws, including CAN-SPAM.
@@ -381,7 +381,7 @@ export default function PrivacyPolicyPage() {
               If you are a California resident, the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA) provide you with additional rights regarding your personal information. These include the right to know what personal information we collect, the right to request deletion, the right to opt out of the sale or sharing of personal information (which we do not engage in), and the right to non-discrimination for exercising your privacy rights.
             </p>
             <p>
-              To exercise any of these rights, contact us at team@voxxypresents.com. We will verify your identity before processing your request. You may also designate an authorized agent to submit a request on your behalf.
+              To exercise any of these rights, contact us at team@heyvoxxy.com. We will verify your identity before processing your request. You may also designate an authorized agent to submit a request on your behalf.
             </p>
           </div>
         </section>
@@ -407,7 +407,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@heyvoxxy.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@heyvoxxy.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

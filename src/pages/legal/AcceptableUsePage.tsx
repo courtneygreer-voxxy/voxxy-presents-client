@@ -29,7 +29,7 @@ export default function AcceptableUsePage() {
         {/* Annotation Box */}
         <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
           <p className="text-slate-700 leading-relaxed">
-            This Acceptable Use Policy sets the ground rules for using Voxxy Presents. It protects everyone on the platform — you, your vendors, your attendees, and us. The annotations in these highlighted boxes aren't part of the official policy but are here to help you understand each section.
+            This Acceptable Use Policy sets the ground rules for using Voxxy. It protects everyone on the platform — you, your vendors, your attendees, and us. The annotations in these highlighted boxes aren't part of the official policy but are here to help you understand each section.
           </p>
         </div>
 
@@ -40,10 +40,10 @@ export default function AcceptableUsePage() {
             <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
-            . If you have any questions about this AUP, contact us at team@voxxypresents.com.
+            . If you have any questions about this AUP, contact us at team@heyvoxxy.com.
           </p>
           <p>
-            Voxxy Presents helps event producers manage their recurring community events more efficiently. We're proud to support the creative, community-building work our Customers do. At the same time, we expect our Customers to use the platform responsibly. By using the Services, you agree not to misuse them or help anyone else do so.
+            Voxxy helps event producers manage their recurring community events more efficiently. We're proud to support the creative, community-building work our Customers do. At the same time, we expect our Customers to use the platform responsibly. By using the Services, you agree not to misuse them or help anyone else do so.
           </p>
         </div>
 
@@ -294,7 +294,7 @@ export default function AcceptableUsePage() {
 
           <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              You can report violations of this AUP by emailing team@voxxypresents.com. We take all reports seriously and will investigate promptly.
+              You can report violations of this AUP by emailing team@heyvoxxy.com. We take all reports seriously and will investigate promptly.
             </p>
           </div>
         </section>

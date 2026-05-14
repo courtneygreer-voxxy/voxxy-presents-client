@@ -128,10 +128,10 @@ export default function PaymentCanceledPage() {
                 <p className="text-sm text-muted-foreground text-center">
                   Having trouble? Contact us at{' '}
                   <a
-                    href="mailto:support@voxxypresents.com"
+                    href="mailto:team@heyvoxxy.com"
                     className="text-primary hover:text-primary/70 underline transition-colors"
                   >
-                    support@voxxypresents.com
+                    team@heyvoxxy.com
                   </a>
                 </p>
               </div>

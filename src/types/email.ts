@@ -628,14 +628,14 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     label: 'Organization Name',
     variable: '{{organization_name}}',
     description: 'Event producer organization',
-    example: 'Voxxy Presents'
+    example: 'Voxxy'
   },
   {
     category: 'organization',
     label: 'Organization Email',
     variable: '{{organization_email}}',
     description: 'Contact email',
-    example: 'hello@voxxypresents.com'
+    example: 'hello@heyvoxxy.com'
   },
 
   // Vendor-specific variables

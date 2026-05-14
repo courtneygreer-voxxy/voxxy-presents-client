@@ -14,11 +14,11 @@ const GUIDE_PAGES: GuidePage[] = [
   // ── Welcome ──
   {
     section: 'Welcome',
-    title: 'Welcome to Voxxy Presents',
+    title: 'Welcome to Voxxy',
     content: (
       <div className="space-y-3">
         <p>
-          Voxxy Presents helps you manage vendor markets and fairs from one
+          Voxxy helps you manage vendor markets and fairs from one
           dashboard. This guide walks you through the key features so you can
           get up and running quickly.
         </p>
@@ -380,7 +380,7 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Events are the core of Voxxy Presents. Each event represents a
+          Events are the core of Voxxy. Each event represents a
           vendor market or fair you're organizing.
         </p>
         <ol className="space-y-2 text-foreground/80">

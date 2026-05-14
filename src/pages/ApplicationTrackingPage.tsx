@@ -256,7 +256,7 @@ export default function ApplicationTrackingPage() {
             onClick={() => navigate('/')}
             className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
-            Voxxy Presents Home
+            Voxxy Home
           </button>
         </div>
       </div>

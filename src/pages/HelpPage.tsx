@@ -99,10 +99,10 @@ export default function HelpPage() {
                   Reach our team directly for questions about your account, event setup, or anything else. We respond within 1–2 business days.
                 </p>
                 <a
-                  href="mailto:team@voxxypresents.com"
+                  href="mailto:team@heyvoxxy.com"
                   className="inline-flex items-center text-[15px] font-semibold text-violet-700 hover:text-violet-900"
                 >
-                  team@voxxypresents.com →
+                  team@heyvoxxy.com →
                 </a>
               </CardContent>
             </Card>

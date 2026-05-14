@@ -359,7 +359,7 @@ export function DebugPanel() {
               <div><strong className="text-gray-100">Admin Session:</strong> {localStorage.getItem('voxxy_admin_session') || 'false'}</div>
               <div><strong className="text-gray-100">Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
               <div><strong className="text-gray-100">⚠️ Current User:</strong> {currentUser?.email || 'N/A'}</div>
-              {localStorage.getItem('voxxy_admin_session') === 'true' && currentUser?.email !== 'team@voxxypresents.com' && (
+              {localStorage.getItem('voxxy_admin_session') === 'true' && currentUser?.email !== 'team@heyvoxxy.com' && (
                 <div className="font-bold text-red-700 dark:text-red-400">🔥 SPLIT BRAIN: Admin localStorage but different user!</div>
               )}
             </div>
