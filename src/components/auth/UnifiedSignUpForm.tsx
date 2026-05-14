@@ -167,9 +167,9 @@ export function UnifiedSignUpForm({
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2 mb-3">
             {isProducer ? (
-              <Users className="h-5 w-5 text-purple-400" />
+              <Users className="h-5 w-5 text-primary" />
             ) : (
-              <Building2 className="h-5 w-5 text-purple-400" />
+              <Building2 className="h-5 w-5 text-primary" />
             )}
             <h3 className="text-lg font-semibold text-foreground">
               {isProducer ? 'Create Producer Account' : 'Create Vendor Account'}
@@ -198,7 +198,7 @@ export function UnifiedSignUpForm({
                 placeholder={isProducer ? "Enter your name" : "Enter your business or artist name"}
                 value={formData.displayName}
                 onChange={(e) => handleInputChange('displayName', e.target.value)}
-                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 disabled={isSubmitting}
               />
             </div>
@@ -218,7 +218,7 @@ export function UnifiedSignUpForm({
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={(e) => handleInputChange('email', e.target.value)}
-                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                className="pl-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 disabled={isSubmitting}
               />
             </div>
@@ -238,7 +238,7 @@ export function UnifiedSignUpForm({
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={(e) => handleInputChange('password', e.target.value)}
-                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 disabled={isSubmitting}
               />
               <button
@@ -270,7 +270,7 @@ export function UnifiedSignUpForm({
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-purple-400"
+                className="pl-10 pr-10 bg-background/10 border-border text-foreground placeholder:text-muted-foreground focus:border-primary"
                 disabled={isSubmitting}
               />
               <button
@@ -295,16 +295,16 @@ export function UnifiedSignUpForm({
                 type="checkbox"
                 checked={formData.acceptTerms}
                 onChange={(e) => handleInputChange('acceptTerms', e.target.checked)}
-                className="w-4 h-4 mt-1 text-purple-600 bg-background/10 border-border rounded focus:ring-purple-500 focus:ring-2"
+                className="w-4 h-4 mt-1 text-primary bg-background/10 border-border rounded focus:ring-primary focus:ring-2"
                 disabled={isSubmitting}
               />
               <Label htmlFor="acceptTerms" className="text-foreground/90 dark:text-muted-foreground text-sm leading-relaxed">
                 I agree to the{' '}
-                <a href="/legal/terms" className="text-purple-400 hover:text-purple-300 underline">
+                <a href="/legal/terms" className="text-primary hover:text-primary/70 underline transition-colors">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/legal/privacy" className="text-purple-400 hover:text-purple-300 underline">
+                <a href="/legal/privacy" className="text-primary hover:text-primary/70 underline transition-colors">
                   Privacy Policy
                 </a>
               </Label>
@@ -349,14 +349,14 @@ export function UnifiedSignUpForm({
         <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
           <TabsTrigger
             value="venue_owner"
-            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Users className="h-4 w-4 mr-2" />
             Producer
           </TabsTrigger>
           <TabsTrigger
             value="vendor"
-            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-purple-600 dark:data-[state=active]:text-primary-foreground text-muted-foreground"
+            className="data-[state=active]:bg-violet-200 data-[state=active]:text-foreground dark:data-[state=active]:bg-primary dark:data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Building2 className="h-4 w-4 mr-2" />
             Vendor

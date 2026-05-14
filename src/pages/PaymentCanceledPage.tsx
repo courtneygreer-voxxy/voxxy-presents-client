@@ -5,8 +5,10 @@ import { XCircle, RefreshCw, ArrowLeft, HelpCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { stripeService } from "@/services/stripeService"
 import { useState } from 'react'
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PaymentCanceledPage() {
+  useForceTheme('dark')
   const navigate = useNavigate()
   const [isRetrying, setIsRetrying] = useState(false)
 
@@ -126,10 +128,10 @@ export default function PaymentCanceledPage() {
                 <p className="text-sm text-muted-foreground text-center">
                   Having trouble? Contact us at{' '}
                   <a
-                    href="mailto:support@voxxypresents.com"
-                    className="text-purple-400 hover:text-purple-300 underline"
+                    href="mailto:team@heyvoxxy.com"
+                    className="text-primary hover:text-primary/70 underline transition-colors"
                   >
-                    support@voxxypresents.com
+                    team@heyvoxxy.com
                   </a>
                 </p>
               </div>

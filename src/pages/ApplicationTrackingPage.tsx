@@ -54,9 +54,9 @@ const STATUS_CONFIG = {
   confirmed: {
     label: 'Confirmed',
     icon: CheckCircle,
-    color: 'text-violet-800 dark:text-purple-400',
-    bg: 'bg-purple-500/20',
-    border: 'border-purple-500/30',
+    color: 'text-violet-800 dark:text-primary',
+    bg: 'bg-primary/20',
+    border: 'border-primary/30',
   },
 };
 
@@ -100,7 +100,7 @@ export default function ApplicationTrackingPage() {
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -136,7 +136,7 @@ export default function ApplicationTrackingPage() {
             Application Status
           </h1>
           <p className="text-foreground/60">
-            Tracking Code: <span className="font-mono text-violet-900 dark:text-purple-300">{registration.ticket_code}</span>
+            Tracking Code: <span className="font-mono text-violet-900 dark:text-primary">{registration.ticket_code}</span>
           </p>
         </div>
 
@@ -197,7 +197,7 @@ export default function ApplicationTrackingPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-foreground/60">Category</span>
-              <span className="px-2 py-1 rounded text-sm bg-purple-500/20 text-violet-950 dark:text-purple-300">
+              <span className="px-2 py-1 rounded text-sm bg-primary/20 text-violet-950 dark:text-primary">
                 {registration.vendor_category}
               </span>
             </div>
@@ -218,7 +218,7 @@ export default function ApplicationTrackingPage() {
           <div className="space-y-3">
             {registration.event.dates.start && (
               <div className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5" />
+                <Calendar className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5" />
                 <div>
                   <p className="text-foreground/60 text-sm">Date</p>
                   <p className="text-foreground">
@@ -234,7 +234,7 @@ export default function ApplicationTrackingPage() {
             )}
             {registration.event.location && (
               <div className="flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5" />
+                <MapPin className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5" />
                 <div>
                   <p className="text-foreground/60 text-sm">Location</p>
                   <p className="text-foreground">{registration.event.location}</p>
@@ -256,7 +256,7 @@ export default function ApplicationTrackingPage() {
             onClick={() => navigate('/')}
             className="flex-1 px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
-            Voxxy Presents Home
+            Voxxy Home
           </button>
         </div>
       </div>

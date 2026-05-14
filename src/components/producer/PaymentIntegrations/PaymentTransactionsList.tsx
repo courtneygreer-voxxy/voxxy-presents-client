@@ -95,7 +95,7 @@ export default function PaymentTransactionsList({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-12">
-        <RefreshCw className="w-6 h-6 text-purple-400 animate-spin" />
+        <RefreshCw className="w-6 h-6 text-primary animate-spin" />
       </div>
     );
   }
@@ -112,8 +112,8 @@ export default function PaymentTransactionsList({
       <div className="bg-background/5 rounded-lg border border-border p-6 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-purple-500/20">
-              <DollarSign className="w-5 h-5 text-purple-400" />
+            <div className="p-2 rounded-lg bg-primary/20">
+              <DollarSign className="w-5 h-5 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold text-lg text-foreground">Payment Transactions</h3>
@@ -142,14 +142,14 @@ export default function PaymentTransactionsList({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search by email, name, ID..."
-              className="w-full pl-10 pr-4 py-2 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              className="w-full pl-10 pr-4 py-2 bg-background/5 border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
             />
           </div>
 
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           >
             <option value="all">All Statuses</option>
             <option value="paid">Paid</option>
@@ -161,7 +161,7 @@ export default function PaymentTransactionsList({
           <select
             value={matchFilter}
             onChange={(e) => setMatchFilter(e.target.value)}
-            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+            className="px-4 py-2 bg-background/5 border border-border rounded-lg text-foreground focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
           >
             <option value="all">All Transactions</option>
             <option value="matched">Matched Only</option>

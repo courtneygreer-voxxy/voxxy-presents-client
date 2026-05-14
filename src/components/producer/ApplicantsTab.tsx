@@ -19,7 +19,13 @@ import {
   ArrowLeftRight,
   MailX,
   Pencil,
+  Copy,
+  LayoutPanelLeft,
+  List,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, emailDeliveriesApi } from '@/services/api';
 import { toast } from 'sonner';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
@@ -66,6 +72,7 @@ interface Applicant {
   portfolio_images?: string[];
   producer_notes?: string;
   tags?: string[];
+  application_code?: string;
   email_unsubscribed?: boolean;
   unsubscribe_status?: {
     is_unsubscribed: boolean;
@@ -104,12 +111,19 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     newStatus: 'approved' | 'waitlist' | 'rejected';
   } | null>(null);
 
+  // View mode: focused (two-panel) or table
+  const [viewMode, setViewMode] = useState<'focused' | 'table'>('focused');
+  const [tablePage, setTablePage] = useState(1);
+  const [selectedApplicantIds, setSelectedApplicantIds] = useState<Set<string>>(new Set());
+  const [allPagesSelected, setAllPagesSelected] = useState(false);
+
   // Category change confirmation modal state
   const [showCategoryConfirmModal, setShowCategoryConfirmModal] = useState(false);
   const [pendingCategoryChange, setPendingCategoryChange] = useState<{
     applicant: Applicant;
     newCategory: string;
   } | null>(null);
+  const [sendCategoryEmail, setSendCategoryEmail] = useState(true);
 
   // Payment change confirmation modal state
   const [showPaymentConfirmModal, setShowPaymentConfirmModal] = useState(false);
@@ -150,25 +164,23 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         if (app.name) categoriesSet.add(app.name);
       });
 
-      // Fetch submissions for each application
+      // Fetch all submissions concurrently (fixes N+1 sequential fetches)
       const allSubmissions: any[] = [];
-      for (const app of applications) {
-        try {
-          const submissions = await vendorApplicationsApi.getSubmissions(app.id);
-          const submissionsWithApp = submissions.map((sub: any) => ({
-            ...sub,
-            vendor_application: { id: app.id, name: app.name },
-          }));
-          allSubmissions.push(...submissionsWithApp);
-
-          // Add submission categories to the set
-          submissions.forEach((sub: any) => {
-            if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
-          });
-        } catch (err) {
-          console.error(`Failed to fetch submissions for application ${app.id}:`, err);
-        }
-      }
+      const submissionResults = await Promise.all(
+        applications.map((app: any) =>
+          vendorApplicationsApi.getSubmissions(app.id).catch((err: any) => {
+            console.error(`Failed to fetch submissions for application ${app.id}:`, err);
+            return [];
+          })
+        )
+      );
+      submissionResults.forEach((submissions: any[], idx: number) => {
+        const app = applications[idx];
+        submissions.forEach((sub: any) => {
+          allSubmissions.push({ ...sub, vendor_application: { id: app.id, name: app.name } });
+          if (sub.vendor_category) categoriesSet.add(sub.vendor_category);
+        });
+      });
 
       setAvailableCategories(Array.from(categoriesSet).sort());
 
@@ -199,6 +211,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           location: submission.location,
           portfolio_images: submission.portfolio_images,
           producer_notes: submission.producer_notes,
+          application_code: submission.application_code,
           email_unsubscribed: submission.email_unsubscribed,
           unsubscribe_status: submission.email_unsubscribed ? {
             is_unsubscribed: true,
@@ -297,36 +310,35 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   // Show confirmation modal before category change
   const requestCategoryChange = (applicant: Applicant, newCategory: string) => {
-    if (newCategory === applicant.vendor_category) return; // No change
+    if (newCategory === applicant.vendor_category) return;
     setPendingCategoryChange({ applicant, newCategory });
+    setSendCategoryEmail(true); // default to on
     setShowCategoryConfirmModal(true);
   };
 
-  // Confirm and execute category change
+  // Confirm and execute category change (email decision captured upfront via toggle)
   const confirmCategoryChange = async () => {
     if (!pendingCategoryChange) return;
 
     const { applicant, newCategory } = pendingCategoryChange;
+    const shouldSendEmail = sendCategoryEmail;
 
-    // Close modal
     setShowCategoryConfirmModal(false);
     setPendingCategoryChange(null);
 
-    // Execute the category change
-    await handleUpdateCategory(applicant, newCategory);
+    await handleUpdateCategory(applicant, newCategory, shouldSendEmail);
   };
 
   // Cancel category change
   const cancelCategoryChange = () => {
     setShowCategoryConfirmModal(false);
     setPendingCategoryChange(null);
-    // Reset the dropdown to original value
     if (selectedApplicant) {
       setSelectedApplicant({ ...selectedApplicant });
     }
   };
 
-  const handleUpdateCategory = async (applicant: Applicant, newCategory: string) => {
+  const handleUpdateCategory = async (applicant: Applicant, newCategory: string, sendEmail = false) => {
     if (!applicant.registrationId) {
       alert('Cannot update category: No application found');
       return;
@@ -334,11 +346,18 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
     try {
       setIsUpdatingCategory(true);
-      const response = await registrationsApi.update(applicant.registrationId, { vendor_category: newCategory });
+      await registrationsApi.update(applicant.registrationId, { vendor_category: newCategory });
 
-      // Handle email notification
-      if (response.email_notification) {
-        handleEmailNotification(response.email_notification, undefined, applicant.registrationId);
+      // Send notification email if the producer chose to
+      if (sendEmail) {
+        try {
+          await registrationsApi.sendCategoryChangeNotification(applicant.registrationId);
+          toast.success('Category updated and notification sent');
+        } catch {
+          toast.success('Category updated (notification email failed)');
+        }
+      } else {
+        toast.success('Category updated');
       }
 
       // Update local state
@@ -348,13 +367,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         )
       );
 
-      // Update selected applicant if it's the one being modified
       if (selectedApplicant?.id === applicant.id) {
         setSelectedApplicant({ ...selectedApplicant, vendor_category: newCategory });
       }
     } catch (err: any) {
       console.error('Failed to update category:', err);
-      alert(`Failed to update category: ${err.message}`);
+      toast.error(`Failed to update category: ${err.message}`);
     } finally {
       setIsUpdatingCategory(false);
     }
@@ -547,7 +565,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         };
       case 'pending':
         return {
-          label: 'Pending',
+          label: 'New',
           variant: 'tintBlue' as BadgeVariant,
           icon: Clock,
         };
@@ -596,6 +614,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     location?: string;
     producer_notes?: string;
     tags?: string[];
+    instagram_handle?: string;
+    tiktok_handle?: string;
+    website?: string;
   }) => {
     toast.success('Vendor details updated');
     setApplicants((prev) =>
@@ -671,7 +692,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -692,16 +713,297 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
     );
   }
 
+  const TABLE_PAGE_SIZE = 100;
+  const totalTablePages = Math.max(1, Math.ceil(filteredApplicants.length / TABLE_PAGE_SIZE));
+  const tableStart = (tablePage - 1) * TABLE_PAGE_SIZE;
+  const tablePageApplicants = filteredApplicants.slice(tableStart, tableStart + TABLE_PAGE_SIZE);
+  const currentPageIds = new Set(tablePageApplicants.map((a) => a.id));
+  const allCurrentPageSelected = tablePageApplicants.length > 0 && tablePageApplicants.every((a) => selectedApplicantIds.has(a.id));
+
+  const toggleTableRow = (id: string) => {
+    setAllPagesSelected(false);
+    setSelectedApplicantIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleCurrentPage = () => {
+    setAllPagesSelected(false);
+    if (allCurrentPageSelected) {
+      setSelectedApplicantIds((prev) => {
+        const next = new Set(prev);
+        currentPageIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setSelectedApplicantIds((prev) => {
+        const next = new Set(prev);
+        currentPageIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  };
+
+  const selectAllPages = () => {
+    setAllPagesSelected(true);
+    setSelectedApplicantIds(new Set(filteredApplicants.map((a) => a.id)));
+  };
+
+  const clearTableSelection = () => {
+    setAllPagesSelected(false);
+    setSelectedApplicantIds(new Set());
+  };
+
   return (
     <div className="h-full flex flex-col">
-      {/* Two-Panel Layout */}
+      {/* View Mode Toggle & Header */}
+      <div className="flex items-center justify-between px-3 md:px-4 pt-3 pb-2 border-b border-border">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Applicants</h2>
+          <p className="text-[10px] text-foreground/60">
+            {filteredApplicants.length} total
+            {statusFilter !== 'all' && ` • ${statusFilter}`}
+            {categoryFilter !== 'all' && ` • ${categoryFilter}`}
+          </p>
+        </div>
+        <div className="flex items-center gap-1 bg-muted rounded-lg p-1">
+          <button
+            onClick={() => setViewMode('focused')}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
+              viewMode === 'focused' ? 'voxxy-nav-tab-active' : 'text-muted-foreground hover:text-foreground'
+            }`}
+            title="Focused view"
+          >
+            <LayoutPanelLeft className="w-3.5 h-3.5" />
+            Focused
+          </button>
+          <button
+            onClick={() => { setViewMode('table'); setTablePage(1); clearTableSelection(); }}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-md text-xs font-medium transition-smooth ${
+              viewMode === 'table' ? 'voxxy-nav-tab-active' : 'text-muted-foreground hover:text-foreground'
+            }`}
+            title="Table view"
+          >
+            <List className="w-3.5 h-3.5" />
+            Table
+          </button>
+        </div>
+      </div>
+
+      {/* ── TABLE VIEW ── */}
+      {viewMode === 'table' && (
+        <div className="flex-1 flex flex-col overflow-hidden p-3 md:p-4 gap-3">
+          {/* Filters row (reuse same controls) */}
+          <div className="flex flex-wrap gap-2 items-center">
+            <div className="relative flex-1 min-w-[160px]">
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-3 h-3 text-foreground/50" />
+              <input
+                type="text"
+                placeholder="Search applicants..."
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setTablePage(1); }}
+                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+              />
+            </div>
+            <Select value={statusFilter} onValueChange={(v) => { setStatusFilter(v as StatusFilter); setTablePage(1); }}>
+              <SelectTrigger className="h-8 w-36 rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50">
+                <SelectValue placeholder="All Status" />
+              </SelectTrigger>
+              <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                <SelectItem value="all" className="text-xs">All Status</SelectItem>
+                <SelectItem value="invited" className="text-xs">Invited</SelectItem>
+                <SelectItem value="pending" className="text-xs">New (Unreviewed)</SelectItem>
+                <SelectItem value="approved" className="text-xs">Approved</SelectItem>
+                <SelectItem value="confirmed" className="text-xs">Confirmed</SelectItem>
+                <SelectItem value="waitlist" className="text-xs">Waitlist</SelectItem>
+                <SelectItem value="rejected" className="text-xs">Declined</SelectItem>
+                <SelectItem value="cancelled" className="text-xs">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+            {uniqueCategories.length > 0 && (
+              <Select value={categoryFilter} onValueChange={(v) => { setCategoryFilter(v); setTablePage(1); }}>
+                <SelectTrigger className="h-8 w-40 rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50">
+                  <SelectValue placeholder="All Categories" />
+                </SelectTrigger>
+                <SelectContent className="border-border bg-muted text-foreground shadow-xl">
+                  <SelectItem value="all" className="text-xs">All Categories</SelectItem>
+                  {uniqueCategories.map((cat) => (
+                    <SelectItem key={cat} value={cat} className="text-xs">{cat}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            {hasActiveFilters && (
+              <button onClick={clearFilters} className="px-2 py-1.5 rounded-lg bg-background/5 text-foreground/60 hover:text-foreground text-xs transition-smooth">
+                Clear filters
+              </button>
+            )}
+          </div>
+
+          {/* Select-all banner */}
+          {allCurrentPageSelected && !allPagesSelected && filteredApplicants.length > TABLE_PAGE_SIZE && (
+            <div className="text-xs text-center bg-primary/10 border border-primary/20 rounded-lg py-2 px-3">
+              All {tablePageApplicants.length} applicants on this page are selected.{' '}
+              <button onClick={selectAllPages} className="text-primary underline font-medium">
+                Select all {filteredApplicants.length} applicants
+              </button>
+            </div>
+          )}
+          {allPagesSelected && (
+            <div className="text-xs text-center bg-primary/10 border border-primary/20 rounded-lg py-2 px-3">
+              All {filteredApplicants.length} applicants selected.{' '}
+              <button onClick={clearTableSelection} className="text-primary underline font-medium">
+                Clear selection
+              </button>
+            </div>
+          )}
+
+          {/* Table */}
+          <div className="flex-1 overflow-auto voxxy-table-shell">
+            <table className="w-full text-xs">
+              <thead className="voxxy-table-header">
+                <tr className="voxxy-table-header-row">
+                  <th className="px-3 py-2.5 text-left w-8">
+                    <input
+                      type="checkbox"
+                      checked={allCurrentPageSelected}
+                      onChange={toggleCurrentPage}
+                      className="rounded border-border accent-primary"
+                    />
+                  </th>
+                  <th className="px-3 py-2.5 text-left font-medium">Name</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Business</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Email</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Category</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Status</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Payment</th>
+                  <th className="px-3 py-2.5 text-left font-medium">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {tablePageApplicants.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-3 py-12 text-center text-foreground/50">
+                      {hasActiveFilters ? 'No matches found' : 'No applicants yet'}
+                    </td>
+                  </tr>
+                ) : (
+                  tablePageApplicants.map((applicant) => {
+                    const statusBadge = getStatusBadge(applicant.status);
+                    const paymentBadge = getPaymentBadge(applicant.payment_status);
+                    return (
+                      <tr key={applicant.id} className="voxxy-table-row voxxy-table-row-hover">
+                        <td className="px-3 py-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedApplicantIds.has(applicant.id)}
+                            onChange={() => toggleTableRow(applicant.id)}
+                            className="rounded border-border accent-primary"
+                          />
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="font-medium text-foreground truncate max-w-[140px]">
+                            {applicant.contact_name || '—'}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="text-foreground/70 truncate max-w-[130px]">
+                            {applicant.business_name || '—'}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          <div className="text-foreground/70 truncate max-w-[140px]" title={applicant.email}>
+                            {applicant.email}
+                          </div>
+                        </td>
+                        <td className="px-3 py-2">
+                          {applicant.status !== 'invited' ? (
+                            <Badge variant="tintPurple" className="rounded px-1.5 py-0.5 text-[9px] font-medium">
+                              {applicant.vendor_category}
+                            </Badge>
+                          ) : (
+                            <span className="text-foreground/40">—</span>
+                          )}
+                        </td>
+                        <td className="px-3 py-2">
+                          <Badge
+                            variant={statusBadge.variant}
+                            className="inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-medium"
+                          >
+                            {React.createElement(statusBadge.icon, { className: 'h-2 w-2' })}
+                            {statusBadge.label}
+                          </Badge>
+                        </td>
+                        <td className="px-3 py-2">
+                          {applicant.status !== 'approved' && applicant.status !== 'confirmed' ? (
+                            <Badge variant="default" className="rounded px-1.5 py-0.5 text-[9px] font-medium opacity-50">
+                              N/A
+                            </Badge>
+                          ) : paymentBadge ? (
+                            <Badge variant={paymentBadge.variant} className="rounded px-1.5 py-0.5 text-[9px] font-medium">
+                              {paymentBadge.label}
+                            </Badge>
+                          ) : (
+                            <Badge variant="tintYellow" className="rounded px-1.5 py-0.5 text-[9px] font-medium">
+                              Pending
+                            </Badge>
+                          )}
+                        </td>
+                        <td className="px-3 py-2">
+                          <button
+                            onClick={() => { setViewMode('focused'); setSelectedApplicant(applicant); }}
+                            className="text-primary hover:text-primary/70 transition-smooth underline text-[10px]"
+                          >
+                            View
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Table Pagination */}
+          {totalTablePages > 1 && (
+            <div className="flex items-center justify-between text-xs text-foreground/60 pt-1">
+              <span>
+                Showing {tableStart + 1}–{Math.min(tableStart + TABLE_PAGE_SIZE, filteredApplicants.length)} of {filteredApplicants.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setTablePage((p) => Math.max(1, p - 1))}
+                  disabled={tablePage === 1}
+                  className="p-1 rounded border border-border hover:bg-muted disabled:opacity-40 transition-smooth"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <span className="px-2">{tablePage} / {totalTablePages}</span>
+                <button
+                  onClick={() => setTablePage((p) => Math.min(totalTablePages, p + 1))}
+                  disabled={tablePage === totalTablePages}
+                  className="p-1 rounded border border-border hover:bg-muted disabled:opacity-40 transition-smooth"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── FOCUSED VIEW ── */}
+      {viewMode === 'focused' && (
       <div className="flex-1 flex overflow-hidden">
         {/* Left Panel - Applicant List */}
         <div className="w-80 border-r border-border flex flex-col">
           {/* List Header */}
           <div className="px-3 md:px-4 pb-3 border-b border-border">
             <div className="mb-2">
-              <h2 className="text-2xl font-bold text-foreground">Vendors & Applicants</h2>
               <p className="text-[10px] text-foreground/85 dark:text-foreground/60">
                 {filteredApplicants.length} total
                 {statusFilter !== 'all' && ` • ${statusFilter}`}
@@ -717,20 +1019,20 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 placeholder="Search..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50"
+                className="w-full pl-7 pr-2 py-1.5 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
             </div>
 
             {/* Status & Category Filters */}
             <div className="space-y-1.5">
               <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
-                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
                   <SelectValue placeholder="All Status" />
                 </SelectTrigger>
                 <SelectContent className="border-border bg-muted text-foreground shadow-xl">
                   <SelectItem value="all" className="text-xs focus:bg-background/10">All Status</SelectItem>
                   <SelectItem value="invited" className="text-xs focus:bg-background/10">Invited (No Application)</SelectItem>
-                  <SelectItem value="pending" className="text-xs focus:bg-background/10">Pending Review</SelectItem>
+                  <SelectItem value="pending" className="text-xs focus:bg-background/10">New (Unreviewed)</SelectItem>
                   <SelectItem value="approved" className="text-xs focus:bg-background/10">Approved</SelectItem>
                   <SelectItem value="confirmed" className="text-xs focus:bg-background/10">Confirmed</SelectItem>
                   <SelectItem value="waitlist" className="text-xs focus:bg-background/10">Waitlist</SelectItem>
@@ -740,7 +1042,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               </Select>
               {uniqueCategories.length > 0 && (
                 <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-purple-500/50">
+                  <SelectTrigger className="voxxy-hover-row h-8 w-full rounded-lg border border-border bg-background/5 px-2 text-xs text-foreground transition-smooth focus:ring-1 focus:ring-primary/50">
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -788,8 +1090,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       onClick={() => setSelectedApplicant(applicant)}
                       className={`w-full p-2 rounded-lg text-left transition-smooth ${
                         isSelected
-                          ? 'bg-purple-600/20 border border-purple-500/50'
-                          : 'voxxy-hover-row bg-background/5 border border-border hover:bg-background/10 hover:border-border'
+                          ? 'bg-primary/20 border border-primary/50'
+                          : 'voxxy-hover-row bg-card/70 dark:bg-card/50 border border-border backdrop-blur-sm'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-1">
@@ -913,7 +1215,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     <p className="text-[10px] text-foreground/60 mb-1">Email</p>
                     <a
                       href={`mailto:${selectedApplicant.email}`}
-                      className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                      className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                     >
                       <Mail className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{selectedApplicant.email}</span>
@@ -924,7 +1226,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <p className="text-[10px] text-foreground/60 mb-1">Phone</p>
                       <a
                         href={`tel:${selectedApplicant.phone}`}
-                        className="flex items-center gap-1.5 text-xs text-purple-400 hover:text-purple-300 transition-smooth"
+                        className="flex items-center gap-1.5 text-xs text-primary hover:text-primary/70 transition-smooth"
                       >
                         <Phone className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{selectedApplicant.phone}</span>
@@ -947,6 +1249,27 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       <span>{formatDate(selectedApplicant.created_at)}</span>
                     </div>
                   </div>
+                  {selectedApplicant.application_code && (
+                    <div>
+                      <p className="text-[10px] text-foreground/60 mb-1">App Code</p>
+                      <div className="flex items-center gap-1.5">
+                        <code className="text-xs text-primary font-mono bg-primary/10 px-2 py-0.5 rounded">
+                          {selectedApplicant.application_code}
+                        </code>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            navigator.clipboard.writeText(selectedApplicant.application_code!);
+                            toast.success('Code copied');
+                          }}
+                          className="p-1 rounded hover:bg-background/10 text-foreground/40 hover:text-foreground transition-colors"
+                          title="Copy code"
+                        >
+                          <Copy className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Category */}
@@ -962,7 +1285,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       onValueChange={(value) => requestCategoryChange(selectedApplicant, value)}
                       disabled={isUpdatingCategory}
                     >
-                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50 disabled:cursor-not-allowed disabled:opacity-50">
+                      <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[140px] rounded-lg border border-border bg-background/5 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50">
                         <SelectValue placeholder={selectedApplicant.vendor_category} />
                       </SelectTrigger>
                       <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -988,7 +1311,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                       {selectedApplicant.tags.map((tag, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20"
+                          className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-primary/10 text-primary dark:text-primary border border-primary/20"
                         >
                           {tag}
                         </span>
@@ -998,85 +1321,91 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 )}
 
                 {/* Producer Notes */}
-                {selectedApplicant.producer_notes && (
-                  <div className="mb-3">
-                    <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                <div className="mb-3">
+                  <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
+                  {selectedApplicant.producer_notes ? (
                     <div className="px-3 py-2 rounded-lg bg-background/5 border border-border">
                       <p className="text-xs text-foreground/80 whitespace-pre-wrap">{selectedApplicant.producer_notes}</p>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-xs text-foreground/40 italic px-3 py-2">No notes yet. Click &quot;Edit details&quot; to add.</p>
+                  )}
+                </div>
               </div>
 
               {/* Social & Links */}
               <div className="glass-card voxxy-hover-panel p-3 mb-3">
                 <h3 className="text-sm font-semibold text-foreground mb-3">Social & Links</h3>
-                <div className="flex flex-wrap gap-2">
-                  {selectedApplicant.instagram_handle && (
-                    <a
-                      href={
-                        selectedApplicant.instagram_handle.startsWith('http')
-                          ? selectedApplicant.instagram_handle
-                          : `https://instagram.com/${selectedApplicant.instagram_handle.replace('@', '')}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Instagram className="w-4 h-4" />
-                      <span>Instagram</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.tiktok_handle && (
-                    <a
-                      href={
-                        selectedApplicant.tiktok_handle.startsWith('http')
-                          ? selectedApplicant.tiktok_handle
-                          : `https://tiktok.com/@${selectedApplicant.tiktok_handle.replace('@', '')}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Music className="w-4 h-4" />
-                      <span>TikTok</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.portfolio && (
-                    <a
-                      href={
-                        selectedApplicant.portfolio.startsWith('http')
-                          ? selectedApplicant.portfolio
-                          : `https://${selectedApplicant.portfolio}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Star className="w-4 h-4 text-yellow-400" />
-                      <span>Portfolio</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                  {selectedApplicant.website && (
-                    <a
-                      href={
-                        selectedApplicant.website.startsWith('http')
-                          ? selectedApplicant.website
-                          : `https://${selectedApplicant.website}`
-                      }
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
-                    >
-                      <Globe className="w-4 h-4" />
-                      <span>Website</span>
-                      <ExternalLink className="w-3 h-3 ml-auto" />
-                    </a>
-                  )}
-                </div>
+                {(selectedApplicant.instagram_handle || selectedApplicant.tiktok_handle || selectedApplicant.portfolio || selectedApplicant.website) ? (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedApplicant.instagram_handle && (
+                      <a
+                        href={
+                          selectedApplicant.instagram_handle.startsWith('http')
+                            ? selectedApplicant.instagram_handle
+                            : `https://instagram.com/${selectedApplicant.instagram_handle.replace('@', '')}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Instagram className="w-4 h-4" />
+                        <span>{selectedApplicant.instagram_handle}</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.tiktok_handle && (
+                      <a
+                        href={
+                          selectedApplicant.tiktok_handle.startsWith('http')
+                            ? selectedApplicant.tiktok_handle
+                            : `https://tiktok.com/@${selectedApplicant.tiktok_handle.replace('@', '')}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Music className="w-4 h-4" />
+                        <span>{selectedApplicant.tiktok_handle}</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.portfolio && (
+                      <a
+                        href={
+                          selectedApplicant.portfolio.startsWith('http')
+                            ? selectedApplicant.portfolio
+                            : `https://${selectedApplicant.portfolio}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Star className="w-4 h-4 text-yellow-400" />
+                        <span>Portfolio</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                    {selectedApplicant.website && (
+                      <a
+                        href={
+                          selectedApplicant.website.startsWith('http')
+                            ? selectedApplicant.website
+                            : `https://${selectedApplicant.website}`
+                        }
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-background/5 hover:bg-background/10 text-xs text-foreground transition-smooth border border-border"
+                      >
+                        <Globe className="w-4 h-4" />
+                        <span>Website</span>
+                        <ExternalLink className="w-3 h-3 ml-auto" />
+                      </a>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-xs text-foreground/40 italic">No social links added yet. Click &quot;Edit details&quot; to add.</p>
+                )}
               </div>
 
               {/* Portfolio Images */}
@@ -1106,7 +1435,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   <h3 className="text-sm font-semibold text-foreground mb-3">Status & Actions</h3>
                   {updatingId === selectedApplicant.id ? (
                     <div className="flex items-center justify-center py-2">
-                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
                   ) : selectedApplicant.status === 'pending' ? (
                     <div className="flex justify-end gap-2">
@@ -1153,7 +1482,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             }
                           }}
                         >
-                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-purple-500/50">
+                          <SelectTrigger className="voxxy-hover-row h-8 w-fit min-w-[180px] rounded-lg border border-border bg-background/10 px-2.5 text-xs text-foreground transition-smooth focus:ring-2 focus:ring-primary/50">
                             <SelectValue placeholder={`Keep as ${getStatusBadge(selectedApplicant.status).label}`} />
                           </SelectTrigger>
                           <SelectContent className="border-border bg-muted text-foreground shadow-xl">
@@ -1209,7 +1538,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
                   {loadingEmailHistory ? (
                     <div className="flex items-center justify-center py-4">
-                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                     </div>
                   ) : emailHistoryData.length > 0 ? (
                     <div className="divide-y divide-border">
@@ -1301,6 +1630,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           )}
         </div>
       </div>
+      )} {/* end focused view */}
 
       {selectedApplicant?.registrationId && (
         <EditVendorDetailsModal
@@ -1315,6 +1645,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           initialLocation={selectedApplicant.location}
           initialProducerNotes={selectedApplicant.producer_notes}
           initialTags={selectedApplicant.tags}
+          initialInstagramHandle={selectedApplicant.instagram_handle}
+          initialTiktokHandle={selectedApplicant.tiktok_handle}
+          initialWebsite={selectedApplicant.website}
           emailReadOnly={selectedApplicant.email}
           onSaved={handleEditVendorSaved}
         />
@@ -1380,7 +1713,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               <p className="text-xs text-foreground/60">
                 {pendingStatusChange.applicant.contact_name || pendingStatusChange.applicant.email}
               </p>
-              <p className="text-xs text-purple-400">
+              <p className="text-xs text-primary">
                 {pendingStatusChange.applicant.vendor_category}
               </p>
             </div>
@@ -1416,17 +1749,32 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
           <div className="bg-card text-card-foreground rounded-2xl border border-border max-w-md w-full p-6 space-y-4">
             {/* Header */}
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-purple-500/20">
-                <ArrowLeftRight className="w-5 h-5 text-purple-400" />
+              <div className="p-2 rounded-lg bg-primary/20">
+                <ArrowLeftRight className="w-5 h-5 text-primary" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">
                   Reassign Category?
                 </h3>
                 <p className="text-sm text-foreground/60">
-                  This may affect pricing. You can notify the vendor in the next step.
+                  This may affect pricing.
                 </p>
               </div>
+            </div>
+
+            {/* Email notification toggle */}
+            <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg border border-primary/30">
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 text-primary" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">Notify applicant by email</p>
+                  <p className="text-xs text-foreground/60">Send a category update email to {pendingCategoryChange.applicant.email}</p>
+                </div>
+              </div>
+              <Switch
+                checked={sendCategoryEmail}
+                onCheckedChange={setSendCategoryEmail}
+              />
             </div>
 
             {/* Category Change Info */}
@@ -1457,7 +1805,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 onClick={confirmCategoryChange}
                 className="flex-1 px-4 py-2 rounded-lg voxxy-btn-solid text-sm font-medium transition-smooth"
               >
-                Reassign Category
+                {sendCategoryEmail ? 'Reassign & Notify' : 'Reassign Category'}
               </button>
             </div>
           </div>

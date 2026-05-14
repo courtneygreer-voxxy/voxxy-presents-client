@@ -3,8 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Calendar, MapPin, Mail, Building2, Clock, Users, DollarSign } from 'lucide-react';
 import { eventInvitationsApi, EventInvitation } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
+import { useForceTheme } from '@/hooks/useForceTheme';
 
 export default function InvitationViewPage() {
+  useForceTheme('dark');
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const [invitation, setInvitation] = useState<EventInvitation | null>(null);
@@ -81,7 +83,7 @@ export default function InvitationViewPage() {
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -110,7 +112,7 @@ export default function InvitationViewPage() {
       {/* Header */}
       <div className="voxxy-nav-surface border-b border-border">
         <div className="max-w-4xl mx-auto px-4 py-4 text-center">
-          <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent">
             voxxy
           </h1>
         </div>
@@ -122,7 +124,7 @@ export default function InvitationViewPage() {
         <div className="voxxy-gradient-panel border border-border rounded-lg p-6 md:p-8">
           {/* You're Invited Badge */}
           <div className="flex justify-center mb-6">
-            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-purple-500/90 backdrop-blur-sm border border-purple-400/50 shadow-lg">
+            <div className="flex items-center gap-2 px-6 py-3 rounded-full bg-primary/90 backdrop-blur-sm border border-primary/50 shadow-lg">
               <Mail className="w-5 h-5 text-foreground" />
               <span className="text-foreground font-semibold">You're Invited!</span>
             </div>
@@ -130,7 +132,7 @@ export default function InvitationViewPage() {
 
           {/* Event Title and Location */}
           <div className="mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
+            <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent mb-2">
               {invitation.event?.title}
             </h1>
             <div className="flex items-center gap-2 text-foreground/60">
@@ -145,7 +147,7 @@ export default function InvitationViewPage() {
               {/* Event Date */}
               {invitation.event?.dates?.start && (
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Event Date</p>
                     <p className="text-foreground text-sm">
@@ -159,7 +161,7 @@ export default function InvitationViewPage() {
               {/* Time */}
               {(invitation.event?.dates?.start_time || invitation.event?.dates?.end_time) && (
                 <div className="flex items-start gap-3">
-                  <Clock className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Clock className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Time</p>
                     <p className="text-foreground text-sm">
@@ -174,7 +176,7 @@ export default function InvitationViewPage() {
               {/* Venue */}
               {invitation.event?.venue && (
                 <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Building2 className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Venue</p>
                     <p className="text-foreground text-sm">{invitation.event.venue}</p>
@@ -185,7 +187,7 @@ export default function InvitationViewPage() {
               {/* Invited By */}
               {invitation.vendor_contact && (
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Mail className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Invited By</p>
                     <p className="text-foreground text-sm">{invitation.event?.organization?.name || invitation.vendor_contact.business_name || invitation.vendor_contact.name}</p>
@@ -196,7 +198,7 @@ export default function InvitationViewPage() {
               {/* Apply By */}
               {invitation.event?.application_deadline && (
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Apply By</p>
                     <p className="text-foreground text-sm">
@@ -209,7 +211,7 @@ export default function InvitationViewPage() {
               {/* Age */}
               {invitation.event?.age_restriction && (
                 <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Users className="w-5 h-5 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-xs mb-1">Age</p>
                     <p className="text-foreground text-sm">{invitation.event.age_restriction}</p>
@@ -246,7 +248,7 @@ export default function InvitationViewPage() {
                       <div className="text-right">
                         {application.booth_price && (
                           <>
-                            <p className="text-2xl font-bold text-violet-900 dark:text-purple-400">
+                            <p className="text-2xl font-bold text-violet-900 dark:text-primary">
                               ${Number(application.booth_price).toFixed(0)}
                             </p>
                             {invitation.event?.application_deadline && (
@@ -281,7 +283,7 @@ export default function InvitationViewPage() {
                     {application.install?.install_date && (
                       <div className="flex items-center gap-4 text-foreground/80 text-sm mb-4">
                         <div className="flex items-center gap-2">
-                          <Calendar className="w-4 h-4 text-violet-700 dark:text-purple-400" />
+                          <Calendar className="w-4 h-4 text-violet-700 dark:text-primary" />
                           <span>Install: {new Date(application.install.install_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                         </div>
                       </div>
@@ -303,7 +305,7 @@ export default function InvitationViewPage() {
           )}
         </div>
 
-        {/* Powered by Voxxy Presents */}
+        {/* Powered by Voxxy */}
         <div className="mt-8 pt-8 border-t border-border">
           <div className="flex items-center justify-center gap-2 text-foreground/40 text-sm">
             <span>Powered by</span>
@@ -312,7 +314,7 @@ export default function InvitationViewPage() {
               alt="Voxxy"
               className="w-4 h-4 opacity-60"
             />
-            <span className="font-semibold">Voxxy Presents</span>
+            <span className="font-semibold">Voxxy</span>
           </div>
         </div>
       </div>

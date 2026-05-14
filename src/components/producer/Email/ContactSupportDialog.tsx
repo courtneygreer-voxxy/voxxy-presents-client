@@ -127,7 +127,7 @@ export function ContactSupportDialog({
           ],
           timestamp: new Date().toISOString(),
           footer: {
-            text: 'Email Audit Log • Voxxy Presents',
+            text: 'Email Audit Log • Voxxy',
           },
         }],
       };

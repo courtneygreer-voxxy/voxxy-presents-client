@@ -14,7 +14,7 @@ export default function MobileEULAPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -23,14 +23,14 @@ export default function MobileEULAPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Mobile End User License Agreement</h1>
-          <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-muted border border-border rounded-lg p-6">
-          <p className="text-gray-700 leading-relaxed">
-            This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy Presents web platform, see our{' '}
-            <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
+        <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+          <p className="text-slate-700 leading-relaxed">
+            This EULA is specific to the Hey Voxxy mobile application. If you're an Event Producer using the Voxxy web platform, see our{' '}
+            <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
             . The annotations in these highlighted boxes aren't part of the official EULA but are here to help you understand each section.
@@ -38,16 +38,16 @@ export default function MobileEULAPage() {
         </div>
 
         {/* Introduction */}
-        <div className="space-y-4 text-gray-700 leading-relaxed">
+        <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
             This End User License Agreement ("EULA") is a binding legal agreement between you (the "End User" or "you") and Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") governing your use of the Hey Voxxy mobile application (the "App"). By downloading, installing, accessing, or using the App, you agree to be bound by this EULA. If you do not agree to this EULA, do not download, install, or use the App.
           </p>
           <p>
             This EULA incorporates by reference our{' '}
-            <a href="/legal/privacy" className="text-purple-600 hover:text-purple-700 underline">
+            <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Privacy Policy
             </a>
-            , which explains how we collect, use, and protect your personal information. Any capitalized terms not defined in this EULA have the meanings set forth in our Privacy Policy. If you have any questions about this EULA, contact us at team@voxxypresents.com.
+            , which explains how we collect, use, and protect your personal information. Any capitalized terms not defined in this EULA have the meanings set forth in our Privacy Policy. If you have any questions about this EULA, contact us at team@heyvoxxy.com.
           </p>
         </div>
 
@@ -55,7 +55,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">1. License Grant</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>1.1 Limited License.</strong> Subject to your compliance with this EULA, Voxxy grants you a limited, non-exclusive, non-transferable, revocable license to download, install, and use the App on a mobile device that you own or control, solely for your personal, non-commercial use.
             </p>
@@ -69,7 +69,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">2. Age Requirement</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>2.1 Minimum Age.</strong> You must be at least 18 years old to use the App. By using the App, you represent and warrant that you are 18 years of age or older. We do not knowingly collect personal information from individuals under 18. If we learn that we have collected personal information from a user under 18, we will delete that information as quickly as possible.
             </p>
@@ -80,7 +80,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">3. Account Registration</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>3.1 Account Creation.</strong> To use certain features of the App, you may be required to create an account. You agree to provide accurate, current, and complete information during the registration process and to update such information to keep it accurate, current, and complete.
             </p>
@@ -94,19 +94,19 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">4. Use of the App</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               Hey Voxxy is a discovery and planning tool for nightlife and events. You use it to browse events, save favorites, get AI-powered recommendations, and stay up to date with your local scene.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>4.1 Purpose of the App.</strong> Hey Voxxy is a mobile application that helps you discover local events, nightlife, and community gatherings. The App allows you to browse upcoming events, receive personalized recommendations, save favorite events, and get updates about events you're interested in.
             </p>
             <p>
               <strong>4.2 Contact Access.</strong> If you grant the App permission to access your device's contacts, we may use this information to help you discover which of your contacts are attending events or to facilitate social features within the App. You can revoke this permission at any time through your device settings. See our{' '}
-              <a href="/legal/privacy" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                 Privacy Policy
               </a>{' '}
               for details on how we handle contact information.
@@ -116,14 +116,14 @@ export default function MobileEULAPage() {
             </p>
             <p>
               <strong>4.4 AI-Powered Features.</strong> The App includes AI-powered features (such as personalized event recommendations and a conversational assistant) to help you discover events that match your interests. When you interact with AI-powered features, your inputs (such as dining preferences, event interests, and questions you ask) may be processed by OpenAI's services under their data processing terms. We do not share personally identifiable information with OpenAI unless necessary to provide the service you requested. See our{' '}
-              <a href="/legal/privacy" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                 Privacy Policy
               </a>{' '}
               for more details.
             </p>
             <p>
               <strong>4.5 Acceptable Use.</strong> You agree to use the App in compliance with all applicable laws and regulations and in a manner consistent with our{' '}
-              <a href="/legal/acceptable-use" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/acceptable-use" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                 Acceptable Use Policy
               </a>
               . You may not use the App to transmit, distribute, or store material that is unlawful, harmful, threatening, abusive, harassing, defamatory, or otherwise objectionable.
@@ -135,7 +135,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">5. Third-Party Services</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>5.1 Event Listings.</strong> The App displays event listings provided by third-party event producers and venues. Voxxy is not responsible for the accuracy, completeness, or quality of third-party event listings, nor are we responsible for any issues that arise from your attendance at third-party events.
             </p>
@@ -152,7 +152,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">6. Intellectual Property</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>6.1 Ownership.</strong> The App and all content, features, and functionality (including but not limited to all information, software, text, displays, images, video, and audio, and the design, selection, and arrangement thereof) are owned by Voxxy, its licensors, or other providers of such material and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
             </p>
@@ -166,13 +166,13 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">7. App Store Terms</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               This section covers Apple App Store and Google Play Store specific requirements. If you downloaded Hey Voxxy from an app store, you also agreed to that store's terms when you installed the app.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>7.1 Apple App Store.</strong> If you downloaded the App from the Apple App Store, the following additional terms apply:
             </p>
@@ -209,7 +209,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">8. Updates and Modifications</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>8.1 App Updates.</strong> Voxxy may from time to time develop and provide updates to the App, which may include upgrades, bug fixes, patches, and other error corrections and/or new features (collectively, "Updates"). Updates may also modify or delete in their entirety certain features and functionality. You agree that Voxxy has no obligation to provide any Updates or to continue to provide or enable any particular features or functionality.
             </p>
@@ -223,7 +223,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">9. Term and Termination</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>9.1 Term.</strong> This EULA is effective from the date you first download, install, access, or use the App and will remain in effect until terminated by you or Voxxy.
             </p>
@@ -243,13 +243,13 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">10. Disclaimers</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               This is the standard "no warranties" section required by law. In plain language: we provide the app as-is, and we can't guarantee it will always work perfectly or meet your specific needs.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, VOXXY DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
             </p>
@@ -266,13 +266,13 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">11. Limitation of Liability</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               This section limits how much we can be held liable for if something goes wrong. The caps exist to keep our legal risk manageable so we can continue operating the service.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               TO THE FULLEST EXTENT PERMITTED BY LAW, IN NO EVENT WILL VOXXY, ITS AFFILIATES, OFFICERS, DIRECTORS, EMPLOYEES, AGENTS, SUPPLIERS, OR LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOSS OF PROFITS, DATA, USE, GOODWILL, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE APP, EVEN IF VOXXY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
             </p>
@@ -289,7 +289,7 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">12. Indemnification</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               You agree to indemnify, defend, and hold harmless Voxxy, its affiliates, officers, directors, employees, agents, suppliers, and licensors from and against any claims, liabilities, damages, judgments, awards, losses, costs, expenses, or fees (including reasonable attorneys' fees) arising out of or related to: (a) your use of the App; (b) your violation of this EULA; (c) your violation of any rights of another party, including any event producers or other users; or (d) your violation of any applicable laws or regulations.
             </p>
@@ -300,15 +300,15 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">13. Dispute Resolution</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               If we have a legal dispute, we'll try to resolve it through binding arbitration rather than going to court. This is faster and cheaper for everyone.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>13.1 Informal Resolution.</strong> If you have a dispute with Voxxy, you agree to first contact us at team@voxxypresents.com and attempt to resolve the dispute informally. We will attempt to resolve the dispute informally by contacting you via email. If a dispute is not resolved within thirty (30) days of submission, you or Voxxy may bring a formal proceeding.
+              <strong>13.1 Informal Resolution.</strong> If you have a dispute with Voxxy, you agree to first contact us at team@heyvoxxy.com and attempt to resolve the dispute informally. We will attempt to resolve the dispute informally by contacting you via email. If a dispute is not resolved within thirty (30) days of submission, you or Voxxy may bring a formal proceeding.
             </p>
             <p>
               <strong>13.2 Binding Arbitration.</strong> Except as provided below, you and Voxxy agree that any dispute, claim, or controversy arising out of or relating to this EULA or the App will be settled by binding arbitration administered by the American Arbitration Association ("AAA") in accordance with its Consumer Arbitration Rules. The arbitration will be conducted in New York, New York, or another mutually agreed upon location. Judgment on the arbitration award may be entered in any court having jurisdiction.
@@ -329,10 +329,10 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">14. General Provisions</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>14.1 Entire Agreement.</strong> This EULA, together with our{' '}
-              <a href="/legal/privacy" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                 Privacy Policy
               </a>
               , constitutes the entire agreement between you and Voxxy regarding the App and supersedes all prior agreements and understandings.
@@ -359,13 +359,13 @@ export default function MobileEULAPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">15. Contact Information</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               If you have any questions about this EULA or the App, please contact us at:
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-purple-600 hover:text-purple-700 underline">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@heyvoxxy.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@heyvoxxy.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

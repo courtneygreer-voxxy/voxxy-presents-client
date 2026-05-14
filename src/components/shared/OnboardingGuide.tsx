@@ -118,7 +118,7 @@ export function OnboardingGuide({
       {/* Spotlight ring on target */}
       {targetRect && (
         <div
-          className="fixed border-2 border-purple-400 rounded-lg pointer-events-none animate-pulse"
+          className="fixed border-2 border-primary rounded-lg pointer-events-none animate-pulse"
           style={{
             top: targetRect.top - 6,
             left: targetRect.left - 6,
@@ -132,12 +132,12 @@ export function OnboardingGuide({
 
       {/* Tooltip */}
       <div
-        className="w-[320px] bg-muted border border-purple-500/30 rounded-xl shadow-2xl shadow-purple-500/10"
+        className="w-[320px] bg-muted border border-primary/30 rounded-xl shadow-2xl shadow-primary/10"
         style={{ ...getTooltipStyle(), zIndex: 10 }}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-4 pt-4 pb-2">
-          <span className="text-xs text-purple-800 dark:text-purple-300 font-medium">
+          <span className="text-xs text-slate-800 dark:text-primary font-medium">
             Step {currentStep + 1} of {totalSteps}
           </span>
           <button
@@ -161,7 +161,7 @@ export function OnboardingGuide({
             <div
               key={i}
               className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                i === currentStep ? 'bg-purple-600 dark:bg-purple-400' : 'bg-background/20'
+                i === currentStep ? 'bg-primary dark:bg-primary' : 'bg-background/20'
               }`}
             />
           ))}

@@ -111,11 +111,11 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-2">
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-pink-400 bg-clip-text text-transparent mb-2">
               Email Testing Center
             </h1>
             <p className="text-foreground/60">
-              Test all your email notifications • Emails will be sent to: <span className="font-mono text-purple-400">{testEmail || 'your email'}</span>
+              Test all your email notifications • Emails will be sent to: <span className="font-mono text-primary">{testEmail || 'your email'}</span>
             </p>
           </div>
           {onBack && (
@@ -135,10 +135,10 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="border-purple-500/20">
+          <Card className="border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
-                <Mail className="w-5 h-5 text-purple-400" />
+                <Mail className="w-5 h-5 text-primary" />
                 Scheduled Emails
               </CardTitle>
               <CardDescription className="text-[13px] text-muted-foreground">
@@ -231,7 +231,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Email Categories */}
         {emailCategories.map((category, idx) => (
-          <Card key={idx} className="border-purple-500/20">
+          <Card key={idx} className="border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground">{category.name}</CardTitle>
               <CardDescription className="text-[13px] text-muted-foreground">
@@ -258,7 +258,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
 
         {/* Results */}
         {results.length > 0 && (
-          <Card className="border-purple-500/20">
+          <Card className="border-primary/20">
             <CardHeader>
               <CardTitle className="text-foreground flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-green-400" />

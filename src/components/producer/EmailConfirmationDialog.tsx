@@ -41,11 +41,11 @@ export function EmailConfirmationDialog({
       <AlertDialogContent className="bg-card text-card-foreground border border-border">
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${isHighPriority ? 'bg-red-500/20' : 'bg-purple-500/20'}`}>
+            <div className={`p-2 rounded-lg ${isHighPriority ? 'bg-red-500/20' : 'bg-primary/20'}`}>
               {isHighPriority ? (
                 <AlertTriangle className="h-5 w-5 text-red-400" />
               ) : (
-                <Mail className="h-5 w-5 text-purple-400" />
+                <Mail className="h-5 w-5 text-primary" />
               )}
             </div>
             <AlertDialogTitle className="text-foreground">{title}</AlertDialogTitle>
@@ -55,9 +55,9 @@ export function EmailConfirmationDialog({
               <p className="text-sm text-foreground/60">{warning}</p>
 
               {isBulkEmail && (
-                <div className="flex items-center gap-2 rounded-lg bg-purple-500/10 border border-purple-500/20 p-3 text-sm">
-                  <Users className="h-4 w-4 text-purple-400" />
-                  <span className="text-purple-300 font-medium">
+                <div className="flex items-center gap-2 rounded-lg bg-primary/10 border border-primary/20 p-3 text-sm">
+                  <Users className="h-4 w-4 text-primary" />
+                  <span className="text-primary font-medium">
                     {recipientCount} {recipientCount === 1 ? 'recipient' : 'recipients'} will receive this email
                   </span>
                 </div>

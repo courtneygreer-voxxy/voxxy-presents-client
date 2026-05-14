@@ -41,6 +41,9 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
     instagram_handle: contact.instagram_handle || '',
     tiktok_handle: contact.tiktok_handle || '',
     website: contact.website || '',
+    eventbrite_email: contact.eventbrite_email || '',
+    venmo_handle: contact.venmo_handle || '',
+    paypal_email: contact.paypal_email || '',
     categories: contact.categories || [],
     tags: contact.tags || [],
     notes: contact.notes || '',
@@ -124,6 +127,10 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
         instagram_handle: formData.instagram_handle || undefined,
         tiktok_handle: formData.tiktok_handle || undefined,
         website: formData.website || undefined,
+        // TODO: Backend migration needed - these will be silently dropped until then
+        eventbrite_email: formData.eventbrite_email || undefined,
+        venmo_handle: formData.venmo_handle || undefined,
+        paypal_email: formData.paypal_email || undefined,
         categories: formData.categories,
         tags: formData.tags,
         notes: formData.notes || undefined,
@@ -139,30 +146,29 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-      <div className="bg-card text-card-foreground rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+    <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="voxxy-modal-surface rounded-xl w-full max-w-2xl max-h-[82vh] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-foreground">Edit Contact</h2>
-              <p className="text-foreground/50 text-xs mt-0.5">{contact.contact_name}</p>
-            </div>
-            <button
-              onClick={onClose}
-              className="text-foreground/60 hover:text-foreground transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+        <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
+          <div>
+            <h2 className="text-sm font-semibold text-foreground">Edit Contact</h2>
+            <p className="text-foreground/50 text-[11px] mt-0.5">{contact.contact_name}</p>
           </div>
+          <button
+            onClick={onClose}
+            className="text-foreground/60 hover:text-foreground transition-colors"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-w-5xl mx-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {/* Row 1: Full Name, Business Name, Email */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="contact_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="contact_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -172,7 +178,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 onChange={(e) => handleChange('contact_name', e.target.value)}
                 className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
                   errors.contact_name ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {errors.contact_name && (
                 <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
@@ -180,7 +186,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
 
             <div>
-              <label htmlFor="business_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="business_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Business Name
               </label>
               <input
@@ -188,12 +194,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="text"
                 value={formData.business_name}
                 onChange={(e) => handleChange('business_name', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="email" className="block text-xs font-medium text-foreground/70 mb-1">
                 Email <span className="text-red-400">*</span>
               </label>
               <input
@@ -203,7 +209,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 onChange={(e) => handleChange('email', e.target.value)}
                 className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
                   errors.email ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-400">{errors.email}</p>
@@ -214,7 +220,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {/* Row 2: Phone, Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="phone" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="phone" className="block text-xs font-medium text-foreground/70 mb-1">
                 Phone
               </label>
               <input
@@ -222,12 +228,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="location" className="block text-xs font-medium text-foreground/70 mb-1">
                 Location
               </label>
               <input
@@ -236,7 +242,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="City, State, ZIP"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
           </div>
@@ -253,7 +259,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.instagram_handle}
                 onChange={(e) => handleChange('instagram_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
@@ -267,7 +273,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 value={formData.tiktok_handle}
                 onChange={(e) => handleChange('tiktok_handle', e.target.value)}
                 placeholder="@username"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
             </div>
 
@@ -283,7 +289,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 placeholder="https://..."
                 className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
                   errors.website ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all`}
               />
               {errors.website && (
                 <p className="mt-1 text-xs text-red-400">{errors.website}</p>
@@ -291,16 +297,61 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
           </div>
 
+          {/* Payment Information */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label htmlFor="eventbrite_email" className="block text-xs font-medium text-foreground/70 mb-1">
+                Eventbrite Email
+              </label>
+              <input
+                id="eventbrite_email"
+                type="email"
+                value={formData.eventbrite_email}
+                onChange={(e) => handleChange('eventbrite_email', e.target.value)}
+                placeholder="artist@email.com"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="venmo_handle" className="block text-xs font-medium text-foreground/70 mb-1">
+                Venmo Handle
+              </label>
+              <input
+                id="venmo_handle"
+                type="text"
+                value={formData.venmo_handle}
+                onChange={(e) => handleChange('venmo_handle', e.target.value)}
+                placeholder="@username"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="paypal_email" className="block text-xs font-medium text-foreground/70 mb-1">
+                PayPal Email
+              </label>
+              <input
+                id="paypal_email"
+                type="email"
+                value={formData.paypal_email}
+                onChange={(e) => handleChange('paypal_email', e.target.value)}
+                placeholder="artist@paypal.com"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
           {/* Categories */}
           <div>
-            <label className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+            <label className="block text-xs font-medium text-foreground/70 mb-1">
               Categories
             </label>
             <div className="relative" ref={categoryDropdownRef}>
               <button
                 type="button"
                 onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               >
                 <span className={formData.categories.length > 0 ? 'text-foreground' : 'text-foreground/40'}>
                   {formData.categories.length > 0
@@ -320,7 +371,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-background/10 transition-colors"
                       >
                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          formData.categories.includes(category.name) ? 'bg-purple-500 border-purple-500' : 'border-border'
+                          formData.categories.includes(category.name) ? 'bg-primary/50 border-primary' : 'border-border'
                         }`}>
                           {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-foreground" strokeWidth={3} />}
                         </div>
@@ -353,7 +404,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {formData.categories.map(cat => {
                   const category = organizationCategories.find(c => c.name === cat);
-                  const categoryColor = category?.color || '#8B5CF6';
+                  const categoryColor = category?.color || '#9054e3';
                   return (
                     <span
                       key={cat}
@@ -391,12 +442,12 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                     }
                   }}
                   placeholder="Add tag..."
-                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
+                  className="px-4 py-2.5 bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary text-sm rounded-lg transition-colors flex items-center gap-2 border border-primary/30"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add
@@ -428,13 +479,13 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded-full text-xs flex items-center gap-1.5 border border-purple-500/30"
+                    className="px-3 py-1 bg-primary/20 text-violet-950 dark:text-primary rounded-full text-xs flex items-center gap-1.5 border border-primary/30"
                   >
                     #{tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-violet-800 dark:hover:text-purple-100"
+                      className="hover:text-violet-800 dark:hover:text-primary/90"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -455,7 +506,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Add notes..."
               rows={3}
-              className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+              className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
             />
           </div>
 
@@ -489,7 +540,7 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
           {contact.event_history && contact.event_history.length > 0 && (
             <div className="mt-6 pt-6 border-t border-border">
               <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-4 h-4 text-purple-500" />
+                <Calendar className="w-4 h-4 text-primary" />
                 <h3 className="text-sm font-semibold text-foreground">Event Application History</h3>
                 <span className="text-xs text-foreground/50">
                   ({contact.total_applications || 0} application{contact.total_applications !== 1 ? 's' : ''} • {contact.total_events || 0} event{contact.total_events !== 1 ? 's' : ''})
@@ -500,13 +551,13 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
                 {contact.event_history.map((event, index) => (
                   <div
                     key={index}
-                    className="p-3 rounded-lg bg-background/20 border border-border hover:border-purple-500/30 transition-all"
+                    className="p-3 rounded-lg bg-background/20 border border-border hover:border-primary/30 transition-all"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
                           <h4 className="text-sm font-medium text-foreground truncate">{event.event_name}</h4>
-                          <span className="px-2 py-0.5 rounded-full text-xs bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                          <span className="px-2 py-0.5 rounded-full text-xs bg-primary/10 text-primary border border-primary/20">
                             {event.category}
                           </span>
                         </div>
@@ -580,24 +631,25 @@ export default function EditContactModal({ organizationId, contact, onClose, onS
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+        </div>
+          {/* Footer */}
+          <div className="px-5 py-3 border-t border-border flex justify-end gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-background/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg voxxy-btn-cta transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
+                  <span className="w-3 h-3 border-2 border-border border-t-primary rounded-full animate-spin" />
                   Saving...
                 </span>
               ) : (

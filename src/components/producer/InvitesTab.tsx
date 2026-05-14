@@ -517,7 +517,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="w-6 h-6 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -554,7 +554,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
           placeholder="Search name, email, category..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-8 pr-3 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="w-full pl-8 pr-3 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50"
         />
       </div>
 
@@ -564,7 +564,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="all">All Status</option>
           <option value="invited">Invited</option>
@@ -580,7 +580,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={reviewFilter}
           onChange={(e) => setReviewFilter(e.target.value as ReviewFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="all">All Reviews</option>
           <option value="reviewed">Reviewed</option>
@@ -591,7 +591,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={paymentFilter}
           onChange={(e) => setPaymentFilter(e.target.value as PaymentFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="all">All Payment</option>
           <option value="paid">Paid</option>
@@ -603,7 +603,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
         <select
           value={sourceFilter}
           onChange={(e) => setSourceFilter(e.target.value as SourceFilter)}
-          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+          className="px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/50"
         >
           <option value="all">All Sources</option>
           <option value="contact">Contact</option>
@@ -652,7 +652,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                   key={row.id}
                   className={`border-b border-border last:border-b-0 ${
                     isUnreviewed ? 'bg-blue-500/5' : ''
-                  } ${isExpanded ? 'bg-background/5 border-l-2 border-l-purple-500' : ''}`}
+                  } ${isExpanded ? 'bg-background/5 border-l-2 border-l-primary' : ''}`}
                 >
                   {/* Row Header */}
                   <button
@@ -728,7 +728,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
 
                           <div>
                             <p className="text-[10px] text-foreground/60 mb-0.5">Email</p>
-                            <a href={`mailto:${row.email}`} className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1.5">
+                            <a href={`mailto:${row.email}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
                               <Mail className="w-3.5 h-3.5" />
                               {row.email}
                             </a>
@@ -737,7 +737,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                           {row.phone && (
                             <div>
                               <p className="text-[10px] text-foreground/60 mb-0.5">Phone</p>
-                              <a href={`tel:${row.phone}`} className="text-sm text-purple-400 hover:text-purple-300 flex items-center gap-1.5">
+                              <a href={`tel:${row.phone}`} className="text-sm text-primary hover:text-primary/70 flex items-center gap-1.5 transition-colors">
                                 <Phone className="w-3.5 h-3.5" />
                                 {row.phone}
                               </a>
@@ -819,7 +819,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                 <div className="mt-2 space-y-2">
                                   {loadingEmailHistory === row.id ? (
                                     <div className="flex items-center justify-center py-4">
-                                      <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                                      <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                                     </div>
                                   ) : emailHistoryData[row.id]?.length > 0 ? (
                                     emailHistoryData[row.id].map((delivery: any) => {
@@ -881,7 +881,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                                     alert(`Failed to retry: ${err.message}`);
                                                   }
                                                 }}
-                                                className="text-[10px] px-2 py-1 rounded bg-purple-600/20 text-violet-950 dark:text-purple-400 hover:bg-purple-600/30 transition-smooth"
+                                                className="text-[10px] px-2 py-1 rounded bg-primary/20 text-violet-950 dark:text-primary hover:bg-primary/30 transition-smooth"
                                               >
                                                 Retry
                                               </button>
@@ -918,7 +918,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                               <p className="text-[10px] text-foreground/60 mb-1.5 uppercase tracking-wide">Status</p>
                               {updatingId === row.id ? (
                                 <div className="flex items-center justify-center py-3">
-                                  <div className="w-4 h-4 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                                  <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                                 </div>
                               ) : row.status === 'applied' ? (
                                 <div className="flex gap-2">
@@ -971,7 +971,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                 value={row.category}
                                 onChange={(e) => handleUpdateCategory(row, e.target.value)}
                                 disabled={isUpdatingCategory}
-                                className="w-full px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-purple-500/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full px-2.5 py-1.5 rounded-lg bg-background/5 text-foreground text-xs border border-border focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed"
                               >
                                 {availableCategories.length > 0 ? (
                                   // Show all available categories, ensuring current category is included
@@ -1016,7 +1016,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                     setEditingNotesId(row.id);
                                     setNotesEditValue(row.producerNotes || '');
                                   }}
-                                  className="text-purple-400 hover:text-purple-300"
+                                  className="text-primary hover:text-primary/70 transition-colors"
                                 >
                                   <Edit2 className="w-3 h-3" />
                                 </button>
@@ -1029,7 +1029,7 @@ export default function InvitesTab({ eventSlug, organizationId, event, isAdmin }
                                   onChange={(e) => setNotesEditValue(e.target.value)}
                                   placeholder="Add private notes..."
                                   rows={3}
-                                  className="w-full px-2.5 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50"
+                                  className="w-full px-2.5 py-2 bg-background/5 border border-border rounded-lg text-xs text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50"
                                 />
                                 <div className="flex gap-2">
                                   <button

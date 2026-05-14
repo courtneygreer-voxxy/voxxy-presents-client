@@ -14,6 +14,7 @@ import {
 import ReportBug from '@/components/ReportBug';
 import FloatingBugButton from '@/components/FloatingBugButton';
 import { Badge } from '@/components/ui/badge';
+import { useForceTheme } from '@/hooks/useForceTheme';
 
 interface VendorApplication {
   id: number;
@@ -57,6 +58,7 @@ interface Event {
 }
 
 export default function VendorApplicationForm() {
+  useForceTheme('dark');
   // Use named parameters from React Router
   // Supports both namespaced format (org-slug-id/event-slug-id) and legacy (event-slug)
   const { slug, applicationId } = useParams<{ slug: string; applicationId: string }>();
@@ -419,7 +421,7 @@ export default function VendorApplicationForm() {
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -434,7 +436,7 @@ export default function VendorApplicationForm() {
             onClick={() => navigate('/')}
             className="px-6 py-3 rounded-lg voxxy-btn-cta transition-all"
           >
-            Back to Voxxy Presents
+            Back to Voxxy
           </button>
         </div>
       </div>
@@ -444,7 +446,7 @@ export default function VendorApplicationForm() {
   // Check if event is cancelled
   if (event?.status?.status === 'cancelled') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+      <div className="min-h-screen voxxy-gradient-page-cool">
         <div className="max-w-3xl mx-auto px-4 py-12">
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -466,7 +468,7 @@ export default function VendorApplicationForm() {
                 {event.organization.email ? (
                   <a
                     href={`mailto:${event.organization.email}`}
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/70 text-sm transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -477,7 +479,7 @@ export default function VendorApplicationForm() {
                   <p className="text-sm text-white/60 italic">Contact information not available</p>
                 )}
                 <p className="text-xs text-white/50 mt-4">
-                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
                 </p>
               </div>
             )}
@@ -582,7 +584,7 @@ export default function VendorApplicationForm() {
             <div className="mt-3 pt-3 border-t border-border">
               <div>
                 <p className="text-foreground/60 text-[10px] mb-0.5">Booth Price</p>
-                <p className="text-2xl font-bold text-purple-400">
+                <p className="text-2xl font-bold text-primary">
                   ${Number(application.booth_price).toFixed(0)}
                 </p>
               </div>
@@ -591,7 +593,7 @@ export default function VendorApplicationForm() {
         </div>
 
         {/* Application Form */}
-        <div className="bg-background/5 border border-border rounded-lg p-4 md:p-5">
+        <div className="rounded-xl border border-white/15 bg-card/90 shadow-lg backdrop-blur-md dark:bg-card/70 dark:border-white/12 p-4 md:p-5">
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Your Information */}
@@ -608,7 +610,7 @@ export default function VendorApplicationForm() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Your full name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                     required
                   />
                 </div>
@@ -623,7 +625,7 @@ export default function VendorApplicationForm() {
                     value={formData.business_name}
                     onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
                     placeholder="Your business or brand name"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                   />
                 </div>
 
@@ -637,7 +639,7 @@ export default function VendorApplicationForm() {
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                     placeholder="your@email.com"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                     required
                   />
                 </div>
@@ -652,7 +654,7 @@ export default function VendorApplicationForm() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
-                    className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors"
+                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
                   />
                 </div>
               </div>
@@ -672,10 +674,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Link to your work <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">https://</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">https://</div>
                     <input
                       type="text"
                       value={formData.website}
@@ -691,10 +691,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Instagram
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">instagram.com/</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">instagram.com/</div>
                     <input
                       type="text"
                       value={formData.instagram_handle}
@@ -713,10 +711,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     TikTok
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">tiktok.com/@</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">tiktok.com/@</div>
                     <input
                       type="text"
                       value={formData.tiktok_handle}
@@ -732,10 +728,8 @@ export default function VendorApplicationForm() {
                   <label className="block text-xs font-medium text-foreground mb-1.5">
                     Facebook
                   </label>
-                  <div className="flex rounded-lg overflow-hidden bg-background/10 border border-border focus-within:border-purple-500 transition-colors">
-                    <div className="flex items-center px-2.5 bg-background/5 border-r border-border">
-                      <span className="text-foreground/60 dark:text-foreground/50 text-sm whitespace-nowrap select-none">facebook.com/</span>
-                    </div>
+                  <div className="voxxy-input-frost-group">
+                    <div className="voxxy-input-frost-prefix">facebook.com/</div>
                     <input
                       type="text"
                       value={formData.facebook_handle}
@@ -758,7 +752,7 @@ export default function VendorApplicationForm() {
                 onChange={(e) => setFormData({ ...formData, note_to_host: e.target.value })}
                 placeholder="Tell the event organizer about your products, experience, or anything else you'd like them to know..."
                 rows={3}
-                className="w-full px-3 py-2 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-purple-500 transition-colors resize-none"
+                className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40 resize-none"
               />
             </div>
 
@@ -773,21 +767,21 @@ export default function VendorApplicationForm() {
                     id="agreed_to_terms"
                     checked={formData.agreed_to_terms}
                     onChange={(e) => setFormData({ ...formData, agreed_to_terms: e.target.checked })}
-                    className="mt-0.5 w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500"
+                    className="mt-0.5 w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary"
                     required
                   />
                   <label htmlFor="agreed_to_terms" className="text-xs text-foreground/90 dark:text-foreground/80">
                     I agree to the{' '}
                     <a
                       href="/legal/privacy"
-                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
                     >
                       Privacy Policy
                     </a>{' '}
                     and{' '}
                     <a
                       href="/legal/acceptable-use"
-                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 underline"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 underline transition-colors"
                     >
                       Acceptable Use Policy
                     </a>{' '}
@@ -835,16 +829,16 @@ export default function VendorApplicationForm() {
           </form>
         </div>
 
-        {/* Powered by Voxxy Presents */}
+        {/* Powered by VOXXY */}
         <div className="mt-12 pt-8 border-t border-border">
           <div className="flex items-center justify-center gap-2 text-foreground/55 dark:text-foreground/40 text-sm">
-            <span>Powered by</span>
+            <span>powered by</span>
             <img
               src="/VoxxyTriangle.svg"
               alt="Voxxy"
               className="w-4 h-4 opacity-60"
             />
-            <span className="font-semibold">Voxxy Presents</span>
+            <span className="font-semibold">VOXXY</span>
           </div>
         </div>
       </div>

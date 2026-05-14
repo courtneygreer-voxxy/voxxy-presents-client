@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Calendar } from 'lucide-react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Percent } from 'lucide-react';
 import { MapPin, Tags } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
-import type { Category } from '@/types/category';
+import type { Category, CategoryFeePreference } from '@/types/category';
+import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types';
 import ContactsTable from './ContactsTable';
 import AddContactModal from './AddContactModal';
 import EditContactModal from './EditContactModal';
@@ -59,14 +60,14 @@ function FilterDropdownButton({
         onClick={() => setOpen(!open)}
         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
           selectedValues.length > 0
-            ? 'bg-purple-500/20 text-violet-950 border border-purple-500/40 dark:text-purple-300 dark:border-purple-500/30'
-            : 'bg-card/80 text-foreground dark:bg-background/10 dark:text-foreground/70 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-background/15'
+            ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+            : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 hover:text-foreground border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
         }`}
       >
         {Icon && <Icon className="w-3.5 h-3.5" />}
         <span>{field.label}</span>
         {selectedValues.length > 0 && (
-          <span className="flex items-center justify-center w-4 h-4 bg-purple-500 text-primary-foreground text-[10px] font-bold rounded-full">
+          <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
             {selectedValues.length}
           </span>
         )}
@@ -82,7 +83,7 @@ function FilterDropdownButton({
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={`Search ${field.label.toLowerCase()}...`}
-                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/40 dark:bg-background/10"
+                className="w-full rounded border border-border bg-card/80 px-2.5 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/40 dark:bg-background/10"
                 autoFocus
               />
             </div>
@@ -100,7 +101,7 @@ function FilterDropdownButton({
                   <div
                     className={`w-3.5 h-3.5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
                       selectedValues.includes(option)
-                        ? 'bg-purple-500 border-purple-500'
+                        ? 'bg-primary/50 border-primary'
                         : 'border-border'
                     }`}
                   >
@@ -154,6 +155,8 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
+  const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+  const actionsMenuRef = useRef<HTMLDivElement>(null);
 
   // SearchFilterBar state
   const [activeFilters, setActiveFilters] = useState<ActiveFilter[]>([]);
@@ -168,8 +171,9 @@ export default function NetworkPage({
     name: '',
     color: '#FF6B6B',
     description: '',
-    booth_price: 0
   });
+  const [paymentPreferences, setPaymentPreferences] = useState<CategoryFeePreference[]>([]);
+  const [feeTypeDropdownOpen, setFeeTypeDropdownOpen] = useState(false);
 
   // Filter options from backend
   const [filterOptions, setFilterOptions] = useState<{
@@ -219,6 +223,17 @@ export default function NetworkPage({
     { key: 'location', label: 'Location', icon: MapPin, options: filterOptions.locations, multi: true },
     { key: 'tags', label: 'Tags', icon: Tags, options: filterOptions.tags, multi: true },
   ];
+
+  // Close actions menu on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (actionsMenuRef.current && !actionsMenuRef.current.contains(e.target as Node)) {
+        setActionsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   // Fetch filter options from backend on mount
   useEffect(() => {
@@ -468,15 +483,18 @@ export default function NetworkPage({
     }
   };
 
+  const emptyCategory = {
+    name: '',
+    color: '#FF6B6B',
+    description: '',
+  };
+
   // Category CRUD functions
   const openAddCategoryModal = () => {
     setEditingCategory(null);
-    setCategoryFormData({
-      name: '',
-      color: '#FF6B6B',
-      description: '',
-      booth_price: 0
-    });
+    setCategoryFormData({ ...emptyCategory });
+    setPaymentPreferences([]);
+    setFeeTypeDropdownOpen(false);
     setShowCategoryModal(true);
   };
 
@@ -486,41 +504,55 @@ export default function NetworkPage({
       name: category.name,
       color: category.color || '#FF6B6B',
       description: category.description || '',
-      booth_price: category.booth_price || 0
     });
+    setPaymentPreferences(category.payment_preferences || []);
+    setFeeTypeDropdownOpen(false);
     setShowCategoryModal(true);
   };
+
+  const addFeeType = (type: CategoryFeePreference['type']) => {
+    const typeDef = PAYMENT_PRICE_TYPES.find(p => p.value === type);
+    setPaymentPreferences(prev => [
+      ...prev,
+      { type, label: typeDef?.label || type, amount: 0, is_percentage: typeDef?.isPercentage || false },
+    ]);
+    setFeeTypeDropdownOpen(false);
+  };
+
+  const removeFeeType = (index: number) => {
+    setPaymentPreferences(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const updateFeeAmount = (index: number, amount: number) => {
+    setPaymentPreferences(prev =>
+      prev.map((p, i) => (i === index ? { ...p, amount } : p))
+    );
+  };
+
+  const availableFeeTypes = PAYMENT_PRICE_TYPES.filter(pt => pt.value !== 'custom');
 
   const handleSaveCategory = async () => {
     if (!categoryFormData.name.trim()) {
       alert('Category name is required');
       return;
     }
+    const payload = {
+      name: categoryFormData.name.trim(),
+      color: categoryFormData.color,
+      description: categoryFormData.description.trim() || undefined,
+      payment_preferences: paymentPreferences.length > 0 ? paymentPreferences : undefined,
+    };
     try {
       if (editingCategory) {
-        await categoriesApi.update(editingCategory.id, {
-          name: categoryFormData.name.trim(),
-          color: categoryFormData.color,
-          description: categoryFormData.description.trim() || undefined,
-          booth_price: categoryFormData.booth_price || undefined,
-        });
+        await categoriesApi.update(editingCategory.id, payload);
       } else {
-        await categoriesApi.create(organizationId, {
-          name: categoryFormData.name.trim(),
-          color: categoryFormData.color,
-          description: categoryFormData.description.trim() || undefined,
-          booth_price: categoryFormData.booth_price || undefined,
-        });
+        await categoriesApi.create(organizationId, payload);
       }
       await loadCategories();
       setShowCategoryModal(false);
       setEditingCategory(null);
-      setCategoryFormData({
-        name: '',
-        color: '#FF6B6B',
-        description: '',
-        booth_price: 0
-      });
+      setCategoryFormData({ ...emptyCategory });
+      setPaymentPreferences([]);
     } catch (error: any) {
       alert(`Failed to save category: ${error.response?.data?.error || error.message || 'Please try again.'}`);
     }
@@ -688,33 +720,46 @@ export default function NetworkPage({
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearchSubmit()}
                   placeholder="Search contacts..."
-                className="w-full rounded-lg border border-border bg-card/80 py-2.5 pl-10 pr-3 text-sm text-foreground placeholder:text-muted-foreground transition-all focus:border-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                className="voxxy-input-frost w-full rounded-lg py-2.5 pl-10 pr-3 text-sm focus:ring-2 focus:ring-ring/40"
                 />
               </div>
 
-              {/* Import CSV, Create List & Add Contact Buttons */}
-              <button
-                onClick={() => setShowCSVUploadModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Import CSV</span>
-              </button>
-              <button
-                onClick={handleStartCreateList}
-                className="flex items-center gap-2 px-3 py-2.5 bg-background/10 hover:bg-background/20 text-foreground text-xs font-semibold rounded-lg transition-all border border-border whitespace-nowrap"
-              >
-                <Filter className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Create List</span>
-              </button>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="flex items-center gap-2 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
-              >
-                <UserPlus className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Add Contact</span>
-                <span className="sm:hidden">Add</span>
-              </button>
+              {/* Actions dropdown */}
+              <div className="relative" ref={actionsMenuRef}>
+                <button
+                  onClick={() => setActionsMenuOpen(prev => !prev)}
+                  className="flex items-center gap-1.5 px-3 py-2.5 voxxy-btn-cta text-xs font-semibold rounded-lg hover:shadow-lg transition-all whitespace-nowrap"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Actions</span>
+                  <ChevronDown className={`w-3 h-3 transition-transform ${actionsMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+                {actionsMenuOpen && (
+                  <div className="voxxy-select-surface absolute right-0 top-full mt-1 z-50 w-48 rounded-lg shadow-xl overflow-hidden">
+                    <button
+                      onClick={() => { setShowAddModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <UserPlus className="w-3.5 h-3.5" />
+                      Add Contact
+                    </button>
+                    <button
+                      onClick={() => { handleStartCreateList(); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Filter className="w-3.5 h-3.5" />
+                      Create List
+                    </button>
+                    <button
+                      onClick={() => { setShowCSVUploadModal(true); setActionsMenuOpen(false); }}
+                      className="flex items-center gap-2 w-full px-4 py-2.5 text-xs font-medium text-foreground hover:bg-primary/10 transition-colors"
+                    >
+                      <Upload className="w-3.5 h-3.5" />
+                      Import CSV
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Filter Dropdowns Row */}
@@ -778,7 +823,7 @@ export default function NetworkPage({
               {!showSaveInput ? (
                 <button
                   onClick={() => setShowSaveInput(true)}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 hover:text-violet-900 dark:text-purple-300 dark:hover:text-purple-200 text-xs font-medium rounded-lg transition-colors border border-purple-500/40 dark:border-purple-500/30"
+                  className="flex items-center gap-1.5 px-3 py-2 bg-primary/20 hover:bg-primary/30 text-violet-950 hover:text-violet-900 dark:text-primary dark:hover:text-primary/70 text-xs font-medium rounded-lg transition-colors border border-primary/40 dark:border-primary/30"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save as List
@@ -791,7 +836,7 @@ export default function NetworkPage({
                     onChange={(e) => setListName(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveList()}
                     placeholder="List name..."
-                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-purple-500 dark:bg-background/10"
+                    className="w-40 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary dark:bg-background/10"
                     autoFocus
                   />
                   <button onClick={handleSaveList} disabled={savingList || !listName.trim()} className="flex items-center gap-1 px-3 py-1.5 voxxy-btn-solid text-xs font-medium rounded-lg disabled:opacity-50 transition-colors">
@@ -812,7 +857,7 @@ export default function NetworkPage({
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
               </p>
-              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-purple-400 dark:hover:text-purple-300 text-sm underline">
+              <button onClick={() => { setSearchTerm(''); clearAllFilters(); fetchContacts(1); }} className="mt-3 text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 text-sm underline transition-colors">
                 Clear all filters
               </button>
             </div>
@@ -894,114 +939,91 @@ export default function NetworkPage({
               <p className="text-foreground/40 text-xs mt-1">Create your first category to organize your vendors</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="voxxy-table-shell divide-y divide-border rounded-lg overflow-hidden">
               {categories.map((category) => {
-                const boothPrice = category.booth_price ? Number(category.booth_price) : 0;
+                const prefs = category.payment_preferences || [];
                 const defaultBoothPrice = category.default_booth_price ? Number(category.default_booth_price) : 0;
-                const hasBoothPrice = boothPrice > 0;
-                const hasDescription = category.description && category.description.trim().length > 0;
-                const hasSmartDefaults = defaultBoothPrice > 0;
+                const hasPrefs = prefs.length > 0;
+                const hasSmartDefaults = defaultBoothPrice > 0 && !hasPrefs;
 
                 return (
                   <div
                     key={category.id}
-                    className="group relative rounded-lg border border-border bg-card hover:shadow-md transition-all overflow-hidden"
-                    style={{
-                      borderLeftWidth: '4px',
-                      borderLeftColor: category.color || '#8B5CF6',
-                    }}
+                    className="group voxxy-table-row voxxy-table-row-hover flex items-center gap-3 px-4 py-3"
                   >
-                    {/* Header Section */}
-                    <div className="p-4 pb-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <h3 className="text-base font-semibold text-foreground leading-tight">
-                          {category.name}
-                        </h3>
-                        <div className="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => handleViewCategory(category)}
-                            className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
-                            title="View contacts in this category"
-                          >
-                            <Users className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => openEditCategoryModal(category)}
-                            className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
-                            title="Edit category"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCategory(category)}
-                            className="p-1.5 rounded-md hover:bg-red-500/20 text-foreground/60 hover:text-red-400 transition-all"
-                            title="Delete category"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </div>
+                    {/* Color swatch */}
+                    <div
+                      className="w-1 self-stretch rounded-full flex-shrink-0"
+                      style={{ backgroundColor: category.color || '#9054e3' }}
+                    />
 
-                      {/* Description */}
-                      {hasDescription ? (
-                        <p className="text-xs text-foreground/60 line-clamp-2 mb-3">
-                          {category.description}
-                        </p>
+                    {/* Name + description */}
+                    <div className="min-w-0 w-40 flex-shrink-0">
+                      <div className="font-semibold text-sm text-foreground truncate">{category.name}</div>
+                      {category.description ? (
+                        <div className="text-xs text-foreground/50 truncate">{category.description}</div>
                       ) : (
-                        <p className="text-xs text-foreground/40 italic mb-3">
-                          No description
-                        </p>
+                        <div className="text-xs text-foreground/30 italic">No description</div>
                       )}
+                    </div>
 
-                      {/* Price Badge */}
-                      {hasBoothPrice ? (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-green-500/10 border border-green-500/20 mb-2">
-                          <DollarSign className="w-3.5 h-3.5 text-green-600 dark:text-green-400" />
-                          <span className="text-sm font-semibold text-green-700 dark:text-green-300">
-                            ${boothPrice.toFixed(2)}
-                          </span>
-                          <span className="text-xs text-green-600/70 dark:text-green-400/70">
-                            default
-                          </span>
-                        </div>
+                    {/* Payment preference badges */}
+                    <div className="flex flex-wrap gap-1.5 flex-1 min-w-0">
+                      {hasPrefs ? (
+                        prefs.map((pref, i) => (
+                          <div key={i} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-primary/10 border border-primary/20">
+                            {pref.is_percentage
+                              ? <Percent className="w-3 h-3 text-primary/70" />
+                              : <DollarSign className="w-3 h-3 text-primary/70" />}
+                            <span className="text-xs font-semibold text-primary/90">
+                              {pref.is_percentage ? `${pref.amount}%` : `$${Number(pref.amount).toFixed(2)}`}
+                            </span>
+                            <span className="text-[10px] text-primary/60">{pref.label}</span>
+                          </div>
+                        ))
                       ) : hasSmartDefaults ? (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-blue-500/10 border border-blue-500/20 mb-2">
-                          <DollarSign className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-                          <span className="text-sm font-medium text-blue-700 dark:text-blue-300">
-                            ${defaultBoothPrice.toFixed(2)}
-                          </span>
-                          <span className="text-xs text-blue-600/70 dark:text-blue-400/70">
-                            from last event
-                          </span>
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-blue-500/10 border border-blue-500/20">
+                          <DollarSign className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                          <span className="text-xs font-medium text-blue-700 dark:text-blue-300">${defaultBoothPrice.toFixed(2)}</span>
+                          <span className="text-[10px] text-blue-600/70 dark:text-blue-400/70">last event</span>
                         </div>
                       ) : (
-                        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-foreground/5 border border-border mb-2">
-                          <DollarSign className="w-3.5 h-3.5 text-foreground/40" />
-                          <span className="text-xs text-foreground/50">
-                            No price set
-                          </span>
+                        <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-foreground/5 border border-border">
+                          <DollarSign className="w-3 h-3 text-foreground/40" />
+                          <span className="text-xs text-foreground/40">No preferences set</span>
                         </div>
                       )}
                     </div>
 
-                    {/* Footer Section */}
-                    <div className="px-4 py-2.5 border-t border-border bg-background/20 dark:bg-background/5">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-1.5 text-foreground/60">
-                          <Users className="w-3.5 h-3.5" />
-                          <span>
-                            {category.usage_stats?.contacts_count || 0} contact{category.usage_stats?.contacts_count !== 1 ? 's' : ''}
-                          </span>
-                        </div>
-                        {category.last_used_event_name && (
-                          <div className="flex items-center gap-1.5 text-foreground/50" title={`Last used in: ${category.last_used_event_name}`}>
-                            <Calendar className="w-3.5 h-3.5" />
-                            <span className="truncate max-w-[120px]">
-                              {category.last_used_event_name}
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                    {/* Contact count */}
+                    <div className="flex items-center gap-1.5 text-xs text-foreground/50 flex-shrink-0">
+                      <Users className="w-3.5 h-3.5" />
+                      <span>{category.usage_stats?.contacts_count || 0} contact{category.usage_stats?.contacts_count !== 1 ? 's' : ''}</span>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 flex-shrink-0 opacity-60 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleViewCategory(category)}
+                        className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
+                        title="View contacts"
+                      >
+                        <Users className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => openEditCategoryModal(category)}
+                        className="p-1.5 rounded-md hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
+                        title="Edit category"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteCategory(category)}
+                        className="p-1.5 rounded-md hover:bg-red-500/20 text-foreground/60 hover:text-red-400 transition-all"
+                        title="Delete category"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 );
@@ -1014,47 +1036,46 @@ export default function NetworkPage({
       {/* Category Add/Edit Modal */}
       {showCategoryModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 voxxy-overlay-scrim">
-          <div className="w-full max-w-md rounded-lg voxxy-modal-surface shadow-xl">
-            <div className="flex items-center justify-between p-4 border-b border-border">
-              <h3 className="text-base font-semibold text-foreground">
+          <div className="w-full max-w-xl rounded-xl voxxy-modal-surface shadow-xl flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
+              <h3 className="text-sm font-semibold text-foreground">
                 {editingCategory ? 'Edit Category' : 'Add Category'}
               </h3>
               <button
                 onClick={() => {
                   setShowCategoryModal(false);
                   setEditingCategory(null);
-                  setCategoryFormData({
-                    name: '',
-                    color: '#FF6B6B',
-                    description: '',
-                    booth_price: 0
-                  });
+                  setCategoryFormData({ ...emptyCategory });
+                  setPaymentPreferences([]);
                 }}
                 className="p-1 rounded-lg hover:bg-background/10 text-foreground/60 hover:text-foreground transition-all"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="p-4 space-y-4">
+
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
               <div>
-                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Category Name <span className="text-red-400">*</span></label>
+                <label className="block text-xs font-medium text-foreground/70 mb-1">Category Name <span className="text-red-400">*</span></label>
                 <input
                   type="text"
                   value={categoryFormData.name}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="e.g., Food Vendor, Artist, Sponsor"
-                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                  className="voxxy-input-frost w-full"
                   autoFocus
                 />
               </div>
               <div>
-                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Color</label>
-                <div className="flex items-center gap-3">
+                <label className="block text-xs font-medium text-foreground/70 mb-1">Color</label>
+                <div className="flex items-center gap-2">
                   <input
                     type="color"
                     value={categoryFormData.color}
                     onChange={(e) => setCategoryFormData(prev => ({ ...prev, color: e.target.value }))}
-                    className="h-10 w-16 cursor-pointer rounded-lg border border-border bg-card/80 dark:bg-background/10"
+                    className="h-8 w-12 cursor-pointer rounded border border-border bg-transparent"
                   />
                   <input
                     type="text"
@@ -1065,66 +1086,121 @@ export default function NetworkPage({
                       }
                     }}
                     placeholder="#FF6B6B"
-                    className="flex-1 rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
+                    className="voxxy-input-frost flex-1"
                     maxLength={7}
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Description - Optional</label>
+                <label className="block text-xs font-medium text-foreground/70 mb-1">Description <span className="text-foreground/40 font-normal">— Optional</span></label>
                 <textarea
                   value={categoryFormData.description}
                   onChange={(e) => setCategoryFormData(prev => ({ ...prev, description: e.target.value }))}
-                  placeholder="Describe this category..."
-                  rows={3}
-                  className="w-full rounded-lg border border-border bg-card/80 px-3 py-2 text-foreground text-sm placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10 resize-none"
+                  placeholder="Internal notes about this vendor category"
+                  rows={2}
+                  className="voxxy-input-frost w-full resize-none"
                 />
-                <p className="mt-1 text-xs text-foreground/50">Internal notes about this vendor category</p>
               </div>
-              <div>
-                <label className="block text-xs text-foreground dark:text-foreground/60 mb-1">Default Booth Price - Optional</label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-foreground/60 text-sm">$</span>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    value={categoryFormData.booth_price || ''}
-                    onChange={(e) => setCategoryFormData(prev => ({ ...prev, booth_price: parseFloat(e.target.value) || 0 }))}
-                    placeholder="150.00"
-                    className="w-full pl-8 pr-3 py-2 text-sm rounded-lg bg-card/80 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500/50 dark:bg-background/10"
-                  />
+
+              {/* Payment Preferences — fee type picker */}
+              <div className="bg-background/5 rounded-xl p-4 border border-border space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-foreground/70">Payment Preferences</p>
+                  <p className="text-[10px] text-foreground/40">Amounts pre-fill the event wizard. Dates set per event.</p>
                 </div>
-                <p className="mt-1 text-xs text-foreground/50">Pre-fills booth price when creating events with this category</p>
-              </div>
-              <div className="voxxy-surface-subtle rounded-lg p-3">
-                <p className="text-xs text-foreground/60 mb-2">Preview:</p>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-foreground font-medium">{categoryFormData.name || 'Category Name'}</span>
-                  <div className="w-4 h-4 rounded border border-border" style={{ backgroundColor: categoryFormData.color }} />
-                </div>
+
+                {/* Added fee rows */}
+                {paymentPreferences.length === 0 && (
+                  <p className="text-xs text-foreground/40 italic py-1">No fee types added yet. Use "+ Add Fee Type" to set a preference.</p>
+                )}
+                {paymentPreferences.map((pref, idx) => (
+                  <div key={idx} className="bg-background/5 rounded-lg p-3 border border-border/60 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={pref.label}
+                        onChange={(e) => setPaymentPreferences(prev =>
+                          prev.map((p, i) => i === idx ? { ...p, label: e.target.value } : p)
+                        )}
+                        className="voxxy-input-frost flex-1 text-xs py-1"
+                        placeholder="Label (e.g. Early Bird - Aug)"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeFeeType(idx)}
+                        className="p-1 rounded hover:bg-red-500/20 text-foreground/40 hover:text-red-400 transition-colors flex-shrink-0"
+                        title="Remove"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-foreground/50 text-xs">
+                        {pref.is_percentage ? <Percent className="w-3 h-3" /> : '$'}
+                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        step={pref.is_percentage ? '0.1' : '0.01'}
+                        value={pref.amount || ''}
+                        onChange={(e) => updateFeeAmount(idx, parseFloat(e.target.value) || 0)}
+                        placeholder={pref.is_percentage ? '10' : '150.00'}
+                        className="voxxy-input-frost w-full pl-6 py-1.5 text-xs"
+                      />
+                    </div>
+                  </div>
+                ))}
+
               </div>
             </div>
-            <div className="flex items-center justify-end gap-3 p-4 border-t border-border">
+
+            {/* Add Fee Type strip — outside overflow-y-auto to prevent dropdown clipping */}
+            <div className="px-5 py-2.5 border-t border-border/40 flex-shrink-0 relative">
+              <button
+                type="button"
+                onClick={() => setFeeTypeDropdownOpen(prev => !prev)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid transition-colors"
+              >
+                <Plus className="w-3 h-3" />
+                Add Fee Type
+              </button>
+              {feeTypeDropdownOpen && (
+                <>
+                  <div className="fixed inset-0 z-[90]" onClick={() => setFeeTypeDropdownOpen(false)} />
+                  <div className="absolute left-5 bottom-full mb-1 w-72 bg-card border border-border rounded-lg shadow-xl z-[91] overflow-hidden">
+                    {availableFeeTypes.map(pt => (
+                      <button
+                        key={pt.value}
+                        type="button"
+                        onClick={() => addFeeType(pt.value as CategoryFeePreference['type'])}
+                        className="w-full flex flex-col items-start px-3 py-2.5 text-left hover:bg-background/10 transition-colors"
+                      >
+                        <span className="text-xs font-medium text-foreground">{pt.label}</span>
+                        <span className="text-[10px] text-foreground/50">{pt.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-5 py-3 border-t border-border flex justify-end gap-2 flex-shrink-0">
               <button
                 onClick={() => {
                   setShowCategoryModal(false);
                   setEditingCategory(null);
-                  setCategoryFormData({
-                    name: '',
-                    color: '#FF6B6B',
-                    description: '',
-                    booth_price: 0
-                  });
+                  setCategoryFormData({ ...emptyCategory });
+                  setPaymentPreferences([]);
                 }}
-                className="px-4 py-2 text-sm rounded-lg border border-border text-foreground hover:bg-background/10 transition-all"
+                className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-background/10 transition-all"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveCategory}
                 disabled={!categoryFormData.name.trim()}
-                className="px-4 py-2 text-sm rounded-lg voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
+                className="px-3 py-1.5 text-xs rounded-lg voxxy-btn-solid disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
               >
                 {editingCategory ? 'Save Changes' : 'Add Category'}
               </button>
@@ -1138,7 +1214,7 @@ export default function NetworkPage({
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="w-[90vw] max-w-2xl max-h-[85vh] overflow-y-auto rounded-xl border border-border bg-card text-card-foreground shadow-2xl dark:border-white/8 dark:bg-[rgba(39,28,63,0.96)] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_24px_48px_rgba(2,2,8,0.34)]">
             {/* Modal Header */}
-            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
+            <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-primary/20 px-6 py-3 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Create Smart List</h2>
               <button
                 onClick={handleCancelCreateList}
@@ -1157,7 +1233,7 @@ export default function NetworkPage({
                   type="text"
                   value={createListName}
                   onChange={(e) => setCreateListName(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
                   placeholder="List name"
                   autoFocus
                 />
@@ -1169,7 +1245,7 @@ export default function NetworkPage({
                 <textarea
                   value={createListDescription}
                   onChange={(e) => setCreateListDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+                  className="w-full px-3 py-2.5 bg-background/10 border border-border rounded-lg text-sm text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all"
                   rows={2}
                   placeholder="Description (optional)"
                 />
@@ -1196,7 +1272,7 @@ export default function NetworkPage({
                 <button
                   onClick={handleSaveCreateList}
                   disabled={savingCreateList || !createListName.trim()}
-                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
+                  className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-primary/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 flex items-center justify-center gap-2"
                 >
                   {savingCreateList ? (
                     <>

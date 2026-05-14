@@ -52,7 +52,7 @@ export default function WizardNavigation({
         </button>
       )}
 
-      {/* Submit Button (Only on Step 4) */}
+      {/* Submit Button (Only on Step 6) */}
       {canSubmit && (
         <button
           type="button"

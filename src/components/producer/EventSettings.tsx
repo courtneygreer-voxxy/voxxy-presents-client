@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle } from 'lucide-react';
+import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle, DollarSign, Save } from 'lucide-react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, eventsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
+import Step3PaymentConfig from './CreateEventWizard/steps/Step3PaymentConfig';
+import { WizardState, ApplicationRow, PaymentEngineConfig, CurrencyCode } from './CreateEventWizard/types';
 import { formatDateForInput, formatEventDate } from '@/utils/dateHelpers';
 import { DebugPanel } from './DebugPanel';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Event {
   id: number;
@@ -23,6 +26,8 @@ interface Event {
   location?: string;
   application_deadline?: string;
   payment_deadline?: string;
+  vendor_fee_currency?: string;
+  payment_engines?: PaymentEngineConfig[];
   ticket_link?: string;
   age_restriction?: string;
   status?: {
@@ -63,7 +68,12 @@ interface VendorApplication {
   install_start_time?: string;
   install_end_time?: string;
   payment_link?: string;
+  payment_prices?: any[];
+  payment_engines?: PaymentEngineConfig[];
   application_tags?: string;
+  category_id?: number;
+  category_color?: string;
+  category_icon?: string;
 }
 
 interface EventSettingsProps {
@@ -76,12 +86,19 @@ interface EventSettingsProps {
 type View = 'settings' | 'create_app';
 
 export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: EventSettingsProps) {
+  const { currentUser } = useAuth();
   const [currentView, setCurrentView] = useState<View>('settings');
   const [applications, setApplications] = useState<VendorApplication[]>([]);
   const [loadingApps, setLoadingApps] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [copiedLink, setCopiedLink] = useState<string | null>(null);
+
+  // Payment configuration state (adapter for Step3PaymentConfig)
+  const [paymentWizardState, setPaymentWizardState] = useState<WizardState | null>(null);
+  const [paymentErrors, setPaymentErrors] = useState<Record<string, string>>({});
+  const [savingPayment, setSavingPayment] = useState(false);
+  const [paymentDirty, setPaymentDirty] = useState(false);
 
   // Helper to get the current event status in UI format
   const getCurrentStatusForUI = () => {
@@ -148,6 +165,93 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
       console.error('Failed to fetch applications:', err);
     } finally {
       setLoadingApps(false);
+    }
+  };
+
+  // Build payment wizard state from applications when they load
+  useEffect(() => {
+    if (applications.length === 0) return;
+
+    const appRows: ApplicationRow[] = applications.map((app) => ({
+      id: String(app.id),
+      category_id: app.category_id || 0,
+      category_name: app.name,
+      category_color: app.category_color,
+      category_icon: app.category_icon,
+      name: app.name,
+      booth_price: app.pricing?.booth_price || 0,
+      description: app.description || '',
+      install_date: app.install_date,
+      install_start_time: app.install_start_time,
+      install_end_time: app.install_end_time,
+      payment_link: app.payment_link || '',
+      application_tags: app.application_tags ? app.application_tags.split(',').map(t => t.trim()) : [],
+      payment_prices: app.payment_prices && app.payment_prices.length > 0
+        ? app.payment_prices
+        : [{ type: 'booth_price' as const, label: 'Booth Fee', amount: app.pricing?.booth_price || 0, is_percentage: false }],
+      payment_engines: app.payment_engines || [],
+    }));
+
+    setPaymentWizardState({
+      currentStep: 3,
+      eventDetails: {
+        title: event.title,
+        description: event.description || '',
+        event_date: event.event_date || '',
+        event_end_date: event.event_end_date,
+        start_time: event.start_time,
+        end_time: event.end_time,
+        venue: event.venue,
+        location: event.location || '',
+        application_deadline: event.application_deadline || '',
+      },
+      applicationDetails: { applications: appRows },
+      paymentConfiguration: {
+        currency: (event.vendor_fee_currency as CurrencyCode) || 'USD',
+        payment_deadline: event.payment_deadline || '',
+        payment_engines: event.payment_engines || [],
+      },
+      automaticMessages: { messages: [] },
+      inviteList: { selectedListIds: [], invitedContactIds: [], excludedContactIds: [] },
+    });
+    setPaymentDirty(false);
+  }, [applications]);
+
+  const updatePaymentWizardState = (updates: Partial<WizardState>) => {
+    setPaymentWizardState(prev => prev ? { ...prev, ...updates } : prev);
+    setPaymentDirty(true);
+  };
+
+  const handleSavePaymentConfig = async () => {
+    if (!paymentWizardState) return;
+    setSavingPayment(true);
+    try {
+      // Save event-level payment config (currency, engines, deadline)
+      const { paymentConfiguration } = paymentWizardState;
+      await eventsApi.update(event.slug, {
+        payment_deadline: paymentConfiguration.payment_deadline,
+        vendor_fee_currency: paymentConfiguration.currency,
+        payment_engines: paymentConfiguration.payment_engines,
+      });
+
+      // Save per-application payment prices
+      for (const app of paymentWizardState.applicationDetails.applications) {
+        const appId = parseInt(app.id);
+        if (isNaN(appId)) continue;
+        await vendorApplicationsApi.update(appId, {
+          payment_prices: app.payment_prices,
+          payment_link: app.payment_link,
+          booth_price: app.booth_price,
+        });
+      }
+
+      setPaymentDirty(false);
+      toast.success('Payment configuration saved');
+    } catch (err) {
+      console.error('Failed to save payment config:', err);
+      toast.error('Failed to save payment configuration');
+    } finally {
+      setSavingPayment(false);
     }
   };
 
@@ -624,8 +728,8 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
           <AccordionItem value="event-details" className="border-border">
             <AccordionTrigger className={triggerHoverClass}>
               <div className="flex items-center gap-3">
-                <div className="p-1.5 rounded-lg bg-purple-500/20">
-                  <Edit className="w-4 h-4 text-purple-400" />
+                <div className="p-1.5 rounded-lg bg-primary/20">
+                  <Edit className="w-4 h-4 text-primary" />
                 </div>
                 <div className="text-left">
                   <span className="text-sm font-semibold text-foreground">Event Details</span>
@@ -830,7 +934,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
             {loadingApps ? (
               <div className="flex items-center justify-center py-8">
-                <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
               </div>
             ) : applications.length === 0 ? (
               <div className={`${innerGlassWell} text-center`}>
@@ -847,7 +951,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
               applications.map((app) => (
                 <div
                   key={app.id}
-                  className={cn(innerGlassWell, 'voxxy-hover-panel hover:border-purple-500/35 transition-all')}
+                  className={cn(innerGlassWell, 'voxxy-hover-panel hover:border-primary/35 transition-all')}
                 >
                   {/* Category Row */}
                   <div className="flex items-center justify-between p-4">
@@ -879,7 +983,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
 
                   {/* Inline Edit Form */}
                   {editingAppId === app.id && (
-                    <div className="border-t border-purple-500/20 p-4 space-y-3">
+                    <div className="border-t border-primary/20 p-4 space-y-3">
                       {editError && (
                         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-2">
                           <p className="text-xs text-red-800 dark:text-red-400">{editError}</p>
@@ -1006,7 +1110,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                             {editTags.map((tag, index) => (
                               <span
                                 key={index}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-purple-500/20 border border-purple-500/30 text-foreground text-[11px]"
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/20 border border-primary/30 text-foreground text-[11px]"
                               >
                                 {tag}
                                 <button
@@ -1059,12 +1163,58 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
             {applications.length > 0 && (
               <button
                 onClick={() => setCurrentView('create_app')}
-                className="w-full rounded-lg border-2 border-dashed border-border px-4 py-2.5 text-sm text-foreground/60 transition-all hover:border-purple-500/40 hover:text-foreground dark:border-violet-400/16 dark:hover:border-violet-400/28"
+                className="w-full rounded-lg border-2 border-dashed border-border px-4 py-2.5 text-sm text-foreground/60 transition-all hover:border-primary/40 hover:text-foreground dark:border-violet-400/16 dark:hover:border-violet-400/28"
               >
                 + Add Category
               </button>
             )}
               </div>
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* Payment Configuration Section */}
+          <AccordionItem value="payment-config" className="border-border">
+            <AccordionTrigger className={triggerHoverClass}>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-green-500/20 p-1.5">
+                  <DollarSign className="h-4 w-4 text-green-700 dark:text-green-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-foreground">Payment Configuration</span>
+                  <p className="text-xs text-foreground/50 font-normal">Currency, payment methods, and per-category pricing</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              {paymentWizardState ? (
+                <div className="space-y-4">
+                  <Step3PaymentConfig
+                    wizardState={paymentWizardState}
+                    updateWizardState={updatePaymentWizardState}
+                    errors={paymentErrors}
+                    setErrors={setPaymentErrors}
+                    isAdmin={isAdmin}
+                    organizationId={currentUser?.organization_id || 0}
+                    standalone
+                  />
+                  {paymentDirty && (
+                    <div className="flex justify-end pt-2 border-t border-border">
+                      <button
+                        onClick={handleSavePaymentConfig}
+                        disabled={savingPayment}
+                        className="flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg voxxy-btn-solid transition-all disabled:opacity-50"
+                      >
+                        <Save className="w-4 h-4" />
+                        {savingPayment ? 'Saving...' : 'Save Payment Configuration'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="py-6 text-center text-sm text-foreground/50">
+                  {loadingApps ? 'Loading payment configuration...' : 'No categories configured yet.'}
+                </div>
+              )}
             </AccordionContent>
           </AccordionItem>
 
@@ -1099,7 +1249,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                         href={eventPageLink}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className={`${utilityActionClass} text-purple-700 dark:text-purple-300`}
+                        className={`${utilityActionClass} text-primary dark:text-primary`}
                       >
                         <ExternalLink className="h-3 w-3" />
                         Open
@@ -1174,7 +1324,7 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                                       href={appUrl}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className={`${utilityActionClass} text-purple-700 dark:text-purple-300`}
+                                      className={`${utilityActionClass} text-primary dark:text-primary`}
                                     >
                                       <ExternalLink className="h-3 w-3" />
                                       Open

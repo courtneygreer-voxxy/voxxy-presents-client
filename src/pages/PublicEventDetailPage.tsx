@@ -3,6 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Calendar, MapPin, Users, DollarSign, ArrowRight, Clock, Building2 } from 'lucide-react';
 import { eventsApi } from '@/services/api';
 import { Badge } from '@/components/ui/badge';
+import { useForceTheme } from '@/hooks/useForceTheme';
 
 interface VendorApplication {
   id: number;
@@ -65,6 +66,7 @@ interface Event {
 }
 
 export default function PublicEventDetailPage() {
+  useForceTheme('dark');
   const location = useLocation();
   const navigate = useNavigate();
   const [event, setEvent] = useState<Event | null>(null);
@@ -156,7 +158,7 @@ export default function PublicEventDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen voxxy-gradient-page-cool flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
     );
   }
@@ -181,7 +183,7 @@ export default function PublicEventDetailPage() {
   // Show cancellation message if event is cancelled
   if (event.status?.status === 'cancelled') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]">
+      <div className="min-h-screen voxxy-gradient-page-cool">
         <div className="max-w-4xl mx-auto px-6 py-12">
           <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-8 text-center">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-500/20 flex items-center justify-center">
@@ -203,7 +205,7 @@ export default function PublicEventDetailPage() {
                 {event.organization.email ? (
                   <a
                     href={`mailto:${event.organization.email}`}
-                    className="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 text-sm"
+                    className="inline-flex items-center gap-2 text-primary hover:text-primary/70 text-sm transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -214,7 +216,7 @@ export default function PublicEventDetailPage() {
                   <p className="text-sm text-white/60 italic">Contact information not available</p>
                 )}
                 <p className="text-xs text-white/50 mt-4">
-                  This event was managed through Voxxy Presents, but all event decisions including cancellations are made by the event organizer.
+                  This event was managed through Voxxy, but all event decisions including cancellations are made by the event organizer.
                 </p>
               </div>
             )}
@@ -236,10 +238,10 @@ export default function PublicEventDetailPage() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Main Card Container */}
-        <div className="voxxy-gradient-panel border border-border rounded-lg p-4 md:p-5">
+        <div className="voxxy-gradient-panel rounded-2xl border border-white/15 p-5 ring-1 ring-white/10 md:p-6">
           {/* Event Title and Location */}
           <div className="mb-4">
-            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-1">
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-primary to-blue-400 bg-clip-text text-transparent mb-1">
               {event.title}
             </h1>
             <div className="flex items-center gap-1.5 text-foreground/60 text-xs">
@@ -254,7 +256,7 @@ export default function PublicEventDetailPage() {
               {/* Venue */}
               {event.venue && (
                 <div className="flex items-start gap-2">
-                  <Building2 className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Building2 className="w-4 h-4 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-[10px] mb-0.5">Venue</p>
                     <p className="text-foreground text-xs">{event.venue}</p>
@@ -265,14 +267,14 @@ export default function PublicEventDetailPage() {
               {/* Tickets */}
               {(event.ticket_link || event.ticket_url) && (
                 <div className="flex items-start gap-2">
-                  <DollarSign className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <DollarSign className="w-4 h-4 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-[10px] mb-0.5">Tickets</p>
                     <a
                       href={normalizeUrl(event.ticket_link || event.ticket_url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-violet-800 hover:text-violet-950 dark:text-purple-400 dark:hover:text-purple-300 text-sm"
+                      className="text-violet-800 hover:text-violet-950 dark:text-primary dark:hover:text-primary/70 text-sm transition-colors"
                     >
                       Buy Tickets
                     </a>
@@ -283,7 +285,7 @@ export default function PublicEventDetailPage() {
               {/* Apply By */}
               {event.application_deadline && (
                 <div className="flex items-start gap-2">
-                  <Calendar className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-[10px] mb-0.5">Apply By</p>
                     <p className="text-foreground text-xs">
@@ -296,7 +298,7 @@ export default function PublicEventDetailPage() {
               {/* Age */}
               {event.age_restriction && (
                 <div className="flex items-start gap-2">
-                  <Users className="w-4 h-4 text-violet-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+                  <Users className="w-4 h-4 text-violet-700 dark:text-primary mt-0.5 flex-shrink-0" />
                   <div className="flex-1 min-w-0">
                     <p className="text-foreground/60 text-[10px] mb-0.5">Age</p>
                     <p className="text-foreground text-xs">{event.age_restriction}</p>
@@ -334,7 +336,7 @@ export default function PublicEventDetailPage() {
                     {/* <div className="text-right">
                       {application.booth_price && (
                         <>
-                          <p className="text-xl font-bold text-violet-900 dark:text-purple-400">
+                          <p className="text-xl font-bold text-violet-900 dark:text-primary">
                             ${Number(application.booth_price).toFixed(0)}
                           </p>
                           {event.application_deadline && (
@@ -381,16 +383,16 @@ export default function PublicEventDetailPage() {
         )}
         </div>
 
-        {/* Powered by Voxxy Presents */}
+        {/* Powered by VOXXY */}
         <div className="mt-6 pt-6 border-t border-border">
           <div className="flex items-center justify-center gap-2 text-foreground/40 text-xs">
-            <span>Powered by</span>
+            <span>powered by</span>
             <img
               src="/VoxxyTriangle.svg"
               alt="Voxxy"
               className="w-4 h-4 opacity-60"
             />
-            <span className="font-semibold">Voxxy Presents</span>
+            <span className="font-semibold">VOXXY</span>
           </div>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Mail, AlertCircle, Check, Edit } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Send, Mail, AlertCircle, Check, Users, ExternalLink, Rocket } from 'lucide-react';
 import { eventsApi } from '@/services/api';
 import GoLiveInvitationEditor from './GoLiveInvitationEditor';
 
@@ -10,6 +11,7 @@ interface GoLiveCardProps {
 }
 
 export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCardProps) {
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [showEditor, setShowEditor] = useState(false);
@@ -26,11 +28,6 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
   useEffect(() => {
     const newIsLive = event.status?.is_live || false;
-    // console.log('🔄 [GoLiveCard] Event status changed:', {
-    //   slug: event.slug,
-    //   isLive: newIsLive,
-    //   status: event.status
-    // });
     setIsLive(newIsLive);
   }, [event, event.status?.is_live]);
 
@@ -38,8 +35,6 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   const hasInvitations = invitationCount > 0;
 
   // Count scheduled emails that are paused
-  // Note: This would need to be passed from parent or fetched separately
-  // For now, we'll show a generic message
   const hasScheduledEmails = true;
 
   const handleSaveInvitations = async (data: {
@@ -80,6 +75,11 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
     }
   };
 
+  const handleEditPortal = () => {
+    const slug = event.namespaced_slug || event.slug;
+    navigate(`/portal/${slug}`);
+  };
+
   // Already live - show success state
   if (isLive) {
     return (
@@ -117,10 +117,10 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   // Confirmation dialog
   if (showConfirm) {
     return (
-      <div className="voxxy-gradient-panel rounded-xl border-2 border-purple-500/30 p-5">
+      <div className="voxxy-gradient-panel rounded-xl border-2 border-primary/30 p-5">
         <div className="mb-3 flex items-start justify-between">
-          <div className="rounded-lg bg-purple-500/20 p-3">
-            <AlertCircle className="h-6 w-6 text-violet-800 dark:text-purple-400" />
+          <div className="rounded-lg bg-primary/20 p-3">
+            <AlertCircle className="h-6 w-6 text-violet-800 dark:text-primary" />
           </div>
         </div>
         <div className="mb-3">
@@ -129,13 +129,13 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           <ul className="space-y-1 text-xs text-muted-foreground">
             {hasInvitations && (
               <li className="flex items-center gap-1.5">
-                <Send className="h-3 w-3 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Send className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                 Send {invitationCount} invitation{invitationCount !== 1 ? 's' : ''}
               </li>
             )}
             {hasScheduledEmails && (
               <li className="flex items-center gap-1.5">
-                <Mail className="h-3 w-3 shrink-0 text-purple-700 dark:text-purple-400" />
+                <Mail className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
                 Activate scheduled emails
               </li>
             )}
@@ -214,52 +214,71 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
     );
   }
 
-  // Initial state - not live yet
+  // Draft state — 3 pill action buttons
   return (
-    <div className="voxxy-gradient-panel rounded-xl border border-amber-500/20 p-5 transition-all hover:border-amber-500/40">
-      <div className="mb-3 flex items-start justify-between">
-        <div className="rounded-lg bg-amber-500/20 p-3">
-          <AlertCircle className="h-6 w-6 text-amber-800 dark:text-amber-400" />
+    <div className="voxxy-gradient-panel rounded-xl border border-amber-500/20 p-5 transition-all">
+      <div className="mb-4">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="inline-flex items-center rounded-md bg-amber-500/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-amber-800 dark:bg-amber-500/20 dark:text-amber-300">
+            Draft
+          </span>
+          {hasInvitations && (
+            <span className="text-xs text-muted-foreground">
+              {invitationCount} contact{invitationCount !== 1 ? 's' : ''} selected
+            </span>
+          )}
         </div>
-      </div>
-      <div className="mb-2">
-        <p className="mb-1 text-sm text-muted-foreground">Event Status</p>
-        <p className="mb-1 text-lg font-semibold text-foreground">Not Live Yet</p>
+        <p className="text-sm font-semibold text-foreground">Ready to launch</p>
+        <p className="mt-0.5 text-xs text-muted-foreground">
+          Set up your portal, review your invite list, then go live.
+        </p>
       </div>
 
-      {hasInvitations && (
-        <p className="mb-3 text-xs text-muted-foreground">
-          {invitationCount} contact{invitationCount !== 1 ? 's' : ''} ready to invite
-        </p>
+      {error && (
+        <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 p-2">
+          <p className="text-xs text-red-800 dark:text-red-400">{error}</p>
+        </div>
       )}
 
-      <div className="flex flex-col gap-2">
-        {error && (
-          <div className="rounded-lg border border-red-500/20 bg-red-500/10 p-2">
-            <p className="text-xs text-red-800 dark:text-red-400">{error}</p>
+      <div className="grid grid-cols-3 gap-2">
+        {/* Edit Vendor Portal */}
+        <button
+          onClick={handleEditPortal}
+          className="group flex flex-col items-center gap-2 rounded-xl border border-purple-200/40 bg-violet-50/60 px-2 py-3.5 text-center transition-all hover:border-purple-300/60 hover:bg-violet-50 hover:shadow-sm dark:border-purple-500/20 dark:bg-purple-950/30 dark:hover:border-purple-500/35 dark:hover:bg-purple-950/45"
+        >
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/12 transition-colors group-hover:bg-purple-500/20 dark:bg-purple-500/20 dark:group-hover:bg-purple-500/30">
+            <ExternalLink className="h-4 w-4 text-purple-700 dark:text-purple-300" />
           </div>
-        )}
+          <span className="text-[11px] font-medium leading-tight text-foreground">Edit Portal</span>
+        </button>
+
+        {/* Review Invites */}
         <button
           onClick={() => {
             if (!organizationId) {
               setError('Organization information is required');
-              console.error('Missing organizationId for invitation editor');
               return;
             }
             setShowEditor(true);
             setError(null);
           }}
-          className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-border bg-muted/50 px-3 py-2 text-xs font-medium text-foreground transition-all hover:bg-muted"
+          className="group flex flex-col items-center gap-2 rounded-xl border border-purple-200/40 bg-violet-50/60 px-2 py-3.5 text-center transition-all hover:border-purple-300/60 hover:bg-violet-50 hover:shadow-sm dark:border-purple-500/20 dark:bg-purple-950/30 dark:hover:border-purple-500/35 dark:hover:bg-purple-950/45"
         >
-          <Edit className="h-3.5 w-3.5" />
-          Review Invitations
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/12 transition-colors group-hover:bg-purple-500/20 dark:bg-purple-500/20 dark:group-hover:bg-purple-500/30">
+            <Users className="h-4 w-4 text-purple-700 dark:text-purple-300" />
+          </div>
+          <span className="text-[11px] font-medium leading-tight text-foreground">Review Invites</span>
         </button>
+
+        {/* Go Live */}
         <button
           onClick={() => setShowConfirm(true)}
-          className="w-full px-3 py-2 voxxy-btn-cta text-xs font-semibold rounded-lg transition-all flex items-center justify-center gap-1.5"
+          className="group flex flex-col items-center gap-2 rounded-xl border border-emerald-200/40 bg-emerald-50/60 px-2 py-3.5 text-center transition-all hover:border-emerald-300/60 hover:bg-emerald-50 hover:shadow-sm dark:border-emerald-500/20 dark:bg-emerald-950/30 dark:hover:border-emerald-500/35 dark:hover:bg-emerald-950/45"
         >
-          <Send className="w-3.5 h-3.5" />
-          Go Live Now
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/12 transition-colors group-hover:bg-emerald-500/20 dark:bg-emerald-500/20 dark:group-hover:bg-emerald-500/30">
+            <Rocket className="h-4 w-4 text-emerald-700 dark:text-emerald-300" />
+          </div>
+          <span className="text-[11px] font-medium leading-tight text-foreground">Go Live</span>
         </button>
       </div>
     </div>

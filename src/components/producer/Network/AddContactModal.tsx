@@ -5,6 +5,7 @@ import type { Category } from '@/types/category';
 import SimsLoadingScreen from '@/components/ui/SimsLoadingScreen';
 import SuccessMessage from '@/components/ui/SuccessMessage';
 import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { cn } from '@/lib/utils';
 
 interface AddContactModalProps {
   organizationId: number;
@@ -18,6 +19,13 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [tagInput, setTagInput] = useState('');
   const [organizationCategories, setOrganizationCategories] = useState<Category[]>([]);
+
+  const contactFieldClass = (field?: string) =>
+    cn(
+      'voxxy-input-frost w-full px-3 py-2.5 text-sm rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring/40 transition-all',
+      field && errors[field] && 'border-red-500 ring-1 ring-red-500/35'
+    );
+
   const [availableTags, setAvailableTags] = useState<string[]>([]);
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
   const categoryDropdownRef = useRef<HTMLDivElement>(null);
@@ -43,6 +51,9 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
     instagram_handle: '',
     tiktok_handle: '',
     website: '',
+    eventbrite_email: '',
+    venmo_handle: '',
+    paypal_email: '',
     categories: [] as string[],
     tags: [] as string[],
     notes: '',
@@ -127,6 +138,10 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
         instagram_handle: formData.instagram_handle || undefined,
         tiktok_handle: formData.tiktok_handle || undefined,
         website: formData.website || undefined,
+        // TODO: Backend migration needed - these will be silently dropped until then
+        eventbrite_email: formData.eventbrite_email || undefined,
+        venmo_handle: formData.venmo_handle || undefined,
+        paypal_email: formData.paypal_email || undefined,
         categories: formData.categories,
         tags: formData.tags,
         notes: formData.notes || undefined,
@@ -179,16 +194,16 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-card text-card-foreground rounded-xl w-[90vw] max-w-4xl max-h-[85vh] overflow-y-auto border border-purple-500/20 shadow-2xl">
+    <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="voxxy-modal-surface rounded-xl w-full max-w-2xl max-h-[82vh] flex flex-col">
         {/* Header */}
-        <div className="sticky top-0 voxxy-gradient-modal-header backdrop-blur-md border-b border-purple-500/20 px-6 py-3 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-foreground">Add New Contact</h2>
+        <div className="voxxy-gradient-modal-header px-5 py-3 flex items-center justify-between border-b border-primary/20 flex-shrink-0 rounded-t-xl">
+          <h2 className="text-sm font-semibold text-foreground">Add New Contact</h2>
           <button
             onClick={onClose}
             className="text-foreground/60 hover:text-foreground transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
@@ -207,11 +222,12 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
 
         {/* Form - only show when not submitting or showing success */}
         {!isSubmitting && !showSuccess && (
-        <form onSubmit={handleSubmit} className="p-6 space-y-4 max-w-5xl mx-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+        <div className="flex-1 overflow-y-auto p-5 space-y-3">
           {/* Row 1: Full Name, Business Name, Email */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="contact_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="contact_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Full Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -220,9 +236,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.contact_name}
                 onChange={(e) => handleChange('contact_name', e.target.value)}
                 placeholder="John Smith"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.contact_name ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('contact_name')}
               />
               {errors.contact_name && (
                 <p className="mt-1 text-xs text-red-400">{errors.contact_name}</p>
@@ -230,7 +244,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
 
             <div>
-              <label htmlFor="business_name" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="business_name" className="block text-xs font-medium text-foreground/70 mb-1">
                 Business Name
               </label>
               <input
@@ -239,12 +253,12 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.business_name}
                 onChange={(e) => handleChange('business_name', e.target.value)}
                 placeholder="Smith's Ceramics"
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="email" className="block text-xs font-medium text-foreground/70 mb-1">
                 Email <span className="text-red-400">*</span>
               </label>
               <input
@@ -253,9 +267,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.email}
                 onChange={(e) => handleChange('email', e.target.value)}
                 placeholder="john@example.com"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.email ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('email')}
               />
               {errors.email && (
                 <p className="mt-1 text-xs text-red-400">{errors.email}</p>
@@ -266,7 +278,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
           {/* Row 2: Phone, Location */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
-              <label htmlFor="phone" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="phone" className="block text-xs font-medium text-foreground/70 mb-1">
                 Phone
               </label>
               <input
@@ -275,9 +287,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.phone}
                 onChange={(e) => handleChange('phone', e.target.value)}
                 placeholder="(555) 123-4567"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.phone ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('phone')}
               />
               {errors.phone && (
                 <p className="mt-1 text-xs text-red-400">{errors.phone}</p>
@@ -285,7 +295,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
 
             <div>
-              <label htmlFor="location" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+              <label htmlFor="location" className="block text-xs font-medium text-foreground/70 mb-1">
                 Location
               </label>
               <input
@@ -294,7 +304,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
                 placeholder="Search city, state, zip..."
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                className={contactFieldClass()}
               />
             </div>
           </div>
@@ -302,7 +312,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
           {/* Row 3: Social Media - Instagram, TikTok, Portfolio URL */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div>
-              <label htmlFor="instagram_handle" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
+              <label htmlFor="instagram_handle" className="block text-xs font-medium text-foreground/70 mb-1 flex items-center gap-1.5">
                 <span className="text-pink-400">@</span> Instagram
               </label>
               <input
@@ -311,9 +321,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.instagram_handle}
                 onChange={(e) => handleChange('instagram_handle', e.target.value)}
                 placeholder="@username"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.instagram_handle ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('instagram_handle')}
               />
               {errors.instagram_handle && (
                 <p className="mt-1 text-xs text-red-400">{errors.instagram_handle}</p>
@@ -321,7 +329,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
 
             <div>
-              <label htmlFor="tiktok_handle" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
+              <label htmlFor="tiktok_handle" className="block text-xs font-medium text-foreground/70 mb-1 flex items-center gap-1.5">
                 <span className="text-cyan-400">@</span> TikTok
               </label>
               <input
@@ -330,9 +338,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.tiktok_handle}
                 onChange={(e) => handleChange('tiktok_handle', e.target.value)}
                 placeholder="@username"
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.tiktok_handle ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('tiktok_handle')}
               />
               {errors.tiktok_handle && (
                 <p className="mt-1 text-xs text-red-400">{errors.tiktok_handle}</p>
@@ -340,7 +346,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
 
             <div>
-              <label htmlFor="website" className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90 flex items-center gap-2">
+              <label htmlFor="website" className="block text-xs font-medium text-foreground/70 mb-1 flex items-center gap-1.5">
                 <span className="text-blue-400">🔗</span> Portfolio URL
               </label>
               <input
@@ -349,9 +355,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 value={formData.website}
                 onChange={(e) => handleChange('website', e.target.value)}
                 placeholder="https://..."
-                className={`w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border ${
-                  errors.website ? 'border-red-500' : 'border-border'
-                } text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                className={contactFieldClass('website')}
               />
               {errors.website && (
                 <p className="mt-1 text-xs text-red-400">{errors.website}</p>
@@ -359,16 +363,63 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
           </div>
 
+          {/* Row 4: Payment Information */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
+              <label htmlFor="eventbrite_email" className="block text-xs font-medium text-foreground/70 mb-1">
+                Eventbrite Email
+              </label>
+              <input
+                id="eventbrite_email"
+                type="email"
+                value={formData.eventbrite_email}
+                onChange={(e) => handleChange('eventbrite_email', e.target.value)}
+                placeholder="artist@email.com"
+                className={contactFieldClass()}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="venmo_handle" className="block text-xs font-medium text-foreground/70 mb-1">
+                Venmo Handle
+              </label>
+              <input
+                id="venmo_handle"
+                type="text"
+                value={formData.venmo_handle}
+                onChange={(e) => handleChange('venmo_handle', e.target.value)}
+                placeholder="@username"
+                className={contactFieldClass()}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="paypal_email" className="block text-xs font-medium text-foreground/70 mb-1">
+                PayPal Email
+              </label>
+              <input
+                id="paypal_email"
+                type="email"
+                value={formData.paypal_email}
+                onChange={(e) => handleChange('paypal_email', e.target.value)}
+                className={contactFieldClass()}
+              />
+            </div>
+          </div>
+
           {/* Categories */}
           <div>
-            <label className="block text-foreground text-sm font-medium mb-1.5 dark:text-foreground/90">
+            <label className="block text-xs font-medium text-foreground/70 mb-1">
               Categories
             </label>
             <div className="relative" ref={categoryDropdownRef}>
               <button
                 type="button"
                 onClick={() => setCategoryDropdownOpen(!categoryDropdownOpen)}
-                className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-left flex items-center justify-between hover:bg-background/15 transition-all focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className={cn(
+                  contactFieldClass(),
+                  'text-left flex items-center justify-between hover:brightness-105'
+                )}
               >
                 <span className={formData.categories.length > 0 ? 'text-foreground' : 'text-foreground/40'}>
                   {formData.categories.length > 0
@@ -388,7 +439,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                         className="w-full flex items-center gap-2 px-3 py-2 text-sm text-left hover:bg-background/10 transition-colors"
                       >
                         <div className={`w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 ${
-                          formData.categories.includes(category.name) ? 'bg-purple-500 border-purple-500' : 'border-border'
+                          formData.categories.includes(category.name) ? 'bg-primary/50 border-primary' : 'border-border'
                         }`}>
                           {formData.categories.includes(category.name) && <Check className="w-3 h-3 text-foreground" strokeWidth={3} />}
                         </div>
@@ -421,7 +472,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {formData.categories.map(cat => {
                   const category = organizationCategories.find(c => c.name === cat);
-                  const categoryColor = category?.color || '#8B5CF6';
+                  const categoryColor = category?.color || '#9054e3';
                   return (
                     <span
                       key={cat}
@@ -459,12 +510,12 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                     }
                   }}
                   placeholder="Add tag..."
-                  className="flex-1 px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  className={cn(contactFieldClass(), 'flex-1')}
                 />
                 <button
                   type="button"
                   onClick={handleAddTag}
-                  className="px-4 py-2.5 bg-purple-500/20 hover:bg-purple-500/30 text-violet-950 dark:text-purple-300 text-sm rounded-lg transition-colors flex items-center gap-2 border border-purple-500/30"
+                  className="px-4 py-2.5 bg-primary/20 hover:bg-primary/30 text-violet-950 dark:text-primary text-sm rounded-lg transition-colors flex items-center gap-2 border border-primary/30"
                 >
                   Add
                 </button>
@@ -495,13 +546,13 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
                 {formData.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-3 py-1 bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded-full text-xs flex items-center gap-1.5 border border-purple-500/30"
+                    className="px-3 py-1 bg-primary/20 text-violet-950 dark:text-primary rounded-full text-xs flex items-center gap-1.5 border border-primary/30"
                   >
                     #{tag}
                     <button
                       type="button"
                       onClick={() => handleRemoveTag(tag)}
-                      className="hover:text-violet-800 dark:hover:text-purple-100"
+                      className="hover:text-violet-800 dark:hover:text-primary/90"
                     >
                       <X className="w-3 h-3" />
                     </button>
@@ -522,7 +573,7 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
               onChange={(e) => handleChange('notes', e.target.value)}
               placeholder="Add notes..."
               rows={3}
-              className="w-full px-3 py-2.5 text-sm rounded-lg bg-background/10 border border-border text-foreground placeholder:text-foreground/40 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none transition-all"
+              className={cn(contactFieldClass(), 'resize-none min-h-[100px]')}
             />
           </div>
 
@@ -538,25 +589,26 @@ export default function AddContactModal({ organizationId, onClose, onSuccess }: 
             </div>
           )}
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-2">
+        </div>
+          {/* Footer */}
+          <div className="px-5 py-3 border-t border-border flex justify-end gap-2 flex-shrink-0">
             <button
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg border border-border text-foreground/90 hover:bg-background/5 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1.5 text-xs rounded-lg border border-border text-foreground hover:bg-background/10 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-5 py-3 text-sm font-semibold rounded-lg voxxy-btn-cta hover:shadow-lg hover:shadow-purple-500/50 hover:scale-[1.02] transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg voxxy-btn-cta transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
-                  Adding Contact...
+                  <span className="w-3 h-3 border-2 border-border border-t-primary rounded-full animate-spin" />
+                  Adding...
                 </span>
               ) : (
                 'Add Contact'

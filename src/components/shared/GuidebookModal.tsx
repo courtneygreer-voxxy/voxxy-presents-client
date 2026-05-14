@@ -14,11 +14,11 @@ const GUIDE_PAGES: GuidePage[] = [
   // ── Welcome ──
   {
     section: 'Welcome',
-    title: 'Welcome to Voxxy Presents',
+    title: 'Welcome to Voxxy',
     content: (
       <div className="space-y-3">
         <p>
-          Voxxy Presents helps you manage vendor markets and fairs from one
+          Voxxy helps you manage vendor markets and fairs from one
           dashboard. This guide walks you through the key features so you can
           get up and running quickly.
         </p>
@@ -30,7 +30,7 @@ const GUIDE_PAGES: GuidePage[] = [
             { icon: Calendar, label: 'Events', desc: 'Create & manage markets' },
           ].map(({ icon: Icon, label, desc }) => (
             <div key={label} className="flex items-start gap-2 p-2.5 rounded-lg bg-background/5 border border-border">
-              <Icon className="w-4 h-4 text-purple-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+              <Icon className="w-4 h-4 text-primary dark:text-primary mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-xs font-semibold text-foreground">{label}</p>
                 <p className="text-[11px] text-foreground/50">{desc}</p>
@@ -101,7 +101,7 @@ const GUIDE_PAGES: GuidePage[] = [
             'View their event history and application status',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-primary mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
@@ -127,7 +127,7 @@ const GUIDE_PAGES: GuidePage[] = [
         </p>
         <div className="space-y-2">
           <div className="p-2.5 rounded-lg bg-background/5 border border-border">
-            <p className="text-xs font-semibold text-violet-900 dark:text-purple-300 mb-1">Smart Lists</p>
+            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">Smart Lists</p>
             <p className="text-[11px] text-foreground/60">
               Auto-update based on rules you set (e.g. "all contacts tagged
               'returning vendor'"). Members update automatically as contacts
@@ -184,7 +184,7 @@ const GUIDE_PAGES: GuidePage[] = [
             </div>
           </div>
           <div className="flex gap-2 items-start p-2.5 rounded-lg bg-background/5 border border-border">
-            <Mail className="w-4 h-4 text-purple-700 dark:text-purple-400 mt-0.5 flex-shrink-0" />
+            <Mail className="w-4 h-4 text-primary dark:text-primary mt-0.5 flex-shrink-0" />
             <div>
               <p className="text-xs font-semibold text-foreground">Targeted Emails</p>
               <p className="text-[11px] text-foreground/60">
@@ -249,7 +249,7 @@ const GUIDE_PAGES: GuidePage[] = [
         </p>
         <div className="space-y-1.5">
           {[
-            { label: 'Event Announcements', desc: 'Invitations and application opens', color: 'text-violet-900 dark:text-purple-300' },
+            { label: 'Event Announcements', desc: 'Invitations and application opens', color: 'text-violet-900 dark:text-primary' },
             { label: 'Application Updates', desc: 'Approvals, rejections, waitlist notices', color: 'text-rose-900 dark:text-pink-300' },
             { label: 'Payment Reminders', desc: 'Booth fees, deadlines, and overdue alerts', color: 'text-blue-900 dark:text-blue-300' },
             { label: 'Event Countdown', desc: 'Setup instructions and final reminders', color: 'text-emerald-900 dark:text-green-300' },
@@ -306,8 +306,8 @@ const GUIDE_PAGES: GuidePage[] = [
       <div className="space-y-3">
         <p>Emails can target all vendors or just specific categories:</p>
         <div className="space-y-2">
-          <div className="p-2.5 rounded-lg bg-purple-500/10 border border-purple-500/20">
-            <p className="text-xs font-semibold text-violet-900 dark:text-purple-300 mb-1">Universal Emails</p>
+          <div className="p-2.5 rounded-lg bg-primary/10 border border-primary/20">
+            <p className="text-xs font-semibold text-violet-900 dark:text-primary mb-1">Universal Emails</p>
             <p className="text-[11px] text-foreground/60">
               Sent to <em>every</em> vendor regardless of category. Use these
               for event-wide announcements, general reminders, and post-event
@@ -360,7 +360,7 @@ const GUIDE_PAGES: GuidePage[] = [
             { tag: '[installDate]', desc: 'Setup date' },
           ].map(({ tag, desc }) => (
             <div key={tag} className="flex items-center gap-2 px-2 py-1.5 rounded bg-background/5">
-              <code className="text-[10px] text-violet-900 dark:text-purple-300 font-mono">{tag}</code>
+              <code className="text-[10px] text-violet-900 dark:text-primary font-mono">{tag}</code>
               <span className="text-[10px] text-foreground/40">{desc}</span>
             </div>
           ))}
@@ -380,7 +380,7 @@ const GUIDE_PAGES: GuidePage[] = [
     content: (
       <div className="space-y-3">
         <p>
-          Events are the core of Voxxy Presents. Each event represents a
+          Events are the core of Voxxy. Each event represents a
           vendor market or fair you're organizing.
         </p>
         <ol className="space-y-2 text-foreground/80">
@@ -465,7 +465,7 @@ const GUIDE_PAGES: GuidePage[] = [
             'Send test emails to yourself before going live',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-primary mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
@@ -506,7 +506,7 @@ const GUIDE_PAGES: GuidePage[] = [
             'Post-event thank you messages',
           ].map((item, i) => (
             <li key={i} className="flex gap-2 items-start">
-              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-purple-400 mt-1.5 flex-shrink-0" />
+              <span className="w-1.5 h-1.5 rounded-full bg-violet-600 dark:bg-primary mt-1.5 flex-shrink-0" />
               <span className="text-foreground/80">{item}</span>
             </li>
           ))}
@@ -558,12 +558,12 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
       <div className="absolute inset-0 bg-black/70" onClick={onClose} />
 
       {/* Modal */}
-      <div className="relative w-[680px] max-w-[95vw] max-h-[85vh] bg-muted border border-border rounded-2xl shadow-2xl shadow-purple-500/10 flex overflow-hidden">
+      <div className="relative w-[680px] max-w-[95vw] max-h-[85vh] bg-muted border border-border rounded-2xl shadow-2xl shadow-primary/10 flex overflow-hidden">
         {/* Left sidebar - section nav */}
         <div className="hidden sm:flex flex-col w-44 bg-background/5 border-r border-border py-4">
           <div className="px-4 mb-4">
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-purple-700 dark:text-purple-400" />
+              <BookOpen className="w-4 h-4 text-primary dark:text-primary" />
               <span className="text-xs font-bold text-foreground tracking-wide">GUIDE</span>
             </div>
           </div>
@@ -577,7 +577,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   onClick={() => setPageIndex(sectionStartIndex[section])}
                   className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all ${
                     isActiveSection
-                      ? 'bg-purple-600/30 text-violet-950 dark:text-purple-300'
+                      ? 'bg-primary/30 text-violet-950 dark:text-primary'
                       : 'text-foreground/50 hover:text-foreground hover:bg-background/5'
                   }`}
                 >
@@ -599,7 +599,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
           {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
             <div>
-              <p className="text-[10px] text-purple-800 dark:text-purple-400 font-semibold uppercase tracking-wider mb-0.5">
+              <p className="text-[10px] text-slate-800 dark:text-primary font-semibold uppercase tracking-wider mb-0.5">
                 {page.section}
               </p>
               <h2 className="text-base font-bold text-foreground">{page.title}</h2>
@@ -641,7 +641,7 @@ export function GuidebookModal({ open, onClose }: GuidebookModalProps) {
                   key={i}
                   onClick={() => setPageIndex(i)}
                   className={`w-1.5 h-1.5 rounded-full transition-colors ${
-                    i === pageIndex ? 'bg-purple-600 dark:bg-purple-400' : 'bg-background/15 hover:bg-background/30'
+                    i === pageIndex ? 'bg-primary dark:bg-primary' : 'bg-background/15 hover:bg-background/30'
                   }`}
                 />
               ))}

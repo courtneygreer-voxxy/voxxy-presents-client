@@ -64,7 +64,7 @@ export default function SimsLoadingScreen({ message }: SimsLoadingScreenProps) {
         {/* Progress Bar */}
         <div className="relative w-full h-3 bg-background/10 rounded-full overflow-hidden">
           <div
-            className="absolute inset-y-0 left-0 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 rounded-full transition-all duration-500 ease-out"
+            className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary via-voxxy-pink to-primary rounded-full transition-all duration-500 ease-out"
             style={{ width: `${progress}%` }}
           >
             {/* Shimmer effect */}
@@ -81,9 +81,9 @@ export default function SimsLoadingScreen({ message }: SimsLoadingScreenProps) {
 
         {/* Optional decorative elements */}
         <div className="flex justify-center gap-2">
-          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
           <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
         </div>
       </div>
     </div>

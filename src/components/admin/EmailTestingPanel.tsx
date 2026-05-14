@@ -187,8 +187,8 @@ export default function EmailTestingPanel() {
 
   const getCategoryColor = (index: number) => {
     const colors = [
-      'from-purple-600 to-blue-500',
-      'from-pink-600 to-purple-500',
+      'from-primary to-blue-500',
+      'from-pink-600 to-primary',
       'from-blue-600 to-cyan-500',
       'from-green-600 to-teal-500',
     ];
@@ -198,7 +198,7 @@ export default function EmailTestingPanel() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="h-8 w-8 text-purple-400 animate-spin" />
+        <Loader2 className="h-8 w-8 text-primary animate-spin" />
       </div>
     );
   }
@@ -214,7 +214,7 @@ export default function EmailTestingPanel() {
             </div>
             <div>
               <h1 className="text-xl lg:text-2xl font-bold text-foreground">Email Testing Dashboard</h1>
-              <p className="text-sm lg:text-base text-muted-foreground">Test all 17 Voxxy Presents emails</p>
+              <p className="text-sm lg:text-base text-muted-foreground">Test all 17 Voxxy emails</p>
             </div>
           </div>
 
@@ -257,9 +257,9 @@ export default function EmailTestingPanel() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-gradient-to-br from-purple-600/20 to-purple-600/10 backdrop-blur-sm border border-purple-400/30 rounded-lg p-4">
+          <div className="bg-gradient-to-br from-primary/20 to-primary/10 backdrop-blur-sm border border-primary/30 rounded-lg p-4">
             <div className="text-3xl font-bold text-foreground">17</div>
-            <div className="text-sm text-purple-200">Total Emails</div>
+            <div className="text-sm text-primary">Total Emails</div>
           </div>
           <div className="bg-gradient-to-br from-pink-600/20 to-pink-600/10 backdrop-blur-sm border border-pink-400/30 rounded-lg p-4">
             <div className="text-3xl font-bold text-foreground">7</div>
@@ -296,7 +296,7 @@ export default function EmailTestingPanel() {
             <Button
               onClick={handleSendScheduledEmails}
               disabled={sendingScheduled}
-              className="bg-gradient-to-r from-pink-600 to-purple-500 hover:from-pink-700 hover:to-purple-600 text-foreground border-0 h-auto py-3"
+              className="bg-gradient-to-r from-pink-600 to-primary hover:from-pink-700 hover:to-primary text-foreground border-0 h-auto py-3"
             >
               {sendingScheduled ? (
                 <>

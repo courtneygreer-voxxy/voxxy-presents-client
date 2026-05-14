@@ -1,24 +1,19 @@
 import React, { useEffect } from 'react'
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import {
   Check,
   ArrowRight,
-  Sparkles,
-  Users,
-  Zap,
-  Shield
 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { usePageTracking } from "@/hooks/usePageTracking"
 import { useSectionTracking } from "@/hooks/useSectionTracking"
-import { analytics } from "@/lib/analytics"
-import { TrackedButton } from "@/components/analytics/TrackedButton"
 import Navigation from "@/components/Navigation"
 import Footer from "@/components/Footer"
+import { useForceTheme } from '@/hooks/useForceTheme'
 
 export default function PricingPage() {
+  useForceTheme('dark')
 
   // Scroll to top on page load
   useEffect(() => {
@@ -34,7 +29,7 @@ export default function PricingPage() {
   })
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[linear-gradient(135deg,#160826_0%,#211137_38%,#13081f_100%)]">
+    <div className="relative min-h-screen overflow-hidden voxxy-gradient-marketing-hero">
       <Navigation activePage="pricing" />
 
       {/* Hero Section */}
@@ -42,7 +37,7 @@ export default function PricingPage() {
         <div className="container mx-auto max-w-4xl text-center">
           <h1 className="mb-5 text-5xl font-bold leading-tight tracking-tight text-white md:text-6xl">
             Simple,{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#cc30e8] to-[#9054e3]">
               Transparent Pricing
             </span>
           </h1>
@@ -53,9 +48,9 @@ export default function PricingPage() {
 
           {/* Divider */}
           <div className="mt-9 flex items-center justify-center">
-            <div className="h-px w-24 bg-gradient-to-r from-transparent to-fuchsia-500/40"></div>
-            <div className="mx-4 w-2 h-2 rounded-full bg-fuchsia-500/40"></div>
-            <div className="h-px w-24 bg-gradient-to-l from-transparent to-fuchsia-500/40"></div>
+            <div className="h-px w-24 bg-gradient-to-r from-transparent to-voxxy-pink/40"></div>
+            <div className="mx-4 w-2 h-2 rounded-full bg-voxxy-pink/40"></div>
+            <div className="h-px w-24 bg-gradient-to-l from-transparent to-voxxy-pink/40"></div>
           </div>
         </div>
       </section>
@@ -73,38 +68,33 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">Perfect for new producers</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 10 events per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>10,000 vendor contacts</span>
+                      <span>10k vendor contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Automated email workflows</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Vendor CRM</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Email support</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
 
             {/* Growth Plan */}
-            <Card className="marketing-card-accent pricing-card relative flex flex-col border-2 border-fuchsia-300 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
+            <Card className="marketing-card-accent pricing-card relative flex flex-col border-2 border-voxxy-pink transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
                 <Badge className="border border-violet-300 bg-violet-200 px-4 py-1 text-sm text-slate-950">Most Popular</Badge>
               </div>
@@ -115,51 +105,41 @@ export default function PricingPage() {
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">For established producers</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Up to 50 events per year</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>50,000 vendor contacts</span>
+                      <span>50k vendor contacts</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Advanced email automation</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Vendor CRM with tagging</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Priority email support</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Custom branding</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
 
-            {/* Enterprise Plan */}
+            {/* Pro Plan */}
             <Card className="marketing-card pricing-card flex flex-col border-2 border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg">
               <CardHeader className="text-center pb-6">
-                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Enterprise</CardTitle>
+                <CardTitle className="mb-2 text-2xl font-bold text-slate-950">Pro</CardTitle>
                 <div className="mb-2 text-4xl font-bold text-slate-950">$400</div>
                 <CardDescription className="text-slate-600">per month</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6 flex-grow flex flex-col">
                 <div className="flex-grow">
-                  <p className="mb-4 font-medium text-slate-700">For large-scale operations</p>
-                  <ul className="space-y-3 min-h-[240px]">
+                  <ul className="space-y-3 min-h-[180px]">
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
                       <span>Unlimited events</span>
@@ -170,21 +150,17 @@ export default function PricingPage() {
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>White-label email automation</span>
+                      <span>$ Marketplace Add ons</span>
                     </li>
                     <li className="flex items-start text-gray-800">
                       <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Advanced CRM & analytics</span>
-                    </li>
-                    <li className="flex items-start text-gray-800">
-                      <Check className="h-5 w-5 text-voxxy-purple-brand mr-3 flex-shrink-0 mt-0.5" />
-                      <span>Dedicated account manager</span>
+                      <span>2% transaction fee</span>
                     </li>
                   </ul>
                 </div>
-                <Button className="w-full voxxy-btn-solid" asChild>
-                  <Link to="/#contact">Request Access</Link>
-                </Button>
+                <Link to="/#contact" className="voxxy-btn-cta w-full inline-flex items-center justify-center rounded-lg px-5 py-3 text-sm font-semibold transition-all">
+                  Request Access
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -192,7 +168,7 @@ export default function PricingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="relative z-10 border-y border-white/10 bg-[linear-gradient(135deg,#1a0c2c_0%,#24123a_50%,#160826_100%)] py-24">
+      <section className="relative z-10 border-y border-white/10 voxxy-gradient-marketing-hero py-24">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <h2 className="mb-6 text-4xl font-bold text-white md:text-5xl">
             Ready to Get Started?
@@ -200,12 +176,10 @@ export default function PricingPage() {
           <p className="mx-auto mb-10 max-w-2xl text-xl leading-relaxed text-white/70">
             Join event producers who are scaling their recurring events with Voxxy
           </p>
-          <Button size="lg" className="border border-fuchsia-400/20 bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl" asChild>
-            <Link to="/#contact">
-              Request Access
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Link>
-          </Button>
+          <Link to="/#contact" className="voxxy-btn-brand inline-flex items-center justify-center rounded-lg px-8 py-4 text-base font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl">
+            Request Access
+            <ArrowRight className="ml-2 h-5 w-5" />
+          </Link>
         </div>
       </section>
 

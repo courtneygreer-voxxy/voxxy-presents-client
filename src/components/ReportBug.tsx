@@ -81,7 +81,7 @@ export default function ReportBug({
       }, 2000);
     } catch (err: any) {
       console.error('Failed to submit bug report:', err);
-      setError('Failed to submit report. Please try again or contact team@voxxypresents.com');
+      setError('Failed to submit report. Please try again or contact team@heyvoxxy.com');
     } finally {
       setSubmitting(false);
     }
@@ -109,7 +109,7 @@ export default function ReportBug({
 
   return (
     <div className="voxxy-overlay-scrim fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div className="voxxy-modal-surface relative max-w-md w-full rounded-lg border border-purple-500/30 p-6 shadow-xl">
+      <div className="voxxy-modal-surface relative max-w-md w-full rounded-lg border border-primary/30 p-6 shadow-xl">
         {/* Close Button */}
         <button
           onClick={onClose}
@@ -120,15 +120,15 @@ export default function ReportBug({
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-purple-500/20 rounded-lg flex items-center justify-center">
-            <Bug className="h-5 w-5 text-violet-700 dark:text-purple-400" />
+          <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+            <Bug className="h-5 w-5 text-violet-700 dark:text-primary" />
           </div>
           <div>
             <h2 className="text-lg font-bold text-foreground">Report a Bug</h2>
             <p className="text-xs text-muted-foreground">
               {autoShow
                 ? "We noticed you're having trouble. Help us fix it!"
-                : 'Help us improve Voxxy Presents'}
+                : 'Help us improve Voxxy'}
             </p>
           </div>
         </div>
@@ -231,10 +231,10 @@ export default function ReportBug({
           <p className="text-center text-xs text-foreground/50">
             Or email us directly at{' '}
             <a
-              href="mailto:team@voxxypresents.com"
-              className="text-purple-400 hover:text-purple-300 underline"
+              href="mailto:team@heyvoxxy.com"
+              className="text-primary hover:text-primary/70 underline transition-colors"
             >
-              team@voxxypresents.com
+              team@heyvoxxy.com
             </a>
           </p>
         </form>

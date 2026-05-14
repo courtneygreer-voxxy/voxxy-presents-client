@@ -21,6 +21,7 @@ import {
   AlertCircle,
   Lock,
   Search,
+  Mail,
 } from 'lucide-react';
 import type { EmailTemplateItem } from '@/types/email';
 import {
@@ -40,6 +41,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { RichTextEditor } from './RichTextEditor';
+import { EmailHtmlPreviewModal } from './EmailHtmlPreviewModal';
 
 interface EmailTemplateEditorPageProps {
   item: EmailTemplateItem | null;
@@ -137,6 +139,7 @@ export function EmailTemplateEditorPage({
   const [tagSearch, setTagSearch] = useState('');
   const [bodyEditor, setBodyEditor] = useState<Editor | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showHtmlPreview, setShowHtmlPreview] = useState(false);
   const [emailFooter, setEmailFooter] = useState<string>(''); // Locked footer content
 
   const subjectRef = useRef<HTMLInputElement>(null);
@@ -385,8 +388,17 @@ export function EmailTemplateEditorPage({
                 className="px-3 py-2 rounded-lg border border-border text-foreground/70 hover:text-foreground hover:border-border transition-all flex items-center gap-2"
               >
                 {showPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                {showPreview ? 'Hide' : 'Show'} Preview
+                {showPreview ? 'Hide' : 'Show'} Sidebar Preview
               </button>
+              {!isCreateMode && item?.id && (
+                <button
+                  onClick={() => setShowHtmlPreview(true)}
+                  className="px-3 py-2 rounded-lg bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 transition-all flex items-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Preview Email
+                </button>
+              )}
               <Button
                 onClick={handleSave}
                 disabled={isSaving || validationErrors.length > 0 || !!duplicateTriggerWarning}
@@ -477,23 +489,23 @@ export function EmailTemplateEditorPage({
             {/* Locked Footer Section */}
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <Lock className="w-4 h-4 text-purple-400" />
+                <Lock className="w-4 h-4 text-primary" />
                 <label className="block text-xs font-medium text-foreground dark:text-foreground/60">
                   Email Footer (Locked)
                 </label>
               </div>
               <div className="relative">
-                <div className="pointer-events-none rounded-lg border border-purple-500/20 bg-card/80 p-4 opacity-60 dark:bg-background/5">
+                <div className="pointer-events-none rounded-lg border border-primary/20 bg-card/80 p-4 opacity-60 dark:bg-background/5">
                   <div
                     className="email-footer-preview prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{ __html: emailFooter }}
                   />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                  <div className="rounded-full border border-purple-500/30 bg-card/95 px-3 py-1.5 backdrop-blur-sm dark:bg-background/80">
+                  <div className="rounded-full border border-primary/30 bg-card/95 px-3 py-1.5 backdrop-blur-sm dark:bg-background/80">
                     <div className="flex items-center gap-2">
-                      <Lock className="w-3 h-3 text-purple-300" />
-                      <span className="text-xs text-purple-300 font-medium">
+                      <Lock className="w-3 h-3 text-primary" />
+                      <span className="text-xs text-primary font-medium">
                         Footer is locked to ensure unsubscribe link is always present
                       </span>
                     </div>
@@ -517,7 +529,7 @@ export function EmailTemplateEditorPage({
                 className="flex items-center justify-between w-full mb-2"
               >
                 <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                  <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+                  <Clock className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
                   <span>Trigger Settings</span>
                 </div>
                 {triggerSettingsOpen ? (
@@ -608,7 +620,7 @@ export function EmailTemplateEditorPage({
                 className="flex items-center justify-between w-full mb-2"
               >
                 <div className="flex items-center gap-1.5 text-foreground font-medium text-sm">
-                  <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-purple-400" />
+                  <Tag className="h-3.5 w-3.5 text-violet-700 dark:text-primary" />
                   <span>Available tags</span>
                 </div>
                 {availableTagsOpen ? (
@@ -650,7 +662,7 @@ export function EmailTemplateEditorPage({
                       if (filteredVars.length === 0) return null;
                       return (
                       <div key={group.label}>
-                        <h4 className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-purple-400">
+                        <h4 className="mb-1.5 px-1 text-[10px] font-semibold uppercase tracking-wide text-violet-700 dark:text-primary">
                           {group.label}
                         </h4>
                         <div className="space-y-0.5">
@@ -667,7 +679,7 @@ export function EmailTemplateEditorPage({
                                 className={`flex items-center gap-1.5 w-full px-2 py-1.5 text-xs rounded transition-all border ${
                                   isDisabled
                                     ? 'cursor-not-allowed border-border bg-background/20 text-foreground/55 opacity-70 dark:bg-background/5 dark:text-foreground/40 dark:opacity-40'
-                                    : 'text-foreground hover:bg-gradient-to-r hover:from-purple-500/20 hover:to-blue-500/20 hover:border-purple-500/40 border-border bg-background/5 group'
+                                    : 'text-foreground hover:bg-gradient-to-r hover:from-primary/20 hover:to-blue-500/20 hover:border-primary/40 border-border bg-background/5 group'
                                 }`}
                                 title={
                                   isAnnouncementEmail && !variable.worksInInvitations
@@ -675,12 +687,12 @@ export function EmailTemplateEditorPage({
                                     : variable.description
                                 }
                               >
-                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-purple-400 dark:group-hover:text-purple-300'}`} />
+                                <Tag className={`w-3 h-3 flex-shrink-0 ${isDisabled ? 'text-foreground/45 dark:text-foreground/30' : 'text-violet-700 group-hover:text-violet-800 dark:text-primary dark:group-hover:text-primary'}`} />
                                 <span className="flex-1 text-left truncate">{variable.label}</span>
                                 <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
                                   isDisabled
                                     ? 'bg-background/20 text-foreground/45 dark:bg-background/5 dark:text-foreground/30'
-                                    : 'bg-violet-100 text-violet-700 dark:bg-purple-500/10 dark:text-purple-400'
+                                    : 'bg-violet-100 text-violet-700 dark:bg-primary/10 dark:text-primary'
                                 }`}>
                                   {variable.frontendVar.replace('[', '').replace(']', '')}
                                 </span>
@@ -703,7 +715,7 @@ export function EmailTemplateEditorPage({
           <div className="voxxy-editor-sidebar w-96 overflow-y-auto border-l border-border">
             <div className="p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Eye className="h-4 w-4 text-violet-700 dark:text-purple-400" />
+                <Eye className="h-4 w-4 text-violet-700 dark:text-primary" />
                 <h3 className="text-sm font-medium text-foreground">Live Preview</h3>
               </div>
 
@@ -718,7 +730,7 @@ export function EmailTemplateEditorPage({
               {/* Preview Body */}
               <div>
                 <p className="mb-1 text-xs text-muted-foreground">Body:</p>
-                <div className="rounded-lg border border-purple-500/20 bg-card/80 p-4 dark:bg-background/5">
+                <div className="rounded-lg border border-primary/20 bg-card/80 p-4 dark:bg-background/5">
                   <div
                           className="email-preview-content voxxy-rich-text-base prose prose-sm max-w-none dark:prose-invert"
                     dangerouslySetInnerHTML={{ __html: renderPreview() }}
@@ -729,6 +741,18 @@ export function EmailTemplateEditorPage({
           </div>
         )}
       </div>
+
+      {/* HTML Preview Modal */}
+      {!isCreateMode && item?.id && (
+        <EmailHtmlPreviewModal
+          open={showHtmlPreview}
+          onClose={() => setShowHtmlPreview(false)}
+          previewUrl={`/v1/presents/email_campaign_templates/${templateId}/preview/${item.id}.html`}
+          subject={formData.subject_template}
+          title={`Preview: ${item.name || 'Email Template'}`}
+          apiMethod="GET"
+        />
+      )}
     </div>
   );
 }

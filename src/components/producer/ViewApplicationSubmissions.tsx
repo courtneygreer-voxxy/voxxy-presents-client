@@ -28,7 +28,7 @@ const STATUS_COLORS = {
   approved: 'bg-green-500/20 text-emerald-900 dark:text-green-400',
   rejected: 'bg-red-500/20 text-red-950 dark:text-red-400',
   waitlist: 'bg-yellow-500/20 text-yellow-950 dark:text-yellow-400',
-  confirmed: 'bg-purple-500/20 text-violet-950 dark:text-purple-400',
+  confirmed: 'bg-primary/20 text-violet-950 dark:text-primary',
 };
 
 const STATUS_LABELS = {
@@ -116,7 +116,7 @@ export default function ViewApplicationSubmissions({
     return (
       <div className="p-6">
         <div className="flex items-center justify-center py-20">
-          <div className="w-8 h-8 border-4 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+          <div className="w-8 h-8 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
         </div>
       </div>
     );
@@ -238,7 +238,7 @@ export default function ViewApplicationSubmissions({
                       )}
                     </td>
                     <td className="px-6 py-4">
-                      <span className="px-2 py-1 rounded text-xs font-medium bg-purple-500/20 text-violet-950 dark:text-purple-400">
+                      <span className="px-2 py-1 rounded text-xs font-medium bg-primary/20 text-violet-950 dark:text-primary">
                         {submission.vendor_category}
                       </span>
                     </td>
@@ -260,7 +260,7 @@ export default function ViewApplicationSubmissions({
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
                         {updatingId === submission.id ? (
-                          <div className="w-5 h-5 border-2 border-purple-500/30 border-t-purple-500 rounded-full animate-spin" />
+                          <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
                         ) : submission.status === 'pending' ? (
                           <>
                             <button

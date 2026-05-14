@@ -21,7 +21,7 @@ export default function ContactRow({
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      Artist: 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border-purple-500/30',
+      Artist: 'bg-primary/20 text-violet-950 dark:text-primary border-primary/30',
       'Table Vendor': 'bg-blue-500/20 text-blue-950 dark:text-blue-300 border-blue-500/30',
       Sponsor: 'bg-amber-500/20 text-amber-950 dark:text-amber-300 border-amber-500/30',
       'Food & Beverage': 'bg-green-500/20 text-emerald-900 dark:text-green-300 border-green-500/30',
@@ -34,14 +34,14 @@ export default function ContactRow({
   return (
     <div className="voxxy-table-row voxxy-table-row-hover last:border-0">
       <div
-        className={`grid grid-cols-[28px,160px,130px,110px,120px,90px,70px,1fr,120px,60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
+        className={`grid grid-cols-[28px,minmax(120px,1fr),minmax(100px,1fr),minmax(120px,1fr),100px,100px,90px,70px,minmax(80px,1fr),60px] gap-2 px-2 py-2 items-center text-[11px] ${isUnsubscribed ? 'opacity-60' : ''}`}
       >
         <div className="flex items-center justify-center" onClick={(e) => e.stopPropagation()}>
           <input
             type="checkbox"
             checked={isSelected}
             onChange={onSelect}
-            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
           />
         </div>
 
@@ -60,6 +60,28 @@ export default function ContactRow({
           <div className="text-foreground/70 truncate">{contact.business_name || '—'}</div>
         </div>
 
+        {/* Email — fixed 140px, truncated */}
+        <div className="min-w-0">
+          <div className="flex items-center gap-1">
+            <a
+              href={`mailto:${contact.email}`}
+              className="text-foreground/70 hover:text-primary transition-colors truncate block"
+              onClick={(e) => e.stopPropagation()}
+              title={contact.email}
+            >
+              {contact.email}
+            </a>
+            {contact.unsubscribe_status?.is_unsubscribed && (
+              <div
+                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30"
+                title={`Unsubscribed (${contact.unsubscribe_status.scope || 'unknown'})`}
+              >
+                <MailX className="w-3 h-3" />
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="min-w-0">
           {contact.location ? (
             <div className="flex items-center gap-0.5 text-foreground/70">
@@ -75,7 +97,7 @@ export default function ContactRow({
           {contact.phone ? (
             <a
               href={`tel:${contact.phone}`}
-              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block"
+              className="text-foreground/70 hover:text-primary transition-colors truncate block"
               onClick={(e) => e.stopPropagation()}
             >
               {contact.phone}
@@ -142,32 +164,12 @@ export default function ContactRow({
         </div>
 
         <div className="min-w-0">
-          <div className="flex items-center gap-1">
-            <a
-              href={`mailto:${contact.email}`}
-              className="text-foreground/70 hover:text-purple-400 transition-colors truncate block flex-1"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {contact.email}
-            </a>
-            {contact.unsubscribe_status?.is_unsubscribed && (
-              <div
-                className="flex-shrink-0 p-0.5 rounded bg-red-500/20 text-red-950 dark:text-red-400 border border-red-500/30"
-                title={`Unsubscribed (${contact.unsubscribe_status.scope || 'unknown'})`}
-              >
-                <MailX className="w-3 h-3" />
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="min-w-0">
           <div className="flex flex-wrap gap-0.5">
             {contact.tags && contact.tags.length > 0 ? (
               contact.tags.slice(0, 2).map((tag) => (
                 <span
                   key={tag}
-                  className="px-1 py-0.5 text-[9px] bg-purple-500/10 text-violet-950 dark:text-purple-300 rounded border border-purple-500/20 truncate"
+                  className="px-1 py-0.5 text-[9px] bg-primary/10 text-violet-950 dark:text-primary rounded border border-primary/20 truncate"
                 >
                   #{tag}
                 </span>

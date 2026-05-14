@@ -14,7 +14,7 @@ export default function CookiePolicyPage() {
         {/* Back Button */}
         <Link
           to="/"
-          className="flex items-center gap-2 text-gray-600 hover:text-foreground transition-colors"
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="text-sm">Back</span>
@@ -23,24 +23,24 @@ export default function CookiePolicyPage() {
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl font-bold text-foreground">Cookie Policy</h1>
-          <p className="text-gray-500 italic">Last Updated: February 12, 2026</p>
+          <p className="text-muted-foreground italic">Last Updated: February 12, 2026</p>
         </div>
 
         {/* Annotation Box */}
-        <div className="bg-muted border border-border rounded-lg p-6">
-          <p className="text-gray-700 leading-relaxed">
+        <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+          <p className="text-slate-700 leading-relaxed">
             This Cookie Policy explains exactly what cookies and similar technologies we use, why we use them, and how you can control them. We believe in opt-in tracking — no analytics cookies run until you say yes.
           </p>
         </div>
 
         {/* Introduction */}
-        <div className="space-y-4 text-gray-700 leading-relaxed">
+        <div className="space-y-4 text-foreground/80 leading-relaxed">
           <p>
-            This Cookie Policy describes how Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") uses cookies and similar technologies when you use the Voxxy Presents platform and visit our websites (collectively, the "Services"). Any capitalized terms not defined in this Cookie Policy have the meanings set forth in our{' '}
-            <a href="/legal/terms" className="text-purple-600 hover:text-purple-700 underline">
+            This Cookie Policy describes how Voxxy AI, Inc. ("Voxxy," "we," "us," or "our") uses cookies and similar technologies when you use the Voxxy platform and visit our websites (collectively, the "Services"). Any capitalized terms not defined in this Cookie Policy have the meanings set forth in our{' '}
+            <a href="/legal/terms" className="text-slate-600 hover:text-slate-900 underline transition-colors">
               Terms of Service
             </a>
-            . If you have any questions about this Cookie Policy, contact us at team@voxxypresents.com.
+            . If you have any questions about this Cookie Policy, contact us at team@heyvoxxy.com.
           </p>
         </div>
 
@@ -48,7 +48,7 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">1. What Are Cookies?</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               Cookies are small text files that are placed on your device (computer, tablet, or mobile phone) when you visit a website. They are widely used to make websites work more efficiently, provide information to site owners, and enable certain features. Cookies can be "first-party" (set by us) or "third-party" (set by our service providers).
             </p>
@@ -59,13 +59,13 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">2. Our Consent-First Approach</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We don't track you until you say it's okay. When you visit our site, you'll see a consent banner. Only strictly necessary cookies run before you opt in.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>2.1 Cookie Consent Banner.</strong> When you first visit our website or platform, you will see a cookie consent banner that gives you the choice to accept or decline non-essential cookies. We will not activate any analytics, performance, or third-party tracking cookies until you have affirmatively opted in through this banner.
             </p>
@@ -82,13 +82,13 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">3. Cookies We Use</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               Here's a transparent breakdown of every cookie and tracking technology we use, organized by purpose.
             </p>
           </div>
 
-          <div className="space-y-6 text-gray-700 leading-relaxed">
+          <div className="space-y-6 text-foreground/80 leading-relaxed">
             <div>
               <h3 className="text-lg font-semibold text-foreground mb-3">Category 1: Strictly Necessary</h3>
               <p className="mb-4">
@@ -201,7 +201,7 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">4. Other Tracking Technologies</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>4.1 Pixels.</strong> A pixel (also called a web beacon or tracking pixel) is a small piece of code embedded in a web page or email. We may use pixels in our marketing emails to understand whether you opened the email or clicked on links within it. You can prevent pixel tracking in emails by configuring your email client to not load remote images.
             </p>
@@ -215,19 +215,19 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">5. What We Don't Do</h2>
 
-          <div className="bg-muted border border-border rounded-lg p-6">
-            <p className="text-gray-700 leading-relaxed">
+          <div className="bg-white border border-violet-100 rounded-lg p-6 shadow-sm">
+            <p className="text-slate-700 leading-relaxed">
               We keep things simple. No ad tracking, no retargeting, no selling your browsing data.
             </p>
           </div>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
-              <strong>We do not run advertising on Voxxy Presents.</strong> We do not use advertising cookies, retargeting pixels, or partner with advertising networks to show you targeted ads on other websites. We do not share your browsing data with advertisers.
+              <strong>We do not run advertising on Voxxy.</strong> We do not use advertising cookies, retargeting pixels, or partner with advertising networks to show you targeted ads on other websites. We do not share your browsing data with advertisers.
             </p>
             <p>
               <strong>We do not sell your data.</strong> As stated in our{' '}
-              <a href="/legal/privacy" className="text-purple-600 hover:text-purple-700 underline">
+              <a href="/legal/privacy" className="text-slate-600 hover:text-slate-900 underline transition-colors">
                 Privacy Policy
               </a>
               , we do not sell or share your personal information with third parties for their marketing purposes.
@@ -242,7 +242,7 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">6. Your Choices</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               <strong>6.1 Cookie Consent Banner.</strong> Use our cookie consent banner to accept or decline non-essential cookies. You can update your preferences at any time by clicking the "Cookie Preferences" link in our website footer.
             </p>
@@ -262,7 +262,7 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">7. Updates to This Cookie Policy</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               We may update this Cookie Policy from time to time to reflect changes in the cookies we use, changes in technology, or changes in applicable law. We will post the most current version on our website. If a modification meaningfully changes how we use cookies, we'll notify you by email or by displaying a prominent notice within the Services at least thirty (30) days before the changes take effect.
             </p>
@@ -273,13 +273,13 @@ export default function CookiePolicyPage() {
         <section className="space-y-4">
           <h2 className="text-2xl font-bold text-foreground">8. Contact Us</h2>
 
-          <div className="space-y-4 text-gray-700 leading-relaxed">
+          <div className="space-y-4 text-foreground/80 leading-relaxed">
             <p>
               If you have questions about this Cookie Policy or our use of cookies, please contact us at:
             </p>
             <div className="pl-4">
               <p className="font-semibold">Voxxy AI, Inc.</p>
-              <p>Email: <a href="mailto:team@voxxypresents.com" className="text-purple-600 hover:text-purple-700 underline">team@voxxypresents.com</a></p>
+              <p>Email: <a href="mailto:team@heyvoxxy.com" className="text-slate-600 hover:text-slate-900 underline transition-colors">team@heyvoxxy.com</a></p>
               <p>Brooklyn, New York</p>
             </div>
           </div>

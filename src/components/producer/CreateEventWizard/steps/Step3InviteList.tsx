@@ -75,6 +75,14 @@ export default function Step3InviteList({
   const [totalContactsCount, setTotalContactsCount] = useState(0);
   const perPage = 50;
 
+  // PHASE 4: Backend pagination state (like Network page)
+  const [paginationMeta, setPaginationMeta] = useState({
+    current_page: 1,
+    total_pages: 1,
+    total_count: 0,
+    per_page: perPage,
+  });
+
   // Track which IDs we've already fetched to avoid redundant requests
   const fetchedIdsRef = useRef<string>('');
 
@@ -89,15 +97,19 @@ export default function Step3InviteList({
     fetchLists();
   }, [organizationId]);
 
+  // PERFORMANCE FIX: Disabled to prevent double-fetching
+  // Contacts are now set directly in handleAutoImport instead of fetching twice
+  // This eliminates the second API call that was fetching the same data again
+  //
   // Load full contact details when we have IDs (and they've actually changed)
-  useEffect(() => {
-    if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
-      fetchContactDetails();
-    } else if (invitedContactIds.length === 0) {
-      setContacts([]);
-      fetchedIdsRef.current = '';
-    }
-  }, [invitedIdsKey, organizationId]);
+  // useEffect(() => {
+  //   if (invitedContactIds.length > 0 && fetchedIdsRef.current !== invitedIdsKey) {
+  //     fetchContactDetails();
+  //   } else if (invitedContactIds.length === 0) {
+  //     setContacts([]);
+  //     fetchedIdsRef.current = '';
+  //   }
+  // }, [invitedIdsKey, organizationId]);
 
   const fetchLists = async () => {
     try {
@@ -114,6 +126,51 @@ export default function Step3InviteList({
       setTotalContactsCount(0);
     } finally {
       setLoadingLists(false);
+    }
+  };
+
+  // PHASE 4: Fetch contacts page by page (backend pagination like Network page)
+  const fetchContactsPage = async (page: number, contactIds?: number[]) => {
+    const idsToFetch = contactIds || invitedContactIds;
+
+    if (idsToFetch.length === 0) {
+      setContacts([]);
+      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      // Calculate which subset of IDs to fetch for this page
+      const startIndex = (page - 1) * perPage;
+      const endIndex = startIndex + perPage;
+      const pageIds = idsToFetch.slice(startIndex, endIndex);
+
+      // Use Phase 3's by_ids endpoint to fetch only this page
+      const response = await vendorContactsApi.getByIds(organizationId, pageIds, {
+        per_page: perPage,
+      });
+
+      const contactsData = response?.vendor_contacts || [];
+
+      // Calculate pagination metadata
+      const totalCount = idsToFetch.length;
+      const totalPages = Math.ceil(totalCount / perPage);
+
+      setContacts(contactsData);
+      setPaginationMeta({
+        current_page: page,
+        total_pages: totalPages,
+        total_count: totalCount,
+        per_page: perPage,
+      });
+      setCurrentPage(page);
+    } catch (err) {
+      console.error('Failed to fetch contacts page:', err);
+      setContacts([]);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -167,6 +224,7 @@ export default function Step3InviteList({
     }
   }, []);
 
+  // PHASE 4: Refactored to only fetch IDs (like Network page)
   const handleAutoImport = async (inviteAll?: boolean, listIds?: number[]) => {
     const shouldInviteAll = inviteAll ?? false;
     const selectedLists = listIds ?? [];
@@ -180,79 +238,60 @@ export default function Step3InviteList({
         },
       });
       setContacts([]);
+      setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
+      fetchedIdsRef.current = '';
       return;
     }
 
     try {
       setLoading(true);
-
       let contactIds: number[] = [];
 
       if (shouldInviteAll) {
-        // Fetch all contacts
-        const firstPage = await vendorContactsApi.getAll(organizationId, {
-          page: 1,
-          per_page: 200,
-        });
-
-        let allContacts: VendorContact[] = firstPage?.vendor_contacts || [];
-        const totalPages = firstPage?.meta?.total_pages || 1;
-
-        if (totalPages > 1) {
-          const remainingPages = Array.from(
-            { length: totalPages - 1 },
-            (_, i) => i + 2
-          );
-          const pageResults = await Promise.all(
-            remainingPages.map((page) =>
-              vendorContactsApi.getAll(organizationId, { page, per_page: 200 })
-            )
-          );
-          for (const result of pageResults) {
-            allContacts = allContacts.concat(result?.vendor_contacts || []);
-          }
-        }
-        contactIds = allContacts.map(c => c.id);
+        // PHASE 4: Only fetch IDs (fast!)
+        const result = await vendorContactsApi.getAllIds(organizationId, {});
+        contactIds = result.ids;
       } else if (selectedLists.length > 0) {
-        // Fetch contacts from selected lists
+        // PHASE 4: Only fetch IDs from lists (not full contacts)
         const listContactPromises = selectedLists.map(async (listId) => {
-          let allContacts: any[] = [];
-          let currentPage = 1;
-          let hasMore = true;
+          // Fetch first page to get total pages
+          const firstPage = await contactListsApi.getContacts(listId, 1, 100);
+          let allContacts: any[] = firstPage.vendor_contacts || [];
+          const totalPages = firstPage?.meta?.total_pages || 1;
 
-          while (hasMore) {
-            const response = await contactListsApi.getContacts(listId, currentPage, 100);
-            const pageContacts = response.vendor_contacts || [];
-            allContacts = [...allContacts, ...pageContacts];
-
-            const meta = response.meta;
-            if (meta && currentPage < meta.total_pages) {
-              currentPage++;
-            } else {
-              hasMore = false;
+          // Fetch remaining pages in parallel (if any)
+          if (totalPages > 1) {
+            const remainingPages = Array.from({ length: totalPages - 1 }, (_, i) => i + 2);
+            const pageResults = await Promise.all(
+              remainingPages.map(page => contactListsApi.getContacts(listId, page, 100))
+            );
+            for (const result of pageResults) {
+              allContacts = allContacts.concat(result.vendor_contacts || []);
             }
           }
+
           return allContacts;
         });
 
         const listContactArrays = await Promise.all(listContactPromises);
         const allListContacts = listContactArrays.flat();
 
-        // De-duplicate by contact ID
-        const uniqueContactIds = Array.from(
-          new Set(allListContacts.map(contact => contact.id))
-        );
-
-        contactIds = uniqueContactIds;
+        // De-duplicate by contact ID (only store IDs)
+        const uniqueIds = Array.from(new Set(allListContacts.map(contact => contact.id)));
+        contactIds = uniqueIds;
       }
 
-      // Update wizard state immediately
+      // Update wizard state with IDs
       updateWizardState({
         inviteList: {
           ...inviteList,
           invitedContactIds: contactIds,
         },
       });
+
+      // PHASE 4: Fetch first page of contacts (backend pagination)
+      await fetchContactsPage(1, contactIds);
+      fetchedIdsRef.current = JSON.stringify(contactIds);
     } catch (err) {
       console.error('Failed to import contacts:', err);
     } finally {
@@ -289,14 +328,19 @@ export default function Step3InviteList({
   };
 
   const handleRemoveContact = (contactId: number) => {
+    const newContactIds = invitedContactIds.filter((id) => id !== contactId);
+
     updateWizardState({
       inviteList: {
         ...inviteList,
-        invitedContactIds: invitedContactIds.filter((id) => id !== contactId),
+        invitedContactIds: newContactIds,
       },
     });
-    // Remove from selection if it was selected
+
+    // PHASE 4: Re-fetch current page with updated IDs
     setSelectedContactIds((prev) => prev.filter((id) => id !== contactId));
+    fetchedIdsRef.current = JSON.stringify(newContactIds);
+    fetchContactsPage(paginationMeta.current_page, newContactIds);
   };
 
   const handleToggleSelect = (contactId: number) => {
@@ -316,16 +360,22 @@ export default function Step3InviteList({
   };
 
   const handleDeleteSelected = () => {
+    const newContactIds = invitedContactIds.filter((id) => !selectedContactIds.includes(id));
+
     updateWizardState({
       inviteList: {
         ...inviteList,
-        invitedContactIds: invitedContactIds.filter((id) => !selectedContactIds.includes(id)),
+        invitedContactIds: newContactIds,
       },
     });
+
+    // PHASE 4: Re-fetch current page with updated IDs
     setSelectedContactIds([]);
+    fetchedIdsRef.current = JSON.stringify(newContactIds);
+    fetchContactsPage(paginationMeta.current_page, newContactIds);
   };
 
-  // Filter contacts by search term
+  // PHASE 4: Client-side search on current page (fast since only 50 contacts loaded)
   const filteredContacts = contacts.filter((contact) => {
     if (!searchTerm.trim()) return true;
     const search = searchTerm.toLowerCase();
@@ -336,15 +386,10 @@ export default function Step3InviteList({
     );
   });
 
-  // Paginate filtered contacts
-  const totalPages = Math.ceil(filteredContacts.length / perPage);
-  const paginatedContacts = filteredContacts.slice(
-    (currentPage - 1) * perPage,
-    currentPage * perPage
-  );
+  const paginatedContacts = filteredContacts;
 
-  // Calculate unsubscribed contacts count
-  const unsubscribedContacts = contacts.filter(
+  // Calculate unsubscribed contacts count (from current page only)
+  const unsubscribedContacts = filteredContacts.filter(
     (c) => c.unsubscribe_status?.is_unsubscribed
   );
   const unsubscribedCount = unsubscribedContacts.length;
@@ -372,7 +417,7 @@ export default function Step3InviteList({
               <label
                 className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                   inviteAllSelected
-                    ? 'bg-purple-500/20 border-purple-500/40'
+                    ? 'bg-primary/20 border-primary/40'
                     : 'bg-background/5 border-border hover:bg-background/10'
                 }`}
               >
@@ -380,10 +425,10 @@ export default function Step3InviteList({
                   type="checkbox"
                   checked={inviteAllSelected}
                   onChange={handleToggleInviteAll}
-                  className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                  className="w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                 />
                 <div className="flex-1 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-400" />
+                  <Users className="w-4 h-4 text-primary" />
                   <span className="text-sm font-medium text-foreground">Invite All Contacts</span>
                 </div>
                 <div className="text-xs text-foreground/60">
@@ -397,7 +442,7 @@ export default function Step3InviteList({
                   key={list.id}
                   className={`flex items-center gap-3 p-4 rounded-lg border cursor-pointer transition-all ${
                     selectedListIds.includes(list.id)
-                      ? 'bg-purple-500/20 border-purple-500/40'
+                      ? 'bg-primary/20 border-primary/40'
                       : 'bg-background/5 border-border hover:bg-background/10'
                   }`}
                 >
@@ -405,7 +450,7 @@ export default function Step3InviteList({
                     type="checkbox"
                     checked={selectedListIds.includes(list.id)}
                     onChange={() => handleToggleList(list.id)}
-                    className="w-4 h-4 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                    className="w-4 h-4 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                   />
                   <div className="flex-1">
                     <div className="text-sm font-medium text-foreground">{list.name}</div>
@@ -449,7 +494,7 @@ export default function Step3InviteList({
             <div>
               <h2 className="text-xl font-semibold text-foreground">Invite List</h2>
               <p className="text-foreground/60 text-sm mt-1">
-                {filteredContacts.length} contacts
+                {paginationMeta.total_count} contacts
               </p>
             </div>
             <button
@@ -461,6 +506,9 @@ export default function Step3InviteList({
                   },
                 });
                 setContacts([]);
+                setPaginationMeta({ current_page: 1, total_pages: 1, total_count: 0, per_page: perPage });
+                setSearchTerm('');
+                fetchedIdsRef.current = '';
               }}
               className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors flex items-center gap-2"
             >
@@ -500,10 +548,7 @@ export default function Step3InviteList({
               <input
                 type="text"
                 value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1); // Reset to first page on search
-                }}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by name, email, or phone..."
                 className="voxxy-input-frost w-full rounded-lg py-2.5 pl-9 pr-4 text-sm"
               />
@@ -534,13 +579,13 @@ export default function Step3InviteList({
               <div className="overflow-x-auto">
                 {/* Table Header */}
                 <div className="voxxy-table-header">
-                  <div className="voxxy-table-header-row grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
+                  <div className="voxxy-table-header-row grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide">
                     <div className="flex items-center justify-center">
                       <input
                         type="checkbox"
                         checked={selectedContactIds.length === paginatedContacts.length && paginatedContacts.length > 0}
                         onChange={handleSelectAll}
-                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                        className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                       />
                     </div>
                     <div>Status</div>
@@ -565,7 +610,7 @@ export default function Step3InviteList({
                     // Determine background color based on selection and unsubscribe status
                     let bgClass = '';
                     if (isSelected) {
-                      bgClass = 'bg-purple-500/10';
+                      bgClass = 'bg-primary/10';
                     } else if (isUnsubscribed) {
                       bgClass = 'bg-red-500/5';
                     }
@@ -573,7 +618,7 @@ export default function Step3InviteList({
                     return (
                       <div
                         key={contact.id}
-                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1700px] grid-cols-[28px,100px,200px,200px,120px,220px,140px,160px,120px,70px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
+                        className={`voxxy-table-row voxxy-table-row-hover grid min-w-[1050px] grid-cols-[20px,72px,150px,140px,90px,165px,100px,120px,85px,55px] items-center gap-2 px-2 py-1 text-[11px] ${bgClass}`}
                       >
                         {/* Checkbox */}
                         <div className="flex items-center justify-center">
@@ -581,7 +626,7 @@ export default function Step3InviteList({
                             type="checkbox"
                             checked={isSelected}
                             onChange={() => handleToggleSelect(contact.id)}
-                            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-purple-600 focus:ring-purple-500 focus:ring-offset-0 focus:ring-1"
+                            className="w-3.5 h-3.5 rounded border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0 focus:ring-1"
                             onClick={(e) => e.stopPropagation()}
                           />
                         </div>
@@ -660,7 +705,7 @@ export default function Step3InviteList({
                               {contact.tags.slice(0, 2).map((tag) => (
                                 <span
                                   key={tag}
-                                  className="px-1 py-0.5 text-[9px] bg-purple-500/20 text-violet-950 dark:text-purple-300 rounded"
+                                  className="px-1 py-0.5 text-[9px] bg-primary/20 text-violet-950 dark:text-primary rounded"
                                 >
                                   {tag}
                                 </span>
@@ -705,26 +750,26 @@ export default function Step3InviteList({
                 </div>
               </div>
 
-              {/* Pagination Footer - Always show */}
+              {/* PHASE 4: Backend Pagination Footer */}
               <div className="bg-background/5 border-t border-border px-3 py-2">
                 <div className="flex items-center justify-between text-[11px]">
                   <div className="text-foreground/60">
-                    Showing {(currentPage - 1) * perPage + 1}-{Math.min(currentPage * perPage, filteredContacts.length)} of {filteredContacts.length}
+                    Showing {(paginationMeta.current_page - 1) * perPage + 1}-{Math.min(paginationMeta.current_page * perPage, paginationMeta.total_count)} of {paginationMeta.total_count}
                   </div>
                   <div className="flex items-center gap-2">
                     <button
-                      onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                      disabled={currentPage === 1}
+                      onClick={() => fetchContactsPage(paginationMeta.current_page - 1)}
+                      disabled={paginationMeta.current_page === 1}
                       className="px-2.5 py-1 bg-background/10 hover:bg-background/20 disabled:bg-background/5 disabled:text-foreground/30 text-foreground rounded transition-colors text-[11px]"
                     >
                       Previous
                     </button>
                     <span className="text-foreground/60">
-                      Page {currentPage} of {totalPages}
+                      Page {paginationMeta.current_page} of {paginationMeta.total_pages}
                     </span>
                     <button
-                      onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={currentPage === totalPages}
+                      onClick={() => fetchContactsPage(paginationMeta.current_page + 1)}
+                      disabled={paginationMeta.current_page === paginationMeta.total_pages}
                       className="px-2.5 py-1 bg-background/10 hover:bg-background/20 disabled:bg-background/5 disabled:text-foreground/30 text-foreground rounded transition-colors text-[11px]"
                     >
                       Next

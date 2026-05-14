@@ -158,6 +158,42 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     worksInInvitations: false
   },
   {
+    label: 'Early Bird Price',
+    frontendVar: '[earlyBirdPrice]',
+    backendVar: '{{early_bird_price}}',
+    category: 'event',
+    description: 'Early bird discounted price (category-specific - only works after vendor applies)',
+    example: '$125.00',
+    worksInInvitations: false
+  },
+  {
+    label: 'Early Bird Deadline',
+    frontendVar: '[earlyBirdDeadline]',
+    backendVar: '{{early_bird_deadline}}',
+    category: 'event',
+    description: 'Deadline for early bird pricing',
+    example: 'May 15, 2025',
+    worksInInvitations: true
+  },
+  {
+    label: 'Jury Fee',
+    frontendVar: '[juryFee]',
+    backendVar: '{{jury_fee}}',
+    category: 'event',
+    description: 'Non-refundable jury/application fee (category-specific)',
+    example: '$25.00',
+    worksInInvitations: true
+  },
+  {
+    label: 'Commission Rate',
+    frontendVar: '[commissionRate]',
+    backendVar: '{{commission_rate}}',
+    category: 'event',
+    description: 'Commission percentage on sales (category-specific - only works after vendor applies)',
+    example: '10%',
+    worksInInvitations: false
+  },
+  {
     label: 'Payment Due Date',
     frontendVar: '[paymentDueDate]',
     backendVar: '{{payment_due_date}}',
@@ -183,7 +219,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_name}}',
     category: 'organization',
     description: 'Your organization name',
-    example: 'Voxxy Presents',
+    example: 'Voxxy',
     worksInInvitations: true
   },
   {
@@ -192,7 +228,7 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     backendVar: '{{organization_email}}',
     category: 'organization',
     description: 'Your contact email',
-    example: 'hello@voxxypresents.com',
+    example: 'hello@heyvoxxy.com',
     worksInInvitations: true
   },
 
@@ -360,6 +396,35 @@ export const EMAIL_VARIABLES: EmailVariable[] = [
     description: 'Unique application reference code (only available after application)',
     example: 'APP-2024-12345',
     worksInInvitations: false
+  },
+
+  // Vendor Payment Info (TODO: backend migration needed)
+  {
+    label: 'Eventbrite Email',
+    frontendVar: '[eventbriteEmail]',
+    backendVar: '{{eventbrite_email}}',
+    category: 'vendor',
+    description: "Vendor's Eventbrite email for payment matching",
+    example: 'john@example.com',
+    worksInInvitations: true
+  },
+  {
+    label: 'Venmo Handle',
+    frontendVar: '[venmoHandle]',
+    backendVar: '{{venmo_handle}}',
+    category: 'vendor',
+    description: "Vendor's Venmo handle for payment",
+    example: '@john-doe',
+    worksInInvitations: true
+  },
+  {
+    label: 'PayPal Email',
+    frontendVar: '[paypalEmail]',
+    backendVar: '{{paypal_email}}',
+    category: 'vendor',
+    description: "Vendor's PayPal email for payment",
+    example: 'john@paypal.com',
+    worksInInvitations: true
   },
 ];
 

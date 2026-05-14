@@ -342,7 +342,7 @@ export function EmailAuditLogOverlay({
               </Button>
               <div className="h-5 w-px bg-border" />
               <div className="flex items-center gap-2">
-                <FileSearch className="h-5 w-5 shrink-0 text-purple-700 dark:text-purple-400" />
+                <FileSearch className="h-5 w-5 shrink-0 text-primary dark:text-primary" />
                 <div>
                   <h1 className="text-base font-semibold text-foreground">Email Audit Log</h1>
                   <p className="text-xs text-muted-foreground">
@@ -403,7 +403,7 @@ export function EmailAuditLogOverlay({
                   <PopoverTrigger asChild>
                     <button className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       filters.date_from || filters.date_to
-                        ? 'bg-purple-500/20 text-violet-950 dark:text-purple-300 border border-purple-500/30'
+                        ? 'bg-primary/20 text-violet-950 dark:text-primary border border-primary/30'
                         : 'bg-background/5 text-foreground/60 hover:text-foreground border border-border hover:bg-background/10'
                     }`}>
                       <CalendarIcon className="w-3.5 h-3.5" />
@@ -454,7 +454,7 @@ export function EmailAuditLogOverlay({
         {/* Table */}
         {isLoading ? (
           <div className="border rounded-lg p-12 text-center">
-            <Loader2 className="w-8 h-8 mx-auto mb-4 text-purple-400 animate-spin" />
+            <Loader2 className="w-8 h-8 mx-auto mb-4 text-primary animate-spin" />
             <p className="text-foreground/60">Loading email audit log...</p>
           </div>
         ) : error ? (

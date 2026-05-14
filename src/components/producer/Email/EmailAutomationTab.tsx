@@ -588,7 +588,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
     return (
       <div className="p-3 md:p-4">
         <div className="flex flex-col items-center justify-center py-16">
-          <Loader2 className="w-8 h-8 text-purple-400 animate-spin mb-3" />
+          <Loader2 className="w-8 h-8 text-primary animate-spin mb-3" />
           <p className="text-foreground/60">Loading email automation...</p>
         </div>
       </div>
@@ -650,7 +650,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
                   onChange={(e) => setAutoRefresh(e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-8 h-4 bg-background/10 rounded-full peer-checked:bg-violet-400 dark:peer-checked:bg-purple-600 transition-all"></div>
+                <div className="w-8 h-4 bg-background/10 rounded-full peer-checked:bg-violet-400 dark:peer-checked:bg-primary transition-all"></div>
                 <div className="absolute left-0.5 top-0.5 w-3 h-3 bg-background rounded-full transition-transform peer-checked:translate-x-4"></div>
               </div>
               <span className="text-[10px] text-foreground/50">Auto</span>
@@ -684,8 +684,8 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
       {/* Scheduled Emails */}
       {emails.length === 0 ? (
         <div className="text-center py-16 bg-background/5 rounded-2xl border border-border">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-200/80 dark:bg-gradient-to-r dark:from-purple-600/30 dark:to-blue-500/30 border border-border mb-4">
-            <Sparkles className="w-8 h-8 text-purple-400" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-200/80 dark:bg-gradient-to-r dark:from-primary/30 dark:to-blue-500/30 border border-border mb-4">
+            <Sparkles className="w-8 h-8 text-primary" />
           </div>
           <h3 className="text-xl font-semibold text-foreground mb-2">
             No Scheduled Emails Yet
@@ -731,7 +731,7 @@ export default function EmailAutomationTab({ eventSlug, event, isAdmin }: EmailA
             {(searchQuery || activeFilters.length > 0) && (
               <button
                 onClick={() => { setSearchQuery(''); setActiveFilters([]); }}
-                className="text-sm text-purple-400 hover:text-purple-300"
+                className="text-sm text-primary hover:text-primary/70 transition-colors"
               >
                 Clear search
               </button>

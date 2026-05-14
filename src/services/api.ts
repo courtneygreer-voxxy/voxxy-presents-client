@@ -132,7 +132,16 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         errors: errorData.errors
       })
 
-      const errorMessage = errorData.message || errorData.error || `API request failed (${response.status})`
+      // Build error message - prioritize specific validation errors from errors array
+      let errorMessage: string
+      if (errorData.errors && Array.isArray(errorData.errors) && errorData.errors.length > 0) {
+        // If we have specific validation errors, use the first one as the main message
+        errorMessage = errorData.errors[0]
+      } else {
+        // Fallback to message/error field or generic message
+        errorMessage = errorData.message || errorData.error || `API request failed: ${response.status}`
+      }
+
       throw new ApiError(errorMessage, response.status, errorData.errors)
     }
 
@@ -694,6 +703,7 @@ export const eventsApi = {
     use_category_templates?: boolean
     use_universal_category_template?: boolean
     universal_category_template_id?: number
+    payment_engines?: any[]
   }) {
     return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',
@@ -728,6 +738,8 @@ export const eventsApi = {
     invitation_list_ids: number[]
     invitation_contact_ids: number[]
     invitation_excluded_ids: number[]
+    vendor_fee_currency: string
+    payment_engines: any[]
   }>) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}`, {
       method: 'PATCH',
@@ -916,7 +928,7 @@ export const registrationsApi = {
   /**
    * Update registration (producer/venue owner only)
    * PATCH /api/v1/presents/registrations/:id
-   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags).
+   * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags, instagram_handle, tiktok_handle, website).
    */
   async update(registrationId: number, data: Partial<{
     vendor_category: string
@@ -927,6 +939,9 @@ export const registrationsApi = {
     location: string
     producer_notes: string
     tags: string[]
+    instagram_handle: string
+    tiktok_handle: string
+    website: string
   }>) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',
@@ -996,6 +1011,8 @@ export const vendorApplicationsApi = {
     install_end_time?: string
     payment_link?: string
     application_tags?: string
+    payment_prices?: any[]
+    payment_engines?: any[]
   }) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`, {
       method: 'POST',
@@ -1019,6 +1036,8 @@ export const vendorApplicationsApi = {
     install_end_time: string
     payment_link: string
     application_tags: string
+    payment_prices: any[]
+    payment_engines: any[]
   }>) {
     return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
       method: 'PATCH',
@@ -1936,6 +1955,10 @@ export interface VendorContact {
   tiktok_handle?: string
   website?: string
   featured?: boolean
+  // Payment information (TODO: Backend migration needed for these fields)
+  eventbrite_email?: string
+  venmo_handle?: string
+  paypal_email?: string
   created_at: string
   updated_at: string
   unsubscribe_status?: {
@@ -2256,6 +2279,10 @@ export const vendorContactsApi = {
     tiktok_handle?: string
     website?: string
     featured?: boolean
+    // TODO: Backend migration needed - silently dropped until then
+    eventbrite_email?: string
+    venmo_handle?: string
+    paypal_email?: string
   }): Promise<VendorContact> {
     // Backend expects FLAT structure for create (not nested)
     const backendData = {
@@ -2627,6 +2654,86 @@ export const vendorContactsApi = {
       }
     )
   },
+
+  /**
+   * PHASE 3 OPTIMIZATION: Get specific vendor contacts by IDs
+   * GET /api/v1/presents/organizations/:organization_id/vendor_contacts/by_ids?ids=1,2,3
+   *
+   * More efficient than getAll when you only need specific contacts.
+   * Useful for selective loading, email preview, invitation editing, etc.
+   *
+   * @param organizationId - Organization ID
+   * @param contactIds - Array of contact IDs to fetch (max 1000)
+   * @param params - Optional pagination parameters
+   * @returns Promise with vendor contacts and pagination metadata
+   */
+  async getByIds(
+    organizationId: number,
+    contactIds: number[],
+    params?: {
+      page?: number
+      per_page?: number
+    }
+  ): Promise<VendorContactsListResponse> {
+    const queryParams = new URLSearchParams()
+
+    // Add comma-separated IDs
+    if (contactIds.length > 0) {
+      queryParams.append('ids', contactIds.join(','))
+    }
+
+    // Add pagination params
+    if (params?.page) queryParams.append('page', params.page.toString())
+    if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
+
+    const queryString = queryParams.toString()
+    const endpoint = `/v1/presents/organizations/${organizationId}/vendor_contacts/by_ids${queryString ? `?${queryString}` : ''}`
+
+    const response = await fetchApi<any>(endpoint)
+
+    // Use same mapping logic as getAll
+    const mapContact = (contact: any): VendorContact => {
+      const mapped: VendorContact = {
+        id: contact.id,
+        organization_id: contact.organization_id,
+        contact_name: contact.contact_name || contact.contact_info?.name || '',
+        business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+        job_title: contact.job_title || contact.contact_info?.job_title || undefined,
+        email: contact.email || contact.contact_info?.email || '',
+        phone: contact.phone || contact.contact_info?.phone || undefined,
+        location: contact.location || contact.contact_info?.location || undefined,
+        contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
+        status: contact.status || contact.crm_data?.status || 'new',
+        tags: contact.tags || contact.crm_data?.tags || [],
+        categories: contact.categories || contact.crm_data?.categories || [],
+        featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+        notes: contact.notes || contact.crm_data?.notes || undefined,
+        source: contact.source || contact.metadata?.source || 'manual',
+        source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
+        interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+        events_participated: contact.events_participated || 0,
+        last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+        imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
+        instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
+        tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
+        website: contact.website || contact.social?.website || undefined,
+        created_at: contact.created_at || contact.metadata?.created_at || '',
+        updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+        unsubscribe_status: contact.unsubscribe_status || undefined,
+      }
+      return mapped
+    }
+
+    return {
+      vendor_contacts: response.vendor_contacts?.map(mapContact) || [],
+      meta: response.meta || {
+        current_page: 1,
+        total_pages: 1,
+        total_count: response.vendor_contacts?.length || 0,
+        per_page: response.vendor_contacts?.length || 0,
+      },
+    }
+  },
 }
 
 // Event Invitations API
@@ -2800,6 +2907,11 @@ export const categoriesApi = {
     color?: string;
     icon?: string;
     booth_price?: number;
+    early_bird_price?: number;
+    early_bird_deadline?: string;
+    payment_deadline?: string;
+    deposit?: number;
+    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/organizations/${organizationId}/categories`,
@@ -2820,6 +2932,11 @@ export const categoriesApi = {
     color?: string;
     icon?: string;
     booth_price?: number;
+    early_bird_price?: number;
+    early_bird_deadline?: string;
+    payment_deadline?: string;
+    deposit?: number;
+    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
   }): Promise<any> {
     return fetchApi<any>(
       `/v1/presents/categories/${categoryId}`,
