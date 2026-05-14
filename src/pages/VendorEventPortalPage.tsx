@@ -24,6 +24,7 @@ import {
   hasActiveSession,
 } from '@/services/eventPortalService';
 import { useAuth } from '@/contexts/AuthContext';
+import { useForceTheme } from '@/hooks/useForceTheme';
 import { eventsApi, vendorApplicationsApi, bulletinsApi, registrationsApi } from '@/services/api';
 import type { EventPortalData } from '@/types/eventPortal';
 import type { Bulletin } from '@/types/bulletin';
@@ -35,6 +36,7 @@ import { VendorPortalSection } from '@/components/vendor-portal/VendorPortalSect
 import { formatDistanceToNow } from 'date-fns';
 
 export default function VendorEventPortalPage() {
+  useForceTheme('dark');
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { isAuthenticated: isLoggedIn, isProducer, isAdmin } = useAuth();
