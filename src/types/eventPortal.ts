@@ -8,6 +8,14 @@ export interface EventPortalData {
   event: EventDetails;
   vendor_categories: VendorCategory[];
   producer_updates: Bulletin[];
+  registration?: {
+    id: number;
+    status: string;
+    email: string;
+    name?: string;
+    vendor_category?: string;
+    payment_status?: string;
+  };
 }
 
 export interface EventDetails {
