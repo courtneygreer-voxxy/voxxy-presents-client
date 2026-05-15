@@ -579,8 +579,50 @@ export default function VendorEventPortalPage() {
       />
 
       <div className="relative mx-auto mt-6 max-w-5xl space-y-6 px-4 pb-16 pt-0 sm:px-6 md:mt-8 md:space-y-8 md:px-8 lg:px-10">
-        <VendorPortalSection
-          title="Event details"
+        {/* Opted Out Alert Banner - Show prominently when opted out, hide all other content */}
+        {portalData.registration?.status === 'opted_out' && (
+          <div className="mb-8">
+            <div className="rounded-2xl border-2 border-orange-400/60 bg-orange-50 p-6 shadow-lg dark:border-orange-500/40 dark:bg-orange-950/30">
+              <div className="flex items-start gap-4">
+                <div className="rounded-full bg-orange-100 p-3 dark:bg-orange-900/50">
+                  <AlertCircle className="h-7 w-7 text-orange-600 dark:text-orange-400" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-orange-900 dark:text-orange-100 mb-2">
+                    You've Been Opted Out of This Event
+                  </h3>
+                  <div className="space-y-2 text-sm text-orange-800 dark:text-orange-200/90">
+                    <p className="leading-relaxed">
+                      Your registration status has been changed to "opted out". This means you will <strong>no longer receive any emails</strong> about this event.
+                    </p>
+                    <p className="leading-relaxed">
+                      If this is not correct or you'd like to rejoin the event, please contact the event organizer directly:
+                    </p>
+                    {portalData.event.organization?.email && (
+                      <div className="mt-3 rounded-lg bg-orange-100/60 px-4 py-2.5 dark:bg-orange-900/30">
+                        <p className="text-xs font-medium text-orange-900/70 dark:text-orange-200/70 mb-1">
+                          Contact {portalData.event.organization.name}:
+                        </p>
+                        <a
+                          href={`mailto:${portalData.event.organization.email}`}
+                          className="text-sm font-semibold text-orange-900 hover:text-orange-700 dark:text-orange-100 dark:hover:text-orange-200 underline"
+                        >
+                          {portalData.event.organization.email}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Hide all event details when opted out - only show banner above */}
+        {portalData.registration?.status !== 'opted_out' && (
+          <>
+            <VendorPortalSection
+              title="Event details"
           description="Schedule context, venue, deadlines, and links your organizer has shared."
           icon={LayoutList}
         >
@@ -702,62 +744,23 @@ export default function VendorEventPortalPage() {
           </VendorPortalSection>
         ) : null}
 
-        {/* Opted Out Alert Banner - Show prominently at top */}
-        {portalData.registration?.status === 'opted_out' && (
-          <div className="mb-8">
-            <div className="rounded-2xl border-2 border-orange-400/60 bg-orange-50 p-6 shadow-lg dark:border-orange-500/40 dark:bg-orange-950/30">
-              <div className="flex items-start gap-4">
-                <div className="rounded-full bg-orange-100 p-3 dark:bg-orange-900/50">
-                  <AlertCircle className="h-7 w-7 text-orange-600 dark:text-orange-400" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-bold text-orange-900 dark:text-orange-100 mb-2">
-                    You've Been Opted Out of This Event
-                  </h3>
-                  <div className="space-y-2 text-sm text-orange-800 dark:text-orange-200/90">
-                    <p className="leading-relaxed">
-                      Your registration status has been changed to "opted out". This means you will <strong>no longer receive any emails</strong> about this event.
-                    </p>
-                    <p className="leading-relaxed">
-                      If this is not correct or you'd like to rejoin the event, please contact the event organizer directly:
-                    </p>
-                    {portalData.event.organization?.email && (
-                      <div className="mt-3 rounded-lg bg-orange-100/60 px-4 py-2.5 dark:bg-orange-900/30">
-                        <p className="text-xs font-medium text-orange-900/70 dark:text-orange-200/70 mb-1">
-                          Contact {portalData.event.organization.name}:
-                        </p>
-                        <a
-                          href={`mailto:${portalData.event.organization.email}`}
-                          className="text-sm font-semibold text-orange-900 hover:text-orange-700 dark:text-orange-100 dark:hover:text-orange-200 underline"
-                        >
-                          {portalData.event.organization.email}
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
+            {/* Opt-Out Button - Only show if NOT opted out (inside conditional wrapper) */}
+            {portalData.registration && (
+              <div className="mb-8">
+                <button
+                  onClick={() => setShowOptOutModal(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200/60 rounded-xl hover:bg-orange-100 transition-colors dark:text-orange-300 dark:bg-orange-950/30 dark:border-orange-500/30 dark:hover:bg-orange-950/50"
+                >
+                  <XCircle className="w-4 h-4" />
+                  Opt Out of Event
+                </button>
               </div>
-            </div>
-          </div>
-        )}
+            )}
 
-        {/* Opt-Out Button - Only show if NOT opted out */}
-        {portalData.registration?.status !== 'opted_out' && portalData.registration && (
-          <div className="mb-8">
-            <button
-              onClick={() => setShowOptOutModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-orange-700 bg-orange-50 border border-orange-200/60 rounded-xl hover:bg-orange-100 transition-colors dark:text-orange-300 dark:bg-orange-950/30 dark:border-orange-500/30 dark:hover:bg-orange-950/50"
-            >
-              <XCircle className="w-4 h-4" />
-              Opt Out of Event
-            </button>
-          </div>
-        )}
+            {/* FAQ section hidden until backend editing UI is built */}
+            {/* <VendorPortalFaq event={event} formatDate={formatDate} /> */}
 
-        {/* FAQ section hidden until backend editing UI is built */}
-        {/* <VendorPortalFaq event={event} formatDate={formatDate} /> */}
-
-        <VendorPortalSection
+            <VendorPortalSection
           title="Updates from the organizer"
           description="Official notes about schedule changes, load-in, rules, or anything applicants should know."
           icon={Megaphone}
@@ -810,6 +813,8 @@ export default function VendorEventPortalPage() {
             </p>
           )}
         </VendorPortalSection>
+          </>
+        )}
       </div>
 
       {/* Opt-Out Warning Modal */}
