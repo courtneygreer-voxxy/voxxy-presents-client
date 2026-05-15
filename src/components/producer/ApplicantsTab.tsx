@@ -1721,18 +1721,22 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   Change Status to {pendingStatusChange.newStatus === 'approved' ? 'Approved' : pendingStatusChange.newStatus === 'rejected' ? 'Declined' : pendingStatusChange.newStatus === 'opted_out' ? 'Opted Out' : 'Waitlisted'}?
                 </h3>
                 <p className="text-sm text-foreground/60">
-                  This will send an automated email notification
+                  {pendingStatusChange.newStatus === 'opted_out'
+                    ? 'No email will be sent for this status change'
+                    : 'This will send an automated email notification'}
                 </p>
               </div>
             </div>
 
-            {/* Warning */}
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
-              <p className="text-xs text-orange-400">
-                <strong>⚠️ Email will be sent to:</strong><br />
-                {pendingStatusChange.applicant.email}
-              </p>
-            </div>
+            {/* Warning - only show for statuses that send emails */}
+            {pendingStatusChange.newStatus !== 'opted_out' && (
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                <p className="text-xs text-orange-400">
+                  <strong>⚠️ Email will be sent to:</strong><br />
+                  {pendingStatusChange.applicant.email}
+                </p>
+              </div>
+            )}
 
             {/* Vendor Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-1">
@@ -1762,10 +1766,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     ? 'bg-green-600 hover:bg-green-500'
                     : pendingStatusChange.newStatus === 'rejected'
                     ? 'bg-red-600 hover:bg-red-500'
+                    : pendingStatusChange.newStatus === 'opted_out'
+                    ? 'bg-orange-600 hover:bg-orange-500'
                     : 'bg-yellow-600 hover:bg-yellow-500'
                 }`}
               >
-                Confirm & Send Email
+                {pendingStatusChange.newStatus === 'opted_out' ? 'Confirm Change' : 'Confirm & Send Email'}
               </button>
             </div>
           </div>
