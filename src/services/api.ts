@@ -975,6 +975,20 @@ export const registrationsApi = {
       body: newPrice ? JSON.stringify({ new_price: newPrice }) : undefined,
     })
   },
+
+  /**
+   * Vendor self-service opt-out
+   * POST /api/v1/presents/registrations/:id/opt_out
+   */
+  async optOut(registrationId: number) {
+    return fetchApi<{
+      success: boolean
+      message: string
+      registration: any
+    }>(`/v1/presents/registrations/${registrationId}/opt_out`, {
+      method: 'POST',
+    })
+  },
 }
 
 // Vendor Applications API

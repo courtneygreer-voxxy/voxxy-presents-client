@@ -58,7 +58,7 @@ interface Applicant {
   email: string;
   phone?: string;
   vendor_category: string;
-  status: 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
+  status: 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled' | 'opted_out';
   payment_status?: 'paid' | 'pending' | 'confirmed' | 'overdue' | 'n/a';
   source?: 'contact' | 'net_new';
   is_returning?: boolean;
@@ -86,7 +86,7 @@ interface ApplicantsTabProps {
   isAdmin?: boolean;
 }
 
-type StatusFilter = 'all' | 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled';
+type StatusFilter = 'all' | 'invited' | 'pending' | 'approved' | 'confirmed' | 'waitlist' | 'rejected' | 'cancelled' | 'opted_out';
 
 export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsTabProps) {
   const [applicants, setApplicants] = useState<Applicant[]>([]);
@@ -108,7 +108,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   const [showStatusConfirmModal, setShowStatusConfirmModal] = useState(false);
   const [pendingStatusChange, setPendingStatusChange] = useState<{
     applicant: Applicant;
-    newStatus: 'approved' | 'waitlist' | 'rejected';
+    newStatus: 'approved' | 'waitlist' | 'rejected' | 'opted_out';
   } | null>(null);
 
   // View mode: focused (two-panel) or table
@@ -303,6 +303,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         return 'rejected';
       case 'cancelled':
         return 'cancelled';
+      case 'opted_out':
+        return 'opted_out';
       default:
         return 'pending';
     }
@@ -379,7 +381,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
   };
 
   // Show confirmation modal before status change
-  const requestStatusChange = (applicant: Applicant, newStatus: 'approved' | 'waitlist' | 'rejected') => {
+  const requestStatusChange = (applicant: Applicant, newStatus: 'approved' | 'waitlist' | 'rejected' | 'opted_out') => {
     setPendingStatusChange({ applicant, newStatus });
     setShowStatusConfirmModal(true);
   };
@@ -406,7 +408,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
   const handleUpdateStatus = async (
     applicant: Applicant,
-    newStatus: 'approved' | 'waitlist' | 'rejected'
+    newStatus: 'approved' | 'waitlist' | 'rejected' | 'opted_out'
   ) => {
     if (!applicant.registrationId) {
       alert('Cannot update status: No application found');
@@ -418,8 +420,8 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
 
       const response = await registrationsApi.update(applicant.registrationId, { status: newStatus });
 
-      // Handle email notification
-      if (response.email_notification) {
+      // Handle email notification (skip for opted_out - no emails sent)
+      if (response.email_notification && newStatus !== 'opted_out') {
         handleEmailNotification(response.email_notification, undefined, applicant.registrationId);
       }
 
@@ -597,6 +599,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
         return {
           label: 'Cancelled',
           variant: 'tintMuted' as BadgeVariant,
+          icon: XCircle,
+        };
+      case 'opted_out':
+        return {
+          label: 'Opted Out',
+          variant: 'tintOrange' as BadgeVariant,
           icon: XCircle,
         };
       default:
@@ -821,6 +829,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                 <SelectItem value="waitlist" className="text-xs">Waitlist</SelectItem>
                 <SelectItem value="rejected" className="text-xs">Declined</SelectItem>
                 <SelectItem value="cancelled" className="text-xs">Cancelled</SelectItem>
+                <SelectItem value="opted_out" className="text-xs">Opted Out</SelectItem>
               </SelectContent>
             </Select>
             {uniqueCategories.length > 0 && (
@@ -1038,6 +1047,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                   <SelectItem value="waitlist" className="text-xs focus:bg-background/10">Waitlist</SelectItem>
                   <SelectItem value="rejected" className="text-xs focus:bg-background/10">Declined</SelectItem>
                   <SelectItem value="cancelled" className="text-xs focus:bg-background/10">Cancelled</SelectItem>
+                  <SelectItem value="opted_out" className="text-xs focus:bg-background/10">Opted Out</SelectItem>
                 </SelectContent>
               </Select>
               {uniqueCategories.length > 0 && (
@@ -1463,6 +1473,22 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     </div>
                   ) : (
                     <div className="space-y-3">
+                      {/* Opted Out Warning Banner */}
+                      {selectedApplicant.status === 'opted_out' && (
+                        <div className="rounded-lg border border-orange-300/60 bg-orange-50/80 p-3 mb-3 dark:border-orange-500/30 dark:bg-orange-950/20">
+                          <div className="flex items-start gap-2.5">
+                            <AlertCircle className="w-4 h-4 text-orange-600 dark:text-orange-400 flex-shrink-0 mt-0.5" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-orange-900 dark:text-orange-100 mb-0.5">
+                                This vendor has opted out
+                              </p>
+                              <p className="text-[11px] text-orange-800 dark:text-orange-200/90 leading-relaxed">
+                                They will not receive any event emails. Use the dropdown below to restore their status if needed.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
                       {/* Vendor Status Row */}
                       <div className="flex items-center justify-between pb-3 border-b border-border">
                         <div>
@@ -1476,7 +1502,7 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                           value="keep"
                           onValueChange={(value) => {
                             if (value === 'keep') return;
-                            const newStatus = value as 'approved' | 'waitlist' | 'rejected';
+                            const newStatus = value as 'approved' | 'waitlist' | 'rejected' | 'opted_out';
                             if (newStatus !== selectedApplicant.status) {
                               requestStatusChange(selectedApplicant, newStatus);
                             }
@@ -1497,6 +1523,9 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                             </SelectItem>
                             <SelectItem value="rejected" className="text-xs focus:bg-background/10">
                               Change to Declined
+                            </SelectItem>
+                            <SelectItem value="opted_out" className="text-xs focus:bg-background/10">
+                              Change to Opted Out
                             </SelectItem>
                           </SelectContent>
                         </Select>
@@ -1689,21 +1718,25 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-foreground mb-1">
-                  Change Status to {pendingStatusChange.newStatus === 'approved' ? 'Approved' : pendingStatusChange.newStatus === 'rejected' ? 'Declined' : 'Waitlisted'}?
+                  Change Status to {pendingStatusChange.newStatus === 'approved' ? 'Approved' : pendingStatusChange.newStatus === 'rejected' ? 'Declined' : pendingStatusChange.newStatus === 'opted_out' ? 'Opted Out' : 'Waitlisted'}?
                 </h3>
                 <p className="text-sm text-foreground/60">
-                  This will send an automated email notification
+                  {pendingStatusChange.newStatus === 'opted_out'
+                    ? 'No email will be sent for this status change'
+                    : 'This will send an automated email notification'}
                 </p>
               </div>
             </div>
 
-            {/* Warning */}
-            <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
-              <p className="text-xs text-orange-400">
-                <strong>⚠️ Email will be sent to:</strong><br />
-                {pendingStatusChange.applicant.email}
-              </p>
-            </div>
+            {/* Warning - only show for statuses that send emails */}
+            {pendingStatusChange.newStatus !== 'opted_out' && (
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-3">
+                <p className="text-xs text-orange-400">
+                  <strong>⚠️ Email will be sent to:</strong><br />
+                  {pendingStatusChange.applicant.email}
+                </p>
+              </div>
+            )}
 
             {/* Vendor Info */}
             <div className="bg-background/5 rounded-lg p-3 space-y-1">
@@ -1733,10 +1766,12 @@ export default function ApplicantsTab({ eventSlug, event, isAdmin }: ApplicantsT
                     ? 'bg-green-600 hover:bg-green-500'
                     : pendingStatusChange.newStatus === 'rejected'
                     ? 'bg-red-600 hover:bg-red-500'
+                    : pendingStatusChange.newStatus === 'opted_out'
+                    ? 'bg-orange-600 hover:bg-orange-500'
                     : 'bg-yellow-600 hover:bg-yellow-500'
                 }`}
               >
-                Confirm & Send Email
+                {pendingStatusChange.newStatus === 'opted_out' ? 'Confirm Change' : 'Confirm & Send Email'}
               </button>
             </div>
           </div>
