@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Send, Mail, AlertCircle, Check, Users, ExternalLink, Rocket } from 'lucide-react';
 import { eventsApi } from '@/services/api';
@@ -18,9 +18,6 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [updatingInvitations, setUpdatingInvitations] = useState(false);
-
-  // Track previous invitation count to detect changes
-  const prevCountRef = useRef<number>(0);
 
   // Live status state - use state instead of derived value to ensure re-renders
   const [isLive, setIsLive] = useState(event.status?.is_live || false);
@@ -63,10 +60,18 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
 
     try {
       await eventsApi.goLive(event.slug);
+
+      // Show success animation briefly
       setSuccess(true);
       setShowConfirm(false);
+
+      // Refresh parent event data
       await onGoLive();
-      setSuccess(false);
+
+      // Hide success animation after 2 seconds
+      setTimeout(() => {
+        setSuccess(false);
+      }, 2000);
     } catch (err: any) {
       console.error('Failed to go live:', err);
       setError(err.message || 'Failed to activate event');
@@ -94,7 +99,8 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
           <p className="text-lg font-semibold text-foreground">Live</p>
         </div>
         <p className="text-xs text-muted-foreground">
-          Invitations sent, emails active
+          {hasInvitations && `${invitationCount} invitation${invitationCount !== 1 ? 's' : ''} being sent in background. `}
+          Emails active.
         </p>
       </div>
     );
@@ -130,7 +136,7 @@ export default function GoLiveCard({ event, onGoLive, organizationId }: GoLiveCa
             {hasInvitations && (
               <li className="flex items-center gap-1.5">
                 <Send className="h-3 w-3 shrink-0 text-primary dark:text-primary" />
-                Send {invitationCount} invitation{invitationCount !== 1 ? 's' : ''}
+                Send {invitationCount} invitation{invitationCount !== 1 ? 's' : ''} in background
               </li>
             )}
             {hasScheduledEmails && (
