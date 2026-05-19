@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Percent } from 'lucide-react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Percent, Download } from 'lucide-react';
 import { MapPin, Tags } from 'lucide-react';
 import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
 import type { Category, CategoryFeePreference } from '@/types/category';
@@ -11,6 +11,7 @@ import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
 import SmartListBuilder from './Lists/SmartListBuilder';
 import { BulkActionToolbar } from './BulkActionToolbar';
+import UnifiedDataExportModal from './UnifiedDataExportModal';
 import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
 type NetworkTab = 'contacts' | 'lists' | 'categories';
@@ -132,6 +133,7 @@ function FilterDropdownButton({
 
 interface NetworkPageProps {
   organizationId: number;
+  organizationSlug: string;
   activeTab: NetworkTab;
   showAddModal: boolean;
   setShowAddModal: (show: boolean) => void;
@@ -142,6 +144,7 @@ interface NetworkPageProps {
 
 export default function NetworkPage({
   organizationId,
+  organizationSlug,
   activeTab,
   showAddModal,
   setShowAddModal,
@@ -155,6 +158,7 @@ export default function NetworkPage({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
+  const [showUnifiedDataExport, setShowUnifiedDataExport] = useState(false);
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
   const actionsMenuRef = useRef<HTMLDivElement>(null);
 
@@ -641,29 +645,58 @@ export default function NetworkPage({
     }
   };
 
+  const unifiedDataExportModal = showUnifiedDataExport ? (
+    <UnifiedDataExportModal
+      open={showUnifiedDataExport}
+      onClose={() => setShowUnifiedDataExport(false)}
+      organizationId={organizationId}
+      organizationSlug={organizationSlug}
+    />
+  ) : null;
+
+  const unifiedDataExportButton = (
+    <button
+      type="button"
+      onClick={() => setShowUnifiedDataExport(true)}
+      className="flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-2 text-xs font-semibold text-foreground transition-all hover:bg-accent/60 whitespace-nowrap dark:bg-card/50"
+    >
+      <Download className="h-3.5 w-3.5" />
+      <span className="hidden sm:inline">Unified data export</span>
+      <span className="sm:hidden">Export</span>
+    </button>
+  );
+
   // Loading state
   if (loading && contacts.length === 0 && activeTab === 'contacts') {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
-          <p className="text-foreground/60">Loading your network...</p>
+      <>
+        <div className="mb-4 flex justify-end">{unifiedDataExportButton}</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-8 h-8 border-2 border-border border-t-primary rounded-full animate-spin" />
+            <p className="text-foreground/60">Loading your network...</p>
+          </div>
         </div>
-      </div>
+        {unifiedDataExportModal}
+      </>
     );
   }
 
   // Error state
   if (error && contacts.length === 0 && activeTab === 'contacts') {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <p className="text-red-400 mb-4">{error}</p>
-          <button onClick={() => fetchContacts()} className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors">
-            Try Again
-          </button>
+      <>
+        <div className="mb-4 flex justify-end">{unifiedDataExportButton}</div>
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <p className="text-red-400 mb-4">{error}</p>
+            <button onClick={() => fetchContacts()} className="px-4 py-2 bg-background/10 hover:bg-background/20 text-foreground rounded-lg transition-colors">
+              Try Again
+            </button>
+          </div>
         </div>
-      </div>
+        {unifiedDataExportModal}
+      </>
     );
   }
 
@@ -671,6 +704,7 @@ export default function NetworkPage({
   if (contacts.length === 0 && !searchTerm && !hasActiveFilters && activeTab === 'contacts') {
     return (
       <>
+        <div className="mb-4 flex justify-end">{unifiedDataExportButton}</div>
         <div className="flex flex-col items-center justify-center py-12">
           <div className="text-center max-w-md">
             <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-card/80 dark:bg-background/10">
@@ -696,12 +730,14 @@ export default function NetworkPage({
         {showCSVUploadModal && (
           <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
         )}
+        {unifiedDataExportModal}
       </>
     );
   }
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">{unifiedDataExportButton}</div>
       {/* Header and tabs removed - now in Dashboard.tsx header */}
 
       {/* Contacts Tab */}
@@ -1291,6 +1327,8 @@ export default function NetworkPage({
           </div>
         </div>
       )}
+
+      {unifiedDataExportModal}
     </div>
   );
 }
