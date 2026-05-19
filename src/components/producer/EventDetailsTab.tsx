@@ -360,7 +360,11 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
       {/* Go Live Card - moved here from above */}
       <GoLiveCard
         event={event}
-        onGoLive={() => window.location.reload()}
+        onGoLive={async () => {
+          if (onRefreshEvent) {
+            await onRefreshEvent();
+          }
+        }}
         organizationId={organizationId}
       />
 
