@@ -789,6 +789,52 @@ export const eventsApi = {
   },
 
   /**
+   * Get all command center data in a single optimized request
+   * GET /api/v1/presents/events/:slug/command_center
+   * Returns: event, applications, submissions, invitations, emails, bulletins, and stats
+   * Eliminates N+1 queries by eager-loading all associations
+   */
+  async getCommandCenterData(eventSlug: string) {
+    return fetchApi<{
+      event: any
+      vendor_applications: any[]
+      submissions: any[]
+      invitations: any[]
+      scheduled_emails: any[]
+      bulletins: any[]
+      stats: {
+        applied: number
+        new_unreviewed: number
+        approved_paid: number
+        missing_payments: number
+      }
+      invitation_meta: {
+        total_count: number
+        sent_count: number
+        viewed_count: number
+        accepted_count: number
+        declined_count: number
+        delivery_stats: {
+          total_sent: number
+          delivered: number
+          bounced: number
+          dropped: number
+          undelivered: number
+          unsubscribed: number
+          pending: number
+        }
+      }
+      _metadata: {
+        fetched_at: string
+        submissions_count: number
+        invitations_count: number
+        invitations_total: number
+        invitations_paginated: boolean
+      }
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/command_center`)
+  },
+
+  /**
    * Check impact of event update email notification
    * POST /api/v1/presents/events/:slug/email_notifications/check_event_update_impact
    */
