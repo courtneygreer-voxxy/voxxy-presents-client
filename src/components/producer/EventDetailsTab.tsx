@@ -18,7 +18,7 @@ import {
   ArrowRight,
   ExternalLink,
 } from 'lucide-react';
-import { eventsApi, vendorApplicationsApi } from '@/services/api';
+import { eventsApi } from '@/services/api';
 import { useEmailNotifications } from '@/hooks/useEmailNotifications';
 import { EmailConfirmationDialog } from './EmailConfirmationDialog';
 import GoLiveCard from './GoLiveCard';
@@ -58,13 +58,6 @@ interface EventDetailsTabProps {
   isAdmin?: boolean;
 }
 
-interface ApplicationStats {
-  total: number;
-  new: number;
-  approved: number;
-  waitlisted: number;
-}
-
 export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRefreshEvent, organizationId, isAdmin }: EventDetailsTabProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -73,13 +66,11 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
 
   // Email notifications hook
   const { dialogOpen, dialogProps, handleEmailNotification, handleConfirmSend, closeDialog } = useEmailNotifications();
-  const [stats, setStats] = useState<ApplicationStats>({
-    total: 0,
-    new: 0,
-    approved: 0,
-    waitlisted: 0,
-  });
-  const [loadingStats, setLoadingStats] = useState(true);
+
+  // Legacy stats state (only for hidden/unused UI below - not fetched)
+  const loadingStats = false;
+  const stats = { total: 0, new: 0, approved: 0, waitlisted: 0 };
+
   const [formData, setFormData] = useState({
     title: event.title || '',
     description: event.description || '',
@@ -113,49 +104,9 @@ export default function EventDetailsTab({ event, onUpdate, onNavigateToTab, onRe
     });
   }, [event]);
 
-  // Fetch application stats
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        setLoadingStats(true);
-        const applications = await vendorApplicationsApi.getByEvent(event.slug);
-
-        // Calculate stats from all applications
-        let totalApplicants = 0;
-        let newApplicants = 0;
-        let approvedApplicants = 0;
-        let waitlistedApplicants = 0;
-
-        for (const app of applications) {
-          try {
-            const submissions = await vendorApplicationsApi.getSubmissions(app.id);
-            totalApplicants += submissions.length;
-
-            submissions.forEach((sub: any) => {
-              if (sub.status === 'pending') newApplicants++;
-              if (sub.status === 'approved') approvedApplicants++;
-              if (sub.status === 'waitlist') waitlistedApplicants++;
-            });
-          } catch (err) {
-            console.error('Failed to fetch submissions for app', app.id, err);
-          }
-        }
-
-        setStats({
-          total: totalApplicants,
-          new: newApplicants,
-          approved: approvedApplicants,
-          waitlisted: waitlistedApplicants,
-        });
-      } catch (err) {
-        console.error('Failed to fetch stats:', err);
-      } finally {
-        setLoadingStats(false);
-      }
-    };
-
-    fetchStats();
-  }, [event.slug]);
+  // ⚡ PERFORMANCE: Removed wasteful stats fetching here
+  // EventDetailsTab now delegates to HomeDashboard which uses the optimized command_center_data endpoint
+  // The hidden stats cards below (line ~247) are legacy UI and not displayed
 
   const handleEdit = () => {
     setIsEditing(true);
