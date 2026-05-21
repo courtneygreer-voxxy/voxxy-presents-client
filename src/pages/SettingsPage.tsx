@@ -108,6 +108,8 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
   const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
   const [isResettingPassword, setIsResettingPassword] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [resendDisabled, setResendDisabled] = useState(false);
 
   const handleSaveChanges = async () => {
     if (!userProfile?.id) {
@@ -182,13 +184,25 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
     try {
       await authApi.requestPasswordReset(userProfile.email);
       toast.success(`Password reset email sent to ${userProfile.email}`);
-      setShowResetPasswordModal(false);
+      setEmailSent(true);
+      setResendDisabled(true);
+      // Enable resend after 30 seconds
+      setTimeout(() => setResendDisabled(false), 30000);
     } catch (error: any) {
       console.error('Failed to send password reset:', error);
       toast.error(error.message || 'Failed to send password reset email');
     } finally {
       setIsResettingPassword(false);
     }
+  };
+
+  const handleCloseResetModal = () => {
+    setShowResetPasswordModal(false);
+    // Reset states when modal closes
+    setTimeout(() => {
+      setEmailSent(false);
+      setResendDisabled(false);
+    }, 300); // Small delay for smooth modal close animation
   };
 
   const handleChange = (field: string, value: string) => {
@@ -749,14 +763,24 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
       {/* Password Reset Confirmation Modal */}
       <ConfirmationModal
         isOpen={showResetPasswordModal}
-        onClose={() => setShowResetPasswordModal(false)}
+        onClose={handleCloseResetModal}
         onConfirm={handleResetPassword}
-        title="Send Password Reset Email?"
-        description={`We'll send a password reset link to ${userProfile?.email}. Check your inbox and follow the instructions to reset your password.`}
-        confirmText="Send Reset Email"
-        cancelText="Cancel"
+        title={emailSent ? "Email Sent!" : "Send Password Reset Email?"}
+        description={
+          emailSent
+            ? `We've sent a password reset link to ${userProfile?.email}. Check your inbox and follow the instructions. Didn't receive it? You can resend in a moment.`
+            : `We'll send a password reset link to ${userProfile?.email}. Check your inbox and follow the instructions to reset your password.`
+        }
+        confirmText={
+          emailSent
+            ? resendDisabled
+              ? "Email Sent - Wait 30s..."
+              : "Resend Email"
+            : "Send Reset Email"
+        }
+        cancelText={emailSent ? "Close" : "Cancel"}
         isDestructive={false}
-        isLoading={isResettingPassword}
+        isLoading={isResettingPassword || (emailSent && resendDisabled)}
       />
     </div>
   );
