@@ -3,8 +3,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { authApi, organizationsApi } from '@/services/api';
 import { stripeService } from '@/services/stripeService';
-import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, ExternalLink, Loader2 } from 'lucide-react';
+import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, ExternalLink, Loader2, Key, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ConfirmationModal } from '@/components/ui/confirmation-modal';
+import { toast } from 'sonner';
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -104,6 +106,8 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
+  const [showResetPasswordModal, setShowResetPasswordModal] = useState(false);
+  const [isResettingPassword, setIsResettingPassword] = useState(false);
 
   const handleSaveChanges = async () => {
     if (!userProfile?.id) {
@@ -165,6 +169,25 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
       console.error('Failed to open billing portal:', error);
       alert('Failed to open billing portal. Please try again or contact support.');
       setIsLoadingBilling(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (!userProfile?.email) {
+      toast.error('Unable to send reset email - email not found');
+      return;
+    }
+
+    setIsResettingPassword(true);
+    try {
+      await authApi.requestPasswordReset(userProfile.email);
+      toast.success(`Password reset email sent to ${userProfile.email}`);
+      setShowResetPasswordModal(false);
+    } catch (error: any) {
+      console.error('Failed to send password reset:', error);
+      toast.error(error.message || 'Failed to send password reset email');
+    } finally {
+      setIsResettingPassword(false);
     }
   };
 
@@ -409,6 +432,42 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
                   <div className="mt-3 border-t border-border pt-3 dark:border-violet-500/30">
                     <p className="text-[10px] text-muted-foreground">
                       Update payment method, view invoices, or cancel subscription
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Password Reset - Only for verified accounts */}
+              {userProfile?.confirmed_at && (
+                <div
+                  className={cn(
+                    'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',
+                    'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm'
+                  )}
+                >
+                  <div className="flex flex-1 items-start justify-between gap-4">
+                    <div className="flex flex-1 items-start gap-3">
+                      <div className={cn(innerGlassWell, 'p-2')}>
+                        <Key className="h-4 w-4 text-primary dark:text-violet-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-sm font-semibold text-foreground mb-1">Password Reset</h4>
+                        <p className="text-xs text-muted-foreground mb-3">
+                          Send a password reset link to {userProfile.email}
+                        </p>
+                        <button
+                          onClick={() => setShowResetPasswordModal(true)}
+                          className="voxxy-btn-cta inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                          Send Reset Email
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 border-t border-border pt-3 dark:border-violet-500/30">
+                    <p className="text-[10px] text-muted-foreground">
+                      You'll receive an email with instructions to reset your password
                     </p>
                   </div>
                 </div>
@@ -686,6 +745,19 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         </div>
 
       </div>
+
+      {/* Password Reset Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showResetPasswordModal}
+        onClose={() => setShowResetPasswordModal(false)}
+        onConfirm={handleResetPassword}
+        title="Send Password Reset Email?"
+        description={`We'll send a password reset link to ${userProfile?.email}. Check your inbox and follow the instructions to reset your password.`}
+        confirmText="Send Reset Email"
+        cancelText="Cancel"
+        isDestructive={false}
+        isLoading={isResettingPassword}
+      />
     </div>
   );
 }
