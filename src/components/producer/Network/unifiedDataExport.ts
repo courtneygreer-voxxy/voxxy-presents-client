@@ -210,7 +210,7 @@ export function mergeDataExportRecords(groups: DataExportRecord[][]): DataExport
   return groups.flat();
 }
 
-function csvEscape(val: string): string {
+export function csvEscape(val: string): string {
   const needsQuote = /[",\n\r]/.test(val);
   const doubled = val.replace(/"/g, '""');
   return needsQuote ? `"${doubled}"` : doubled;
