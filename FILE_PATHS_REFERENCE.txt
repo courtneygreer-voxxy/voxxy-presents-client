@@ -1,0 +1,375 @@
+================================================================================
+COMPLETE FILE PATHS - EMAIL SYSTEM DOCUMENTATION
+================================================================================
+
+CATALOG FILES (NEW - USE THESE FIRST):
+================================================================================
+
+QUICK START GUIDE (5-minute orientation):
+- /Users/beaulazear/Desktop/voxxy-rails/QUICK_START_EMAIL_DOCS.md
+- /Users/beaulazear/Desktop/voxxy-presents-client/QUICK_START_EMAIL_DOCS.md
+
+COMPLETE CATALOG (comprehensive reference):
+- /Users/beaulazear/Desktop/voxxy-rails/docs/email/DOCUMENTATION_CATALOG.md
+- /Users/beaulazear/Desktop/voxxy-presents-client/docs/email-system/DOCUMENTATION_CATALOG.md
+
+
+BACKEND - RAILS REPOSITORY
+================================================================================
+BASE: /Users/beaulazear/Desktop/voxxy-rails
+
+EMAIL SYSTEM CORE (66 files):
+Location: /docs/email/
+
+MUST READ:
+- /docs/email/README_EMAIL_SYSTEMS.md
+- /docs/email/VOXXY_PRESENTS_EMAIL_MASTER_REFERENCE.md (40 KB)
+- /docs/email/EMAIL_AUTOMATION_SYSTEM_GUIDE.md (87 KB - LARGEST!)
+- /docs/email/EMAIL_SYSTEMS_GUIDE.md (33 KB)
+- /docs/email/EMAIL_SYSTEMS_ARCHITECTURE.md (29 KB)
+- /docs/email/EMAIL_DOCS_INDEX.md (39 KB)
+- /docs/email/EMAIL_QUICK_REFERENCE.md
+
+WEBHOOK & DELIVERY TRACKING:
+- /docs/email/SENDGRID_WEBHOOK_SETUP.md
+- /docs/email/SENDGRID_WEBHOOK_SETUP_APRIL_2026.md
+- /docs/email/WEBHOOK_TRACKING_COMPLETE_FLOW.md
+- /docs/email/WEBHOOK_VERIFICATION_CHECKLIST.md
+- /docs/email/WEBHOOK_PROCESSING_FIX_JAN_23_2026.md
+- /docs/email/WEBHOOK_TRANSACTIONAL_EMAIL_FIX_APRIL_2026.md
+- /docs/email/WEBHOOK_CUSTOM_ARGS_FIX_APRIL_2026.md (CRITICAL FIX)
+- /docs/email/WEBHOOK_FALLBACK_TIER_225_FIX_APRIL_2026.md (CRITICAL FIX)
+- /docs/email/SENDGRID_DOMAIN_FIX.md
+
+EMAIL RECIPIENTS & FILTERING:
+- /docs/email/EMAIL_RECIPIENT_FILTERING_FIX.md (58 KB - LARGE)
+- /docs/email/EMAIL_RECIPIENT_FILTERING_FIX_V2.md
+- /docs/email/EMAIL_RECIPIENTS_DEBUG_ANALYSIS.md
+- /docs/email/EMAIL_RECIPIENTS_FIX_SUMMARY_JAN_18.md
+- /docs/email/EMAIL_FILTER_CRITERIA_FIX_JAN_18.md
+- /docs/email/RECIPIENT_FLOW_ANALYSIS_APRIL_2026.md
+- /docs/email/INVALID_EMAIL_EXCLUSION_APRIL_2026.md
+
+INVITATIONS & BOUNCES:
+- /docs/email/INVITATION_BOUNCE_TRACKING_IMPLEMENTATION.md
+- /docs/email/INVITATION_BOUNCE_TRACKING_FIX.md
+- /docs/email/INVITATION_REMINDER_ROUTING_SYSTEM.md
+- /docs/email/INVITATION_QUICK_REFERENCE.md
+
+EMAIL CONTENT & PREVIEW:
+- /docs/email/EMAIL_PREVIEW_FEATURE.md
+- /docs/email/EMAIL_STYLING_CENTRALIZATION_APRIL_2026.md
+- /docs/email/EMAIL_FOOTER_UPDATE_APRIL_2026.md
+- /docs/email/EMAIL_TEMPLATE_MIGRATION_GUIDE.md
+- /docs/email/EMAIL_TEMPLATES_FOR_REVIEW.md
+
+TESTING & DELIVERY:
+- /docs/email/EMAIL_DELIVERY_TESTING_GUIDE.md
+- /docs/email/EMAIL_TESTING_SYSTEM.md
+- /docs/email/EMAIL_TESTING_REACT_INTEGRATION.md
+- /docs/email/EMAIL_NOTIFICATION_TESTING.md
+- /docs/email/EMAIL_TESTING_CHECKLIST_JAN_28.md
+- /docs/email/EMAIL_FILTERING_TEST_GUIDE.md
+
+SYSTEM NOTIFICATIONS:
+- /docs/email/EMAIL_NOTIFICATION_SYSTEM.md
+- /docs/email/SYSTEM_NOTIFICATION_EMAILS_IMPLEMENTATION.md
+- /docs/email/SYSTEM_NOTIFICATION_EMAILS_IMPLEMENTATION_COMPLETE.md
+- /docs/email/EMAIL_OVERDUE_DETECTION_SYSTEM.md
+
+BUG FIXES & ISSUES:
+- /docs/email/EMAIL_SYSTEM_FIXES_JANUARY_17_2026.md
+- /docs/email/EMAIL_UPDATES_JANUARY_2026.md
+- /docs/email/EMAIL_SENDGRID_SSL_FIX_JAN_26_2026.md
+- /docs/email/EMAIL_SENDING_BUG_FIXES.md
+- /docs/email/EMAIL_LINKS_FIX_SUMMARY.md
+- /docs/email/BUG_FIX_EMAIL_UNSUBSCRIBE.md
+- /docs/email/EMAIL_TIMEZONE_FIX_APRIL_2026.md
+- /docs/email/ACTIVE_EMAIL_STATUS_FIX_APRIL_2026.md
+
+PHASE COMPLETION:
+- /docs/email/UNIFIED_EMAIL_SYSTEM_PLAN.md
+- /docs/email/UNIFIED_EMAIL_SYSTEM_PHASE_1_COMPLETE.md
+- /docs/email/UNIFIED_EMAIL_SYSTEM_PHASE_2_COMPLETE.md
+- /docs/email/UNIFIED_EMAIL_SYSTEM_PHASE_3_COMPLETE.md
+- /docs/email/UNIFIED_EMAIL_SYSTEM_PHASE_3_ADDENDUM_FEB_28_2026.md
+
+ANALYTICS & REPORTING:
+- /docs/email/DELIVERABILITY_ACTION_PLAN.md
+- /docs/email/DELIVERABILITY_DIAGNOSTIC_RESULTS.md
+- /docs/email/EMAIL_DELIVERABILITY_TRACKING_STATUS.md
+- /docs/email/CENTRALIZED_EMAIL_ANALYTICS_APRIL_2026.md
+
+TECHNICAL DEBT & CLEANUP:
+- /docs/email/EMAIL_TECH_DEBT_CLEANUP_PLAN_APRIL_2026.md (37 KB)
+- /docs/email/TECH_DEBT_CLEANUP_TESTING_GUIDE.md
+- /docs/email/EMAIL_SYSTEM_KEY_FINDINGS.md
+- /docs/email/EMAIL_SYSTEM_ARCHITECTURE_APRIL_2026.md
+
+DEVELOPMENT GUIDES:
+Location: /docs/development/
+- /docs/development/LOCAL_DEVELOPMENT_GUIDE.md
+- /docs/development/LOCAL_DEV_QUICK_REFERENCE.md
+- /docs/development/TESTING.md
+- /docs/development/CONSOLE_TESTING_GUIDE.md
+- /docs/development/ADMIN_SCRIPTS.md
+- /docs/development/ADMIN_EMAIL_TESTING_PROPOSAL.md
+- /docs/development/SPED_UP_EMAIL_TEMPLATE.md
+- /docs/development/SECURITY_AUDIT_CHECKLIST.md
+- /docs/development/CATEGORY_SPECIFIC_APPLICATION_LINKS_PLAN.md
+- /docs/development/REMOVE_EMBEDDED_CLIENT_PLAN.md
+
+DEPLOYMENT GUIDES:
+Location: /docs/deployment/
+- /docs/deployment/RENDER_DEPLOYMENT.md
+- /docs/deployment/INFRASTRUCTURE_GUIDE.md
+- /docs/deployment/DEPLOYMENT_WORKFLOW.md
+- /docs/deployment/REDIS_SIDEKIQ_SETUP.md
+- /docs/deployment/SIDEKIQ_QUICKSTART.md
+- /docs/deployment/MONITORING_SETUP.md
+- /docs/deployment/STRIPE_GO_LIVE_CHECKLIST.md
+- /docs/deployment/STRIPE_PRODUCTION_SETUP.md
+- /docs/deployment/STRIPE_PRICE_TESTING.md
+- /docs/deployment/ORGANIZATION_AUTO_CREATE_DEPLOYMENT.md
+- /docs/deployment/STAGING_ENVIRONMENT.md
+- /docs/deployment/redis_monitoring.md
+
+BUG FIXES:
+Location: /docs/bug-fixes/
+- /docs/bug-fixes/FOOTER_LOCK_FIX.md
+- /docs/bug-fixes/FOOTER_LOCK_IMPLEMENTATION.md
+- /docs/bug-fixes/CATEGORY_SPECIFIC_EMAIL_RECIPIENT_COUNT_FIX.md
+- /docs/bug-fixes/DUAL_CATEGORY_SYSTEM_FIX.md
+- /docs/bug-fixes/VENDOR_CATEGORY_FIX_IMPLEMENTATION.md
+- /docs/bug-fixes/RICH_TEXT_EDITOR_FIX_PLAN.md
+- /docs/bug-fixes/RENDER_BUILD_FIX.md
+- /docs/bug-fixes/MERGE_CONFLICT_FIX.md
+
+FEATURES:
+Location: /docs/features/
+- /docs/features/CSV_UPLOAD_IMPLEMENTATION_GUIDE.md
+- /docs/features/SEO_IMPLEMENTATION.md
+- /docs/features/CATEGORY_DEFAULTS_SYSTEM.md
+- /docs/features/CATEGORY_SPECIFIC_APPLICATION_LINKS.md
+- /docs/features/USER_PREFERENCES_API.md
+- /docs/features/ROLE_BASED_AUTHENTICATION_GUIDE.md
+
+TESTING:
+Location: /docs/testing/
+- /docs/testing/TESTING_GUIDE.md
+- /docs/testing/EMAIL_COPY_UPDATE_TESTING.md
+- /docs/testing/RICH_TEXT_EDITOR_TESTING_GUIDE.md
+- /docs/testing/FRONTEND_UI_TESTING_GUIDE.md
+- /docs/testing/PHASE1_MANUAL_TEST.md
+- /docs/testing/STAGING_TESTING_GUIDE.md
+- /docs/testing/PRODUCTION_TEST_CHECKLIST.md
+- /docs/testing/VENDOR_TRACKING_TEST_RESULTS.md
+
+OTHER IMPORTANT DOCS:
+Location: /docs/
+- /docs/README.md (Documentation index)
+- /docs/TECHNICAL_STACK.md
+- /docs/API_REFERENCE.md
+- /docs/RECENT_CHANGES_MAY_2026.md
+- /docs/EMAIL_SEQUENCE_SYSTEM.md
+- /docs/CATEGORY_SPECIFIC_EMAIL_SYSTEM.md
+- /docs/SUBSCRIPTION_PAYMENT_SYSTEM.md
+- /docs/COMMAND_CENTER_PERFORMANCE_PLAN.md
+- /docs/UNSUBSCRIBE_SYSTEM.md
+- /docs/UNSUBSCRIBE_IMPLEMENTATION_SUMMARY.md
+
+SPEC/TESTS:
+- /spec/EMAIL_AUDIT_TESTING_GUIDE.md
+- /spec/EMAIL_TEST_SUMMARY.md
+
+ROOT LEVEL:
+- /README.md (Project README)
+- /VOXXY_APPLICATION_OVERVIEW.md
+- /EMAIL_SYSTEM_ASSESSMENT_AND_REPAIR_PLAN.txt
+- /VENDOR_EMAIL_TRACKING_IMPLEMENTATION_SUMMARY.txt
+- /TESTING_SUMMARY.md
+
+STRIPE DOCUMENTATION (RELATED):
+- /STRIPE_DOCUMENTATION_INDEX.md
+- /STRIPE_COMPLETE_IMPLEMENTATION.md
+- /STRIPE_INTEGRATION_BACKEND.md
+- /STRIPE_PAYMENT_COMPLETE_GUIDE.md
+- /STRIPE_QUICK_REFERENCE.md
+- /STRIPE_TROUBLESHOOTING.md
+- /PAYMENT_SECURITY_FIX.md
+
+
+FRONTEND - REACT REPOSITORY
+================================================================================
+BASE: /Users/beaulazear/Desktop/voxxy-presents-client
+
+EMAIL SYSTEM CORE (32 files):
+Location: /docs/email-system/
+
+MUST READ:
+- /docs/email-system/EMAIL_DOCUMENTATION_INDEX.md (MASTER INDEX)
+- /docs/email-system/EMAIL_SYSTEM_GUIDE.md
+- /docs/email-system/EMAIL_VARIABLES_REFERENCE.md (48 variables)
+- /docs/email-system/EMAIL_EDITOR_GUIDE.md (PRODUCER GUIDE)
+- /docs/email-system/EMAIL_SYSTEM_QUICK_REFERENCE.md
+- /docs/email-system/EMAIL_SYSTEM_STATUS_REPORT.md
+
+INVITATIONS:
+- /docs/email-system/INVITATION_EMAIL_INDEX.md
+- /docs/email-system/INVITATION_EMAIL_ANALYSIS_SUMMARY.md
+- /docs/email-system/INVITATION_EMAIL_QUICK_REFERENCE.md
+- /docs/email-system/INVITATION_EMAIL_SYSTEM_ANALYSIS.md
+- /docs/email-system/INVITATION_EMAIL_ARCHITECTURE.md
+- /docs/email-system/INVITATION_UNIFICATION_FRONTEND_UPDATE.md
+
+AUDIT & LOGS:
+- /docs/email-system/EMAIL_AUDIT_LOG_TECHNICAL_SPEC.md
+- /docs/email-system/EMAIL_AUDIT_LOG_PHASES_1-3_TESTING.md
+- /docs/email-system/EMAIL_AUDIT_LOG_BACKEND_CHECKLIST.md
+- /docs/email-system/EMAIL_AUDIT_CURRENT_STATUS_2026-03-01.md
+- /docs/email-system/EMAIL_AUDIT_LOG_QUICK_REFERENCE.md
+- /docs/email-system/AUDIT_LOG_ACTIVE_EMAILS_FIX_APRIL_2026.md
+- /docs/email-system/EMAIL_HISTORY_AUDIT.md
+
+TEMPLATES & CUSTOMIZATION:
+- /docs/email-system/EMAIL_TEMPLATES.md
+- /docs/email-system/CATEGORY_EMAIL_TEMPLATES.md
+- /docs/email-system/EMAIL_PREVIEW_STANDARDIZATION_SUMMARY.md
+- /docs/email-system/EMAIL_SEQUENCE_WRITER_BRIEF.md
+- /docs/email-system/email-sequence-variable-analysis.md
+
+EDITOR & UI:
+- /docs/email-system/EDIT_MODAL_IMPROVEMENTS.md
+- /docs/email-system/EDIT_MODAL_SESSION_SUMMARY.md
+- /docs/email-system/RICH_TEXT_EDITOR_BUG_FIXES_FEB_2026.md
+
+AUTOMATION:
+- /docs/email-system/SCHEDULED_EMAILS_SYSTEM.md (OUTDATED - use EMAIL_SYSTEM_GUIDE.md)
+- /docs/email-system/EMAIL_AUTOMATION_PLAN.md
+- /docs/email-system/EMAIL_AUTOMATION_PROGRESS.md
+
+BACKEND REQUIREMENTS:
+- /docs/email-system/BACKEND_INVITATION_REQUIREMENTS.md
+
+DEBUGGING:
+- /docs/email-system/EMAIL_DEBUG_SUMMARY.md
+
+DEVELOPMENT GUIDES:
+Location: /docs/development/
+- /docs/development/BRANCHING_STRATEGY.md
+- /docs/development/BACKEND_EMAIL_SETUP.md
+- /docs/development/tracking-plan.md
+- /docs/development/RUNBOOK.md
+
+DESIGN:
+Location: /docs/design/
+- /docs/design/GLASS_MODAL_DESIGN_SYSTEM.md
+- /docs/design/STYLING_UPDATE_SESSION.md
+- /docs/design/VOXXY_STYLE_GUIDE.md
+
+DEPLOYMENT:
+Location: /docs/deployment/
+- /docs/deployment/DEPLOYMENT.md
+- /docs/deployment/PLATFORM_INTEGRATION_DEPLOYMENT.md
+- /docs/deployment/RENDER_DEPLOYMENT.md
+
+ARCHITECTURE:
+Location: /docs/architecture/
+- /docs/architecture/ARCHITECTURE_SUMMARY.md
+- /docs/architecture/API_CONFIGURATION.md
+- /docs/architecture/CODEBASE_ANALYSIS.md
+- /docs/architecture/FLOW_DIAGRAMS.md
+- /docs/architecture/ROLE_MAPPING.md
+- /docs/architecture/IMPLEMENTATION_PATTERNS.md
+- /docs/architecture/VENDOR_CRM_BIDIRECTIONAL_SYNC.md
+
+FEATURES:
+Location: /docs/features/
+- /docs/features/SMART_LISTS_FEATURE.md
+- /docs/features/PAYMENT_DEADLINE_FEATURE.md
+- /docs/features/FRONTEND_PAYMENT_DEADLINE_INTEGRATION.md
+- /docs/features/EVENT_CREATION_WIZARD.md
+- /docs/features/LANDING_PAGE_COPY.md
+
+PROJECTS:
+Location: /docs/projects/
+- /docs/projects/RSVP-SECURITY-PROJECT.md
+- /docs/projects/CATEGORY_SYSTEM_PROJECT.md
+- /docs/projects/UNIFIED_EMAIL_EDITOR_PROJECT.md
+
+SPECIFICATIONS:
+Location: /docs/specs/
+- /docs/specs/EMAIL_VARIANT_SYSTEM_SPEC.md
+
+RELEASES:
+Location: /docs/releases/
+- /docs/releases/RELEASE_NOTES_v1.6.0.md
+- /docs/releases/RELEASE_NOTES_v1.7.0.md
+- /docs/releases/RELEASE_NOTES_v1.8.0.md
+- /docs/releases/RELEASE_NOTES_v1.9.0.md
+- /docs/releases/RELEASE_PROGRESS_v1.9.0.md
+- /docs/releases/v1.5.0.md
+- /docs/releases/v1.7.0.md
+
+DEMO DATA:
+Location: /docs/demo-data/
+- /docs/demo-data/voxxy_presents_demo_seed_data.md
+
+V3 MIGRATION (HISTORICAL):
+Location: /docs/v3-migration/
+- /docs/v3-migration/README.md
+- /docs/v3-migration/DEPRECATIONS.md
+- /docs/v3-migration/DEPLOYMENT-CHECKLIST-V3.md
+- /docs/v3-migration/SIGNUP-AUDIT-V3.md
+- /docs/v3-migration/VENDOR_MARKETPLACE_MIGRATION.md
+- /docs/v3-migration/UI-CHANGES-SCHEMA-VALIDATION.md
+- /docs/v3-migration/VOXXY_PRESENTS_MVP_TECHNICAL_REQUIREMENTS_V3.md
+
+FIXES:
+Location: /docs/fixes/
+- /docs/fixes/AUTH_CLEANUP_2026-04-05.md
+
+ROOT LEVEL:
+Location: /docs/
+- /docs/README.md (Documentation index)
+- /docs/DOCUMENTATION_INDEX.md
+- /docs/CONTRIBUTING.md
+- /docs/TESTING_ROADMAP.md
+- /docs/PAYMENT_SYSTEM.md
+- /docs/STATUS_INVENTORY.md
+- /docs/CONTACT_IMPORT_OPTIMIZATION_PLAN.md
+- /docs/SESSION_GUIDE.md
+- /docs/STYLE_GUIDE.md
+- /docs/UI_SPRINT_PROJECT_DOC.md
+- /docs/PRD-payment-type-categories.md
+- /docs/BETA_PENDING_PAGE_DEBUG_FEATURES.md
+- /docs/BUILD_FIX_DELETE_ACCOUNT.md
+- /docs/GUIDEBOOK_TRIGGER_FIX.md
+- /docs/KNOWN_BUGS.md
+- /docs/PRE_DEPLOYMENT_CHECKLIST_MAY_2026.md
+
+PROJECT ROOT:
+- /README.md (Project README)
+- /EMAIL_SCHEDULING_TIMEZONE_FIX_2026.md
+
+
+ARCHIVE DOCUMENTATION (HISTORICAL)
+================================================================================
+
+Backend Archive: /Users/beaulazear/Desktop/voxxy-rails/docs/archive/
+- 30+ files including legacy email implementations
+- EMAIL_AUTOMATION_PROGRESS.md
+- EMAIL_GENERATION_TROUBLESHOOTING.md
+- VENDOR_CONTACTS_QUICK_START.md
+- And more...
+
+Frontend Archive: /Users/beaulazear/Desktop/voxxy-presents-client/docs/archive/
+- 50+ files including legacy implementations
+- Guest flows and documentation
+- Landing page changes
+- Email overdue features
+- And more...
+
+================================================================================
+END OF FILE PATHS REFERENCE
+================================================================================
