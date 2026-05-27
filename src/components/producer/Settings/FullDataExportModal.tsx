@@ -14,6 +14,11 @@ import {
   contactsToCsv,
   triggerCsvDownload,
 } from '@/components/producer/Network/contactsCsvExport';
+import { buildEventLocationMap } from '@/utils/eventLocation';
+import {
+  enrichContactsWithEventHistory,
+  getShowLocationsForContact,
+} from '@/utils/enrichContactsEventHistory';
 
 type TabId = 'events' | 'contacts';
 
@@ -71,6 +76,11 @@ export default function FullDataExportModal({
         setEvents(Array.isArray(eventsResult.value) ? (eventsResult.value as Record<string, unknown>[]) : []);
       }
 
+      let eventList: Record<string, unknown>[] =
+        eventsResult.status === 'fulfilled' && Array.isArray(eventsResult.value)
+          ? (eventsResult.value as Record<string, unknown>[])
+          : [];
+
       if (contactsResult.status === 'fulfilled') {
         const res = contactsResult.value;
         let contactList = res.vendor_contacts ?? [];
@@ -80,6 +90,9 @@ export default function FullDataExportModal({
             const pageRes = await vendorContactsApi.getAll(organizationId, { page: p, per_page: 500 });
             contactList = [...contactList, ...(pageRes.vendor_contacts ?? [])];
           }
+        }
+        if (eventList.length > 0) {
+          contactList = await enrichContactsWithEventHistory(contactList, eventList);
         }
         setContacts(contactList);
       }
@@ -237,25 +250,10 @@ export default function FullDataExportModal({
     triggerCsvDownload(csv, `contacts-export-${organizationSlug}-${date}.csv`);
   };
 
-  /* ---------- Derived "Show Locations" via event cross-reference ---------- */
-  const eventLocationMap = useMemo(() => {
-    const map = new Map<number, string>();
-    for (const ev of events) {
-      const id = Number(ev.id);
-      const loc = String(ev.location || '');
-      if (id && loc) map.set(id, loc);
-    }
-    return map;
-  }, [events]);
+  const eventLocationMap = useMemo(() => buildEventLocationMap(events), [events]);
 
-  const getShowLocations = (c: VendorContact): string => {
-    const locs = new Set<string>();
-    for (const eh of c.event_history || []) {
-      const loc = eventLocationMap.get(eh.event_id);
-      if (loc) locs.add(loc);
-    }
-    return [...locs].join(', ');
-  };
+  const getShowLocations = (c: VendorContact): string =>
+    getShowLocationsForContact(c, eventLocationMap, events);
 
   /* ---------- Columns to display in table (subset for readability) ---------- */
   const eventTableCols = ['title', 'event_date', 'start_time', 'end_time', 'venue', 'location', 'status', 'ticket_url', 'capacity', 'registered', 'application_deadline', 'created_at', 'updated_at'];

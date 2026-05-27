@@ -2115,6 +2115,41 @@ export interface ContactListsResponse {
   contact_lists: ContactList[]
 }
 
+function mapVendorContactFromApi(contact: any): VendorContact {
+  return {
+    id: contact.id,
+    organization_id: contact.organization_id,
+    contact_name: contact.contact_name || contact.contact_info?.name || '',
+    business_name: contact.business_name || contact.contact_info?.business_name || undefined,
+    job_title: contact.job_title || contact.contact_info?.job_title || undefined,
+    email: contact.email || contact.contact_info?.email || '',
+    phone: contact.phone || contact.contact_info?.phone || undefined,
+    location: contact.location || contact.contact_info?.location || undefined,
+    contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
+    status: contact.status || contact.crm_data?.status || 'new',
+    tags: contact.tags || contact.crm_data?.tags || [],
+    categories: contact.categories || contact.crm_data?.categories || [],
+    featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+    notes: contact.notes || contact.crm_data?.notes || undefined,
+    source: contact.source || contact.metadata?.source || 'manual',
+    source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
+    interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+    events_participated: contact.events_participated || 0,
+    last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+    imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
+    instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
+    tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
+    website: contact.website || contact.social?.website || undefined,
+    created_at: contact.created_at || contact.metadata?.created_at || '',
+    updated_at: contact.updated_at || contact.metadata?.updated_at || '',
+    unsubscribe_status: contact.unsubscribe_status || undefined,
+    event_history: contact.event_history || undefined,
+    change_history: contact.change_history || undefined,
+    total_applications: contact.total_applications || undefined,
+    total_events: contact.total_events || undefined,
+  }
+}
+
 export const vendorContactsApi = {
   /**
    * Get all vendor contacts for an organization
@@ -2160,46 +2195,11 @@ export const vendorContactsApi = {
 
     const response = await fetchApi<any>(endpoint)
 
-    // Map backend field names to frontend field names
-    // Handles both flat structure (new) and nested structure (old) for backwards compatibility
-    const mapContact = (contact: any): VendorContact => {
-      const mapped: VendorContact = {
-        id: contact.id,
-        organization_id: contact.organization_id,
-        // Try flat structure first, fall back to nested
-        contact_name: contact.contact_name || contact.contact_info?.name || '',
-        business_name: contact.business_name || contact.contact_info?.business_name || undefined,
-        job_title: contact.job_title || contact.contact_info?.job_title || undefined,
-        email: contact.email || contact.contact_info?.email || '',
-        phone: contact.phone || contact.contact_info?.phone || undefined,
-        location: contact.location || contact.contact_info?.location || undefined,
-        contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
-        status: contact.status || contact.crm_data?.status || 'new',
-        tags: contact.tags || contact.crm_data?.tags || [],
-        categories: contact.categories || contact.crm_data?.categories || [],
-        featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
-        notes: contact.notes || contact.crm_data?.notes || undefined,
-        source: contact.source || contact.metadata?.source || 'manual',
-        source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-        interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
-        events_participated: contact.events_participated || 0,
-        last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
-        imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
-        instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
-        tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
-        website: contact.website || contact.social?.website || undefined,
-        created_at: contact.created_at || contact.metadata?.created_at || '',
-        updated_at: contact.updated_at || contact.metadata?.updated_at || '',
-        unsubscribe_status: contact.unsubscribe_status || undefined,
-      }
-      return mapped
-    }
-
     // Handle both array and object response formats
     if (Array.isArray(response)) {
       // Backend returned plain array
       return {
-        vendor_contacts: response.map(mapContact),
+        vendor_contacts: response.map(mapVendorContactFromApi),
         meta: {
           current_page: 1,
           total_pages: 1,
@@ -2211,7 +2211,7 @@ export const vendorContactsApi = {
 
     // Backend returned object with vendor_contacts key
     return {
-      vendor_contacts: response.vendor_contacts?.map(mapContact) || [],
+      vendor_contacts: response.vendor_contacts?.map(mapVendorContactFromApi) || [],
       meta: response.meta || {
         current_page: 1,
         total_pages: 1,
@@ -2230,40 +2230,7 @@ export const vendorContactsApi = {
       `/v1/presents/vendor_contacts/${id}`
     )
     const contact = response.vendor_contact || response
-    return {
-      id: contact.id,
-      organization_id: contact.organization_id,
-      // Try flat structure first, fall back to nested
-      contact_name: contact.contact_name || contact.contact_info?.name || '',
-      business_name: contact.business_name || contact.contact_info?.business_name || undefined,
-      job_title: contact.job_title || contact.contact_info?.job_title || undefined,
-      email: contact.email || contact.contact_info?.email || '',
-      phone: contact.phone || contact.contact_info?.phone || undefined,
-      location: contact.location || contact.contact_info?.location || undefined,
-      contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
-      status: contact.status || contact.crm_data?.status || 'new',
-      tags: contact.tags || contact.crm_data?.tags || [],
-      categories: contact.categories || contact.crm_data?.categories || [],
-      featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
-      notes: contact.notes || contact.crm_data?.notes || undefined,
-      source: contact.source || contact.metadata?.source || 'manual',
-      source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-      interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
-      events_participated: contact.events_participated || 0,
-      last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
-      imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
-      instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
-      tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
-      website: contact.website || contact.social?.website || undefined,
-      created_at: contact.created_at || contact.metadata?.created_at || '',
-      updated_at: contact.updated_at || contact.metadata?.updated_at || '',
-      unsubscribe_status: contact.unsubscribe_status || undefined,
-      // Include event history and change history (from include_relations: true)
-      event_history: contact.event_history || undefined,
-      change_history: contact.change_history || undefined,
-      total_applications: contact.total_applications || undefined,
-      total_events: contact.total_events || undefined,
-    }
+    return mapVendorContactFromApi(contact)
   },
 
   /**
@@ -2751,41 +2718,8 @@ export const vendorContactsApi = {
 
     const response = await fetchApi<any>(endpoint)
 
-    // Use same mapping logic as getAll
-    const mapContact = (contact: any): VendorContact => {
-      const mapped: VendorContact = {
-        id: contact.id,
-        organization_id: contact.organization_id,
-        contact_name: contact.contact_name || contact.contact_info?.name || '',
-        business_name: contact.business_name || contact.contact_info?.business_name || undefined,
-        job_title: contact.job_title || contact.contact_info?.job_title || undefined,
-        email: contact.email || contact.contact_info?.email || '',
-        phone: contact.phone || contact.contact_info?.phone || undefined,
-        location: contact.location || contact.contact_info?.location || undefined,
-        contact_type: contact.contact_type || contact.crm_data?.contact_type || 'vendor',
-        status: contact.status || contact.crm_data?.status || 'new',
-        tags: contact.tags || contact.crm_data?.tags || [],
-        categories: contact.categories || contact.crm_data?.categories || [],
-        featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
-        notes: contact.notes || contact.crm_data?.notes || undefined,
-        source: contact.source || contact.metadata?.source || 'manual',
-        source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-        interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
-        events_participated: contact.events_participated || 0,
-        last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
-        imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
-        instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
-        tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
-        website: contact.website || contact.social?.website || undefined,
-        created_at: contact.created_at || contact.metadata?.created_at || '',
-        updated_at: contact.updated_at || contact.metadata?.updated_at || '',
-        unsubscribe_status: contact.unsubscribe_status || undefined,
-      }
-      return mapped
-    }
-
     return {
-      vendor_contacts: response.vendor_contacts?.map(mapContact) || [],
+      vendor_contacts: response.vendor_contacts?.map(mapVendorContactFromApi) || [],
       meta: response.meta || {
         current_page: 1,
         total_pages: 1,

@@ -1,4 +1,5 @@
 import type { VendorContact } from '@/services/api';
+import { resolveEventLocation } from '@/utils/eventLocation';
 import { csvEscape, formatIsoForCsv } from './unifiedDataExport';
 
 export interface ExportColumn {
@@ -76,7 +77,7 @@ export const EXPORT_EVENT_COLUMNS: EventExportColumn[] = [
   { key: 'start_time', label: 'Start Time', getValue: ev => evStr(ev, 'start_time') },
   { key: 'end_time', label: 'End Time', getValue: ev => evStr(ev, 'end_time') },
   { key: 'venue', label: 'Venue', getValue: ev => evStr(ev, 'venue') },
-  { key: 'location', label: 'Location', getValue: ev => evStr(ev, 'location') },
+  { key: 'location', label: 'Location', getValue: ev => resolveEventLocation(ev) },
   { key: 'status', label: 'Status', getValue: ev => evNested(ev, 'status', 'status') },
   { key: 'published', label: 'Published', getValue: ev => evNested(ev, 'status', 'published') ? 'Yes' : 'No' },
   { key: 'is_live', label: 'Live', getValue: ev => evNested(ev, 'status', 'is_live') ? 'Yes' : 'No' },
