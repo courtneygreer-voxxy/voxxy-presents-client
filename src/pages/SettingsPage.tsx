@@ -7,6 +7,7 @@ import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, 
 import { cn } from '@/lib/utils';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { toast } from 'sonner';
+import FullDataExportSection from '@/components/producer/Settings/FullDataExportSection';
 
 interface SettingsPageProps {
   onBack?: () => void;
@@ -712,6 +713,14 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         >
           {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
+
+        {/* Data Export */}
+        {organization && (
+          <FullDataExportSection
+            organizationId={organization.id}
+            organizationSlug={organization.slug}
+          />
+        )}
 
         {/* Danger Zone */}
         <div className="rounded-lg border border-destructive/40 bg-card dark:bg-card/90 p-4">

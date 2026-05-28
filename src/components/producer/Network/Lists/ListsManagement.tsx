@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save, Plus } from 'lucide-react';
+import { Filter, Users, Calendar, Trash2, Edit3, Eye, X, Save, Plus, Download, Loader2 } from 'lucide-react';
 import { contactListsApi, ContactList } from '@/services/api';
+import type { VendorContact } from '@/services/api';
 import { formatDistanceToNow } from 'date-fns';
 import SmartListBuilder from './SmartListBuilder';
+import { contactsToCsv, triggerCsvDownload } from '../contactsCsvExport';
 
 interface ListsManagementProps {
   organizationId: number;
@@ -36,6 +38,33 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
     tags?: string[];
   }>({});
   const [savingCreate, setSavingCreate] = useState(false);
+
+  // Download state
+  const [downloadingListId, setDownloadingListId] = useState<number | null>(null);
+
+  const handleDownloadList = async (listId: number, listName: string) => {
+    setDownloadingListId(listId);
+    try {
+      let allContacts: VendorContact[] = [];
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const response = await contactListsApi.getContacts(listId, page, 200);
+        allContacts.push(...(response.vendor_contacts || []));
+        totalPages = response.meta?.total_pages || 1;
+        page++;
+      } while (page <= totalPages);
+
+      const csv = contactsToCsv(allContacts);
+      const safeName = listName.replace(/[^a-zA-Z0-9-_]/g, '_').toLowerCase();
+      const date = new Date().toISOString().slice(0, 10);
+      triggerCsvDownload(csv, `list-${safeName}-${date}.csv`);
+    } catch (err: any) {
+      alert(err.message || 'Failed to export list');
+    } finally {
+      setDownloadingListId(null);
+    }
+  };
 
   useEffect(() => {
     fetchLists();
@@ -408,6 +437,18 @@ export default function ListsManagement({ organizationId, onViewList, onViewManu
                 {/* Actions */}
                 <td className="px-4 py-3">
                   <div className="flex items-center justify-end gap-1">
+                    <button
+                      onClick={() => handleDownloadList(list.id, list.name)}
+                      disabled={downloadingListId === list.id}
+                      className="rounded p-1.5 text-foreground/60 transition-colors hover:bg-accent/60 hover:text-foreground dark:hover:bg-background/10"
+                      title="Export list as CSV"
+                    >
+                      {downloadingListId === list.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Download className="w-3.5 h-3.5" />
+                      )}
+                    </button>
                     <button
                       onClick={() => {
                         if (list.filters && onViewList) {
