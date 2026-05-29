@@ -6,6 +6,7 @@ import { analytics } from './lib/analytics'
 import { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
 import { AdminRoute } from './components/auth/AdminRoute'
 import { LoadingTransition } from './components/LoadingTransition'
+import { Toaster } from 'sonner'
 
 // Eager load: Homepage (critical for first paint)
 import HomePage from './pages/HomePage'
@@ -185,6 +186,15 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Toast Notifications - Auto-dismiss after 4 seconds */}
+        <Toaster
+          position="top-right"
+          duration={4000}
+          closeButton
+          richColors
+          theme="system"
+        />
+
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
 
