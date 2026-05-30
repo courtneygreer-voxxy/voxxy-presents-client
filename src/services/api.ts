@@ -638,6 +638,116 @@ export const organizationsApi = {
       method: 'DELETE',
     })
   },
+
+  /**
+   * Get organization webhook configuration
+   * GET /api/v1/presents/organizations/:slug/webhook_config
+   */
+  async getWebhookConfig(slug: string) {
+    return fetchApi<{
+      webhook_url: string
+      webhook_token: string
+      organization_id: number
+    }>(`/v1/presents/organizations/${slug}/webhook_config`)
+  },
+
+  /**
+   * Regenerate organization webhook token
+   * POST /api/v1/presents/organizations/:slug/regenerate_webhook_token
+   */
+  async regenerateWebhookToken(slug: string) {
+    return fetchApi<{
+      webhook_url: string
+      webhook_token: string
+      organization_id: number
+      message: string
+    }>(`/v1/presents/organizations/${slug}/regenerate_webhook_token`, {
+      method: 'POST',
+    })
+  },
+}
+
+// Incoming Payments API (n8n Webhook Payments)
+export const incomingPaymentsApi = {
+  /**
+   * Get incoming payments for an organization
+   * GET /api/v1/presents/organizations/:orgSlug/incoming_payments
+   */
+  async getAll(orgSlug: string, params?: {
+    status?: string
+    event_id?: number
+    start_date?: string
+    end_date?: string
+    page?: number
+    per_page?: number
+  }) {
+    const queryParams = new URLSearchParams()
+    if (params?.status) queryParams.append('status', params.status)
+    if (params?.event_id) queryParams.append('event_id', String(params.event_id))
+    if (params?.start_date) queryParams.append('start_date', params.start_date)
+    if (params?.end_date) queryParams.append('end_date', params.end_date)
+    if (params?.page) queryParams.append('page', String(params.page))
+    if (params?.per_page) queryParams.append('per_page', String(params.per_page))
+
+    const query = queryParams.toString() ? `?${queryParams}` : ''
+    return fetchApi<{
+      payments: any[]
+      pagination: {
+        current_page: number
+        per_page: number
+        total_count: number
+        total_pages: number
+      }
+    }>(`/v1/presents/organizations/${orgSlug}/incoming_payments${query}`)
+  },
+
+  /**
+   * Get incoming payment by ID
+   * GET /api/v1/presents/incoming_payments/:id
+   */
+  async getById(id: number) {
+    return fetchApi<any>(`/v1/presents/incoming_payments/${id}`)
+  },
+
+  /**
+   * Link incoming payment to registration
+   * POST /api/v1/presents/incoming_payments/:id/link_to_registration
+   */
+  async linkToRegistration(id: number, registrationId: number) {
+    return fetchApi<{
+      payment: any
+      message: string
+    }>(`/v1/presents/incoming_payments/${id}/link_to_registration`, {
+      method: 'POST',
+      body: JSON.stringify({ registration_id: registrationId }),
+    })
+  },
+
+  /**
+   * Retry failed payment processing
+   * POST /api/v1/presents/incoming_payments/:id/retry
+   */
+  async retry(id: number) {
+    return fetchApi<{
+      payment: any
+      message: string
+    }>(`/v1/presents/incoming_payments/${id}/retry`, {
+      method: 'POST',
+    })
+  },
+
+  /**
+   * Dismiss unmatched/failed payment
+   * POST /api/v1/presents/incoming_payments/:id/dismiss
+   */
+  async dismiss(id: number) {
+    return fetchApi<{
+      payment: any
+      message: string
+    }>(`/v1/presents/incoming_payments/${id}/dismiss`, {
+      method: 'POST',
+    })
+  },
 }
 
 // Events API (Voxxy Presents)

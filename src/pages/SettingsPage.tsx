@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { authApi, organizationsApi } from '@/services/api';
 import { stripeService } from '@/services/stripeService';
-import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, ExternalLink, Loader2, Key, Mail } from 'lucide-react';
+import { AlertTriangle, User, Building2, MapPin, Globe, HelpCircle, CreditCard, ExternalLink, Loader2, Key, Mail, Webhook, Copy, RotateCw, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConfirmationModal } from '@/components/ui/confirmation-modal';
 import { toast } from 'sonner';
@@ -104,6 +104,25 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
     fetchOrganization();
   }, [userProfile]);
 
+  // Fetch webhook config
+  useEffect(() => {
+    const fetchWebhookConfig = async () => {
+      if (!organization?.slug) return;
+
+      try {
+        setLoadingWebhook(true);
+        const config = await organizationsApi.getWebhookConfig(organization.slug);
+        setWebhookConfig(config);
+      } catch (err) {
+        console.error('Failed to fetch webhook config:', err);
+      } finally {
+        setLoadingWebhook(false);
+      }
+    };
+
+    fetchWebhookConfig();
+  }, [organization]);
+
   const [isSaving, setIsSaving] = useState(false);
   const [showDeleteWarning, setShowDeleteWarning] = useState(false);
   const [isLoadingBilling, setIsLoadingBilling] = useState(false);
@@ -111,6 +130,17 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
   const [isResettingPassword, setIsResettingPassword] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [resendDisabled, setResendDisabled] = useState(false);
+
+  // Webhook state
+  const [webhookConfig, setWebhookConfig] = useState<{
+    webhook_url: string;
+    webhook_token: string;
+  } | null>(null);
+  const [loadingWebhook, setLoadingWebhook] = useState(false);
+  const [copiedWebhook, setCopiedWebhook] = useState(false);
+  const [copiedPayload, setCopiedPayload] = useState(false);
+  const [showRegenerateModal, setShowRegenerateModal] = useState(false);
+  const [isRegenerating, setIsRegenerating] = useState(false);
 
   const handleSaveChanges = async () => {
     if (!userProfile?.id) {
@@ -212,6 +242,62 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
 
   const handleOrganizationChange = (field: string, value: string) => {
     setOrganizationData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleCopyWebhookUrl = async () => {
+    if (!webhookConfig?.webhook_url) return;
+
+    try {
+      await navigator.clipboard.writeText(webhookConfig.webhook_url);
+      setCopiedWebhook(true);
+      toast.success('Webhook URL copied to clipboard!');
+      setTimeout(() => setCopiedWebhook(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy webhook URL:', err);
+      toast.error('Failed to copy URL');
+    }
+  };
+
+  const handleCopyN8nPayload = async () => {
+    const payloadTemplate = `{
+  "eventbrite_event_id": "={{ $json.event.id }}",
+  "application_code": "={{ $json.attendee.answers.application_code }}",
+  "eventbrite_order_id": "={{ $json.order.id }}",
+  "email": "={{ $json.attendee.profile.email }}",
+  "first_name": "={{ $json.attendee.profile.first_name }}",
+  "last_name": "={{ $json.attendee.profile.last_name }}",
+  "payment_date": "={{ $json.order.created }}",
+  "payment_amount": "={{ $json.order.costs.gross.value }}",
+  "currency": "={{ $json.order.costs.gross.currency }}",
+  "ticket_type": "={{ $json.attendee.ticket_class_name }}"
+}`;
+
+    try {
+      await navigator.clipboard.writeText(payloadTemplate);
+      setCopiedPayload(true);
+      toast.success('n8n payload template copied to clipboard!');
+      setTimeout(() => setCopiedPayload(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy payload template:', err);
+      toast.error('Failed to copy template');
+    }
+  };
+
+  const handleRegenerateWebhookToken = async () => {
+    if (!organization?.slug) return;
+
+    setIsRegenerating(true);
+    try {
+      const config = await organizationsApi.regenerateWebhookToken(organization.slug);
+      setWebhookConfig(config);
+      toast.success('Webhook token regenerated! Update your n8n workflow with the new URL.');
+      setShowRegenerateModal(false);
+    } catch (err: any) {
+      console.error('Failed to regenerate webhook token:', err);
+      toast.error(err.message || 'Failed to regenerate token');
+    } finally {
+      setIsRegenerating(false);
+    }
   };
 
   if (!userProfile) {
@@ -703,6 +789,148 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
             </>
           )}
 
+          {/* Webhook Integration Section */}
+          {organization && webhookConfig && (
+            <>
+              <div className="border-t border-border dark:border-violet-500/25" />
+
+              <div>
+                <div className="flex items-center gap-3 mb-3">
+                  <Webhook className="h-4 w-4 text-primary dark:text-violet-400" />
+                  <div>
+                    <span className="text-sm font-semibold text-foreground">n8n Webhook Integration</span>
+                    <p className="text-xs text-muted-foreground font-normal">Automatically sync Eventbrite payments via n8n workflows</p>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div
+                    className={cn(
+                      'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',
+                      'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm'
+                    )}
+                  >
+                    <div className="flex flex-1 items-start justify-between gap-4 mb-3">
+                      <div className="flex flex-1 items-start gap-3">
+                        <div className={cn(innerGlassWell, 'p-2')}>
+                          <Webhook className="h-4 w-4 text-primary dark:text-violet-400" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-semibold text-foreground mb-1">Webhook URL</h4>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Use this URL in your n8n HTTP Request node to send payment notifications
+                          </p>
+                          <div className={cn(innerGlassWell, 'mb-3')}>
+                            <code className="text-xs text-foreground font-mono break-all">
+                              {webhookConfig.webhook_url}
+                            </code>
+                          </div>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleCopyWebhookUrl}
+                              className="voxxy-btn-cta inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                            >
+                              {copiedWebhook ? (
+                                <>
+                                  <Check className="w-3.5 h-3.5" />
+                                  Copied!
+                                </>
+                              ) : (
+                                <>
+                                  <Copy className="w-3.5 h-3.5" />
+                                  Copy URL
+                                </>
+                              )}
+                            </button>
+                            <button
+                              onClick={() => setShowRegenerateModal(true)}
+                              className="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium border border-border bg-muted text-foreground hover:bg-muted/80 transition-colors"
+                            >
+                              <RotateCw className="w-3.5 h-3.5" />
+                              Regenerate Token
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-t border-border pt-3 dark:border-violet-500/30">
+                      <p className="text-[10px] text-muted-foreground mb-2">
+                        <strong>How to use:</strong> Copy this URL and paste it into your n8n HTTP Request node. When Eventbrite payments are received, n8n will POST to this endpoint to automatically mark registrations as paid.
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        <strong>⚠️ Warning:</strong> Regenerating the token will invalidate the old URL immediately. Update your n8n workflow before regenerating.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* n8n Payload Template */}
+                  <div
+                    className={cn(
+                      'rounded-lg border border-border bg-gradient-to-br from-primary/[0.06] via-muted/40 to-accent/[0.08] p-4',
+                      'dark:border-violet-400/45 dark:from-violet-950/50 dark:via-primary/15/35 dark:to-voxxy-pink/10 dark:backdrop-blur-sm'
+                    )}
+                  >
+                    <div className="flex flex-1 items-start justify-between gap-4 mb-3">
+                      <div className="flex flex-1 items-start gap-3">
+                        <div className={cn(innerGlassWell, 'p-2')}>
+                          <Copy className="h-4 w-4 text-primary dark:text-violet-400" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="text-sm font-semibold text-foreground mb-1">n8n Payload Template</h4>
+                          <p className="text-xs text-muted-foreground mb-3">
+                            Universal payload template that works for all events - automatically detects the correct event via Eventbrite Event ID
+                          </p>
+                          <div className={cn(innerGlassWell, 'mb-3 overflow-x-auto')}>
+                            <pre className="text-[10px] text-foreground font-mono whitespace-pre">
+{`{
+  "eventbrite_event_id": "={{ $json.event.id }}",
+  "application_code": "={{ $json.attendee.answers.application_code }}",
+  "eventbrite_order_id": "={{ $json.order.id }}",
+  "email": "={{ $json.attendee.profile.email }}",
+  "first_name": "={{ $json.attendee.profile.first_name }}",
+  "last_name": "={{ $json.attendee.profile.last_name }}",
+  "payment_date": "={{ $json.order.created }}",
+  "payment_amount": "={{ $json.order.costs.gross.value }}",
+  "currency": "={{ $json.order.costs.gross.currency }}",
+  "ticket_type": "={{ $json.attendee.ticket_class_name }}"
+}`}
+                            </pre>
+                          </div>
+                          <button
+                            onClick={handleCopyN8nPayload}
+                            className="voxxy-btn-cta inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors"
+                          >
+                            {copiedPayload ? (
+                              <>
+                                <Check className="w-3.5 h-3.5" />
+                                Copied!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3.5 h-3.5" />
+                                Copy Template
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="border-t border-border pt-3 dark:border-violet-500/30">
+                      <p className="text-[10px] text-muted-foreground mb-2">
+                        <strong>✨ Auto-Detection:</strong> This template automatically detects which Voxxy event to use based on the Eventbrite Event ID. No need to configure anything per-event!
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mb-2">
+                        <strong>How it works:</strong> When you add an Eventbrite payment link to a vendor category in Event Settings, we automatically extract and store the Eventbrite Event ID. When n8n sends this payload, we match it to the correct Voxxy event.
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        <strong>Setup:</strong> Paste this template into your n8n HTTP Request node's Body (JSON format). Configure your workflow once, then reuse it for all future events!
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
         </div>
 
         {/* Save Button */}
@@ -790,6 +1018,19 @@ export default function SettingsPage({ onBack, onStartGuide }: SettingsPageProps
         cancelText={emailSent ? "Close" : "Cancel"}
         isDestructive={false}
         isLoading={isResettingPassword || (emailSent && resendDisabled)}
+      />
+
+      {/* Regenerate Webhook Token Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showRegenerateModal}
+        onClose={() => setShowRegenerateModal(false)}
+        onConfirm={handleRegenerateWebhookToken}
+        title="Regenerate Webhook Token?"
+        description="This will generate a new webhook URL and immediately invalidate the old one. Make sure to update your n8n workflow with the new URL after regenerating, or your payment sync will stop working."
+        confirmText="Regenerate Token"
+        cancelText="Cancel"
+        isDestructive={true}
+        isLoading={isRegenerating}
       />
     </div>
   );
