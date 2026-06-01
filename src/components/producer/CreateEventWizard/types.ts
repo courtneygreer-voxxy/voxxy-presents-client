@@ -38,7 +38,7 @@ export interface PaymentEngineConfig {
   collect_app_code: boolean;   // Whether to prompt artists to include app code in payment
 }
 
-export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD';
+export type CurrencyCode = 'USD' | 'EUR' | 'GBP' | 'CAD' | 'AUD' | 'MXN';
 
 // ─── Payment Constants ───────────────────────────────────────────────────────
 
@@ -48,6 +48,7 @@ export const SUPPORTED_CURRENCIES: { code: CurrencyCode; label: string; symbol: 
   { code: 'GBP', label: 'British Pound', symbol: '£' },
   { code: 'CAD', label: 'Canadian Dollar', symbol: 'CA$' },
   { code: 'AUD', label: 'Australian Dollar', symbol: 'A$' },
+  { code: 'MXN', label: 'Mexican Peso', symbol: 'MX$' },
 ];
 
 export const PAYMENT_PRICE_TYPES: { value: PaymentPriceType; label: string; description: string; isPercentage: boolean }[] = [
