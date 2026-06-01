@@ -39,6 +39,7 @@ interface Organization {
   id: number;
   slug: string;
   name: string;
+  user_id: number;
 }
 
 export default function IncomingPaymentsPage() {
