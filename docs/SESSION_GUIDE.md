@@ -67,9 +67,9 @@
 | ID | Rule | Source |
 |------|------|--------|
 | RL-020 | Use conventional commit format: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| RL-021 | Feature branches rebase onto `staging`. Hotfix branches are based on `main`. Never merge directly to `main`. | [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) |
-| RL-022 | Use the batch release process: feature → staging → release branch → main. Do not deploy individual features to main. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
-| RL-023 | Never push directly to `main`, `staging`, or `develop`. Always open a PR into active branches. Force-push is only acceptable on your own feature/fix branch to update an open PR. | SESSION_GUIDE §1 |
+| RL-021 | Feature branches rebase onto `dev`. Hotfix branches are based on `main`. Never merge directly to `main`. | [BRANCHING_STRATEGY.md](./development/BRANCHING_STRATEGY.md) |
+| RL-022 | Use the 3-stage pipeline: feature → dev → staging → main. Do not deploy individual features directly to main. | [CONTRIBUTING.md](./CONTRIBUTING.md) |
+| RL-023 | Never push directly to `main`, `staging`, or `dev`. Always open a PR into active branches. Force-push is only acceptable on your own feature/fix branch to update an open PR. | SESSION_GUIDE §1 |
 
 ---
 
@@ -111,16 +111,16 @@ CURRENT_BRANCH=$(git branch --show-current)
 git fetch origin
 
 # Show incoming changes
-echo "=== Incoming from staging ==="
-git log --oneline HEAD..origin/staging 2>/dev/null | head -10
+echo "=== Incoming from dev ==="
+git log --oneline HEAD..origin/dev 2>/dev/null | head -10
 echo "=== Incoming from main ==="
 git log --oneline HEAD..origin/main 2>/dev/null | head -10
 
-# Rebase onto staging (or main for hotfix branches)
+# Rebase onto dev (or main for hotfix branches)
 if [[ "$CURRENT_BRANCH" == hotfix/* ]]; then
   git rebase origin/main
 else
-  git rebase origin/staging
+  git rebase origin/dev
 fi
 
 if [ $? -eq 0 ]; then
@@ -140,10 +140,10 @@ cd ~/Development/voxxy-rails-react
 BACKEND_BRANCH=$(git branch --show-current)
 git fetch origin
 
-echo "=== Incoming from main ==="
-git log --oneline HEAD..origin/main 2>/dev/null | head -10
+echo "=== Incoming from dev ==="
+git log --oneline HEAD..origin/dev 2>/dev/null | head -10
 
-git rebase origin/main
+git rebase origin/dev
 
 if [ $? -eq 0 ]; then
   echo "BACKEND REBASE: SUCCESS — $BACKEND_BRANCH is up to date."
@@ -240,7 +240,7 @@ docs(scope): description
 
 Review with:
 ```bash
-git log --oneline staging..HEAD
+git log --oneline dev..HEAD
 ```
 
 ### Step 6: Produce pre-PR summary
@@ -355,8 +355,8 @@ After completing SESSION_START mode, output this:
 - Backend: SUCCESS | CONFLICT (list files) | SKIPPED | N/A
 
 ### Incoming Changes
-- Frontend: <N> new commits from origin/staging since last session
-- Backend: <N> new commits from origin/main since last session
+- Frontend: <N> new commits from origin/dev since last session
+- Backend: <N> new commits from origin/dev since last session
 
 ### Tests After Rebase
 - Frontend: <N> passed, <N> failed | SKIPPED (conflict blocks tests)
@@ -424,3 +424,4 @@ After completing PRE_PR mode, output this:
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-05-07 | Initial creation with 22 rules seeded from STYLE_GUIDE, HANDOFF, TESTING_ROADMAP, CONTRIBUTING | Team |
+| 2026-06-02 | Updated git workflow references from staging to dev (3-stage pipeline: dev → staging → main) | Team |

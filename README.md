@@ -14,24 +14,28 @@
 |--------|-------------|-----|-------------|
 | `main` | Production | https://voxxypresents.com | Yes -- on merge via Render |
 | `staging` | Pre-production | Render staging service | Yes -- on merge via Render |
-
-> `develop` was retired in April 2026 during the org transfer to Voxxy-AI.
+| `dev` | Integration testing | Render dev service | Yes -- on merge via Render |
 
 ---
 
 ## Team Swim Lanes -- How We Ship Code
 
-Every change follows this path. **No direct pushes to `staging` or `main`.**
+Every change follows this path. **No direct pushes to `dev`, `staging`, or `main`.**
 
 ```
   Your local branch
          |
          | git push origin <branch>
          v
-  Open PR -> staging
+  Open PR -> dev
          |
          | CI must pass (typecheck + lint + test + build)
          | Self-merge allowed after green CI
+         v
+       dev  -->  Render dev deploy (automatic)
+         |
+         | Integration testing on dev environment
+         | Open PR -> staging
          v
       staging  -->  Render staging deploy (automatic)
          |
@@ -44,7 +48,7 @@ Every change follows this path. **No direct pushes to `staging` or `main`.**
 
 ### Branch Naming Conventions
 
-Always branch off `staging`. Use one of these prefixes:
+Always branch off `dev`. Use one of these prefixes:
 
 | Prefix | When to use | Example |
 |--------|-------------|---------|
@@ -56,9 +60,10 @@ Always branch off `staging`. Use one of these prefixes:
 
 ### PR Rules (enforced by branch protection)
 
+- PRs into `dev`: CI must pass. Self-merge allowed.
 - PRs into `staging`: CI must pass. Self-merge allowed.
 - PRs into `main`: CI must pass + minimum 1 approving review required.
-- Never force-push to `staging` or `main`.
+- Never force-push to `dev`, `staging`, or `main`.
 - Delete your branch after it merges.
 
 ---
@@ -103,6 +108,8 @@ Always branch off `staging`. Use one of these prefixes:
 npm install
 npm run dev
 ```
+
+The frontend connects to the Rails API backend. For local development, the backend must be running on port 3001. See the [backend repo](https://github.com/Voxxy-AI/voxxy-rails-react) README for setup instructions. API base URLs are configured in `src/config/environments.ts`.
 
 ### Commands
 ```bash
@@ -165,4 +172,4 @@ All API endpoints are namespaced under `/api/v1/presents/`.
 
 ---
 
-Last updated: April 28, 2026
+Last updated: June 2, 2026
