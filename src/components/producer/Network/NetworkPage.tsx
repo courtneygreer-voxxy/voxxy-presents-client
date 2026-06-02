@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, Check, DollarSign, FileText, Percent } from 'lucide-react';
+import { UserPlus, Upload, Save, X, Filter, Tag, Plus, Edit2, Trash2, Users, Search, ChevronDown, ChevronUp, Check, DollarSign, Percent, Download } from 'lucide-react';
 import { MapPin, Tags } from 'lucide-react';
-import { vendorContactsApi, contactListsApi, categoriesApi, VendorContact } from '@/services/api';
+import { vendorContactsApi, contactListsApi, categoriesApi, eventsApi, VendorContact } from '@/services/api';
 import type { Category, CategoryFeePreference } from '@/types/category';
 import { PAYMENT_PRICE_TYPES } from '@/components/producer/CreateEventWizard/types';
 import ContactsTable from './ContactsTable';
@@ -11,6 +11,7 @@ import { CSVUploadModal } from './CSVUploadModal';
 import ListsManagement from './Lists/ListsManagement';
 import SmartListBuilder from './Lists/SmartListBuilder';
 import { BulkActionToolbar } from './BulkActionToolbar';
+import ContactExportModal from './ContactExportModal';
 import type { ActiveFilter, FilterFieldConfig } from '@/components/shared/SearchFilterBar';
 
 type NetworkTab = 'contacts' | 'lists' | 'categories';
@@ -132,6 +133,7 @@ function FilterDropdownButton({
 
 interface NetworkPageProps {
   organizationId: number;
+  organizationSlug: string;
   activeTab: NetworkTab;
   showAddModal: boolean;
   setShowAddModal: (show: boolean) => void;
@@ -142,6 +144,7 @@ interface NetworkPageProps {
 
 export default function NetworkPage({
   organizationId,
+  organizationSlug,
   activeTab,
   showAddModal,
   setShowAddModal,
@@ -156,6 +159,14 @@ export default function NetworkPage({
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [editingContact, setEditingContact] = useState<VendorContact | null>(null);
   const [actionsMenuOpen, setActionsMenuOpen] = useState(false);
+
+  // Client-side filter states
+  const [updatedAtRange, setUpdatedAtRange] = useState<'all' | '24h' | '48h' | '7d' | '30d'>('all');
+  const [eventFilter, setEventFilter] = useState<string>('all'); // 'all' | 'none' | event_id
+  const [eventStatusFilter, setEventStatusFilter] = useState<string>('all'); // 'all' | 'approved' | 'pending' | 'rejected' etc.
+  const [orgEvents, setOrgEvents] = useState<{ id: number; title: string }[]>([]);
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const actionsMenuRef = useRef<HTMLDivElement>(null);
 
   // SearchFilterBar state
@@ -215,7 +226,7 @@ export default function NetworkPage({
   const locationFilters = activeFilters.find(f => f.fieldKey === 'location')?.values || [];
   const categoryFilters = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
   const tagFilters = activeFilters.find(f => f.fieldKey === 'tags')?.values || [];
-  const hasActiveFilters = locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0;
+  const hasActiveFilters = locationFilters.length > 0 || categoryFilters.length > 0 || tagFilters.length > 0 || updatedAtRange !== 'all' || eventFilter !== 'all' || eventStatusFilter !== 'all';
 
   // Filter field config for SearchFilterBar
   const filterFieldConfigs: FilterFieldConfig[] = [
@@ -251,6 +262,23 @@ export default function NetworkPage({
     };
     loadFilterOptions();
   }, [organizationId]);
+
+  // Fetch org events for the event filter dropdown
+  useEffect(() => {
+    const loadEvents = async () => {
+      try {
+        const events = await eventsApi.getByOrganization(organizationSlug);
+        const list = Array.isArray(events) ? events : [];
+        setOrgEvents(list.map((ev: Record<string, unknown>) => ({
+          id: Number(ev.id),
+          title: String(ev.title || 'Untitled'),
+        })));
+      } catch (err) {
+        console.error('Failed to load events for filter:', err);
+      }
+    };
+    loadEvents();
+  }, [organizationSlug]);
 
   // Load categories
   const loadCategories = async () => {
@@ -465,9 +493,66 @@ export default function NetworkPage({
 
   const clearAllFilters = () => {
     setActiveFilters([]);
+    setUpdatedAtRange('all');
+    setEventFilter('all');
+    setEventStatusFilter('all');
     setViewingManualList(null);
     setShowSaveInput(false);
     setListName('');
+  };
+
+  // Apply client-side filters that the backend doesn't support
+  const applyClientSideFilters = (data: VendorContact[]): VendorContact[] => {
+    let filtered = data;
+    if (updatedAtRange !== 'all') {
+      const now = Date.now();
+      const ranges: Record<string, number> = { '24h': 86400000, '48h': 172800000, '7d': 604800000, '30d': 2592000000 };
+      const cutoff = now - ranges[updatedAtRange];
+      filtered = filtered.filter(c => new Date(c.updated_at).getTime() >= cutoff);
+    }
+    if (eventFilter === 'none') {
+      filtered = filtered.filter(c => (c.events_participated || 0) === 0);
+    } else if (eventFilter !== 'all') {
+      // Filter by specific event ID
+      const eventId = Number(eventFilter);
+      filtered = filtered.filter(c =>
+        (c.event_history || []).some(eh => {
+          if (eh.event_id !== eventId) return false;
+          if (eventStatusFilter !== 'all') return eh.status?.toLowerCase() === eventStatusFilter;
+          return true;
+        })
+      );
+    } else if (eventStatusFilter !== 'all') {
+      // Status filter without specific event — match any event with that status
+      filtered = filtered.filter(c =>
+        (c.event_history || []).some(eh => eh.status?.toLowerCase() === eventStatusFilter)
+      );
+    }
+    return filtered;
+  };
+
+  // Fetch all filtered contacts (used by export modal)
+  const fetchAllFilteredContacts = async (): Promise<VendorContact[]> => {
+    let allContacts: VendorContact[] = [];
+    const totalPages = paginationMeta.total_pages;
+    for (let p = 1; p <= totalPages; p++) {
+      const response = await vendorContactsApi.getAll(organizationId, {
+        search: searchTerm || undefined,
+        location: locationFilters.length > 0 ? locationFilters : undefined,
+        category: categoryFilters.length > 0 ? categoryFilters : undefined,
+        tags: tagFilters.length > 0 ? tagFilters : undefined,
+        page: p,
+        per_page: 200,
+      });
+      allContacts.push(...(response.vendor_contacts || []));
+    }
+    if (locationFilters.length > 1) {
+      allContacts = allContacts.filter(c => c.location && locationFilters.includes(c.location));
+    }
+    if (categoryFilters.length > 1) {
+      allContacts = allContacts.filter(c => c.categories?.some(cat => categoryFilters.includes(cat)));
+    }
+    return applyClientSideFilters(allContacts);
   };
 
   // Fetch full contact details before opening edit modal
@@ -641,6 +726,9 @@ export default function NetworkPage({
     }
   };
 
+  // Get displayed contacts (with client-side filters applied)
+  const displayedContacts = applyClientSideFilters(contacts);
+
   // Loading state
   if (loading && contacts.length === 0 && activeTab === 'contacts') {
     return (
@@ -762,39 +850,180 @@ export default function NetworkPage({
               </div>
             </div>
 
-            {/* Filter Dropdowns Row */}
-            {(filterFieldConfigs.length > 0) && (
-              <div className="flex items-center gap-2 flex-wrap">
-                {filterFieldConfigs.map(field => {
-                  const selectedValues = activeFilters.find(f => f.fieldKey === field.key)?.values || [];
+            {/* Filter toggle + Export */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  hasActiveFilters
+                    ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                    : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border hover:bg-accent/60 dark:hover:bg-card/70 dark:border-white/10'
+                }`}
+              >
+                <Filter className="w-3.5 h-3.5" />
+                Filters
+                {hasActiveFilters && (
+                  <span className="flex items-center justify-center w-4 h-4 bg-primary/50 text-primary-foreground text-[10px] font-bold rounded-full">
+                    {[
+                      categoryFilters.length > 0,
+                      locationFilters.length > 0,
+                      tagFilters.length > 0,
+                      updatedAtRange !== 'all',
+                      eventFilter !== 'all',
+                      eventStatusFilter !== 'all',
+                    ].filter(Boolean).length}
+                  </span>
+                )}
+                {showFilters ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+
+              {hasActiveFilters && (
+                <button
+                  onClick={clearAllFilters}
+                  className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <X className="w-3 h-3" />
+                  Clear all
+                </button>
+              )}
+
+              <div className="ml-auto">
+                <button
+                  onClick={() => setShowExportModal(true)}
+                  disabled={displayedContacts.length === 0}
+                  className="flex items-center gap-1.5 rounded-lg border border-border bg-card/80 px-3 py-1.5 text-xs font-medium text-foreground transition-all hover:bg-accent/60 whitespace-nowrap dark:bg-card/50 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  <span>Export ({displayedContacts.length})</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Collapsible Filter Bar */}
+            {showFilters && (
+              <div className="flex items-center gap-2 flex-wrap pt-1">
+                {/* 1. Category */}
+                {(() => {
+                  const field = filterFieldConfigs.find(f => f.key === 'category');
+                  if (!field) return null;
+                  const selectedValues = activeFilters.find(f => f.fieldKey === 'category')?.values || [];
                   return (
                     <FilterDropdownButton
-                      key={field.key}
                       field={field}
                       selectedValues={selectedValues}
                       onChange={(values) => {
-                        const existing = activeFilters.find(f => f.fieldKey === field.key);
+                        const existing = activeFilters.find(f => f.fieldKey === 'category');
                         if (existing) {
-                          if (values.length === 0) {
-                            setActiveFilters(activeFilters.filter(f => f.fieldKey !== field.key));
-                          } else {
-                            setActiveFilters(activeFilters.map(f => f.fieldKey === field.key ? { ...f, values } : f));
-                          }
+                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'category'));
+                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'category' ? { ...f, values } : f));
                         } else if (values.length > 0) {
-                          setActiveFilters([...activeFilters, { fieldKey: field.key, values }]);
+                          setActiveFilters([...activeFilters, { fieldKey: 'category', values }]);
                         }
                       }}
                     />
                   );
-                })}
-                {activeFilters.filter(f => f.values.length > 0).length > 0 && (
-                  <button
-                    onClick={() => setActiveFilters([])}
-                    className="flex items-center gap-1 px-2 py-1.5 text-xs text-foreground/75 dark:text-muted-foreground hover:text-foreground transition-colors"
+                })()}
+
+                {/* 2. Location */}
+                {(() => {
+                  const field = filterFieldConfigs.find(f => f.key === 'location');
+                  if (!field) return null;
+                  const selectedValues = activeFilters.find(f => f.fieldKey === 'location')?.values || [];
+                  return (
+                    <FilterDropdownButton
+                      field={field}
+                      selectedValues={selectedValues}
+                      onChange={(values) => {
+                        const existing = activeFilters.find(f => f.fieldKey === 'location');
+                        if (existing) {
+                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'location'));
+                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'location' ? { ...f, values } : f));
+                        } else if (values.length > 0) {
+                          setActiveFilters([...activeFilters, { fieldKey: 'location', values }]);
+                        }
+                      }}
+                    />
+                  );
+                })()}
+
+                {/* 3. Tags */}
+                {(() => {
+                  const field = filterFieldConfigs.find(f => f.key === 'tags');
+                  if (!field) return null;
+                  const selectedValues = activeFilters.find(f => f.fieldKey === 'tags')?.values || [];
+                  return (
+                    <FilterDropdownButton
+                      field={field}
+                      selectedValues={selectedValues}
+                      onChange={(values) => {
+                        const existing = activeFilters.find(f => f.fieldKey === 'tags');
+                        if (existing) {
+                          if (values.length === 0) setActiveFilters(activeFilters.filter(f => f.fieldKey !== 'tags'));
+                          else setActiveFilters(activeFilters.map(f => f.fieldKey === 'tags' ? { ...f, values } : f));
+                        } else if (values.length > 0) {
+                          setActiveFilters([...activeFilters, { fieldKey: 'tags', values }]);
+                        }
+                      }}
+                    />
+                  );
+                })()}
+
+                {/* 4. Updated */}
+                <select
+                  value={updatedAtRange}
+                  onChange={(e) => setUpdatedAtRange(e.target.value as typeof updatedAtRange)}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
+                    updatedAtRange !== 'all'
+                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
+                  }`}
+                >
+                  <option value="all">Updated</option>
+                  <option value="24h">Last 24h</option>
+                  <option value="48h">Last 48h</option>
+                  <option value="7d">Last 7 days</option>
+                  <option value="30d">Last 30 days</option>
+                </select>
+
+                {/* 5. Shows Attended */}
+                <select
+                  value={eventFilter}
+                  onChange={(e) => {
+                    setEventFilter(e.target.value);
+                    if (e.target.value === 'all' || e.target.value === 'none') setEventStatusFilter('all');
+                  }}
+                  className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer max-w-[180px] truncate ${
+                    eventFilter !== 'all'
+                      ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                      : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
+                  }`}
+                >
+                  <option value="all">Shows Attended</option>
+                  <option value="none">No Shows</option>
+                  {orgEvents.map(ev => (
+                    <option key={ev.id} value={String(ev.id)}>{ev.title}</option>
+                  ))}
+                </select>
+
+                {/* 6. App Status (contextual — shows when a specific show is selected) */}
+                {eventFilter !== 'all' && eventFilter !== 'none' && (
+                  <select
+                    value={eventStatusFilter}
+                    onChange={(e) => setEventStatusFilter(e.target.value)}
+                    className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-all cursor-pointer ${
+                      eventStatusFilter !== 'all'
+                        ? 'bg-primary/20 text-violet-950 border border-primary/40 dark:text-primary dark:border-primary/30'
+                        : 'bg-card/80 text-foreground dark:bg-card/50 dark:text-foreground/80 border border-border dark:border-white/10'
+                    }`}
                   >
-                    <X className="w-3 h-3" />
-                    Clear all
-                  </button>
+                    <option value="all">App Status</option>
+                    <option value="approved">Approved</option>
+                    <option value="pending">Pending</option>
+                    <option value="confirmed">Confirmed</option>
+                    <option value="rejected">Rejected</option>
+                    <option value="waitlist">Waitlist</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
                 )}
               </div>
             )}
@@ -852,7 +1081,7 @@ export default function NetworkPage({
           )}
 
           {/* No results */}
-          {contacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
+          {displayedContacts.length === 0 && (searchTerm || hasActiveFilters || viewingManualList) && (
             <div className="voxxy-surface-subtle text-center rounded-lg py-12">
               <p className="text-foreground/80 dark:text-foreground/50 text-sm">
                 {searchTerm ? `No contacts found for "${searchTerm}"` : viewingManualList ? 'This list has no contacts' : 'No contacts match the selected filters'}
@@ -875,9 +1104,9 @@ export default function NetworkPage({
           />
 
           {/* Contacts Table */}
-          {contacts.length > 0 && (
+          {displayedContacts.length > 0 && (
             <ContactsTable
-              contacts={contacts}
+              contacts={displayedContacts}
               selectedContacts={selectedContacts}
               onSelectContact={handleSelectContact}
               onSelectAll={handleSelectAll}
@@ -898,6 +1127,13 @@ export default function NetworkPage({
           {showCSVUploadModal && (
             <CSVUploadModal open={showCSVUploadModal} onClose={() => setShowCSVUploadModal(false)} onSuccess={() => { fetchContacts(); }} />
           )}
+          <ContactExportModal
+            open={showExportModal}
+            onClose={() => setShowExportModal(false)}
+            contactCount={displayedContacts.length}
+            organizationSlug={organizationSlug}
+            fetchAllContacts={fetchAllFilteredContacts}
+          />
         </>
       )}
 
@@ -1291,6 +1527,7 @@ export default function NetworkPage({
           </div>
         </div>
       )}
+
     </div>
   );
 }

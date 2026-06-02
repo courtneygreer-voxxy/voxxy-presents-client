@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle, DollarSign, Save } from 'lucide-react';
+import { Trash2, FileText, Edit, Link, ExternalLink, Check, X, Plus, Copy, AlertCircle, DollarSign, Save, Webhook } from 'lucide-react';
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion';
 import { vendorApplicationsApi, registrationsApi, eventInvitationsApi, eventsApi } from '@/services/api';
 import CreateApplicationForm from './CreateApplicationForm';
@@ -70,6 +70,7 @@ interface VendorApplication {
   payment_link?: string;
   payment_prices?: any[];
   payment_engines?: PaymentEngineConfig[];
+  eventbrite_event_id?: string;
   application_tags?: string;
   category_id?: number;
   category_color?: string;
@@ -1215,6 +1216,104 @@ export default function EventSettings({ event, onUpdate, onDelete, isAdmin }: Ev
                   {loadingApps ? 'Loading payment configuration...' : 'No categories configured yet.'}
                 </div>
               )}
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* n8n Webhook Integration Status */}
+          <AccordionItem value="n8n-webhook" className="border-border">
+            <AccordionTrigger className={triggerHoverClass}>
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-purple-500/20 p-1.5">
+                  <Webhook className="h-4 w-4 text-purple-700 dark:text-purple-400" />
+                </div>
+                <div className="text-left">
+                  <span className="text-sm font-semibold text-foreground">n8n Payment Sync Status</span>
+                  <p className="text-xs text-foreground/50 font-normal">Eventbrite Event ID auto-detection status per category</p>
+                </div>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4">
+              <div className="space-y-3">
+                <div className={cn(compactWell, 'bg-blue-500/5 border border-blue-500/20')}>
+                  <p className="text-xs text-foreground/70 mb-2">
+                    <strong>✨ Auto-Detection Enabled:</strong>
+                  </p>
+                  <p className="text-xs text-muted-foreground mb-3">
+                    Webhook configuration is now organization-wide! When you add Eventbrite payment links to categories below,
+                    we automatically extract the Eventbrite Event ID. Your n8n workflow will detect the correct event without any manual configuration.
+                  </p>
+                  <a
+                    href="#"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      window.location.href = '/dashboard/settings';
+                    }}
+                    className="inline-flex items-center gap-2 px-3 py-2 text-sm rounded-lg voxxy-btn-cta transition-all"
+                  >
+                    <Webhook className="h-4 w-4" />
+                    Configure Webhook in Settings
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
+
+                {applications.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-foreground mb-2">Category Status:</p>
+                    <div className="space-y-2">
+                      {applications.map((app) => {
+                        const hasEventbriteEngine = app.payment_engines?.some(pe => pe.engine === 'eventbrite');
+                        const hasEventbriteId = !!app.eventbrite_event_id;
+
+                        return (
+                          <div
+                            key={app.id}
+                            className={cn(compactWell, 'voxxy-hover-panel')}
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <p className="text-xs font-semibold text-foreground">{app.name}</p>
+                                {hasEventbriteId ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-green-500/20 border border-green-500/30 text-[10px] font-medium text-green-800 dark:text-green-400">
+                                    <Check className="w-3 h-3" />
+                                    n8n Ready
+                                  </span>
+                                ) : hasEventbriteEngine ? (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/30 text-[10px] font-medium text-amber-800 dark:text-amber-400">
+                                    <AlertCircle className="w-3 h-3" />
+                                    Invalid URL
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-muted border border-border text-[10px] font-medium text-muted-foreground">
+                                    No Eventbrite
+                                  </span>
+                                )}
+                              </div>
+                              {hasEventbriteId && (
+                                <p className="text-[10px] font-mono text-muted-foreground">
+                                  ID: {app.eventbrite_event_id}
+                                </p>
+                              )}
+                            </div>
+                            {hasEventbriteEngine && !hasEventbriteId && (
+                              <p className="text-[10px] text-muted-foreground mt-1">
+                                ⚠️ Eventbrite link found but ID extraction failed. Check URL format in Payment Config.
+                              </p>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                <div className={cn(compactWell, 'bg-accent/30')}>
+                  <p className="text-xs text-muted-foreground">
+                    <strong>How it works:</strong> Add Eventbrite payment links in Payment Configuration above.
+                    We automatically extract the Event ID from URLs like <code className="bg-background/50 px-1 rounded">eventbrite.com/e/event-name-123456</code>.
+                    Your n8n workflow sends this ID in the payload, and we match it to the correct category automatically!
+                  </p>
+                </div>
+              </div>
             </AccordionContent>
           </AccordionItem>
 

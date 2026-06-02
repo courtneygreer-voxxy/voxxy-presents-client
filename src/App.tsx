@@ -6,6 +6,7 @@ import { analytics } from './lib/analytics'
 import { RedirectIfAuthenticatedV2 } from './components/auth/ProtectedRouteV2'
 import { AdminRoute } from './components/auth/AdminRoute'
 import { LoadingTransition } from './components/LoadingTransition'
+import { Toaster } from 'sonner'
 
 // Eager load: Homepage (critical for first paint)
 import HomePage from './pages/HomePage'
@@ -52,6 +53,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'))
 const VendorDashboard = lazy(() => import('./pages/VendorDashboard'))
 const AdminUnsubscribesPage = lazy(() => import('./pages/AdminUnsubscribesPage'))
 const AdminBugReportsPage = lazy(() => import('./pages/AdminBugReportsPage'))
+const IncomingPaymentsPage = lazy(() => import('./pages/IncomingPaymentsPage'))
 
 // Lazy load: Email Template Manager (load on-demand)
 const TemplateManager = lazy(() => import('./components/producer/Email/TemplateManager'))
@@ -95,6 +97,42 @@ function ProtectedDashboard() {
   // All checks passed, render dashboard
   console.log('✅ All checks passed, rendering dashboard')
   return <Dashboard />
+}
+
+// Protected Incoming Payments - ensures user is verified and paid before showing payments
+function ProtectedIncomingPayments() {
+  const { userProfile, loading, isAdmin, isProducer, isEmailVerified, isPaid } = useAuth()
+
+  if (loading) {
+    return <LoadingTransition message="Loading payments..." />
+  }
+
+  if (!userProfile) {
+    console.log('🔒 No user profile, redirecting to home')
+    return <Navigate to="/" replace />
+  }
+
+  // Admins always have access
+  if (isAdmin) {
+    console.log('🟣 Admin accessing payments')
+    return <IncomingPaymentsPage />
+  }
+
+  // Check email verification for non-admins
+  if (!isEmailVerified) {
+    console.log('🔒 Email not verified, redirecting to pending')
+    return <Navigate to="/pending" replace />
+  }
+
+  // Check payment for producers
+  if (isProducer && !isPaid) {
+    console.log('🔒 Producer without active subscription, redirecting to pending')
+    return <Navigate to="/pending" replace />
+  }
+
+  // All checks passed, render payments page
+  console.log('✅ All checks passed, rendering payments page')
+  return <IncomingPaymentsPage />
 }
 
 // Role-based redirect component - routes authenticated users to their holding screen
@@ -185,6 +223,15 @@ export default function App() {
   return (
     <AuthProvider>
       <Router>
+        {/* Toast Notifications - Auto-dismiss after 4 seconds */}
+        <Toaster
+          position="top-right"
+          duration={4000}
+          closeButton
+          richColors
+          theme="system"
+        />
+
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
 
@@ -323,6 +370,9 @@ export default function App() {
 
           {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
           <Route path="/dashboard" element={<ProtectedDashboard />} />
+
+          {/* Incoming Payments - Protected (verified + paid producers/admins only) */}
+          <Route path="/payments" element={<ProtectedIncomingPayments />} />
 
           {/* 404 - Redirect to home */}
           <Route path="*" element={<Navigate to="/" replace />} />

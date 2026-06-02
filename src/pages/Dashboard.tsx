@@ -1162,6 +1162,7 @@ export default function ProducerDashboard() {
               {organization ? (
                 <NetworkPage
                   organizationId={organization.id}
+                  organizationSlug={organization.slug}
                   activeTab={networkTab}
                   showAddModal={networkShowAddModal}
                   setShowAddModal={setNetworkShowAddModal}
