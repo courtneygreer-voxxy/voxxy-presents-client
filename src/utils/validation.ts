@@ -1,4 +1,5 @@
 // Email validation utility
+// already have same func in inputSanitization.ts
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email.trim())

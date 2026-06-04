@@ -1046,7 +1046,7 @@ export const registrationsApi = {
   async submitVendorApplication(eventSlug: string, data: {
     name: string
     email: string
-    phone?: string
+    phone: string
     business_name: string
     vendor_category: string
     vendor_application_id: number
@@ -1055,6 +1055,8 @@ export const registrationsApi = {
     tiktok_handle?: string
     website?: string
     note_to_host?: string
+    //to-do: backend change to accept this?
+    affiliation?: string
   }) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/registrations`, {
       method: 'POST',
