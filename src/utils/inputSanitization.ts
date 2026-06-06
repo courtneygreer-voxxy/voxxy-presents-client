@@ -157,7 +157,7 @@ export function detectMaliciousContent(text: string): string[] {
 }
 
       
-export const buildInstagramUrl = (handle: string): string | undefined => {
+export const buildInstagramUrl = (handle: string | undefined): string | undefined => {
   // Construct full URLs from user input with defensive handling
         try {
           if (!handle || !handle.trim()) return undefined;
@@ -175,7 +175,7 @@ export const buildInstagramUrl = (handle: string): string | undefined => {
         }
 };
 
-export const buildTikTokUrl = (handle: string): string | undefined => {
+export const buildTikTokUrl = (handle: string | undefined): string | undefined => {
         try {
           if (!handle || !handle.trim()) return undefined;
           // Remove @ symbol, https://, tiktok.com, etc if user added them
@@ -192,7 +192,7 @@ export const buildTikTokUrl = (handle: string): string | undefined => {
         }
 };
 
-export const buildWebsiteUrl = (site: string): string | undefined => {
+export const buildWebsiteUrl = (site: string | undefined): string | undefined => {
         try {
           if (!site || !site.trim()) return undefined;
           let cleanSite = site.trim();

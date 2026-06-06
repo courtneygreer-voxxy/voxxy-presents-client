@@ -16,6 +16,8 @@ import ReportBug from '@/components/ReportBug';
 import FloatingBugButton from '@/components/FloatingBugButton';
 import { Badge } from '@/components/ui/badge';
 import { useForceTheme } from '@/hooks/useForceTheme';
+import { VendorApplicationFormData } from '@/types/eventPortal';
+import { validatePhone } from '@/utils/validation'
 
 interface VendorApplication {
   id: number;
@@ -73,6 +75,7 @@ export default function VendorApplicationForm() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
@@ -81,7 +84,7 @@ export default function VendorApplicationForm() {
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const failedAttemptsRef = useRef(0);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<VendorApplicationFormData>({
     // name: '',
     first_name:'',
     last_name:'',
@@ -277,6 +280,11 @@ export default function VendorApplicationForm() {
       return;
     }
 
+    if (!validatePhone(formData.phone)) {
+      setPhoneError('Please enter a valid phone number');
+      return;
+    }
+
     // Validate at least one social/portfolio link is provided
     const hasAtLeastOneLink =
       (formData.website && formData.website.trim()) ||
@@ -297,6 +305,7 @@ export default function VendorApplicationForm() {
     try {
       setSubmitting(true);
       setError(null);
+      setPhoneError(null);
       setRetryAttempt(0);
 
       // Submit with retry logic for network/server errors
@@ -309,13 +318,13 @@ export default function VendorApplicationForm() {
             phone: formData.phone,
             business_name: formData.business_name,
             vendor_category: formData.vendor_category,
-            vendor_application_id: application.id,
+            vendor_application_id: Number(applicationId),
             subscribed: formData.subscribed,
             instagram_handle: buildInstagramUrl(formData.instagram_handle),
             tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
             website: buildWebsiteUrl(formData.website),
-            note_to_host: formData.note_to_host || undefined,
-            affiliation: formData.affiliation || undefined,
+            note_to_host: formData.note_to_host,
+            affiliation: formData.affiliation,
           });
         },
         {
@@ -791,8 +800,10 @@ export default function VendorApplicationForm() {
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                 <p className="text-red-800 dark:text-red-400 text-xs">{error}</p>
+                
               </div>
             )}
+            {phoneError && <p className="text-red-800 dark:text-red-400 text-xs">{phoneError}</p>}
 
             {/* Submit Button */}
             <button

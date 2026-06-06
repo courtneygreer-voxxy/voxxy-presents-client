@@ -97,3 +97,38 @@ export interface PortalSession {
   email: string;
   expiresAt: number;
 }
+
+export interface VendorApplicationFormData {
+  name?: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  business_name?: string;
+  vendor_category?: string;
+  instagram_handle?: string;
+  tiktok_handle?: string;
+  facebook_handle?: string;
+  twitter_handle?: string;
+  website?: string;
+  note_to_host?: string;
+  agreed_to_terms: boolean;
+  subscribed: boolean;
+  affiliation?: string;
+}
+
+export interface VendorApplicationSubmit {
+    name: string
+    email: string
+    phone: string
+    business_name?: string
+    vendor_category?: string
+    vendor_application_id: number
+    subscribed?: boolean
+    instagram_handle?: string
+    tiktok_handle?: string
+    website?: string
+    note_to_host?: string
+    //to-do: backend change to accept this?
+    affiliation?: string
+}
