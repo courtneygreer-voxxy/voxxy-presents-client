@@ -274,7 +274,7 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    // done: only enable submit button when required fields are filled
+    // extra check that all required fields are done before validating individual fields, to avoid overwhelming users with multiple error messages at once. specific field errors (like invalid phone) will show after this initial check that all required fields are filled.
     if (!requiredFieldsFilled) {
       setError('Please fill in all required fields');
       return;
