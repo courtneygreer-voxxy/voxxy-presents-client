@@ -1044,23 +1044,7 @@ export const registrationsApi = {
    * Submit vendor application (public, no auth required)
    * POST /api/v1/presents/events/:event_slug/registrations
    */
-  async submitVendorApplication(eventSlug: string, data: VendorApplicationSubmit
-  //   {
-  //   name: string
-  //   email: string
-  //   phone: string
-  //   business_name: string
-  //   vendor_category: string
-  //   vendor_application_id: number
-  //   subscribed?: boolean
-  //   instagram_handle?: string
-  //   tiktok_handle?: string
-  //   website?: string
-  //   note_to_host?: string
-  //   //to-do: backend change to accept this?
-  //   affiliation?: string
-  // }
-) {
+  async submitVendorApplication(eventSlug: string, data: VendorApplicationSubmit) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/registrations`, {
       method: 'POST',
       body: JSON.stringify({ registration: data }),

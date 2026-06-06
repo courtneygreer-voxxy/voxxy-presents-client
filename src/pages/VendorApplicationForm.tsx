@@ -309,7 +309,7 @@ export default function VendorApplicationForm() {
       setRetryAttempt(0);
 
       // Submit with retry logic for network/server errors
-      // to-do: validate/sanitize inputs before submitting. currently relies on server-side validation to reject bad inputs, but would be better to catch common issues client-side before submission.
+      // to-do: validate/sanitize inputs before submitting, on change. currently relies on server-side validation to reject bad inputs, but would be better to catch common issues client-side before submission.
       const response = await retryWithBackoff(
         async () => {
           return await registrationsApi.submitVendorApplication(event.slug, {
