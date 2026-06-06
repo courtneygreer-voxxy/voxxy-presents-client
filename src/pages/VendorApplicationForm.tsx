@@ -77,6 +77,7 @@ export default function VendorApplicationForm() {
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
   const [bugReportContext, setBugReportContext] = useState<any>(null);
+  const [requiredFieldsFilled, setRequiredFieldsFilled] = useState(false);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const failedAttemptsRef = useRef(0);
 
@@ -98,6 +99,11 @@ export default function VendorApplicationForm() {
     subscribed: true,
     affiliation: '',
   });
+
+  useEffect(() => {
+    const { first_name, last_name, email, phone, instagram_handle, website, twitter_handle, facebook_handle, tiktok_handle, agreed_to_terms } = formData;
+    setRequiredFieldsFilled(!!(first_name && last_name && email && phone && agreed_to_terms && (instagram_handle || website || twitter_handle || facebook_handle || tiktok_handle)));
+  }, [formData]);
 
   useEffect(() => {
     if (slug && applicationId) {
@@ -265,8 +271,8 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    // to-do: only enable submit button when required fields are filled
-    if (!formData.first_name || !formData.last_name || !formData.email || !formData.vendor_category || !formData.phone) {
+    // done: only enable submit button when required fields are filled
+    if (!requiredFieldsFilled) {
       setError('Please fill in all required fields');
       return;
     }
@@ -791,11 +797,10 @@ export default function VendorApplicationForm() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={submitting}
+              disabled={!requiredFieldsFilled || submitting}
               className="w-full px-5 py-3 rounded-lg voxxy-btn-cta font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {submitting ? (
-                // to-do: bug here. submitting never evaluates to true, even when form is being submitted. retryAttempt also doesn't update during submission attempts. likely related to state updates not triggering re-render during async submit process. need to investigate further.
                 <>
                   <div className="w-4 h-4 border-2 border-border border-t-primary rounded-full animate-spin" />
                   <span>
