@@ -85,7 +85,6 @@ export default function VendorApplicationForm() {
   const failedAttemptsRef = useRef(0);
 
   const [formData, setFormData] = useState<VendorApplicationFormData>({
-    // name: '',
     first_name:'',
     last_name:'',
     email: '',
@@ -202,9 +201,6 @@ export default function VendorApplicationForm() {
       setFormData(prev => ({
         ...prev,
         email: data.email || prev.email,
-        // name: data.first_name && data.last_name
-        //   ? `${data.first_name} ${data.last_name}`.trim()
-        //   : prev.name,
         first_name: data.first_name || prev.first_name,
         last_name: data.last_name || prev.last_name,
         business_name: data.business_name || prev.business_name,
@@ -659,7 +655,7 @@ export default function VendorApplicationForm() {
                 {/* Link to your work */}
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Link to your work <span className="text-red-600 dark:text-red-400">*</span>
+                    Link to your work
                   </label>
                   <div className="voxxy-input-frost-group">
                     <div className="voxxy-input-frost-prefix">https://</div>

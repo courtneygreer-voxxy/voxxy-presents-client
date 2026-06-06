@@ -129,6 +129,6 @@ export interface VendorApplicationSubmit {
     tiktok_handle?: string
     website?: string
     note_to_host?: string
-    //to-do: backend change to accept this?
+    //to-do: backend change to accept this
     affiliation?: string
 }
