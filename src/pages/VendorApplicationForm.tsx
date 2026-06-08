@@ -11,10 +11,13 @@ import {
   retryWithBackoff,
   isRetryableError,
 } from '@/utils/formPersistence';
+import { buildTikTokUrl, buildWebsiteUrl, buildInstagramUrl } from '@/utils/inputSanitization';
 import ReportBug from '@/components/ReportBug';
 import FloatingBugButton from '@/components/FloatingBugButton';
 import { Badge } from '@/components/ui/badge';
 import { useForceTheme } from '@/hooks/useForceTheme';
+import { VendorApplicationFormData } from '@/types/eventPortal';
+import { validatePhone } from '@/utils/validation'
 
 interface VendorApplication {
   id: number;
@@ -72,15 +75,18 @@ export default function VendorApplicationForm() {
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [retryAttempt, setRetryAttempt] = useState(0);
   const [showRestorePrompt, setShowRestorePrompt] = useState(false);
   const [showBugReport, setShowBugReport] = useState(false);
   const [bugReportContext, setBugReportContext] = useState<any>(null);
+  const [requiredFieldsFilled, setRequiredFieldsFilled] = useState(false);
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const failedAttemptsRef = useRef(0);
 
-  const [formData, setFormData] = useState({
-    name: '',
+  const [formData, setFormData] = useState<VendorApplicationFormData>({
+    first_name:'',
+    last_name:'',
     email: '',
     phone: '',
     business_name: '',
@@ -93,7 +99,13 @@ export default function VendorApplicationForm() {
     note_to_host: '',
     agreed_to_terms: false,
     subscribed: true,
+    affiliation: '',
   });
+
+  useEffect(() => {
+    const { first_name, last_name, email, phone, instagram_handle, website, twitter_handle, facebook_handle, tiktok_handle, agreed_to_terms } = formData;
+    setRequiredFieldsFilled(!!(first_name && last_name && email && phone && agreed_to_terms && (instagram_handle || website || twitter_handle || facebook_handle || tiktok_handle)));
+  }, [formData]);
 
   useEffect(() => {
     if (slug && applicationId) {
@@ -139,7 +151,7 @@ export default function VendorApplicationForm() {
 
     autoSaveTimerRef.current = setTimeout(() => {
       // Only save if form has been touched (not all defaults)
-      const hasData = formData.name || formData.email || formData.business_name;
+      const hasData = formData.first_name || formData.last_name || formData.email || formData.business_name;
       if (hasData) {
         saveFormData(formId, formData);
         console.log('[AutoSave] Form data saved');
@@ -189,9 +201,8 @@ export default function VendorApplicationForm() {
       setFormData(prev => ({
         ...prev,
         email: data.email || prev.email,
-        name: data.first_name && data.last_name
-          ? `${data.first_name} ${data.last_name}`.trim()
-          : prev.name,
+        first_name: data.first_name || prev.first_name,
+        last_name: data.last_name || prev.last_name,
         business_name: data.business_name || prev.business_name,
       }));
 
@@ -259,8 +270,14 @@ export default function VendorApplicationForm() {
     }
 
     // Validation
-    if (!formData.name || !formData.email || !formData.vendor_category) {
+    // extra check that all required fields are done before validating individual fields, to avoid overwhelming users with multiple error messages at once. specific field errors (like invalid phone) will show after this initial check that all required fields are filled.
+    if (!requiredFieldsFilled) {
       setError('Please fill in all required fields');
+      return;
+    }
+
+    if (!validatePhone(formData.phone)) {
+      setPhoneError('Please enter a valid phone number');
       return;
     }
 
@@ -284,75 +301,26 @@ export default function VendorApplicationForm() {
     try {
       setSubmitting(true);
       setError(null);
+      setPhoneError(null);
       setRetryAttempt(0);
 
-      // Construct full URLs from user input with defensive handling
-      const buildInstagramUrl = (handle: string): string | undefined => {
-        try {
-          if (!handle || !handle.trim()) return undefined;
-          // Remove @ symbol, https://, instagram.com, etc if user added them
-          let cleanHandle = handle.trim()
-            .replace(/^@/, '')
-            .replace(/^https?:\/\//i, '')
-            .replace(/^(www\.)?instagram\.com\//i, '')
-            .trim();
-
-          // Only return if we have a valid handle left
-          return cleanHandle && cleanHandle.length > 0 ? `https://instagram.com/${cleanHandle}` : undefined;
-        } catch {
-          return undefined;
-        }
-      };
-
-      const buildTikTokUrl = (handle: string): string | undefined => {
-        try {
-          if (!handle || !handle.trim()) return undefined;
-          // Remove @ symbol, https://, tiktok.com, etc if user added them
-          let cleanHandle = handle.trim()
-            .replace(/^@/, '')
-            .replace(/^https?:\/\//i, '')
-            .replace(/^(www\.)?tiktok\.com\/@?/i, '')
-            .trim();
-
-          // Only return if we have a valid handle left
-          return cleanHandle && cleanHandle.length > 0 ? `https://tiktok.com/@${cleanHandle}` : undefined;
-        } catch {
-          return undefined;
-        }
-      };
-
-      const buildWebsiteUrl = (site: string): string | undefined => {
-        try {
-          if (!site || !site.trim()) return undefined;
-          let cleanSite = site.trim();
-
-          // If already a complete URL, validate and return
-          if (cleanSite.startsWith('http://') || cleanSite.startsWith('https://')) {
-            return cleanSite;
-          }
-
-          // Otherwise add https:// prefix
-          return cleanSite.length > 0 ? `https://${cleanSite}` : undefined;
-        } catch {
-          return undefined;
-        }
-      };
-
       // Submit with retry logic for network/server errors
+      // to-do: validate/sanitize inputs before submitting, on change. currently relies on server-side validation to reject bad inputs, but would be better to catch common issues client-side before submission.
       const response = await retryWithBackoff(
         async () => {
           return await registrationsApi.submitVendorApplication(event.slug, {
-            name: formData.name,
+            name: formData.first_name.concat(' ', formData.last_name).trim(),
             email: formData.email,
-            phone: formData.phone || undefined,
+            phone: formData.phone,
             business_name: formData.business_name,
             vendor_category: formData.vendor_category,
-            vendor_application_id: application.id,
+            vendor_application_id: Number(applicationId),
             subscribed: formData.subscribed,
             instagram_handle: buildInstagramUrl(formData.instagram_handle),
             tiktok_handle: buildTikTokUrl(formData.tiktok_handle),
             website: buildWebsiteUrl(formData.website),
-            note_to_host: formData.note_to_host || undefined,
+            note_to_host: formData.note_to_host,
+            affiliation: formData.affiliation,
           });
         },
         {
@@ -600,33 +568,47 @@ export default function VendorApplicationForm() {
             <div>
               <h3 className="text-base font-semibold text-foreground mb-3">Your Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {/* Full Name */}
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Full Name <span className="text-red-600 dark:text-red-400">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    placeholder="Your full name"
-                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                    required
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-foreground mb-1.5">
+                      First Name <span className="text-red-600 dark:text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.first_name}
+                      onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                      placeholder="Your first name"
+                      className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-foreground mb-1.5">
+                      Last Name <span className="text-red-600 dark:text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.last_name}
+                      onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                      placeholder="Your last name"
+                      className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                      required
+                    />
+                  </div>
                 </div>
 
-                {/* Business/Brand Name */}
+                
                 <div>
-                  <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Business/Brand Name <span className="text-muted-foreground text-[10px] ml-1 font-normal">(optional)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.business_name}
-                    onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
-                    placeholder="Your business or brand name"
-                    className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
-                  />
+                    <label className="block text-xs font-medium text-foreground mb-1.5">
+                      Business/Brand Name <span className="text-muted-foreground text-[10px] ml-1 font-normal">(optional)</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.business_name}
+                      onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+                      placeholder="Your business or brand name"
+                      className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                    />
                 </div>
 
                 {/* Email */}
@@ -647,7 +629,7 @@ export default function VendorApplicationForm() {
                 {/* Phone Number */}
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Phone Number
+                    Phone Number <span className="text-red-600 dark:text-red-400">*</span>
                   </label>
                   <input
                     type="tel"
@@ -655,6 +637,7 @@ export default function VendorApplicationForm() {
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder="(555) 123-4567"
                     className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40"
+                    required
                   />
                 </div>
               </div>
@@ -672,7 +655,7 @@ export default function VendorApplicationForm() {
                 {/* Link to your work */}
                 <div>
                   <label className="block text-xs font-medium text-foreground mb-1.5">
-                    Link to your work <span className="text-red-600 dark:text-red-400">*</span>
+                    Link to your work
                   </label>
                   <div className="voxxy-input-frost-group">
                     <div className="voxxy-input-frost-prefix">https://</div>
@@ -756,6 +739,20 @@ export default function VendorApplicationForm() {
               />
             </div>
 
+            {/* Studio/Gallery/Business Affiliation(Optional) */}
+            <div>
+              <label className="block text-xs font-medium text-foreground mb-1.5">
+                Studio/Gallery/Business Affiliation (Optional)
+              </label>
+              <textarea
+                value={formData.affiliation}
+                onChange={(e) => setFormData({ ...formData, affiliation: e.target.value })}
+                placeholder="Tell the event organizer about your studio, gallery, or business affiliation..."
+                rows={3}
+                className="voxxy-input-frost w-full px-3 py-2 text-sm rounded-lg focus:ring-2 focus:ring-ring/40 resize-none"
+              />
+            </div>
+
             {/* Permissions & Preferences */}
             <div>
               <h3 className="text-base font-semibold text-foreground mb-3">Permissions & Preferences</h3>
@@ -799,13 +796,15 @@ export default function VendorApplicationForm() {
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3">
                 <p className="text-red-800 dark:text-red-400 text-xs">{error}</p>
+                
               </div>
             )}
+            {phoneError && <p className="text-red-800 dark:text-red-400 text-xs">{phoneError}</p>}
 
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={submitting}
+              disabled={!requiredFieldsFilled || submitting}
               className="w-full px-5 py-3 rounded-lg voxxy-btn-cta font-semibold hover:opacity-90 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
             >
               {submitting ? (

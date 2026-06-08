@@ -155,3 +155,56 @@ export function detectMaliciousContent(text: string): string[] {
 
   return issues
 }
+
+      
+export const buildInstagramUrl = (handle: string | undefined): string | undefined => {
+  // Construct full URLs from user input with defensive handling
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, instagram.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?instagram\.com\//i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://instagram.com/${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
+};
+
+export const buildTikTokUrl = (handle: string | undefined): string | undefined => {
+        try {
+          if (!handle || !handle.trim()) return undefined;
+          // Remove @ symbol, https://, tiktok.com, etc if user added them
+          let cleanHandle = handle.trim()
+            .replace(/^@/, '')
+            .replace(/^https?:\/\//i, '')
+            .replace(/^(www\.)?tiktok\.com\/@?/i, '')
+            .trim();
+
+          // Only return if we have a valid handle left
+          return cleanHandle && cleanHandle.length > 0 ? `https://tiktok.com/@${cleanHandle}` : undefined;
+        } catch {
+          return undefined;
+        }
+};
+
+export const buildWebsiteUrl = (site: string | undefined): string | undefined => {
+        try {
+          if (!site || !site.trim()) return undefined;
+          let cleanSite = site.trim();
+
+          // If already a complete URL, validate and return
+          if (cleanSite.startsWith('http://') || cleanSite.startsWith('https://')) {
+            return cleanSite;
+          }
+
+          // Otherwise add https:// prefix
+          return cleanSite.length > 0 ? `https://${cleanSite}` : undefined;
+        } catch {
+          return undefined;
+        }
+};

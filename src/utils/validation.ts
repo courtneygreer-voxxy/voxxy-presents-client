@@ -1,4 +1,5 @@
 // Email validation utility
+// already have same func in inputSanitization.ts
 export const validateEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email.trim())
@@ -28,4 +29,11 @@ export const validatePassword = (password: string): { isValid: boolean; errors: 
     isValid: errors.length === 0,
     errors
   }
+}
+
+export const validatePhone = (phoneNumber: string): boolean => {
+  let digits = phoneNumber.replace(/\D/g, '');
+  if (digits.length === 11 && digits.startsWith('1')) digits = digits.slice(1);
+  const valid = /^[2-9]\d{9}$/.test(digits);
+  return valid
 }
