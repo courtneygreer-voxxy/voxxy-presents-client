@@ -1,52 +1,52 @@
 // Google Places Service for Voxxy Presents Web App
 // Uses backend proxy to keep API key secure (matches mobile app pattern)
 
-import { getApiUrl } from '@/config/environments';
+import { getApiUrl } from '@/config/environments'
 
-const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
 // Types matching Google Places API responses
 export interface PlacePrediction {
-  place_id: string;
-  description: string;
+  place_id: string
+  description: string
   structured_formatting: {
-    main_text: string;
-    secondary_text: string;
+    main_text: string
+    secondary_text: string
     main_text_matched_substrings?: Array<{
-      offset: number;
-      length: number;
-    }>;
-  };
-  types: string[];
+      offset: number
+      length: number
+    }>
+  }
+  types: string[]
 }
 
 export interface PlaceDetails {
   geometry: {
     location: {
-      lat: number;
-      lng: number;
-    };
-  };
-  formatted_address: string;
+      lat: number
+      lng: number
+    }
+  }
+  formatted_address: string
   address_components: Array<{
-    long_name: string;
-    short_name: string;
-    types: string[];
-  }>;
+    long_name: string
+    short_name: string
+    types: string[]
+  }>
 }
 
 export interface LocationData {
-  neighborhood: string;
-  city: string;
-  state: string;
-  country: string;
-  formatted: string;
-  latitude: number | null;
-  longitude: number | null;
-  place_id: string;
+  neighborhood: string
+  city: string
+  state: string
+  country: string
+  formatted: string
+  latitude: number | null
+  longitude: number | null
+  place_id: string
 }
 
-type AddressComponent = PlaceDetails['address_components'][number];
+type AddressComponent = PlaceDetails['address_components'][number]
 
 class GooglePlacesService {
   /**
@@ -65,16 +65,16 @@ class GooglePlacesService {
       'sublocality',
       'postal_town',
       'administrative_area_level_3',
-    ];
+    ]
 
     for (const type of cityPriority) {
-      const component = addressComponents.find(({ types }) => types.includes(type));
+      const component = addressComponents.find(({ types }) => types.includes(type))
       if (component) {
-        return component.long_name;
+        return component.long_name
       }
     }
 
-    return '';
+    return ''
   }
 
   /**
@@ -83,39 +83,36 @@ class GooglePlacesService {
    * @param types - Place types ('geocode' for all locations, '(cities)' for cities only, 'establishment' for businesses)
    * @returns Array of place predictions
    */
-  async searchPlaces(
-    input: string,
-    types: string = 'establishment'
-  ): Promise<PlacePrediction[]> {
+  async searchPlaces(input: string, types: string = 'establishment'): Promise<PlacePrediction[]> {
     if (!input || input.length < 2) {
-      return [];
+      return []
     }
 
     try {
-      const url = `${API_BASE_URL}/places/search?query=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}`;
+      const url = `${API_BASE_URL}/places/search?query=${encodeURIComponent(input)}&types=${encodeURIComponent(types)}`
 
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
 
       if (!response.ok) {
-        console.error('Places search failed:', response.status);
-        return [];
+        console.error('Places search failed:', response.status)
+        return []
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.results && Array.isArray(data.results)) {
-        return data.results;
+        return data.results
       }
 
-      return [];
+      return []
     } catch (error) {
-      console.error('Error searching places:', error);
-      return [];
+      console.error('Error searching places:', error)
+      return []
     }
   }
 
@@ -126,30 +123,30 @@ class GooglePlacesService {
    */
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      const url = `${API_BASE_URL}/places/details?place_id=${encodeURIComponent(placeId)}`;
+      const url = `${API_BASE_URL}/places/details?place_id=${encodeURIComponent(placeId)}`
 
       const response = await fetch(url, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-      });
+      })
 
       if (!response.ok) {
-        console.error('Place details fetch failed:', response.status);
-        return null;
+        console.error('Place details fetch failed:', response.status)
+        return null
       }
 
-      const data = await response.json();
+      const data = await response.json()
 
       if (data.details) {
-        return data.details;
+        return data.details
       }
 
-      return null;
+      return null
     } catch (error) {
-      console.error('Error fetching place details:', error);
-      return null;
+      console.error('Error fetching place details:', error)
+      return null
     }
   }
 
@@ -163,42 +160,42 @@ class GooglePlacesService {
    */
   parseLocationData(
     place: PlacePrediction,
-    placeDetails: PlaceDetails | null = null
+    placeDetails: PlaceDetails | null = null,
   ): LocationData {
-    let neighborhood = '';
-    let city = '';
-    let state = '';
-    let country = '';
-    let latitude: number | null = null;
-    let longitude: number | null = null;
+    let neighborhood = ''
+    let city = ''
+    let state = ''
+    let country = ''
+    let latitude: number | null = null
+    let longitude: number | null = null
 
     // Extract from address_components if available (most reliable)
     if (placeDetails?.address_components) {
       // Derive the display city first so NYC boroughs can win when `locality`
       // is absent but `sublocality_level_1` is present.
-      city = this.getCityFromComponents(placeDetails.address_components);
+      city = this.getCityFromComponents(placeDetails.address_components)
 
       placeDetails.address_components.forEach((component) => {
-        const types = component.types;
+        const types = component.types
 
         if (
           types.includes('neighborhood') ||
           types.includes('sublocality') ||
           types.includes('sublocality_level_1')
         ) {
-          neighborhood = component.long_name;
+          neighborhood = component.long_name
         } else if (types.includes('administrative_area_level_1')) {
-          state = component.short_name;
+          state = component.short_name
         } else if (types.includes('country')) {
-          country = component.short_name;
+          country = component.short_name
         }
-      });
+      })
     }
 
     // Extract coordinates
     if (placeDetails?.geometry?.location) {
-      latitude = placeDetails.geometry.location.lat;
-      longitude = placeDetails.geometry.location.lng;
+      latitude = placeDetails.geometry.location.lat
+      longitude = placeDetails.geometry.location.lng
     }
 
     // Do not derive city by splitting `secondary_text`.
@@ -208,11 +205,11 @@ class GooglePlacesService {
     // than risk turning "Brooklyn, NY, USA" into the incorrect "NY, NY".
 
     // Create formatted address (always just city, state - never street address)
-    let formattedAddress = '';
+    let formattedAddress = ''
     if (city && state) {
-      formattedAddress = `${city}, ${state}`;
+      formattedAddress = `${city}, ${state}`
     } else if (city) {
-      formattedAddress = city;
+      formattedAddress = city
     }
 
     return {
@@ -224,7 +221,7 @@ class GooglePlacesService {
       latitude,
       longitude,
       place_id: place.place_id,
-    };
+    }
   }
 
   /**
@@ -234,12 +231,12 @@ class GooglePlacesService {
    */
   getCityDisplay(locationData: LocationData): string {
     if (locationData.city && locationData.state) {
-      return `${locationData.city}, ${locationData.state}`;
+      return `${locationData.city}, ${locationData.state}`
     } else if (locationData.city) {
-      return locationData.city;
+      return locationData.city
     }
-    return '';
+    return ''
   }
 }
 
-export default new GooglePlacesService();
+export default new GooglePlacesService()

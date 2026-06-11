@@ -2,28 +2,30 @@
 
 ## TL;DR - Key Authentication Files
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `/src/contexts/AuthContext.tsx` | Auth state management (login, logout, signup, profile) | 356 |
-| `/src/services/api.ts` | API calls and token management | 800+ |
-| `/src/App.tsx` | Router setup and route protection | 213 |
-| `/src/components/auth/ProtectedRouteV2.tsx` | Prevent auth users from seeing auth pages | 50 |
-| `/src/components/auth/AdminRoute.tsx` | Restrict admin routes | 34 |
-| `/src/utils/cache.ts` | User profile caching with TTL | 155 |
+| File                                        | Purpose                                                | Lines |
+| ------------------------------------------- | ------------------------------------------------------ | ----- |
+| `/src/contexts/AuthContext.tsx`             | Auth state management (login, logout, signup, profile) | 356   |
+| `/src/services/api.ts`                      | API calls and token management                         | 800+  |
+| `/src/App.tsx`                              | Router setup and route protection                      | 213   |
+| `/src/components/auth/ProtectedRouteV2.tsx` | Prevent auth users from seeing auth pages              | 50    |
+| `/src/components/auth/AdminRoute.tsx`       | Restrict admin routes                                  | 34    |
+| `/src/utils/cache.ts`                       | User profile caching with TTL                          | 155   |
 
 ---
 
 ## Authentication Methods (AuthContext)
 
 ### Sign In
+
 ```typescript
 const { signIn } = useAuth()
 
 await signIn({
-  email: "user@example.com",
-  password: "password123"
+  email: 'user@example.com',
+  password: 'password123',
 })
 ```
+
 - Posts to `/login` endpoint with `X-Mobile-App: true` header (required for JWT)
 - Saves JWT token to localStorage as `railsAuthToken`
 - Fetches and caches user profile (5-minute TTL)
@@ -37,34 +39,39 @@ await signIn({
 const { signUp } = useAuth()
 
 await signUp({
-  email: "user@example.com",
-  password: "password123",
-  displayName: "John Doe",
-  role: "producer" // or "vendor", "consumer"
+  email: 'user@example.com',
+  password: 'password123',
+  displayName: 'John Doe',
+  role: 'producer', // or "vendor", "consumer"
 })
 ```
+
 - Posts to `/users` endpoint (when enabled)
 - Auto-login after signup
 - Handles duplicate emails (attempts login)
 - **Current flow:** Users submit contact form → Admin reviews → Account created manually
 
 ### Sign Out
+
 ```typescript
 const { signOut } = useAuth()
 
 await signOut()
 ```
+
 - Deletes `/logout` endpoint
 - Clears token from localStorage
 - Clears cached profile
 - Sets auth state to null
 
 ### Reset Password
+
 ```typescript
 const { resetPassword } = useAuth()
 
-await resetPassword("user@example.com")
+await resetPassword('user@example.com')
 ```
+
 - Sends POST to `/password_reset`
 - Initiates email verification flow
 
@@ -82,18 +89,18 @@ function MyComponent() {
     currentUser,        // Current user object
     loading,            // Boolean during async operations
     error,              // Error message string
-    
+
     // Authentication
     isAuthenticated,    // Boolean
     isEmailVerified,    // Boolean (confirmed_at != null)
-    
+
     // Roles
     isAdmin,            // Boolean
     isProducer,         // Boolean (includes venue_owner)
     isVendor,           // Boolean
     isGuest,            // Boolean (consumer/guest)
     hasRole('admin'),   // Check specific role
-    
+
     // Methods
     signIn,
     signUp,
@@ -117,23 +124,31 @@ function MyComponent() {
 ## Protected Routes
 
 ### Login Page Protection
+
 ```jsx
 // Prevent authenticated users from seeing login page
-<Route path="/login" element={
-  <RedirectIfAuthenticatedV2>
-    <LoginPage />
-  </RedirectIfAuthenticatedV2>
-} />
+<Route
+  path="/login"
+  element={
+    <RedirectIfAuthenticatedV2>
+      <LoginPage />
+    </RedirectIfAuthenticatedV2>
+  }
+/>
 ```
 
 ### Admin Route Protection
+
 ```jsx
 // Only admins can access this route
-<Route path="/admin/dashboard" element={
-  <AdminRoute>
-    <AdminDashboard />
-  </AdminRoute>
-} />
+<Route
+  path="/admin/dashboard"
+  element={
+    <AdminRoute>
+      <AdminDashboard />
+    </AdminRoute>
+  }
+/>
 ```
 
 ---
@@ -156,6 +171,7 @@ unknown → /
 ## Token Management
 
 ### Save Token
+
 ```typescript
 import { saveAuthToken } from '@/services/api'
 saveAuthToken(token: string)
@@ -163,12 +179,14 @@ saveAuthToken(token: string)
 ```
 
 ### Get Token
+
 ```typescript
 import { getAuthToken } from '@/services/api'
 const token = getAuthToken() // Returns string or null
 ```
 
 ### Clear Token
+
 ```typescript
 import { clearAuthToken } from '@/services/api'
 clearAuthToken()
@@ -180,6 +198,7 @@ clearAuthToken()
 ## User Profile Caching
 
 ### Cache User Profile
+
 ```typescript
 import { cacheUserProfile } from '@/utils/cache'
 cacheUserProfile('rails-user', userData)
@@ -187,12 +206,14 @@ cacheUserProfile('rails-user', userData)
 ```
 
 ### Get Cached Profile
+
 ```typescript
 import { getCachedUserProfile } from '@/utils/cache'
 const cached = getCachedUserProfile('rails-user')
 ```
 
 ### Remove Cached Profile
+
 ```typescript
 import { removeCachedUserProfile } from '@/utils/cache'
 removeCachedUserProfile('rails-user')
@@ -203,6 +224,7 @@ removeCachedUserProfile('rails-user')
 ## API Endpoints Used
 
 ### Authentication
+
 - `POST /login` - Login
 - `POST /users` - Signup
 - `DELETE /logout` - Logout
@@ -210,10 +232,12 @@ removeCachedUserProfile('rails-user')
 - `PATCH /users/:id` - Update user profile
 
 ### Password Management
+
 - `POST /password_reset` - Request password reset
 - `PATCH /password_reset` - Reset password with token
 
 ### Email Verification
+
 - `POST /verify_code` - Verify email code
 - `POST /resend_verification` - Resend verification email
 
@@ -227,7 +251,7 @@ interface User {
   email: string
   name: string
   role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest'
-  confirmed_at: string | null        // Email verified if not null
+  confirmed_at: string | null // Email verified if not null
   avatar?: string
   profile_pic?: string
   username?: string
@@ -249,6 +273,7 @@ VITE_EXPERIMENTAL_FEATURES=false         # true|false
 ```
 
 ### Environment-Based API URLs
+
 - Development: `https://www.voxxyai.com/api`
 - Staging: `https://www.voxxyai.com/api`
 - Production: `https://www.heyvoxxy.com/api`
@@ -258,6 +283,7 @@ VITE_EXPERIMENTAL_FEATURES=false         # true|false
 ## Common Patterns
 
 ### Check if User is Authenticated
+
 ```typescript
 const { isAuthenticated } = useAuth()
 
@@ -267,6 +293,7 @@ if (isAuthenticated) {
 ```
 
 ### Check User Role
+
 ```typescript
 const { isProducer, isVendor, isAdmin } = useAuth()
 
@@ -276,6 +303,7 @@ if (isProducer) {
 ```
 
 ### Handle Login with Error
+
 ```typescript
 const { signIn, error, clearError } = useAuth()
 
@@ -292,6 +320,7 @@ clearError()
 ```
 
 ### Logout and Redirect
+
 ```typescript
 const { signOut } = useAuth()
 const navigate = useNavigate()
@@ -303,13 +332,14 @@ async function handleLogout() {
 ```
 
 ### Protect Component with Role
+
 ```typescript
 function AdminPanel() {
   const { isAdmin, loading } = useAuth()
-  
+
   if (loading) return <LoadingSpinner />
   if (!isAdmin) return <Navigate to="/" />
-  
+
   return <AdminContent />
 }
 ```
@@ -319,6 +349,7 @@ function AdminPanel() {
 ## Error Handling
 
 ### API Errors
+
 ```typescript
 import { ApiError } from '@/services/api'
 
@@ -326,14 +357,15 @@ try {
   await signIn({ email, password })
 } catch (err) {
   if (err instanceof ApiError) {
-    console.log(err.message)    // "Invalid email or password"
-    console.log(err.status)      // 401
-    console.log(err.errors)      // ["Email has been taken"]
+    console.log(err.message) // "Invalid email or password"
+    console.log(err.status) // 401
+    console.log(err.errors) // ["Email has been taken"]
   }
 }
 ```
 
 ### Common Error Messages
+
 - "Invalid email or password" - Login failed
 - "Email has already been taken" - Email exists
 - "Failed to get current user" - Profile fetch failed
@@ -344,6 +376,7 @@ try {
 ## Component Usage Examples
 
 ### Full Login Component
+
 ```typescript
 import { useAuth } from '@/contexts/AuthContext'
 
@@ -365,14 +398,14 @@ export default function LoginPage() {
   return (
     <form onSubmit={handleSubmit}>
       {error && <Alert>{error}</Alert>}
-      <input 
-        value={email} 
+      <input
+        value={email}
         onChange={(e) => {
           setEmail(e.target.value)
           clearError()
         }}
       />
-      <input 
+      <input
         type="password"
         value={password}
         onChange={(e) => {
@@ -387,6 +420,7 @@ export default function LoginPage() {
 ```
 
 ### Protected Dashboard
+
 ```typescript
 import { useAuth } from '@/contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
@@ -420,6 +454,7 @@ export default function Dashboard() {
 ## Debugging Tips
 
 ### Check Auth State in Console
+
 ```typescript
 // Add to any component
 const auth = useAuth()
@@ -428,23 +463,26 @@ console.log('Auth State:', {
   userRole: auth.userProfile?.role,
   loading: auth.loading,
   error: auth.error,
-  token: auth.userProfile?.id
+  token: auth.userProfile?.id,
 })
 ```
 
 ### View Cached Profile
+
 ```javascript
 // In browser console
 JSON.parse(localStorage.getItem('user_profile_rails-user'))
 ```
 
 ### View Token
+
 ```javascript
 // In browser console
 localStorage.getItem('railsAuthToken')
 ```
 
 ### Enable Debug Mode
+
 ```env
 VITE_DEBUG_MODE=true
 ```
@@ -454,6 +492,7 @@ VITE_DEBUG_MODE=true
 ## Authentication Flow Summary
 
 ### Login Flow
+
 ```
 1. User enters email/password
 2. Form validation
@@ -466,6 +505,7 @@ VITE_DEBUG_MODE=true
 ```
 
 ### Logout Flow
+
 ```
 1. signOut() called
 2. removeCachedUserProfile() → clear cache
@@ -476,6 +516,7 @@ VITE_DEBUG_MODE=true
 ```
 
 ### App Startup
+
 ```
 1. Check localStorage for token
 2. If token exists:
@@ -490,9 +531,9 @@ VITE_DEBUG_MODE=true
 ---
 
 ## Related Files to Check
+
 - `/src/pages/LoginPage.tsx` - Login UI example
 - `/src/pages/BetaPendingPage.tsx` - Dashboard with logout example
 - `/src/pages/ProducerDashboard.tsx` - Protected dashboard
 - `/src/pages/AdminDashboard.tsx` - Admin-only dashboard
 - `/src/pages/ForgotPasswordPage.tsx` - Password reset
-

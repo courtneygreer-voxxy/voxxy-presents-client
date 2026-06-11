@@ -9,9 +9,11 @@
 ## ✅ CHANGE 1: Producer Dashboard - Organization-First Approach
 
 ### **Current Issue:**
+
 `/organizer/dashboard` (now `/producer/dashboard`) is producer-specific, assumes 1 producer → many clubs
 
 ### **Your Requirement:**
+
 - Organization-first approach
 - Producer is one of many admins on ONE organization
 - Vertical nav: Home, Events, Notifications, Settings
@@ -19,6 +21,7 @@
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 Organization {
   id: string
@@ -34,11 +37,13 @@ User {
 ```
 
 **What Needs to Change:**
+
 - ✅ Schema already supports 1:1 (producer → organization)
 - ⚠️ **FUTURE**: Add `adminIds: string[]` to Organization if you want multiple admins
 - ✅ Current setup: 1 producer owns 1 organization (perfect for your use case)
 
 **Recommended Schema Addition (Optional Future):**
+
 ```typescript
 Organization {
   ownerId: string          // Primary owner
@@ -51,6 +56,7 @@ Organization {
 ## ✅ CHANGE 2: Remove "My Clubs" - Single Organization Model
 
 ### **Your Requirement:**
+
 - Remove "My Clubs" functionality
 - Producer dashboard shows THE organization (not a list)
 - Brooklyn-Hearts-Club becomes THE organization
@@ -59,18 +65,21 @@ Organization {
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 producerProfile: {
-  organizationId: string  // Points to ONE organization ✅
+  organizationId: string // Points to ONE organization ✅
 }
 ```
 
 **What This Means:**
+
 - ✅ Producer has 1 organization (via `producerProfile.organizationId`)
 - ✅ No array of organizations
 - ✅ Perfect for single organization model
 
 **Migration Needed:**
+
 - ⚠️ **YES - Data Migration Required**
 - Existing producers may have created multiple "clubs"
 - Need to decide: Keep first club? Let them choose? Merge?
@@ -81,6 +90,7 @@ producerProfile: {
 ## ✅ CHANGE 3: Voxxy Shop → Voxxy Vendor Marketplace
 
 ### **Your Requirement:**
+
 - `/voxxy-shop` + `/voxxy-shop/venues` → Vendor Marketplace
 - Publicly viewable, only producers can interact
 - No more "shop" terminology
@@ -88,6 +98,7 @@ producerProfile: {
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 Vendor {
   id: string
@@ -97,6 +108,7 @@ Vendor {
 ```
 
 **What Needs to Change:**
+
 - ✅ Schema supports all vendor types (not just venues)
 - ✅ Routes: `/voxxy-shop/*` → `/marketplace` or `/vendors`
 - ✅ No schema changes needed, just UI/routes
@@ -106,6 +118,7 @@ Vendor {
 ## ✅ CHANGE 4: Venue Routes → Vendor Routes
 
 ### **Your Requirement:**
+
 - `/venue/brooklyn-loft` → `/vendor/brooklyn-loft`
 - Scrap all `venue/slug` routes
 - Update with new vendor schema
@@ -113,6 +126,7 @@ Vendor {
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 Vendor {
   slug: string  // URL-friendly ✅
@@ -121,6 +135,7 @@ Vendor {
 ```
 
 **What Needs to Change:**
+
 - ✅ Routes already configured: `/vendor/:slug` exists
 - ✅ Add redirect: `/venue/:slug` → `/vendor/:slug`
 - ✅ Schema already supports this
@@ -130,12 +145,14 @@ Vendor {
 ## ✅ CHANGE 5: Organization Admin Page
 
 ### **Your Requirement:**
+
 - `/:orgSlug/admin` becomes replica of organization dashboard OR event command center
 - Need to figure out hierarchy: producer → organization → events
 
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 Organization {
   slug: string        // brooklyn-hearts-club
@@ -148,6 +165,7 @@ Event {
 ```
 
 **Recommended Route Hierarchy:**
+
 ```
 /producer/dashboard          → Producer's main dashboard (organization overview)
 /producer/events             → All events for their organization
@@ -168,6 +186,7 @@ Event {
 ## ✅ CHANGE 6: Public Organization Page Simplification
 
 ### **Your Requirement:**
+
 - `/:orgSlug` → Simplified for vendors
 - Just: Logo, Name, Description, Connect links
 - Remove: Events, Subscribe, Our Story, Photos, Quick Actions
@@ -175,6 +194,7 @@ Event {
 ### **Schema Support:** ✅ **FULLY SUPPORTED**
 
 **Current Schema Has Everything:**
+
 ```typescript
 Organization {
   name: string           ✅
@@ -187,6 +207,7 @@ Organization {
 ```
 
 **What Needs to Change:**
+
 - ✅ Just hide fields in UI (no schema changes)
 - ✅ Fields still exist if you want them later
 
@@ -195,12 +216,14 @@ Organization {
 ## ✅ CHANGE 7: Event Command Center
 
 ### **Your Requirement:**
+
 - `/:orgSlug/edit-event/:id` → Event Command Center
 - Becomes main place to manage event, vendor applications, messages, run of show
 
 ### **Schema Support:** ✅ **NEEDS NEW COLLECTIONS (ALREADY PLANNED)**
 
 **Current Schema:**
+
 ```typescript
 Event {
   id: string
@@ -210,6 +233,7 @@ Event {
 ```
 
 **Missing (From Your Phase 1 Requirements):**
+
 ```typescript
 // NEW - From your earlier requirements
 VendorApplication {
@@ -238,17 +262,20 @@ RunOfShow {
 ## ❌ CHANGE 8: Remove `/create-club` and Beta Approval
 
 ### **Your Requirement:**
+
 - Remove `/create-club` (part of signup now)
 - Remove `/beta-pending` (no approval needed)
 
 ### **Schema Support:** ✅ **SUPPORTED**
 
 **What Needs to Change:**
+
 - ✅ Remove `betaStatus` checks from code
 - ✅ Update signup flow to create organization immediately
 - ✅ Remove beta approval UI components
 
 **Schema Fields to Deprecate:**
+
 ```typescript
 User {
   betaStatus?: 'pending' | 'approved' | 'denied'  // Can remove
@@ -262,11 +289,13 @@ User {
 ## ⚠️ CHANGE 9: Admin Dashboard
 
 ### **Your Requirement:**
+
 - `/admin/login` + `/admin/dashboard` need revamp and fixes
 
 ### **Schema Support:** ✅ **SUPPORTED**
 
 **Current Schema:**
+
 ```typescript
 User {
   role: 'admin'  ✅
@@ -274,6 +303,7 @@ User {
 ```
 
 **What Needs to Change:**
+
 - Define what admins should see/do
 - Currently has beta user approval (you want to remove this)
 - What should admins manage instead?
@@ -283,7 +313,9 @@ User {
 ## 🐛 CHANGE 10: Vendor Dashboard Bug
 
 ### **Your Issue:**
+
 Vendor dashboard stuck on "Loading..." with error:
+
 ```
 No Venue Found
 User ID: AbNb85X4YfTLKaY9ZhU725IsT0V2
@@ -293,11 +325,13 @@ Venues loaded: 0
 ### **Root Cause:** ⚠️ **CODE BUG - NOT SCHEMA**
 
 **The Problem:**
+
 - Vendor dashboard is looking for `venues` collection
 - Should look for `vendors` collection
 - User has `vendorProfile` but no vendors created
 
 **Schema is Fine:**
+
 ```typescript
 User {
   vendorProfile?: {
@@ -308,6 +342,7 @@ User {
 ```
 
 **Fix Needed:**
+
 - Update `VenueOwnerDashboardNew.tsx` to query `vendors` not `venues`
 - Update to use new vendor schema
 - Show "Create Your Vendor Profile" instead of "Create Your Venue"
@@ -317,18 +352,21 @@ User {
 ## 📊 SCHEMA CHANGES NEEDED SUMMARY
 
 ### ✅ **No Schema Changes Required:**
+
 1. Organization-first approach (already 1:1)
 2. Vendor marketplace (schema supports all types)
 3. Route changes (just UI/routing)
 4. Public org page simplification (hide fields)
 
 ### ⚠️ **Schema Additions Needed (Already Planned):**
+
 1. `VendorApplication` collection
 2. `EventMessage` collection
 3. `RunOfShow` collection
 4. `vendorSlots[]` on Event (for tracking needed vendors)
 
 ### 🔧 **Code Changes Needed (Not Schema):**
+
 1. Fix vendor dashboard to use `vendors` collection
 2. Update producer dashboard for 1 organization
 3. Add route redirects
@@ -346,6 +384,7 @@ User {
 **Options:**
 
 **Option A: Keep First Club**
+
 ```typescript
 // Migration script
 - Find all users with role='producer'
@@ -355,6 +394,7 @@ User {
 ```
 
 **Option B: Let Them Choose**
+
 ```typescript
 // On first login after migration
 - Show: "You have 3 organizations. Pick your primary one"
@@ -364,6 +404,7 @@ User {
 ```
 
 **Option C: Merge Organizations**
+
 ```typescript
 // Complex - merge events, data from all clubs into one
 ```
@@ -377,6 +418,7 @@ User {
 **All your UI changes are supported by the V3.0 schema!**
 
 **Schema is ready for:**
+
 - ✅ Single organization per producer
 - ✅ All vendor types
 - ✅ Event command center (with new collections)
@@ -384,6 +426,7 @@ User {
 - ✅ Simplified public pages
 
 **Just need:**
+
 - UI/UX updates
 - Route changes (already mostly done)
 - Code fixes (vendor dashboard bug)

@@ -48,17 +48,19 @@
 ### Updated Files
 
 **1. `src/types/email.ts`**
+
 ```typescript
 export interface EmailDelivery {
   // ... existing fields ...
 
   // ✅ NEW: Phase 1-3 backend now includes these
-  recipient_name?: string | null;
-  vendor_category?: string | null;
+  recipient_name?: string | null
+  vendor_category?: string | null
 }
 ```
 
 **2. `src/components/producer/Email/EmailAuditLogOverlay.tsx`**
+
 ```typescript
 // BEFORE (lines 116, 121):
 recipient_name: null, // TODO: Fetch from registration
@@ -87,6 +89,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Confirm events have all 17 scheduled emails
 
 **Steps:**
+
 1. Navigate to Command Center → Mail tab for any event
 2. Count the number of email rows (should be exactly 17 total)
 3. Verify Position 1 is "Initial Invitation" (real scheduled email, NOT virtual)
@@ -101,11 +104,13 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
    - "New Submission Notification" (on_application_submit)
 
 **Expected Result:**
+
 - ✅ Exactly 17 total rows (no virtual invitation email)
 - ✅ Position 1 "Initial Invitation" is a real scheduled email
 - ✅ New email types visible with proper names
 
 **If Fails:**
+
 - Check event was migrated (may only have 9 emails)
 - Check backend logs for migration status
 - Try different event
@@ -117,6 +122,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Confirm new email types send and create EmailDelivery records
 
 **Steps:**
+
 1. Find an event with pending applications
 2. Open Mail tab in one browser tab
 3. Open Applicants tab in another tab
@@ -130,12 +136,14 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
    - Status shows "sent"
 
 **Expected Result:**
+
 - ✅ Email sent immediately on approval
 - ✅ Console shows "✓ sent via unified system"
 - ✅ Recipient count increases
 - ✅ Status = "sent"
 
 **Repeat for other triggers:**
+
 - Reject application → "Application Rejected" email
 - Move to waitlist → "Moved to Waitlist" email
 - Mark payment received → "Payment Confirmed" email
@@ -147,6 +155,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Confirm "Unknown" recipient names are fixed
 
 **Steps:**
+
 1. Navigate to Mail tab
 2. Click "View Audit Log" button (top right)
 3. Audit log opens full-screen
@@ -155,10 +164,12 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 6. Check multiple entries
 
 **Expected Result:**
+
 - ✅ Recipient names display correctly (NOT "Unknown")
 - ✅ Real names from vendor contacts
 
 **If Shows "Unknown":**
+
 - Check browser console for errors
 - Check Network tab → filter by "email_deliveries"
 - Inspect API response → should include `recipient_name` field
@@ -171,6 +182,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Confirm "Unknown" categories are fixed
 
 **Steps:**
+
 1. In Email Audit Log, look at "Category" column (6th column)
 2. Verify vendor categories appear as badges:
    - "Food & Beverage"
@@ -180,10 +192,12 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 3. Check multiple entries
 
 **Expected Result:**
+
 - ✅ Category badges show actual vendor categories (NOT "Unknown")
 - ✅ Categories match vendor contact data
 
 **If Shows "Unknown":**
+
 - Check Network tab → `email_deliveries` response
 - Verify `vendor_category` field present
 - Check registration has vendor_category set
@@ -195,6 +209,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Verify deep linking from Mail tab works
 
 **Steps:**
+
 1. Close audit log (back to Mail tab)
 2. Find email with sent status and recipients > 0
 3. Click the recipient count number (e.g., "24")
@@ -203,6 +218,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 6. Check filter dropdown shows email name selected
 
 **Expected Result:**
+
 - ✅ Audit log opens with email name filter applied
 - ✅ Only deliveries for that email show
 - ✅ Filter dropdown reflects selection
@@ -214,6 +230,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Verify deep linking from undelivered count works
 
 **Steps:**
+
 1. Close audit log (back to Mail tab)
 2. Find email with undelivered_count > 0 (red number)
 3. Click the undelivered count number (e.g., "5")
@@ -223,6 +240,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 5. Verify only bounced/dropped deliveries show
 
 **Expected Result:**
+
 - ✅ Audit log opens with email + status filters applied
 - ✅ Only shows bounced and dropped deliveries
 - ✅ All other statuses hidden
@@ -234,6 +252,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Verify Position 1 invitation email shows correct delivery stats
 
 **Steps:**
+
 1. Mail tab → Find "Initial Invitation" (Position 1) row
 2. Check recipient count matches sent invitations
 3. Check undelivered count (if any bounced invitations)
@@ -246,6 +265,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 7. Verify you can edit Position 1 subject/body
 
 **Expected Result:**
+
 - ✅ Position 1 is a real scheduled email (not virtual)
 - ✅ Invitation stats match actual invitations sent
 - ✅ Audit log shows invitation deliveries with full data
@@ -259,6 +279,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Test global search works with new data
 
 **Steps:**
+
 1. Open audit log (View Audit Log button)
 2. In search box (top), type a vendor name (e.g., "John")
 3. Results should filter to show only matching recipients
@@ -266,6 +287,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 5. Results should filter to that recipient
 
 **Expected Result:**
+
 - ✅ Search finds recipients by name
 - ✅ Search finds recipients by email
 - ✅ Results update in real-time
@@ -277,6 +299,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Verify sorting works with new data
 
 **Steps:**
+
 1. In audit log, click "Recipient" column header
 2. Table should sort alphabetically by recipient name
 3. Click again → reverse sort
@@ -284,6 +307,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 5. Categories should sort alphabetically
 
 **Expected Result:**
+
 - ✅ Recipient column sorts by name (not email)
 - ✅ Category column sorts alphabetically
 - ✅ Sort indicator shows direction (↑/↓)
@@ -295,6 +319,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Verify Issue #4 still exists (expected to fail)
 
 **Steps:**
+
 1. Mail tab → Find sent email with deliveries
 2. Note the delivered_count, undelivered_count from Mail tab
 3. Click recipient count → Open audit log
@@ -302,11 +327,13 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 5. Compare counts
 
 **Expected Result:**
+
 - ⚠️ **COUNTS MAY NOT MATCH** (Known Issue #4)
 - Mail Tab: Uses `scheduled_email.delivery_counts` (may be stale)
 - Audit Log: Uses `email_deliveries.status` (accurate, source of truth)
 
 **Document any discrepancies:**
+
 - Email ID:
 - Mail Tab counts:
 - Audit Log counts:
@@ -321,6 +348,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Monitor performance during auto-refresh
 
 **Steps:**
+
 1. Mail tab → Enable auto-refresh toggle (if not already on)
 2. Open browser DevTools → Network tab
 3. Wait 30 seconds for auto-refresh
@@ -330,11 +358,13 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 5. Note response times
 
 **Expected Result:**
+
 - ⚠️ **May be slow** (N+1 query issue, Phase 4 will optimize)
 - Auto-refresh works but not optimized yet
 - No errors in console
 
 **Document Performance:**
+
 - Total API calls on refresh:
 - Slowest endpoint:
 - Time to refresh:
@@ -346,6 +376,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **Goal:** Test events with only 9 emails use fallback
 
 **Steps:**
+
 1. Find old event (created before migration)
 2. Mail tab → Should have 9 emails (not 17)
 3. Trigger an approval on this event
@@ -355,6 +386,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 6. Check audit log shows the delivery
 
 **Expected Result:**
+
 - ✅ Old events still work with fallback templates
 - ✅ Deliveries create EmailDelivery records
 - ✅ Audit log shows deliveries
@@ -398,6 +430,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **URL:** `GET /api/v1/presents/events/:slug/scheduled_emails/:id/email_deliveries`
 
 **Expected Response:**
+
 ```json
 [
   {
@@ -419,6 +452,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 ```
 
 **Verify:**
+
 - [ ] `recipient_name` field present
 - [ ] `vendor_category` field present
 - [ ] Values are NOT null (for valid registrations)
@@ -428,6 +462,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 **URL:** `GET /api/v1/presents/events/:slug/invitations`
 
 **Expected Response:**
+
 ```json
 {
   "invitations": [...],
@@ -450,6 +485,7 @@ category: delivery.vendor_category || 'Unknown', // ✅ Now uses backend data
 ```
 
 **Verify:**
+
 - [ ] `meta.delivery_stats` field present
 - [ ] Stats match individual invitation statuses
 
@@ -465,34 +501,37 @@ When reporting bugs, include:
 **Issue:** [Brief description]
 
 **Environment:**
+
 - Frontend: [branch/commit]
 - Backend: Phases 1-3 staging deployment
 - Browser: [Chrome/Firefox/Safari version]
 - Event ID: [event slug]
 
 **Steps to Reproduce:**
+
 1.
 2.
 3.
 
 **Expected Result:**
 
-
 **Actual Result:**
-
 
 **Console Logs:**
 ```
+
 [paste relevant console logs]
-```
+
+````
 
 **Network Response:** (if API issue)
 ```json
 [paste API response from Network tab]
-```
+````
 
 **Screenshots:**
 [attach if helpful]
+
 ```
 
 ### Where to Report
@@ -579,3 +618,4 @@ When reporting bugs, include:
 ---
 
 Happy Testing! 🧪
+```

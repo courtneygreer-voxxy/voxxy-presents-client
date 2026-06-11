@@ -1,49 +1,49 @@
-import { useState, useMemo } from 'react';
-import { Calendar, MapPin, Plus, Eye, EyeOff, Trash2, Search, Users } from 'lucide-react';
-import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers';
-import { DebugPanel } from './DebugPanel';
-import { Badge, type BadgeVariant } from '@/components/ui/badge';
+import { useState, useMemo } from 'react'
+import { Calendar, MapPin, Plus, Eye, EyeOff, Trash2, Search, Users } from 'lucide-react'
+import { formatEventDate as formatDate, isDatePast, getDaysUntil } from '../../utils/dateHelpers'
+import { DebugPanel } from './DebugPanel'
+import { Badge, type BadgeVariant } from '@/components/ui/badge'
 
 interface Event {
-  id: number;
-  slug: string;
-  namespaced_slug?: string;
-  title: string;
-  description?: string;
+  id: number
+  slug: string
+  namespaced_slug?: string
+  title: string
+  description?: string
   dates?: {
-    start?: string;
-    end?: string;
-  };
-  event_date?: string;
-  location?: string;
+    start?: string
+    end?: string
+  }
+  event_date?: string
+  location?: string
   status?: {
-    published?: boolean;
-    registration_open?: boolean;
-    status?: 'draft' | 'published' | 'cancelled' | 'completed';
-    is_live?: boolean;
-  };
-  published?: boolean;
-  registered_count?: number;
+    published?: boolean
+    registration_open?: boolean
+    status?: 'draft' | 'published' | 'cancelled' | 'completed'
+    is_live?: boolean
+  }
+  published?: boolean
+  registered_count?: number
   capacity?: {
-    total?: number;
-    registered?: number;
-    remaining?: number;
-    is_full?: boolean;
-  };
+    total?: number
+    registered?: number
+    remaining?: number
+    is_full?: boolean
+  }
 }
 
 interface EventsListProps {
-  events: Event[];
-  searchTerm: string;
-  statusFilter: string | null;
-  showPastEvents: boolean;
-  sortBy: 'date' | 'status' | 'name';
-  onCreateEvent: () => void;
-  onEditEvent: (eventSlug: string) => void;
-  onCommandCenter: (eventSlug: string) => void;
-  onDeleteEvent?: (eventSlug: string) => Promise<void>;
-  isAdmin?: boolean;
-  loading?: boolean;
+  events: Event[]
+  searchTerm: string
+  statusFilter: string | null
+  showPastEvents: boolean
+  sortBy: 'date' | 'status' | 'name'
+  onCreateEvent: () => void
+  onEditEvent: (eventSlug: string) => void
+  onCommandCenter: (eventSlug: string) => void
+  onDeleteEvent?: (eventSlug: string) => Promise<void>
+  isAdmin?: boolean
+  loading?: boolean
 }
 
 export default function EventsList({
@@ -59,94 +59,94 @@ export default function EventsList({
   isAdmin = false,
   loading = false,
 }: EventsListProps) {
-
   const getStatusBadge = (event: Event) => {
     if (event.status?.status === 'cancelled') {
-      return { label: 'Cancelled', variant: 'tintRed' as BadgeVariant, value: 'cancelled' };
+      return { label: 'Cancelled', variant: 'tintRed' as BadgeVariant, value: 'cancelled' }
     }
     if (event.status?.status === 'completed') {
-      return { label: 'Completed', variant: 'tintBlue' as BadgeVariant, value: 'completed' };
+      return { label: 'Completed', variant: 'tintBlue' as BadgeVariant, value: 'completed' }
     }
-    const eventDate = event.dates?.start || event.event_date;
+    const eventDate = event.dates?.start || event.event_date
     if (eventDate && isDatePast(eventDate)) {
-      return { label: 'Past', variant: 'tintMuted' as BadgeVariant, value: 'past' };
+      return { label: 'Past', variant: 'tintMuted' as BadgeVariant, value: 'past' }
     }
     if (event.status?.is_live) {
-      return { label: 'Live', variant: 'tintGreen' as BadgeVariant, value: 'live' };
+      return { label: 'Live', variant: 'tintGreen' as BadgeVariant, value: 'live' }
     }
-    return { label: 'Draft', variant: 'tintPurple' as BadgeVariant, value: 'draft' };
-  };
+    return { label: 'Draft', variant: 'tintPurple' as BadgeVariant, value: 'draft' }
+  }
 
   const formatEventDateDisplay = (event: Event) => {
-    const dateString = event.dates?.start || event.event_date;
-    if (!dateString) return 'Date TBD';
+    const dateString = event.dates?.start || event.event_date
+    if (!dateString) return 'Date TBD'
 
-    const formatted = formatDate(dateString, 'MMMM d, yyyy');
-    return formatted || 'Invalid date';
-  };
+    const formatted = formatDate(dateString, 'MMMM d, yyyy')
+    return formatted || 'Invalid date'
+  }
 
   // Filter and sort events
   const filteredAndSortedEvents = useMemo(() => {
-    let filtered = events.filter(event => {
+    let filtered = events.filter((event) => {
       // Search filter
       if (searchTerm) {
-        const searchLower = searchTerm.toLowerCase();
+        const searchLower = searchTerm.toLowerCase()
         const matchesSearch =
           event.title?.toLowerCase().includes(searchLower) ||
           event.description?.toLowerCase().includes(searchLower) ||
-          event.location?.toLowerCase().includes(searchLower);
-        if (!matchesSearch) return false;
+          event.location?.toLowerCase().includes(searchLower)
+        if (!matchesSearch) return false
       }
 
       // Status filter
-      const badge = getStatusBadge(event);
+      const badge = getStatusBadge(event)
 
       // Hide past and cancelled events by default unless showPastEvents is true or explicitly filtered
-      const isPastOrCancelled = badge.value === 'past' || badge.value === 'cancelled';
+      const isPastOrCancelled = badge.value === 'past' || badge.value === 'cancelled'
       // When filtering by "Past", cancelled events ARE considered explicitly filtered
-      const isExplicitlyFiltered = statusFilter === badge.label || (statusFilter === 'Past' && badge.value === 'cancelled');
+      const isExplicitlyFiltered =
+        statusFilter === badge.label || (statusFilter === 'Past' && badge.value === 'cancelled')
 
       if (!showPastEvents && isPastOrCancelled && !isExplicitlyFiltered) {
-        return false;
+        return false
       }
 
       // When filtering by "Past", include cancelled events (they're effectively "over")
       if (statusFilter) {
         if (statusFilter === 'Past' && isPastOrCancelled) {
           // "Past" filter includes both past and cancelled events
-          return true;
+          return true
         } else if (badge.label !== statusFilter) {
           // For all other filters (including "Cancelled"), do exact match
-          return false;
+          return false
         }
       }
 
-      return true;
-    });
+      return true
+    })
 
     // Sort events
     filtered.sort((a, b) => {
       if (sortBy === 'date') {
-        const dateA = new Date(a.dates?.start || a.event_date || 0).getTime();
-        const dateB = new Date(b.dates?.start || b.event_date || 0).getTime();
-        return dateB - dateA; // Newest first
+        const dateA = new Date(a.dates?.start || a.event_date || 0).getTime()
+        const dateB = new Date(b.dates?.start || b.event_date || 0).getTime()
+        return dateB - dateA // Newest first
       } else if (sortBy === 'name') {
-        return (a.title || '').localeCompare(b.title || '');
+        return (a.title || '').localeCompare(b.title || '')
       } else if (sortBy === 'status') {
-        return getStatusBadge(a).label.localeCompare(getStatusBadge(b).label);
+        return getStatusBadge(a).label.localeCompare(getStatusBadge(b).label)
       }
-      return 0;
-    });
+      return 0
+    })
 
-    return filtered;
-  }, [events, searchTerm, statusFilter, showPastEvents, sortBy]);
+    return filtered
+  }, [events, searchTerm, statusFilter, showPastEvents, sortBy])
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
   return (
@@ -157,25 +157,22 @@ export default function EventsList({
       <div className="space-y-2.5">
         {filteredAndSortedEvents.length === 0 ? (
           <div className="text-center py-8 text-foreground/40">
-            <p className="text-xs">No events found{(searchTerm || statusFilter) && ' - try adjusting your filters'}</p>
+            <p className="text-xs">
+              No events found{(searchTerm || statusFilter) && ' - try adjusting your filters'}
+            </p>
           </div>
         ) : (
           filteredAndSortedEvents.map((event) => {
-            const badge = getStatusBadge(event);
-            const applicantCount = event.capacity?.registered || event.registered_count || 0;
+            const badge = getStatusBadge(event)
+            const applicantCount = event.capacity?.registered || event.registered_count || 0
 
             return (
-              <div
-                key={event.id}
-                className="glass-card voxxy-hover-panel event-list-card p-4"
-              >
+              <div key={event.id} className="glass-card voxxy-hover-panel event-list-card p-4">
                 <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3">
                   {/* Event Info */}
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-base font-semibold text-foreground">
-                        {event.title}
-                      </h3>
+                      <h3 className="text-base font-semibold text-foreground">{event.title}</h3>
                       <Badge
                         variant={badge.variant}
                         className="px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide"
@@ -241,7 +238,7 @@ export default function EventsList({
                   </div>
                 </div>
               </div>
-            );
+            )
           })
         )}
       </div>
@@ -263,5 +260,5 @@ export default function EventsList({
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

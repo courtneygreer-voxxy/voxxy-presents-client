@@ -1,19 +1,32 @@
-import { useState, useMemo } from 'react';
-import { Search, Filter, Mail, ChevronDown, ChevronUp, Megaphone, FileText, CreditCard, Calendar, PartyPopper, MessageSquare, Settings2 } from 'lucide-react';
-import type { ScheduledEmail, ScheduledEmailStatus, EmailCategory } from '@/types/email';
-import ScheduledEmailCard from './ScheduledEmailCard';
+import { useState, useMemo } from 'react'
+import {
+  Search,
+  Filter,
+  Mail,
+  ChevronDown,
+  ChevronUp,
+  Megaphone,
+  FileText,
+  CreditCard,
+  Calendar,
+  PartyPopper,
+  MessageSquare,
+  Settings2,
+} from 'lucide-react'
+import type { ScheduledEmail, ScheduledEmailStatus, EmailCategory } from '@/types/email'
+import ScheduledEmailCard from './ScheduledEmailCard'
 
 interface ScheduledEmailListProps {
-  emails: ScheduledEmail[];
-  onEdit?: (email: ScheduledEmail) => void;
-  onPreview?: (email: ScheduledEmail) => void;
-  onPause?: (emailId: number) => Promise<void>;
-  onResume?: (emailId: number) => Promise<void>;
-  onSendNow?: (emailId: number) => Promise<void>;
-  onDelete?: (emailId: number) => Promise<void>;
+  emails: ScheduledEmail[]
+  onEdit?: (email: ScheduledEmail) => void
+  onPreview?: (email: ScheduledEmail) => void
+  onPause?: (emailId: number) => Promise<void>
+  onResume?: (emailId: number) => Promise<void>
+  onSendNow?: (emailId: number) => Promise<void>
+  onDelete?: (emailId: number) => Promise<void>
 }
 
-type FilterType = 'all' | ScheduledEmailStatus;
+type FilterType = 'all' | ScheduledEmailStatus
 
 const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'all', label: 'All Emails' },
@@ -22,83 +35,86 @@ const FILTER_OPTIONS: { value: FilterType; label: string }[] = [
   { value: 'sent', label: 'Sent' },
   { value: 'failed', label: 'Failed' },
   { value: 'cancelled', label: 'Cancelled' },
-];
+]
 
 // Category configuration with icons and colors
-const CATEGORY_CONFIG: Record<EmailCategory, { label: string; icon: any; color: string; bgColor: string }> = {
+const CATEGORY_CONFIG: Record<
+  EmailCategory,
+  { label: string; icon: any; color: string; bgColor: string }
+> = {
   pre_application: {
     label: 'Event Announcements',
     icon: Megaphone,
     color: 'text-primary',
-    bgColor: 'bg-primary/20'
+    bgColor: 'bg-primary/20',
   },
   application: {
     label: 'Application Updates',
     icon: FileText,
     color: 'text-pink-400',
-    bgColor: 'bg-pink-500/20'
+    bgColor: 'bg-pink-500/20',
   },
   payment: {
     label: 'Payment Reminders',
     icon: CreditCard,
     color: 'text-blue-400',
-    bgColor: 'bg-blue-500/20'
+    bgColor: 'bg-blue-500/20',
   },
   pre_event: {
     label: 'Event Countdown',
     icon: Calendar,
     color: 'text-green-400',
-    bgColor: 'bg-green-500/20'
+    bgColor: 'bg-green-500/20',
   },
   event_day: {
     label: 'Event Day',
     icon: PartyPopper,
     color: 'text-orange-400',
-    bgColor: 'bg-orange-500/20'
+    bgColor: 'bg-orange-500/20',
   },
   post_event: {
     label: 'Post-Event',
     icon: MessageSquare,
     color: 'text-cyan-400',
-    bgColor: 'bg-cyan-500/20'
+    bgColor: 'bg-cyan-500/20',
   },
   system: {
     label: 'System Notifications',
     icon: Settings2,
     color: 'text-yellow-400',
-    bgColor: 'bg-yellow-500/20'
+    bgColor: 'bg-yellow-500/20',
   },
   event_announcements: {
     label: 'Event Announcements',
     icon: Megaphone,
     color: 'text-primary',
-    bgColor: 'bg-primary/20'
+    bgColor: 'bg-primary/20',
   },
   application_updates: {
     label: 'Application Updates',
     icon: FileText,
     color: 'text-pink-400',
-    bgColor: 'bg-pink-500/20'
+    bgColor: 'bg-pink-500/20',
   },
   payment_reminders: {
     label: 'Payment Reminders',
     icon: CreditCard,
     color: 'text-blue-400',
-    bgColor: 'bg-blue-500/20'
+    bgColor: 'bg-blue-500/20',
   },
   event_countdown: {
     label: 'Event Countdown',
     icon: Calendar,
     color: 'text-green-400',
-    bgColor: 'bg-green-500/20'
+    bgColor: 'bg-green-500/20',
   },
   event_updates: {
     label: 'Event Updates',
     icon: Settings2,
     color: 'text-yellow-400',
-    bgColor: 'bg-yellow-500/20'
-  }
-};
+    bgColor: 'bg-yellow-500/20',
+  },
+}
 
 export default function ScheduledEmailList({
   emails,
@@ -107,117 +123,127 @@ export default function ScheduledEmailList({
   onPause,
   onResume,
   onSendNow,
-  onDelete
+  onDelete,
 }: ScheduledEmailListProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<FilterType>('all');
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilter, setStatusFilter] = useState<FilterType>('all')
   const [expandedCategories, setExpandedCategories] = useState<Set<EmailCategory>>(
-    new Set(['pre_application', 'application', 'payment', 'pre_event'])
-  );
+    new Set(['pre_application', 'application', 'payment', 'pre_event']),
+  )
 
   // Infer category from email name/trigger if category not explicitly set
   const inferCategory = (email: ScheduledEmail): EmailCategory => {
-    const name = email.name.toLowerCase();
-    const trigger = email.trigger_type;
+    const name = email.name.toLowerCase()
+    const trigger = email.trigger_type
 
     // Check for payment-related emails
     if (name.includes('payment') || trigger.includes('payment')) {
-      return 'payment';
+      return 'payment'
     }
 
     // Check for application-related emails
-    if (name.includes('application') || name.includes('approval') || name.includes('rejected') || name.includes('waitlist')) {
-      return 'application';
+    if (
+      name.includes('application') ||
+      name.includes('approval') ||
+      name.includes('rejected') ||
+      name.includes('waitlist')
+    ) {
+      return 'application'
     }
 
     // Check for event countdown/pre-event
     if (trigger === 'days_before_event' || name.includes('days before')) {
-      return 'pre_event';
+      return 'pre_event'
     }
 
     // Check for event day
     if (trigger === 'on_event_date' || name.includes('day of')) {
-      return 'event_day';
+      return 'event_day'
     }
 
     // Check for post-event
     if (trigger === 'days_after_event') {
-      return 'post_event';
+      return 'post_event'
     }
 
     // Check for announcement/invitation
-    if (name.includes('announcement') || name.includes('immediate') || name.includes('invitation')) {
-      return 'pre_application';
+    if (
+      name.includes('announcement') ||
+      name.includes('immediate') ||
+      name.includes('invitation')
+    ) {
+      return 'pre_application'
     }
 
     // Default to pre_application
-    return 'pre_application';
-  };
+    return 'pre_application'
+  }
 
   // Filter and search emails
   const filteredEmails = useMemo(() => {
-    let result = emails;
+    let result = emails
 
     // Filter by status
     if (statusFilter !== 'all') {
-      result = result.filter(email => email.status === statusFilter);
+      result = result.filter((email) => email.status === statusFilter)
     }
 
     // Search by name or subject
     if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(email =>
-        email.name.toLowerCase().includes(query) ||
-        email.subject_template.toLowerCase().includes(query)
-      );
+      const query = searchQuery.toLowerCase()
+      result = result.filter(
+        (email) =>
+          email.name.toLowerCase().includes(query) ||
+          email.subject_template.toLowerCase().includes(query),
+      )
     }
 
     // Sort by scheduled_for date (ascending)
     return result.sort((a, b) => {
-      const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0;
-      const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0;
-      return dateA - dateB;
-    });
-  }, [emails, searchQuery, statusFilter]);
+      const dateA = a.scheduled_for ? new Date(a.scheduled_for).getTime() : 0
+      const dateB = b.scheduled_for ? new Date(b.scheduled_for).getTime() : 0
+      return dateA - dateB
+    })
+  }, [emails, searchQuery, statusFilter])
 
   // Group emails by category
   const emailsByCategory = useMemo(() => {
-    const grouped: Partial<Record<EmailCategory, ScheduledEmail[]>> = {};
+    const grouped: Partial<Record<EmailCategory, ScheduledEmail[]>> = {}
 
-    filteredEmails.forEach(email => {
+    filteredEmails.forEach((email) => {
       // Try to infer category from email name if not explicitly set
-      const category = inferCategory(email);
+      const category = inferCategory(email)
       if (!grouped[category]) {
-        grouped[category] = [];
+        grouped[category] = []
       }
-      grouped[category]!.push(email);
-    });
+      grouped[category]!.push(email)
+    })
 
-    return grouped;
-  }, [filteredEmails]);
+    return grouped
+  }, [filteredEmails])
 
   // Statistics
   const stats = useMemo(() => {
     return {
       total: emails.length,
-      scheduled: emails.filter(e => e.status === 'scheduled').length,
-      paused: emails.filter(e => e.status === 'paused').length,
-      sent: emails.filter(e => e.status === 'sent').length,
-      failed: emails.filter(e => e.status === 'failed').length,
-    };
-  }, [emails]);
+      scheduled: emails.filter((e) => e.status === 'scheduled').length,
+      paused: emails.filter((e) => e.status === 'paused').length,
+      sent: emails.filter((e) => e.status === 'sent').length,
+      failed: emails.filter((e) => e.status === 'failed').length,
+    }
+  }, [emails])
 
   const toggleCategory = (category: EmailCategory) => {
-    setExpandedCategories(prev => {
-      const newSet = new Set(prev);
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev)
       if (newSet.has(category)) {
-        newSet.delete(category);
+        newSet.delete(category)
       } else {
-        newSet.add(category);
+        newSet.add(category)
       }
-      return newSet;
-    });
-  };
+      return newSet
+    })
+  }
 
   if (emails.length === 0) {
     return (
@@ -225,14 +251,12 @@ export default function ScheduledEmailList({
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-background/5 border border-border mb-4">
           <Mail className="w-8 h-8 text-foreground/40" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground mb-2">
-          No Scheduled Emails
-        </h3>
+        <h3 className="text-xl font-semibold text-foreground mb-2">No Scheduled Emails</h3>
         <p className="text-foreground/60">
           Emails will be automatically generated based on your event template.
         </p>
       </div>
-    );
+    )
   }
 
   return (
@@ -259,7 +283,7 @@ export default function ScheduledEmailList({
             onChange={(e) => setStatusFilter(e.target.value as FilterType)}
             className="px-4 py-2.5 bg-background/5 border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
           >
-            {FILTER_OPTIONS.map(option => (
+            {FILTER_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
                 {option.value !== 'all' && ` (${stats[option.value as keyof typeof stats] || 0})`}
@@ -288,12 +312,16 @@ export default function ScheduledEmailList({
       {filteredEmails.length > 0 ? (
         <div className="space-y-6">
           {Object.entries(emailsByCategory).map(([category, categoryEmails]) => {
-            const config = CATEGORY_CONFIG[category as EmailCategory] || CATEGORY_CONFIG['event_announcements'];
-            const Icon = config.icon;
-            const isExpanded = expandedCategories.has(category as EmailCategory);
+            const config =
+              CATEGORY_CONFIG[category as EmailCategory] || CATEGORY_CONFIG['event_announcements']
+            const Icon = config.icon
+            const isExpanded = expandedCategories.has(category as EmailCategory)
 
             return (
-              <div key={category} className="glass-card overflow-hidden rounded-xl border border-primary/20">
+              <div
+                key={category}
+                className="glass-card overflow-hidden rounded-xl border border-primary/20"
+              >
                 {/* Category Header */}
                 <button
                   onClick={() => toggleCategory(category as EmailCategory)}
@@ -306,7 +334,8 @@ export default function ScheduledEmailList({
                     <div className="text-left">
                       <h3 className="text-lg font-semibold text-foreground">{config.label}</h3>
                       <p className="text-sm text-foreground/60">
-                        {categoryEmails?.length || 0} {categoryEmails?.length === 1 ? 'email' : 'emails'}
+                        {categoryEmails?.length || 0}{' '}
+                        {categoryEmails?.length === 1 ? 'email' : 'emails'}
                       </p>
                     </div>
                   </div>
@@ -321,7 +350,7 @@ export default function ScheduledEmailList({
                 {isExpanded && categoryEmails && categoryEmails.length > 0 && (
                   <div className="border-t border-border">
                     <div className="p-4 space-y-3">
-                      {categoryEmails.map(email => (
+                      {categoryEmails.map((email) => (
                         <ScheduledEmailCard
                           key={`${email.id}-${email.scheduled_for}`}
                           email={email}
@@ -337,7 +366,7 @@ export default function ScheduledEmailList({
                   </div>
                 )}
               </div>
-            );
+            )
           })}
         </div>
       ) : (
@@ -345,8 +374,8 @@ export default function ScheduledEmailList({
           <p className="text-foreground/80 dark:text-foreground/60">No emails match your filters</p>
           <button
             onClick={() => {
-              setSearchQuery('');
-              setStatusFilter('all');
+              setSearchQuery('')
+              setStatusFilter('all')
             }}
             className="mt-4 text-sm text-violet-900 hover:text-violet-800 dark:text-primary dark:hover:text-primary/70 transition-colors"
           >
@@ -355,5 +384,5 @@ export default function ScheduledEmailList({
         </div>
       )}
     </div>
-  );
+  )
 }

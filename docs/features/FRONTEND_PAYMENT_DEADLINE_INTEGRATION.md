@@ -22,6 +22,7 @@ I've completed a **comprehensive analysis and update** of the frontend to ensure
 ### 1. **API Layer** (`src/services/api.ts`)
 
 **Updates Made:**
+
 - ✅ Added `payment_deadline?: string` to `eventsApi.create()` interface (line 577)
 - ✅ Added `payment_deadline: string` to `eventsApi.update()` interface (line 608)
 - ✅ Added `application_deadline: string` to `eventsApi.update()` (was missing!)
@@ -63,6 +64,7 @@ async update(eventSlug: string, eventData: Partial<{
 ### 2. **Event Creation Wizard** (`src/components/producer/CreateEventWizard/`)
 
 #### `types.ts`
+
 **Updated:** `WizardState.eventDetails` interface
 
 ```typescript
@@ -77,6 +79,7 @@ eventDetails: {
 ```
 
 #### `CreateEventWizard.tsx`
+
 **Updated:** Initial wizard state
 
 ```typescript
@@ -87,13 +90,14 @@ const [wizardState, setWizardState] = useState<WizardState>({
     description: '',
     // ... other fields
     application_deadline: '',
-    payment_deadline: '',  // ✅ ADDED
+    payment_deadline: '', // ✅ ADDED
   },
   // ...
-});
+})
 ```
 
 #### `steps/Step1EventDetails.tsx`
+
 **Updated:** Added payment deadline input field in 2-column layout
 
 ```tsx
@@ -122,6 +126,7 @@ const [wizardState, setWizardState] = useState<WizardState>({
 ### 3. **Event Display Component** (`src/components/producer/EventDetailsTab.tsx`)
 
 **Updates Made:**
+
 - ✅ Added `payment_deadline?: string` to Event interface (line 43)
 - ✅ Added to formData state initialization (line 83)
 - ✅ Added to useEffect formData sync (line 100)
@@ -130,16 +135,15 @@ const [wizardState, setWizardState] = useState<WizardState>({
 - ✅ Added display UI (lines 666-674)
 
 **Edit Form (2-column layout):**
+
 ```tsx
-{/* Application Deadline & Payment Deadline */}
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+{
+  /* Application Deadline & Payment Deadline */
+}
+;<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
   <div>
-    <label className="block text-white/90 font-medium mb-2">
-      Application Deadline *
-    </label>
-    <p className="text-white/50 text-xs mb-2">
-      Deadline for vendors to submit applications
-    </p>
+    <label className="block text-white/90 font-medium mb-2">Application Deadline *</label>
+    <p className="text-white/50 text-xs mb-2">Deadline for vendors to submit applications</p>
     <input
       type="date"
       value={formData.application_deadline}
@@ -149,12 +153,8 @@ const [wizardState, setWizardState] = useState<WizardState>({
   </div>
 
   <div>
-    <label className="block text-white/90 font-medium mb-2">
-      Payment Deadline
-    </label>
-    <p className="text-white/50 text-xs mb-2">
-      Deadline for approved vendors to pay
-    </p>
+    <label className="block text-white/90 font-medium mb-2">Payment Deadline</label>
+    <p className="text-white/50 text-xs mb-2">Deadline for approved vendors to pay</p>
     <input
       type="date"
       value={formData.payment_deadline}
@@ -166,16 +166,19 @@ const [wizardState, setWizardState] = useState<WizardState>({
 ```
 
 **Display View:**
+
 ```tsx
-{event.payment_deadline && (
-  <div>
-    <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
-      <Calendar className="w-4 h-4" />
-      Payment Deadline
+{
+  event.payment_deadline && (
+    <div>
+      <div className="flex items-center gap-2 text-white/60 text-sm mb-1">
+        <Calendar className="w-4 h-4" />
+        Payment Deadline
+      </div>
+      <p className="text-white">{formatDate(event.payment_deadline)}</p>
     </div>
-    <p className="text-white">{formatDate(event.payment_deadline)}</p>
-  </div>
-)}
+  )
+}
 ```
 
 ---
@@ -191,10 +194,10 @@ const newEvent = await eventsApi.create(organization.slug, {
   event_date: wizardState.eventDetails.event_date,
   // ... other fields
   application_deadline: wizardState.eventDetails.application_deadline,
-  payment_deadline: wizardState.eventDetails.payment_deadline || undefined,  // ✅ ADDED
+  payment_deadline: wizardState.eventDetails.payment_deadline || undefined, // ✅ ADDED
   status: 'draft',
   published: false,
-});
+})
 ```
 
 ---
@@ -205,32 +208,32 @@ const newEvent = await eventsApi.create(organization.slug, {
 
 ```typescript
 interface Event {
-  id: number;
-  slug: string;
-  title: string;
-  description?: string;
-  event_date?: string;
-  event_end_date?: string;
-  start_time?: string;
-  end_time?: string;
-  venue?: string;
-  location?: string;
-  age_restriction?: string;
-  ticket_link?: string;
-  application_deadline?: string;
-  payment_deadline?: string;  // ✅ ADDED
+  id: number
+  slug: string
+  title: string
+  description?: string
+  event_date?: string
+  event_end_date?: string
+  start_time?: string
+  end_time?: string
+  venue?: string
+  location?: string
+  age_restriction?: string
+  ticket_link?: string
+  application_deadline?: string
+  payment_deadline?: string // ✅ ADDED
   status?: {
-    published?: boolean;
-    registration_open?: boolean;
-    status?: 'draft' | 'published' | 'cancelled' | 'completed';
-  };
-  published?: boolean;
+    published?: boolean
+    registration_open?: boolean
+    status?: 'draft' | 'published' | 'cancelled' | 'completed'
+  }
+  published?: boolean
   capacity?: {
-    total?: number;
-    registered?: number;
-    remaining?: number;
-    is_full?: boolean;
-  };
+    total?: number
+    registered?: number
+    remaining?: number
+    is_full?: boolean
+  }
 }
 ```
 
@@ -239,11 +242,13 @@ interface Event {
 ## ✅ Complete Integration Checklist
 
 ### **Data Layer**
+
 - [x] API TypeScript interfaces updated (`eventsApi.create`, `eventsApi.update`)
 - [x] EventInvitation interface includes payment_deadline
 - [x] All Event interfaces across components are consistent
 
 ### **Event Creation Flow**
+
 - [x] WizardState.eventDetails includes payment_deadline
 - [x] Step1EventDetails form has payment deadline input
 - [x] Form field is properly styled and positioned
@@ -253,6 +258,7 @@ interface Event {
 - [x] handleCreateEvent sends payment_deadline to API
 
 ### **Event Display**
+
 - [x] EventDetailsTab Event interface includes payment_deadline
 - [x] formData state includes payment_deadline
 - [x] useEffect syncs payment_deadline from props
@@ -262,12 +268,14 @@ interface Event {
 - [x] formatDate handles payment deadline formatting
 
 ### **Event Editing**
+
 - [x] Edit form includes payment deadline field
 - [x] Field updates formData state on change
 - [x] handleSave sends payment_deadline to API
 - [x] Field validation (browser native date validation)
 
 ### **Type Safety**
+
 - [x] All Event interfaces include payment_deadline
 - [x] Optional field marked with `?`
 - [x] Consistent typing across all components
@@ -353,6 +361,7 @@ All date fields follow this pattern:
 ### **Scenario 1: Create Event WITH Payment Deadline**
 
 **Steps:**
+
 1. Open Create Event wizard
 2. Fill in event details
 3. Set application_deadline: "2026-02-15"
@@ -360,6 +369,7 @@ All date fields follow this pattern:
 5. Complete wizard
 
 **Expected Result:**
+
 - ✅ Event created successfully
 - ✅ Backend stores payment_deadline: "2026-02-25"
 - ✅ Event details page shows both deadlines
@@ -368,6 +378,7 @@ All date fields follow this pattern:
 ### **Scenario 2: Create Event WITHOUT Payment Deadline**
 
 **Steps:**
+
 1. Open Create Event wizard
 2. Fill in event details
 3. Set application_deadline: "2026-02-15"
@@ -375,6 +386,7 @@ All date fields follow this pattern:
 5. Complete wizard
 
 **Expected Result:**
+
 - ✅ Event created successfully
 - ✅ Backend stores payment_deadline: null
 - ✅ Event details page shows application deadline only
@@ -383,12 +395,14 @@ All date fields follow this pattern:
 ### **Scenario 3: Edit Event - Add Payment Deadline**
 
 **Steps:**
+
 1. Open existing event (no payment deadline)
 2. Click "Edit Event Details"
 3. Set payment_deadline: "2026-03-01"
 4. Save changes
 
 **Expected Result:**
+
 - ✅ API receives PATCH with payment_deadline
 - ✅ Backend updates payment_deadline
 - ✅ Display immediately shows payment deadline
@@ -397,12 +411,14 @@ All date fields follow this pattern:
 ### **Scenario 4: Edit Event - Update Payment Deadline**
 
 **Steps:**
+
 1. Open existing event (has payment deadline: "2026-03-01")
 2. Click "Edit Event Details"
 3. Change payment_deadline to "2026-03-05"
 4. Save changes
 
 **Expected Result:**
+
 - ✅ API receives updated payment_deadline
 - ✅ Backend updates value
 - ✅ Display shows new date
@@ -411,12 +427,14 @@ All date fields follow this pattern:
 ### **Scenario 5: Edit Event - Remove Payment Deadline**
 
 **Steps:**
+
 1. Open existing event (has payment deadline)
 2. Click "Edit Event Details"
 3. Clear payment_deadline field
 4. Save changes
 
 **Expected Result:**
+
 - ✅ API receives payment_deadline: ""
 - ✅ Backend sets payment_deadline to null
 - ✅ Payment deadline disappears from display
@@ -427,34 +445,42 @@ All date fields follow this pattern:
 ## 🐛 Edge Cases Handled
 
 ### **1. Backend Returns null**
+
 ```typescript
 payment_deadline: event.payment_deadline || ''
 ```
+
 - Empty string prevents uncontrolled input warnings
 - Conditional rendering prevents showing "Not set"
 
 ### **2. Field Clearing**
+
 ```typescript
 value={formData.payment_deadline}
 onChange={(e) => setFormData({ ...formData, payment_deadline: e.target.value })}
 ```
+
 - Allows user to clear field completely
 - Empty string sent to API is valid
 
 ### **3. Optional Field**
+
 ```tsx
 <label>Payment Deadline</label>  {/* No asterisk */}
 ```
+
 - No required validation
 - User can skip or clear
 
 ### **4. Date Formatting**
+
 ```typescript
 const formatDate = (dateString?: string) => {
-  if (!dateString) return 'Not set';
+  if (!dateString) return 'Not set'
   // ... formatting logic
-};
+}
 ```
+
 - Handles undefined/null gracefully
 - Conditional rendering prevents calling with null
 
@@ -469,13 +495,14 @@ All Event interfaces now consistently include:
 ```typescript
 interface Event {
   // ... core fields
-  application_deadline?: string;
-  payment_deadline?: string;  // ✅ Consistently typed as optional string
+  application_deadline?: string
+  payment_deadline?: string // ✅ Consistently typed as optional string
   // ... other fields
 }
 ```
 
 **Files with Event interface:**
+
 - ✅ `src/services/api.ts` - eventsApi methods
 - ✅ `src/services/api.ts` - EventInvitation.event
 - ✅ `src/components/producer/CreateEventWizard/types.ts` - WizardState
@@ -535,6 +562,7 @@ User sees formatted payment deadline
 ```
 
 ### **✅ All User Paths Covered:**
+
 1. Create event WITH payment deadline → ✅ Works
 2. Create event WITHOUT payment deadline → ✅ Works
 3. Edit event to ADD payment deadline → ✅ Works
@@ -544,6 +572,7 @@ User sees formatted payment deadline
 7. View event without payment deadline → ✅ Hides field
 
 ### **✅ Type Safety:**
+
 - All TypeScript interfaces aligned
 - No `any` types used
 - Optional field properly marked with `?`
@@ -556,6 +585,7 @@ User sees formatted payment deadline
 The frontend is **100% ready** to accept, display, and edit the `payment_deadline` field. All components have been updated, tested for type safety, and follow consistent UI/UX patterns.
 
 **Next Steps:**
+
 1. ✅ Test end-to-end flow in development
 2. ✅ Verify API integration with backend
 3. ✅ Test date validation (browser native)

@@ -13,6 +13,7 @@
 The frontend has **removed virtual invitation email logic**. Position 1 "Initial Invitation" is now treated as the only invitation template in the UI. This aligns with your recent backend changes where Position 1 became the real template used for sending invitations.
 
 **Key Changes:**
+
 - ✅ Removed ~85 lines of virtual email creation code
 - ✅ Mail tab now shows exactly **17 rows** (not 18)
 - ✅ Position 1 is fully editable and opens audit log like other emails
@@ -27,18 +28,21 @@ The frontend has **removed virtual invitation email logic**. Position 1 "Initial
 ### The Old System (Before Today)
 
 **Backend:**
+
 - Position 1 "Initial Invitation" existed as a database record
 - But it WASN'T used for sending invitations
 - Instead, invitations used a hardcoded mailer template
 - Position 1 was effectively a "preview-only" template
 
 **Frontend:**
+
 1. Fetched 17 scheduled emails from `/events/:slug/scheduled_emails`
 2. Fetched invitations from `/events/:slug/invitations`
 3. Created a **virtual email object** with `id: -1` for the invitation
 4. Displayed **18 total rows** in Mail tab (17 real + 1 virtual)
 
 **Problems This Caused:**
+
 - Clicking recipients on invitation opened old modal (not audit log)
 - Couldn't edit Position 1 (frontend blocked it)
 - Confusing duplicate rows for the same concept
@@ -47,18 +51,21 @@ The frontend has **removed virtual invitation email logic**. Position 1 "Initial
 ### The New System (After Backend Phases 1-3 + Today)
 
 **Backend:**
+
 - ✅ Position 1 is now the **REAL** template used for sending
 - ✅ `EventInvitationsController` uses Position 1 template
 - ✅ Template variables resolved via `InvitationVariableResolver`
 - ✅ Creates proper `EmailDelivery` records for audit tracking
 
 **Frontend:**
+
 1. Fetches 17 scheduled emails from `/events/:slug/scheduled_emails`
 2. Position 1 is in the list and treated like any other email
 3. Displays **17 total rows** in Mail tab
 4. No more virtual email creation
 
 **Benefits:**
+
 - ✅ Consistent behavior across all emails
 - ✅ Position 1 can be edited (subject, body, triggers)
 - ✅ Audit log works for invitations (recipient names, categories)
@@ -71,15 +78,18 @@ The frontend has **removed virtual invitation email logic**. Position 1 "Initial
 ### Files Modified
 
 #### 1. `src/components/producer/Email/EmailAutomationTab.tsx`
+
 **Removed:**
+
 - ~85 lines of invitation fetching and virtual email creation
 - Special case for `isInvitationAnnouncement` flag
 - Edit restrictions for invitation emails
 
 **Before:**
+
 ```typescript
 // Fetch invitations separately
-const invitationsData = await eventInvitationsApi.getByEvent(eventSlug);
+const invitationsData = await eventInvitationsApi.getByEvent(eventSlug)
 
 // Create virtual email object
 const invitationEmail: ScheduledEmail = {
@@ -87,50 +97,58 @@ const invitationEmail: ScheduledEmail = {
   isInvitationAnnouncement: true,
   name: 'Event Announcement (Invitation...)',
   // ... lots of mapped data
-};
+}
 
 // Inject at the beginning
-allEmails.unshift(invitationEmail);
+allEmails.unshift(invitationEmail)
 ```
 
 **After:**
+
 ```typescript
 // Just fetch scheduled emails - Position 1 is in the list!
-const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug);
-setEmails(scheduledEmailsData);
+const scheduledEmailsData = await scheduledEmailsApi.getByEvent(eventSlug)
+setEmails(scheduledEmailsData)
 ```
 
 #### 2. `src/components/producer/Email/EmailRow.tsx`
+
 **Fixed Issue #1:** Recipients button now opens audit log for ALL emails
 
 **Before:**
+
 ```typescript
 // Special case prevented invitations from opening audit log
 if (!isInvitationAnnouncement && onViewAuditLog) {
-  onViewAuditLog({ email_name: email.name });
+  onViewAuditLog({ email_name: email.name })
 } else {
-  setShowRecipientsModal(true); // Old modal
+  setShowRecipientsModal(true) // Old modal
 }
 ```
 
 **After:**
+
 ```typescript
 // All emails use audit log
 if (onViewAuditLog) {
-  onViewAuditLog({ email_name: email.name });
+  onViewAuditLog({ email_name: email.name })
 }
 ```
 
 #### 3. `src/types/email.ts`
+
 **Removed:**
+
 - `isInvitationAnnouncement?: boolean` flag
 - `isPreviewOnly?: boolean` flag
 
 **Added (from Phases 1-3):**
+
 - `recipient_name?: string | null` ✅
 - `vendor_category?: string | null` ✅
 
 #### 4. Other Components
+
 - `ScheduledEmailCard.tsx` - Removed invitation click restrictions
 - `EventEmailPreviewModal.tsx` - Removed special invitation preview logic
 
@@ -141,16 +159,20 @@ if (onViewAuditLog) {
 ### API Usage Changes
 
 #### `/events/:slug/scheduled_emails`
+
 **Before:**
+
 - Frontend fetched this, then separately fetched invitations
 - Position 1 was in the response but largely ignored
 
 **After:**
+
 - Frontend fetches this ONLY
 - Position 1 is treated like any other scheduled email
 - No separate invitation fetching in most cases
 
 **Expected Response:**
+
 ```json
 [
   {
@@ -176,9 +198,11 @@ if (onViewAuditLog) {
 ```
 
 #### `/events/:slug/invitations`
+
 **Status:** Still used by audit log for legacy delivery stats
 
 **Usage:**
+
 - Audit log still calls this to get `meta.delivery_stats`
 - But no longer creates virtual email from invitation data
 - Consider this endpoint "legacy support" for now
@@ -186,7 +210,9 @@ if (onViewAuditLog) {
 **Future:** Could potentially deprecate if all invitation data comes through Position 1 deliveries
 
 #### `/events/:slug/scheduled_emails/1/email_deliveries`
+
 **New Behavior:**
+
 - Frontend now fetches Position 1 deliveries like any other email
 - Expects registration data (recipient_name, vendor_category) ✅
 - Used to populate audit log for invitation emails
@@ -198,13 +224,16 @@ if (onViewAuditLog) {
 ### What You Should Verify (Backend)
 
 #### 1. Position 1 Sends Correctly
+
 **Test:**
+
 1. Create new event (or use existing migrated event)
 2. Open applications
 3. Send batch invitations
 4. Check backend logs
 
 **Expected Logs:**
+
 ```
 ✓ Using unified template: Position 1 - Initial Invitation
 ✓ Resolved variables: [eventName], [applicationUrl], etc.
@@ -213,26 +242,30 @@ if (onViewAuditLog) {
 ```
 
 **NOT Expected:**
+
 ```
 ⚠️ No unified email template found, using fallback
 ```
 
 #### 2. Position 1 Deliveries Track Correctly
+
 **Test:**
+
 1. After sending invitations, call:
    `GET /events/:slug/scheduled_emails/1/email_deliveries`
 2. Verify response includes registration data
 
 **Expected:**
+
 ```json
 [
   {
     "id": 123,
-    "scheduled_email_id": 1,  // Position 1
+    "scheduled_email_id": 1, // Position 1
     "registration_id": 456,
     "recipient_email": "vendor@example.com",
-    "recipient_name": "John Doe",  // ✅ Must be present
-    "vendor_category": "Food & Beverage",  // ✅ Must be present
+    "recipient_name": "John Doe", // ✅ Must be present
+    "vendor_category": "Food & Beverage", // ✅ Must be present
     "status": "delivered",
     "sent_at": "2026-02-28T10:00:00Z"
   }
@@ -240,24 +273,30 @@ if (onViewAuditLog) {
 ```
 
 #### 3. Position 1 Can Be Edited
+
 **Test:**
+
 1. Frontend user edits Position 1 subject: "CUSTOM: [eventName] Invitations!"
 2. Frontend calls: `PUT /events/:slug/scheduled_emails/1`
 3. Send invitations
 4. Verify invitations use the CUSTOM subject
 
 **Expected:**
+
 - ✅ Position 1 updates successfully
 - ✅ Next invitations use updated template
 - ✅ Variables still resolve correctly
 
 #### 4. Delivery Counts Update
+
 **Test:**
+
 1. Send invitations (Position 1 status changes to "sent")
 2. SendGrid webhook fires with delivery/bounce status
 3. Check Position 1 record
 
 **Expected:**
+
 ```ruby
 scheduled_email = ScheduledEmail.find(1)
 scheduled_email.delivered_count  # Should match actual deliveries
@@ -284,6 +323,7 @@ We're testing these scenarios on staging:
 7. ✅ Deep links work (undelivered count filters to bounced/dropped)
 
 **If any of these fail**, it likely indicates a backend issue with:
+
 - Position 1 not being returned in `/scheduled_emails`
 - Position 1 not creating EmailDelivery records
 - Missing registration data in deliveries response
@@ -293,6 +333,7 @@ We're testing these scenarios on staging:
 ## Potential Backend Validations (Optional)
 
 ### Validation 1: Position 1 Always Exists
+
 **Recommendation:** Ensure all events have Position 1
 
 ```ruby
@@ -312,6 +353,7 @@ end
 ```
 
 ### Validation 2: Invitation Controller Uses Position 1
+
 **Verify:** When sending invitations, Position 1 template is used
 
 ```ruby
@@ -330,6 +372,7 @@ end
 ```
 
 ### Validation 3: Email Deliveries Include Registration Data
+
 **Verify:** Serializer includes recipient_name and vendor_category
 
 ```ruby
@@ -355,30 +398,37 @@ end
 ## Known Issues & Workarounds
 
 ### Issue #4: Delivery Count Discrepancy (Phase 4)
+
 **Status:** Still exists, not related to this change
 
 **What It Is:**
+
 - `scheduled_email.delivered_count` may be stale
 - `email_deliveries.where(status: 'delivered').count` is accurate
 
 **Workaround:**
+
 - Frontend uses individual `email_deliveries` as source of truth
 - Mail tab counts may show slight discrepancies until Phase 4
 
 **Phase 4 Will Fix:**
+
 - Implement `recalculate_delivery_counts!` method
 - Update SendGrid webhook to call it after status changes
 
 ### Legacy Events (Pre-Migration)
+
 **Issue:** Some events may not have Position 1 yet
 
 **Behavior:**
+
 - Backend logs: `⚠️ No unified email template found, using fallback`
 - Invitations still send via old hardcoded mailer
 - No Position 1 row in frontend Mail tab
 - Invitations don't create EmailDelivery records
 
 **Solution:**
+
 - Run migration to create Position 1 for all events
 - Or accept fallback behavior for old events
 
@@ -387,26 +437,34 @@ end
 ## FAQ for Backend Team
 
 ### Q: Do I need to change any backend code?
+
 **A:** No! Your Phases 1-3 changes already support this. We're just removing frontend workarounds that were masking the fact that Position 1 is now real.
 
 ### Q: Will this break anything?
+
 **A:** No. We're removing **frontend-only** virtual email creation. Backend API usage remains the same.
 
 ### Q: What if Position 1 doesn't exist for an event?
+
 **A:** Backend should continue using fallback mailer (current behavior). Frontend will show 16 rows instead of 17, which is fine.
 
 ### Q: Should I delete the `/invitations` endpoint?
+
 **A:** Not yet. Frontend audit log still uses `meta.delivery_stats` from that endpoint. We can deprecate later after confirming all data comes through Position 1.
 
 ### Q: What about SendGrid webhooks?
+
 **A:** No changes needed. Webhooks should continue updating `email_deliveries.status` as before. Position 1 deliveries work the same as other emails.
 
 ### Q: How do I know if Position 1 is working?
+
 **A:** After sending invitations, check:
+
 ```sql
 SELECT * FROM scheduled_emails WHERE position = 1 AND event_id = 123;
 SELECT * FROM email_deliveries WHERE scheduled_email_id = <position_1_id> LIMIT 10;
 ```
+
 You should see EmailDelivery records with `scheduled_email_id` pointing to Position 1.
 
 ---
@@ -414,6 +472,7 @@ You should see EmailDelivery records with `scheduled_email_id` pointing to Posit
 ## Rollback Plan (If Needed)
 
 ### Frontend Rollback
+
 If this causes issues, frontend can rollback by restoring virtual email logic:
 
 ```bash
@@ -423,6 +482,7 @@ npm run build
 ```
 
 **What Gets Restored:**
+
 - Virtual invitation email creation
 - Special case for `isInvitationAnnouncement`
 - Old recipients modal behavior
@@ -431,6 +491,7 @@ npm run build
 **Note:** Even if frontend rolls back, backend Position 1 system continues working. We just get duplicate UI rows again.
 
 ### Backend Rollback
+
 **Not needed** - no backend changes were made as part of this frontend update.
 
 ---
@@ -438,6 +499,7 @@ npm run build
 ## Success Criteria
 
 ### Must Work (Blocking)
+
 - [ ] Position 1 sends invitations correctly
 - [ ] Position 1 creates EmailDelivery records
 - [ ] Email deliveries include `recipient_name` and `vendor_category`
@@ -445,6 +507,7 @@ npm run build
 - [ ] No 500 errors when fetching `/scheduled_emails`
 
 ### Nice to Have (Non-Blocking)
+
 - [ ] Position 1 exists for all events (if not, fallback works)
 - [ ] Delivery counts stay in sync (Phase 4 will improve this)
 - [ ] Fast auto-refresh performance (Phase 4 will optimize)
@@ -454,18 +517,21 @@ npm run build
 ## Timeline & Next Steps
 
 ### Today (Feb 28, 2026)
+
 - [x] ✅ Frontend changes deployed to staging
 - [x] ✅ Documentation updated
 - [ ] 🧪 Frontend QA testing in progress
 - [ ] 📋 Backend team review (this document)
 
 ### This Week
+
 - [ ] Complete frontend testing
 - [ ] Document any issues found
 - [ ] Coordinate on any backend fixes needed
 - [ ] Plan production deployment
 
 ### Phase 4 (Future)
+
 - [ ] Implement `recalculate_delivery_counts!`
 - [ ] Update SendGrid webhook handler
 - [ ] Add bulk deliveries endpoint
@@ -476,14 +542,17 @@ npm run build
 ## Contact & Questions
 
 **Frontend Team:**
+
 - Slack: `#voxxy-frontend-dev`
 - Lead: Courtney + Claude Code
 
 **Backend Team:**
+
 - Slack: `#voxxy-backend-dev`
 - Lead: [Your backend team lead]
 
 **For This Update:**
+
 - Questions about frontend changes → `#voxxy-frontend-dev`
 - Questions about Position 1 behavior → `#voxxy-backend-dev`
 - Integration issues → Both channels
@@ -493,6 +562,7 @@ npm run build
 ## Related Documentation
 
 ### Frontend Docs
+
 1. **[INVITATION_UNIFICATION_FRONTEND_UPDATE.md](./INVITATION_UNIFICATION_FRONTEND_UPDATE.md)**
    - Complete details of frontend changes
    - Before/after code comparisons
@@ -507,6 +577,7 @@ npm run build
    - Updated to reflect invitation unification
 
 ### Backend Docs (Your Side)
+
 - Migration that created Position 1 for all events
 - `InvitationVariableResolver` implementation
 - `EventInvitationsController` updates for unified system

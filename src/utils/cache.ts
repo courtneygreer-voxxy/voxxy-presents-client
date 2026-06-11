@@ -20,7 +20,7 @@ export function setCache<T>(key: string, value: T, ttl: number = 5 * 60 * 1000):
     const entry: CacheEntry<T> = {
       data: value,
       timestamp: Date.now(),
-      ttl
+      ttl,
     }
     localStorage.setItem(key, JSON.stringify(entry))
   } catch (error) {
@@ -35,7 +35,7 @@ export function setCache<T>(key: string, value: T, ttl: number = 5 * 60 * 1000):
         const entry: CacheEntry<T> = {
           data: value,
           timestamp: Date.now(),
-          ttl
+          ttl,
         }
         localStorage.setItem(key, JSON.stringify(entry))
       } catch {
@@ -51,7 +51,7 @@ export function setCache<T>(key: string, value: T, ttl: number = 5 * 60 * 1000):
  */
 function cleanupExpiredCacheSync(): void {
   const keys = Object.keys(localStorage)
-  keys.forEach(key => {
+  keys.forEach((key) => {
     try {
       const item = localStorage.getItem(key)
       if (!item) return
@@ -116,7 +116,7 @@ export function removeCache(key: string): void {
 export function clearCacheByPrefix(prefix: string): void {
   try {
     const keys = Object.keys(localStorage)
-    keys.forEach(key => {
+    keys.forEach((key) => {
       if (key.startsWith(prefix)) {
         localStorage.removeItem(key)
       }
@@ -132,7 +132,7 @@ export function clearCacheByPrefix(prefix: string): void {
 export function cleanupExpiredCache(): void {
   try {
     const keys = Object.keys(localStorage)
-    keys.forEach(key => {
+    keys.forEach((key) => {
       try {
         const item = localStorage.getItem(key)
         if (!item) return

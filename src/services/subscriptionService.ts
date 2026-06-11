@@ -27,7 +27,7 @@ class SubscriptionService {
       const sanitizedData: any = {
         ...data,
         name: sanitizeInput(data.name.trim()),
-        message: data.message ? sanitizeInput(data.message.trim()) : undefined
+        message: data.message ? sanitizeInput(data.message.trim()) : undefined,
       }
 
       // Sanitize and validate email if provided
@@ -69,16 +69,15 @@ class SubscriptionService {
         notes: sanitizedData.message,
         subscribeToUpdates: sanitizedData.preferences.updates,
         subscribeToNewsletter: sanitizedData.preferences.newsletter,
-        source: 'website'
+        source: 'website',
       })
 
       console.log('Subscription created successfully:', result)
 
       return {
         success: true,
-        submissionId: result.registration?.id || 'created_' + Date.now()
+        submissionId: result.registration?.id || 'created_' + Date.now(),
       }
-
     } catch (error) {
       console.error('Subscription creation failed:', error)
       throw error
@@ -90,21 +89,21 @@ class SubscriptionService {
     try {
       // Check if this email has subscribed recently (within last 5 minutes)
       const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000)
-      
+
       // In a real implementation, you'd query the database
       // For now, we'll use localStorage as a simple rate limiting mechanism
       const recentSubscriptions = localStorage.getItem('recent_subscriptions')
       const subscriptions = recentSubscriptions ? JSON.parse(recentSubscriptions) : {}
-      
+
       const lastSubscription = subscriptions[email]
       if (lastSubscription && new Date(lastSubscription) > fiveMinutesAgo) {
         throw new Error('Please wait before subscribing again')
       }
-      
+
       // Update rate limit tracking
       subscriptions[email] = new Date().toISOString()
       localStorage.setItem('recent_subscriptions', JSON.stringify(subscriptions))
-      
+
       return true
     } catch (error) {
       console.error('Rate limit check failed:', error)
@@ -120,10 +119,12 @@ class SubscriptionService {
       // Filter by organizationId since the API returns all subscriptions
       const allSubscribers = subscriptions.registrations?.subscription || []
       const filteredSubscribers = allSubscribers.filter(
-        (sub: any) => sub.organizationId === organizationId
+        (sub: any) => sub.organizationId === organizationId,
       )
 
-      console.log(`📊 Filtered ${filteredSubscribers.length} subscribers for org ${organizationId} from ${allSubscribers.length} total`)
+      console.log(
+        `📊 Filtered ${filteredSubscribers.length} subscribers for org ${organizationId} from ${allSubscribers.length} total`,
+      )
 
       return filteredSubscribers
     } catch (error) {

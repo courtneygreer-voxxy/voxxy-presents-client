@@ -70,6 +70,7 @@
 ### 1. When Invitation Is Created
 
 **Available Data:**
+
 ```
 EventInvitation {
   id: 1
@@ -104,6 +105,7 @@ Event {
 ### 2. When Position 1 Email Is Fetched
 
 **ScheduledEmail (Position 1):**
+
 ```
 {
   id: 1
@@ -120,6 +122,7 @@ Event {
 ### 3. When Variables Are Resolved
 
 **InvitationVariableResolver Access:**
+
 ```
 INPUT:
 - event_invitation (has vendor_contact)
@@ -136,6 +139,7 @@ RESOLVES:
 ### 4. When Email Delivery Is Tracked
 
 **EmailDelivery Record:**
+
 ```
 {
   id: 1000
@@ -351,6 +355,7 @@ THIRD BRANCH: Applications
 ## Variable Categories & Sources
 
 ### Event Variables (From `event`)
+
 ```
 [eventName]           ← event.title
 [eventDate]           ← event.date_start
@@ -364,6 +369,7 @@ THIRD BRANCH: Applications
 ```
 
 ### Contact Variables (From `vendor_contact` in invitation)
+
 ```
 [greetingName]  ← Prefers business_name, falls back to first_name
 [firstName]     ← vendor_contact.first_name
@@ -374,6 +380,7 @@ THIRD BRANCH: Applications
 ```
 
 ### Category Variables (From `vendor_application` in registration)
+
 ```
 [boothPrice]      ← registration.vendor_application.booth_price
 [categoryPrice]   ← Alias for boothPrice
@@ -386,6 +393,7 @@ THIRD BRANCH: Applications
 ```
 
 ### Computed/Link Variables
+
 ```
 [eventLink]        ← URL to event application page
 [invitationLink]   ← Same as eventLink
@@ -454,6 +462,7 @@ TIMELINE:
 ## Summary
 
 ### What Invitations Have:
+
 1. EventInvitation record (pre-application)
 2. VendorContact data
 3. Event data
@@ -461,6 +470,7 @@ TIMELINE:
 5. InvitationVariableResolver
 
 ### What Invitations Lack:
+
 1. Registration record (no application yet)
 2. VendorApplication context (don't know their category)
 3. Category-specific pricing/dates
@@ -468,11 +478,13 @@ TIMELINE:
 5. RegistrationVariableResolver
 
 ### Result:
+
 - Can use: Event + contact variables
 - Cannot use: Category + registration variables
 - Cannot know: Which category they'll choose
 
 ### Solution:
+
 - Show all categories in invitation
 - Let vendor explore and choose on application page
 - Send follow-up emails after registration with category-specific info

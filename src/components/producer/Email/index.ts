@@ -1,11 +1,11 @@
-export { default as EmailAutomationTab } from './EmailAutomationTab';
-export { default as TemplateSelectorModal } from './TemplateSelectorModal';
-export { default as DeliveryStatusBadge } from './DeliveryStatusBadge';
-export { default as ScheduledEmailList } from './ScheduledEmailList';
-export { default as ScheduledEmailCard } from './ScheduledEmailCard';
-export { default as SaveAsTemplateDialog } from './SaveAsTemplateDialog';
-export { default as TemplateLibraryPage } from './TemplateLibraryPage';
-export { default as TemplateBuilderPage } from './TemplateBuilderPage';
-export { default as TemplateManager } from './TemplateManager';
-export { default as EmailTemplateItemEditor } from './EmailTemplateItemEditor';
-export { EmailTemplateEditorPage } from './EmailTemplateEditorPage';
+export { default as EmailAutomationTab } from './EmailAutomationTab'
+export { default as TemplateSelectorModal } from './TemplateSelectorModal'
+export { default as DeliveryStatusBadge } from './DeliveryStatusBadge'
+export { default as ScheduledEmailList } from './ScheduledEmailList'
+export { default as ScheduledEmailCard } from './ScheduledEmailCard'
+export { default as SaveAsTemplateDialog } from './SaveAsTemplateDialog'
+export { default as TemplateLibraryPage } from './TemplateLibraryPage'
+export { default as TemplateBuilderPage } from './TemplateBuilderPage'
+export { default as TemplateManager } from './TemplateManager'
+export { default as EmailTemplateItemEditor } from './EmailTemplateItemEditor'
+export { EmailTemplateEditorPage } from './EmailTemplateEditorPage'

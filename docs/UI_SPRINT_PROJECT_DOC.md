@@ -17,28 +17,38 @@ The goal is to ship a testable build that can be reviewed visually in a sandbox 
 ## Themes
 
 ### 1. Declutter & Simplify
+
 Remove unused features, reduce visual noise, and make dense screens easier to scan.
+
 - **UI-10** Remove Eventbrite + Notifications from Settings
 - **UI-12** Reduce Voxxy card popup opacity
 - **UI-16** Collapsible Settings sections
 
 ### 2. Visual Polish
+
 Modernize flat screens with subtle depth, fix viewport issues, and tighten spacing.
+
 - **UI-11** Gradient treatment on email/template/audit screens
 - **UI-12** Card popup opacity adjustment
 
 ### 3. Structural Reorganization
+
 Move features to where users expect them and create consistent interaction patterns.
+
 - **UI-04** Move Categories into the Network tab
 - **UI-05** Standardize search & filter UI across the app
 
 ### 4. Protective UX
+
 Prevent user mistakes by gating actions behind state checks and defaulting to smart values.
+
 - **UI-01** Hide "Send Now" until event is live
 - **UI-14** Default install date to event date
 
 ### 5. Onboarding Foundation
+
 Build a lightweight, reusable guide system that can grow as the product evolves.
+
 - **UI-08** Onboarding guide component (framework only)
 
 ---
@@ -46,18 +56,21 @@ Build a lightweight, reusable guide system that can grow as the product evolves.
 ## Items
 
 ### UI-01 — Hide "Send Now" Until Event Is Live
+
 **Complexity:** Low
 **Where:** `src/components/producer/Email/EmailAutomationTab.tsx`, `EmailRow.tsx`, `ScheduledEmailCard.tsx`
 
 The "Send Now" button on individual scheduled emails in the Mail tab should not be clickable until the event has been published (gone live).
 
 **What to do:**
+
 - The `event` prop is passed down from `CommandCenter.tsx` into `EmailAutomationTab`
 - Check `event.status?.status === 'published'` or `event.published === true`
 - If the event is still in draft, either hide the "Send Now" button entirely or render it as disabled with a tooltip: "Event must be live to send emails"
 - This applies to the Send Now action on individual email rows, not to test emails (test should always work)
 
 **Acceptance:**
+
 - In draft state, "Send Now" is not actionable
 - In published state, "Send Now" works normally
 - "Send Test" remains available regardless of event state
@@ -65,6 +78,7 @@ The "Send Now" button on individual scheduled emails in the Mail tab should not 
 ---
 
 ### UI-04 — Move Categories to the Network Tab
+
 **Complexity:** Medium-High
 **Where:** `src/components/producer/Network/NetworkPage.tsx`, `src/pages/SettingsPage.tsx`
 
@@ -90,12 +104,14 @@ Categories currently live in `SettingsPage.tsx` (the global settings page). They
    - Keep the Settings page focused on org profile, integrations, and notifications
 
 **API endpoints (already built):**
+
 - `GET /api/v1/presents/organizations/:id/categories` — list categories
 - `POST /api/v1/presents/organizations/:id/categories` — create
 - `PATCH /api/v1/presents/categories/:id` — update
 - `DELETE /api/v1/presents/categories/:id` — delete
 
 **Acceptance:**
+
 - Categories tab appears in Network page between Lists and (or after) Contacts
 - Full CRUD works: create, edit name/color, delete with confirmation
 - "View" on a category navigates to Contacts tab filtered by that category
@@ -104,12 +120,14 @@ Categories currently live in `SettingsPage.tsx` (the global settings page). They
 ---
 
 ### UI-05 — Standardize Search & Filter UI
+
 **Complexity:** Medium-High
 **Where:** Multiple files (Network, Mail, Audit Log)
 
 Search and filter components look different across the app. The target is one consistent pattern: search bar on top, filter chips/dropdowns below, tight vertical spacing.
 
 **Current state:**
+
 - **NetworkPage.tsx** — Has a custom `MultiSelectFilterDropdown` component built inline (lines 20-100+), a search input, and `CategoryFilterBar`
 - **EmailAutomationTab.tsx** — Has its own search/filter pattern for scheduled emails
 - **EmailAuditTable.tsx / EmailAuditFilters.tsx** — Separate filter UI for the audit log
@@ -117,6 +135,7 @@ Search and filter components look different across the app. The target is one co
 **What to do:**
 
 1. **Create a shared `SearchFilterBar` component** at `src/components/shared/SearchFilterBar.tsx`:
+
    ```
    ┌──────────────────────────────────────────┐
    │ 🔍 Search...                             │
@@ -124,6 +143,7 @@ Search and filter components look different across the app. The target is one co
    │ [Filter 1 ▾] [Filter 2 ▾] [Clear All]   │
    └──────────────────────────────────────────┘
    ```
+
    - Props: `searchPlaceholder`, `filters` (array of filter configs), `onSearchChange`, `onFilterChange`
    - Each filter config: `{ key, label, options[], multi?: boolean }`
    - Use existing UI primitives: `src/components/ui/popover.tsx`, `src/components/ui/command.tsx`, `src/components/ui/badge.tsx`
@@ -142,6 +162,7 @@ Search and filter components look different across the app. The target is one co
    - Filters: delivery status (delivered/bounced/dropped), date range
 
 **Acceptance:**
+
 - All three screens (Network, Mail tab, Audit Log) use the same `SearchFilterBar` component
 - Visual appearance is identical across screens
 - Filter behavior is preserved (same data, just unified UI)
@@ -149,6 +170,7 @@ Search and filter components look different across the app. The target is one co
 ---
 
 ### UI-08 — Onboarding Guide Component (Framework Only)
+
 **Complexity:** Medium (scoped down)
 **Where:** New component at `src/components/shared/OnboardingGuide.tsx`
 
@@ -180,10 +202,12 @@ Build a lightweight, reusable onboarding guide system. This sprint is **framewor
    - This proves the system works end-to-end
 
 **Do NOT do yet:**
+
 - Do not strip inline text from Email tab or sequence views
 - Do not build guides for every screen — just the dashboard demo
 
 **Acceptance:**
+
 - First-time user sees a guided tour on the Dashboard
 - Steps highlight real UI elements with a spotlight effect
 - User can navigate forward/back/skip
@@ -194,12 +218,14 @@ Build a lightweight, reusable onboarding guide system. This sprint is **framewor
 ---
 
 ### UI-10 — Remove Eventbrite Integration & Notifications From Settings
+
 **Complexity:** Low
 **Where:** `src/pages/SettingsPage.tsx`, `src/components/producer/PaymentIntegrations/EventbriteConnection.tsx`
 
 Both Eventbrite integration and notification preferences are present in the Settings page but not functional.
 
 **What to do:**
+
 - In `SettingsPage.tsx`, the sub-tabs are defined as: `type SettingsSubTab = 'organization' | 'integrations' | 'notifications'` (line 35)
 - Remove `'integrations'` and `'notifications'` from the type and the tab bar
 - Remove the tab content that renders `EventbriteConnection` (imported on line 5)
@@ -208,6 +234,7 @@ Both Eventbrite integration and notification preferences are present in the Sett
 - Do NOT delete the component files yet — just disconnect them from Settings
 
 **Acceptance:**
+
 - Settings page shows only Organization settings (no Integrations or Notifications tabs)
 - No dead UI — everything visible is functional
 - `EventbriteConnection.tsx` still exists in the codebase (not deleted, just not rendered)
@@ -215,6 +242,7 @@ Both Eventbrite integration and notification preferences are present in the Sett
 ---
 
 ### UI-11 — Gradient Treatment + Zoom Out on Email/Template/Audit Screens
+
 **Complexity:** Low-Medium
 **Where:** Email editor, template editor, audit log screens + `src/components/ui/BackgroundGradient.tsx`
 
@@ -240,6 +268,7 @@ These screens are visually flat. Add subtle gradient backgrounds and adjust scal
    - The gradient should be subtle enough that it doesn't compete with the content
 
 **Acceptance:**
+
 - Email editor, template editor, and audit log have a subtle gradient background
 - Footer is visible without scrolling on the email editor
 - Screens feel more polished and less flat
@@ -248,17 +277,20 @@ These screens are visually flat. Add subtle gradient backgrounds and adjust scal
 ---
 
 ### UI-12 — Voxxy Card Popup Opacity
+
 **Complexity:** Trivial
 **Where:** Identify the card popup component (likely a modal/dialog overlay)
 
 The card popup that appears when editing is too opaque — the backdrop blocks too much of the underlying content.
 
 **What to do:**
+
 - Find the popup/modal component used for the "Voxxy card" editing experience
 - Reduce the backdrop opacity (e.g., from `bg-black/70` to `bg-black/40` or similar)
 - If the card itself has a solid background, consider adding slight transparency or a glassmorphism effect using `backdrop-blur`
 
 **Acceptance:**
+
 - Popup backdrop is noticeably less opaque
 - User can still perceive the content behind the popup
 - Card content remains fully readable
@@ -266,18 +298,21 @@ The card popup that appears when editing is too opaque — the backdrop blocks t
 ---
 
 ### UI-14 — Default Install Date to Event Date
+
 **Complexity:** Low
 **Where:** `src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx`
 
 When creating a new event and setting up vendor categories, the install date currently defaults to a date near the application deadline. It should default to the event date since installs typically happen day-of.
 
 **What to do:**
+
 - In the event creation wizard Step 2 (Application Details), find where `install_date` is initialized
 - Change the default value to use the event date from Step 1
 - The event date is available in the wizard state (passed through from `Step1EventDetails.tsx` → wizard state → `Step2ApplicationDetails.tsx`)
 - If no event date is set yet, leave install date blank
 
 **Acceptance:**
+
 - New event creation pre-fills install date with the event date
 - User can still override the install date manually
 - If event date changes in Step 1, install date updates to match (unless manually overridden)
@@ -285,6 +320,7 @@ When creating a new event and setting up vendor categories, the install date cur
 ---
 
 ### UI-16 — Collapsible Settings Sections
+
 **Complexity:** Low-Medium
 **Where:** `src/pages/SettingsPage.tsx`
 
@@ -308,6 +344,7 @@ After removing Integrations and Notifications tabs (UI-10), the remaining Organi
    - Sections remember their open/closed state within the session (useState is fine, no need for persistence)
 
 **Acceptance:**
+
 - Settings page has clearly labeled collapsible sections
 - Clicking a section header expands/collapses it
 - Only one section takes up visual space at a time (or allow multiple — use judgment)
@@ -317,26 +354,26 @@ After removing Integrations and Notifications tabs (UI-10), the remaining Organi
 
 ## File Reference
 
-| Area | Key Files |
-|------|-----------|
-| Command Center shell | `src/components/producer/CommandCenter.tsx` |
-| Mail tab | `src/components/producer/Email/EmailAutomationTab.tsx` |
-| Email rows | `src/components/producer/Email/EmailRow.tsx`, `ScheduledEmailCard.tsx` |
-| Email editor | `src/components/producer/Email/EmailEditorPage.tsx` |
-| Template editor | `src/components/producer/Email/EmailTemplateEditorPage.tsx`, `TemplateBuilderPage.tsx` |
-| Audit log | `src/components/producer/Email/EmailAuditTable.tsx`, `EmailAuditFilters.tsx` |
-| Network page | `src/components/producer/Network/NetworkPage.tsx` |
-| Network lists | `src/components/producer/Network/Lists/ListsManagement.tsx` |
-| Shared category filter | `src/components/shared/CategoryFilterBar.tsx` |
-| Settings (global) | `src/pages/SettingsPage.tsx` |
-| Settings (event-level) | `src/components/producer/EventSettings.tsx` |
-| Event wizard | `src/components/producer/CreateEventWizard/` |
-| Wizard Step 2 | `src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx` |
-| UI primitives | `src/components/ui/` (accordion, collapsible, popover, badge, command, tooltip, dialog) |
-| Background gradient | `src/components/ui/BackgroundGradient.tsx` |
-| Existing shared | `src/components/shared/CategoryFilterBar.tsx`, `CategoryBadge.tsx`, `CategorySelector.tsx` |
-| API service | `src/services/api.ts` |
-| Auth context | `src/contexts/AuthContext.tsx` |
+| Area                   | Key Files                                                                                  |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| Command Center shell   | `src/components/producer/CommandCenter.tsx`                                                |
+| Mail tab               | `src/components/producer/Email/EmailAutomationTab.tsx`                                     |
+| Email rows             | `src/components/producer/Email/EmailRow.tsx`, `ScheduledEmailCard.tsx`                     |
+| Email editor           | `src/components/producer/Email/EmailEditorPage.tsx`                                        |
+| Template editor        | `src/components/producer/Email/EmailTemplateEditorPage.tsx`, `TemplateBuilderPage.tsx`     |
+| Audit log              | `src/components/producer/Email/EmailAuditTable.tsx`, `EmailAuditFilters.tsx`               |
+| Network page           | `src/components/producer/Network/NetworkPage.tsx`                                          |
+| Network lists          | `src/components/producer/Network/Lists/ListsManagement.tsx`                                |
+| Shared category filter | `src/components/shared/CategoryFilterBar.tsx`                                              |
+| Settings (global)      | `src/pages/SettingsPage.tsx`                                                               |
+| Settings (event-level) | `src/components/producer/EventSettings.tsx`                                                |
+| Event wizard           | `src/components/producer/CreateEventWizard/`                                               |
+| Wizard Step 2          | `src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx`              |
+| UI primitives          | `src/components/ui/` (accordion, collapsible, popover, badge, command, tooltip, dialog)    |
+| Background gradient    | `src/components/ui/BackgroundGradient.tsx`                                                 |
+| Existing shared        | `src/components/shared/CategoryFilterBar.tsx`, `CategoryBadge.tsx`, `CategorySelector.tsx` |
+| API service            | `src/services/api.ts`                                                                      |
+| Auth context           | `src/contexts/AuthContext.tsx`                                                             |
 
 ---
 
@@ -344,15 +381,15 @@ After removing Integrations and Notifications tabs (UI-10), the remaining Organi
 
 This order minimizes context-switching and lets you build on prior work:
 
-1. **UI-10** — Remove Eventbrite/Notifications from Settings *(quick win, cleans up Settings for UI-16)*
-2. **UI-16** — Collapsible Settings sections *(builds on the cleaned-up Settings page)*
-3. **UI-12** — Card popup opacity *(trivial, ship it)*
-4. **UI-14** — Default install date *(small, isolated change)*
-5. **UI-01** — Hide Send Now before live *(small, isolated change)*
-6. **UI-11** — Gradient treatment *(visual polish pass across email screens)*
-7. **UI-05** — Standardize search/filter *(shared component, then retrofit)*
-8. **UI-04** — Move Categories to Network *(biggest item, benefits from UI-05's shared filter)*
-9. **UI-08** — Onboarding guide framework *(standalone, can be done in parallel)*
+1. **UI-10** — Remove Eventbrite/Notifications from Settings _(quick win, cleans up Settings for UI-16)_
+2. **UI-16** — Collapsible Settings sections _(builds on the cleaned-up Settings page)_
+3. **UI-12** — Card popup opacity _(trivial, ship it)_
+4. **UI-14** — Default install date _(small, isolated change)_
+5. **UI-01** — Hide Send Now before live _(small, isolated change)_
+6. **UI-11** — Gradient treatment _(visual polish pass across email screens)_
+7. **UI-05** — Standardize search/filter _(shared component, then retrofit)_
+8. **UI-04** — Move Categories to Network _(biggest item, benefits from UI-05's shared filter)_
+9. **UI-08** — Onboarding guide framework _(standalone, can be done in parallel)_
 
 ---
 

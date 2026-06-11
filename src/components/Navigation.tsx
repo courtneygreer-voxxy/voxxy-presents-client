@@ -11,14 +11,14 @@ export default function Navigation({ activePage }: NavigationProps) {
 
   const getLinkClass = (page: string) => {
     return activePage === page
-      ? "font-medium text-white bg-white/15 px-3 py-2 rounded-md"
-      : "text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md transition-all"
+      ? 'font-medium text-white bg-white/15 px-3 py-2 rounded-md'
+      : 'text-white/80 hover:text-white hover:bg-white/10 px-3 py-2 rounded-md transition-all'
   }
 
   const getMobileLinkClass = (page: string) => {
     return activePage === page
-      ? "block py-2 px-3 font-medium text-white bg-white/15 rounded-md transition-colors"
-      : "block py-2 px-3 text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-all"
+      ? 'block py-2 px-3 font-medium text-white bg-white/15 rounded-md transition-colors'
+      : 'block py-2 px-3 text-white/80 hover:text-white hover:bg-white/10 rounded-md transition-all'
   }
 
   return (

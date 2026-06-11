@@ -3,6 +3,7 @@
 ## API Service Methods (src/services/api.ts)
 
 ### Submit Vendor Application
+
 ```typescript
 registrationsApi.submitVendorApplication(eventSlug: string, data: {
   email: string
@@ -28,6 +29,7 @@ navigate(`/applications/success?ticket_code=${response.ticket_code}&event=${even
 ```
 
 ### Track Application Status
+
 ```typescript
 registrationsApi.trackByTicketCode(ticketCode: string)
 
@@ -37,6 +39,7 @@ console.log(registration.status) // 'pending' | 'approved' | 'rejected' | 'waitl
 ```
 
 ### Get Event Details
+
 ```typescript
 eventsApi.getById(slug: string)
 
@@ -49,6 +52,7 @@ if (event.vendor_application) {
 ```
 
 ### Lookup Vendor Application by Short Code
+
 ```typescript
 vendorApplicationsApi.lookupByCode(code: string)
 
@@ -62,43 +66,42 @@ navigate(`/events/${eventData.slug}/apply`)
 ## Component Examples
 
 ### PublicEventDetailPage.tsx - Displaying Vendor Application
+
 ```tsx
 // Show vendor application section if available
-{event.vendor_application && (
-  <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
-    <h2 className="text-2xl font-bold text-white mb-4">
-      Vendor Opportunities
-    </h2>
-    <p className="text-lg text-purple-300 mb-4">
-      {event.vendor_application.name}
-    </p>
-    
-    {/* Categories */}
-    <div className="mb-6">
-      <h3 className="text-sm font-semibold text-white/60 mb-2">
-        Seeking Vendors In:
-      </h3>
-      <div className="flex flex-wrap gap-2">
-        {event.vendor_application.categories.map((category) => (
-          <span key={category} className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium">
-            {category}
-          </span>
-        ))}
+{
+  event.vendor_application && (
+    <div className="bg-gradient-to-br from-purple-900/20 to-blue-900/20 border-2 border-purple-500/30 rounded-lg p-6">
+      <h2 className="text-2xl font-bold text-white mb-4">Vendor Opportunities</h2>
+      <p className="text-lg text-purple-300 mb-4">{event.vendor_application.name}</p>
+
+      {/* Categories */}
+      <div className="mb-6">
+        <h3 className="text-sm font-semibold text-white/60 mb-2">Seeking Vendors In:</h3>
+        <div className="flex flex-wrap gap-2">
+          {event.vendor_application.categories.map((category) => (
+            <span
+              key={category}
+              className="px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-sm font-medium"
+            >
+              {category}
+            </span>
+          ))}
+        </div>
       </div>
+
+      <button onClick={() => navigate(`/events/${event.slug}/apply`)}>Apply as Vendor</button>
+
+      <p className="text-white/40 text-sm mt-4">
+        {event.vendor_application.submissions_count} vendors have applied
+      </p>
     </div>
-
-    <button onClick={() => navigate(`/events/${event.slug}/apply`)}>
-      Apply as Vendor
-    </button>
-
-    <p className="text-white/40 text-sm mt-4">
-      {event.vendor_application.submissions_count} vendors have applied
-    </p>
-  </div>
-)}
+  )
+}
 ```
 
 ### VendorApplicationForm.tsx - Form Submission
+
 ```tsx
 const [formData, setFormData] = useState({
   email: '',
@@ -119,7 +122,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
   try {
     setSubmitting(true)
-    
+
     const response = await registrationsApi.submitVendorApplication(event.slug, {
       email: formData.email,
       phone: formData.phone || undefined,
@@ -130,9 +133,7 @@ const handleSubmit = async (e: React.FormEvent) => {
     })
 
     // Redirect to confirmation
-    navigate(
-      `/applications/success?ticket_code=${response.ticket_code}&event=${event.slug}`
-    )
+    navigate(`/applications/success?ticket_code=${response.ticket_code}&event=${event.slug}`)
   } catch (err: any) {
     setError(err.message || 'Failed to submit application')
   } finally {
@@ -142,6 +143,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 ```
 
 ### ApplicationTrackingPage.tsx - Tracking Status
+
 ```tsx
 const { ticketCode } = useParams<{ ticketCode: string }>()
 
@@ -166,17 +168,18 @@ const StatusIcon = statusConfig.icon
 
 return (
   <div className={`bg-white/5 border ${statusConfig.border} rounded-lg p-8`}>
-    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.bg}`}>
+    <div
+      className={`inline-flex items-center justify-center w-20 h-20 rounded-full ${statusConfig.bg}`}
+    >
       <StatusIcon className={`w-12 h-12 ${statusConfig.color}`} />
     </div>
-    <h2 className={`text-2xl font-bold ${statusConfig.color}`}>
-      {statusConfig.label}
-    </h2>
+    <h2 className={`text-2xl font-bold ${statusConfig.color}`}>{statusConfig.label}</h2>
   </div>
 )
 ```
 
 ### ShortLinkRedirectPage.tsx - Short Link Resolution
+
 ```tsx
 const { code } = useParams<{ code: string }>()
 
@@ -190,7 +193,7 @@ useEffect(() => {
     try {
       // Lookup the event by shareable code
       const eventData = await vendorApplicationsApi.lookupByCode(code)
-      
+
       // Redirect to the vendor application form for this event
       navigate(`/events/${eventData.slug}/apply`, { replace: true })
     } catch (err: any) {
@@ -207,6 +210,7 @@ useEffect(() => {
 ## API Request/Response Examples
 
 ### Submit Application Request
+
 ```javascript
 POST /api/v1/presents/events/music-festival-2025/registrations
 
@@ -239,6 +243,7 @@ Response (200 OK):
 ```
 
 ### Track Application Request
+
 ```javascript
 GET /api/v1/presents/registrations/track/APP-ABC123XYZ
 
@@ -264,6 +269,7 @@ Response (200 OK):
 ```
 
 ### Get Event Details Request
+
 ```javascript
 GET /api/v1/presents/events/music-festival-2025
 
@@ -307,6 +313,7 @@ Response (200 OK):
 ```
 
 ### Lookup Vendor Application Request
+
 ```javascript
 GET /api/v1/presents/vendor_applications/lookup/ABC123
 
@@ -326,6 +333,7 @@ Response (200 OK):
 ## Validation Rules
 
 ### Email Field
+
 ```typescript
 // Must be valid email format
 const isValidEmail = (email: string) => {
@@ -339,6 +347,7 @@ if (!isValidEmail(formData.email)) {
 ```
 
 ### Business Name
+
 ```typescript
 // Required, non-empty
 if (!formData.business_name || formData.business_name.trim() === '') {
@@ -347,6 +356,7 @@ if (!formData.business_name || formData.business_name.trim() === '') {
 ```
 
 ### Vendor Category
+
 ```typescript
 // Must be selected from available categories
 if (!formData.vendor_category) {
@@ -359,17 +369,18 @@ if (!event.vendor_application.categories.includes(formData.vendor_category)) {
 ```
 
 ### Phone (Optional)
+
 ```typescript
 // If provided, should be formatted
 const formatPhone = (phone: string) => {
   // Remove non-digits
   const cleaned = phone.replace(/\D/g, '')
-  
+
   // Format as (XXX) XXX-XXXX
   if (cleaned.length === 10) {
     return `(${cleaned.slice(0, 3)}) ${cleaned.slice(3, 6)}-${cleaned.slice(6)}`
   }
-  
+
   return phone
 }
 ```
@@ -379,11 +390,12 @@ const formatPhone = (phone: string) => {
 ## Error Handling
 
 ### API Error Class
+
 ```typescript
 class ApiError extends Error {
   status: number
   errors?: string[]
-  
+
   constructor(message: string, status: number, errors?: string[]) {
     super(message)
     this.status = status
@@ -406,6 +418,7 @@ try {
 ```
 
 ### Common Error Responses
+
 ```javascript
 // 400 Bad Request
 {
@@ -431,6 +444,7 @@ try {
 ## Route Guards
 
 ### Public Routes (No Auth Required)
+
 ```tsx
 <Route path="/events/:slug" element={<PublicEventDetailPage />} />
 <Route path="/events/:slug/apply" element={<VendorApplicationForm />} />
@@ -440,6 +454,7 @@ try {
 ```
 
 ### Authenticated Routes (Require Auth)
+
 ```tsx
 // Producers
 <Route path="/producer/pending" element={<ProducerDashboard />} />
@@ -460,6 +475,7 @@ try {
 ## CSS Classes for Guest Pages
 
 ### Dark Theme
+
 ```css
 /* Background */
 bg-gradient-to-br from-[#1a0d2e] to-[#0f0820]
@@ -482,6 +498,7 @@ text-purple-400 (icons)
 ```
 
 ### Status Badge Colors
+
 ```css
 /* Pending */
 bg-blue-500/20 text-blue-400
@@ -509,6 +526,7 @@ border-purple-500/30
 ## Testing the Guest Flow
 
 ### Manual Test Steps
+
 ```
 1. Visit http://localhost:5173/events/test-event
    - Verify event details load
@@ -538,6 +556,7 @@ border-purple-500/30
 ```
 
 ### Testing Error Cases
+
 ```
 1. Empty email field - Should show validation error
 2. Invalid email format - Should show validation error

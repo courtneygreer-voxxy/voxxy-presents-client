@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Save, Loader2 } from 'lucide-react';
+import { useState } from 'react'
+import { Save, Loader2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -7,15 +7,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { scheduledEmailsApi } from '@/services/api';
+} from '@/components/ui/dialog'
+import { scheduledEmailsApi } from '@/services/api'
 
 interface SaveAsTemplateDialogProps {
-  isOpen: boolean;
-  onClose: () => void;
-  eventSlug: string;
-  emailCount: number;
-  onSuccess?: (templateId: number) => void;
+  isOpen: boolean
+  onClose: () => void
+  eventSlug: string
+  emailCount: number
+  onSuccess?: (templateId: number) => void
 }
 
 export default function SaveAsTemplateDialog({
@@ -23,54 +23,54 @@ export default function SaveAsTemplateDialog({
   onClose,
   eventSlug,
   emailCount,
-  onSuccess
+  onSuccess,
 }: SaveAsTemplateDialogProps) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState('')
+  const [description, setDescription] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleSave = async () => {
     if (!name.trim()) {
-      setError('Please enter a template name');
-      return;
+      setError('Please enter a template name')
+      return
     }
 
-    setIsSaving(true);
-    setError(null);
+    setIsSaving(true)
+    setError(null)
 
     try {
       const template = await scheduledEmailsApi.saveAsTemplate(eventSlug, {
         name: name.trim(),
-        description: description.trim() || undefined
-      });
+        description: description.trim() || undefined,
+      })
 
       // Reset form
-      setName('');
-      setDescription('');
+      setName('')
+      setDescription('')
 
       // Call success callback
       if (onSuccess && template.id) {
-        onSuccess(template.id);
+        onSuccess(template.id)
       }
 
       // Close dialog
-      onClose();
+      onClose()
     } catch (err: any) {
-      setError(err.message || 'Failed to save template');
+      setError(err.message || 'Failed to save template')
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
   const handleClose = () => {
     if (!isSaving) {
-      setName('');
-      setDescription('');
-      setError(null);
-      onClose();
+      setName('')
+      setDescription('')
+      setError(null)
+      onClose()
     }
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
@@ -88,7 +88,10 @@ export default function SaveAsTemplateDialog({
         <div className="space-y-4 py-4">
           {/* Template Name */}
           <div>
-            <label htmlFor="template-name" className="block text-sm font-medium text-foreground mb-2">
+            <label
+              htmlFor="template-name"
+              className="block text-sm font-medium text-foreground mb-2"
+            >
               Template Name *
             </label>
             <input
@@ -105,7 +108,10 @@ export default function SaveAsTemplateDialog({
 
           {/* Description (Optional) */}
           <div>
-            <label htmlFor="template-description" className="block text-sm font-medium text-foreground mb-2">
+            <label
+              htmlFor="template-description"
+              className="block text-sm font-medium text-foreground mb-2"
+            >
               Description <span className="text-foreground/40 font-normal">(Optional)</span>
             </label>
             <textarea
@@ -118,15 +124,14 @@ export default function SaveAsTemplateDialog({
               disabled={isSaving}
               maxLength={500}
             />
-            <p className="mt-1 text-xs text-foreground/40">
-              {description.length}/500 characters
-            </p>
+            <p className="mt-1 text-xs text-foreground/40">{description.length}/500 characters</p>
           </div>
 
           {/* Info Box */}
           <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
             <p className="text-sm text-blue-400">
-              <strong>Note:</strong> This will create a copy of your current email setup that you can reuse for other events. Your current event emails won't be affected.
+              <strong>Note:</strong> This will create a copy of your current email setup that you
+              can reuse for other events. Your current event emails won't be affected.
             </p>
           </div>
 
@@ -166,5 +171,5 @@ export default function SaveAsTemplateDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

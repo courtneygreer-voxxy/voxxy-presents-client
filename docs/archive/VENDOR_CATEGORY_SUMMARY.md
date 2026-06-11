@@ -3,6 +3,7 @@
 ## Analysis Overview
 
 This comprehensive analysis examines how vendor categories (application types) are implemented in the Voxxy Presents frontend codebase, including:
+
 - Type definitions and data structures
 - Category-specific fields and their variations
 - Email variable system integration
@@ -20,6 +21,7 @@ Generated: March 4, 2026
 **VendorCategory Interface** (`/src/types/eventPortal.ts`)
 
 The main type defining vendor application categories with all category-specific fields:
+
 - `booth_price`: Cost per booth for this category
 - `install_date`, `install_start_time`, `install_end_time`: Setup schedule by category
 - `payment_link`: Payment URL specific to category
@@ -30,6 +32,7 @@ The main type defining vendor application categories with all category-specific 
 ### 2. Storage Model
 
 **Events store categories as arrays:**
+
 ```
 Event
   ├─ vendor_categories: VendorCategory[]  [multiple categories per event]
@@ -40,6 +43,7 @@ Event
 ```
 
 **Registrations track which category vendor applied to:**
+
 ```
 Registration
   ├─ vendor_category: "Artist Booth"  [application name they applied for]
@@ -50,26 +54,28 @@ Registration
 
 ### 3. Category-Specific Fields
 
-| Field | Type | Email Variable | Status |
-|-------|------|----------------|--------|
-| booth_price | $USD | [boothPrice], [categoryPrice] | WORKING |
-| install_date | Date | [installDate] | WORKING |
-| install_start_time | HH:MM | [installStartTime] | WORKING |
-| install_end_time | HH:MM | [installEndTime] | WORKING |
-| install_time (range) | Computed | [installTime] | WORKING |
-| payment_link | URL | [paymentLink] | WORKING |
-| application_tags | string[] | MISSING | Need to add |
-| description | string | MISSING | Need to add |
+| Field                | Type     | Email Variable                | Status      |
+| -------------------- | -------- | ----------------------------- | ----------- |
+| booth_price          | $USD     | [boothPrice], [categoryPrice] | WORKING     |
+| install_date         | Date     | [installDate]                 | WORKING     |
+| install_start_time   | HH:MM    | [installStartTime]            | WORKING     |
+| install_end_time     | HH:MM    | [installEndTime]              | WORKING     |
+| install_time (range) | Computed | [installTime]                 | WORKING     |
+| payment_link         | URL      | [paymentLink]                 | WORKING     |
+| application_tags     | string[] | MISSING                       | Need to add |
+| description          | string   | MISSING                       | Need to add |
 
 ### 4. Email System Integration
 
 **Current implementation:**
+
 - Email preview modal detects category-specific variables
 - Shows dropdown to select which category to preview
 - Passes `{ category: "Artist Booth" }` to backend
 - Backend resolves variables based on category context
 
 **Limitations:**
+
 - Only [installDate], [installTime*], [vendorCategory], [paymentLink] work perfectly
 - [boothPrice]/[categoryPrice] not yet fully category-specific (needs backend fix)
 - Missing variables for application_tags and description
@@ -77,6 +83,7 @@ Registration
 ### 5. Category-Specific Variables Available
 
 **Already implemented (8 variables):**
+
 1. [boothPrice] - Cost of booth
 2. [categoryPrice] - Alias for boothPrice
 3. [installDate] - Setup date
@@ -87,6 +94,7 @@ Registration
 8. [paymentLink] - Payment checkout URL
 
 **Missing (3 variables) - HIGH PRIORITY:**
+
 1. [categoryDescription] - What this application type is for
 2. [applicationTags] - Features/requirements of this category (comma-separated)
 3. [tagsList] - Same as above but formatted as bulleted list
@@ -96,15 +104,18 @@ Registration
 ## Code Locations
 
 ### Type Definitions
+
 - **VendorCategory**: `/src/types/eventPortal.ts` (lines 39-52)
 - **ApplicationRow**: `/src/components/producer/CreateEventWizard/types.ts` (lines 3-14)
 - **EventPortalData**: `/src/types/eventPortal.ts` (lines 4-11)
 
 ### Email Variables
+
 - **EMAIL_VARIABLES array**: `/src/utils/emailVariables.ts` (lines 36-308)
 - **26 total variables, 8 category-specific**
 
 ### Components Using Categories
+
 - **EventEmailPreviewModal**: `/src/components/shared/EventEmailPreviewModal.tsx`
 - **CreateApplicationForm**: `/src/components/producer/CreateApplicationForm.tsx`
 - **Step2ApplicationDetails**: `/src/components/producer/CreateEventWizard/steps/Step2ApplicationDetails.tsx`
@@ -112,6 +123,7 @@ Registration
 - **InvitationViewPage**: `/src/pages/InvitationViewPage.tsx`
 
 ### API Endpoints
+
 - **Vendor Applications**: `/src/services/api.ts` (lines 915-1007)
 - **Email Preview**: `/src/services/api.ts` - POST `/v1/presents/events/{slug}/scheduled_emails/{id}/preview`
 
@@ -146,6 +158,7 @@ Email preview shows vendor-specific values
 ## Current Gaps & Issues
 
 ### 1. Missing Email Variables
+
 - [categoryDescription] - not yet implemented
 - [applicationTags] - not yet implemented
 - [tagsList] - not yet implemented
@@ -153,6 +166,7 @@ Email preview shows vendor-specific values
 **Impact:** Emails cannot mention special features of specific booth types
 
 ### 2. [boothPrice]/[categoryPrice] Not Fully Category-Specific
+
 - Currently both resolve to event-level price
 - Should resolve to category-specific price
 - Requires backend EmailVariableResolver fix
@@ -160,6 +174,7 @@ Email preview shows vendor-specific values
 **Impact:** Multi-category events cannot have different prices per category in emails
 
 ### 3. No Category-Level Metadata
+
 - `categories` field (vendor types accepted) not used
 - Could support: "This application accepts: Artists, Musicians, Craftspeople"
 
@@ -201,6 +216,7 @@ Email preview shows vendor-specific values
 ## Implementation Checklist
 
 ### Frontend
+
 - [ ] Add [categoryDescription] to EMAIL_VARIABLES
 - [ ] Add [applicationTags] to EMAIL_VARIABLES
 - [ ] Add [tagsList] to EMAIL_VARIABLES
@@ -208,12 +224,14 @@ Email preview shows vendor-specific values
 - [ ] Update UI help text
 
 ### Backend
+
 - [ ] Update EmailVariableResolver for new variables
 - [ ] Fix [categoryPrice] to be truly category-specific
 - [ ] Test registration-based resolution
 - [ ] Add unit tests for category-specific variables
 
 ### Testing
+
 - [ ] Single-category events work correctly
 - [ ] Multi-category events show correct values per category
 - [ ] Category dropdown appears/disappears appropriately
@@ -289,4 +307,3 @@ Created comprehensive documentation:
 Generated: March 4, 2026
 Version: 1.0
 Status: Complete Analysis
-

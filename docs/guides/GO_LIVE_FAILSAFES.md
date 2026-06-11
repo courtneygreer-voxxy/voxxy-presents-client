@@ -17,9 +17,11 @@ Implemented comprehensive failsafe mechanisms to ensure smooth go-live tomorrow.
 ### **Backend (Rails) - Admin Scripts**
 
 #### 1. **Email Retry Script** (`lib/scripts/email_retry.rb`)
+
 **Purpose:** Manually retry failed email deliveries
 
 **Usage:**
+
 ```bash
 # Dry-run (preview)
 rails runner lib/scripts/email_retry.rb --event=EVENT_SLUG --status=failed --dry-run
@@ -35,6 +37,7 @@ rails runner lib/scripts/email_retry.rb --event=EVENT_SLUG --status=failed --typ
 ```
 
 **Features:**
+
 - Filters by event, status, type, or specific emails
 - Dry-run mode for safety
 - Production safety checks
@@ -42,9 +45,11 @@ rails runner lib/scripts/email_retry.rb --event=EVENT_SLUG --status=failed --typ
 - Detailed progress tracking
 
 #### 2. **Data Backup Script** (`lib/scripts/data_backup.rb`)
+
 **Purpose:** Export/restore complete event data for disaster recovery
 
 **Usage:**
+
 ```bash
 # Backup single event
 rails runner lib/scripts/data_backup.rb --event=EVENT_SLUG
@@ -60,6 +65,7 @@ rails runner lib/scripts/data_backup.rb --restore=backups/FILENAME.json
 ```
 
 **What Gets Backed Up:**
+
 - Event details
 - Vendor applications/registrations
 - Invitation lists
@@ -72,9 +78,11 @@ rails runner lib/scripts/data_backup.rb --restore=backups/FILENAME.json
 **Storage:** Local `backups/` directory (JSON files)
 
 #### 3. **Spam Resend Script** (`lib/scripts/spam_resend.rb`)
+
 **Purpose:** Resend emails marked as spam by SendGrid
 
 **Usage:**
+
 ```bash
 # Resend to specific addresses (dry-run)
 rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --emails=user1@me.com --dry-run
@@ -87,12 +95,14 @@ rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --file=spam_reports.c
 ```
 
 **Features:**
+
 - Accepts CSV files from spam monitoring services
 - Time-based filtering (24h, 7d, etc.)
 - Tracks resend attempts in database
 - Integrates with SendGrid webhook data
 
 #### 4. **Daily Automated Backups**
+
 **File:** `app/workers/daily_backup_worker.rb`
 
 - **Schedule:** Every day at 2:00 AM EST
@@ -101,6 +111,7 @@ rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --file=spam_reports.c
 - **Scope:** All organizations
 
 #### 5. **Documentation** (`ADMIN_SCRIPTS.md`)
+
 - Complete usage guide
 - Common scenarios with examples
 - Troubleshooting section
@@ -111,23 +122,28 @@ rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --file=spam_reports.c
 ### **Frontend (React/TypeScript) - User-Facing Failsafes**
 
 #### 1. **Application Form Auto-Save** (`src/utils/formPersistence.ts`)
+
 **Purpose:** Prevent data loss from browser crashes or network issues
 
 **Features:**
+
 - Auto-saves every 30 seconds to localStorage
 - Restore prompt on page reload with timestamp
 - Auto-expires after 7 days
 - Clears on successful submission
 
 **UI Elements:**
+
 - Blue restore prompt at top of form
 - "Restore My Data" vs "Start Fresh" buttons
 - Auto-save indicator below submit button
 
 #### 2. **Retry Logic with Exponential Backoff**
+
 **Purpose:** Automatically retry failed submissions
 
 **Features:**
+
 - 3 automatic attempts with 2s, 4s, 8s delays
 - Only retries network/server errors (not validation)
 - Shows retry progress: "Retrying (1/3)..."
@@ -135,37 +151,45 @@ rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --file=spam_reports.c
 - Enhanced error messages with guidance
 
 **Error Types Handled:**
+
 - Network failures
 - Server errors (5xx)
 - Timeouts (408)
 - Rate limits (429)
 
 #### 3. **Bug Report System**
+
 **Components:**
+
 - `src/components/ReportBug.tsx` - Modal form
 - `src/components/FloatingBugButton.tsx` - Always-available button
 - `src/components/ErrorBoundary.tsx` - Catches React errors
 
 **User Flow:**
+
 1. **Manual:** Click floating button (bottom-right)
 2. **Automatic:** After 3 consecutive failed submissions
 3. **Error Boundary:** On unhandled React errors
 
 **Form Fields:**
+
 - Name (required)
 - Email (required)
 - Description (optional)
 - Auto-captured: Error message, browser info, URL, timestamp, form context
 
 **Backend Integration:**
+
 - POST `/bug_reports` (public endpoint)
 - Stores in database with JSON error_context
 - Admin endpoints ready: GET `/bug_reports`, GET `/bug_reports/:id`
 
 #### 4. **Error Boundary**
+
 **Purpose:** Prevent full app crashes from unhandled errors
 
 **Features:**
+
 - Catches any React component errors
 - Shows user-friendly error page
 - "Refresh Page" and "Go Home" buttons
@@ -180,6 +204,7 @@ rails runner lib/scripts/spam_resend.rb --event=EVENT_SLUG --file=spam_reports.c
 ## 📂 Files Created/Modified
 
 ### Backend (`voxxy-rails-react`)
+
 ```
 lib/scripts/
 ├── email_retry.rb (new, 360 lines)
@@ -202,6 +227,7 @@ ADMIN_SCRIPTS.md (new, comprehensive guide)
 ```
 
 ### Frontend (`voxxy-presents-client`)
+
 ```
 src/utils/
 └── formPersistence.ts (new, 280 lines)
@@ -225,6 +251,7 @@ GO_LIVE_FAILSAFES.md (this file)
 ## 🚀 Git Branches & Commits
 
 ### Backend (`feature/go-live-failsafes` off `staging`)
+
 ```
 ef6bcdc - Update bug reports API to support error_context JSON
 754aa08 - Add go-live failsafe scripts and automated backups
@@ -233,6 +260,7 @@ ef6bcdc - Update bug reports API to support error_context JSON
 **Total:** 2 commits, 7 files, 2,104 lines added
 
 ### Frontend (`feature/go-live-failsafes` off `develop`)
+
 ```
 f892e3a - Add Error Boundary and wire up bug reports API
 61ea415 - Add application form auto-save, retry logic, and bug reporting
@@ -247,6 +275,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 ### Backend Scripts (To Test on Staging)
 
 #### Email Retry Script
+
 - [ ] Dry-run works without errors
 - [ ] Can filter by event slug
 - [ ] Can target specific email addresses
@@ -256,6 +285,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] Shows accurate summary before execution
 
 #### Data Backup Script
+
 - [ ] Can export single event
 - [ ] Can export all events for organization
 - [ ] Backup file is valid JSON
@@ -265,6 +295,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] All data is preserved (registrations, invitations, etc.)
 
 #### Spam Resend Script
+
 - [ ] Can target specific emails
 - [ ] `--since` time parsing works (24h, 7d, etc.)
 - [ ] Can read CSV files
@@ -272,6 +303,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] Tracks resend attempts
 
 #### Daily Backups
+
 - [ ] Sidekiq schedule is loaded
 - [ ] Job appears in Sidekiq dashboard
 - [ ] Can manually trigger: `DailyBackupWorker.perform_async`
@@ -281,6 +313,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 ### Frontend Features (To Test on Staging/Dev)
 
 #### Auto-Save
+
 - [ ] Form data saves every 30 seconds (check console logs)
 - [ ] Restore prompt appears on page reload
 - [ ] "Restore My Data" populates form fields
@@ -289,6 +322,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] Data clears on successful submission
 
 #### Retry Logic
+
 - [ ] Failed submissions retry automatically
 - [ ] Shows "Retrying (1/3)" etc.
 - [ ] Stops after 3 attempts
@@ -296,6 +330,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] Error messages are contextual and helpful
 
 #### Bug Report
+
 - [ ] Floating button appears (bottom-right)
 - [ ] Modal opens on button click
 - [ ] Auto-opens after 3 failed submissions
@@ -305,6 +340,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 - [ ] Backend receives bug reports
 
 #### Error Boundary
+
 - [ ] Catches React errors (test by throwing error in component)
 - [ ] Shows error page instead of blank screen
 - [ ] "Refresh Page" reloads
@@ -317,6 +353,7 @@ f892e3a - Add Error Boundary and wire up bug reports API
 ## 🔐 Security & Safety
 
 ### Production Safety Checks
+
 All backend scripts require `ALLOW_PRODUCTION_SCRIPTS=true` environment variable in production.
 
 ```bash
@@ -326,11 +363,13 @@ rails runner lib/scripts/email_retry.rb ...
 ```
 
 ### Confirmation Prompts
+
 - Email retry (non-dry-run): "Type 'yes' to continue"
 - Data restore: "Type 'yes' to continue"
 - Spam resend (non-dry-run): "Type 'yes' to continue"
 
 ### Data Protection
+
 - Bug reports don't include sensitive data (passwords, tokens, etc.)
 - Form auto-save excludes `agreed_to_terms` checkbox
 - Backup files stored locally (not committed to git)
@@ -358,19 +397,20 @@ rails runner lib/scripts/email_retry.rb ...
 
 ### How to Respond to Issues
 
-| Issue | Action |
-|-------|--------|
-| Emails not sending | Run email retry script |
-| High spam reports | Run spam resend script with CSV |
-| Data corruption | Restore from most recent backup |
-| Form submissions failing | Check bug reports for patterns |
-| App crashing | Error boundary should catch, check Sentry |
+| Issue                    | Action                                    |
+| ------------------------ | ----------------------------------------- |
+| Emails not sending       | Run email retry script                    |
+| High spam reports        | Run spam resend script with CSV           |
+| Data corruption          | Restore from most recent backup           |
+| Form submissions failing | Check bug reports for patterns            |
+| App crashing             | Error boundary should catch, check Sentry |
 
 ---
 
 ## 🎯 Next Steps
 
 ### Before Go-Live (Today/Tomorrow Morning)
+
 1. ✅ **Test backend scripts on staging data**
    - Run each script in dry-run mode
    - Verify output looks correct
@@ -394,7 +434,9 @@ rails runner lib/scripts/email_retry.rb ...
    - Verify backup file created
 
 ### During Go-Live (Tomorrow)
+
 1. **Pre-launch backup**
+
    ```bash
    rails runner lib/scripts/data_backup.rb --event=EVENT_SLUG
    ```
@@ -410,6 +452,7 @@ rails runner lib/scripts/email_retry.rb ...
    - Test dry-runs if time permits
 
 ### Post-Launch (This Week)
+
 1. **Review bug reports daily**
    - Build admin dashboard (optional - can use API for now)
    - Address recurring issues
@@ -453,6 +496,7 @@ GET /bug_reports (with admin auth)
 ```
 
 ### Support Contacts
+
 - **User-facing support:** support@voxxy.com
 - **Sentry:** https://sentry.io (alerts configured)
 - **Render:** Dashboard for deployment status
@@ -463,6 +507,7 @@ GET /bug_reports (with admin auth)
 ## 🏁 Summary
 
 **Total Implementation:**
+
 - **Backend:** 3 admin scripts + 1 scheduled worker + API updates
 - **Frontend:** 4 components + 1 utility + form enhancements
 - **Documentation:** 2 comprehensive guides
@@ -470,6 +515,7 @@ GET /bug_reports (with admin auth)
 - **Lines of Code:** ~3,000
 
 **Key Benefits:**
+
 1. **Data Safety:** Auto-save + backups = zero data loss
 2. **Error Recovery:** Retry logic + manual scripts = always recoverable
 3. **User Support:** Bug reports + error boundary = never stuck
@@ -480,4 +526,4 @@ All critical failsafes in place. Team has tools to respond to any issue quickly.
 
 ---
 
-*Generated by Claude Code on February 8, 2026*
+_Generated by Claude Code on February 8, 2026_

@@ -1,7 +1,7 @@
-import { Bug } from 'lucide-react';
+import { Bug } from 'lucide-react'
 
 interface FloatingBugButtonProps {
-  onClick: () => void;
+  onClick: () => void
 }
 
 export default function FloatingBugButton({ onClick }: FloatingBugButtonProps) {
@@ -16,5 +16,5 @@ export default function FloatingBugButton({ onClick }: FloatingBugButtonProps) {
         Report Bug
       </span>
     </button>
-  );
+  )
 }

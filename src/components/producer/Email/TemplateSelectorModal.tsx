@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Mail, Check, Loader2, ChevronRight } from 'lucide-react';
+import { useState, useEffect } from 'react'
+import { Mail, Check, Loader2, ChevronRight } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -7,70 +7,70 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { emailCampaignTemplatesApi } from '@/services/api';
-import type { EmailCampaignTemplate } from '@/types/email';
-import { Badge } from '@/components/ui/badge';
+} from '@/components/ui/dialog'
+import { emailCampaignTemplatesApi } from '@/services/api'
+import type { EmailCampaignTemplate } from '@/types/email'
+import { Badge } from '@/components/ui/badge'
 
 interface TemplateSelectorModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelect?: (templateId: number | null) => void;
-  selectedTemplateId?: number | null;
+  isOpen: boolean
+  onClose: () => void
+  onSelect?: (templateId: number | null) => void
+  selectedTemplateId?: number | null
 }
 
 export default function TemplateSelectorModal({
   isOpen,
   onClose,
   onSelect,
-  selectedTemplateId = null
+  selectedTemplateId = null,
 }: TemplateSelectorModalProps) {
-  const [templates, setTemplates] = useState<EmailCampaignTemplate[]>([]);
-  const [selectedId, setSelectedId] = useState<number | null>(selectedTemplateId);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<EmailCampaignTemplate[]>([])
+  const [selectedId, setSelectedId] = useState<number | null>(selectedTemplateId)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   // Load templates when modal opens
   useEffect(() => {
     if (isOpen) {
-      loadTemplates();
+      loadTemplates()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   const loadTemplates = async () => {
-    setIsLoading(true);
-    setError(null);
+    setIsLoading(true)
+    setError(null)
     try {
-      const data = await emailCampaignTemplatesApi.getAll();
-      setTemplates(data);
+      const data = await emailCampaignTemplatesApi.getAll()
+      setTemplates(data)
 
       // Auto-select default template if nothing selected
       if (!selectedId) {
-        const defaultTemplate = data.find(t => t.is_default);
+        const defaultTemplate = data.find((t) => t.is_default)
         if (defaultTemplate) {
-          setSelectedId(defaultTemplate.id);
+          setSelectedId(defaultTemplate.id)
         }
       }
     } catch (err: any) {
-      setError(err.message || 'Failed to load templates');
+      setError(err.message || 'Failed to load templates')
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleConfirm = () => {
     if (onSelect) {
-      onSelect(selectedId);
+      onSelect(selectedId)
     }
-    onClose();
-  };
+    onClose()
+  }
 
   const handleSkip = () => {
     if (onSelect) {
-      onSelect(null);
+      onSelect(null)
     }
-    onClose();
-  };
+    onClose()
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -108,8 +108,8 @@ export default function TemplateSelectorModal({
           ) : (
             <div className="space-y-3">
               {templates.map((template) => {
-                const isSelected = selectedId === template.id;
-                const isSystem = template.organization_id === null;
+                const isSelected = selectedId === template.id
+                const isSystem = template.organization_id === null
 
                 return (
                   <button
@@ -124,9 +124,7 @@ export default function TemplateSelectorModal({
                     <div className="flex items-start justify-between">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-foreground">
-                            {template.name}
-                          </h3>
+                          <h3 className="font-medium text-foreground">{template.name}</h3>
                           {template.is_default && (
                             <Badge variant="tintBlue" className="px-2 py-0.5 text-xs font-medium">
                               Default
@@ -150,16 +148,16 @@ export default function TemplateSelectorModal({
                           )}
                         </div>
                       </div>
-                      <div className={`flex-shrink-0 ml-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        isSelected
-                          ? 'border-primary bg-primary/50'
-                          : 'border-border'
-                      }`}>
+                      <div
+                        className={`flex-shrink-0 ml-3 w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                          isSelected ? 'border-primary bg-primary/50' : 'border-border'
+                        }`}
+                      >
                         {isSelected && <Check className="w-3 h-3 text-foreground" />}
                       </div>
                     </div>
                   </button>
-                );
+                )
               })}
             </div>
           )}
@@ -183,5 +181,5 @@ export default function TemplateSelectorModal({
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
+  )
 }

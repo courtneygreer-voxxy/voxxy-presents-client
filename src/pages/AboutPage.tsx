@@ -25,13 +25,14 @@ export default function AboutPage() {
 
         <div className="container mx-auto max-w-[900px] text-center relative z-10">
           <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-            Community is built{" "}
+            Community is built{' '}
             <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
               in person
             </em>
           </h1>
           <p className="mx-auto mb-0 max-w-[700px] text-[18px] leading-relaxed text-white/65">
-            Voxxy exists because we believe the best communities are formed face-to-face — at art markets, pop-ups, and the events that give neighborhoods their identity.
+            Voxxy exists because we believe the best communities are formed face-to-face — at art
+            markets, pop-ups, and the events that give neighborhoods their identity.
           </p>
 
           {/* Divider */}
@@ -47,21 +48,32 @@ export default function AboutPage() {
       <section className="bg-[#faf9fc] py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">Our Story</div>
-            <h2 className="mb-6 text-[42px] font-display font-bold leading-tight text-slate-950">Built by producers, for producers</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">
+              Our Story
+            </div>
+            <h2 className="mb-6 text-[42px] font-display font-bold leading-tight text-slate-950">
+              Built by producers, for producers
+            </h2>
           </div>
 
           {/* Story Content with Image Grid */}
           <div className="grid md:grid-cols-2 gap-12 items-start mb-16">
             <div className="space-y-6">
               <p className="text-[16px] text-gray-700 leading-relaxed">
-                We're a small team based in Brooklyn, building tools for the people who bring communities together. The event producers running art shows at local venues. The market organizers coordinating 100 vendors across a weekend. The people who believe that gathering in real life matters.
+                We're a small team based in Brooklyn, building tools for the people who bring
+                communities together. The event producers running art shows at local venues. The
+                market organizers coordinating 100 vendors across a weekend. The people who believe
+                that gathering in real life matters.
               </p>
               <p className="text-[16px] text-gray-700 leading-relaxed">
-                We started Voxxy because we saw these organizers drowning in coordination work — juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools — instead of doing what they do best: curating experiences that bring people together.
+                We started Voxxy because we saw these organizers drowning in coordination work —
+                juggling spreadsheets, manual emails, endless follow-ups, and disconnected tools —
+                instead of doing what they do best: curating experiences that bring people together.
               </p>
               <p className="text-[16px] text-gray-700 leading-relaxed">
-                Our background is in community organizing, tech, and events. We've been on both sides — producing events and building the tools that power them. Voxxy is the platform we wished we had.
+                Our background is in community organizing, tech, and events. We've been on both
+                sides — producing events and building the tools that power them. Voxxy is the
+                platform we wished we had.
               </p>
             </div>
 
@@ -95,28 +107,36 @@ export default function AboutPage() {
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h4 className="mb-2 text-[18px] font-bold text-slate-950">🤝 Community First</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
-                Everything we build starts with the question: does this help people connect in real life?
+                Everything we build starts with the question: does this help people connect in real
+                life?
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h4 className="mb-2 text-[18px] font-bold text-slate-950">⚡ Simplicity Over Features</h4>
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">
+                ⚡ Simplicity Over Features
+              </h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
-                We'd rather do 5 things perfectly than 50 things poorly. Our competitors have feature bloat. We have focus.
+                We'd rather do 5 things perfectly than 50 things poorly. Our competitors have
+                feature bloat. We have focus.
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h4 className="mb-2 text-[18px] font-bold text-slate-950">🌍 Representation Matters</h4>
+              <h4 className="mb-2 text-[18px] font-bold text-slate-950">
+                🌍 Representation Matters
+              </h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
-                We're committed to supporting underrepresented communities in events and tech. That's not a talking point — it's our founding story.
+                We're committed to supporting underrepresented communities in events and tech.
+                That's not a talking point — it's our founding story.
               </p>
             </div>
 
             <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
               <h4 className="mb-2 text-[18px] font-bold text-slate-950">🛠️ Built by Producers</h4>
               <p className="text-[15px] text-gray-700 leading-relaxed">
-                We produce events alongside our customers. We don't just build tools — we use them every week.
+                We produce events alongside our customers. We don't just build tools — we use them
+                every week.
               </p>
             </div>
           </div>
@@ -129,9 +149,7 @@ export default function AboutPage() {
           <h2 className="mb-6 text-[42px] font-display font-bold text-white md:text-[48px]">
             Want to learn more?
           </h2>
-          <p className="mb-10 text-[18px] text-white/70">
-            We'd love to hear about your events.
-          </p>
+          <p className="mb-10 text-[18px] text-white/70">We'd love to hear about your events.</p>
           <TrackedLink
             to="/contact"
             className="inline-flex items-center rounded-xl voxxy-btn-brand px-8 py-4 text-lg font-semibold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:brightness-105 hover:shadow-xl"
@@ -139,7 +157,7 @@ export default function AboutPage() {
               link_text: 'Get in Touch',
               destination_page: 'Contact',
               current_page: 'About',
-              link_position: 'cta_section'
+              link_position: 'cta_section',
             }}
           >
             Get in Touch <ArrowRight className="ml-2 h-5 w-5" />

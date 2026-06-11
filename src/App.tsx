@@ -224,159 +224,171 @@ export default function App() {
     <AuthProvider>
       <Router>
         {/* Toast Notifications - Auto-dismiss after 4 seconds */}
-        <Toaster
-          position="top-right"
-          duration={4000}
-          closeButton
-          richColors
-          theme="system"
-        />
+        <Toaster position="top-right" duration={4000} closeButton richColors theme="system" />
 
         {/* Debug Panel - Shows on all pages in development */}
         <DebugPanel />
 
         <Suspense fallback={<LoadingTransition />}>
           <Routes>
-          {/* ==========================================
+            {/* ==========================================
               PUBLIC ROUTES
               ========================================== */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/help" element={<HelpPage />} />
-          <Route path="/contact" element={<Navigate to="/#contact" replace />} />
-          <Route path="/about" element={<AboutPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/help" element={<HelpPage />} />
+            <Route path="/contact" element={<Navigate to="/#contact" replace />} />
+            <Route path="/about" element={<AboutPage />} />
 
-          {/* New Legal Hub Routes */}
-          <Route path="/legal/terms" element={<TermsOfServicePage />} />
-          <Route path="/legal/privacy" element={<PrivacyPolicyPage />} />
-          <Route path="/legal/acceptable-use" element={<AcceptableUsePage />} />
-          <Route path="/legal/cookies" element={<CookiePolicyPage />} />
-          <Route path="/legal/mobile" element={<MobileEULAPage />} />
+            {/* New Legal Hub Routes */}
+            <Route path="/legal/terms" element={<TermsOfServicePage />} />
+            <Route path="/legal/privacy" element={<PrivacyPolicyPage />} />
+            <Route path="/legal/acceptable-use" element={<AcceptableUsePage />} />
+            <Route path="/legal/cookies" element={<CookiePolicyPage />} />
+            <Route path="/legal/mobile" element={<MobileEULAPage />} />
 
-          {/* Legacy redirects to new legal pages */}
-          <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
-          <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
+            {/* Legacy redirects to new legal pages */}
+            <Route path="/privacy" element={<Navigate to="/legal/privacy" replace />} />
+            <Route path="/terms" element={<Navigate to="/legal/terms" replace />} />
 
-          {/* Public Event & Vendor Application Routes */}
-          {/* Supports both new namespaced format (/org-slug-id/event-slug-id) and legacy (/event-slug) */}
-          {/* Note: More specific routes must come BEFORE wildcard routes */}
-          <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
-          <Route path="/events/*" element={<PublicEventDetailPage />} />
-          <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
-          <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
-          <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />
+            {/* Public Event & Vendor Application Routes */}
+            {/* Supports both new namespaced format (/org-slug-id/event-slug-id) and legacy (/event-slug) */}
+            {/* Note: More specific routes must come BEFORE wildcard routes */}
+            <Route path="/events/:slug/apply/:applicationId" element={<VendorApplicationForm />} />
+            <Route path="/events/*" element={<PublicEventDetailPage />} />
+            <Route path="/applications/success" element={<ApplicationConfirmationPage />} />
+            <Route path="/applications/track/:ticketCode" element={<ApplicationTrackingPage />} />
+            <Route path="/apply/:code" element={<ShortLinkRedirectPage />} />
 
-          {/* Public Invitation View Route */}
-          <Route path="/invitations/:token" element={<InvitationViewPage />} />
+            {/* Public Invitation View Route */}
+            <Route path="/invitations/:token" element={<InvitationViewPage />} />
 
-          {/* Vendor Event Portal Routes - Supports namespaced format and legacy formats */}
-          <Route path="/portal/*" element={<VendorEventPortalPage />} />
+            {/* Vendor Event Portal Routes - Supports namespaced format and legacy formats */}
+            <Route path="/portal/*" element={<VendorEventPortalPage />} />
 
-          {/* Unsubscribe Route (public - token-based) */}
-          <Route path="/unsubscribe/:token" element={<UnsubscribePage />} />
+            {/* Unsubscribe Route (public - token-based) */}
+            <Route path="/unsubscribe/:token" element={<UnsubscribePage />} />
 
-          {/* ==========================================
+            {/* ==========================================
               AUTH ROUTES - Redirect if already logged in
               ========================================== */}
 
-          {/* Unified Login Page */}
-          <Route path="/login" element={
-            <RedirectIfAuthenticatedV2>
-              <LoginPage />
-            </RedirectIfAuthenticatedV2>
-          } />
+            {/* Unified Login Page */}
+            <Route
+              path="/login"
+              element={
+                <RedirectIfAuthenticatedV2>
+                  <LoginPage />
+                </RedirectIfAuthenticatedV2>
+              }
+            />
 
-          {/* Unified Sign Up Page */}
-          <Route path="/signup" element={
-            <RedirectIfAuthenticatedV2>
-              <SignUpPage />
-            </RedirectIfAuthenticatedV2>
-          } />
+            {/* Unified Sign Up Page */}
+            <Route
+              path="/signup"
+              element={
+                <RedirectIfAuthenticatedV2>
+                  <SignUpPage />
+                </RedirectIfAuthenticatedV2>
+              }
+            />
 
-          {/* Legacy signup routes - redirect to unified signup */}
-          <Route path="/auth" element={<Navigate to="/signup" replace />} />
-          <Route path="/sign-up" element={<Navigate to="/signup" replace />} />
-          <Route path="/signup/producer" element={<Navigate to="/signup" replace />} />
-          <Route path="/signup/vendor" element={<Navigate to="/signup" replace />} />
-          <Route path="/signup/club-owner" element={<Navigate to="/signup" replace />} />
-          <Route path="/signup/venue-owner" element={<Navigate to="/signup" replace />} />
+            {/* Legacy signup routes - redirect to unified signup */}
+            <Route path="/auth" element={<Navigate to="/signup" replace />} />
+            <Route path="/sign-up" element={<Navigate to="/signup" replace />} />
+            <Route path="/signup/producer" element={<Navigate to="/signup" replace />} />
+            <Route path="/signup/vendor" element={<Navigate to="/signup" replace />} />
+            <Route path="/signup/club-owner" element={<Navigate to="/signup" replace />} />
+            <Route path="/signup/venue-owner" element={<Navigate to="/signup" replace />} />
 
-          {/* Legacy login routes - redirect to unified login */}
-          <Route path="/login/producer" element={<Navigate to="/login" replace />} />
-          <Route path="/login/vendor" element={<Navigate to="/login" replace />} />
-          <Route path="/login/club-owner" element={<Navigate to="/login" replace />} />
-          <Route path="/login/venue-owner" element={<Navigate to="/login" replace />} />
+            {/* Legacy login routes - redirect to unified login */}
+            <Route path="/login/producer" element={<Navigate to="/login" replace />} />
+            <Route path="/login/vendor" element={<Navigate to="/login" replace />} />
+            <Route path="/login/club-owner" element={<Navigate to="/login" replace />} />
+            <Route path="/login/venue-owner" element={<Navigate to="/login" replace />} />
 
-          {/* Password Reset */}
-          <Route path="/forgot-password" element={
-            <RedirectIfAuthenticatedV2>
-              <ForgotPasswordPage />
-            </RedirectIfAuthenticatedV2>
-          } />
-          <Route path="/reset-password" element={
-            <RedirectIfAuthenticatedV2>
-              <ResetPasswordPage />
-            </RedirectIfAuthenticatedV2>
-          } />
+            {/* Password Reset */}
+            <Route
+              path="/forgot-password"
+              element={
+                <RedirectIfAuthenticatedV2>
+                  <ForgotPasswordPage />
+                </RedirectIfAuthenticatedV2>
+              }
+            />
+            <Route
+              path="/reset-password"
+              element={
+                <RedirectIfAuthenticatedV2>
+                  <ResetPasswordPage />
+                </RedirectIfAuthenticatedV2>
+              }
+            />
 
-          {/* Email Verification - Redirect to pending page (consolidated account setup hub) */}
-          <Route path="/verify-email" element={<Navigate to="/pending" replace />} />
+            {/* Email Verification - Redirect to pending page (consolidated account setup hub) */}
+            <Route path="/verify-email" element={<Navigate to="/pending" replace />} />
 
-          {/* ==========================================
+            {/* ==========================================
               DASHBOARDS & HOLDING SCREENS (Role-based)
               ========================================== */}
 
-          {/* Unified Account Setup Hub - Email verification & payment request */}
-          <Route path="/pending" element={<BetaPendingPage />} />
+            {/* Unified Account Setup Hub - Email verification & payment request */}
+            <Route path="/pending" element={<BetaPendingPage />} />
 
-          {/* Payment Flow */}
-          <Route path="/payment/onboarding" element={<PaymentOnboardingPage />} />
-          <Route path="/payment/success" element={<PaymentSuccessPage />} />
-          <Route path="/payment/canceled" element={<PaymentCanceledPage />} />
+            {/* Payment Flow */}
+            <Route path="/payment/onboarding" element={<PaymentOnboardingPage />} />
+            <Route path="/payment/success" element={<PaymentSuccessPage />} />
+            <Route path="/payment/canceled" element={<PaymentCanceledPage />} />
 
-          {/* Legacy producer route - redirect to unified dashboard */}
-          <Route path="/producer/pending" element={<Navigate to="/dashboard" replace />} />
+            {/* Legacy producer route - redirect to unified dashboard */}
+            <Route path="/producer/pending" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Email Template Manager */}
-          <Route path="/producer/templates" element={<TemplateManager />} />
+            {/* Email Template Manager */}
+            <Route path="/producer/templates" element={<TemplateManager />} />
 
-          {/* Vendor Dashboard */}
-          <Route path="/vendor/pending" element={<VendorDashboard />} />
+            {/* Vendor Dashboard */}
+            <Route path="/vendor/pending" element={<VendorDashboard />} />
 
-          {/* Legacy admin dashboard route - redirect to unified dashboard */}
-          <Route path="/admin/dashboard" element={<Navigate to="/dashboard" replace />} />
+            {/* Legacy admin dashboard route - redirect to unified dashboard */}
+            <Route path="/admin/dashboard" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Admin Unsubscribes - Protected */}
-          <Route path="/admin/unsubscribes" element={
-            <AdminRoute>
-              <AdminUnsubscribesPage />
-            </AdminRoute>
-          } />
+            {/* Admin Unsubscribes - Protected */}
+            <Route
+              path="/admin/unsubscribes"
+              element={
+                <AdminRoute>
+                  <AdminUnsubscribesPage />
+                </AdminRoute>
+              }
+            />
 
-          {/* Admin Bug Reports - Protected */}
-          <Route path="/admin/bug-reports" element={
-            <AdminRoute>
-              <AdminBugReportsPage />
-            </AdminRoute>
-          } />
+            {/* Admin Bug Reports - Protected */}
+            <Route
+              path="/admin/bug-reports"
+              element={
+                <AdminRoute>
+                  <AdminBugReportsPage />
+                </AdminRoute>
+              }
+            />
 
-          {/* ==========================================
+            {/* ==========================================
               CATCH-ALL & REDIRECTS
               ========================================== */}
 
-          {/* Legacy /profile route - redirect to role-based holding screen */}
-          <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
+            {/* Legacy /profile route - redirect to role-based holding screen */}
+            <Route path="/profile" element={<RoleBasedDashboardRedirect />} />
 
-          {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
-          <Route path="/dashboard" element={<ProtectedDashboard />} />
+            {/* Unified Dashboard - Protected (verified + paid producers/admins only) */}
+            <Route path="/dashboard" element={<ProtectedDashboard />} />
 
-          {/* Incoming Payments - Protected (verified + paid producers/admins only) */}
-          <Route path="/payments" element={<ProtectedIncomingPayments />} />
+            {/* Incoming Payments - Protected (verified + paid producers/admins only) */}
+            <Route path="/payments" element={<ProtectedIncomingPayments />} />
 
-          {/* 404 - Redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            {/* 404 - Redirect to home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
         </Suspense>
       </Router>
     </AuthProvider>

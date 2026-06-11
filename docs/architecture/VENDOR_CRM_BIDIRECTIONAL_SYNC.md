@@ -9,10 +9,12 @@
 ## Overview
 
 The Vendor CRM system provides **bidirectional synchronization** between:
+
 1. **Event-Specific Data** (registrations table) - Vendor applications per event
 2. **Global CRM Data** (vendor_contacts table) - Producer's vendor network
 
 This allows producers to:
+
 - Maintain a centralized vendor network across all events
 - View vendor history and notes when they apply to new events
 - Edit vendor details in any tab and have changes propagate everywhere
@@ -93,6 +95,7 @@ add_column :registrations, :tags, :jsonb, default: []
 ```
 
 **Key Fields:**
+
 - `location` (string) - Event-specific vendor location
 - `producer_notes` (text) - Internal notes about vendor for this event
 - `tags` (jsonb array) - Categorization tags (e.g., ["artist", "reliable"])
@@ -100,6 +103,7 @@ add_column :registrations, :tags, :jsonb, default: []
 ### VendorContacts Table
 
 **Existing Fields:**
+
 - `location` (string) - Global vendor location
 - `notes` (text) - Global notes about vendor
 - `tags` (jsonb array) - Global categorization tags
@@ -216,51 +220,53 @@ This fix ensures tags, notes, location, and all other vendor_contact fields are 
 
 ```typescript
 // Fetch data
-const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, 1, 100);
-const invitations = invitationsResponse.invitations || [];
-const applications = await vendorApplicationsApi.getByEvent(eventSlug);
+const invitationsResponse = await eventInvitationsApi.getByEvent(eventSlug, 1, 100)
+const invitations = invitationsResponse.invitations || []
+const applications = await vendorApplicationsApi.getByEvent(eventSlug)
 
 // Build email map from registrations
-const emailMap = new Map<string, Applicant>();
+const emailMap = new Map<string, Applicant>()
 allSubmissions.forEach((submission) => {
-  const email = submission.email?.toLowerCase();
-  if (!email) return;
+  const email = submission.email?.toLowerCase()
+  if (!email) return
 
   emailMap.set(email, {
     ...submission,
     location: submission.location,
     producer_notes: submission.producer_notes,
-    tags: submission.tags || []
-  });
-});
+    tags: submission.tags || [],
+  })
+})
 
 // Merge vendor_contact data
 invitations.forEach((invitation: any) => {
-  const contact = invitation.vendor_contact;
-  if (!contact) return;
+  const contact = invitation.vendor_contact
+  if (!contact) return
 
-  const email = contact.email?.toLowerCase();
-  if (!email) return;
+  const email = contact.email?.toLowerCase()
+  if (!email) return
 
   if (emailMap.has(email)) {
-    const existing = emailMap.get(email)!;
-    existing.source = 'contact';
-    existing.is_returning = contact.source === 'returning' || contact.source === 'past_event';
+    const existing = emailMap.get(email)!
+    existing.source = 'contact'
+    existing.is_returning = contact.source === 'returning' || contact.source === 'past_event'
 
     // Priority: registration > vendor_contact
-    existing.producer_notes = existing.producer_notes || contact.notes;
-    existing.location = existing.location || contact.location;
-    existing.tags = existing.tags?.length > 0 ? existing.tags : (contact.tags || []);
-    existing.invitationId = invitation.id;
+    existing.producer_notes = existing.producer_notes || contact.notes
+    existing.location = existing.location || contact.location
+    existing.tags = existing.tags?.length > 0 ? existing.tags : contact.tags || []
+    existing.invitationId = invitation.id
   }
-});
+})
 ```
 
 **Display in UI:**
 
 ```tsx
-{/* Top Section - Contact Info */}
-<div className="glass-card">
+{
+  /* Top Section - Contact Info */
+}
+;<div className="glass-card">
   {/* Email, Phone, Location, Applied Date */}
   {selectedApplicant.location && (
     <div>
@@ -293,9 +299,7 @@ invitations.forEach((invitation: any) => {
     <div className="mb-3">
       <p className="text-[10px] text-foreground/60 mb-2">Producer Notes</p>
       <div className="px-3 py-2 rounded-lg bg-background/5 border">
-        <p className="text-xs text-foreground/80">
-          {selectedApplicant.producer_notes}
-        </p>
+        <p className="text-xs text-foreground/80">{selectedApplicant.producer_notes}</p>
       </div>
     </div>
   )}
@@ -341,7 +345,7 @@ await registrationsApi.update(registrationId, {
   location: location.trim() || undefined,
   producer_notes: producerNotes.trim() || undefined,
   tags: tags.length > 0 ? tags : undefined,
-});
+})
 
 // Update local state
 onSaved(applicantId, {
@@ -350,7 +354,7 @@ onSaved(applicantId, {
   location: location.trim(),
   producer_notes: producerNotes.trim(),
   tags: tags,
-});
+})
 ```
 
 ---
@@ -364,6 +368,7 @@ GET /api/v1/presents/events/:event_slug/invitations?page=1&per_page=100
 ```
 
 **Response:**
+
 ```json
 {
   "invitations": [
@@ -395,6 +400,7 @@ GET /api/v1/presents/vendor_applications/:id/submissions
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -430,6 +436,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "registration": {
@@ -558,6 +565,7 @@ NOW: Go to Network tab → Vendor contact shows updated data! ✅
 **Fix:** Updated to use `VendorContactSerializer.new(@event_invitation.vendor_contact).as_json`
 
 **Verify:**
+
 ```bash
 # Check API response
 curl http://localhost:3000/api/v1/presents/events/:slug/invitations | jq '.invitations[0].vendor_contact.tags'
@@ -571,6 +579,7 @@ curl http://localhost:3000/api/v1/presents/events/:slug/invitations | jq '.invit
 **Fix:** Added `sync_to_vendor_contact` callback
 
 **Verify:**
+
 ```bash
 # Check Rails logs
 tail -f log/development.log | grep "Synced registration"
@@ -592,10 +601,12 @@ tail -f log/development.log | grep "Synced registration"
 ### Database Queries
 
 **Before Smart Merge:**
+
 - 1 query for registrations
 - N queries for vendor_contacts (N+1 problem)
 
 **After Optimization:**
+
 - 1 query for registrations
 - 1 query for invitations (includes vendor_contacts)
 - Email-based merge in memory (O(n))
@@ -646,6 +657,7 @@ tail -f log/development.log | grep "Synced registration"
 ### 2026-05-04 - Initial Implementation
 
 **Added:**
+
 - `location`, `producer_notes`, `tags` columns to registrations table
 - Bidirectional sync via `sync_to_vendor_contact` callback
 - Smart CRM merge in ApplicantsTab
@@ -653,13 +665,16 @@ tail -f log/development.log | grep "Synced registration"
 - EventInvitationSerializer fix to return full vendor_contact data
 
 **Removed:**
+
 - Legacy VendorsTab.tsx (not in use)
 
 **Database Migrations:**
+
 - `20260501125522_add_location_and_producer_notes_to_registrations.rb`
 - `20260504115023_add_tags_to_registrations.rb`
 
 **Files Changed:**
+
 - Frontend: `ApplicantsTab.tsx`, `EditVendorDetailsModal.tsx`
 - Backend: `Registration.rb`, `RegistrationsController.rb`, `RegistrationSerializer.rb`, `EventInvitationSerializer.rb`
 
@@ -674,13 +689,15 @@ tail -f log/development.log | grep "Synced registration"
 **Issue:** Tags were unconditionally overwritten with contact tags, violating "prefer registration data" principle.
 
 **Before:**
+
 ```typescript
-existing.tags = contact.tags || [];
+existing.tags = contact.tags || []
 ```
 
 **After:**
+
 ```typescript
-existing.tags = (existing.tags && existing.tags.length > 0) ? existing.tags : (contact.tags || []);
+existing.tags = existing.tags && existing.tags.length > 0 ? existing.tags : contact.tags || []
 ```
 
 **Impact:** Registration tags now take priority. Contact tags only used as fallback when registration has no tags.
@@ -692,12 +709,14 @@ existing.tags = (existing.tags && existing.tags.length > 0) ? existing.tags : (c
 **Issue:** Empty strings (`""`) overwrote valid vendor_contact data because Ruby treats `""` as truthy.
 
 **Before:**
+
 ```ruby
 # This would overwrite vendor_contact.phone with "" if registration.phone = ""
 phone: phone.nil? ? vendor_contact.phone : phone
 ```
 
 **After:**
+
 ```ruby
 # Using .presence to handle blank values correctly
 phone: phone.presence || vendor_contact.phone
@@ -707,14 +726,14 @@ phone: phone.presence || vendor_contact.phone
 
 **Behavior Matrix:**
 
-| Registration Value | VendorContact Value | Result |
-|-------------------|---------------------|--------|
-| `"555-1234"` | `"555-9999"` | `"555-1234"` ✅ (registration wins) |
-| `""` | `"555-9999"` | `"555-9999"` ✅ (keeps contact) |
-| `nil` | `"555-9999"` | `"555-9999"` ✅ (keeps contact) |
-| `["Tag1"]` | `["Tag2"]` | `["Tag1"]` ✅ (registration wins) |
-| `[]` | `["Tag2"]` | `["Tag2"]` ✅ (keeps contact) |
-| `nil` | `["Tag2"]` | `["Tag2"]` ✅ (keeps contact) |
+| Registration Value | VendorContact Value | Result                              |
+| ------------------ | ------------------- | ----------------------------------- |
+| `"555-1234"`       | `"555-9999"`        | `"555-1234"` ✅ (registration wins) |
+| `""`               | `"555-9999"`        | `"555-9999"` ✅ (keeps contact)     |
+| `nil`              | `"555-9999"`        | `"555-9999"` ✅ (keeps contact)     |
+| `["Tag1"]`         | `["Tag2"]`          | `["Tag1"]` ✅ (registration wins)   |
+| `[]`               | `["Tag2"]`          | `["Tag2"]` ✅ (keeps contact)       |
+| `nil`              | `["Tag2"]`          | `["Tag2"]` ✅ (keeps contact)       |
 
 ---
 
@@ -723,25 +742,27 @@ phone: phone.presence || vendor_contact.phone
 **Issue:** Frontend sent `undefined` to API when clearing fields (stripped by JSON.stringify), but updated local state with empty values, causing UI/backend divergence.
 
 **Before:**
+
 ```typescript
 await registrationsApi.update(registrationId, {
-  location: location.trim() || undefined,  // undefined gets stripped!
-  tags: tags.length > 0 ? tags : undefined
-});
+  location: location.trim() || undefined, // undefined gets stripped!
+  tags: tags.length > 0 ? tags : undefined,
+})
 onSaved(applicantId, {
-  location: location.trim(),  // Empty string sent to UI state
-  tags: tags                   // Empty array sent to UI state
-});
+  location: location.trim(), // Empty string sent to UI state
+  tags: tags, // Empty array sent to UI state
+})
 ```
 
 **After:**
+
 ```typescript
 // Send all fields including empty values
 await registrationsApi.update(registrationId, {
-  location: location.trim(),  // Empty string sent to API
+  location: location.trim(), // Empty string sent to API
   producer_notes: producerNotes.trim(),
-  tags: tags
-});
+  tags: tags,
+})
 ```
 
 **Impact:** UI and backend stay in sync. User can clear fields and values remain cleared after page reload.
@@ -753,6 +774,7 @@ await registrationsApi.update(registrationId, {
 **Issue:** VendorContactSerializer changed `name` to `contact_name`, breaking existing frontend code expecting `vendor_contact.name`.
 
 **Before:**
+
 ```ruby
 {
   contact_name: @vendor_contact.name  # Only this
@@ -760,6 +782,7 @@ await registrationsApi.update(registrationId, {
 ```
 
 **After:**
+
 ```ruby
 {
   name: @vendor_contact.name,         # Backwards compatible
@@ -778,6 +801,7 @@ await registrationsApi.update(registrationId, {
 **Scenario:** Producer clears location on event-specific registration.
 
 **Expected Behavior:**
+
 1. Registration location becomes `""` ✅
 2. VendorContact location keeps original value (e.g., "San Francisco") ✅
 3. UI shows empty location for this event ✅
@@ -792,6 +816,7 @@ await registrationsApi.update(registrationId, {
 **Scenario:** VendorContact has phone "555-1111". Vendor applies with phone "555-2222".
 
 **Expected Behavior:**
+
 1. Registration shows "555-2222" ✅
 2. On edit, "555-2222" appears in form ✅
 3. If saved without changes, VendorContact phone becomes "555-2222" ✅
@@ -805,6 +830,7 @@ await registrationsApi.update(registrationId, {
 **Scenario:** VendorContact invited but hasn't applied yet.
 
 **Expected Behavior:**
+
 1. Shows in "Invited" status ✅
 2. Displays contact data (tags, notes, location) ✅
 3. No registration-specific fields ✅
@@ -817,6 +843,7 @@ await registrationsApi.update(registrationId, {
 **Scenario:** Vendor applies without being in Network CRM.
 
 **Expected Behavior:**
+
 1. Creates registration ✅
 2. Creates VendorContact via `create_or_update_vendor_contact` callback ✅
 3. Sync works normally after contact created ✅
@@ -849,6 +876,7 @@ The sync is designed for **bidirectional enhancement**, not **destructive update
 An empty event-specific value means "not provided for this event", NOT "delete from vendor profile".
 
 **Example:**
+
 - Vendor applies to Event A with location "Brooklyn"
 - VendorContact.location becomes "Brooklyn"
 - Vendor applies to Event B without location

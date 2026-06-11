@@ -14,11 +14,13 @@ Complete analysis and documentation of the Voxxy Presents guest/attendee applica
 ## Documentation Files
 
 ### 1. GUEST_APPLICATION_FLOW.md
+
 **Size:** 417 lines, 12K  
 **Audience:** Architects, Senior Developers, Product Managers  
 **Depth:** Comprehensive (100%)
 
 **Contents:**
+
 - Executive summary
 - Guest user journey overview
 - 5-stage detailed breakdown with API calls
@@ -40,11 +42,13 @@ Complete analysis and documentation of the Voxxy Presents guest/attendee applica
 ---
 
 ### 2. GUEST_FLOW_QUICK_REFERENCE.md
+
 **Size:** 216 lines, 5.4K  
 **Audience:** Frontend Developers, Feature Implementers  
 **Depth:** Condensed (70%)
 
 **Contents:**
+
 - Quick start overview
 - 4-step guest flow breakdown
 - Endpoint summary table
@@ -65,11 +69,13 @@ Complete analysis and documentation of the Voxxy Presents guest/attendee applica
 ---
 
 ### 3. GUEST_CODE_EXAMPLES.md
+
 **Size:** 553 lines, 13K  
 **Audience:** Frontend Developers, Integration Engineers  
 **Depth:** Practical (80%)
 
 **Contents:**
+
 - API service methods with usage examples
 - Component code snippets (5 components)
 - Full request/response examples (4 scenarios)
@@ -90,18 +96,23 @@ Complete analysis and documentation of the Voxxy Presents guest/attendee applica
 ### By Use Case
 
 #### "I need to understand the whole system"
+
 → Read `GUEST_APPLICATION_FLOW.md` (15 min) + `GUEST_FLOW_QUICK_REFERENCE.md` (5 min)
 
 #### "I need to implement a feature"
+
 → Read `GUEST_FLOW_QUICK_REFERENCE.md` (5 min) + `GUEST_CODE_EXAMPLES.md` (10 min)
 
 #### "I need to debug an issue"
+
 → Check `GUEST_CODE_EXAMPLES.md` (error handling section) + Look at actual component code
 
 #### "I need to explain this to stakeholders"
+
 → Use `GUEST_APPLICATION_FLOW.md` (executive summary + key features)
 
 #### "I need API documentation"
+
 → Check `GUEST_FLOW_QUICK_REFERENCE.md` (endpoint table) + `GUEST_CODE_EXAMPLES.md` (request/response examples)
 
 ---
@@ -109,13 +120,16 @@ Complete analysis and documentation of the Voxxy Presents guest/attendee applica
 ## Key Information at a Glance
 
 ### What is This System?
+
 A **vendor application platform** (NOT general event ticketing). Non-logged-in vendors can:
+
 1. View event details
 2. Apply as vendors with 5-field form
 3. Receive unique tracking code
 4. Track application status anytime
 
 ### Public Routes (6 total)
+
 ```
 / - Home
 /events/:slug - Event details
@@ -126,6 +140,7 @@ A **vendor application platform** (NOT general event ticketing). Non-logged-in v
 ```
 
 ### Public API Endpoints (4 total)
+
 ```
 GET /api/v1/presents/events/:slug - Get event
 POST /api/v1/presents/events/:slug/registrations - Submit app
@@ -134,11 +149,13 @@ GET /api/v1/presents/vendor_applications/lookup/:code - Lookup
 ```
 
 ### Application Status States (5 total)
+
 ```
 pending → approved/rejected/waitlist/confirmed
 ```
 
 ### Components
+
 ```
 PublicEventDetailPage.tsx - Event detail view
 VendorApplicationForm.tsx - Application form
@@ -152,6 +169,7 @@ ShortLinkRedirectPage.tsx - Short link redirect
 ## File Locations in Codebase
 
 ### Pages
+
 - `/src/pages/PublicEventDetailPage.tsx` (275 lines)
 - `/src/pages/VendorApplicationForm.tsx` (275 lines)
 - `/src/pages/ApplicationConfirmationPage.tsx` (107 lines)
@@ -159,12 +177,15 @@ ShortLinkRedirectPage.tsx - Short link redirect
 - `/src/pages/ShortLinkRedirectPage.tsx` (73 lines)
 
 ### API Service
+
 - `/src/services/api.ts` (registrationsApi and vendorApplicationsApi)
 
 ### Routing
+
 - `/src/App.tsx` (lines 128-133 define guest routes)
 
 ### Producer Components
+
 - `/src/components/producer/ViewApplicationSubmissions.tsx`
 - `/src/components/producer/CreateApplicationForm.tsx`
 
@@ -175,6 +196,7 @@ ShortLinkRedirectPage.tsx - Short link redirect
 Each document is organized for its audience:
 
 ### GUEST_APPLICATION_FLOW.md
+
 1. Executive Summary
 2. Guest User Journey Overview
 3. Detailed Stage Breakdown (5 stages)
@@ -191,6 +213,7 @@ Each document is organized for its audience:
 14. Conclusion
 
 ### GUEST_FLOW_QUICK_REFERENCE.md
+
 1. Overview
 2. Quick Start (5 stages)
 3. Endpoint Summary
@@ -203,6 +226,7 @@ Each document is organized for its audience:
 10. Capabilities & Limitations
 
 ### GUEST_CODE_EXAMPLES.md
+
 1. API Service Methods (with examples)
 2. Component Examples (5 components)
 3. API Request/Response Examples (4 scenarios)
@@ -217,61 +241,66 @@ Each document is organized for its audience:
 ## Key Insights
 
 ### Design Strengths
+
 ✅ Zero authentication friction  
 ✅ Opaque ticket codes for security  
 ✅ Clear 5-state status progression  
 ✅ Simple, validated forms  
 ✅ Email-integrated workflow  
 ✅ Producer management tools  
-✅ Short link support  
+✅ Short link support
 
 ### Design Limitations
+
 ❌ Vendor-only (no general RSVP)  
 ❌ No event search/discovery  
 ❌ No in-app messaging  
 ❌ External ticketing only  
-❌ No self-service signup  
+❌ No self-service signup
 
 ### Perfect For
+
 ✅ Event producers seeking vendors  
 ✅ Businesses applying to participate  
 ✅ Multi-event vendor recruitment  
-✅ Anonymous application tracking  
+✅ Anonymous application tracking
 
 ### Not Suitable For
+
 ❌ General event attendee RSVP  
 ❌ Ticket sales  
 ❌ Event discovery platform  
-❌ User account management  
+❌ User account management
 
 ---
 
 ## API Quick Reference
 
-| Method | Endpoint | Auth | Purpose |
-|--------|----------|------|---------|
-| GET | `/api/v1/presents/events/:slug` | No | Get event details |
-| POST | `/api/v1/presents/events/:slug/registrations` | No | Submit vendor app |
-| GET | `/api/v1/presents/registrations/track/:code` | No | Track application |
-| GET | `/api/v1/presents/vendor_applications/lookup/:code` | No | Lookup event by code |
+| Method | Endpoint                                            | Auth | Purpose              |
+| ------ | --------------------------------------------------- | ---- | -------------------- |
+| GET    | `/api/v1/presents/events/:slug`                     | No   | Get event details    |
+| POST   | `/api/v1/presents/events/:slug/registrations`       | No   | Submit vendor app    |
+| GET    | `/api/v1/presents/registrations/track/:code`        | No   | Track application    |
+| GET    | `/api/v1/presents/vendor_applications/lookup/:code` | No   | Lookup event by code |
 
 ---
 
 ## Route Quick Reference
 
-| Route | Component | Purpose | Auth |
-|-------|-----------|---------|------|
-| `/events/:slug` | PublicEventDetailPage | Event details | No |
-| `/events/:slug/apply` | VendorApplicationForm | Vendor app form | No |
-| `/applications/success` | ApplicationConfirmationPage | Confirmation | No |
-| `/applications/track/:ticketCode` | ApplicationTrackingPage | Track status | No |
-| `/apply/:code` | ShortLinkRedirectPage | Short link | No |
+| Route                             | Component                   | Purpose         | Auth |
+| --------------------------------- | --------------------------- | --------------- | ---- |
+| `/events/:slug`                   | PublicEventDetailPage       | Event details   | No   |
+| `/events/:slug/apply`             | VendorApplicationForm       | Vendor app form | No   |
+| `/applications/success`           | ApplicationConfirmationPage | Confirmation    | No   |
+| `/applications/track/:ticketCode` | ApplicationTrackingPage     | Track status    | No   |
+| `/apply/:code`                    | ShortLinkRedirectPage       | Short link      | No   |
 
 ---
 
 ## Testing Checklist
 
 ### Manual Testing
+
 - [ ] Visit event page without login
 - [ ] See vendor opportunities section
 - [ ] Click "Apply as Vendor"
@@ -284,6 +313,7 @@ Each document is organized for its audience:
 - [ ] Test error scenarios (invalid email, missing fields)
 
 ### API Testing
+
 - [ ] Test GET event endpoint
 - [ ] Test POST application endpoint
 - [ ] Test GET track endpoint with valid code
@@ -292,6 +322,7 @@ Each document is organized for its audience:
 - [ ] Verify CORS headers present
 
 ### Security Testing
+
 - [ ] Try to enumerate ticket codes
 - [ ] Try accessing other user's application
 - [ ] Verify email validation
@@ -318,24 +349,31 @@ Each document is organized for its audience:
 ## Common Questions
 
 ### Q: Can guests RSVP as attendees?
+
 A: No. This system is vendor-only. General attendees use external ticketing platforms.
 
 ### Q: Can guests purchase tickets?
+
 A: No. The platform links to external ticket URLs. Voxxy doesn't process ticket transactions.
 
 ### Q: Can guests create accounts?
+
 A: No. Beta access only via contact form. No self-service signup.
 
 ### Q: Can vendors edit their application?
+
 A: Not yet. System only supports submission and status tracking. Editing would require account creation.
 
 ### Q: How are emails handled?
+
 A: Backend Rails application sends confirmation and status update emails. Email delivery configured there.
 
 ### Q: Is the ticket code secure?
+
 A: Yes. Opaque, non-sequential codes prevent enumeration. Code-specific lookups only.
 
 ### Q: Can producers see all applications?
+
 A: Yes. Producers logged in can view all applications for their events and update statuses.
 
 ---
@@ -354,11 +392,11 @@ This documentation provides everything needed to understand, implement, and debu
 
 **Start with:** `GUEST_FLOW_QUICK_REFERENCE.md` (5 min)  
 **Then read:** `GUEST_APPLICATION_FLOW.md` (15 min)  
-**Reference:** `GUEST_CODE_EXAMPLES.md` as needed  
+**Reference:** `GUEST_CODE_EXAMPLES.md` as needed
 
 Total time to understand: 20-30 minutes  
 Total lines of documentation: 1,186  
-Codebase files analyzed: 5 pages + API service + producer components  
+Codebase files analyzed: 5 pages + API service + producer components
 
 ---
 

@@ -48,6 +48,7 @@ git push origin main
 **Expected Time**: 3-5 minutes per deployment
 
 **If deployment fails**:
+
 - Check build logs in Render
 - Verify environment variables are set
 - Rollback if necessary: `git revert HEAD && git push`
@@ -94,6 +95,7 @@ GOOGLE_APPLICATION_CREDENTIALS=serviceAccountKey-prod.json npm run migrate:roles
 ```
 
 **Expected Output**:
+
 ```
 📦 Creating backup of all users...
 ✅ Backed up X users to: /opt/render/project/src/backups/users-backup-XXXXX.json
@@ -115,6 +117,7 @@ Errors: 0
 ```
 
 **⚠️ If errors occur**:
+
 ```bash
 # Rollback using the backup file path from the migration output
 npm run migrate:roles-v3 rollback /path/to/backup-file.json
@@ -152,6 +155,7 @@ npm run migrate:roles-v3 rollback /path/to/backup-file.json
 ## 📊 EXPECTED MIGRATION RESULTS
 
 Based on dry-run:
+
 - **Total users**: 7
 - **venue_owner → vendor**: 3 users
 - **organizer → producer**: 2 users
@@ -165,6 +169,7 @@ Based on dry-run:
 ### **If Something Goes Wrong**
 
 #### **Option 1: Revert Git Commits**
+
 ```bash
 # API
 cd /Users/courtneygreer/Development/voxxy-presents-api
@@ -178,12 +183,14 @@ git push origin main
 ```
 
 #### **Option 2: Rollback Database Migration**
+
 ```bash
 # Use the backup file created during migration
 npm run migrate:roles-v3 rollback /path/to/backup-file.json
 ```
 
 #### **Option 3: Emergency Fix**
+
 - Old roles still work during transition
 - Users won't be locked out
 - You can fix issues and re-migrate
@@ -223,6 +230,7 @@ npm run migrate:roles-v3 rollback /path/to/backup-file.json
 ## 🎯 WHAT YOUR NEW DEVELOPER WILL FIND WEDNESDAY
 
 **Clean, modern codebase with**:
+
 - Clear role terminology: `producer`, `vendor`, `guest`
 - Consistent route structure: `/producer/*`, `/vendor/*`
 - New auth helpers: `isProducer`, `isVendor`, `isGuest`
@@ -230,6 +238,7 @@ npm run migrate:roles-v3 rollback /path/to/backup-file.json
 - Zero technical debt from old naming conventions
 
 **They can start building**:
+
 - Vendor Discovery UI (Phase 1, Day 2)
 - Event Application System (Phase 1, Day 3)
 - Command Center features (Phase 1, Day 4)
@@ -239,6 +248,7 @@ npm run migrate:roles-v3 rollback /path/to/backup-file.json
 ## 📞 SUPPORT
 
 **If you encounter issues**:
+
 1. Check Render build logs
 2. Check browser console for errors
 3. Check Firestore for data integrity
@@ -246,6 +256,7 @@ npm run migrate:roles-v3 rollback /path/to/backup-file.json
 5. Review DEPRECATIONS.md for what changed
 
 **Migration-specific issues**:
+
 - Backup files stored in: `/backups/` directory
 - Migration logs show exactly what changed
 - Rollback available anytime

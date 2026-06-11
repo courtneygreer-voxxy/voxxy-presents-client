@@ -15,7 +15,7 @@ import {
   MapPin,
   Building2,
   Calendar,
-  UserCog
+  UserCog,
 } from 'lucide-react'
 
 type UserRole = 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest'
@@ -23,14 +23,14 @@ type UserRole = 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | '
 export function DebugPanel() {
   // Only show in development and staging environments
   const isDevelopment = import.meta.env.DEV
-  const isStaging = window.location.hostname.includes('staging') ||
-                   window.location.hostname.includes('dev') ||
-                   import.meta.env.VITE_ENVIRONMENT === 'staging'
+  const isStaging =
+    window.location.hostname.includes('staging') ||
+    window.location.hostname.includes('dev') ||
+    import.meta.env.VITE_ENVIRONMENT === 'staging'
 
   // Hide in production (when NODE_ENV is production and not staging)
-  const isProduction = import.meta.env.PROD &&
-                      !isStaging &&
-                      import.meta.env.VITE_ENVIRONMENT !== 'staging'
+  const isProduction =
+    import.meta.env.PROD && !isStaging && import.meta.env.VITE_ENVIRONMENT !== 'staging'
 
   if (isProduction) {
     return null
@@ -48,7 +48,7 @@ export function DebugPanel() {
     isGuest,
     isAdmin,
     signOut,
-    refreshUserProfile
+    refreshUserProfile,
   } = useAuth()
 
   const [isVisible, setIsVisible] = useState(true)
@@ -80,34 +80,49 @@ export function DebugPanel() {
 
   const getStatusColor = (status?: string) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800'
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'denied': return 'bg-red-100 text-red-800'
-      default: return 'bg-muted text-gray-800'
+      case 'approved':
+        return 'bg-green-100 text-green-800'
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800'
+      case 'denied':
+        return 'bg-red-100 text-red-800'
+      default:
+        return 'bg-muted text-gray-800'
     }
   }
 
   const getRoleColor = (role?: string) => {
     switch (role) {
       // V3.0 Roles
-      case 'admin': return 'bg-primary/10 text-slate-800'
-      case 'producer': return 'bg-green-100 text-green-800'
-      case 'venue_owner': return 'bg-green-100 text-green-800' // Maps to Producer
-      case 'vendor': return 'bg-blue-100 text-blue-800'
-      case 'consumer': return 'bg-amber-100 text-amber-800'
-      case 'guest': return 'bg-muted text-gray-800'
+      case 'admin':
+        return 'bg-primary/10 text-slate-800'
+      case 'producer':
+        return 'bg-green-100 text-green-800'
+      case 'venue_owner':
+        return 'bg-green-100 text-green-800' // Maps to Producer
+      case 'vendor':
+        return 'bg-blue-100 text-blue-800'
+      case 'consumer':
+        return 'bg-amber-100 text-amber-800'
+      case 'guest':
+        return 'bg-muted text-gray-800'
       // Legacy Roles (deprecated)
-      case 'organizer': return 'bg-green-100 text-green-800'
-      default: return 'bg-muted text-gray-800'
+      case 'organizer':
+        return 'bg-green-100 text-green-800'
+      default:
+        return 'bg-muted text-gray-800'
     }
   }
 
   const getDisplayRole = (role?: string) => {
     // Map backend roles to user-facing labels
     switch (role) {
-      case 'venue_owner': return 'PRODUCER'
-      case 'organizer': return 'PRODUCER (Legacy)'
-      default: return role?.toUpperCase() || 'NO ROLE'
+      case 'venue_owner':
+        return 'PRODUCER'
+      case 'organizer':
+        return 'PRODUCER (Legacy)'
+      default:
+        return role?.toUpperCase() || 'NO ROLE'
     }
   }
 
@@ -129,7 +144,7 @@ export function DebugPanel() {
       console.log(`📥 [ROLE SWITCH] API update response:`, updateResponse)
 
       // Step 2: Wait a moment for database to update
-      await new Promise(resolve => setTimeout(resolve, 500))
+      await new Promise((resolve) => setTimeout(resolve, 500))
 
       // Step 3: Verify the role was actually changed by fetching current user
       console.log(`🔍 [ROLE SWITCH] Verifying role change by fetching current user...`)
@@ -139,7 +154,9 @@ export function DebugPanel() {
       if (verifyResponse.role !== newRole) {
         console.error(`❌ [ROLE SWITCH] Role verification failed!`)
         console.error(`❌ [ROLE SWITCH] Expected: ${newRole}, Got: ${verifyResponse.role}`)
-        alert(`Role switch failed!\n\nExpected: ${newRole}\nActual: ${verifyResponse.role}\n\nCheck Rails server logs for errors.`)
+        alert(
+          `Role switch failed!\n\nExpected: ${newRole}\nActual: ${verifyResponse.role}\n\nCheck Rails server logs for errors.`,
+        )
         setIsSwitchingRole(false)
         return
       }
@@ -222,13 +239,17 @@ export function DebugPanel() {
                 🎭 CURRENT ROLE
               </div>
               <div className="flex items-center justify-center">
-                <Badge className={`${getRoleColor(userProfile.role)} text-base px-4 py-2 font-bold`}>
+                <Badge
+                  className={`${getRoleColor(userProfile.role)} text-base px-4 py-2 font-bold`}
+                >
                   {getDisplayRole(userProfile.role)}
                 </Badge>
               </div>
 
               <div className="pt-2 space-y-2">
-                <div className="text-center font-semibold text-amber-800 dark:text-yellow-300">Switch Role (Testing)</div>
+                <div className="text-center font-semibold text-amber-800 dark:text-yellow-300">
+                  Switch Role (Testing)
+                </div>
                 <div className="grid grid-cols-2 gap-1">
                   <Button
                     onClick={() => handleRoleSwitch('venue_owner')}
@@ -281,9 +302,16 @@ export function DebugPanel() {
             <div className="space-y-2">
               <div className="font-semibold text-muted-foreground">👤 Current User</div>
               <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
-                <div><strong className="text-gray-100">ID:</strong> {currentUser.id}</div>
-                <div><strong className="text-gray-100">Email:</strong> {currentUser.email}</div>
-                <div><strong className="text-gray-100">Email Verified:</strong> {currentUser.confirmed_at ? '✅' : '❌'}</div>
+                <div>
+                  <strong className="text-gray-100">ID:</strong> {currentUser.id}
+                </div>
+                <div>
+                  <strong className="text-gray-100">Email:</strong> {currentUser.email}
+                </div>
+                <div>
+                  <strong className="text-gray-100">Email Verified:</strong>{' '}
+                  {currentUser.confirmed_at ? '✅' : '❌'}
+                </div>
               </div>
             </div>
           )}
@@ -294,12 +322,27 @@ export function DebugPanel() {
               <div className="font-semibold text-muted-foreground">📋 User Profile</div>
               <div className="space-y-1">
                 <div className="bg-slate-800/50 p-2 rounded text-gray-200">
-                  <div><strong className="text-gray-100">ID:</strong> {userProfile.id || 'N/A'}</div>
-                  <div><strong className="text-gray-100">Name:</strong> {userProfile.name || 'N/A'}</div>
-                  <div><strong className="text-gray-100">Username:</strong> {userProfile.username || 'N/A'}</div>
-                  <div><strong className="text-gray-100">Status:</strong> {userProfile.status || 'N/A'}</div>
-                  <div><strong className="text-gray-100">Product Context:</strong> {userProfile.product_context || 'N/A'}</div>
-                  <div><strong className="text-gray-100">Confirmed:</strong> {userProfile.confirmed_at ? '✅ Yes' : '❌ No'}</div>
+                  <div>
+                    <strong className="text-gray-100">ID:</strong> {userProfile.id || 'N/A'}
+                  </div>
+                  <div>
+                    <strong className="text-gray-100">Name:</strong> {userProfile.name || 'N/A'}
+                  </div>
+                  <div>
+                    <strong className="text-gray-100">Username:</strong>{' '}
+                    {userProfile.username || 'N/A'}
+                  </div>
+                  <div>
+                    <strong className="text-gray-100">Status:</strong> {userProfile.status || 'N/A'}
+                  </div>
+                  <div>
+                    <strong className="text-gray-100">Product Context:</strong>{' '}
+                    {userProfile.product_context || 'N/A'}
+                  </div>
+                  <div>
+                    <strong className="text-gray-100">Confirmed:</strong>{' '}
+                    {userProfile.confirmed_at ? '✅ Yes' : '❌ No'}
+                  </div>
                 </div>
               </div>
             </div>
@@ -324,12 +367,20 @@ export function DebugPanel() {
             </div>
             {isExpanded && (
               <>
-                <div className="font-semibold text-muted-foreground text-[10px] pt-2">DEPRECATED FLAGS (Legacy)</div>
+                <div className="font-semibold text-muted-foreground text-[10px] pt-2">
+                  DEPRECATED FLAGS (Legacy)
+                </div>
                 <div className="grid grid-cols-2 gap-1">
-                  <Badge variant={isVenueOwner ? 'default' : 'secondary'} className="text-xs opacity-60">
+                  <Badge
+                    variant={isVenueOwner ? 'default' : 'secondary'}
+                    className="text-xs opacity-60"
+                  >
                     {isVenueOwner ? '🏢 Venue Owner' : '⭕ Not Venue'}
                   </Badge>
-                  <Badge variant={isOrganizer ? 'default' : 'secondary'} className="text-xs opacity-60">
+                  <Badge
+                    variant={isOrganizer ? 'default' : 'secondary'}
+                    className="text-xs opacity-60"
+                  >
                     {isOrganizer ? '🎯 Organizer' : '⭕ Not Organizer'}
                   </Badge>
                 </div>
@@ -337,16 +388,23 @@ export function DebugPanel() {
             )}
           </div>
 
-
           {/* Producer/Organizer Profile */}
           {(isProducer || isOrganizer) && isExpanded && (
             <div className="space-y-2">
               <div className="font-semibold text-muted-foreground">🎯 Producer Debug</div>
               <div className="bg-green-900/30 p-2 rounded text-xs text-green-200">
-                <div><strong className="text-green-100">isProducer:</strong> {isProducer ? '✅ True' : '❌ False'}</div>
-                <div><strong className="text-green-100">isOrganizer (deprecated):</strong> {isOrganizer ? '✅ True' : '❌ False'}</div>
+                <div>
+                  <strong className="text-green-100">isProducer:</strong>{' '}
+                  {isProducer ? '✅ True' : '❌ False'}
+                </div>
+                <div>
+                  <strong className="text-green-100">isOrganizer (deprecated):</strong>{' '}
+                  {isOrganizer ? '✅ True' : '❌ False'}
+                </div>
                 <div className="mt-1 pt-1 border-t border-green-700/50">
-                  <div className="text-muted-foreground text-[10px]">Organizations managed by this user will appear in the producer dashboard</div>
+                  <div className="text-muted-foreground text-[10px]">
+                    Organizations managed by this user will appear in the producer dashboard
+                  </div>
                 </div>
               </div>
             </div>
@@ -356,12 +414,24 @@ export function DebugPanel() {
           <div className="space-y-2">
             <div className="font-semibold text-muted-foreground">👑 Admin Session</div>
             <div className="bg-red-900/30 p-2 rounded text-xs text-gray-200">
-              <div><strong className="text-gray-100">Admin Session:</strong> {localStorage.getItem('voxxy_admin_session') || 'false'}</div>
-              <div><strong className="text-gray-100">Admin Email:</strong> {localStorage.getItem('voxxy_admin_email') || 'N/A'}</div>
-              <div><strong className="text-gray-100">⚠️ Current User:</strong> {currentUser?.email || 'N/A'}</div>
-              {localStorage.getItem('voxxy_admin_session') === 'true' && currentUser?.email !== 'team@heyvoxxy.com' && (
-                <div className="font-bold text-red-700 dark:text-red-400">🔥 SPLIT BRAIN: Admin localStorage but different user!</div>
-              )}
+              <div>
+                <strong className="text-gray-100">Admin Session:</strong>{' '}
+                {localStorage.getItem('voxxy_admin_session') || 'false'}
+              </div>
+              <div>
+                <strong className="text-gray-100">Admin Email:</strong>{' '}
+                {localStorage.getItem('voxxy_admin_email') || 'N/A'}
+              </div>
+              <div>
+                <strong className="text-gray-100">⚠️ Current User:</strong>{' '}
+                {currentUser?.email || 'N/A'}
+              </div>
+              {localStorage.getItem('voxxy_admin_session') === 'true' &&
+                currentUser?.email !== 'team@heyvoxxy.com' && (
+                  <div className="font-bold text-red-700 dark:text-red-400">
+                    🔥 SPLIT BRAIN: Admin localStorage but different user!
+                  </div>
+                )}
             </div>
           </div>
 
@@ -369,10 +439,21 @@ export function DebugPanel() {
           <div className="space-y-2">
             <div className="font-semibold text-muted-foreground">🌐 Current State</div>
             <div className="bg-slate-800/50 p-2 rounded text-xs text-gray-200">
-              <div><strong className="text-gray-100">URL:</strong> {window.location.pathname}</div>
-              <div><strong className="text-gray-100">API Base:</strong> {import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'}</div>
-              <div><strong className="text-gray-100">Environment:</strong> {import.meta.env.VITE_ENVIRONMENT || 'Auto-detected'}</div>
-              <div><strong className="text-gray-100">Timestamp:</strong> {new Date().toLocaleTimeString()}</div>
+              <div>
+                <strong className="text-gray-100">URL:</strong> {window.location.pathname}
+              </div>
+              <div>
+                <strong className="text-gray-100">API Base:</strong>{' '}
+                {import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'}
+              </div>
+              <div>
+                <strong className="text-gray-100">Environment:</strong>{' '}
+                {import.meta.env.VITE_ENVIRONMENT || 'Auto-detected'}
+              </div>
+              <div>
+                <strong className="text-gray-100">Timestamp:</strong>{' '}
+                {new Date().toLocaleTimeString()}
+              </div>
             </div>
           </div>
 
@@ -423,7 +504,9 @@ export function DebugPanel() {
                   console.log('🔍 DEBUG: Testing API connection...')
                   const response = await authApi.getCurrentUser()
                   console.log('🔍 DEBUG: API test result:', response)
-                  alert(`API Test Success:\nUser: ${response.email}\nRole: ${response.role}\nID: ${response.id}`)
+                  alert(
+                    `API Test Success:\nUser: ${response.email}\nRole: ${response.role}\nID: ${response.id}`,
+                  )
                 } catch (error) {
                   console.error('🔍 DEBUG: API test failed:', error)
                   alert(`API Test Failed: ${error}`)

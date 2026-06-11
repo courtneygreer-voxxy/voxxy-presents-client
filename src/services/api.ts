@@ -17,7 +17,7 @@ import type {
   GenerateScheduledEmailsRequest,
   GenerateScheduledEmailsResponse,
 } from '@/types/email'
-import { VendorApplicationSubmit } from '@/types/eventPortal';
+import { VendorApplicationSubmit } from '@/types/eventPortal'
 
 const API_BASE_URL = getApiUrl() || import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'
 
@@ -77,7 +77,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(options?.headers as Record<string, string> || {}),
+    ...((options?.headers as Record<string, string>) || {}),
   }
 
   // Admin endpoints use JWT authentication (no separate admin key needed)
@@ -130,7 +130,7 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         url,
         status: response.status,
         message: errorData.message || errorData.error,
-        errors: errorData.errors
+        errors: errorData.errors,
       })
 
       // Build error message - prioritize specific validation errors from errors array
@@ -140,7 +140,8 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
         errorMessage = errorData.errors[0]
       } else {
         // Fallback to message/error field or generic message
-        errorMessage = errorData.message || errorData.error || `API request failed: ${response.status}`
+        errorMessage =
+          errorData.message || errorData.error || `API request failed: ${response.status}`
       }
 
       throw new ApiError(errorMessage, response.status, errorData.errors)
@@ -153,7 +154,6 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
     const data = await response.json()
     return data
-
   } catch (error) {
     if (error instanceof ApiError) {
       throw error
@@ -161,10 +161,13 @@ async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> 
 
     console.error('Network Error:', {
       url,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: error instanceof Error ? error.message : 'Unknown error',
     })
 
-    throw new ApiError(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`, 0)
+    throw new ApiError(
+      `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      0,
+    )
   }
 }
 
@@ -187,11 +190,7 @@ export const authApi = {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new ApiError(
-        data.error || 'Dev login failed',
-        response.status,
-        data.errors
-      )
+      throw new ApiError(data.error || 'Dev login failed', response.status, data.errors)
     }
 
     // Validate response
@@ -227,11 +226,7 @@ export const authApi = {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new ApiError(
-        data.error || 'Login failed',
-        response.status,
-        data.errors
-      )
+      throw new ApiError(data.error || 'Login failed', response.status, data.errors)
     }
 
     // Validate response
@@ -278,7 +273,10 @@ export const authApi = {
 
     if (!response.ok) {
       // Check if user already exists (from Mobile app or previous signup)
-      if (response.status === 422 && responseData.errors?.includes('Email has already been taken')) {
+      if (
+        response.status === 422 &&
+        responseData.errors?.includes('Email has already been taken')
+      ) {
         // User exists - try to login with provided credentials
         try {
           console.log('Email already registered. Attempting login...')
@@ -293,7 +291,7 @@ export const authApi = {
           throw new ApiError(
             'An account with this email already exists. Please login instead or reset your password.',
             401,
-            ['Email has already been taken']
+            ['Email has already been taken'],
           )
         }
       }
@@ -301,7 +299,7 @@ export const authApi = {
       throw new ApiError(
         responseData.error || 'Signup failed',
         response.status,
-        responseData.errors
+        responseData.errors,
       )
     }
 
@@ -321,7 +319,7 @@ export const authApi = {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${getAuthToken()}`
+          Authorization: `Bearer ${getAuthToken()}`,
         },
       })
     } finally {
@@ -349,7 +347,7 @@ export const authApi = {
       headers: {
         'Content-Type': 'application/json',
         'X-Mobile-App': 'true', // CRITICAL: Required for JWT auth on backend
-        'Authorization': `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
     })
 
@@ -382,7 +380,7 @@ export const authApi = {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
       body: JSON.stringify(payload),
     })
@@ -397,12 +395,12 @@ export const authApi = {
         status: response.status,
         error: data.error,
         errors: data.errors,
-        message: data.message
+        message: data.message,
       })
       throw new ApiError(
         data.error || data.message || 'Failed to update user',
         response.status,
-        data.errors
+        data.errors,
       )
     }
 
@@ -429,7 +427,7 @@ export const authApi = {
       throw new ApiError(
         data.error || 'Failed to send password reset email',
         response.status,
-        data.errors
+        data.errors,
       )
     }
 
@@ -452,11 +450,7 @@ export const authApi = {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new ApiError(
-        data.error || 'Failed to reset password',
-        response.status,
-        data.errors
-      )
+      throw new ApiError(data.error || 'Failed to reset password', response.status, data.errors)
     }
 
     return data
@@ -478,11 +472,7 @@ export const authApi = {
     const data = await response.json()
 
     if (!response.ok) {
-      throw new ApiError(
-        data.error || 'Verification failed',
-        response.status,
-        data.errors
-      )
+      throw new ApiError(data.error || 'Verification failed', response.status, data.errors)
     }
 
     return data
@@ -507,7 +497,7 @@ export const authApi = {
       throw new ApiError(
         data.error || 'Failed to resend verification email',
         response.status,
-        data.errors
+        data.errors,
       )
     }
 
@@ -526,17 +516,13 @@ export const authApi = {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`,
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({ error: 'Failed to delete account' }))
-      throw new ApiError(
-        data.error || 'Failed to delete account',
-        response.status,
-        data.errors
-      )
+      throw new ApiError(data.error || 'Failed to delete account', response.status, data.errors)
     }
 
     const data = await response.json()
@@ -608,22 +594,25 @@ export const organizationsApi = {
    * Update organization
    * PATCH /api/v1/presents/organizations/:slug
    */
-  async update(slug: string, orgData: Partial<{
-    name: string
-    description: string
-    logo_url: string
-    website: string
-    instagram_handle: string
-    phone: string
-    email: string
-    address: string
-    city: string
-    state: string
-    zip_code: string
-    latitude: number
-    longitude: number
-    timezone: string
-  }>) {
+  async update(
+    slug: string,
+    orgData: Partial<{
+      name: string
+      description: string
+      logo_url: string
+      website: string
+      instagram_handle: string
+      phone: string
+      email: string
+      address: string
+      city: string
+      state: string
+      zip_code: string
+      latitude: number
+      longitude: number
+      timezone: string
+    }>,
+  ) {
     return fetchApi<any>(`/v1/presents/organizations/${slug}`, {
       method: 'PATCH',
       body: JSON.stringify({ organization: orgData }),
@@ -674,14 +663,17 @@ export const incomingPaymentsApi = {
    * Get incoming payments for an organization
    * GET /api/v1/presents/organizations/:orgSlug/incoming_payments
    */
-  async getAll(orgSlug: string, params?: {
-    status?: string
-    event_id?: number
-    start_date?: string
-    end_date?: string
-    page?: number
-    per_page?: number
-  }) {
+  async getAll(
+    orgSlug: string,
+    params?: {
+      status?: string
+      event_id?: number
+      start_date?: string
+      end_date?: string
+      page?: number
+      per_page?: number
+    },
+  ) {
     const queryParams = new URLSearchParams()
     if (params?.status) queryParams.append('status', params.status)
     if (params?.event_id) queryParams.append('event_id', String(params.event_id))
@@ -790,32 +782,35 @@ export const eventsApi = {
    * Create event under an organization
    * POST /api/v1/presents/organizations/:organization_id/events
    */
-  async create(organizationSlug: string, eventData: {
-    title: string
-    description?: string
-    event_date?: string
-    event_end_date?: string
-    start_time?: string
-    end_time?: string
-    venue?: string
-    location?: string
-    age_restriction?: string
-    ticket_link?: string
-    application_deadline?: string
-    payment_deadline?: string
-    poster_url?: string
-    ticket_url?: string
-    ticket_price?: number
-    capacity?: number
-    published?: boolean
-    registration_open?: boolean
-    status?: 'draft' | 'published' | 'cancelled' | 'completed'
-    email_campaign_template_id?: number
-    use_category_templates?: boolean
-    use_universal_category_template?: boolean
-    universal_category_template_id?: number
-    payment_engines?: any[]
-  }) {
+  async create(
+    organizationSlug: string,
+    eventData: {
+      title: string
+      description?: string
+      event_date?: string
+      event_end_date?: string
+      start_time?: string
+      end_time?: string
+      venue?: string
+      location?: string
+      age_restriction?: string
+      ticket_link?: string
+      application_deadline?: string
+      payment_deadline?: string
+      poster_url?: string
+      ticket_url?: string
+      ticket_price?: number
+      capacity?: number
+      published?: boolean
+      registration_open?: boolean
+      status?: 'draft' | 'published' | 'cancelled' | 'completed'
+      email_campaign_template_id?: number
+      use_category_templates?: boolean
+      use_universal_category_template?: boolean
+      universal_category_template_id?: number
+      payment_engines?: any[]
+    },
+  ) {
     return fetchApi<any>(`/v1/presents/organizations/${organizationSlug}/events`, {
       method: 'POST',
       body: JSON.stringify({ event: eventData }),
@@ -826,32 +821,35 @@ export const eventsApi = {
    * Update event
    * PATCH /api/v1/presents/events/:id
    */
-  async update(eventSlug: string, eventData: Partial<{
-    title: string
-    description: string
-    event_date: string
-    event_end_date: string
-    start_time: string
-    end_time: string
-    venue: string
-    location: string
-    age_restriction: string
-    ticket_link: string
-    application_deadline: string
-    payment_deadline: string
-    poster_url: string
-    ticket_url: string
-    ticket_price: number
-    capacity: number
-    published: boolean
-    registration_open: boolean
-    status: 'draft' | 'published' | 'cancelled' | 'completed'
-    invitation_list_ids: number[]
-    invitation_contact_ids: number[]
-    invitation_excluded_ids: number[]
-    vendor_fee_currency: string
-    payment_engines: any[]
-  }>) {
+  async update(
+    eventSlug: string,
+    eventData: Partial<{
+      title: string
+      description: string
+      event_date: string
+      event_end_date: string
+      start_time: string
+      end_time: string
+      venue: string
+      location: string
+      age_restriction: string
+      ticket_link: string
+      application_deadline: string
+      payment_deadline: string
+      poster_url: string
+      ticket_url: string
+      ticket_price: number
+      capacity: number
+      published: boolean
+      registration_open: boolean
+      status: 'draft' | 'published' | 'cancelled' | 'completed'
+      invitation_list_ids: number[]
+      invitation_contact_ids: number[]
+      invitation_excluded_ids: number[]
+      vendor_fee_currency: string
+      payment_engines: any[]
+    }>,
+  ) {
     return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}`, {
       method: 'PATCH',
       body: JSON.stringify({ event: eventData }),
@@ -956,9 +954,12 @@ export const eventsApi = {
       event: any
       warning: string
       requires_confirmation: boolean
-    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_event_update_impact`, {
-      method: 'POST',
-    })
+    }>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_event_update_impact`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -971,10 +972,13 @@ export const eventsApi = {
       message: string
       sent_count: number
       failed_count: number
-    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_event_update`, {
-      method: 'POST',
-      body: JSON.stringify({ confirmed: true }),
-    })
+    }>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_event_update`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ confirmed: true }),
+      },
+    )
   },
 
   /**
@@ -988,9 +992,12 @@ export const eventsApi = {
       event: any
       warning: string
       requires_confirmation: boolean
-    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_cancellation_impact`, {
-      method: 'POST',
-    })
+    }>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/check_cancellation_impact`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -1003,10 +1010,13 @@ export const eventsApi = {
       message: string
       sent_count: number
       failed_count: number
-    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_cancellation`, {
-      method: 'POST',
-      body: JSON.stringify({ confirmed: true }),
-    })
+    }>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/email_notifications/send_cancellation`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ confirmed: true }),
+      },
+    )
   },
 }
 
@@ -1063,7 +1073,10 @@ export const registrationsApi = {
    * Update registration status (producer/venue owner only)
    * PATCH /api/v1/presents/registrations/:id
    */
-  async updateStatus(registrationId: number, status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed') {
+  async updateStatus(
+    registrationId: number,
+    status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed',
+  ) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',
       body: JSON.stringify({ registration: { status } }),
@@ -1075,19 +1088,22 @@ export const registrationsApi = {
    * PATCH /api/v1/presents/registrations/:id
    * Permitted keys must match Rails `update_params` (name, phone, status, vendor_category, payment_status, location, producer_notes, tags, instagram_handle, tiktok_handle, website).
    */
-  async update(registrationId: number, data: Partial<{
-    vendor_category: string
-    payment_status: 'pending' | 'paid' | 'confirmed' | 'overdue'
-    status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed' | 'cancelled' | string
-    name: string
-    phone: string
-    location: string
-    producer_notes: string
-    tags: string[]
-    instagram_handle: string
-    tiktok_handle: string
-    website: string
-  }>) {
+  async update(
+    registrationId: number,
+    data: Partial<{
+      vendor_category: string
+      payment_status: 'pending' | 'paid' | 'confirmed' | 'overdue'
+      status: 'pending' | 'approved' | 'rejected' | 'waitlist' | 'confirmed' | 'cancelled' | string
+      name: string
+      phone: string
+      location: string
+      producer_notes: string
+      tags: string[]
+      instagram_handle: string
+      tiktok_handle: string
+      website: string
+    }>,
+  ) {
     return fetchApi<any>(`/v1/presents/registrations/${registrationId}`, {
       method: 'PATCH',
       body: JSON.stringify({ registration: data }),
@@ -1102,9 +1118,12 @@ export const registrationsApi = {
     return fetchApi<{
       success: boolean
       message: string
-    }>(`/v1/presents/registrations/${registrationId}/email_notifications/send_payment_confirmation`, {
-      method: 'POST',
-    })
+    }>(
+      `/v1/presents/registrations/${registrationId}/email_notifications/send_payment_confirmation`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -1143,7 +1162,9 @@ export const vendorApplicationsApi = {
    * GET /api/v1/presents/events/:event_slug/vendor_applications
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<any[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`)
+    return fetchApi<any[]>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`,
+    )
   },
 
   /**
@@ -1158,46 +1179,55 @@ export const vendorApplicationsApi = {
    * Create vendor application for an event
    * POST /api/v1/presents/events/:event_slug/vendor_applications
    */
-  async create(eventSlug: string, data: {
-    name: string
-    description?: string
-    booth_price?: number
-    status?: 'active' | 'inactive'
-    category_id?: number
-    categories?: string[]
-    install_date?: string
-    install_start_time?: string
-    install_end_time?: string
-    payment_link?: string
-    application_tags?: string
-    payment_prices?: any[]
-    payment_engines?: any[]
-  }) {
-    return fetchApi<any>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`, {
-      method: 'POST',
-      body: JSON.stringify({ vendor_application: data }),
-    })
+  async create(
+    eventSlug: string,
+    data: {
+      name: string
+      description?: string
+      booth_price?: number
+      status?: 'active' | 'inactive'
+      category_id?: number
+      categories?: string[]
+      install_date?: string
+      install_start_time?: string
+      install_end_time?: string
+      payment_link?: string
+      application_tags?: string
+      payment_prices?: any[]
+      payment_engines?: any[]
+    },
+  ) {
+    return fetchApi<any>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/vendor_applications`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ vendor_application: data }),
+      },
+    )
   },
 
   /**
    * Update vendor application
    * PATCH /api/v1/presents/vendor_applications/:id
    */
-  async update(id: number, data: Partial<{
-    name: string
-    description: string
-    booth_price: number
-    status: 'active' | 'inactive'
-    category_id: number
-    categories: string[]
-    install_date: string
-    install_start_time: string
-    install_end_time: string
-    payment_link: string
-    application_tags: string
-    payment_prices: any[]
-    payment_engines: any[]
-  }>) {
+  async update(
+    id: number,
+    data: Partial<{
+      name: string
+      description: string
+      booth_price: number
+      status: 'active' | 'inactive'
+      category_id: number
+      categories: string[]
+      install_date: string
+      install_start_time: string
+      install_end_time: string
+      payment_link: string
+      application_tags: string
+      payment_prices: any[]
+      payment_engines: any[]
+    }>,
+  ) {
     return fetchApi<any>(`/v1/presents/vendor_applications/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ vendor_application: data }),
@@ -1218,10 +1248,13 @@ export const vendorApplicationsApi = {
    * Get submissions for a vendor application
    * GET /api/v1/presents/vendor_applications/:id/submissions
    */
-  async getSubmissions(id: number, params?: {
-    category?: string
-    status?: string
-  }) {
+  async getSubmissions(
+    id: number,
+    params?: {
+      category?: string
+      status?: string
+    },
+  ) {
     const queryParams = new URLSearchParams()
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
@@ -1282,9 +1315,11 @@ export const emailApi = {
   },
 
   async getEmailThreads(organizationId?: string) {
-    const endpoint = organizationId ? `/email/threads?organization=${organizationId}` : '/email/threads'
+    const endpoint = organizationId
+      ? `/email/threads?organization=${organizationId}`
+      : '/email/threads'
     return fetchApi<any[]>(endpoint)
-  }
+  },
 }
 
 // Email Campaign Templates API (Email Automation System)
@@ -1320,7 +1355,13 @@ export const emailCampaignTemplatesApi = {
    * Clone template
    * POST /api/v1/presents/email_campaign_templates/:id/clone
    */
-  async clone(id: number, name: string, description?: string, category_id?: number, is_universal?: boolean) {
+  async clone(
+    id: number,
+    name: string,
+    description?: string,
+    category_id?: number,
+    is_universal?: boolean,
+  ) {
     return fetchApi<EmailCampaignTemplate>(`/v1/presents/email_campaign_templates/${id}/clone`, {
       method: 'POST',
       body: JSON.stringify({ name, description, category_id, is_universal }),
@@ -1379,7 +1420,7 @@ export const emailTemplateItemsApi = {
    */
   async getByTemplate(templateId: number) {
     return fetchApi<EmailTemplateItem[]>(
-      `/v1/presents/email_campaign_templates/${templateId}/email_template_items`
+      `/v1/presents/email_campaign_templates/${templateId}/email_template_items`,
     )
   },
 
@@ -1393,7 +1434,7 @@ export const emailTemplateItemsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ email_template_item: data }),
-      }
+      },
     )
   },
 
@@ -1407,7 +1448,7 @@ export const emailTemplateItemsApi = {
       {
         method: 'PATCH',
         body: JSON.stringify({ email_template_item: data }),
-      }
+      },
     )
   },
 
@@ -1421,7 +1462,7 @@ export const emailTemplateItemsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ email_item_ids: emailItemIds }),
-      }
+      },
     )
   },
 
@@ -1434,7 +1475,7 @@ export const emailTemplateItemsApi = {
       `/v1/presents/email_campaign_templates/${templateId}/email_template_items/${id}`,
       {
         method: 'DELETE',
-      }
+      },
     )
   },
 
@@ -1448,7 +1489,7 @@ export const emailTemplateItemsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ test_email: testEmail }),
-      }
+      },
     )
   },
 }
@@ -1460,7 +1501,9 @@ export const scheduledEmailsApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<ScheduledEmail[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails`)
+    return fetchApi<ScheduledEmail[]>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails`,
+    )
   },
 
   /**
@@ -1468,7 +1511,9 @@ export const scheduledEmailsApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async getById(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`)
+    return fetchApi<ScheduledEmail>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`,
+    )
   },
 
   /**
@@ -1481,7 +1526,7 @@ export const scheduledEmailsApi = {
       {
         method: 'POST',
         body: JSON.stringify(data || {}),
-      }
+      },
     )
   },
 
@@ -1490,10 +1535,13 @@ export const scheduledEmailsApi = {
    * PATCH /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async update(eventSlug: string, id: number, data: UpdateEmailRequest) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ scheduled_email: data }),
-    })
+    return fetchApi<ScheduledEmail>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`,
+      {
+        method: 'PATCH',
+        body: JSON.stringify({ scheduled_email: data }),
+      },
+    )
   },
 
   /**
@@ -1501,9 +1549,12 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/pause
    */
   async pause(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/pause`, {
-      method: 'POST',
-    })
+    return fetchApi<ScheduledEmail>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/pause`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -1511,9 +1562,12 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/resume
    */
   async resume(eventSlug: string, id: number) {
-    return fetchApi<ScheduledEmail>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/resume`, {
-      method: 'POST',
-    })
+    return fetchApi<ScheduledEmail>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/resume`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -1521,9 +1575,12 @@ export const scheduledEmailsApi = {
    * POST /api/v1/presents/events/:event_slug/scheduled_emails/:id/send_now
    */
   async sendNow(eventSlug: string, id: number) {
-    return fetchApi<SendNowResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/send_now`, {
-      method: 'POST',
-    })
+    return fetchApi<SendNowResponse>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}/send_now`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -1536,7 +1593,7 @@ export const scheduledEmailsApi = {
       {
         method: 'POST',
         body: JSON.stringify(data),
-      }
+      },
     )
   },
 
@@ -1550,7 +1607,7 @@ export const scheduledEmailsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ test_email: testEmail }),
-      }
+      },
     )
   },
 
@@ -1597,7 +1654,7 @@ export const scheduledEmailsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ scheduled_email: data }),
-      }
+      },
     )
   },
 
@@ -1606,9 +1663,12 @@ export const scheduledEmailsApi = {
    * DELETE /api/v1/presents/events/:event_slug/scheduled_emails/:id
    */
   async delete(eventSlug: string, id: number) {
-    return fetchApi<void>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`, {
-      method: 'DELETE',
-    })
+    return fetchApi<void>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${id}`,
+      {
+        method: 'DELETE',
+      },
+    )
   },
 
   /**
@@ -1621,7 +1681,7 @@ export const scheduledEmailsApi = {
       {
         method: 'POST',
         body: JSON.stringify(data),
-      }
+      },
     )
   },
 }
@@ -1633,7 +1693,9 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/events/:event_slug/scheduled_emails/:scheduled_email_id/email_deliveries
    */
   async getByScheduledEmail(eventSlug: string, scheduledEmailId: number) {
-    return fetchApi<EmailDelivery[]>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${scheduledEmailId}/email_deliveries`)
+    return fetchApi<EmailDelivery[]>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/scheduled_emails/${scheduledEmailId}/email_deliveries`,
+    )
   },
 
   /**
@@ -1681,12 +1743,12 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/registrations/:registration_id/email_history
    */
   async getByRegistration(registrationId: number) {
-    console.log('[API DEBUG] getByRegistration called with:', registrationId);
-    const url = `/v1/presents/registrations/${registrationId}/email_history`;
-    console.log('[API DEBUG] Full URL:', url);
-    const result = await fetchApi<EmailDelivery[]>(url);
-    console.log('[API DEBUG] getByRegistration result:', result);
-    return result;
+    console.log('[API DEBUG] getByRegistration called with:', registrationId)
+    const url = `/v1/presents/registrations/${registrationId}/email_history`
+    console.log('[API DEBUG] Full URL:', url)
+    const result = await fetchApi<EmailDelivery[]>(url)
+    console.log('[API DEBUG] getByRegistration result:', result)
+    return result
   },
 
   /**
@@ -1694,12 +1756,12 @@ export const emailDeliveriesApi = {
    * GET /api/v1/presents/events/:event_slug/invitations/:invitation_id/email_history
    */
   async getByInvitation(eventSlug: string, invitationId: number) {
-    console.log('[API DEBUG] getByInvitation called with:', { eventSlug, invitationId });
-    const url = `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/${invitationId}/email_history`;
-    console.log('[API DEBUG] Full URL:', url);
-    const result = await fetchApi<EmailDelivery[]>(url);
-    console.log('[API DEBUG] getByInvitation result:', result);
-    return result;
+    console.log('[API DEBUG] getByInvitation called with:', { eventSlug, invitationId })
+    const url = `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/${invitationId}/email_history`
+    console.log('[API DEBUG] Full URL:', url)
+    const result = await fetchApi<EmailDelivery[]>(url)
+    console.log('[API DEBUG] getByInvitation result:', result)
+    return result
   },
 }
 
@@ -1757,19 +1819,22 @@ export const venuesApi = {
     })
   },
 
-  async contact(id: string, data: {
-    fromName: string
-    fromEmail: string
-    eventDate?: string
-    attendeeCount?: number
-    eventType?: string
-    message: string
-  }) {
+  async contact(
+    id: string,
+    data: {
+      fromName: string
+      fromEmail: string
+      eventDate?: string
+      attendeeCount?: number
+      eventType?: string
+      message: string
+    },
+  ) {
     return fetchApi<any>(`/venues/${id}/contact`, {
       method: 'POST',
       body: JSON.stringify(data),
     })
-  }
+  },
 }
 
 // Users API
@@ -1777,7 +1842,7 @@ export const usersApi = {
   async getCurrentUser() {
     // Delegate to authApi for consistency
     return authApi.getCurrentUser()
-  }
+  },
 }
 
 // Admin API
@@ -1788,13 +1853,16 @@ export const adminApi = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Failed to fetch users' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch users', response.status)
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to fetch users',
+        response.status,
+      )
     }
 
     const data = await response.json()
@@ -1808,19 +1876,30 @@ export const adminApi = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch analytics' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch analytics', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to fetch analytics' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to fetch analytics',
+        response.status,
+      )
     }
 
     return await response.json()
   },
 
-  async getUnsubscribedUsers(params?: { page?: number; per_page?: number; scope?: string; source?: string; search?: string }) {
+  async getUnsubscribedUsers(params?: {
+    page?: number
+    per_page?: number
+    scope?: string
+    source?: string
+    search?: string
+  }) {
     const queryParams = new URLSearchParams()
     if (params?.page) queryParams.append('page', params.page.toString())
     if (params?.per_page) queryParams.append('per_page', params.per_page.toString())
@@ -1835,13 +1914,18 @@ export const adminApi = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch unsubscribed users' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch unsubscribed users', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to fetch unsubscribed users' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to fetch unsubscribed users',
+        response.status,
+      )
     }
 
     return await response.json()
@@ -1881,13 +1965,18 @@ export const adminApi = {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to fetch email categories' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to fetch email categories', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to fetch email categories' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to fetch email categories',
+        response.status,
+      )
     }
 
     return response.json()
@@ -1898,64 +1987,91 @@ export const adminApi = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Failed to send emails' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to send emails', response.status)
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to send emails',
+        response.status,
+      )
     }
 
     return response.json()
   },
 
   async sendScheduledEmails() {
-    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/send_scheduled.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+    const response = await fetch(
+      `${API_BASE_URL.replace('/api', '')}/admin/emails/send_scheduled.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
       },
-    })
+    )
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to send scheduled emails' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to send scheduled emails', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to send scheduled emails' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to send scheduled emails',
+        response.status,
+      )
     }
 
     return response.json()
   },
 
   async setupTestData() {
-    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/setup_test_data.json`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+    const response = await fetch(
+      `${API_BASE_URL.replace('/api', '')}/admin/emails/setup_test_data.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
       },
-    })
+    )
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to setup test data' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to setup test data', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to setup test data' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to setup test data',
+        response.status,
+      )
     }
 
     return response.json()
   },
 
   async cleanupTestData() {
-    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/emails/cleanup_test_data.json`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+    const response = await fetch(
+      `${API_BASE_URL.replace('/api', '')}/admin/emails/cleanup_test_data.json`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
       },
-    })
+    )
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to cleanup test data' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to cleanup test data', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to cleanup test data' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to cleanup test data',
+        response.status,
+      )
     }
 
     return response.json()
@@ -1966,35 +2082,46 @@ export const adminApi = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+        Authorization: `Bearer ${getAuthToken()}`,
       },
-      body: JSON.stringify({ email_type: emailType })
+      body: JSON.stringify({ email_type: emailType }),
     })
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({ message: 'Failed to preview email' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to preview email', response.status)
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to preview email',
+        response.status,
+      )
     }
 
     return response.json()
   },
 
   async toggleUserPaid(userId: number) {
-    const response = await fetch(`${API_BASE_URL.replace('/api', '')}/admin/users/${userId}/toggle_paid`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${getAuthToken()}`
+    const response = await fetch(
+      `${API_BASE_URL.replace('/api', '')}/admin/users/${userId}/toggle_paid`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${getAuthToken()}`,
+        },
       },
-    })
+    )
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Failed to toggle paid status' }))
-      throw new ApiError(errorData.error || errorData.message || 'Failed to toggle paid status', response.status)
+      const errorData = await response
+        .json()
+        .catch(() => ({ message: 'Failed to toggle paid status' }))
+      throw new ApiError(
+        errorData.error || errorData.message || 'Failed to toggle paid status',
+        response.status,
+      )
     }
 
     return await response.json()
-  }
+  },
 }
 
 // Budget API
@@ -2086,7 +2213,7 @@ export const budgetsApi = {
     }>(`/line-items/${lineItemId}`, {
       method: 'DELETE',
     })
-  }
+  },
 }
 
 // Vendor Contacts API (Network/CRM)
@@ -2228,13 +2355,18 @@ function mapVendorContactFromApi(contact: any): VendorContact {
     status: contact.status || contact.crm_data?.status || 'new',
     tags: contact.tags || contact.crm_data?.tags || [],
     categories: contact.categories || contact.crm_data?.categories || [],
-    featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+    featured:
+      contact.featured !== undefined ? contact.featured : contact.crm_data?.featured || false,
     notes: contact.notes || contact.crm_data?.notes || undefined,
     source: contact.source || contact.metadata?.source || 'manual',
     source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-    interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+    interaction_count:
+      contact.interaction_count !== undefined
+        ? contact.interaction_count
+        : contact.activity?.interaction_count || 0,
     events_participated: contact.events_participated || 0,
-    last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+    last_contacted_at:
+      contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
     imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
     instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
     tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
@@ -2254,34 +2386,37 @@ export const vendorContactsApi = {
    * Get all vendor contacts for an organization
    * GET /api/v1/presents/organizations/:organization_id/vendor_contacts
    */
-  async getAll(organizationId: number, params?: {
-    search?: string
-    contact_type?: string
-    status?: string
-    tags?: string[]
-    location?: string | string[]
-    category?: string | string[]
-    featured?: string
-    page?: number
-    per_page?: number
-    sort?: string
-    order?: 'asc' | 'desc'
-  }): Promise<VendorContactsListResponse> {
+  async getAll(
+    organizationId: number,
+    params?: {
+      search?: string
+      contact_type?: string
+      status?: string
+      tags?: string[]
+      location?: string | string[]
+      category?: string | string[]
+      featured?: string
+      page?: number
+      per_page?: number
+      sort?: string
+      order?: 'asc' | 'desc'
+    },
+  ): Promise<VendorContactsListResponse> {
     const queryParams = new URLSearchParams()
 
     if (params?.search) queryParams.append('search', params.search)
     if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
     if (params?.status) queryParams.append('status', params.status)
     if (params?.tags && params.tags.length > 0) {
-      params.tags.forEach(tag => queryParams.append('tags[]', tag))
+      params.tags.forEach((tag) => queryParams.append('tags[]', tag))
     }
     if (params?.location) {
       const locations = Array.isArray(params.location) ? params.location : [params.location]
-      locations.forEach(loc => queryParams.append('location[]', loc))
+      locations.forEach((loc) => queryParams.append('location[]', loc))
     }
     if (params?.category) {
       const categories = Array.isArray(params.category) ? params.category : [params.category]
-      categories.forEach(cat => queryParams.append('category[]', cat))
+      categories.forEach((cat) => queryParams.append('category[]', cat))
     }
     if (params?.featured) queryParams.append('featured', params.featured)
     if (params?.page) queryParams.append('page', params.page.toString())
@@ -2325,9 +2460,7 @@ export const vendorContactsApi = {
    * GET /api/v1/presents/vendor_contacts/:id
    */
   async getById(id: number): Promise<VendorContact> {
-    const response = await fetchApi<any>(
-      `/v1/presents/vendor_contacts/${id}`
-    )
+    const response = await fetchApi<any>(`/v1/presents/vendor_contacts/${id}`)
     const contact = response.vendor_contact || response
     return mapVendorContactFromApi(contact)
   },
@@ -2336,37 +2469,40 @@ export const vendorContactsApi = {
    * Get all vendor contact IDs for bulk selection
    * GET /api/v1/presents/organizations/:organization_id/vendor_contacts/ids
    */
-  async getAllIds(organizationId: number, params?: {
-    search?: string
-    contact_type?: string
-    status?: string
-    tags?: string[]
-    location?: string | string[]
-    category?: string | string[]
-    featured?: string
-  }): Promise<{ ids: number[], count: number }> {
+  async getAllIds(
+    organizationId: number,
+    params?: {
+      search?: string
+      contact_type?: string
+      status?: string
+      tags?: string[]
+      location?: string | string[]
+      category?: string | string[]
+      featured?: string
+    },
+  ): Promise<{ ids: number[]; count: number }> {
     const queryParams = new URLSearchParams()
 
     if (params?.search) queryParams.append('search', params.search)
     if (params?.contact_type) queryParams.append('contact_type', params.contact_type)
     if (params?.status) queryParams.append('status', params.status)
     if (params?.tags && params.tags.length > 0) {
-      params.tags.forEach(tag => queryParams.append('tags[]', tag))
+      params.tags.forEach((tag) => queryParams.append('tags[]', tag))
     }
     if (params?.location) {
       const locations = Array.isArray(params.location) ? params.location : [params.location]
-      locations.forEach(loc => queryParams.append('location[]', loc))
+      locations.forEach((loc) => queryParams.append('location[]', loc))
     }
     if (params?.category) {
       const categories = Array.isArray(params.category) ? params.category : [params.category]
-      categories.forEach(cat => queryParams.append('category[]', cat))
+      categories.forEach((cat) => queryParams.append('category[]', cat))
     }
     if (params?.featured) queryParams.append('featured', params.featured)
 
     const queryString = queryParams.toString()
     const endpoint = `/v1/presents/organizations/${organizationId}/vendor_contacts/ids${queryString ? `?${queryString}` : ''}`
 
-    return fetchApi<{ ids: number[], count: number }>(endpoint)
+    return fetchApi<{ ids: number[]; count: number }>(endpoint)
   },
 
   /**
@@ -2378,8 +2514,8 @@ export const vendorContactsApi = {
     tags: string[]
     categories: string[]
   }> {
-    return fetchApi<{ locations: string[], tags: string[], categories: string[] }>(
-      `/v1/presents/organizations/${organizationId}/vendor_contacts/filter_options`
+    return fetchApi<{ locations: string[]; tags: string[]; categories: string[] }>(
+      `/v1/presents/organizations/${organizationId}/vendor_contacts/filter_options`,
     )
   },
 
@@ -2387,29 +2523,32 @@ export const vendorContactsApi = {
    * Create new vendor contact
    * POST /api/v1/presents/vendor_contacts
    */
-  async create(organizationId: number, data: {
-    contact_name: string
-    business_name?: string
-    job_title?: string
-    email: string
-    phone?: string
-    location?: string
-    contact_type?: 'vendor' | 'partner' | 'sponsor' | 'staff'
-    tags?: string[]
-    categories?: string[]
-    notes?: string
-    source?: 'manual' | 'event_application' | 'csv_import'
-    vendor_id?: number
-    registration_id?: number
-    instagram_handle?: string
-    tiktok_handle?: string
-    website?: string
-    featured?: boolean
-    // TODO: Backend migration needed - silently dropped until then
-    eventbrite_email?: string
-    venmo_handle?: string
-    paypal_email?: string
-  }): Promise<VendorContact> {
+  async create(
+    organizationId: number,
+    data: {
+      contact_name: string
+      business_name?: string
+      job_title?: string
+      email: string
+      phone?: string
+      location?: string
+      contact_type?: 'vendor' | 'partner' | 'sponsor' | 'staff'
+      tags?: string[]
+      categories?: string[]
+      notes?: string
+      source?: 'manual' | 'event_application' | 'csv_import'
+      vendor_id?: number
+      registration_id?: number
+      instagram_handle?: string
+      tiktok_handle?: string
+      website?: string
+      featured?: boolean
+      // TODO: Backend migration needed - silently dropped until then
+      eventbrite_email?: string
+      venmo_handle?: string
+      paypal_email?: string
+    },
+  ): Promise<VendorContact> {
     // Backend expects FLAT structure for create (not nested)
     const backendData = {
       organization_id: organizationId,
@@ -2433,15 +2572,12 @@ export const vendorContactsApi = {
       source: data.source || 'manual',
     }
 
-    const response = await fetchApi<any>(
-      '/v1/presents/vendor_contacts',
-      {
-        method: 'POST',
-        body: JSON.stringify({
-          vendor_contact: backendData,
-        }),
-      }
-    )
+    const response = await fetchApi<any>('/v1/presents/vendor_contacts', {
+      method: 'POST',
+      body: JSON.stringify({
+        vendor_contact: backendData,
+      }),
+    })
 
     // Response can be in either flat or nested format
     const contact = response.vendor_contact || response
@@ -2460,13 +2596,19 @@ export const vendorContactsApi = {
       status: contact.status || contact.crm_data?.status || 'new',
       tags: contact.tags || contact.crm_data?.tags || [],
       categories: contact.categories || contact.crm_data?.categories || [],
-      featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+      featured:
+        contact.featured !== undefined ? contact.featured : contact.crm_data?.featured || false,
       notes: contact.notes || contact.crm_data?.notes || undefined,
       source: contact.source || contact.metadata?.source || 'manual',
-      source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-      interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+      source_registration_id:
+        contact.source_registration_id || contact.registration_id || undefined,
+      interaction_count:
+        contact.interaction_count !== undefined
+          ? contact.interaction_count
+          : contact.activity?.interaction_count || 0,
       events_participated: contact.events_participated || 0,
-      last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+      last_contacted_at:
+        contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
       imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
       instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
       tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
@@ -2502,15 +2644,12 @@ export const vendorContactsApi = {
     if (data.website !== undefined) backendData.website = data.website
     if (data.featured !== undefined) backendData.featured = data.featured
 
-    const response = await fetchApi<any>(
-      `/v1/presents/vendor_contacts/${id}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({
-          vendor_contact: backendData,
-        }),
-      }
-    )
+    const response = await fetchApi<any>(`/v1/presents/vendor_contacts/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        vendor_contact: backendData,
+      }),
+    })
 
     // Response can be in either flat or nested format
     const contact = response.vendor_contact || response
@@ -2529,16 +2668,22 @@ export const vendorContactsApi = {
       status: contact.status || contact.crm_data?.status || 'new',
       tags: contact.tags || contact.crm_data?.tags || [],
       categories: contact.categories || contact.crm_data?.categories || [],
-      featured: contact.featured !== undefined ? contact.featured : (contact.crm_data?.featured || false),
+      featured:
+        contact.featured !== undefined ? contact.featured : contact.crm_data?.featured || false,
       notes: contact.notes || contact.crm_data?.notes || undefined,
       source: contact.source || contact.metadata?.source || 'manual',
       instagram_handle: contact.instagram_handle || contact.social?.instagram_handle || undefined,
       tiktok_handle: contact.tiktok_handle || contact.social?.tiktok_handle || undefined,
       website: contact.website || contact.social?.website || undefined,
-      source_registration_id: contact.source_registration_id || contact.registration_id || undefined,
-      interaction_count: contact.interaction_count !== undefined ? contact.interaction_count : (contact.activity?.interaction_count || 0),
+      source_registration_id:
+        contact.source_registration_id || contact.registration_id || undefined,
+      interaction_count:
+        contact.interaction_count !== undefined
+          ? contact.interaction_count
+          : contact.activity?.interaction_count || 0,
       events_participated: contact.events_participated || 0,
-      last_contacted_at: contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
+      last_contacted_at:
+        contact.last_contacted_at || contact.activity?.last_contacted_at || undefined,
       imported_at: contact.imported_at || contact.metadata?.imported_at || undefined,
       created_at: contact.created_at || contact.metadata?.created_at || '',
       updated_at: contact.updated_at || contact.metadata?.updated_at || '',
@@ -2551,12 +2696,9 @@ export const vendorContactsApi = {
    * DELETE /api/v1/presents/vendor_contacts/:id
    */
   async delete(id: number): Promise<{ message: string }> {
-    return fetchApi<{ message: string }>(
-      `/v1/presents/vendor_contacts/${id}`,
-      {
-        method: 'DELETE',
-      }
-    )
+    return fetchApi<{ message: string }>(`/v1/presents/vendor_contacts/${id}`, {
+      method: 'DELETE',
+    })
   },
 
   /**
@@ -2569,7 +2711,7 @@ export const vendorContactsApi = {
       {
         method: 'POST',
         body: JSON.stringify({ tag }),
-      }
+      },
     )
     return response.vendor_contact
   },
@@ -2584,7 +2726,7 @@ export const vendorContactsApi = {
       {
         method: 'DELETE',
         body: JSON.stringify({ tag }),
-      }
+      },
     )
     return response.vendor_contact
   },
@@ -2593,7 +2735,11 @@ export const vendorContactsApi = {
    * Record interaction with contact
    * POST /api/v1/presents/vendor_contacts/:id/record_interaction
    */
-  async recordInteraction(id: number, interactionType: string, notes?: string): Promise<VendorContact> {
+  async recordInteraction(
+    id: number,
+    interactionType: string,
+    notes?: string,
+  ): Promise<VendorContact> {
     const response = await fetchApi<{ vendor_contact: VendorContact }>(
       `/v1/presents/vendor_contacts/${id}/record_interaction`,
       {
@@ -2602,7 +2748,7 @@ export const vendorContactsApi = {
           interaction_type: interactionType,
           notes,
         }),
-      }
+      },
     )
     return response.vendor_contact
   },
@@ -2613,13 +2759,16 @@ export const vendorContactsApi = {
    *
    * NOTE: This endpoint may not be implemented yet on backend
    */
-  async bulkEmail(contactIds: number[], emailData: {
-    subject: string
-    message: string
-    htmlMessage?: string
-    includeEventLink?: boolean
-    eventId?: number
-  }): Promise<{ emails_sent: number; failed: any[]; message: string }> {
+  async bulkEmail(
+    contactIds: number[],
+    emailData: {
+      subject: string
+      message: string
+      htmlMessage?: string
+      includeEventLink?: boolean
+      eventId?: number
+    },
+  ): Promise<{ emails_sent: number; failed: any[]; message: string }> {
     // Keep mock for now as bulk email may not be implemented on backend yet
     return fetchApi<{ emails_sent: number; failed: any[]; message: string }>(
       '/v1/presents/vendor_contacts/bulk_email',
@@ -2629,7 +2778,7 @@ export const vendorContactsApi = {
           contact_ids: contactIds,
           ...emailData,
         }),
-      }
+      },
     ).catch(() => {
       // Fallback to mock if endpoint doesn't exist
       return {
@@ -2646,7 +2795,10 @@ export const vendorContactsApi = {
    *
    * NOTE: This endpoint may not be implemented yet on backend
    */
-  async importFromRegistration(registrationId: number, organizationId: number): Promise<{
+  async importFromRegistration(
+    registrationId: number,
+    organizationId: number,
+  ): Promise<{
     vendor_contact: VendorContact
     created: boolean
   }> {
@@ -2658,7 +2810,7 @@ export const vendorContactsApi = {
           registration_id: registrationId,
           organization_id: organizationId,
         }),
-      }
+      },
     )
   },
 
@@ -2666,10 +2818,7 @@ export const vendorContactsApi = {
    * Bulk import vendor contacts from CSV file
    * POST /api/v1/presents/vendor_contacts/bulk_import
    */
-  async bulkImport(
-    file: File,
-    options: BulkImportOptions = {}
-  ): Promise<BulkImportResult> {
+  async bulkImport(file: File, options: BulkImportOptions = {}): Promise<BulkImportResult> {
     const formData = new FormData()
     formData.append('file', file)
     formData.append('skip_duplicates', String(options.skipDuplicates ?? true))
@@ -2682,7 +2831,10 @@ export const vendorContactsApi = {
       formData.append('tags', JSON.stringify(options.tags))
     }
 
-    console.log('📤 Sending bulk import request to:', `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`)
+    console.log(
+      '📤 Sending bulk import request to:',
+      `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`,
+    )
     console.log('📤 File size:', file.size, 'bytes')
 
     // Create abort controller for timeout (5 minutes for large files)
@@ -2690,18 +2842,15 @@ export const vendorContactsApi = {
     const timeoutId = setTimeout(() => controller.abort(), 300000) // 5 min timeout
 
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`,
-        {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${getAuthToken()}`,
-            // Don't set Content-Type - browser will set it with boundary for multipart
-          },
-          body: formData,
-          signal: controller.signal,
-        }
-      )
+      const response = await fetch(`${API_BASE_URL}/v1/presents/vendor_contacts/bulk_import`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${getAuthToken()}`,
+          // Don't set Content-Type - browser will set it with boundary for multipart
+        },
+        body: formData,
+        signal: controller.signal,
+      })
 
       clearTimeout(timeoutId)
 
@@ -2729,7 +2878,9 @@ export const vendorContactsApi = {
 
       if (error instanceof Error && error.name === 'AbortError') {
         console.error('❌ Request timeout after 5 minutes')
-        throw new Error('Import timeout - file may be too large or server is slow. Please try with a smaller batch.')
+        throw new Error(
+          'Import timeout - file may be too large or server is slow. Please try with a smaller batch.',
+        )
       }
 
       console.error('❌ Bulk import error:', error)
@@ -2752,7 +2903,7 @@ export const vendorContactsApi = {
       featured?: boolean
       location?: string
       category_mode?: 'replace' | 'append'
-    }
+    },
   ): Promise<{ message: string; updated_count: number; total_selected: number }> {
     return fetchApi<{ message: string; updated_count: number; total_selected: number }>(
       `/v1/presents/organizations/${organizationId}/vendor_contacts/bulk_update`,
@@ -2762,13 +2913,13 @@ export const vendorContactsApi = {
           contact_ids: contactIds,
           ...updates,
         }),
-      }
+      },
     )
   },
 
   async bulkDelete(
     organizationId: number,
-    contactIds: number[]
+    contactIds: number[],
   ): Promise<{ message: string; deleted_count: number; total_selected: number }> {
     return fetchApi<{ message: string; deleted_count: number; total_selected: number }>(
       `/v1/presents/organizations/${organizationId}/vendor_contacts/bulk_delete`,
@@ -2777,7 +2928,7 @@ export const vendorContactsApi = {
         body: JSON.stringify({
           contact_ids: contactIds,
         }),
-      }
+      },
     )
   },
 
@@ -2799,7 +2950,7 @@ export const vendorContactsApi = {
     params?: {
       page?: number
       per_page?: number
-    }
+    },
   ): Promise<VendorContactsListResponse> {
     const queryParams = new URLSearchParams()
 
@@ -2852,7 +3003,7 @@ export interface EventInvitation {
       start_time?: string
       end_time?: string
     }
-    event_date?: string  // Legacy support
+    event_date?: string // Legacy support
     venue?: string
     location: string
     age_restriction?: string
@@ -2893,7 +3044,7 @@ export const contactListsApi = {
    */
   async getAll(organizationId: number): Promise<ContactListsResponse> {
     return fetchApi<ContactListsResponse>(
-      `/v1/presents/organizations/${organizationId}/contact_lists`
+      `/v1/presents/organizations/${organizationId}/contact_lists`,
     )
   },
 
@@ -2911,7 +3062,7 @@ export const contactListsApi = {
    */
   async getContacts(listId: number, page = 1, perPage = 100): Promise<VendorContactsListResponse> {
     return fetchApi<VendorContactsListResponse>(
-      `/v1/presents/contact_lists/${listId}/contacts?page=${page}&per_page=${perPage}`
+      `/v1/presents/contact_lists/${listId}/contacts?page=${page}&per_page=${perPage}`,
     )
   },
 
@@ -2919,20 +3070,20 @@ export const contactListsApi = {
    * Create new contact list
    * POST /api/v1/presents/organizations/:organization_id/contact_lists
    */
-  async create(organizationId: number, listData: {
-    name: string
-    description?: string
-    list_type: 'smart' | 'manual'
-    filters?: ContactList['filters']
-    contact_ids?: number[]
-  }): Promise<ContactList> {
-    return fetchApi<ContactList>(
-      `/v1/presents/organizations/${organizationId}/contact_lists`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ contact_list: listData })
-      }
-    )
+  async create(
+    organizationId: number,
+    listData: {
+      name: string
+      description?: string
+      list_type: 'smart' | 'manual'
+      filters?: ContactList['filters']
+      contact_ids?: number[]
+    },
+  ): Promise<ContactList> {
+    return fetchApi<ContactList>(`/v1/presents/organizations/${organizationId}/contact_lists`, {
+      method: 'POST',
+      body: JSON.stringify({ contact_list: listData }),
+    })
   },
 
   /**
@@ -2940,13 +3091,10 @@ export const contactListsApi = {
    * PATCH /api/v1/presents/contact_lists/:id
    */
   async update(listId: number, listData: Partial<ContactList>): Promise<ContactList> {
-    return fetchApi<ContactList>(
-      `/v1/presents/contact_lists/${listId}`,
-      {
-        method: 'PATCH',
-        body: JSON.stringify({ contact_list: listData })
-      }
-    )
+    return fetchApi<ContactList>(`/v1/presents/contact_lists/${listId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ contact_list: listData }),
+    })
   },
 
   /**
@@ -2955,9 +3103,9 @@ export const contactListsApi = {
    */
   async delete(listId: number): Promise<void> {
     return fetchApi<void>(`/v1/presents/contact_lists/${listId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
     })
-  }
+  },
 }
 
 export const categoriesApi = {
@@ -2966,10 +3114,10 @@ export const categoriesApi = {
    * GET /api/v1/presents/organizations/:organization_id/categories
    */
   async getAll(organizationId: number, includeUsage = false): Promise<{ categories: any[] }> {
-    const params = includeUsage ? '?include_usage=true' : '';
+    const params = includeUsage ? '?include_usage=true' : ''
     return fetchApi<{ categories: any[] }>(
-      `/v1/presents/organizations/${organizationId}/categories${params}`
-    );
+      `/v1/presents/organizations/${organizationId}/categories${params}`,
+    )
   },
 
   /**
@@ -2977,7 +3125,7 @@ export const categoriesApi = {
    * GET /api/v1/presents/categories/:id
    */
   async getById(categoryId: number): Promise<any> {
-    return fetchApi<any>(`/v1/presents/categories/${categoryId}`);
+    return fetchApi<any>(`/v1/presents/categories/${categoryId}`)
   },
 
   /**
@@ -2985,59 +3133,67 @@ export const categoriesApi = {
    * GET /api/v1/presents/categories/:id/usage
    */
   async getUsage(categoryId: number): Promise<{ category: any; usage: any }> {
-    return fetchApi<{ category: any; usage: any }>(
-      `/v1/presents/categories/${categoryId}/usage`
-    );
+    return fetchApi<{ category: any; usage: any }>(`/v1/presents/categories/${categoryId}/usage`)
   },
 
   /**
    * Create new category
    * POST /api/v1/presents/organizations/:organization_id/categories
    */
-  async create(organizationId: number, categoryData: {
-    name: string;
-    description?: string;
-    color?: string;
-    icon?: string;
-    booth_price?: number;
-    early_bird_price?: number;
-    early_bird_deadline?: string;
-    payment_deadline?: string;
-    deposit?: number;
-    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
-  }): Promise<any> {
-    return fetchApi<any>(
-      `/v1/presents/organizations/${organizationId}/categories`,
-      {
-        method: 'POST',
-        body: JSON.stringify({ category: categoryData }),
-      }
-    );
+  async create(
+    organizationId: number,
+    categoryData: {
+      name: string
+      description?: string
+      color?: string
+      icon?: string
+      booth_price?: number
+      early_bird_price?: number
+      early_bird_deadline?: string
+      payment_deadline?: string
+      deposit?: number
+      payment_preferences?: {
+        type: string
+        label: string
+        amount: number
+        is_percentage: boolean
+      }[]
+    },
+  ): Promise<any> {
+    return fetchApi<any>(`/v1/presents/organizations/${organizationId}/categories`, {
+      method: 'POST',
+      body: JSON.stringify({ category: categoryData }),
+    })
   },
 
   /**
    * Update category
    * PUT /api/v1/presents/categories/:id
    */
-  async update(categoryId: number, categoryData: {
-    name?: string;
-    description?: string;
-    color?: string;
-    icon?: string;
-    booth_price?: number;
-    early_bird_price?: number;
-    early_bird_deadline?: string;
-    payment_deadline?: string;
-    deposit?: number;
-    payment_preferences?: { type: string; label: string; amount: number; is_percentage: boolean }[];
-  }): Promise<any> {
-    return fetchApi<any>(
-      `/v1/presents/categories/${categoryId}`,
-      {
-        method: 'PUT',
-        body: JSON.stringify({ category: categoryData }),
-      }
-    );
+  async update(
+    categoryId: number,
+    categoryData: {
+      name?: string
+      description?: string
+      color?: string
+      icon?: string
+      booth_price?: number
+      early_bird_price?: number
+      early_bird_deadline?: string
+      payment_deadline?: string
+      deposit?: number
+      payment_preferences?: {
+        type: string
+        label: string
+        amount: number
+        is_percentage: boolean
+      }[]
+    },
+  ): Promise<any> {
+    return fetchApi<any>(`/v1/presents/categories/${categoryId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ category: categoryData }),
+    })
   },
 
   /**
@@ -3047,10 +3203,10 @@ export const categoriesApi = {
   async delete(categoryId: number): Promise<void> {
     return fetchApi<void>(`/v1/presents/categories/${categoryId}`, {
       method: 'DELETE',
-    });
+    })
   },
   // Note: getLastApplication removed - categories now include default values directly
-};
+}
 
 export const eventInvitationsApi = {
   /**
@@ -3063,11 +3219,13 @@ export const eventInvitationsApi = {
    */
   async createBatch(
     eventSlug: string,
-    params: number[] | {
-      list_ids?: number[]
-      vendor_contact_ids?: number[]
-      excluded_contact_ids?: number[]
-    }
+    params:
+      | number[]
+      | {
+          list_ids?: number[]
+          vendor_contact_ids?: number[]
+          excluded_contact_ids?: number[]
+        },
   ) {
     // Support legacy array signature for backward compatibility
     const body = Array.isArray(params)
@@ -3082,20 +3240,22 @@ export const eventInvitationsApi = {
       invitations: EventInvitation[]
       created_count: number
       errors: any[]
-    }>(
-      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/batch`,
-      {
-        method: 'POST',
-        body: JSON.stringify(body),
-      }
-    )
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/batch`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
   },
 
   /**
    * Get all invitations for an event
    * GET /api/v1/presents/events/:event_slug/invitations
    */
-  async getByEvent(eventSlug: string, page?: number, perPage?: number, params?: { status?: string }) {
+  async getByEvent(
+    eventSlug: string,
+    page?: number,
+    perPage?: number,
+    params?: { status?: string },
+  ) {
     const queryParams = new URLSearchParams()
     if (params?.status) queryParams.append('status', params.status)
     if (page) queryParams.append('page', page.toString())
@@ -3132,7 +3292,7 @@ export const eventInvitationsApi = {
         }
       }
     }>(
-      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations${query ? `?${query}` : ''}`
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations${query ? `?${query}` : ''}`,
     )
   },
 
@@ -3141,9 +3301,7 @@ export const eventInvitationsApi = {
    * GET /api/v1/presents/invitations/:token
    */
   async getByToken(token: string) {
-    return fetchApi<{ invitation: EventInvitation }>(
-      `/v1/presents/invitations/${token}`
-    )
+    return fetchApi<{ invitation: EventInvitation }>(`/v1/presents/invitations/${token}`)
   },
 
   /**
@@ -3159,7 +3317,7 @@ export const eventInvitationsApi = {
           status,
           response_notes: responseNotes,
         }),
-      }
+      },
     )
   },
 
@@ -3174,9 +3332,7 @@ export const eventInvitationsApi = {
       recipient_name: string
       recipient_email: string
       is_sample: boolean
-    }>(
-      `/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/preview_email`
-    )
+    }>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/invitations/preview_email`)
   },
 
   /**
@@ -3189,9 +3345,7 @@ export const eventInvitationsApi = {
       first_name: string
       last_name: string
       business_name: string
-    }>(
-      `/v1/presents/invitations/prefill/${token}`
-    )
+    }>(`/v1/presents/invitations/prefill/${token}`)
   },
 }
 
@@ -3278,7 +3432,9 @@ export const bulletinsApi = {
    * GET /api/v1/presents/events/:eventSlug/bulletins
    */
   async getByEvent(eventSlug: string) {
-    return fetchApi<import('@/types/bulletin').BulletinsResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`)
+    return fetchApi<import('@/types/bulletin').BulletinsResponse>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`,
+    )
   },
 
   /**
@@ -3294,10 +3450,13 @@ export const bulletinsApi = {
    * POST /api/v1/presents/events/:eventSlug/bulletins
    */
   async create(eventSlug: string, data: import('@/types/bulletin').CreateBulletinRequest) {
-    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`, {
-      method: 'POST',
-      body: JSON.stringify({ bulletin: data }),
-    })
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ bulletin: data }),
+      },
+    )
   },
 
   /**
@@ -3326,9 +3485,12 @@ export const bulletinsApi = {
    * POST /api/v1/presents/bulletins/:id/toggle_pin
    */
   async togglePin(id: number) {
-    return fetchApi<import('@/types/bulletin').BulletinResponse>(`/v1/presents/bulletins/${id}/toggle_pin`, {
-      method: 'POST',
-    })
+    return fetchApi<import('@/types/bulletin').BulletinResponse>(
+      `/v1/presents/bulletins/${id}/toggle_pin`,
+      {
+        method: 'POST',
+      },
+    )
   },
 
   /**
@@ -3346,28 +3508,31 @@ export const bulletinsApi = {
    * Preview recipient count for bulletin email blast
    * GET /api/v1/presents/events/:eventSlug/bulletins/preview_recipients
    */
-  async previewRecipients(eventSlug: string, criteria: import('@/types/bulletin').EmailAudienceCriteria) {
-    const params = new URLSearchParams();
+  async previewRecipients(
+    eventSlug: string,
+    criteria: import('@/types/bulletin').EmailAudienceCriteria,
+  ) {
+    const params = new URLSearchParams()
 
     if (criteria.include_all) {
-      params.append('email_audience_criteria[include_all]', 'true');
+      params.append('email_audience_criteria[include_all]', 'true')
     }
 
     if (criteria.statuses && criteria.statuses.length > 0) {
-      criteria.statuses.forEach(status => {
-        params.append('email_audience_criteria[statuses][]', status);
-      });
+      criteria.statuses.forEach((status) => {
+        params.append('email_audience_criteria[statuses][]', status)
+      })
     }
 
     if (criteria.vendor_categories && criteria.vendor_categories.length > 0) {
-      criteria.vendor_categories.forEach(category => {
-        params.append('email_audience_criteria[vendor_categories][]', category);
-      });
+      criteria.vendor_categories.forEach((category) => {
+        params.append('email_audience_criteria[vendor_categories][]', category)
+      })
     }
 
     return fetchApi<import('@/types/bulletin').RecipientPreview>(
-      `/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins/preview_recipients?${params.toString()}`
-    );
+      `/v1/presents/events/${encodeURIComponent(eventSlug)}/bulletins/preview_recipients?${params.toString()}`,
+    )
   },
 }
 
@@ -3380,12 +3545,7 @@ export const bugReportsApi = {
    * Submit a bug report
    * POST /v1/shared/bug_reports
    */
-  async create(data: {
-    name: string
-    email: string
-    description: string
-    error_context?: any
-  }) {
+  async create(data: { name: string; email: string; description: string; error_context?: any }) {
     // Note: Bug reports endpoint is public (no auth required)
     return fetchApi<{ id: number; message?: string }>('/v1/shared/bug_reports', {
       method: 'POST',
@@ -3406,14 +3566,16 @@ export const bugReportsApi = {
    * GET /v1/shared/bug_reports
    */
   async getAll() {
-    return fetchApi<Array<{
-      id: number
-      name: string
-      email: string
-      bug_description: string
-      error_context?: any
-      created_at: string
-    }>>('/v1/shared/bug_reports')
+    return fetchApi<
+      Array<{
+        id: number
+        name: string
+        email: string
+        bug_description: string
+        error_context?: any
+        created_at: string
+      }>
+    >('/v1/shared/bug_reports')
   },
 
   /**

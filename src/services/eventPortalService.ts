@@ -65,7 +65,7 @@ class PortalApiError extends Error {
  * POST /api/v1/presents/portals/verify
  */
 export async function verifyPortalAccess(
-  request: VerifyAccessRequest
+  request: VerifyAccessRequest,
 ): Promise<VerifyAccessResponse> {
   const url = `${API_BASE_URL}/v1/presents/portals/verify`
 
@@ -81,10 +81,7 @@ export async function verifyPortalAccess(
     const data: VerifyAccessResponse = await response.json()
 
     if (!response.ok) {
-      throw new PortalApiError(
-        data.error || 'Access verification failed',
-        response.status
-      )
+      throw new PortalApiError(data.error || 'Access verification failed', response.status)
     }
 
     // If access granted, save session
@@ -104,10 +101,7 @@ export async function verifyPortalAccess(
       throw error
     }
     console.error('Portal access verification error:', error)
-    throw new PortalApiError(
-      'Network error. Please check your connection and try again.',
-      0
-    )
+    throw new PortalApiError('Network error. Please check your connection and try again.', 0)
   }
 }
 
@@ -143,10 +137,7 @@ export async function fetchPortalDataByToken(accessToken: string): Promise<Event
         error: 'Failed to fetch portal data',
       }))
 
-      throw new PortalApiError(
-        errorData.error || 'Failed to fetch portal data',
-        response.status
-      )
+      throw new PortalApiError(errorData.error || 'Failed to fetch portal data', response.status)
     }
 
     const result: PortalApiResponse = await response.json()
@@ -156,10 +147,7 @@ export async function fetchPortalDataByToken(accessToken: string): Promise<Event
       throw error
     }
     console.error('Portal data fetch error:', error)
-    throw new PortalApiError(
-      'Network error. Please check your connection and try again.',
-      0
-    )
+    throw new PortalApiError('Network error. Please check your connection and try again.', 0)
   }
 }
 
@@ -195,10 +183,7 @@ export async function fetchPortalData(eventSlug: string): Promise<EventPortalDat
         error: 'Failed to fetch portal data',
       }))
 
-      throw new PortalApiError(
-        errorData.error || 'Failed to fetch portal data',
-        response.status
-      )
+      throw new PortalApiError(errorData.error || 'Failed to fetch portal data', response.status)
     }
 
     const result: PortalApiResponse = await response.json()
@@ -208,10 +193,7 @@ export async function fetchPortalData(eventSlug: string): Promise<EventPortalDat
       throw error
     }
     console.error('Portal data fetch error:', error)
-    throw new PortalApiError(
-      'Network error. Please check your connection and try again.',
-      0
-    )
+    throw new PortalApiError('Network error. Please check your connection and try again.', 0)
   }
 }
 

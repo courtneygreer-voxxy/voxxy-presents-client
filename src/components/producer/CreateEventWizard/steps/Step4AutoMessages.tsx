@@ -1,26 +1,32 @@
-import { useState, useEffect } from 'react';
-import { Mail, Eye } from 'lucide-react';
-import { format, addDays, subDays, parseISO } from 'date-fns';
-import { emailCampaignTemplatesApi } from '@/services/api';
-import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email';
-import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal';
-import { DebugPanel } from '../../DebugPanel';
-import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles';
+import { useState, useEffect } from 'react'
+import { Mail, Eye } from 'lucide-react'
+import { format, addDays, subDays, parseISO } from 'date-fns'
+import { emailCampaignTemplatesApi } from '@/services/api'
+import type { EmailCampaignTemplate, EmailTemplateItem, EmailCategory } from '@/types/email'
+import TemplatePreviewModal from '@/components/shared/TemplatePreviewModal'
+import { DebugPanel } from '../../DebugPanel'
+import { getCategorySequenceBadgeStyle } from '@/lib/categoryBadgeStyles'
 
 interface Step4AutoMessagesProps {
-  selectedTemplateId?: number | null;
-  onTemplateSelect?: (templateId: number | null) => void;
-  useCategoryTemplates?: boolean;
-  onUseCategoryTemplatesChange?: (value: boolean) => void;
-  useUniversalCategoryTemplate?: boolean;
-  onUseUniversalCategoryTemplateChange?: (value: boolean) => void;
-  universalCategoryTemplateId?: number | null;
-  onUniversalCategoryTemplateIdChange?: (templateId: number | null) => void;
-  eventCategories?: Array<{ id: number; name: string; icon?: string; color?: string; email_campaign_template_id?: number }>; // Categories from Step 2 applications
-  eventDate?: string;
-  applicationDeadline?: string;
-  paymentDeadline?: string;
-  isAdmin?: boolean;
+  selectedTemplateId?: number | null
+  onTemplateSelect?: (templateId: number | null) => void
+  useCategoryTemplates?: boolean
+  onUseCategoryTemplatesChange?: (value: boolean) => void
+  useUniversalCategoryTemplate?: boolean
+  onUseUniversalCategoryTemplateChange?: (value: boolean) => void
+  universalCategoryTemplateId?: number | null
+  onUniversalCategoryTemplateIdChange?: (templateId: number | null) => void
+  eventCategories?: Array<{
+    id: number
+    name: string
+    icon?: string
+    color?: string
+    email_campaign_template_id?: number
+  }> // Categories from Step 2 applications
+  eventDate?: string
+  applicationDeadline?: string
+  paymentDeadline?: string
+  isAdmin?: boolean
 }
 
 // Category display names and order
@@ -37,35 +43,35 @@ const CATEGORY_CONFIG: Record<EmailCategory, { label: string; order: number }> =
   payment_reminders: { label: 'Payment Reminders', order: 3 },
   event_countdown: { label: 'Event Countdown', order: 4 },
   event_updates: { label: 'Event Updates', order: 8 },
-};
+}
 
 // Map trigger types to readable labels
 const getTriggerLabel = (triggerType: string, triggerValue: number | null): string => {
   switch (triggerType) {
     case 'days_before_event':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before event`
     case 'days_after_event':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after event`
     case 'days_before_deadline':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before application deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before application deadline`
     case 'days_before_payment_deadline':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} before payment deadline`
     case 'days_after_payment_deadline':
-      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`;
+      return `${triggerValue} ${triggerValue === 1 ? 'day' : 'days'} after payment deadline`
     case 'on_application_open':
-      return 'When applications open';
+      return 'When applications open'
     case 'on_application_submit':
-      return 'On application submission';
+      return 'On application submission'
     case 'on_approval':
-      return 'On application approval';
+      return 'On application approval'
     case 'on_payment_deadline':
-      return 'On payment deadline';
+      return 'On payment deadline'
     case 'on_event_date':
-      return 'On event day';
+      return 'On event day'
     default:
-      return 'Auto';
+      return 'Auto'
   }
-};
+}
 
 // Calculate when an email will be sent based on trigger
 const calculateSendDate = (
@@ -73,42 +79,42 @@ const calculateSendDate = (
   triggerValue: number | null,
   eventDate?: string,
   applicationDeadline?: string,
-  paymentDeadline?: string
+  paymentDeadline?: string,
 ): string | null => {
-  if (!eventDate) return null;
+  if (!eventDate) return null
 
   try {
-    const eventDateObj = parseISO(eventDate);
+    const eventDateObj = parseISO(eventDate)
 
     switch (triggerType) {
       case 'days_before_event':
-        if (triggerValue === null) return null;
-        return format(subDays(eventDateObj, triggerValue), 'MMM d, yyyy');
+        if (triggerValue === null) return null
+        return format(subDays(eventDateObj, triggerValue), 'MMM d, yyyy')
       case 'days_after_event':
-        if (triggerValue === null) return null;
-        return format(addDays(eventDateObj, triggerValue), 'MMM d, yyyy');
+        if (triggerValue === null) return null
+        return format(addDays(eventDateObj, triggerValue), 'MMM d, yyyy')
       case 'days_before_deadline':
-        if (triggerValue === null || !applicationDeadline) return null;
-        return format(subDays(parseISO(applicationDeadline), triggerValue), 'MMM d, yyyy');
+        if (triggerValue === null || !applicationDeadline) return null
+        return format(subDays(parseISO(applicationDeadline), triggerValue), 'MMM d, yyyy')
       case 'days_before_payment_deadline':
-        if (triggerValue === null || !paymentDeadline) return null;
-        return format(subDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy');
+        if (triggerValue === null || !paymentDeadline) return null
+        return format(subDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy')
       case 'days_after_payment_deadline':
-        if (triggerValue === null || !paymentDeadline) return null;
-        return format(addDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy');
+        if (triggerValue === null || !paymentDeadline) return null
+        return format(addDays(parseISO(paymentDeadline), triggerValue), 'MMM d, yyyy')
       case 'on_application_open':
-        return applicationDeadline ? format(parseISO(applicationDeadline), 'MMM d, yyyy') : null;
+        return applicationDeadline ? format(parseISO(applicationDeadline), 'MMM d, yyyy') : null
       case 'on_event_date':
-        return format(eventDateObj, 'MMM d, yyyy');
+        return format(eventDateObj, 'MMM d, yyyy')
       case 'on_payment_deadline':
-        return paymentDeadline ? format(parseISO(paymentDeadline), 'MMM d, yyyy') : null;
+        return paymentDeadline ? format(parseISO(paymentDeadline), 'MMM d, yyyy') : null
       default:
-        return null;
+        return null
     }
   } catch {
-    return null;
+    return null
   }
-};
+}
 
 // Event-wide trigger types that apply to all vendors (not category-specific)
 const EVENT_WIDE_TRIGGERS = [
@@ -118,23 +124,23 @@ const EVENT_WIDE_TRIGGERS = [
   'on_application_rejected',
   'on_payment_received',
   'on_vendor_assigned_space',
-  'on_category_change'
-];
+  'on_category_change',
+]
 
 // Count category-specific emails (excluding event-wide emails)
 const getCategorySpecificEmailCount = (template: EmailCampaignTemplate | null) => {
-  if (!template?.email_template_items) return 0;
+  if (!template?.email_template_items) return 0
 
-  return template.email_template_items.filter(item => {
+  return template.email_template_items.filter((item) => {
     // Exclude event announcements
-    if (item.category === 'event_announcements') return false;
+    if (item.category === 'event_announcements') return false
 
     // Exclude event-wide trigger types
-    if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false;
+    if (EVENT_WIDE_TRIGGERS.includes(item.trigger_type)) return false
 
-    return true;
-  }).length;
-};
+    return true
+  }).length
+}
 
 /**
  * Step4AutoMessages - Email sequence configuration
@@ -217,112 +223,111 @@ export default function Step4AutoMessages({
   eventDate,
   applicationDeadline,
   paymentDeadline,
-  isAdmin
+  isAdmin,
 }: Step4AutoMessagesProps) {
-  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false);
-  const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null);
-  const [isSequenceListModalOpen, setIsSequenceListModalOpen] = useState(false);
-  const [sequenceListType, setSequenceListType] = useState<'event' | 'category' | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null);
-  const [allTemplates, setAllTemplates] = useState<EmailCampaignTemplate[]>([]);
-  const [universalTemplate, setUniversalTemplate] = useState<EmailCampaignTemplate | null>(null);
-  const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false)
+  const [previewEmail, setPreviewEmail] = useState<EmailTemplateItem | null>(null)
+  const [isSequenceListModalOpen, setIsSequenceListModalOpen] = useState(false)
+  const [sequenceListType, setSequenceListType] = useState<'event' | 'category' | null>(null)
+  const [selectedTemplate, setSelectedTemplate] = useState<EmailCampaignTemplate | null>(null)
+  const [allTemplates, setAllTemplates] = useState<EmailCampaignTemplate[]>([])
+  const [universalTemplate, setUniversalTemplate] = useState<EmailCampaignTemplate | null>(null)
+  const [emailItems, setEmailItems] = useState<EmailTemplateItem[]>([])
+  const [loading, setLoading] = useState(true)
 
   // Check which categories have category-specific templates
   // In new architecture, categories have email_campaign_template_id pointing to their template
   // If no template assigned, fall back to universal template (default category template)
-  const categoryTemplatesAvailable = eventCategories.map(cat => {
+  const categoryTemplatesAvailable = eventCategories.map((cat) => {
     const categoryTemplate = cat.email_campaign_template_id
-      ? allTemplates.find(t => t.id === cat.email_campaign_template_id)
-      : null;
+      ? allTemplates.find((t) => t.id === cat.email_campaign_template_id)
+      : null
 
     // Fall back to universal template if no category-specific template
-    const template = categoryTemplate || universalTemplate;
+    const template = categoryTemplate || universalTemplate
 
     return {
       category: cat,
       hasTemplate: !!categoryTemplate, // True only if category has its own template
-      template
-    };
-  });
+      template,
+    }
+  })
 
   useEffect(() => {
-    fetchTemplates();
-  }, []);
+    fetchTemplates()
+  }, [])
 
   const fetchTemplates = async () => {
     try {
-      setLoading(true);
-      const templates = await emailCampaignTemplatesApi.getAll();
-      setAllTemplates(templates);
+      setLoading(true)
+      const templates = await emailCampaignTemplatesApi.getAll()
+      setAllTemplates(templates)
 
       // Find and set universal template (prefer is_universal, fall back to first category template)
-      const universal = templates.find((t) => t.template_type === 'category' && t.is_universal === true)
-        || templates.find((t) => t.template_type === 'category');
+      const universal =
+        templates.find((t) => t.template_type === 'category' && t.is_universal === true) ||
+        templates.find((t) => t.template_type === 'category')
       if (universal) {
-        setUniversalTemplate(universal);
+        setUniversalTemplate(universal)
         // Initialize universal template ID in parent if not set
         if (onUniversalCategoryTemplateIdChange && !universalCategoryTemplateId) {
-          onUniversalCategoryTemplateIdChange(universal.id);
+          onUniversalCategoryTemplateIdChange(universal.id)
         }
       }
 
-      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'generic');
+      const defaultTemplate = templates.find((t) => t.is_default && t.template_type === 'generic')
       if (defaultTemplate) {
-        const fullTemplate = await emailCampaignTemplatesApi.getById(defaultTemplate.id);
-        setSelectedTemplate(fullTemplate);
-        setEmailItems(fullTemplate.email_template_items || []);
+        const fullTemplate = await emailCampaignTemplatesApi.getById(defaultTemplate.id)
+        setSelectedTemplate(fullTemplate)
+        setEmailItems(fullTemplate.email_template_items || [])
 
         if (onTemplateSelect && !selectedTemplateId) {
-          onTemplateSelect(fullTemplate.id);
+          onTemplateSelect(fullTemplate.id)
         }
       }
     } catch (err) {
-      console.error('Failed to fetch templates:', err);
+      console.error('Failed to fetch templates:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleTemplateChange = async (templateId: number) => {
-    const template = allTemplates.find((t) => t.id === templateId);
-    if (!template) return;
+    const template = allTemplates.find((t) => t.id === templateId)
+    if (!template) return
 
     try {
-      setLoading(true);
-      const fullTemplate = await emailCampaignTemplatesApi.getById(template.id);
-      setSelectedTemplate(fullTemplate);
-      setEmailItems(fullTemplate.email_template_items || []);
+      setLoading(true)
+      const fullTemplate = await emailCampaignTemplatesApi.getById(template.id)
+      setSelectedTemplate(fullTemplate)
+      setEmailItems(fullTemplate.email_template_items || [])
 
       if (onTemplateSelect) {
-        onTemplateSelect(fullTemplate.id);
+        onTemplateSelect(fullTemplate.id)
       }
     } catch (err) {
-      console.error('Failed to fetch template:', err);
+      console.error('Failed to fetch template:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handlePreviewEmail = (email: EmailTemplateItem) => {
-    setPreviewEmail(email);
-    setIsPreviewModalOpen(true);
-  };
+    setPreviewEmail(email)
+    setIsPreviewModalOpen(true)
+  }
 
   const handleOpenSequenceList = (type: 'event' | 'category') => {
-    setSequenceListType(type);
-    setIsSequenceListModalOpen(true);
-  };
+    setSequenceListType(type)
+    setIsSequenceListModalOpen(true)
+  }
 
   return (
     <div className="space-y-4">
       <div className="glass-card rounded-2xl p-5 lg:p-6">
         {/* Header */}
         <div className="mb-4">
-          <h2 className="text-xl font-bold text-foreground mb-1">
-            Email Customization
-          </h2>
+          <h2 className="text-xl font-bold text-foreground mb-1">Email Customization</h2>
           <p className="text-sm text-foreground/60">
             Configure automated emails for your event and applicant communications.
           </p>
@@ -337,7 +342,7 @@ export default function Step4AutoMessages({
 
           <div className="space-y-2">
             {allTemplates
-              .filter(t => t.template_type === 'generic')
+              .filter((t) => t.template_type === 'generic')
               .map((template) => (
                 <label
                   key={template.id}
@@ -366,9 +371,9 @@ export default function Step4AutoMessages({
                       </div>
                       <button
                         onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleOpenSequenceList('event');
+                          e.preventDefault()
+                          e.stopPropagation()
+                          handleOpenSequenceList('event')
                         }}
                         className="flex items-center gap-1 px-2 py-1 rounded text-[10px] text-blue-950 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-200 hover:bg-blue-500/10 transition-all border border-blue-500/30"
                       >
@@ -396,7 +401,9 @@ export default function Step4AutoMessages({
         {/* Category Email Strategy - Only show if event has categories */}
         {eventCategories.length > 0 && selectedTemplate && universalTemplate && (
           <div className="voxxy-surface-subtle mb-4 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-foreground mb-2">Applicant Category Sequences</h3>
+            <h3 className="text-sm font-semibold text-foreground mb-2">
+              Applicant Category Sequences
+            </h3>
             <p className="text-xs text-foreground/50 mb-3">
               Applicant emails during application, payment, and countdown phases
             </p>
@@ -415,15 +422,17 @@ export default function Step4AutoMessages({
                   name="category-strategy"
                   checked={useUniversalCategoryTemplate}
                   onChange={() => {
-                    onUseUniversalCategoryTemplateChange?.(true);
-                    onUseCategoryTemplatesChange?.(false);
+                    onUseUniversalCategoryTemplateChange?.(true)
+                    onUseCategoryTemplatesChange?.(false)
                   }}
                   className="mt-0.5 w-4 h-4 border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm font-medium text-foreground">Universal Sequence</span>
+                      <span className="text-sm font-medium text-foreground">
+                        Universal Sequence
+                      </span>
                       <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold bg-primary/20 text-violet-950 dark:text-primary">
                         DEFAULT
                       </span>
@@ -433,9 +442,9 @@ export default function Step4AutoMessages({
                     </div>
                     <button
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleOpenSequenceList('category');
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleOpenSequenceList('category')
                       }}
                       className="flex items-center gap-1 rounded border border-primary/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-primary/10 hover:text-violet-950 dark:text-primary dark:hover:text-primary"
                     >
@@ -444,7 +453,8 @@ export default function Step4AutoMessages({
                     </button>
                   </div>
                   <p className="text-xs text-foreground/50 mt-1">
-                    Same content for all applicants • Simplifies management when content doesn't need to vary by category
+                    Same content for all applicants • Simplifies management when content doesn't
+                    need to vary by category
                   </p>
 
                   {useUniversalCategoryTemplate && (
@@ -453,7 +463,9 @@ export default function Step4AutoMessages({
                         {universalTemplate.name}
                       </div>
                       <div className="text-[10px] text-violet-800/75 dark:text-primary/70">
-                        {universalTemplate?.email_count || 0} emails • Shared by all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'}
+                        {universalTemplate?.email_count || 0} emails • Shared by all{' '}
+                        {eventCategories.length}{' '}
+                        {eventCategories.length === 1 ? 'category' : 'categories'}
                       </div>
                     </div>
                   )}
@@ -473,8 +485,8 @@ export default function Step4AutoMessages({
                   name="category-strategy"
                   checked={!useUniversalCategoryTemplate}
                   onChange={() => {
-                    onUseUniversalCategoryTemplateChange?.(false);
-                    onUseCategoryTemplatesChange?.(true);
+                    onUseUniversalCategoryTemplateChange?.(false)
+                    onUseCategoryTemplatesChange?.(true)
                   }}
                   className="mt-0.5 w-4 h-4 border-border bg-background/10 text-primary focus:ring-primary focus:ring-offset-0"
                 />
@@ -485,20 +497,25 @@ export default function Step4AutoMessages({
                         Category-Specific Sequences
                       </span>
                       <span className="text-[10px] text-foreground/40">
-                        ({(() => {
+                        (
+                        {(() => {
                           // Calculate total emails across all categories
-                          const totalEmails = categoryTemplatesAvailable.reduce((sum, { template }) => {
-                            return sum + (template?.email_count || 0);
-                          }, 0);
-                          return totalEmails;
-                        })()} total emails)
+                          const totalEmails = categoryTemplatesAvailable.reduce(
+                            (sum, { template }) => {
+                              return sum + (template?.email_count || 0)
+                            },
+                            0,
+                          )
+                          return totalEmails
+                        })()}{' '}
+                        total emails)
                       </span>
                     </div>
                     <button
                       onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handleOpenSequenceList('category');
+                        e.preventDefault()
+                        e.stopPropagation()
+                        handleOpenSequenceList('category')
                       }}
                       className="flex items-center gap-1 rounded border border-primary/30 px-2 py-1 text-[10px] text-violet-900 transition-all hover:bg-primary/10 hover:text-violet-950 dark:text-primary dark:hover:text-primary"
                     >
@@ -552,7 +569,9 @@ export default function Step4AutoMessages({
         ) : !selectedTemplate ? (
           /* No Template Selected */
           <div className="voxxy-surface-subtle text-center rounded-lg py-12">
-            <p className="text-foreground/50 text-sm">No template selected. Select an Event Sequence above to continue.</p>
+            <p className="text-foreground/50 text-sm">
+              No template selected. Select an Event Sequence above to continue.
+            </p>
           </div>
         ) : null}
       </div>
@@ -562,8 +581,8 @@ export default function Step4AutoMessages({
         <TemplatePreviewModal
           isOpen={isPreviewModalOpen}
           onClose={() => {
-            setIsPreviewModalOpen(false);
-            setPreviewEmail(null);
+            setIsPreviewModalOpen(false)
+            setPreviewEmail(null)
           }}
           template={{
             name: previewEmail.name,
@@ -582,16 +601,22 @@ export default function Step4AutoMessages({
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${sequenceListType === 'event' ? 'bg-blue-400' : 'bg-primary'}`} />
+                  <div
+                    className={`w-2 h-2 rounded-full ${sequenceListType === 'event' ? 'bg-blue-400' : 'bg-primary'}`}
+                  />
                   <h3 className="text-lg font-semibold text-foreground">
-                    {sequenceListType === 'event' ? 'Event-Wide Emails' : 'Applicant Category Emails'}
+                    {sequenceListType === 'event'
+                      ? 'Event-Wide Emails'
+                      : 'Applicant Category Emails'}
                   </h3>
                   <span className="text-sm text-foreground/40">
-                    ({sequenceListType === 'event'
+                    (
+                    {sequenceListType === 'event'
                       ? emailItems.length
                       : useUniversalCategoryTemplate
-                        ? (universalTemplate?.email_count || 0)
-                        : (universalTemplate?.email_count || 0) * eventCategories.length} emails)
+                        ? universalTemplate?.email_count || 0
+                        : (universalTemplate?.email_count || 0) * eventCategories.length}{' '}
+                    emails)
                   </span>
                 </div>
                 <button
@@ -599,7 +624,12 @@ export default function Step4AutoMessages({
                   className="text-foreground/60 hover:text-foreground transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M6 18L18 6M6 6l12 12"
+                    />
                   </svg>
                 </button>
               </div>
@@ -618,14 +648,16 @@ export default function Step4AutoMessages({
                         email.trigger_value ?? null,
                         eventDate,
                         applicationDeadline,
-                        paymentDeadline
-                      );
+                        paymentDeadline,
+                      )
                       return (
                         <div
                           key={email.id}
                           className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                         >
-                          <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
+                          <span className="text-xs text-foreground/40 font-mono w-6">
+                            {index + 1}.
+                          </span>
                           <Mail className="w-3.5 h-3.5 text-blue-400/60 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
                             <div className="text-sm text-foreground font-medium">{email.name}</div>
@@ -635,7 +667,7 @@ export default function Step4AutoMessages({
                             </div>
                           </div>
                         </div>
-                      );
+                      )
                     })}
                 </div>
               ) : (
@@ -645,7 +677,8 @@ export default function Step4AutoMessages({
                     // Universal template - show once
                     <div>
                       <div className="mb-2 px-1 text-xs font-medium text-violet-900 dark:text-primary">
-                        {universalTemplate?.name} (sent to all {eventCategories.length} {eventCategories.length === 1 ? 'category' : 'categories'})
+                        {universalTemplate?.name} (sent to all {eventCategories.length}{' '}
+                        {eventCategories.length === 1 ? 'category' : 'categories'})
                       </div>
                       <div className="space-y-1">
                         {universalTemplate?.email_template_items
@@ -656,40 +689,52 @@ export default function Step4AutoMessages({
                               email.trigger_value ?? null,
                               eventDate,
                               applicationDeadline,
-                              paymentDeadline
-                            );
+                              paymentDeadline,
+                            )
                             return (
                               <div
                                 key={email.id}
                                 className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                               >
-                                <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
+                                <span className="text-xs text-foreground/40 font-mono w-6">
+                                  {index + 1}.
+                                </span>
                                 <Mail className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
                                 <div className="flex-1 min-w-0">
-                                  <div className="text-sm text-foreground font-medium">{email.name}</div>
+                                  <div className="text-sm text-foreground font-medium">
+                                    {email.name}
+                                  </div>
                                   <div className="text-xs text-foreground/50 mt-0.5">
-                                    {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
+                                    {getTriggerLabel(
+                                      email.trigger_type,
+                                      email.trigger_value ?? null,
+                                    )}
                                     {sendDate && ` • ${sendDate}`}
                                   </div>
                                 </div>
                               </div>
-                            );
+                            )
                           })}
                       </div>
                     </div>
                   ) : (
                     // Category-specific - show per category
-                    eventCategories.map(cat => {
+                    eventCategories.map((cat) => {
                       const template = cat.email_campaign_template_id
-                        ? allTemplates.find(t => t.id === cat.email_campaign_template_id)
-                        : universalTemplate;
+                        ? allTemplates.find((t) => t.id === cat.email_campaign_template_id)
+                        : universalTemplate
 
                       return (
                         <div key={cat.id}>
                           <div className="mb-2 flex items-center gap-2 px-1 text-xs font-medium text-violet-900 dark:text-primary">
-                            <span>{cat.icon && `${cat.icon} `}{cat.name}</span>
+                            <span>
+                              {cat.icon && `${cat.icon} `}
+                              {cat.name}
+                            </span>
                             <span className="text-foreground/30">→</span>
-                            <span className="text-foreground/50">{template?.name || 'Default'}</span>
+                            <span className="text-foreground/50">
+                              {template?.name || 'Default'}
+                            </span>
                           </div>
                           <div className="space-y-1">
                             {template?.email_template_items
@@ -700,28 +745,35 @@ export default function Step4AutoMessages({
                                   email.trigger_value ?? null,
                                   eventDate,
                                   applicationDeadline,
-                                  paymentDeadline
-                                );
+                                  paymentDeadline,
+                                )
                                 return (
                                   <div
                                     key={email.id}
                                     className="flex items-center gap-3 rounded-lg border border-border bg-card/80 p-3 transition-all hover:bg-accent/60 dark:bg-background/10 dark:hover:bg-background/15"
                                   >
-                                    <span className="text-xs text-foreground/40 font-mono w-6">{index + 1}.</span>
+                                    <span className="text-xs text-foreground/40 font-mono w-6">
+                                      {index + 1}.
+                                    </span>
                                     <Mail className="w-3.5 h-3.5 text-primary/60 flex-shrink-0" />
                                     <div className="flex-1 min-w-0">
-                                      <div className="text-sm text-foreground font-medium">{email.name}</div>
+                                      <div className="text-sm text-foreground font-medium">
+                                        {email.name}
+                                      </div>
                                       <div className="text-xs text-foreground/50 mt-0.5">
-                                        {getTriggerLabel(email.trigger_type, email.trigger_value ?? null)}
+                                        {getTriggerLabel(
+                                          email.trigger_type,
+                                          email.trigger_value ?? null,
+                                        )}
                                         {sendDate && ` • ${sendDate}`}
                                       </div>
                                     </div>
                                   </div>
-                                );
+                                )
                               })}
                           </div>
                         </div>
-                      );
+                      )
                     })
                   )}
                 </div>
@@ -754,5 +806,5 @@ export default function Step4AutoMessages({
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

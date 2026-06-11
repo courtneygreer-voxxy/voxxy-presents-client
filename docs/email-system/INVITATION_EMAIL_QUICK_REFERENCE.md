@@ -11,6 +11,7 @@
 **Position 1 ("Initial Invitation")** is the email sent when invitations are created.
 
 It's a **real ScheduledEmail** (not virtual) that:
+
 - Uses `on_invitation_send` trigger
 - Is in the pre_application category
 - Can be edited like any other email
@@ -33,6 +34,7 @@ It's a **real ScheduledEmail** (not virtual) that:
 ## What Variables CAN Be Used (34 total)
 
 ### ✅ Event Variables (14/15)
+
 ```
 [eventName]              → "Summer Market 2025"
 [eventDate]              → "Saturday, June 15, 2025"
@@ -51,12 +53,14 @@ It's a **real ScheduledEmail** (not virtual) that:
 ```
 
 ### ✅ Organization Variables (2/2)
+
 ```
 [organizationName]       → "Voxxy Presents"
 [organizationEmail]      → "hello@voxxypresents.com"
 ```
 
 ### ✅ Vendor Contact Variables (10/19)
+
 ```
 [greetingName]           → "John's Tacos" or "John" (smart!)
 [firstName]              → "John"
@@ -71,6 +75,7 @@ It's a **real ScheduledEmail** (not virtual) that:
 ```
 
 ### ✅ Link Variables (3/4)
+
 ```
 [eventLink]              → Public event page URL (main hub)
 [eventPortalLink]        → Vendor portal URL
@@ -84,6 +89,7 @@ It's a **real ScheduledEmail** (not virtual) that:
 ## What Variables CAN'T Be Used (14 total)
 
 ### ❌ Category-Specific (Don't use!)
+
 ```
 [boothPrice]             ❌ Unknown until they pick category
 [installDate]            ❌ Varies by category
@@ -95,6 +101,7 @@ It's a **real ScheduledEmail** (not virtual) that:
 ```
 
 ### ❌ Registration-Level (Don't use!)
+
 ```
 [vendorCategory]         ❌ They haven't applied yet
 [boothNumber]            ❌ Not assigned yet
@@ -124,6 +131,7 @@ Apply here: [eventLink]
 ```
 
 **Result:**
+
 ```
 Hi John's Tacos,
 
@@ -152,6 +160,7 @@ Hi [greetingName], excited to invite you to [eventName]!
 ```
 
 **Results:**
+
 - Business name: "Hi John's Tacos, excited to..."
 - First name only: "Hi John, excited to..."
 - No name: "Hi there, excited to..."
@@ -198,6 +207,7 @@ Apply now: [eventLink]
 ## Solution for Multi-Category Events
 
 ### ✅ Option 1: Use [categoryList] Variable (BEST)
+
 ```
 Hi [greetingName],
 
@@ -212,6 +222,7 @@ Deadline: [applicationDeadline]
 ```
 
 ### ✅ Option 2: Direct Application Links in [categoryList]
+
 ```
 Hi [greetingName],
 
@@ -223,6 +234,7 @@ View full event details: [eventLink]
 ```
 
 ### ✅ Option 3: Generic Language
+
 ```
 Hi [greetingName],
 
@@ -241,15 +253,18 @@ Learn more and apply: [eventLink]
 **File:** `/app/services/invitation_variable_resolver.rb`
 
 **What it has access to:**
+
 - `event` - Full event record
 - `vendor_contact` - Contact being invited
 - `event.vendor_applications` - Public application info
 
 **What it resolves:**
+
 - ✅ 34 variables (see above lists)
 - ❌ 14 variables (post-application only)
 
 **Example:**
+
 ```ruby
 resolver = InvitationVariableResolver.new(event, vendor_contact)
 subject = resolver.resolve("[greetingName], join us at [eventName]!")
@@ -261,21 +276,23 @@ subject = resolver.resolve("[greetingName], join us at [eventName]!")
 ## Key Files
 
 ### Frontend
-| File | Purpose |
-|------|---------|
-| `/src/utils/emailVariables.ts` | All 48 variables with `worksInInvitations` flags |
-| `/src/types/email.ts` | EmailDelivery type (has `event_invitation_id`) |
-| `/src/components/producer/Email/EmailAutomationTab.tsx` | Mail tab showing emails |
-| `/src/services/api.ts` | EventInvitation API calls |
-| `/src/components/shared/EventEmailPreviewModal.tsx` | Preview modal |
+
+| File                                                    | Purpose                                          |
+| ------------------------------------------------------- | ------------------------------------------------ |
+| `/src/utils/emailVariables.ts`                          | All 48 variables with `worksInInvitations` flags |
+| `/src/types/email.ts`                                   | EmailDelivery type (has `event_invitation_id`)   |
+| `/src/components/producer/Email/EmailAutomationTab.tsx` | Mail tab showing emails                          |
+| `/src/services/api.ts`                                  | EventInvitation API calls                        |
+| `/src/components/shared/EventEmailPreviewModal.tsx`     | Preview modal                                    |
 
 ### Backend
-| File | Purpose |
-|------|---------|
-| `/app/services/invitation_variable_resolver.rb` | Resolves 34 invitation variables |
-| `/app/services/email_variable_resolver.rb` | Resolves all 48 registration variables |
-| `/app/controllers/api/v1/presents/event_invitations_controller.rb` | Handles batch invitation sends |
-| `/app/models/email_delivery.rb` | Tracks delivery with `event_invitation_id` |
+
+| File                                                               | Purpose                                    |
+| ------------------------------------------------------------------ | ------------------------------------------ |
+| `/app/services/invitation_variable_resolver.rb`                    | Resolves 34 invitation variables           |
+| `/app/services/email_variable_resolver.rb`                         | Resolves all 48 registration variables     |
+| `/app/controllers/api/v1/presents/event_invitations_controller.rb` | Handles batch invitation sends             |
+| `/app/models/email_delivery.rb`                                    | Tracks delivery with `event_invitation_id` |
 
 ---
 
@@ -339,6 +356,7 @@ A: Position 1 "Initial Invitation" is in the Mail tab. Invitations are tracked s
 
 **Q: How does the backend know what to put in variables?**
 A: InvitationVariableResolver uses:
+
 - event_invitation object (has vendor_contact)
 - vendor_contact data (first_name, last_name, email, business_name)
 - event data (title, date, location, etc.)
@@ -368,6 +386,7 @@ A: Yes - click Preview on Position 1 email in Mail tab.
 ## Recommended Practices
 
 ### ✅ DO
+
 - Use [greetingName] to personalize
 - Include [eventLink] for call-to-action
 - List all categories/prices if multi-category
@@ -375,6 +394,7 @@ A: Yes - click Preview on Position 1 email in Mail tab.
 - Preview before sending
 
 ### ❌ DON'T
+
 - Use [boothPrice] (unknown at invitation time)
 - Use [installDate] (category-specific)
 - Assume vendor_category is known
@@ -386,8 +406,8 @@ A: Yes - click Preview on Position 1 email in Mail tab.
 ## What's Coming
 
 Planned enhancements:
+
 - [ ] [categoryList] variable (shows all categories with prices)
 - [ ] [applicationsList] variable (for registrations)
 - [ ] Invite-specific preview (select vendor contact)
 - [ ] [invitationTokenLink] for direct accept/decline
-

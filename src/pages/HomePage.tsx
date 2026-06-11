@@ -1,16 +1,16 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Link } from "react-router-dom"
-import { useAuth } from "@/hooks/useAuth"
-import { usePageTracking } from "@/hooks/usePageTracking"
-import { useSectionTracking } from "@/hooks/useSectionTracking"
-import { TrackedLink } from "@/components/analytics/TrackedLink"
-import { TrackedButton } from "@/components/analytics/TrackedButton"
-import { analytics } from "@/lib/analytics"
-import { useFormTracking } from "@/hooks/useFormTracking"
+import { Link } from 'react-router-dom'
+import { useAuth } from '@/hooks/useAuth'
+import { usePageTracking } from '@/hooks/usePageTracking'
+import { useSectionTracking } from '@/hooks/useSectionTracking'
+import { TrackedLink } from '@/components/analytics/TrackedLink'
+import { TrackedButton } from '@/components/analytics/TrackedButton'
+import { analytics } from '@/lib/analytics'
+import { useFormTracking } from '@/hooks/useFormTracking'
 import { useForceTheme } from '@/hooks/useForceTheme'
-import Navigation from "@/components/Navigation"
-import Footer from "@/components/Footer"
-import { ArrowRight, CheckCircle, Mail, MessageCircle, Instagram } from "lucide-react"
+import Navigation from '@/components/Navigation'
+import Footer from '@/components/Footer'
+import { ArrowRight, CheckCircle, Mail, MessageCircle, Instagram } from 'lucide-react'
 
 // Inline types and API for contact form
 interface CreateContactSubmissionData {
@@ -39,13 +39,13 @@ const contactFormApi = {
     const response = await fetch(`${API_BASE_URL}/contact_submissions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contact_submission: data })
+      body: JSON.stringify({ contact_submission: data }),
     })
     if (!response.ok) {
       throw new EmailServiceError('Failed to submit contact form')
     }
     return response.json()
-  }
+  },
 }
 
 interface ContactFormData {
@@ -73,7 +73,7 @@ export default function HomePage() {
 
       window.scrollTo({
         top: offsetPosition,
-        behavior: 'smooth'
+        behavior: 'smooth',
       })
     }
   }, [])
@@ -122,7 +122,7 @@ export default function HomePage() {
     name: '',
     email: '',
     eventName: '',
-    message: ''
+    message: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -134,7 +134,7 @@ export default function HomePage() {
       setFormStarted(true)
       contactFormTracking.trackFormStart('cta_form')
     }
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -156,7 +156,7 @@ export default function HomePage() {
         email: formData.email,
         organizationName: formData.eventName || undefined,
         description: formData.message,
-        source: 'home_page_cta'
+        source: 'home_page_cta',
       }
 
       await contactFormApi.submitForm(submissionData)
@@ -167,14 +167,18 @@ export default function HomePage() {
         conversion_stage: 'submitted',
         profile_confidence: 'high',
       })
-
     } catch (error) {
       console.error('Contact form submission failed:', error)
-      contactFormTracking.trackFormError('submission', error instanceof Error ? error.message : 'Unknown error')
+      contactFormTracking.trackFormError(
+        'submission',
+        error instanceof Error ? error.message : 'Unknown error',
+      )
       if (error instanceof EmailServiceError) {
         setSubmissionError(`Failed to submit: ${error.message}`)
       } else {
-        setSubmissionError('An unexpected error occurred. Please try again or email us at team@heyvoxxy.com')
+        setSubmissionError(
+          'An unexpected error occurred. Please try again or email us at team@heyvoxxy.com',
+        )
       }
     } finally {
       setIsSubmitting(false)
@@ -186,7 +190,10 @@ export default function HomePage() {
       <Navigation activePage="home" />
 
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 pt-32 pb-20">
+      <section
+        ref={heroRef}
+        className="relative min-h-screen flex flex-col justify-center px-6 md:px-12 pt-32 pb-20"
+      >
         <div className="absolute inset-0 bg-gradient-radial from-voxxy-pink/12 via-voxxy-purple-brand/8 to-transparent opacity-60"></div>
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
@@ -195,15 +202,21 @@ export default function HomePage() {
             <div>
               <div className="inline-flex items-center gap-2 bg-voxxy-pink/15 border border-voxxy-pink/25 px-4 py-1.5 rounded-full mb-6">
                 <div className="w-2 h-2 rounded-full bg-green-400 shadow-glow"></div>
-                <span className="text-[13px] font-semibold text-primary">Now Live — Accepting Event Producers</span>
+                <span className="text-[13px] font-semibold text-primary">
+                  Now Live — Accepting Event Producers
+                </span>
               </div>
 
               <h1 className="mb-5 text-[52px] font-display font-bold leading-[1.1] tracking-tight text-white md:text-[56px]">
-                The Operating System for <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">Recurring Event Producers</em>
+                The Operating System for{' '}
+                <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
+                  Recurring Event Producers
+                </em>
               </h1>
 
               <p className="mb-9 max-w-[500px] text-[18px] leading-relaxed text-white/68">
-                Manage vendor applications, automate communications, and grow your events — all from one platform. Built for art shows, markets, and pop-ups that happen more than once.
+                Manage vendor applications, automate communications, and grow your events — all from
+                one platform. Built for art shows, markets, and pop-ups that happen more than once.
               </p>
 
               <div className="flex gap-4 flex-wrap">
@@ -213,7 +226,7 @@ export default function HomePage() {
                     button_text: 'Request Access',
                     button_location: 'hero',
                     page_name: 'Home',
-                    is_primary_cta: true
+                    is_primary_cta: true,
                   }}
                   asChild
                 >
@@ -227,13 +240,11 @@ export default function HomePage() {
                     button_text: 'See How It Works',
                     button_location: 'hero',
                     page_name: 'Home',
-                    is_primary_cta: false
+                    is_primary_cta: false,
                   }}
                   asChild
                 >
-                  <Link to="/features">
-                    See How It Works
-                  </Link>
+                  <Link to="/features">See How It Works</Link>
                 </TrackedButton>
               </div>
             </div>
@@ -246,7 +257,9 @@ export default function HomePage() {
                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
                   <div className="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                   <div className="flex gap-1 ml-auto">
-                    <div className="px-3 py-1 bg-voxxy-purple-brand text-primary-foreground text-[11px] rounded-md font-medium">Events</div>
+                    <div className="px-3 py-1 bg-voxxy-purple-brand text-primary-foreground text-[11px] rounded-md font-medium">
+                      Events
+                    </div>
                     <div className="rounded-md px-3 py-1 text-[11px] text-white/40">Vendors</div>
                     <div className="rounded-md px-3 py-1 text-[11px] text-white/40">Messages</div>
                   </div>
@@ -267,35 +280,49 @@ export default function HomePage() {
       <section ref={problemsRef} className="bg-[#faf9fc] py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">The Problem</div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">Event coordination is broken</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">
+              The Problem
+            </div>
+            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">
+              Event coordination is broken
+            </h2>
             <p className="text-[18px] text-gray-600 max-w-[600px]">
-              The bigger your event calendar grows, the more coordination eats your time — and your margins.
+              The bigger your event calendar grows, the more coordination eats your time — and your
+              margins.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className={problemCardClass}>
               <div className={problemIconClass}>📧</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">5–7 Tools, Zero Visibility</h3>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
+                5–7 Tools, Zero Visibility
+              </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                You're chasing vendors across email, text, Instagram DMs, WhatsApp, and spreadsheets. Critical details get buried. Deadlines slip.
+                You're chasing vendors across email, text, Instagram DMs, WhatsApp, and
+                spreadsheets. Critical details get buried. Deadlines slip.
               </p>
             </div>
 
             <div className={problemCardClass}>
               <div className={problemIconClass}>⏱️</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">Hours of Unpaid Coordination</h3>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
+                Hours of Unpaid Coordination
+              </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                Every event eats hours of back-and-forth that doesn't scale. Your calendar grows, but your coordination workflow stays manual.
+                Every event eats hours of back-and-forth that doesn't scale. Your calendar grows,
+                but your coordination workflow stays manual.
               </p>
             </div>
 
             <div className={problemCardClass}>
               <div className={problemIconClass}>📋</div>
-              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">200+ Applications, No Way to Compare</h3>
+              <h3 className="mb-3 text-[20px] font-display font-bold text-slate-950">
+                200+ Applications, No Way to Compare
+              </h3>
               <p className="text-[15px] leading-relaxed text-slate-600">
-                You're scrolling social profiles one by one. Great vendors get lost in the pile. By application 80, you're approving on fatigue.
+                You're scrolling social profiles one by one. Great vendors get lost in the pile. By
+                application 80, you're approving on fatigue.
               </p>
             </div>
           </div>
@@ -306,19 +333,28 @@ export default function HomePage() {
       <section ref={featuresRef} className="py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-pink mb-4">The Platform</div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">One place for everything</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-pink mb-4">
+              The Platform
+            </div>
+            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">
+              One place for everything
+            </h2>
             <p className="max-w-[600px] text-[18px] text-white/60">
-              Replace disconnected tools with a single platform built for how you actually run events.
+              Replace disconnected tools with a single platform built for how you actually run
+              events.
             </p>
           </div>
 
           {/* Feature Block 1 */}
           <div className="mb-16 grid items-center gap-16 border-b border-white/10 pb-16 md:grid-cols-2">
             <div>
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">Automated emails that keep vendors in the loop</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">
+                Automated emails that keep vendors in the loop
+              </h3>
               <p className="mb-5 text-[16px] leading-relaxed text-white/60">
-                Application confirmations, approval notices, payment reminders, event-day details — all sent automatically from one branded email thread. Vendors always know where they stand. You never have to write the same email twice.
+                Application confirmations, approval notices, payment reminders, event-day details —
+                all sent automatically from one branded email thread. Vendors always know where they
+                stand. You never have to write the same email twice.
               </p>
               <div className="flex gap-2 flex-wrap">
                 <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
@@ -343,14 +379,24 @@ export default function HomePage() {
           {/* Feature Block 2 - Reversed */}
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="md:order-2">
-              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">Vendor relationships that compound</h3>
+              <h3 className="mb-4 text-[28px] font-display font-bold leading-tight text-white">
+                Vendor relationships that compound
+              </h3>
               <p className="mb-5 text-[16px] leading-relaxed text-white/60">
-                Stop rebuilding your vendor list from scratch every season. Track performance, notes, tags, and ratings across all your events. Your best vendors are always one search away.
+                Stop rebuilding your vendor list from scratch every season. Track performance,
+                notes, tags, and ratings across all your events. Your best vendors are always one
+                search away.
               </p>
               <div className="flex gap-2 flex-wrap">
-                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">Vendor CRM</span>
-                <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">Performance Tracking</span>
-                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">CSV Import</span>
+                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">
+                  Vendor CRM
+                </span>
+                <span className="rounded-full border border-primary/20 bg-primary/15 px-3.5 py-1.5 text-[12px] font-semibold text-white/80">
+                  Performance Tracking
+                </span>
+                <span className="rounded-full border border-fuchsia-400/20 bg-voxxy-pink/15 px-3.5 py-1.5 text-[12px] font-semibold text-fuchsia-100">
+                  CSV Import
+                </span>
               </div>
             </div>
             <div className="md:order-1">
@@ -371,7 +417,7 @@ export default function HomePage() {
                 link_text: 'See All Features',
                 destination_page: 'Features',
                 current_page: 'Home',
-                link_position: 'features_section'
+                link_position: 'features_section',
               }}
             >
               See All Features <ArrowRight className="ml-2 h-5 w-5" />
@@ -384,33 +430,53 @@ export default function HomePage() {
       <section className="bg-[#faf9fc] py-[100px] px-6 md:px-12">
         <div className="container mx-auto max-w-[1200px]">
           <div className="mb-14 text-center">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">How It Works</div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">Live in minutes, not months</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-brand mb-4">
+              How It Works
+            </div>
+            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-slate-950">
+              Live in minutes, not months
+            </h2>
             <p className="text-[18px] text-gray-600 max-w-[600px] mx-auto">
-              No enterprise onboarding. No implementation timeline. You can be running your next event through Voxxy today.
+              No enterprise onboarding. No implementation timeline. You can be running your next
+              event through Voxxy today.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-voxxy-pink text-2xl font-display font-bold text-white">1</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Build your network</h3>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-primary to-voxxy-pink text-2xl font-display font-bold text-white">
+                1
+              </div>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
+                Build your network
+              </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Import vendor contacts via CSV or add them manually. Organize with categories, tags, and smart lists to keep your roster ready.
+                Import vendor contacts via CSV or add them manually. Organize with categories, tags,
+                and smart lists to keep your roster ready.
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-voxxy-pink to-pink-500 text-2xl font-display font-bold text-white">2</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Launch your event</h3>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-voxxy-pink to-pink-500 text-2xl font-display font-bold text-white">
+                2
+              </div>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
+                Launch your event
+              </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Create events, open applications, and review vendors in table or focused view. Set payment preferences per category.
+                Create events, open applications, and review vendors in table or focused view. Set
+                payment preferences per category.
               </p>
             </div>
             <div className="text-center">
-              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-primary text-2xl font-display font-bold text-white">3</div>
-              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">Automate everything</h3>
+              <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-pink-500 to-primary text-2xl font-display font-bold text-white">
+                3
+              </div>
+              <h3 className="mb-2.5 text-[20px] font-display font-bold text-slate-950">
+                Automate everything
+              </h3>
               <p className="text-[15px] text-gray-600 leading-relaxed">
-                Email sequences handle confirmations, reminders, and payments. Vendors access their own event portal. Your CRM grows with every show.
+                Email sequences handle confirmations, reminders, and payments. Vendors access their
+                own event portal. Your CRM grows with every show.
               </p>
             </div>
           </div>
@@ -423,20 +489,29 @@ export default function HomePage() {
 
         <div className="container mx-auto max-w-[1200px] relative z-10">
           <div className="mb-14">
-            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-light mb-4">Already Live</div>
-            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">Powering events across the country</h2>
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-purple-light mb-4">
+              Already Live
+            </div>
+            <h2 className="mb-4 text-[42px] font-display font-bold leading-tight text-white">
+              Powering events across the country
+            </h2>
             <p className="max-w-[600px] text-[18px] text-white/60">
-              From art shows in San Francisco to touring national events — Voxxy is where producers are moving their operations.
+              From art shows in San Francisco to touring national events — Voxxy is where producers
+              are moving their operations.
             </p>
           </div>
 
           <div className="grid items-center gap-12 rounded-2xl border border-voxxy-pink/15 bg-white/8 p-10 backdrop-blur-sm md:grid-cols-2">
             <div>
               <p className="mb-6 text-[20px] italic leading-relaxed text-white/85">
-                "We've grown from one market every other month to two markets a month with Voxxy. The automation freed us up to focus on bringing more vendors and revenue to Brooklyn. Game changer."
+                "We've grown from one market every other month to two markets a month with Voxxy.
+                The automation freed us up to focus on bringing more vendors and revenue to
+                Brooklyn. Game changer."
               </p>
               <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 text-[32px]">❤️</div>
+                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-white/10 text-[32px]">
+                  ❤️
+                </div>
                 <div>
                   <div className="font-bold text-white">Brooklyn Hearts Club</div>
                   <div className="text-[13px] text-white/50">Brooklyn art market series</div>
@@ -458,12 +533,15 @@ export default function HomePage() {
         <div className="container mx-auto max-w-[1200px]">
           {/* Header */}
           <div className="mb-12">
-            <div className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-white/60">TALK TO OUR TEAM</div>
+            <div className="mb-4 text-[11px] font-semibold uppercase tracking-wider text-white/60">
+              TALK TO OUR TEAM
+            </div>
             <h2 className="mb-4 text-[42px] font-display font-bold text-white md:text-[48px]">
               Your next event starts here
             </h2>
             <p className="max-w-[600px] text-[16px] text-white/60">
-              Tell us about your events and we'll get you set up. Real humans, fast responses, no sales funnel.
+              Tell us about your events and we'll get you set up. Real humans, fast responses, no
+              sales funnel.
             </p>
           </div>
 
@@ -472,9 +550,13 @@ export default function HomePage() {
             {/* Left Column - Contact Info */}
             <div className="space-y-8">
               <div>
-                <h3 className="mb-4 text-[24px] font-display font-bold text-white">Let's talk about your events</h3>
+                <h3 className="mb-4 text-[24px] font-display font-bold text-white">
+                  Let's talk about your events
+                </h3>
                 <p className="text-[15px] leading-relaxed text-white/60">
-                  Whether you're running 5 art markets a year or 50 pop-ups across the country, we'd love to hear what you're building. We respond to every message within 1–2 business days.
+                  Whether you're running 5 art markets a year or 50 pop-ups across the country, we'd
+                  love to hear what you're building. We respond to every message within 1–2 business
+                  days.
                 </p>
               </div>
 
@@ -485,8 +567,13 @@ export default function HomePage() {
                     <Mail className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
-                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">EMAIL</div>
-                    <a href="mailto:team@heyvoxxy.com" className="text-[15px] text-white transition-colors hover:text-fuchsia-300">
+                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                      EMAIL
+                    </div>
+                    <a
+                      href="mailto:team@heyvoxxy.com"
+                      className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
+                    >
                       team@heyvoxxy.com
                     </a>
                   </div>
@@ -497,8 +584,15 @@ export default function HomePage() {
                     <MessageCircle className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
-                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">COMMUNITY</div>
-                    <a href="https://discord.gg/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white transition-colors hover:text-fuchsia-300">
+                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                      COMMUNITY
+                    </div>
+                    <a
+                      href="https://discord.gg/voxxypresents"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
+                    >
                       Join our Discord
                     </a>
                   </div>
@@ -509,8 +603,15 @@ export default function HomePage() {
                     <Instagram className="w-5 h-5 text-voxxy-pink" />
                   </div>
                   <div>
-                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">SOCIAL</div>
-                    <a href="https://instagram.com/voxxypresents" target="_blank" rel="noopener noreferrer" className="text-[15px] text-white transition-colors hover:text-fuchsia-300">
+                    <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-white/40">
+                      SOCIAL
+                    </div>
+                    <a
+                      href="https://instagram.com/voxxypresents"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[15px] text-white transition-colors hover:text-fuchsia-300"
+                    >
                       @voxxypresents on Instagram
                     </a>
                   </div>
@@ -525,7 +626,9 @@ export default function HomePage() {
                   <div className="w-16 h-16 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full flex items-center justify-center mx-auto mb-6">
                     <CheckCircle className="h-8 w-8 text-green-300" />
                   </div>
-                  <h3 className="mb-4 text-[24px] font-bold text-white">Thanks for reaching out!</h3>
+                  <h3 className="mb-4 text-[24px] font-bold text-white">
+                    Thanks for reaching out!
+                  </h3>
                   <p className="mb-6 text-white/70">
                     We'll review your message and get back to you within 1-2 business days.
                   </p>
@@ -593,7 +696,10 @@ export default function HomePage() {
                     {/* Bottom Email Link */}
                     <p className="text-center text-[13px] text-white/50">
                       Or email us directly at{' '}
-                      <a href="mailto:team@heyvoxxy.com" className="text-white/70 underline transition-colors hover:text-fuchsia-300">
+                      <a
+                        href="mailto:team@heyvoxxy.com"
+                        className="text-white/70 underline transition-colors hover:text-fuchsia-300"
+                      >
                         team@heyvoxxy.com
                       </a>
                     </p>

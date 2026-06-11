@@ -1,7 +1,14 @@
 import React from 'react'
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { AlertTriangle, Loader } from "lucide-react"
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { AlertTriangle, Loader } from 'lucide-react'
 
 interface ConfirmationModalProps {
   isOpen: boolean
@@ -22,11 +29,11 @@ export function ConfirmationModal({
   onConfirm,
   title,
   description,
-  confirmText = "Confirm",
-  cancelText = "Cancel",
+  confirmText = 'Confirm',
+  cancelText = 'Cancel',
   isDestructive = false,
   isLoading = false,
-  children
+  children,
 }: ConfirmationModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -39,30 +46,21 @@ export function ConfirmationModal({
               </div>
             )}
             <div>
-              <DialogTitle className={isDestructive ? "text-red-900" : ""}>{title}</DialogTitle>
+              <DialogTitle className={isDestructive ? 'text-red-900' : ''}>{title}</DialogTitle>
               <DialogDescription className="mt-2">{description}</DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
-        {children && (
-          <div className="py-4">
-            {children}
-          </div>
-        )}
+        {children && <div className="py-4">{children}</div>}
 
         <DialogFooter className="gap-2 sm:gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            disabled={isLoading}
-          >
+          <Button type="button" variant="outline" onClick={onClose} disabled={isLoading}>
             {cancelText}
           </Button>
           <Button
             type="button"
-            variant={isDestructive ? "destructive" : "default"}
+            variant={isDestructive ? 'destructive' : 'default'}
             onClick={onConfirm}
             disabled={isLoading}
           >

@@ -15,6 +15,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ## ✅ Pre-Deployment Checklist
 
 ### Critical Paths Tested
+
 - [x] **Invites Tab** - Data merge logic working correctly
 - [x] **Applicants Tab** - Two-panel review workflow functional
 - [x] **Home Dashboard** - Stats and widgets displaying correctly
@@ -23,6 +24,7 @@ This staging build includes a major Command Center redesign with improved vendor
 - [x] **Category Management** - Dynamic category dropdowns working across tabs
 
 ### Build Status
+
 - [x] TypeScript compilation: ✅ PASSED
 - [x] Production build: ✅ PASSED
 - [x] Bundle size warnings: ⚠️ Some chunks >500KB (acceptable, not blocking)
@@ -32,6 +34,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ## 📦 What's Included in This Release
 
 ### 1. **New Home Dashboard** (Command Center)
+
 - **Location**: `src/components/producer/HomeDashboard.tsx`
 - **Features**:
   - Real-time stats cards: Total Invited, Applied, New/Unreviewed, Approved & Paid, Missing Payments
@@ -41,6 +44,7 @@ This staging build includes a major Command Center redesign with improved vendor
   - Quick copy links for Application Page and Vendor Portal
 
 ### 2. **Rebuilt Invites Tab**
+
 - **Location**: `src/components/producer/InvitesTab.tsx`
 - **Features**:
   - **Unified CRM table** merging event invitations and vendor applications
@@ -52,6 +56,7 @@ This staging build includes a major Command Center redesign with improved vendor
   - **Reviewed indicator**: Visual feedback for reviewed applications
 
 ### 3. **Rebuilt Applicants Tab**
+
 - **Location**: `src/components/producer/ApplicantsTab.tsx`
 - **Features**:
   - **Two-panel layout**: List view (left) + detail view (right)
@@ -62,6 +67,7 @@ This staging build includes a major Command Center redesign with improved vendor
   - **Email notifications**: Integrated email workflow on status changes
 
 ### 4. **Category Management Enhancement**
+
 - **Files Modified**:
   - `src/components/producer/ApplicantsTab.tsx`
   - `src/components/producer/InvitesTab.tsx`
@@ -73,6 +79,7 @@ This staging build includes a major Command Center redesign with improved vendor
   - **Future**: Will be migrated to organization-level global categories
 
 ### 5. **UI/UX Refinements**
+
 - **Action buttons**: Reduced aggression (border-based vs solid backgrounds)
 - **Category dropdown positioning**: Moved to right column under status actions in InvitesTab
 - **Consistent styling**: Glass morphism, compact design (13px base), purple/blue gradient accents
@@ -83,15 +90,18 @@ This staging build includes a major Command Center redesign with improved vendor
 ## 🔧 Technical Details
 
 ### New Components
+
 - `src/components/producer/HomeDashboard.tsx` (417 lines)
 - `src/components/producer/InvitesTab.tsx` (869 lines)
 
 ### Modified Components
+
 - `src/components/producer/ApplicantsTab.tsx` (refactored: 1045 → 543 lines after cleanup)
 - `src/components/producer/CommandCenter.tsx` (updated tab routing)
 - `src/components/producer/EventDetailsTab.tsx` (minor updates)
 
 ### API Integration Points
+
 - `eventInvitationsApi.getByEvent()` - Fetch invited contacts
 - `vendorApplicationsApi.getByEvent()` - Fetch applications and categories
 - `vendorApplicationsApi.getSubmissions()` - Fetch applicant submissions
@@ -100,6 +110,7 @@ This staging build includes a major Command Center redesign with improved vendor
 - `bulletinsApi.getByEvent()` - Fetch bulletins
 
 ### Database Schema Assumptions
+
 - `vendor_applications.categories` - Array of category strings
 - `registrations.vendor_category` - Current category assignment
 - `registrations.payment_status` - Payment tracking
@@ -110,6 +121,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ## 🧪 Testing Instructions for Systems Engineer
 
 ### 1. Invites Tab End-to-End Test
+
 ```
 1. Navigate to Command Center → Invites tab
 2. Verify table shows both invited contacts and net-new applicants
@@ -125,6 +137,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ```
 
 ### 2. Applicants Tab End-to-End Test
+
 ```
 1. Navigate to Command Center → Applicants tab
 2. Verify left panel shows pending/waitlist applicants
@@ -141,6 +154,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ```
 
 ### 3. Home Dashboard End-to-End Test
+
 ```
 1. Navigate to Command Center → Home tab
 2. Verify stats cards show correct counts:
@@ -159,6 +173,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ```
 
 ### 4. Email Automation Test
+
 ```
 1. Navigate to Command Center → Mail tab
 2. Verify scheduled emails display correctly
@@ -167,6 +182,7 @@ This staging build includes a major Command Center redesign with improved vendor
 ```
 
 ### 5. Application Page Test (Public-Facing)
+
 ```
 1. Navigate to public application URL: /events/{event-slug}
 2. Verify application form displays correctly
@@ -182,6 +198,7 @@ This staging build includes a major Command Center redesign with improved vendor
 **Note**: Backend changes should also be in staging. Verify the following endpoints are deployed:
 
 ### Required API Endpoints
+
 - `GET /api/events/:slug/invitations` - Returns invited vendor contacts
 - `GET /api/events/:slug/vendor-applications` - Returns applications with `categories` array
 - `GET /api/vendor-applications/:id/submissions` - Returns applicant submissions
@@ -190,7 +207,9 @@ This staging build includes a major Command Center redesign with improved vendor
 - `GET /api/events/:slug/bulletins` - Returns event bulletins
 
 ### Database Migrations
+
 Ensure these fields exist:
+
 - `vendor_applications.categories` (Array/JSONB)
 - `registrations.vendor_category` (String)
 - `registrations.payment_status` (String)
@@ -211,6 +230,7 @@ Ensure these fields exist:
 ### For Systems Engineer:
 
 1. **Verify Backend is Deployed to Staging**
+
    ```bash
    # Test critical API endpoints
    curl https://staging-api.voxxypresents.com/api/events/{test-slug}/invitations
@@ -220,6 +240,7 @@ Ensure these fields exist:
 2. **Run End-to-End Tests** (see Testing Instructions above)
 
 3. **If Tests Pass, Deploy to Production**:
+
    ```bash
    git checkout main
    git merge staging
@@ -240,6 +261,7 @@ Ensure these fields exist:
 ## 🎯 Success Criteria
 
 ✅ **Deployment is successful if**:
+
 - Command Center tabs load without errors
 - Invites tab shows merged data (invited + applied)
 - Applicants tab shows pending queue
@@ -269,4 +291,4 @@ Ensure these fields exist:
 
 ---
 
-*Generated: 2026-02-09*
+_Generated: 2026-02-09_

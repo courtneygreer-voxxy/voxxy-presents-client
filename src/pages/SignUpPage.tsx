@@ -23,7 +23,9 @@ export default function SignUpPage() {
   const handleSignUpSuccess = (email: string) => {
     // After successful signup, redirect to pending/account setup page
     navigate('/pending', {
-      state: { message: 'Account created successfully! Please check your email for a verification code.' }
+      state: {
+        message: 'Account created successfully! Please check your email for a verification code.',
+      },
     })
   }
 
@@ -48,7 +50,8 @@ export default function SignUpPage() {
             <Sparkles className="h-20 w-20 mx-auto mb-6" />
             <h1 className="text-5xl font-bold mb-4">Join Voxxy</h1>
             <p className="text-xl text-white/80 max-w-md">
-              Start managing your events, building your community, and growing your business with Voxxy
+              Start managing your events, building your community, and growing your business with
+              Voxxy
             </p>
           </div>
         </div>
@@ -86,9 +89,7 @@ export default function SignUpPage() {
             <Card className="w-full bg-background/5 backdrop-blur-xl border border-primary/30 shadow-[0_0_50px_rgba(144,84,227,0.3)]">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-foreground">Join Voxxy</CardTitle>
-                <CardDescription>
-                  Choose your account type to get started
-                </CardDescription>
+                <CardDescription>Choose your account type to get started</CardDescription>
               </CardHeader>
               <CardContent>
                 <UnifiedSignUpForm
@@ -102,7 +103,10 @@ export default function SignUpPage() {
                   <Separator className="bg-background/20 mb-4" />
                   <p className="text-muted-foreground text-sm text-center">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-primary hover:text-primary/70 font-medium transition-colors">
+                    <Link
+                      to="/login"
+                      className="text-primary hover:text-primary/70 font-medium transition-colors"
+                    >
                       Sign in here
                     </Link>
                   </p>

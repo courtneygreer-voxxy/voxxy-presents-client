@@ -26,60 +26,60 @@ This document contains all styling, colors, typography, and design patterns used
 
 ```css
 /* Purple Shades - Primary Brand Color */
---purple-400: #c084fc;      /* Light purple for text highlights */
---purple-500: #a855f7;      /* Standard purple */
---purple-600: #9333ea;      /* Primary CTA buttons */
---purple-700: #7e22ce;      /* Hover states */
+--purple-400: #c084fc; /* Light purple for text highlights */
+--purple-500: #a855f7; /* Standard purple */
+--purple-600: #9333ea; /* Primary CTA buttons */
+--purple-700: #7e22ce; /* Hover states */
 
 /* Pink Accents */
---pink-400: #f472b6;        /* Light pink for gradients */
---pink-500: #ec4899;        /* Accent pink */
+--pink-400: #f472b6; /* Light pink for gradients */
+--pink-500: #ec4899; /* Accent pink */
 
 /* Blue Accents */
---blue-500: #3b82f6;        /* Accent blue */
---indigo-600: #4f46e5;      /* Indigo accent */
+--blue-500: #3b82f6; /* Accent blue */
+--indigo-600: #4f46e5; /* Indigo accent */
 ```
 
 ### Background Colors (Dark Theme)
 
 ```css
 /* Deep Purple/Navy Backgrounds - Core Brand Identity */
---bg-primary: #1a0b2e;      /* Deep purple-black (darkest) */
---bg-secondary: #2d1b4e;    /* Medium purple-navy */
---bg-tertiary: #0f172a;     /* Slate-navy (darkest slate) */
+--bg-primary: #1a0b2e; /* Deep purple-black (darkest) */
+--bg-secondary: #2d1b4e; /* Medium purple-navy */
+--bg-tertiary: #0f172a; /* Slate-navy (darkest slate) */
 
 /* Glassmorphism Overlays */
---overlay-light: rgba(255, 255, 255, 0.1);    /* Light glass effect */
---overlay-dark: rgba(0, 0, 0, 0.5);           /* Dark overlay */
+--overlay-light: rgba(255, 255, 255, 0.1); /* Light glass effect */
+--overlay-dark: rgba(0, 0, 0, 0.5); /* Dark overlay */
 ```
 
 ### Text Colors
 
 ```css
 /* Text */
---text-primary: #ffffff;         /* Pure white - main text */
---text-secondary: #e2e8f0;       /* Light gray - secondary text */
---text-muted: #94a3b8;           /* Muted gray - subtle text */
---text-purple: #c084fc;          /* Purple text highlights */
---text-pink: #f472b6;            /* Pink text accents */
+--text-primary: #ffffff; /* Pure white - main text */
+--text-secondary: #e2e8f0; /* Light gray - secondary text */
+--text-muted: #94a3b8; /* Muted gray - subtle text */
+--text-purple: #c084fc; /* Purple text highlights */
+--text-pink: #f472b6; /* Pink text accents */
 
 /* Borders */
---border-light: rgba(255, 255, 255, 0.1);     /* Subtle white borders */
---border-medium: rgba(255, 255, 255, 0.2);    /* Medium white borders */
---border-purple: rgba(168, 85, 247, 0.3);     /* Purple borders */
+--border-light: rgba(255, 255, 255, 0.1); /* Subtle white borders */
+--border-medium: rgba(255, 255, 255, 0.2); /* Medium white borders */
+--border-purple: rgba(168, 85, 247, 0.3); /* Purple borders */
 ```
 
 ### State Colors
 
 ```css
 /* Success */
---success: #10b981;             /* Green for success states */
+--success: #10b981; /* Green for success states */
 
 /* Error/Destructive */
---error: #ef4444;               /* Red for errors */
+--error: #ef4444; /* Red for errors */
 
 /* Warning */
---warning: #f59e0b;             /* Orange for warnings */
+--warning: #f59e0b; /* Orange for warnings */
 ```
 
 ---
@@ -138,12 +138,12 @@ background: linear-gradient(to right, #7e22ce, #db2777, #2563eb);
 
 ```css
 /* Primary Font */
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-             "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-             sans-serif;
+font-family:
+  -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+  'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
 
 /* Alternative: Geist Font (if installed) */
-font-family: "Geist", sans-serif;
+font-family: 'Geist', sans-serif;
 ```
 
 ### Font Sizes & Weights
@@ -151,50 +151,50 @@ font-family: "Geist", sans-serif;
 ```css
 /* Headings */
 .text-5xl {
-  font-size: 3rem;        /* 48px */
+  font-size: 3rem; /* 48px */
   line-height: 1.2;
-  font-weight: 700;       /* Bold */
+  font-weight: 700; /* Bold */
 }
 
 .text-4xl {
-  font-size: 2.25rem;     /* 36px */
+  font-size: 2.25rem; /* 36px */
   line-height: 1.3;
   font-weight: 700;
 }
 
 .text-3xl {
-  font-size: 1.875rem;    /* 30px */
+  font-size: 1.875rem; /* 30px */
   line-height: 1.3;
-  font-weight: 600;       /* Semi-bold */
+  font-weight: 600; /* Semi-bold */
 }
 
 .text-2xl {
-  font-size: 1.5rem;      /* 24px */
+  font-size: 1.5rem; /* 24px */
   line-height: 1.4;
   font-weight: 600;
 }
 
 .text-xl {
-  font-size: 1.25rem;     /* 20px */
+  font-size: 1.25rem; /* 20px */
   line-height: 1.5;
-  font-weight: 500;       /* Medium */
+  font-weight: 500; /* Medium */
 }
 
 /* Body Text */
 .text-lg {
-  font-size: 1.125rem;    /* 18px */
+  font-size: 1.125rem; /* 18px */
   line-height: 1.6;
-  font-weight: 400;       /* Regular */
+  font-weight: 400; /* Regular */
 }
 
 .text-base {
-  font-size: 1rem;        /* 16px */
+  font-size: 1rem; /* 16px */
   line-height: 1.6;
   font-weight: 400;
 }
 
 .text-sm {
-  font-size: 0.875rem;    /* 14px */
+  font-size: 0.875rem; /* 14px */
   line-height: 1.5;
   font-weight: 400;
 }
@@ -208,13 +208,13 @@ font-family: "Geist", sans-serif;
 
 ```css
 /* Maximum content width */
-max-width: 1152px;        /* 72rem - main content container */
+max-width: 1152px; /* 72rem - main content container */
 margin: 0 auto;
-padding: 0 1rem;          /* 16px horizontal padding */
+padding: 0 1rem; /* 16px horizontal padding */
 
 /* Responsive padding */
 @media (min-width: 768px) {
-  padding: 0 2rem;        /* 32px on tablets and up */
+  padding: 0 2rem; /* 32px on tablets and up */
 }
 ```
 
@@ -222,27 +222,27 @@ padding: 0 1rem;          /* 16px horizontal padding */
 
 ```css
 /* Section padding */
-padding-top: 5rem;        /* 80px */
-padding-bottom: 5rem;     /* 80px */
+padding-top: 5rem; /* 80px */
+padding-bottom: 5rem; /* 80px */
 
 /* Card/Component padding */
-padding: 1.5rem;          /* 24px */
+padding: 1.5rem; /* 24px */
 
 /* Button padding */
-padding: 0.75rem 2rem;    /* 12px vertical, 32px horizontal */
+padding: 0.75rem 2rem; /* 12px vertical, 32px horizontal */
 ```
 
 ### Border Radius
 
 ```css
 /* Buttons, small cards */
-border-radius: 0.5rem;    /* 8px */
+border-radius: 0.5rem; /* 8px */
 
 /* Large cards */
-border-radius: 1rem;      /* 16px */
+border-radius: 1rem; /* 16px */
 
 /* Circular elements (badges, avatars) */
-border-radius: 9999px;    /* Fully rounded */
+border-radius: 9999px; /* Fully rounded */
 ```
 
 ---
@@ -256,18 +256,18 @@ border-radius: 9999px;    /* Fully rounded */
   position: relative;
   z-index: 50;
   padding: 1.5rem 1rem;
-  background: rgba(31, 41, 55, 0.5);    /* Gray-800 with 50% opacity */
+  background: rgba(31, 41, 55, 0.5); /* Gray-800 with 50% opacity */
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .navbar-link {
-  color: #d1d5db;                       /* Gray-300 */
+  color: #d1d5db; /* Gray-300 */
   transition: color 0.2s ease;
 }
 
 .navbar-link:hover {
-  color: #c084fc;                       /* Purple-400 */
+  color: #c084fc; /* Purple-400 */
 }
 ```
 
@@ -316,7 +316,7 @@ border-radius: 9999px;    /* Fully rounded */
 ```css
 .btn-purple {
   padding: 0.5rem 1rem;
-  background: #9333ea;                  /* Purple-600 */
+  background: #9333ea; /* Purple-600 */
   color: #ffffff;
   font-weight: 500;
   border-radius: 0.5rem;
@@ -324,7 +324,7 @@ border-radius: 9999px;    /* Fully rounded */
 }
 
 .btn-purple:hover {
-  background: #7e22ce;                  /* Purple-700 */
+  background: #7e22ce; /* Purple-700 */
 }
 ```
 
@@ -354,7 +354,7 @@ border-radius: 9999px;    /* Fully rounded */
 
 ```css
 .card-purple {
-  background: rgba(168, 85, 247, 0.2);  /* Purple-500 at 20% opacity */
+  background: rgba(168, 85, 247, 0.2); /* Purple-500 at 20% opacity */
   border: 1px solid rgba(196, 132, 252, 0.3);
   border-radius: 1rem;
   padding: 1.5rem;
@@ -368,10 +368,10 @@ border-radius: 9999px;    /* Fully rounded */
   display: inline-flex;
   align-items: center;
   padding: 0.5rem 1rem;
-  background: rgba(168, 85, 247, 0.2);  /* Purple-500 at 20% opacity */
+  background: rgba(168, 85, 247, 0.2); /* Purple-500 at 20% opacity */
   backdrop-filter: blur(12px);
   border: 1px solid rgba(196, 132, 252, 0.3);
-  color: #d8b4fe;                       /* Purple-300 */
+  color: #d8b4fe; /* Purple-300 */
   font-size: 0.875rem;
   font-weight: 500;
   border-radius: 9999px;
@@ -395,12 +395,12 @@ border-radius: 9999px;    /* Fully rounded */
 .input:focus {
   outline: none;
   background: rgba(255, 255, 255, 0.08);
-  border-color: #9333ea;                /* Purple-600 */
+  border-color: #9333ea; /* Purple-600 */
   box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
 }
 
 .input::placeholder {
-  color: #94a3b8;                       /* Slate-400 */
+  color: #94a3b8; /* Slate-400 */
 }
 ```
 
@@ -450,7 +450,8 @@ transition: transform 0.3s ease;
 
 ```css
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -547,9 +548,9 @@ Here's a complete CSS file you can use directly:
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-               "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-               sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell',
+    'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   background: linear-gradient(to bottom right, #1a0b2e, #2d1b4e, #0f172a);
   color: #ffffff;
   min-height: 100vh;
@@ -748,7 +749,8 @@ p {
 
 /* Animations */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -846,18 +848,12 @@ p {
 ```html
 <div class="section text-center">
   <div class="container">
-    <div class="badge mb-4">
-      🎉 Now in Beta
-    </div>
-    <h1 class="text-gradient-purple-pink">
-      Build Your Community
-    </h1>
+    <div class="badge mb-4">🎉 Now in Beta</div>
+    <h1 class="text-gradient-purple-pink">Build Your Community</h1>
     <p class="text-gray-300 mb-8">
       The easiest way to manage events, engage your audience, and grow your club.
     </p>
-    <button class="btn btn-primary">
-      Get Started
-    </button>
+    <button class="btn btn-primary">Get Started</button>
   </div>
 </div>
 ```
@@ -879,6 +875,7 @@ p {
 ## Brand Guidelines
 
 ### Do's ✅
+
 - Use the dark purple/navy gradient background (`#1a0b2e` → `#2d1b4e` → `#0f172a`)
 - Apply glassmorphism effects (backdrop blur + subtle borders)
 - Use purple (`#9333ea`) as the primary CTA color
@@ -887,6 +884,7 @@ p {
 - Use smooth transitions (0.2s-0.3s)
 
 ### Don'ts ❌
+
 - Don't use bright white backgrounds (breaks brand aesthetic)
 - Don't use hard borders without transparency
 - Don't use colors outside the purple/pink/blue palette

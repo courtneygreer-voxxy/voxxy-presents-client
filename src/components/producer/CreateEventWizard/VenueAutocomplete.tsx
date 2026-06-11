@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from 'react';
-import { MapPin, Loader2 } from 'lucide-react';
-import googlePlacesService, { PlacePrediction, LocationData } from '@/services/googlePlacesService';
+import { useState, useEffect, useRef } from 'react'
+import { MapPin, Loader2 } from 'lucide-react'
+import googlePlacesService, { PlacePrediction, LocationData } from '@/services/googlePlacesService'
 
 interface VenueAutocompleteProps {
-  value: string;
-  onChange: (value: string) => void;
-  onLocationSelect: (locationData: LocationData, venueName: string) => void;
-  error?: string;
-  placeholder?: string;
+  value: string
+  onChange: (value: string) => void
+  onLocationSelect: (locationData: LocationData, venueName: string) => void
+  error?: string
+  placeholder?: string
 }
 
 export default function VenueAutocomplete({
@@ -17,110 +17,110 @@ export default function VenueAutocomplete({
   error,
   placeholder = 'Search for a venue...',
 }: VenueAutocompleteProps) {
-  const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const [suggestions, setSuggestions] = useState<PlacePrediction[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isOpen, setIsOpen] = useState(false)
+  const [selectedIndex, setSelectedIndex] = useState(-1)
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const wrapperRef = useRef<HTMLDivElement>(null)
 
   // Debounced search
   useEffect(() => {
     // Clear previous timeout
     if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+      clearTimeout(searchTimeoutRef.current)
     }
 
     // Don't search if input is too short
     if (!value || value.length < 2) {
-      setSuggestions([]);
-      setIsOpen(false);
-      return;
+      setSuggestions([])
+      setIsOpen(false)
+      return
     }
 
     // Set new timeout for search
     searchTimeoutRef.current = setTimeout(async () => {
-      setIsLoading(true);
+      setIsLoading(true)
       try {
-        const results = await googlePlacesService.searchPlaces(value, 'establishment');
-        setSuggestions(results);
-        setIsOpen(results.length > 0);
-        setSelectedIndex(-1);
+        const results = await googlePlacesService.searchPlaces(value, 'establishment')
+        setSuggestions(results)
+        setIsOpen(results.length > 0)
+        setSelectedIndex(-1)
       } catch (error) {
-        console.error('Search failed:', error);
-        setSuggestions([]);
+        console.error('Search failed:', error)
+        setSuggestions([])
       } finally {
-        setIsLoading(false);
+        setIsLoading(false)
       }
-    }, 300); // 300ms debounce
+    }, 300) // 300ms debounce
 
     return () => {
       if (searchTimeoutRef.current) {
-        clearTimeout(searchTimeoutRef.current);
+        clearTimeout(searchTimeoutRef.current)
       }
-    };
-  }, [value]);
+    }
+  }, [value])
 
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
+        setIsOpen(false)
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Handle selection
   const handleSelect = async (place: PlacePrediction) => {
-    setIsLoading(true);
-    setIsOpen(false);
+    setIsLoading(true)
+    setIsOpen(false)
 
     try {
       // Get detailed place info including coordinates
-      const placeDetails = await googlePlacesService.getPlaceDetails(place.place_id);
+      const placeDetails = await googlePlacesService.getPlaceDetails(place.place_id)
 
       // Parse into standardized format
-      const locationData = googlePlacesService.parseLocationData(place, placeDetails);
+      const locationData = googlePlacesService.parseLocationData(place, placeDetails)
 
       // Notify parent component of location data AND venue name for atomic update
-      onLocationSelect(locationData, place.structured_formatting.main_text);
+      onLocationSelect(locationData, place.structured_formatting.main_text)
     } catch (error) {
-      console.error('Failed to fetch place details:', error);
+      console.error('Failed to fetch place details:', error)
       // Still update the venue name even if details fetch fails
-      onChange(place.structured_formatting.main_text);
+      onChange(place.structured_formatting.main_text)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   // Keyboard navigation
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (!isOpen || suggestions.length === 0) return;
+    if (!isOpen || suggestions.length === 0) return
 
     switch (e.key) {
       case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1));
-        break;
+        e.preventDefault()
+        setSelectedIndex((prev) => Math.min(prev + 1, suggestions.length - 1))
+        break
       case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) => Math.max(prev - 1, -1));
-        break;
+        e.preventDefault()
+        setSelectedIndex((prev) => Math.max(prev - 1, -1))
+        break
       case 'Enter':
-        e.preventDefault();
+        e.preventDefault()
         if (selectedIndex >= 0 && selectedIndex < suggestions.length) {
-          handleSelect(suggestions[selectedIndex]);
+          handleSelect(suggestions[selectedIndex])
         }
-        break;
+        break
       case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        break;
+        e.preventDefault()
+        setIsOpen(false)
+        break
     }
-  };
+  }
 
   return (
     <div ref={wrapperRef} className="relative">
@@ -133,7 +133,7 @@ export default function VenueAutocomplete({
           onKeyDown={handleKeyDown}
           onFocus={() => {
             if (suggestions.length > 0) {
-              setIsOpen(true);
+              setIsOpen(true)
             }
           }}
           placeholder={placeholder}
@@ -193,5 +193,5 @@ export default function VenueAutocomplete({
         </div>
       )}
     </div>
-  );
+  )
 }

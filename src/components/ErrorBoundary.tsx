@@ -1,17 +1,17 @@
-import React, { Component, ReactNode } from 'react';
-import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
-import ReportBug from './ReportBug';
+import React, { Component, ReactNode } from 'react'
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react'
+import ReportBug from './ReportBug'
 
 interface Props {
-  children: ReactNode;
-  fallbackUI?: ReactNode;
+  children: ReactNode
+  fallbackUI?: ReactNode
 }
 
 interface State {
-  hasError: boolean;
-  error: Error | null;
-  errorInfo: React.ErrorInfo | null;
-  showBugReport: boolean;
+  hasError: boolean
+  error: Error | null
+  errorInfo: React.ErrorInfo | null
+  showBugReport: boolean
 }
 
 /**
@@ -21,29 +21,29 @@ interface State {
  */
 class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props);
+    super(props)
     this.state = {
       hasError: false,
       error: null,
       errorInfo: null,
       showBugReport: false,
-    };
+    }
   }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
     // Update state so the next render shows the fallback UI
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error details
-    console.error('ErrorBoundary caught an error:', error, errorInfo);
+    console.error('ErrorBoundary caught an error:', error, errorInfo)
 
     // Update state with error info
     this.setState({
       error,
       errorInfo,
-    });
+    })
 
     // Could also send to error logging service here
     // Example: Sentry.captureException(error, { extra: errorInfo });
@@ -55,22 +55,22 @@ class ErrorBoundary extends Component<Props, State> {
       error: null,
       errorInfo: null,
       showBugReport: false,
-    });
-  };
+    })
+  }
 
   handleReload = () => {
-    window.location.reload();
-  };
+    window.location.reload()
+  }
 
   handleGoHome = () => {
-    window.location.href = '/';
-  };
+    window.location.href = '/'
+  }
 
   render() {
     if (this.state.hasError) {
       // Custom fallback UI if provided
       if (this.props.fallbackUI) {
-        return this.props.fallbackUI;
+        return this.props.fallbackUI
       }
 
       // Default error UI
@@ -92,8 +92,8 @@ class ErrorBoundary extends Component<Props, State> {
 
               {/* Description */}
               <p className="text-foreground/70 text-center mb-6">
-                We encountered an unexpected error. Don't worry, your data is safe.
-                Try refreshing the page or returning to the home page.
+                We encountered an unexpected error. Don't worry, your data is safe. Try refreshing
+                the page or returning to the home page.
               </p>
 
               {/* Error Details (Collapsible in dev mode) */}
@@ -168,11 +168,11 @@ class ErrorBoundary extends Component<Props, State> {
             autoShow={false}
           />
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 
-export default ErrorBoundary;
+export default ErrorBoundary

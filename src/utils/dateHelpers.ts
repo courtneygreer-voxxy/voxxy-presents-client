@@ -1,4 +1,4 @@
-import { DateTime } from 'luxon';
+import { DateTime } from 'luxon'
 
 /**
  * Parse an ISO date string into a Luxon DateTime object in the specified timezone
@@ -8,17 +8,17 @@ import { DateTime } from 'luxon';
  */
 export const parseEventDate = (
   dateString: string | null | undefined,
-  timezone: string = 'America/Los_Angeles'
+  timezone: string = 'America/Los_Angeles',
 ): DateTime | null => {
-  if (!dateString) return null;
+  if (!dateString) return null
 
   try {
-    return DateTime.fromISO(dateString, { zone: timezone });
+    return DateTime.fromISO(dateString, { zone: timezone })
   } catch (error) {
-    console.error('Failed to parse date:', dateString, error);
-    return null;
+    console.error('Failed to parse date:', dateString, error)
+    return null
   }
-};
+}
 
 /**
  * Format a date for display
@@ -29,21 +29,21 @@ export const parseEventDate = (
  */
 export const formatEventDate = (
   dateString: string | null | undefined,
-  format: string = 'MMM d, yyyy'
+  format: string = 'MMM d, yyyy',
 ): string => {
-  if (!dateString) return '';
+  if (!dateString) return ''
 
   try {
     // Parse as UTC to preserve the date value (prevent timezone shifting for date-only fields)
-    const dt = DateTime.fromISO(dateString, { zone: 'utc' });
-    if (!dt.isValid) return '';
+    const dt = DateTime.fromISO(dateString, { zone: 'utc' })
+    if (!dt.isValid) return ''
 
-    return dt.toFormat(format);
+    return dt.toFormat(format)
   } catch (error) {
-    console.error('Failed to format date:', dateString, error);
-    return '';
+    console.error('Failed to format date:', dateString, error)
+    return ''
   }
-};
+}
 
 /**
  * Format a datetime for display with time in the user's timezone
@@ -53,13 +53,13 @@ export const formatEventDate = (
  */
 export const formatEventDateTime = (
   dateString: string | null | undefined,
-  timezone?: string
+  timezone?: string,
 ): string => {
-  const dt = parseEventDate(dateString, timezone);
-  if (!dt || !dt.isValid) return '';
+  const dt = parseEventDate(dateString, timezone)
+  if (!dt || !dt.isValid) return ''
 
-  return dt.toFormat('MMM d, yyyy \'at\' h:mm a ZZZZ');
-};
+  return dt.toFormat("MMM d, yyyy 'at' h:mm a ZZZZ")
+}
 
 /**
  * Format just the time portion in the user's timezone
@@ -69,13 +69,13 @@ export const formatEventDateTime = (
  */
 export const formatEventTime = (
   dateString: string | null | undefined,
-  timezone?: string
+  timezone?: string,
 ): string => {
-  const dt = parseEventDate(dateString, timezone);
-  if (!dt || !dt.isValid) return '';
+  const dt = parseEventDate(dateString, timezone)
+  if (!dt || !dt.isValid) return ''
 
-  return dt.toFormat('h:mm a');
-};
+  return dt.toFormat('h:mm a')
+}
 
 /**
  * Get the timezone abbreviation for display (e.g., "PST", "PDT")
@@ -83,9 +83,9 @@ export const formatEventTime = (
  * @returns Timezone abbreviation
  */
 export const getTimezoneAbbr = (timezone: string = 'America/Los_Angeles'): string => {
-  const now = DateTime.now().setZone(timezone);
-  return now.toFormat('ZZZZ');
-};
+  const now = DateTime.now().setZone(timezone)
+  return now.toFormat('ZZZZ')
+}
 
 /**
  * Check if a date is in the past
@@ -93,16 +93,13 @@ export const getTimezoneAbbr = (timezone: string = 'America/Los_Angeles'): strin
  * @param timezone IANA timezone string
  * @returns True if the date has passed
  */
-export const isDatePast = (
-  dateString: string | null | undefined,
-  timezone?: string
-): boolean => {
-  const dt = parseEventDate(dateString, timezone);
-  if (!dt || !dt.isValid) return false;
+export const isDatePast = (dateString: string | null | undefined, timezone?: string): boolean => {
+  const dt = parseEventDate(dateString, timezone)
+  if (!dt || !dt.isValid) return false
 
-  const now = DateTime.now().setZone(timezone || 'America/Los_Angeles');
-  return dt < now;
-};
+  const now = DateTime.now().setZone(timezone || 'America/Los_Angeles')
+  return dt < now
+}
 
 /**
  * Get days until a date
@@ -110,16 +107,13 @@ export const isDatePast = (
  * @param timezone IANA timezone string
  * @returns Number of days until the date (negative if past)
  */
-export const getDaysUntil = (
-  dateString: string | null | undefined,
-  timezone?: string
-): number => {
-  const dt = parseEventDate(dateString, timezone);
-  if (!dt || !dt.isValid) return 0;
+export const getDaysUntil = (dateString: string | null | undefined, timezone?: string): number => {
+  const dt = parseEventDate(dateString, timezone)
+  if (!dt || !dt.isValid) return 0
 
-  const now = DateTime.now().setZone(timezone || 'America/Los_Angeles');
-  return Math.ceil(dt.diff(now, 'days').days);
-};
+  const now = DateTime.now().setZone(timezone || 'America/Los_Angeles')
+  return Math.ceil(dt.diff(now, 'days').days)
+}
 
 /**
  * Format a date for input fields (YYYY-MM-DD format)
@@ -127,23 +121,21 @@ export const getDaysUntil = (
  * @param dateString ISO 8601 date string from backend
  * @returns Date string in YYYY-MM-DD format
  */
-export const formatDateForInput = (
-  dateString: string | null | undefined
-): string => {
-  if (!dateString) return '';
+export const formatDateForInput = (dateString: string | null | undefined): string => {
+  if (!dateString) return ''
 
   try {
     // For date-only inputs, we want to preserve the date value without timezone conversion
     // Parse as UTC and extract just the date portion
-    const dt = DateTime.fromISO(dateString, { zone: 'utc' });
-    if (!dt.isValid) return '';
+    const dt = DateTime.fromISO(dateString, { zone: 'utc' })
+    if (!dt.isValid) return ''
 
-    return dt.toFormat('yyyy-MM-dd');
+    return dt.toFormat('yyyy-MM-dd')
   } catch (error) {
-    console.error('Failed to format date for input:', dateString, error);
-    return '';
+    console.error('Failed to format date for input:', dateString, error)
+    return ''
   }
-};
+}
 
 /**
  * Convert a local date input (YYYY-MM-DD) to ISO string for backend
@@ -153,15 +145,15 @@ export const formatDateForInput = (
  */
 export const convertLocalDateToISO = (
   dateString: string,
-  timezone: string = 'America/Los_Angeles'
+  timezone: string = 'America/Los_Angeles',
 ): string | null => {
-  if (!dateString) return null;
+  if (!dateString) return null
 
   try {
-    const dt = DateTime.fromISO(dateString, { zone: timezone });
-    return dt.toISO();
+    const dt = DateTime.fromISO(dateString, { zone: timezone })
+    return dt.toISO()
   } catch (error) {
-    console.error('Failed to convert date to ISO:', dateString, error);
-    return null;
+    console.error('Failed to convert date to ISO:', dateString, error)
+    return null
   }
-};
+}

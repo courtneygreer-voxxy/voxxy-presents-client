@@ -34,13 +34,13 @@ export function UnifiedLoginForm({
   onSuccess,
   onSwitchToSignUp,
   onForgotPassword,
-  defaultTab = 'club-owner'
+  defaultTab = 'club-owner',
 }: UnifiedLoginFormProps) {
   const { signIn, loading, error, clearError } = useAuth()
   const [activeTab, setActiveTab] = useState<UserType>(defaultTab)
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    password: ''
+    password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -65,11 +65,11 @@ export function UnifiedLoginForm({
 
   // Handle input changes with validation
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
 
     // Clear previous errors for this field
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
 
     // Clear general auth error when user starts typing
@@ -104,7 +104,7 @@ export function UnifiedLoginForm({
     try {
       await signIn({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       })
       onSuccess?.()
     } catch (err) {
@@ -135,8 +135,7 @@ export function UnifiedLoginForm({
           <p className="text-muted-foreground text-sm">
             {isClubOwner
               ? 'Organize events and manage your club community'
-              : 'Manage your venue and connect with event organizers'
-            }
+              : 'Manage your venue and connect with event organizers'}
           </p>
         </div>
 
@@ -144,7 +143,9 @@ export function UnifiedLoginForm({
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Email Field */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground">Email</Label>
+            <Label htmlFor="email" className="text-foreground">
+              Email
+            </Label>
             <div className="relative">
               <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -157,15 +158,15 @@ export function UnifiedLoginForm({
                 disabled={isSubmitting}
               />
             </div>
-            {errors.email && (
-              <p className="text-red-400 text-sm">{errors.email}</p>
-            )}
+            {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
           </div>
 
           {/* Password Field */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
+              <Label htmlFor="password" className="text-foreground">
+                Password
+              </Label>
               <button
                 type="button"
                 onClick={onForgotPassword}
@@ -195,9 +196,7 @@ export function UnifiedLoginForm({
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            {errors.password && (
-              <p className="text-red-400 text-sm">{errors.password}</p>
-            )}
+            {errors.password && <p className="text-red-400 text-sm">{errors.password}</p>}
           </div>
 
           {/* Submit Button */}
@@ -219,9 +218,7 @@ export function UnifiedLoginForm({
           {/* Error Display */}
           {(error || errors.submit) && (
             <Alert className="bg-red-400/10 border-red-400/30">
-              <AlertDescription className="text-red-300">
-                {error || errors.submit}
-              </AlertDescription>
+              <AlertDescription className="text-red-300">{error || errors.submit}</AlertDescription>
             </Alert>
           )}
         </form>
@@ -233,12 +230,14 @@ export function UnifiedLoginForm({
     <Card className="w-full max-w-md bg-background/15 backdrop-blur-md border border-border">
       <CardHeader className="text-center">
         <CardTitle className="text-2xl font-bold text-foreground">Welcome Back</CardTitle>
-        <CardDescription>
-          Choose your account type to continue
-        </CardDescription>
+        <CardDescription>Choose your account type to continue</CardDescription>
       </CardHeader>
       <CardContent>
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as UserType)} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as UserType)}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2 mb-6 bg-background/10 backdrop-blur-sm">
             <TabsTrigger
               value="club-owner"

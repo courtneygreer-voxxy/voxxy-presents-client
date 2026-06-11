@@ -1,109 +1,110 @@
-import { useState, useEffect } from 'react';
-import { Mail, Send, CheckCircle2, XCircle, AlertCircle, Loader2, ArrowLeft } from 'lucide-react';
-import { toast } from 'sonner';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import EmailSequenceManager from '@/components/admin/EmailSequenceManager';
+import { useState, useEffect } from 'react'
+import { Mail, Send, CheckCircle2, XCircle, AlertCircle, Loader2, ArrowLeft } from 'lucide-react'
+import { toast } from 'sonner'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import EmailSequenceManager from '@/components/admin/EmailSequenceManager'
 
 interface EmailCategory {
-  name: string;
-  description: string;
-  count: number;
+  name: string
+  description: string
+  count: number
   emails: Array<{
-    position?: number;
-    name: string;
-    subject: string;
-  }>;
+    position?: number
+    name: string
+    subject: string
+  }>
 }
 
 interface EmailTestResult {
-  name: string;
-  status: 'sent' | 'failed';
-  error?: string;
-  timestamp?: string;
+  name: string
+  status: 'sent' | 'failed'
+  error?: string
+  timestamp?: string
 }
 
 export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
-  const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<EmailTestResult[]>([]);
-  const [emailCategories, setEmailCategories] = useState<EmailCategory[]>([]);
-  const [testEmail, setTestEmail] = useState('');
+  const [loading, setLoading] = useState(false)
+  const [results, setResults] = useState<EmailTestResult[]>([])
+  const [emailCategories, setEmailCategories] = useState<EmailCategory[]>([])
+  const [testEmail, setTestEmail] = useState('')
 
   useEffect(() => {
-    fetchEmailTestInfo();
-  }, []);
+    fetchEmailTestInfo()
+  }, [])
 
   const fetchEmailTestInfo = async () => {
     try {
-      const token = localStorage.getItem('railsAuthToken');
+      const token = localStorage.getItem('railsAuthToken')
       const response = await fetch('/api/v1/presents/email_tests', {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
+      })
 
-      if (!response.ok) throw new Error('Failed to fetch email test info');
+      if (!response.ok) throw new Error('Failed to fetch email test info')
 
-      const data = await response.json();
-      setEmailCategories(data.email_categories || []);
-      setTestEmail(data.test_email || '');
+      const data = await response.json()
+      setEmailCategories(data.email_categories || [])
+      setTestEmail(data.test_email || '')
     } catch (error: any) {
-      console.error('Failed to fetch email test info:', error);
-      toast.error('Failed to load email testing information');
+      console.error('Failed to fetch email test info:', error)
+      toast.error('Failed to load email testing information')
     }
-  };
+  }
 
   const sendTestEmails = async (type: 'scheduled' | 'notification' | 'all') => {
-    setLoading(true);
-    setResults([]);
+    setLoading(true)
+    setResults([])
 
     try {
-      const endpoint = type === 'scheduled'
-        ? '/api/v1/presents/email_tests/send_scheduled'
-        : type === 'notification'
-        ? '/api/v1/presents/email_tests/send_notification_emails'
-        : '/api/v1/presents/email_tests/send_all';
+      const endpoint =
+        type === 'scheduled'
+          ? '/api/v1/presents/email_tests/send_scheduled'
+          : type === 'notification'
+            ? '/api/v1/presents/email_tests/send_notification_emails'
+            : '/api/v1/presents/email_tests/send_all'
 
-      const token = localStorage.getItem('railsAuthToken');
+      const token = localStorage.getItem('railsAuthToken')
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
+      })
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to send emails');
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to send emails')
       }
 
-      const data = await response.json();
-      setResults(data.results || []);
+      const data = await response.json()
+      setResults(data.results || [])
 
-      const successCount = data.success_count || 0;
-      const failureCount = data.failure_count || 0;
+      const successCount = data.success_count || 0
+      const failureCount = data.failure_count || 0
 
       if (failureCount > 0) {
-        toast.warning(`Sent ${successCount} emails, ${failureCount} failed`);
+        toast.warning(`Sent ${successCount} emails, ${failureCount} failed`)
       } else {
-        toast.success(`Successfully sent ${successCount} test emails to ${data.recipient}`);
+        toast.success(`Successfully sent ${successCount} test emails to ${data.recipient}`)
       }
     } catch (error: any) {
-      console.error('Failed to send test emails:', error);
-      toast.error(error.message || 'Failed to send test emails');
+      console.error('Failed to send test emails:', error)
+      toast.error(error.message || 'Failed to send test emails')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const getStatusIcon = (status: 'sent' | 'failed') => {
     if (status === 'sent') {
-      return <CheckCircle2 className="w-4 h-4 text-green-500" />;
+      return <CheckCircle2 className="w-4 h-4 text-green-500" />
     }
-    return <XCircle className="w-4 h-4 text-red-500" />;
-  };
+    return <XCircle className="w-4 h-4 text-red-500" />
+  }
 
   return (
     <div className="min-h-screen voxxy-gradient-admin p-6">
@@ -115,15 +116,12 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
               Email Testing Center
             </h1>
             <p className="text-foreground/60">
-              Test all your email notifications • Emails will be sent to: <span className="font-mono text-primary">{testEmail || 'your email'}</span>
+              Test all your email notifications • Emails will be sent to:{' '}
+              <span className="font-mono text-primary">{testEmail || 'your email'}</span>
             </p>
           </div>
           {onBack && (
-            <Button
-              onClick={onBack}
-              variant="outline"
-              className="gap-2"
-            >
+            <Button onClick={onBack} variant="outline" className="gap-2">
               <ArrowLeft className="w-4 h-4" />
               Back
             </Button>
@@ -265,7 +263,8 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
                 Test Results
               </CardTitle>
               <CardDescription className="text-[13px] text-muted-foreground">
-                {results.filter(r => r.status === 'sent').length} sent • {results.filter(r => r.status === 'failed').length} failed
+                {results.filter((r) => r.status === 'sent').length} sent •{' '}
+                {results.filter((r) => r.status === 'failed').length} failed
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -283,9 +282,7 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
                       {getStatusIcon(result.status)}
                       <div>
                         <div className="text-sm font-medium text-foreground">{result.name}</div>
-                        {result.error && (
-                          <div className="text-xs text-red-400">{result.error}</div>
-                        )}
+                        {result.error && <div className="text-xs text-red-400">{result.error}</div>}
                       </div>
                     </div>
                     <div className="text-xs text-foreground/60">
@@ -299,5 +296,5 @@ export default function EmailTestingPage({ onBack }: { onBack?: () => void }) {
         )}
       </div>
     </div>
-  );
+  )
 }

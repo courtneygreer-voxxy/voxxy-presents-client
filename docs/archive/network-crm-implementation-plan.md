@@ -8,6 +8,7 @@
 ---
 
 ## Table of Contents
+
 1. [Overview](#overview)
 2. [Current State](#current-state)
 3. [Feature Requirements](#feature-requirements)
@@ -25,7 +26,9 @@
 ## Overview
 
 ### Purpose
+
 Build a CRM-style contact management system for producers to:
+
 - Save vendor contacts from event applications
 - Manually add new contacts
 - Organize contacts with notes and metadata
@@ -33,6 +36,7 @@ Build a CRM-style contact management system for producers to:
 - Power the "Invite List" feature in event creation wizard
 
 ### Goals
+
 1. **Contact Management** - Save and organize vendor relationships
 2. **Cross-Event Tracking** - See which vendors have worked across multiple events
 3. **Bulk Communication** - Send emails to groups of vendors
@@ -40,6 +44,7 @@ Build a CRM-style contact management system for producers to:
 5. **Data Enrichment** - Add notes, tags, and custom information per contact
 
 ### Non-Goals (Out of Scope)
+
 - Direct 1-on-1 messaging (not included per requirements)
 - Real-time chat or notifications
 - Payment/invoice management
@@ -51,6 +56,7 @@ Build a CRM-style contact management system for producers to:
 ## Current State
 
 ### What Exists
+
 - **Per-event vendor submissions** tracked in `registrations` table
 - **VendorsTab** in CommandCenter shows submissions per event
 - **Contact data** already collected: name, email, phone, business_name, category
@@ -58,6 +64,7 @@ Build a CRM-style contact management system for producers to:
 - **Email API** exists for sending emails (`emailApi.sendEmail`)
 
 ### What Doesn't Exist
+
 - No cross-event contact management
 - No saved/favorited vendors
 - No contact database separate from event submissions
@@ -66,7 +73,9 @@ Build a CRM-style contact management system for producers to:
 - No notes or custom metadata per contact
 
 ### Data Currently Available
+
 From `registrations` table:
+
 - Vendor name, email, phone
 - Business name
 - Vendor category
@@ -82,29 +91,30 @@ From `registrations` table:
 
 ### Contact Fields
 
-| Field | Type | Required | Description | Example |
-|-------|------|----------|-------------|---------|
-| **Contact Name** | text | Yes | Full name of vendor contact | "Sarah Mitchell" |
-| **Business Name** | text | No | Vendor business/brand name | "Sarah's Ceramics" |
-| **Contact Type** | select | Yes | Type of contact | "Vendor" (future: "Partner", "Sponsor", etc.) |
-| **Location** | text | No | City, State or full address | "Portland, OR" |
-| **Email** | email | Yes | Primary email address | "sarah.mitchell0@example.com" |
-| **Phone** | tel | No | Contact phone number | "(200) 555-0000" |
-| **Notes** | textarea | No | Custom notes about vendor | "Great vendor, very reliable. Has participated in 1 events." |
-| **Tags** | array | No | Custom tags for filtering | ["ceramics", "reliable", "returning"] |
+| Field             | Type     | Required | Description                 | Example                                                      |
+| ----------------- | -------- | -------- | --------------------------- | ------------------------------------------------------------ |
+| **Contact Name**  | text     | Yes      | Full name of vendor contact | "Sarah Mitchell"                                             |
+| **Business Name** | text     | No       | Vendor business/brand name  | "Sarah's Ceramics"                                           |
+| **Contact Type**  | select   | Yes      | Type of contact             | "Vendor" (future: "Partner", "Sponsor", etc.)                |
+| **Location**      | text     | No       | City, State or full address | "Portland, OR"                                               |
+| **Email**         | email    | Yes      | Primary email address       | "sarah.mitchell0@example.com"                                |
+| **Phone**         | tel      | No       | Contact phone number        | "(200) 555-0000"                                             |
+| **Notes**         | textarea | No       | Custom notes about vendor   | "Great vendor, very reliable. Has participated in 1 events." |
+| **Tags**          | array    | No       | Custom tags for filtering   | ["ceramics", "reliable", "returning"]                        |
 
 ### Auto-Calculated Fields
 
-| Field | Description | Example |
-|-------|-------------|---------|
-| **Events Participated** | Count of events they've worked | "1 events" |
-| **Total Applications** | Count of total submissions | "3 applications" |
-| **Approval Rate** | % of approved applications | "67% approved" |
-| **Last Contact** | Most recent interaction date | "Dec 1, 2025" |
-| **Date Added** | When added to network | "Nov 15, 2025" |
-| **Source** | How they were added | "Event Application" or "Manual" |
+| Field                   | Description                    | Example                         |
+| ----------------------- | ------------------------------ | ------------------------------- |
+| **Events Participated** | Count of events they've worked | "1 events"                      |
+| **Total Applications**  | Count of total submissions     | "3 applications"                |
+| **Approval Rate**       | % of approved applications     | "67% approved"                  |
+| **Last Contact**        | Most recent interaction date   | "Dec 1, 2025"                   |
+| **Date Added**          | When added to network          | "Nov 15, 2025"                  |
+| **Source**              | How they were added            | "Event Application" or "Manual" |
 
 ### Contact Types (Initial)
+
 - **Vendor** - Default for marketplace vendors
 - **Partner** - Collaborators or co-promoters (future)
 - **Sponsor** - Event sponsors (future)
@@ -114,14 +124,14 @@ Start with just "Vendor" - add others later.
 
 ### Actions Per Contact
 
-| Action | Description |
-|--------|-------------|
-| **Edit** | Update contact details |
-| **Email** | Compose email to this contact |
-| **Add to Group** | Add to selection for bulk email |
+| Action           | Description                            |
+| ---------------- | -------------------------------------- |
+| **Edit**         | Update contact details                 |
+| **Email**        | Compose email to this contact          |
+| **Add to Group** | Add to selection for bulk email        |
 | **View History** | See all events they've participated in |
-| **Delete** | Remove from network (soft delete) |
-| **Add Note** | Quick add to notes field |
+| **Delete**       | Remove from network (soft delete)      |
+| **Add Note**     | Quick add to notes field               |
 
 ---
 
@@ -184,37 +194,37 @@ Organization (Producer)
 
 ```typescript
 interface VendorContact {
-  id: number;
-  organization_id: number;
+  id: number
+  organization_id: number
 
   // Core fields
-  contact_name: string;
-  business_name?: string;
-  email: string;
-  phone?: string;
-  location?: string;
+  contact_name: string
+  business_name?: string
+  email: string
+  phone?: string
+  location?: string
 
   // Categorization
-  contact_type: 'vendor' | 'partner' | 'sponsor' | 'staff';
-  tags: string[];
+  contact_type: 'vendor' | 'partner' | 'sponsor' | 'staff'
+  tags: string[]
 
   // Custom data
-  notes?: string;
+  notes?: string
 
   // Metadata
-  source: 'manual' | 'event_application';
-  source_registration_id?: number;
-  last_contacted_at?: string;
-  archived: boolean;
+  source: 'manual' | 'event_application'
+  source_registration_id?: number
+  last_contacted_at?: string
+  archived: boolean
 
   // Timestamps
-  created_at: string;
-  updated_at: string;
+  created_at: string
+  updated_at: string
 
   // Computed fields (from backend)
-  events_participated?: number;
-  total_applications?: number;
-  approval_rate?: number;
+  events_participated?: number
+  total_applications?: number
+  approval_rate?: number
 }
 ```
 
@@ -372,6 +382,7 @@ interface VendorContact {
 ```
 
 When clicked:
+
 - Check if contact already exists in network (by email)
 - If exists: Show toast "Already in your network"
 - If new: Create vendor_contact record with data from registration
@@ -455,6 +466,7 @@ src/services/
 ### Backend Endpoints (Rails)
 
 #### 1. List Contacts
+
 ```
 GET /api/v1/presents/organizations/:organization_id/vendor_contacts
 
@@ -506,6 +518,7 @@ Response:
 ---
 
 #### 2. Get Single Contact
+
 ```
 GET /api/v1/presents/vendor_contacts/:id
 
@@ -534,6 +547,7 @@ Response:
 ---
 
 #### 3. Create Contact
+
 ```
 POST /api/v1/presents/organizations/:organization_id/vendor_contacts
 
@@ -563,6 +577,7 @@ Errors:
 ---
 
 #### 4. Update Contact
+
 ```
 PATCH /api/v1/presents/vendor_contacts/:id
 
@@ -577,6 +592,7 @@ Response:
 ---
 
 #### 5. Delete Contact (Soft Delete)
+
 ```
 DELETE /api/v1/presents/vendor_contacts/:id
 
@@ -591,6 +607,7 @@ Note: Sets archived = true, doesn't actually delete
 ---
 
 #### 6. Import from Registration
+
 ```
 POST /api/v1/presents/vendor_contacts/import_from_registration
 
@@ -612,6 +629,7 @@ This creates a contact from an existing event submission
 ---
 
 #### 7. Bulk Email
+
 ```
 POST /api/v1/presents/vendor_contacts/bulk_email
 
@@ -639,6 +657,7 @@ Errors:
 ---
 
 #### 8. Bulk Actions
+
 ```
 POST /api/v1/presents/vendor_contacts/bulk_action
 
@@ -663,6 +682,7 @@ Response:
 ## Implementation Phases
 
 ### Phase 1: Data Model & API (Backend) - Days 1-2
+
 **Backend work required**
 
 - [ ] Create migration for `vendor_contacts` table
@@ -681,6 +701,7 @@ Response:
 ---
 
 ### Phase 2: Core UI Components - Days 3-4
+
 **Frontend work**
 
 - [ ] Create `vendorContactsApi` service in `api.ts`
@@ -697,6 +718,7 @@ Response:
 ---
 
 ### Phase 3: Contact Management - Days 5-6
+
 **Frontend work**
 
 - [ ] Build `AddContactModal.tsx` form
@@ -713,6 +735,7 @@ Response:
 ---
 
 ### Phase 4: Bulk Email Feature - Day 7
+
 **Frontend work**
 
 - [ ] Build `BulkEmailModal.tsx`
@@ -729,6 +752,7 @@ Response:
 ---
 
 ### Phase 5: VendorsTab Integration - Day 8
+
 **Frontend work**
 
 - [ ] Create `AddToNetworkButton.tsx` component
@@ -744,6 +768,7 @@ Response:
 ---
 
 ### Phase 6: Contact Details & History - Day 9
+
 **Frontend work**
 
 - [ ] Build `ContactDetailModal.tsx`
@@ -759,6 +784,7 @@ Response:
 ---
 
 ### Phase 7: Polish & Testing - Day 10
+
 **Frontend work**
 
 - [ ] Accessibility audit (keyboard nav, ARIA labels)
@@ -775,6 +801,7 @@ Response:
 ---
 
 ### Phase 8: Deployment & Monitoring - Day 11
+
 **Deployment**
 
 - [ ] Deploy to staging
@@ -792,30 +819,34 @@ Response:
 ## Integration Points
 
 ### 1. ProducerDashboard Navigation
+
 **File:** `/src/pages/ProducerDashboard.tsx`
 
 **Changes:**
+
 - Network tab currently shows placeholder "Dashboard content coming soon..."
 - Replace with `<NetworkPage />` component
 
 ```tsx
 // Before
-{activeTab === 'network' && (
-  <div className="text-white">Dashboard content coming soon...</div>
-)}
+{
+  activeTab === 'network' && <div className="text-white">Dashboard content coming soon...</div>
+}
 
 // After
-{activeTab === 'network' && (
-  <NetworkPage organizationId={organization.id} />
-)}
+{
+  activeTab === 'network' && <NetworkPage organizationId={organization.id} />
+}
 ```
 
 ---
 
 ### 2. VendorsTab - Add to Network
+
 **File:** `/src/components/producer/VendorsTab.tsx`
 
 **Changes:**
+
 - Add "Add to Network" button to each vendor submission card
 - Import `AddToNetworkButton` component
 - Pass submission data to button
@@ -831,9 +862,11 @@ Response:
 ---
 
 ### 3. Event Creation Wizard - Step 3 (Future)
+
 **File:** `/src/components/producer/CreateEventWizard/steps/Step3InviteList.tsx`
 
 **Changes:**
+
 - Replace placeholder with contact selection UI
 - Fetch contacts from network
 - Allow multi-select of contacts
@@ -850,6 +883,7 @@ Response:
 ---
 
 ### 4. Email API Integration
+
 **File:** `/src/services/api.ts`
 
 **Current:** `emailApi.sendEmail()` exists
@@ -858,19 +892,22 @@ Response:
 
 ```typescript
 export const vendorContactsApi = {
-  async bulkEmail(contactIds: number[], emailData: {
-    subject: string;
-    message: string;
-    htmlMessage?: string;
-  }) {
+  async bulkEmail(
+    contactIds: number[],
+    emailData: {
+      subject: string
+      message: string
+      htmlMessage?: string
+    },
+  ) {
     return api.post('/vendor_contacts/bulk_email', {
       vendor_contact_ids: contactIds,
       subject: emailData.subject,
       message: emailData.message,
       html_message: emailData.htmlMessage,
-    });
-  }
-};
+    })
+  },
+}
 ```
 
 ---
@@ -923,45 +960,48 @@ end
 ### Frontend Tests
 
 #### Unit Tests
+
 ```typescript
 // ContactsTable.test.tsx
 describe('ContactsTable', () => {
-  it('renders contact rows', () => {});
-  it('handles row selection', () => {});
-  it('sorts by column', () => {});
-  it('shows empty state when no contacts', () => {});
-});
+  it('renders contact rows', () => {})
+  it('handles row selection', () => {})
+  it('sorts by column', () => {})
+  it('shows empty state when no contacts', () => {})
+})
 
 // AddContactModal.test.tsx
 describe('AddContactModal', () => {
-  it('validates required fields', () => {});
-  it('validates email format', () => {});
-  it('submits valid data', () => {});
-  it('shows error on duplicate email', () => {});
-});
+  it('validates required fields', () => {})
+  it('validates email format', () => {})
+  it('submits valid data', () => {})
+  it('shows error on duplicate email', () => {})
+})
 
 // BulkEmailModal.test.tsx
 describe('BulkEmailModal', () => {
-  it('lists selected recipients', () => {});
-  it('validates subject and message', () => {});
-  it('sends emails on submit', () => {});
-  it('shows progress indicator', () => {});
-});
+  it('lists selected recipients', () => {})
+  it('validates subject and message', () => {})
+  it('sends emails on submit', () => {})
+  it('shows progress indicator', () => {})
+})
 ```
 
 #### Integration Tests
+
 ```typescript
 describe('Network Page Integration', () => {
-  it('loads contacts on mount', async () => {});
-  it('adds new contact', async () => {});
-  it('edits existing contact', async () => {});
-  it('deletes contact', async () => {});
-  it('sends bulk email to selected contacts', async () => {});
-  it('filters contacts by search term', async () => {});
-});
+  it('loads contacts on mount', async () => {})
+  it('adds new contact', async () => {})
+  it('edits existing contact', async () => {})
+  it('deletes contact', async () => {})
+  it('sends bulk email to selected contacts', async () => {})
+  it('filters contacts by search term', async () => {})
+})
 ```
 
 #### E2E Tests
+
 ```typescript
 describe('Network Management E2E', () => {
   it('complete workflow: add contact -> edit -> send email -> delete', async () => {
@@ -973,15 +1013,15 @@ describe('Network Management E2E', () => {
     // Select contact, send email
     // Delete contact
     // Verify removed from table
-  });
+  })
 
   it('import from event submission', async () => {
     // Go to event VendorsTab
     // Click "Add to Network" on submission
     // Navigate to Network page
     // Verify contact exists with submission data
-  });
-});
+  })
+})
 ```
 
 ---
@@ -989,6 +1029,7 @@ describe('Network Management E2E', () => {
 ### Manual Testing Checklist
 
 **Contact Management:**
+
 - [ ] Add contact manually with all fields
 - [ ] Add contact with only required fields
 - [ ] Edit contact and update all fields
@@ -1001,6 +1042,7 @@ describe('Network Management E2E', () => {
 - [ ] Sort by different columns
 
 **Bulk Email:**
+
 - [ ] Select multiple contacts
 - [ ] Send email to selected
 - [ ] Verify emails received
@@ -1010,12 +1052,14 @@ describe('Network Management E2E', () => {
 - [ ] Verify last_contacted_at updates
 
 **VendorsTab Integration:**
+
 - [ ] Add vendor from submission
 - [ ] Try to add same vendor twice (should detect)
 - [ ] Verify data pre-filled correctly
 - [ ] Test with approved/rejected/pending submissions
 
 **Edge Cases:**
+
 - [ ] Network page with 0 contacts
 - [ ] Very long notes field
 - [ ] Special characters in names/emails
@@ -1030,6 +1074,7 @@ describe('Network Management E2E', () => {
 ## Future Enhancements
 
 ### Short-term (Next Quarter)
+
 - [ ] **Import from CSV** - Bulk import contacts
 - [ ] **Export to CSV** - Download contact list
 - [ ] **Contact groups/segments** - Create saved groups (e.g., "Ceramics Vendors", "VIP")
@@ -1039,6 +1084,7 @@ describe('Network Management E2E', () => {
 - [ ] **Email tracking** - Track opens and clicks
 
 ### Medium-term (6 months)
+
 - [ ] **Vendor profiles** - Public vendor profile pages
 - [ ] **Rating/review system** - Rate vendors after events
 - [ ] **Performance metrics** - Sales data, attendance records
@@ -1048,6 +1094,7 @@ describe('Network Management E2E', () => {
 - [ ] **Integration with wizard Step 3** - Seamless invite flow
 
 ### Long-term (1 year)
+
 - [ ] **CRM analytics dashboard** - Vendor retention, engagement metrics
 - [ ] **Smart recommendations** - AI-suggested vendors for events
 - [ ] **Two-way sync** - Vendors update their own info
@@ -1061,22 +1108,26 @@ describe('Network Management E2E', () => {
 ## Success Metrics
 
 ### User Adoption
+
 - **Week 1:** 20% of active producers add at least 1 contact
 - **Month 1:** 50% of active producers have 5+ contacts
 - **Month 3:** 70% of producers using bulk email feature
 
 ### Engagement
+
 - **Average contacts per producer:** 15+ within 3 months
 - **Bulk emails sent:** 100+ per week across all producers
 - **Conversion rate:** 30% of event submissions → saved to network
 
 ### Technical
+
 - **API response time:** < 200ms for contact list
 - **Bulk email delivery:** > 95% success rate
 - **Page load time:** < 2 seconds
 - **Zero downtime** during rollout
 
 ### Business Impact
+
 - **Reduced time to invite vendors:** 50% faster for repeat events
 - **Increased vendor retention:** 25% more vendors apply to multiple events
 - **Producer satisfaction:** 4.5+ star rating on network feature
@@ -1124,6 +1175,7 @@ end
 **Option 2: Manual Opt-in (User Triggered)**
 
 Add a banner to VendorsTab:
+
 ```
 ┌─────────────────────────────────────────────────────────┐
 │ 💡 New Feature: Import your past vendors to Network!   │
@@ -1140,6 +1192,7 @@ On click, preview contacts and let user confirm import.
 ## Security Considerations
 
 ### Data Protection
+
 - [ ] Vendor emails/contacts are **private to each organization**
 - [ ] Never expose contacts between different producers
 - [ ] Validate organization_id on all API requests
@@ -1147,12 +1200,14 @@ On click, preview contacts and let user confirm import.
 - [ ] Rate limit bulk email API to prevent spam
 
 ### Authorization
+
 - [ ] Only producers/venue_owners can access network
 - [ ] Vendors cannot see producer's network
 - [ ] Require JWT authentication on all endpoints
 - [ ] Verify user owns organization before CRUD operations
 
 ### Email Compliance
+
 - [ ] Include unsubscribe link in bulk emails
 - [ ] Track unsubscribe requests
 - [ ] Respect email preferences
@@ -1160,6 +1215,7 @@ On click, preview contacts and let user confirm import.
 - [ ] Add sender's organization info to emails
 
 ### Privacy
+
 - [ ] Add privacy policy section about contact management
 - [ ] Allow vendors to request data deletion (GDPR)
 - [ ] Don't share vendor data with third parties
@@ -1170,24 +1226,28 @@ On click, preview contacts and let user confirm import.
 ## Rollout Plan
 
 ### Phase 1: Beta (Week 1)
+
 - Deploy to staging
 - Invite 5-10 active producers to test
 - Gather feedback
 - Fix critical bugs
 
 ### Phase 2: Limited Release (Week 2)
+
 - Deploy to production
 - Feature flag: only show to beta users
 - Monitor performance and errors
 - Iterate based on feedback
 
 ### Phase 3: General Availability (Week 3)
+
 - Enable for all producers
 - Add in-app announcement/tutorial
 - Send email to all producers announcing feature
 - Monitor adoption metrics
 
 ### Phase 4: Optimization (Week 4+)
+
 - Analyze usage data
 - Identify pain points
 - Prioritize enhancements
@@ -1198,6 +1258,7 @@ On click, preview contacts and let user confirm import.
 ## Documentation
 
 ### User-Facing Docs
+
 - [ ] **Help Center Article:** "Managing Your Vendor Network"
 - [ ] **Video Tutorial:** "How to Build Your Network"
 - [ ] **FAQ:** Common questions about contacts
@@ -1205,6 +1266,7 @@ On click, preview contacts and let user confirm import.
 - [ ] **Privacy Policy Update:** Contact management section
 
 ### Developer Docs
+
 - [ ] API endpoint documentation
 - [ ] Data model diagrams
 - [ ] Component architecture docs
@@ -1218,12 +1280,14 @@ On click, preview contacts and let user confirm import.
 ### Related Files (Current)
 
 **Frontend:**
+
 - `/src/pages/ProducerDashboard.tsx` - Main producer interface
 - `/src/components/producer/VendorsTab.tsx` - Event vendor submissions
 - `/src/components/producer/ApplicationsTab.tsx` - Event applications
 - `/src/services/api.ts` - API service layer
 
 **Documentation:**
+
 - `/docs/PRODUCER_FLOW_STATUS.md` - Producer feature tracking
 - `/docs/API_CONFIGURATION.md` - API reference
 

@@ -1,5 +1,5 @@
-import { ArrowLeft, ArrowRight } from 'lucide-react';
-import { WizardNavigationProps } from './types';
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { WizardNavigationProps } from './types'
 
 export default function WizardNavigation({
   currentStep,
@@ -71,5 +71,5 @@ export default function WizardNavigation({
         </button>
       )}
     </div>
-  );
+  )
 }

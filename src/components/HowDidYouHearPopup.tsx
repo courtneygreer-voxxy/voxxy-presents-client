@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { MessageCircle, X } from "lucide-react"
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { MessageCircle, X } from 'lucide-react'
 
 interface HowDidYouHearPopupProps {
   isOpen: boolean
@@ -20,10 +20,14 @@ const hearAboutOptions = [
   { value: 'flyer', label: 'Flyer or poster' },
   { value: 'website', label: 'Organization website' },
   { value: 'newsletter', label: 'Email newsletter' },
-  { value: 'other', label: 'Other' }
+  { value: 'other', label: 'Other' },
 ]
 
-export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowDidYouHearPopupProps) {
+export default function HowDidYouHearPopup({
+  isOpen,
+  onClose,
+  eventTitle,
+}: HowDidYouHearPopupProps) {
   const [selectedOption, setSelectedOption] = useState<string>('')
   const [otherText, setOtherText] = useState<string>('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -32,18 +36,18 @@ export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowD
     if (!selectedOption) return
 
     setIsSubmitting(true)
-    
+
     try {
       // TODO: Add API call to save how they heard about us
       console.log('How did you hear about us submission:', {
         eventTitle,
         source: selectedOption,
-        otherDetails: selectedOption === 'other' ? otherText : undefined
+        otherDetails: selectedOption === 'other' ? otherText : undefined,
       })
-      
+
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500))
-      
+      await new Promise((resolve) => setTimeout(resolve, 500))
+
       onClose()
     } catch (error) {
       console.error('Error submitting feedback:', error)
@@ -71,12 +75,7 @@ export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowD
               <MessageCircle className="h-5 w-5 text-primary" />
               Quick Question
             </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleClose}
-              className="h-6 w-6 p-0"
-            >
+            <Button variant="ghost" size="sm" onClick={handleClose} className="h-6 w-6 p-0">
               <X className="h-4 w-4" />
             </Button>
           </div>
@@ -116,9 +115,9 @@ export default function HowDidYouHearPopup({ isOpen, onClose, eventTitle }: HowD
           )}
 
           <div className="flex gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="ghost" 
+            <Button
+              type="button"
+              variant="ghost"
               onClick={handleSkip}
               className="flex-1"
               disabled={isSubmitting}

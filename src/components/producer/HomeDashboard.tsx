@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react'
 import {
   ClipboardList,
   Eye,
@@ -24,111 +24,115 @@ import {
   User,
   X,
   Save,
-} from 'lucide-react';
-import {
-  bulletinsApi,
-  eventsApi,
-} from '@/services/api';
-import { ScheduledEmail } from '@/types/email';
-import { CreateBulletinRequest } from '@/types/bulletin';
-import GoLiveCard from './GoLiveCard';
-import { formatEventDate } from '@/utils/dateHelpers';
-import { CreateBulletinModal } from './Bulletins/CreateBulletinModal';
-import { DebugPanel } from './DebugPanel';
-import { Badge } from '@/components/ui/badge';
+} from 'lucide-react'
+import { bulletinsApi, eventsApi } from '@/services/api'
+import { ScheduledEmail } from '@/types/email'
+import { CreateBulletinRequest } from '@/types/bulletin'
+import GoLiveCard from './GoLiveCard'
+import { formatEventDate } from '@/utils/dateHelpers'
+import { CreateBulletinModal } from './Bulletins/CreateBulletinModal'
+import { DebugPanel } from './DebugPanel'
+import { Badge } from '@/components/ui/badge'
 
 interface HomeDashboardProps {
-  eventSlug: string;
-  event: any;
-  onNavigateToTab?: (tab: string) => void;
-  onRefreshEvent?: () => Promise<void>;
-  organizationId?: number;
-  isAdmin?: boolean;
+  eventSlug: string
+  event: any
+  onNavigateToTab?: (tab: string) => void
+  onRefreshEvent?: () => Promise<void>
+  organizationId?: number
+  isAdmin?: boolean
 }
 
 interface DashboardStats {
-  applied: number;
-  newUnreviewed: number;
-  approvedPaid: number;
-  missingPayments: number;
+  applied: number
+  newUnreviewed: number
+  approvedPaid: number
+  missingPayments: number
 }
 
 interface CategoryStat {
-  name: string;
-  applied: number;
-  unreviewed: number;
-  paid: number;
-  unpaid: number;
+  name: string
+  applied: number
+  unreviewed: number
+  paid: number
+  unpaid: number
 }
 
 interface BulletinAuthor {
-  id: number;
-  name: string;
-  email: string;
-  role: string;
+  id: number
+  name: string
+  email: string
+  role: string
 }
 
 interface Bulletin {
-  id: number;
-  subject: string;
-  body: string;
-  created_at: string;
-  pinned: boolean;
-  author: BulletinAuthor;
-  view_count: number;
-  read_count: number;
+  id: number
+  subject: string
+  body: string
+  created_at: string
+  pinned: boolean
+  author: BulletinAuthor
+  view_count: number
+  read_count: number
 }
 
-export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRefreshEvent, organizationId, isAdmin }: HomeDashboardProps) {
+export default function HomeDashboard({
+  eventSlug,
+  event,
+  onNavigateToTab,
+  onRefreshEvent,
+  organizationId,
+  isAdmin,
+}: HomeDashboardProps) {
   const [stats, setStats] = useState<DashboardStats>({
     applied: 0,
     newUnreviewed: 0,
     approvedPaid: 0,
     missingPayments: 0,
-  });
-  const [scheduledEmails, setScheduledEmails] = useState<ScheduledEmail[]>([]);
-  const [bulletins, setBulletins] = useState<Bulletin[]>([]);
-  const [vendorApplications, setVendorApplications] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [categoryLinksExpanded, setCategoryLinksExpanded] = useState(false);
-  const [isCreateBulletinModalOpen, setIsCreateBulletinModalOpen] = useState(false);
-  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([]);
-  const [showAllBulletins, setShowAllBulletins] = useState(false);
+  })
+  const [scheduledEmails, setScheduledEmails] = useState<ScheduledEmail[]>([])
+  const [bulletins, setBulletins] = useState<Bulletin[]>([])
+  const [vendorApplications, setVendorApplications] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [categoryLinksExpanded, setCategoryLinksExpanded] = useState(false)
+  const [isCreateBulletinModalOpen, setIsCreateBulletinModalOpen] = useState(false)
+  const [categoryStats, setCategoryStats] = useState<CategoryStat[]>([])
+  const [showAllBulletins, setShowAllBulletins] = useState(false)
 
   // Ticket link edit state
-  const [isEditingTicketLink, setIsEditingTicketLink] = useState(false);
-  const [editedTicketLink, setEditedTicketLink] = useState('');
-  const [ticketLinkError, setTicketLinkError] = useState<string | null>(null);
+  const [isEditingTicketLink, setIsEditingTicketLink] = useState(false)
+  const [editedTicketLink, setEditedTicketLink] = useState('')
+  const [ticketLinkError, setTicketLinkError] = useState<string | null>(null)
 
   // Live status state - use state instead of derived value to ensure re-renders
-  const [isLive, setIsLive] = useState(event.status?.is_live || false);
+  const [isLive, setIsLive] = useState(event.status?.is_live || false)
 
   // Update isLive when event prop changes (fixes issue where state doesn't update after going live)
   useEffect(() => {
-    const newIsLive = event.status?.is_live || false;
+    const newIsLive = event.status?.is_live || false
     // console.log('🔄 [HomeDashboard] Event status changed:', {
     //   slug: event.slug,
     //   isLive: newIsLive,
     //   status: event.status
     // });
-    setIsLive(newIsLive);
-  }, [event, event.status?.is_live]);
+    setIsLive(newIsLive)
+  }, [event, event.status?.is_live])
 
   useEffect(() => {
-    fetchDashboardData();
-  }, [eventSlug]);
+    fetchDashboardData()
+  }, [eventSlug])
 
   // Combined refresh function that updates both event AND dashboard data
   const handleRefresh = async () => {
     if (onRefreshEvent) {
-      await onRefreshEvent();
+      await onRefreshEvent()
     }
-    await fetchDashboardData();
-  };
+    await fetchDashboardData()
+  }
 
   const fetchDashboardData = async () => {
     try {
-      setLoading(true);
+      setLoading(true)
 
       // ⚡ PERFORMANCE OPTIMIZATION: Use single compound endpoint instead of 15-20+ sequential requests
       // This eliminates N+1 query problem and reduces load time from 5-10s to <500ms
@@ -137,10 +141,10 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         // Fetch bulletins separately since command_center endpoint doesn't use BulletinSerializer
         // and is missing author, view_count, read_count fields
         bulletinsApi.getByEvent(eventSlug).catch(() => ({ bulletins: [] })),
-      ]);
+      ])
 
       // Save applications to state
-      setVendorApplications(data.vendor_applications);
+      setVendorApplications(data.vendor_applications)
 
       // Use pre-calculated stats from backend (massive performance gain)
       setStats({
@@ -148,153 +152,155 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         newUnreviewed: data.stats.new_unreviewed,
         approvedPaid: data.stats.approved_paid,
         missingPayments: data.stats.missing_payments,
-      });
+      })
 
       // Calculate per-category stats client-side from returned submissions
       // (Backend doesn't include this breakdown, so we compute it here)
-      const perCategoryStats: CategoryStat[] = [];
+      const perCategoryStats: CategoryStat[] = []
       for (const app of data.vendor_applications) {
         const appSubmissions = data.submissions.filter(
-          (s: any) => s.vendor_application_id === app.id
-        );
+          (s: any) => s.vendor_application_id === app.id,
+        )
         const catApproved = appSubmissions.filter(
-          (s: any) => s.status === 'approved' || s.status === 'confirmed'
-        );
+          (s: any) => s.status === 'approved' || s.status === 'confirmed',
+        )
         perCategoryStats.push({
           name: app.name,
           applied: appSubmissions.length,
           unreviewed: appSubmissions.filter((s: any) => s.status === 'pending').length,
           paid: catApproved.filter((s: any) => s.payment_status === 'paid').length,
           unpaid: catApproved.filter((s: any) => s.payment_status !== 'paid').length,
-        });
+        })
       }
-      setCategoryStats(perCategoryStats);
+      setCategoryStats(perCategoryStats)
 
       // Set scheduled emails (filter out sent/failed/cancelled, limit to 4 most recent)
-      const emailsArray = Array.isArray(data.scheduled_emails) ? data.scheduled_emails : [];
+      const emailsArray = Array.isArray(data.scheduled_emails) ? data.scheduled_emails : []
       const upcomingEmails = emailsArray.filter(
-        (email: any) => email.status === 'scheduled' || email.status === 'paused'
-      );
-      setScheduledEmails(upcomingEmails.slice(0, 4));
+        (email: any) => email.status === 'scheduled' || email.status === 'paused',
+      )
+      setScheduledEmails(upcomingEmails.slice(0, 4))
 
       // Set bulletins (pinned first, then sorted newest first) - from separate API call
-      const bulletinsArray = Array.isArray(bulletinsRes.bulletins) ? bulletinsRes.bulletins : [];
+      const bulletinsArray = Array.isArray(bulletinsRes.bulletins) ? bulletinsRes.bulletins : []
       bulletinsArray.sort((a: Bulletin, b: Bulletin) => {
         // Pinned bulletins come first
         if (a.pinned !== b.pinned) {
-          return a.pinned ? -1 : 1;
+          return a.pinned ? -1 : 1
         }
         // Then sort by created_at (newest first)
-        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-      });
-      setBulletins(bulletinsArray);
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
+      setBulletins(bulletinsArray)
     } catch (err) {
-      console.error('Failed to fetch dashboard data:', err);
+      console.error('Failed to fetch dashboard data:', err)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Not set';
-    return formatEventDate(dateString, 'MMM d, yyyy') || 'Invalid date';
-  };
+    if (!dateString) return 'Not set'
+    return formatEventDate(dateString, 'MMM d, yyyy') || 'Invalid date'
+  }
 
   const formatTime = (timeString?: string) => {
-    if (!timeString) return '';
+    if (!timeString) return ''
     try {
-      const [hours, minutes] = timeString.split(':');
-      const hour = parseInt(hours, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
-      const displayHour = hour % 12 || 12;
-      return `${displayHour}:${minutes} ${ampm}`;
+      const [hours, minutes] = timeString.split(':')
+      const hour = parseInt(hours, 10)
+      const ampm = hour >= 12 ? 'PM' : 'AM'
+      const displayHour = hour % 12 || 12
+      return `${displayHour}:${minutes} ${ampm}`
     } catch {
-      return timeString;
+      return timeString
     }
-  };
+  }
 
   const getInitials = (name: string) => {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase()
-      .slice(0, 2);
-  };
+      .slice(0, 2)
+  }
 
   const formatTimeAgo = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+    const date = new Date(dateString)
+    const now = new Date()
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000)
 
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return formatDate(dateString);
-  };
+    if (seconds < 60) return 'just now'
+    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`
+    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`
+    return formatDate(dateString)
+  }
 
-  const applicationPageUrl = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`;
-  const vendorPortalUrl = `${window.location.origin}/portal/${event.namespaced_slug || event.slug}`;
+  const applicationPageUrl = `${window.location.origin}/events/${event.namespaced_slug || event.slug}`
+  const vendorPortalUrl = `${window.location.origin}/portal/${event.namespaced_slug || event.slug}`
 
   const handleCreateBulletin = async (data: CreateBulletinRequest) => {
     try {
-      await bulletinsApi.create(eventSlug, data);
-      await fetchDashboardData(); // Refresh bulletins
-      setIsCreateBulletinModalOpen(false);
+      await bulletinsApi.create(eventSlug, data)
+      await fetchDashboardData() // Refresh bulletins
+      setIsCreateBulletinModalOpen(false)
     } catch (err) {
-      console.error('Failed to create bulletin:', err);
-      throw err;
+      console.error('Failed to create bulletin:', err)
+      throw err
     }
-  };
+  }
 
   const handleStartEditTicketLink = () => {
-    setEditedTicketLink(event.ticket_link || '');
-    setIsEditingTicketLink(true);
-    setTicketLinkError(null);
-  };
+    setEditedTicketLink(event.ticket_link || '')
+    setIsEditingTicketLink(true)
+    setTicketLinkError(null)
+  }
 
   const handleCancelEditTicketLink = () => {
-    setIsEditingTicketLink(false);
-    setEditedTicketLink('');
-    setTicketLinkError(null);
-  };
+    setIsEditingTicketLink(false)
+    setEditedTicketLink('')
+    setTicketLinkError(null)
+  }
 
   const handleSaveTicketLink = async () => {
     try {
-      setTicketLinkError(null);
+      setTicketLinkError(null)
 
       await eventsApi.update(eventSlug, {
         ticket_link: editedTicketLink.trim() || undefined,
-      });
+      })
 
-      setIsEditingTicketLink(false);
-      setEditedTicketLink('');
+      setIsEditingTicketLink(false)
+      setEditedTicketLink('')
 
       // Refresh event data
       if (onRefreshEvent) {
-        await onRefreshEvent();
+        await onRefreshEvent()
       }
     } catch (err: any) {
-      console.error('Failed to update ticket link:', err);
-      setTicketLinkError(err.message || 'Failed to update ticket link');
+      console.error('Failed to update ticket link:', err)
+      setTicketLinkError(err.message || 'Failed to update ticket link')
     }
-  };
+  }
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
       </div>
-    );
+    )
   }
 
-  const isEventCancelled = event.status?.status === 'cancelled';
+  const isEventCancelled = event.status?.status === 'cancelled'
 
-  const commandPanelClass = 'glass-card voxxy-hover-panel rounded-2xl shadow-sm';
-  const commandRowClass = 'voxxy-surface-subtle voxxy-hover-row flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10';
-  const commandInsetClass = 'voxxy-surface-subtle rounded-xl';
-  const sideLinkClass = 'voxxy-surface-subtle w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10 group';
+  const commandPanelClass = 'glass-card voxxy-hover-panel rounded-2xl shadow-sm'
+  const commandRowClass =
+    'voxxy-surface-subtle voxxy-hover-row flex items-center justify-between rounded-xl px-3 py-2.5 transition-smooth hover:bg-accent/50 dark:hover:bg-background/10'
+  const commandInsetClass = 'voxxy-surface-subtle rounded-xl'
+  const sideLinkClass =
+    'voxxy-surface-subtle w-full flex items-center justify-between rounded-xl px-3 py-2.5 text-xs text-foreground transition-smooth hover:bg-accent/50 dark:hover:bg-background/10 group'
 
   return (
     <div className="px-3 md:px-4">
@@ -312,7 +318,9 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             <div className="flex-1">
               <h3 className="text-sm font-bold text-foreground mb-1">Event Locked - Cancelled</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                This event has been cancelled and is now in read-only mode. You cannot create bulletins, edit emails, or change the event status. All vendors have been notified of the cancellation.
+                This event has been cancelled and is now in read-only mode. You cannot create
+                bulletins, edit emails, or change the event status. All vendors have been notified
+                of the cancellation.
               </p>
             </div>
           </div>
@@ -341,8 +349,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.applied}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">
+                          {cat.applied}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -364,8 +376,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.unreviewed}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">
+                          {cat.unreviewed}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -387,8 +403,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.paid}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">
+                          {cat.paid}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -410,8 +430,12 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <div className="mt-2 pt-2 border-t border-border space-y-0.5">
                     {categoryStats.map((cat) => (
                       <div key={cat.name} className="flex items-center justify-between">
-                        <span className="text-[10px] text-foreground/50 truncate mr-2">{cat.name}</span>
-                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">{cat.unpaid}</span>
+                        <span className="text-[10px] text-foreground/50 truncate mr-2">
+                          {cat.name}
+                        </span>
+                        <span className="text-[10px] text-foreground/70 font-medium tabular-nums">
+                          {cat.unpaid}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -420,11 +444,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             </div>
           ) : (
             /* Go Live Card - Show when event is NOT live */
-            <GoLiveCard
-              event={event}
-              onGoLive={handleRefresh}
-              organizationId={organizationId}
-            />
+            <GoLiveCard event={event} onGoLive={handleRefresh} organizationId={organizationId} />
           )}
 
           {/* Upcoming Emails */}
@@ -447,10 +467,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
             ) : (
               <div className="space-y-2">
                 {scheduledEmails.map((email) => (
-                  <div
-                    key={email.id}
-                    className={commandRowClass}
-                  >
+                  <div key={email.id} className={commandRowClass}>
                     <div className="flex-1">
                       <p className="text-xs font-medium text-foreground">{email.name}</p>
                       <p className="text-[10px] text-foreground/60">
@@ -494,7 +511,11 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       ? 'cursor-not-allowed opacity-50 bg-muted text-muted-foreground'
                       : 'voxxy-btn-cta hover:shadow-lg'
                   }`}
-                  title={isEventCancelled ? 'Cannot create bulletins for cancelled events' : 'Create a new bulletin'}
+                  title={
+                    isEventCancelled
+                      ? 'Cannot create bulletins for cancelled events'
+                      : 'Create a new bulletin'
+                  }
                 >
                   <MessageSquare className="w-3 h-3" />
                   Create Bulletin
@@ -507,7 +528,9 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                 Post updates for your vendors
               </p>
             ) : (
-              <div className={`space-y-3 ${showAllBulletins ? 'max-h-[400px] overflow-y-auto pr-1' : ''}`}>
+              <div
+                className={`space-y-3 ${showAllBulletins ? 'max-h-[400px] overflow-y-auto pr-1' : ''}`}
+              >
                 {(showAllBulletins ? bulletins : bulletins.slice(0, 3)).map((bulletin) => (
                   <div
                     key={bulletin.id}
@@ -515,9 +538,7 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                       bulletin.pinned
                         ? 'voxxy-surface-subtle border-primary/40 dark:border-primary/24'
                         : 'voxxy-surface-subtle'
-                    } ${
-                      bulletin.pinned ? 'dark:border-primary/28' : ''
-                    }`}
+                    } ${bulletin.pinned ? 'dark:border-primary/28' : ''}`}
                   >
                     {/* Header */}
                     <div className="flex items-start gap-2 mb-2">
@@ -568,11 +589,11 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
 
         {/* Right Column - Event Details */}
         <div className={`${commandPanelClass} p-3.5`}>
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary dark:text-primary" />
-                <h3 className="text-sm font-semibold text-foreground">Event Details</h3>
-              </div>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-primary dark:text-primary" />
+              <h3 className="text-sm font-semibold text-foreground">Event Details</h3>
+            </div>
             <button
               onClick={() => onNavigateToTab?.('settings')}
               className="flex items-center gap-1 text-xs text-primary transition-smooth hover:text-slate-900 dark:text-primary dark:hover:text-primary/70"
@@ -609,14 +630,24 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
               </div>
               <div className="flex-1">
                 <p className="text-[10px] text-muted-foreground">Event Status</p>
-                <p className={`text-xs font-medium ${
-                  event.status?.status === 'cancelled' ? 'text-red-700 dark:text-red-400' :
-                  event.status?.status === 'completed' ? 'text-blue-700 dark:text-blue-400' :
-                  isLive ? 'text-green-700 dark:text-green-400' : 'text-amber-700 dark:text-yellow-400'
-                }`}>
-                  {event.status?.status === 'cancelled' ? 'Cancelled' :
-                   event.status?.status === 'completed' ? 'Completed' :
-                   isLive ? 'Live' : 'Draft'}
+                <p
+                  className={`text-xs font-medium ${
+                    event.status?.status === 'cancelled'
+                      ? 'text-red-700 dark:text-red-400'
+                      : event.status?.status === 'completed'
+                        ? 'text-blue-700 dark:text-blue-400'
+                        : isLive
+                          ? 'text-green-700 dark:text-green-400'
+                          : 'text-amber-700 dark:text-yellow-400'
+                  }`}
+                >
+                  {event.status?.status === 'cancelled'
+                    ? 'Cancelled'
+                    : event.status?.status === 'completed'
+                      ? 'Completed'
+                      : isLive
+                        ? 'Live'
+                        : 'Draft'}
                 </p>
               </div>
             </div>
@@ -797,9 +828,13 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
                   <div className="flex items-center gap-2">
                     <FileText className="w-3.5 h-3.5 text-blue-400" />
                     <span>Category Links</span>
-                    <span className="text-[10px] text-foreground/40">({vendorApplications.filter(a => a.status === 'active').length})</span>
+                    <span className="text-[10px] text-foreground/40">
+                      ({vendorApplications.filter((a) => a.status === 'active').length})
+                    </span>
                   </div>
-                  <ChevronDown className={`w-3 h-3 text-foreground/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`} />
+                  <ChevronDown
+                    className={`w-3 h-3 text-foreground/40 transition-transform ${categoryLinksExpanded ? 'rotate-180' : ''}`}
+                  />
                 </button>
                 {categoryLinksExpanded && (
                   <div className="space-y-1 border-t border-border px-2 pb-2 pt-1">
@@ -850,5 +885,5 @@ export default function HomeDashboard({ eventSlug, event, onNavigateToTab, onRef
         isAdmin={isAdmin}
       />
     </div>
-  );
+  )
 }

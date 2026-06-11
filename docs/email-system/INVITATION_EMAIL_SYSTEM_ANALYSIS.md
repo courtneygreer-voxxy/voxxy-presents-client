@@ -28,6 +28,7 @@
 The invitation system has been **unified** as of February 28, 2026. Instead of using a separate invitation system, invitation emails are now sent using **Position 1 ("Initial Invitation")** of the scheduled emails system.
 
 **Key Changes:**
+
 - ✅ Position 1 is now a **real ScheduledEmail** from the database (not virtual)
 - ✅ Uses `InvitationVariableResolver` on the backend for variable resolution
 - ✅ Creates proper `EmailDelivery` records for audit log tracking
@@ -58,6 +59,7 @@ export interface EventInvitation {
 ```
 
 **Data Flow:**
+
 1. Created via `POST /api/v1/presents/events/:event_slug/invitations/batch`
 2. Stored in `event_invitations` table
 3. Associated with `vendor_contact` (not a registration)
@@ -73,6 +75,7 @@ export interface EventInvitation {
 **Location:** `EventInvitationsController` (backend)
 
 1. **Create Invitations:**
+
    ```
    POST /api/v1/presents/events/:slug/invitations/batch
    ├── Create EventInvitation records
@@ -81,6 +84,7 @@ export interface EventInvitation {
    ```
 
 2. **Send Email (Background Job):**
+
    ```
    - Fetch Position 1 (Initial Invitation) ScheduledEmail
    - Use InvitationVariableResolver to resolve variables
@@ -125,12 +129,14 @@ await eventInvitationsApi.createBatch(newEvent.slug, invitedContactIds)
 **Format Used:** `[bracket]` notation (NOT {{mustache}})
 
 **Why [bracket]:**
+
 - Frontend UI uses: `[eventName]`, `[firstName]`, etc.
 - Backend database stores: `[eventName]`, `[firstName]`, etc.
 - Backend `InvitationVariableResolver` expects: `[bracket]` format
 - Legacy {{mustache}} format is converted to [bracket] on load
 
 **Conversion Functions:**
+
 ```typescript
 // Load from database → Frontend
 backendToFrontend(text): Converts {{mustache}} → [bracket]
@@ -142,6 +148,7 @@ frontendToBackend(text): Keeps [bracket] format (backend expects this!)
 ### Variable Resolver Behavior
 
 **For Invitations:**
+
 - Resolver Type: `InvitationVariableResolver` (backend)
 - Input Context:
   - `event_invitation` object
@@ -151,6 +158,7 @@ frontendToBackend(text): Keeps [bracket] format (backend expects this!)
 - Can resolve variables that have event or vendor contact data
 
 **For Registrations:**
+
 - Resolver Type: `RegistrationVariableResolver` (backend)
 - Input Context:
   - `registration` object
@@ -170,43 +178,44 @@ export interface EmailDelivery {
   id: number
   scheduled_email_id: number
   event_id: number
-  
+
   // Key: Can be registration OR invitation (but not both)
-  registration_id: number | null      // For registration emails
-  event_invitation_id: number | null  // For invitation emails
-  
+  registration_id: number | null // For registration emails
+  event_invitation_id: number | null // For invitation emails
+
   // Email tracking
   sendgrid_message_id: string
   recipient_email: string
-  
+
   // Status (updated via SendGrid webhook)
   status: DeliveryStatus
   bounce_type: 'soft' | 'hard' | null
   bounce_reason: string | null
   drop_reason: string | null
-  
+
   // Timestamps from SendGrid
   sent_at: string | null
   delivered_at: string | null
   bounced_at: string | null
   dropped_at: string | null
   unsubscribed_at: string | null
-  
+
   // Auto-retry logic
   retry_count: number
   next_retry_at: string | null
   max_retries: number
-  
+
   // Audit log data
   recipient_name?: string | null
-  vendor_category?: string | null     // For registrations only
-  
+  vendor_category?: string | null // For registrations only
+
   created_at: string
   updated_at: string
 }
 ```
 
 **Key Point:** `registration_id` AND `event_invitation_id` are BOTH nullable
+
 - When sending to an invitee (no registration yet): `registration_id = null`, `event_invitation_id = X`
 - When sending to a registered vendor: `registration_id = X`, `event_invitation_id = null`
 - Audit log can handle both scenarios
@@ -218,11 +227,13 @@ export interface EmailDelivery {
 ### Invitation Emails (Position 1)
 
 **When Sent:**
+
 - Trigger: `on_invitation_send` (when batch invitations are created)
 - Recipient: Vendor contact (from vendor_contact table)
 - Status: Email is sent IMMEDIATELY when invitations are created
 
 **Data Available:**
+
 - ✅ Event-level data: event name, date, location, venue
 - ✅ Contact-level data: first name, last name, business name
 - ❌ **NO** vendor category context
@@ -232,6 +243,7 @@ export interface EmailDelivery {
 - ⚠️ Recipient may not have applied yet
 
 **What Resolver Can Access:**
+
 ```
 event_invitation:
   - vendor_contact: first_name, last_name, email, business_name
@@ -247,11 +259,13 @@ Result: Can only use event-level + contact-level variables
 ### Registration Emails
 
 **When Sent:**
+
 - Trigger: Various (`on_approval`, `on_rejection`, `on_payment_received`, etc.)
 - Recipient: Registered vendor (from registrations table)
 - Status: Email sent AFTER vendor applies
 
 **Data Available:**
+
 - ✅ Event-level data: event name, date, location
 - ✅ Contact-level data: first name, last name, business name
 - ✅ **Registration-level data:** vendor_category (which application they applied to)
@@ -259,6 +273,7 @@ Result: Can only use event-level + contact-level variables
 - ✅ Full vendor application context
 
 **What Resolver Can Access:**
+
 ```
 registration:
   - vendor_contact: all contact data
@@ -275,6 +290,7 @@ Result: Can use all variables including category-specific ones
 **Can be reliably used in Position 1 (Initial Invitation) emails:**
 
 ### Event Variables
+
 ```
 [eventName]              → "Summer Market 2025"
 [eventDate]              → "June 15, 2025"
@@ -288,12 +304,14 @@ Result: Can use all variables including category-specific ones
 ```
 
 ### Organization Variables
+
 ```
 [organizationName]       → "Voxxy Presents"
 [organizationEmail]      → "hello@voxxypresents.com"
 ```
 
 ### Vendor Contact Variables (From invitee's contact record)
+
 ```
 [greetingName]           → "John's Tacos" or "John" (smart choice)
 [firstName]              → "John"
@@ -304,6 +322,7 @@ Result: Can use all variables including category-specific ones
 ```
 
 ### Computed/Link Variables
+
 ```
 [eventLink]              → Public event application page
 [invitationLink]         → Same as eventLink (invitation context)
@@ -329,6 +348,7 @@ Result: Can use all variables including category-specific ones
 ```
 
 **Why Not Available:**
+
 1. Invitation is sent BEFORE vendor chooses their category
 2. No registration exists yet (they haven't applied)
 3. Backend resolver doesn't have `vendor_application` context
@@ -344,6 +364,7 @@ Result: Can use all variables including category-specific ones
 ```
 
 ### ⚠️ Currently Missing (Even for registrations)
+
 ```
 application_tags         → Not yet in EMAIL_VARIABLES
 Category name/description → Not exposed as variables
@@ -360,6 +381,7 @@ Category name/description → Not exposed as variables
 **Two Preview Systems:**
 
 #### 1. **Standard Preview (Registration/Scheduled Emails)**
+
 ```typescript
 // API Endpoint
 POST /api/v1/presents/events/:slug/scheduled_emails/:id/preview
@@ -380,11 +402,13 @@ POST /api/v1/presents/events/:slug/scheduled_emails/:id/preview
 ```
 
 **Issue:** Requires a sample registration to resolve variables!
+
 - If no `registration_id` provided, backend uses a sample
 - Categories are only helpful if registration exists
 - Category selection UI appears but may not work properly
 
 #### 2. **Invitation-Specific Preview (Deprecated)**
+
 ```typescript
 // Legacy endpoint (still exists but not used)
 GET /api/v1/presents/events/:slug/invitations/preview_email
@@ -393,6 +417,7 @@ GET /api/v1/presents/events/:slug/invitations/preview_email
 ```
 
 **Current Status:** Not used since Feb 28, 2026
+
 - Position 1 now uses standard preview endpoint
 - No special invitation preview handling
 
@@ -403,19 +428,18 @@ GET /api/v1/presents/events/:slug/invitations/preview_email
 ```typescript
 // Load preview when modal opens
 const loadPreview = async () => {
-  const context = hasCategorySpecificContent
-    ? { category: selectedCategory }
-    : {}
+  const context = hasCategorySpecificContent ? { category: selectedCategory } : {}
 
   const data = await scheduledEmailsApi.preview(
     eventSlug,
     email.id,
-    context  // May include registration_id
+    context, // May include registration_id
   )
 }
 ```
 
 **For Invitation Emails (Position 1):**
+
 - ✅ Preview works (uses sample invitation)
 - ❌ Category selection appears but doesn't affect invitation variables
 - ❌ No way to preview with specific vendor contact data
@@ -430,6 +454,7 @@ const loadPreview = async () => {
 **Problem:** Invitations are sent to potential vendors BEFORE they choose their category
 
 **Example:**
+
 - Event has 3 categories: Artist ($100), Food ($200), Sponsor ($500)
 - Vendor receives invitation with `[boothPrice]`
 - Which price do we show? Unknown until they apply!
@@ -439,6 +464,7 @@ const loadPreview = async () => {
 #### 1. **Show All Categories (Recommended)**
 
 **New Variable (Proposal):**
+
 ```typescript
 [categoryList]  → Bulleted list of all categories with prices
 
@@ -449,6 +475,7 @@ Example output:
 ```
 
 **Implementation:**
+
 ```typescript
 {
   label: 'All Categories',
@@ -463,6 +490,7 @@ Example output:
 #### 2. **Show Default/First Category**
 
 **Current Approach (Not Ideal):**
+
 - `[boothPrice]` defaults to first category's price
 - Misleading if categories have different prices
 - Can't control which category is "default"
@@ -470,12 +498,13 @@ Example output:
 #### 3. **Generic Pricing Language**
 
 **Example Email:**
+
 ```
 Dear [greetingName],
 
 You're invited to participate in [eventName]!
 
-Application fee varies by vendor category. 
+Application fee varies by vendor category.
 To learn more and apply, click here: [eventLink]
 
 Setup: [installDate]
@@ -487,6 +516,7 @@ Setup: [installDate]
 #### 4. **Category-Specific Emails**
 
 **Advanced (Not Yet Implemented):**
+
 - Send multiple invitation emails, one per category
 - Each invitation shows the specific category's price
 - Same vendor gets 3 separate emails (one per category they could apply to)
@@ -503,6 +533,7 @@ Setup: [installDate]
 **File:** Backend system templates (not in frontend repo)
 
 **Position 1 Template ("Initial Invitation"):**
+
 - Managed in database as `email_template_items` with position = 1
 - Trigger type: `on_invitation_send`
 - Category: `pre_application`
@@ -511,13 +542,14 @@ Setup: [installDate]
 ### Template Content
 
 **Typical Default:**
+
 ```
 Subject: [greetingName], you're invited to [eventName]!
 
 Body:
 <p>Hello [greetingName],</p>
 
-<p>You're invited to participate in [eventName], 
+<p>You're invited to participate in [eventName],
 happening on [eventDate] at [eventLocation].</p>
 
 <p>[eventDescription]</p>
@@ -533,6 +565,7 @@ happening on [eventDate] at [eventLocation].</p>
 ### Customization
 
 **Producers can:**
+
 - ✅ Edit subject and body for Position 1
 - ✅ Change trigger timing (though typically `on_invitation_send`)
 - ✅ Add/remove variables
@@ -549,6 +582,7 @@ happening on [eventDate] at [eventLocation].</p>
 **Purpose:** Support multi-category invitation emails
 
 **Implementation:**
+
 ```typescript
 // In emailVariables.ts
 {
@@ -562,7 +596,9 @@ happening on [eventDate] at [eventLocation].</p>
 ```
 
 **Backend Implementation:**
+
 - In `InvitationVariableResolver`:
+
 ```ruby
 when 'categories_list'
   event.vendor_applications.map do |app|
@@ -571,6 +607,7 @@ when 'categories_list'
 ```
 
 **Example Email:**
+
 ```
 Subject: You're invited to [eventName]!
 
@@ -588,6 +625,7 @@ Learn more and apply: [eventLink]
 **Purpose:** Help vendors who applied to multiple categories see their options
 
 **For Registration Emails:**
+
 ```typescript
 {
   label: 'Applications List',
@@ -612,14 +650,14 @@ Learn more and apply: [eventLink]
 interface EventEmailPreviewModalProps {
   // ... existing props
   invitationMode?: boolean
-  availableContacts?: VendorContact[]  // For invitation preview
+  availableContacts?: VendorContact[] // For invitation preview
   onSelectContact?: (contact: VendorContact) => void
 }
 
 // In preview request:
 const context = {
-  vendor_contact_id: selectedContact?.id,  // For invitations
-  category: selectedCategory
+  vendor_contact_id: selectedContact?.id, // For invitations
+  category: selectedCategory,
 }
 ```
 
@@ -628,6 +666,7 @@ const context = {
 ### 4. Document Invitation Resolver Limitations
 
 **Create Backend Documentation:**
+
 - Document what `InvitationVariableResolver` can/cannot resolve
 - List which variables require `registration` context
 - Provide examples of invitations with/without category-specific vars
@@ -640,9 +679,9 @@ const context = {
 
 ```typescript
 trigger_types: [
-  'on_invitation_send',    // Default - send when created
-  'days_before_event',     // Send 7 days before
-  'days_before_deadline',  // Send before app deadline
+  'on_invitation_send', // Default - send when created
+  'days_before_event', // Send 7 days before
+  'days_before_deadline', // Send before app deadline
 ]
 ```
 
@@ -653,6 +692,7 @@ trigger_types: [
 ### 6. Add Invitation Token Variable
 
 **New Variable (Low Priority):**
+
 ```typescript
 {
   label: 'Acceptance Link',
@@ -670,18 +710,18 @@ trigger_types: [
 
 ## Summary Table
 
-| Aspect | Registration Email | Invitation Email |
-|--------|-------------------|------------------|
-| **Recipient Context** | Has registration data | Pre-registration (no app yet) |
-| **Data Available** | Registration + category | Contact + event only |
-| **[boothPrice]** | ✅ Category-specific | ❌ Would be generic |
-| **[installDate]** | ✅ Category-specific | ❌ Not available |
-| **[vendorCategory]** | ✅ Their choice | ❌ Unknown |
-| **[eventLink]** | ✅ Works | ✅ Works |
-| **[greetingName]** | ✅ Works | ✅ Works |
-| **Preview Method** | Standard + registration | Standard + sample |
-| **Editable** | ✅ Yes | ✅ Yes (Position 1) |
-| **Sent Immediately** | After trigger event | When created |
+| Aspect                | Registration Email      | Invitation Email              |
+| --------------------- | ----------------------- | ----------------------------- |
+| **Recipient Context** | Has registration data   | Pre-registration (no app yet) |
+| **Data Available**    | Registration + category | Contact + event only          |
+| **[boothPrice]**      | ✅ Category-specific    | ❌ Would be generic           |
+| **[installDate]**     | ✅ Category-specific    | ❌ Not available              |
+| **[vendorCategory]**  | ✅ Their choice         | ❌ Unknown                    |
+| **[eventLink]**       | ✅ Works                | ✅ Works                      |
+| **[greetingName]**    | ✅ Works                | ✅ Works                      |
+| **Preview Method**    | Standard + registration | Standard + sample             |
+| **Editable**          | ✅ Yes                  | ✅ Yes (Position 1)           |
+| **Sent Immediately**  | After trigger event     | When created                  |
 
 ---
 
@@ -693,4 +733,3 @@ trigger_types: [
 4. **Preview mode needs vendor selection** - currently uses generic samples
 5. **EmailDelivery supports both** - registration_id OR event_invitation_id (not both)
 6. **Variable resolver differs** - `InvitationVariableResolver` vs `RegistrationVariableResolver`
-

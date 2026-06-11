@@ -13,6 +13,7 @@ The **venue_owner** role in Voxxy Presents is mapped to the **Producer** label i
 **File:** `/src/pages/VenueOwnerLoginPage.tsx`
 
 #### Login Steps:
+
 1. User navigates to **legacy routes** (all redirect to `/login`):
    - `/login/venue-owner` → redirects to `/login`
    - `/login/club-owner` → redirects to `/login`
@@ -25,13 +26,14 @@ The **venue_owner** role in Voxxy Presents is mapped to the **Producer** label i
    - Backend returns JWT token with user ID
 
 3. **Post-Login Flow** in AuthContext:
+
    ```typescript
    // 1. Login saves JWT token
    const loginResponse = await authApi.login(data.email, data.password)
-   
+
    // 2. Fetch full user profile with role
    const user = await authApi.getCurrentUser()
-   
+
    // 3. Profile contains role: 'venue_owner'
    setCurrentUser(user)
    setUserProfile(user)
@@ -48,6 +50,7 @@ The **venue_owner** role in Voxxy Presents is mapped to the **Producer** label i
 **File:** `/src/pages/VenueOwnerSignUpPage.tsx`
 
 #### Sign-Up Steps:
+
 1. User fills form:
    - Display Name
    - Email
@@ -55,16 +58,18 @@ The **venue_owner** role in Voxxy Presents is mapped to the **Producer** label i
    - Accepts Terms & Conditions
 
 2. Form submission calls:
+
    ```typescript
    await signUp({
      email: formData.email,
      password: formData.password,
      displayName: formData.displayName,
-     userType: 'venue-owner'  // Maps to 'producer' role
+     userType: 'venue-owner', // Maps to 'producer' role
    })
    ```
 
 3. **AuthContext SignUp Handler** maps userType to role:
+
    ```typescript
    case 'venue-owner':
      role = 'producer'  // Actually sends 'producer' or keeps 'vendor' depending on mapping
@@ -98,6 +103,7 @@ The **venue_owner** role in Voxxy Presents is mapped to the **Producer** label i
 **User Type:** Event Producer/Organizer
 
 **Type Definition** (`/src/contexts/AuthContext.tsx`):
+
 ```typescript
 role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest'
 ```
@@ -105,6 +111,7 @@ role: 'consumer' | 'vendor' | 'venue_owner' | 'admin' | 'producer' | 'guest'
 ### 2.2 Frontend Display & Helpers
 
 **Helper Flags in AuthContext:**
+
 ```typescript
 // True for venue_owner users
 isProducer = userProfile?.role === 'producer' || userProfile?.role === 'venue_owner'
@@ -115,11 +122,11 @@ hasRole(role) = userProfile?.role === role
 
 **Role Mapping** (documented in `/docs/ROLE_MAPPING.md`):
 
-| Backend Role | Frontend Display | Helper Flag | Route |
-|---|---|---|---|
-| `venue_owner` | **Producer** | `isProducer` | `/producer/pending` |
-| `producer` | **Producer** | `isProducer` | `/producer/pending` |
-| `vendor` | **Vendor** | `isVendor` | `/vendor/pending` |
+| Backend Role  | Frontend Display | Helper Flag  | Route               |
+| ------------- | ---------------- | ------------ | ------------------- |
+| `venue_owner` | **Producer**     | `isProducer` | `/producer/pending` |
+| `producer`    | **Producer**     | `isProducer` | `/producer/pending` |
+| `vendor`      | **Vendor**       | `isVendor`   | `/vendor/pending`   |
 
 ### 2.3 Permissions & Capabilities
 
@@ -167,6 +174,7 @@ Venue owners (producers) can:
 **Route:** `/producer/pending`
 
 **Layout:**
+
 ```
 ┌─────────────────────────────────────────────┐
 │ Left Sidebar (220px)   │  Main Content Area │
@@ -186,12 +194,14 @@ Venue owners (producers) can:
 ### 3.2 Events View States
 
 #### a) Empty State
+
 - Component: `EventsEmptyState`
 - Shows when user has no events
 - 3-step guide for creating first event
 - "Create Event" button
 
 #### b) Events List View
+
 - Component: `EventsList`
 - Displays all user's events
 - Each event shows:
@@ -204,6 +214,7 @@ Venue owners (producers) can:
   - Command Center button
 
 #### c) Create Event Form
+
 - Component: `CreateEventForm`
 - Fields:
   - Title (required)
@@ -214,6 +225,7 @@ Venue owners (producers) can:
 - Cancel button returns to list
 
 #### d) Edit Event Form
+
 - Component: `EditEventForm`
 - Pre-populated with event data
 - Same fields as create form
@@ -222,6 +234,7 @@ Venue owners (producers) can:
 - Cancel returns to list
 
 #### e) Command Center
+
 - Component: `CommandCenter`
 - Tabs: Messages, Applications, Vendors, Settings
 - Full event management interface
@@ -229,6 +242,7 @@ Venue owners (producers) can:
 ### 3.3 Command Center Tabs
 
 #### Tab 1: Message Board
+
 - **Component:** `MessageBoard`
 - **Features:**
   - View posted messages
@@ -237,6 +251,7 @@ Venue owners (producers) can:
   - (Currently using mock data - backend integration pending)
 
 #### Tab 2: Vendor Applications
+
 - **Component:** `ApplicationsTab`
 - **Features:**
   - List all vendor applications for event
@@ -250,6 +265,7 @@ Venue owners (producers) can:
     - **Submissions View:** `ViewApplicationSubmissions` - see who applied, filter by status
 
 #### Tab 3: Vendors
+
 - **Component:** `VendorsTab`
 - **Features:**
   - List all vendor submissions across all applications
@@ -267,6 +283,7 @@ Venue owners (producers) can:
     - Contact vendor
 
 #### Tab 4: Settings
+
 - **Component:** `EventSettings`
 - **Features:**
   - Event visibility (Published/Draft toggle)
@@ -281,6 +298,7 @@ Venue owners (producers) can:
 **File:** `/src/pages/SettingsPage.tsx`
 
 **Sections:**
+
 1. **Profile Information**
    - Full Name
    - Email
@@ -350,6 +368,7 @@ Venue owners (producers) can:
 ### 4.3 Deprecated/Legacy Components
 
 **These still exist but are not actively used:**
+
 - `/src/pages/VenueOwnerLoginPage.tsx` (redirects via old routes)
 - `/src/pages/VenueOwnerSignUpPage.tsx` (signup redirects to contact form)
 - `/src/pages/ClubOwnerLoginPage.tsx` (same as venue owner)
@@ -605,17 +624,17 @@ registrationsApi.updateStatus(registrationId, status)
 const handleSignIn = async (data: SignInData) => {
   // Login gets JWT token
   const loginResponse = await authApi.login(email, password)
-  
+
   // Fetch full profile with role
   const user = await authApi.getCurrentUser()
-  
+
   // Set auth state
   setCurrentUser(user)
   setUserProfile(user)
-  
+
   // Cache for instant reload
   cacheUserProfile('rails-user', user)
-  
+
   // Track analytics
   analytics.trackUserSignIn(user.email, user.id, user.role)
 }
@@ -637,7 +656,9 @@ if (isProducer) {
 // Main state variables
 const [organization, setOrganization] = useState<Organization | null>(null)
 const [events, setEvents] = useState<Event[]>([])
-const [eventsView, setEventsView] = useState<'empty' | 'list' | 'create' | 'edit' | 'command-center'>()
+const [eventsView, setEventsView] = useState<
+  'empty' | 'list' | 'create' | 'edit' | 'command-center'
+>()
 const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 const [activeNav, setActiveNav] = useState<'events' | 'network' | 'settings'>()
 
@@ -649,14 +670,14 @@ const [loadingCommandCenter, setLoadingCommandCenter] = useState(false)
 // On mount: fetch organization
 useEffect(() => {
   const response = await organizationsApi.getMine()
-  
+
   if (!response) {
     // Create org automatically
     const newOrg = await organizationsApi.create({ name: userProfile.name })
   }
-  
+
   setOrganization(userOrg)
-  
+
   // Then fetch events for org
   await fetchEvents(userOrg.slug)
 }, [userProfile])
@@ -665,7 +686,7 @@ useEffect(() => {
 const fetchEvents = async (orgSlug) => {
   const fetchedEvents = await eventsApi.getByOrganization(orgSlug)
   setEvents(fetchedEvents)
-  
+
   // Set view based on state
   if (fetchedEvents.length === 0) {
     setEventsView('empty')
@@ -711,6 +732,7 @@ const handleCopyLink = async (application) => {
 **Purpose:** Allow event producers to share vendor application forms with vendors who don't have accounts
 
 **Flow:**
+
 1. Producer creates vendor application in Command Center
 2. Backend generates unique `shareable_code` (format: `EVENT-YYYYMM-XXXXXX`)
 3. Producer gets shareable URL: `/apply/{code}`
@@ -728,6 +750,7 @@ const handleCopyLink = async (application) => {
 **Statuses:** pending → approved/rejected/waitlist/confirmed
 
 **Producer Actions:**
+
 1. View vendor in Vendors tab
 2. Click status button on vendor row
 3. Select new status from dropdown
@@ -738,6 +761,7 @@ const handleCopyLink = async (application) => {
 ### 8.3 Event Publication Workflow
 
 **Event Lifecycle:**
+
 1. Create event → status: 'draft'
 2. Edit event details
 3. Create vendor applications for event
@@ -799,11 +823,13 @@ const handleCopyLink = async (application) => {
 ### 10.2 Authorization
 
 **Backend Enforces:**
+
 - Only organization owner can view/edit/delete their organization's events
 - Only event owner can create vendor applications
 - Only producer/admin can update vendor application status
 
 **Frontend:**
+
 - RedirectIfAuthenticatedV2 checks role before routing
 - AdminRoute protects admin-only pages
 - Components conditionally render based on `isProducer` flag
@@ -811,6 +837,7 @@ const handleCopyLink = async (application) => {
 ### 10.3 Public Endpoints
 
 These don't require authentication:
+
 - `vendorApplicationsApi.lookupByCode()` - Lookup event by shareable code
 - `registrationsApi.submitVendorApplication()` - Submit vendor application
 - `registrationsApi.trackByTicketCode()` - Check application status
@@ -842,6 +869,7 @@ const user = await authApi.getCurrentUser()
 ### 11.2 Organization Auto-Creation
 
 First login flow:
+
 1. Fetch organization from API
 2. If none exists, auto-create
 3. Handle 422 duplicate errors
@@ -979,6 +1007,7 @@ if (role === 'venue_owner') {
 ## Summary
 
 The **venue_owner** role represents **Event Producers** in Voxxy Presents. They have complete control over:
+
 - Event creation and management
 - Vendor application collection
 - Vendor approval workflows

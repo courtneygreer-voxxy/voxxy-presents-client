@@ -21,7 +21,7 @@ import {
   Coffee,
   Music,
   ArrowLeft,
-  Home
+  Home,
 } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
 import { validateEmail } from '@/utils/validation'
@@ -48,14 +48,14 @@ type UserType = 'club-owner' | 'venue-owner'
 export function SplitScreenLoginForm({
   onSuccess,
   onSwitchToSignUp,
-  onForgotPassword
+  onForgotPassword,
 }: SplitScreenLoginFormProps) {
   const navigate = useNavigate()
   const { signIn, loading, error, clearError } = useAuth()
   const [activeType, setActiveType] = useState<UserType>('club-owner')
   const [formData, setFormData] = useState<FormData>({
     email: '',
-    password: ''
+    password: '',
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [showPassword, setShowPassword] = useState(false)
@@ -80,11 +80,11 @@ export function SplitScreenLoginForm({
 
   // Handle input changes with validation
   const handleInputChange = (field: keyof FormData, value: any) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+    setFormData((prev) => ({ ...prev, [field]: value }))
 
     // Clear previous errors for this field
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }))
+      setErrors((prev) => ({ ...prev, [field]: undefined }))
     }
 
     // Clear general auth error when user starts typing
@@ -119,7 +119,7 @@ export function SplitScreenLoginForm({
     try {
       await signIn({
         email: formData.email,
-        password: formData.password
+        password: formData.password,
       })
       onSuccess?.()
     } catch (err) {
@@ -134,14 +134,14 @@ export function SplitScreenLoginForm({
     { icon: Calendar, text: 'Organize amazing events' },
     { icon: Users, text: 'Build your community' },
     { icon: Music, text: 'Curate unique experiences' },
-    { icon: Sparkles, text: 'Track your success' }
+    { icon: Sparkles, text: 'Track your success' },
   ]
 
   const venueFeatures = [
     { icon: TrendingUp, text: 'Increase foot traffic' },
     { icon: Coffee, text: 'Generate steady revenue' },
     { icon: MapPin, text: 'Get discovered by organizers' },
-    { icon: Building2, text: 'Showcase your space' }
+    { icon: Building2, text: 'Showcase your space' },
   ]
 
   return (
@@ -187,9 +187,7 @@ export function SplitScreenLoginForm({
           )}
 
           {activeType !== 'club-owner' && (
-            <div className="text-foreground/60 text-sm">
-              Click to login as Club Owner
-            </div>
+            <div className="text-foreground/60 text-sm">Click to login as Club Owner</div>
           )}
         </div>
       </div>
@@ -231,9 +229,7 @@ export function SplitScreenLoginForm({
           )}
 
           {activeType !== 'venue-owner' && (
-            <div className="text-foreground/60 text-sm">
-              Click to login as Venue Owner
-            </div>
+            <div className="text-foreground/60 text-sm">Click to login as Venue Owner</div>
           )}
         </div>
       </div>
@@ -259,15 +255,16 @@ export function SplitScreenLoginForm({
               <p className="text-muted-foreground text-sm">
                 {activeType === 'club-owner'
                   ? 'Ready to create your next event?'
-                  : 'Ready to list your venue?'
-                }
+                  : 'Ready to list your venue?'}
               </p>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Field */}
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-foreground">Email</Label>
+                  <Label htmlFor="email" className="text-foreground">
+                    Email
+                  </Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
@@ -280,15 +277,15 @@ export function SplitScreenLoginForm({
                       disabled={isSubmitting}
                     />
                   </div>
-                  {errors.email && (
-                    <p className="text-red-400 text-sm">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="text-red-400 text-sm">{errors.email}</p>}
                 </div>
 
                 {/* Password Field */}
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password" className="text-foreground">Password</Label>
+                    <Label htmlFor="password" className="text-foreground">
+                      Password
+                    </Label>
                     <button
                       type="button"
                       onClick={onForgotPassword}
@@ -318,9 +315,7 @@ export function SplitScreenLoginForm({
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="text-red-400 text-sm">{errors.password}</p>
-                  )}
+                  {errors.password && <p className="text-red-400 text-sm">{errors.password}</p>}
                 </div>
 
                 {/* Submit Button */}
