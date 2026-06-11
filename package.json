@@ -34,7 +34,20 @@
     "pre-deploy": "tsx scripts/pre-deployment-tests.ts",
     "deployment-ready": "tsx scripts/deployment-readiness.ts",
     "health-check": "echo 'Health check available in browser: window.__voxxy_health_check()'",
-    "validate-env": "tsx scripts/validate-environment.ts"
+    "validate-env": "tsx scripts/validate-environment.ts",
+    "prepare": "simple-git-hooks"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix --report-unused-disable-directives",
+      "prettier --write"
+    ],
+    "*.{css,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",
@@ -123,8 +136,10 @@
     "eslint-plugin-react-refresh": "^0.4.7",
     "express": "^5.1.0",
     "jsdom": "^26.1.0",
+    "lint-staged": "^17.0.7",
     "postcss": "^8.5",
     "prettier": "^3.8.3",
+    "simple-git-hooks": "^2.13.1",
     "tailwindcss": "^3.4.17",
     "terser": "^5.44.1",
     "tsx": "^4.20.3",
