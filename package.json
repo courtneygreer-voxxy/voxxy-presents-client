@@ -35,7 +35,7 @@
     "deployment-ready": "tsx scripts/deployment-readiness.ts",
     "health-check": "echo 'Health check available in browser: window.__voxxy_health_check()'",
     "validate-env": "tsx scripts/validate-environment.ts",
-    "prepare": "simple-git-hooks"
+    "prepare": "simple-git-hooks || true"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
