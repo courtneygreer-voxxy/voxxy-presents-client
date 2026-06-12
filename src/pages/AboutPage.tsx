@@ -12,7 +12,18 @@ export default function AboutPage() {
   usePageTracking('About')
 
   useEffect(() => {
-    window.scrollTo(0, 0)
+    const hash = window.location.hash
+    if (hash) {
+      // Small delay to ensure the DOM has fully painted before scrolling
+      setTimeout(() => {
+        const el = document.querySelector(hash)
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        }
+      }, 100)
+    } else {
+      window.scrollTo(0, 0)
+    }
   }, [])
 
   return (
@@ -123,6 +134,65 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* AI Pledge Section */}
+      <section id="ai-pledge" className="voxxy-gradient-marketing-hero py-[100px] px-6 md:px-12">
+        <div className="container mx-auto max-w-[900px]">
+          <div className="mb-10">
+            <div className="text-[12px] font-semibold uppercase tracking-wider text-voxxy-pink mb-4">Our Stance on AI</div>
+            <h2 className="text-[42px] font-display font-bold leading-tight text-white">
+              We are, first and foremost,{' '}
+              <em className="not-italic bg-gradient-to-r from-[#cc30e8] via-[#9054e3] to-[#651ae9] bg-clip-text text-transparent">
+                a company built for community.
+              </em>
+            </h2>
+          </div>
+
+          <div className="space-y-6 text-[16px] leading-relaxed text-white/70">
+            <p>
+              Our commitment to technology is simple: we will never introduce any feature or tool that causes unjust or undue harm to the people we serve. Given the still-growing unknowns around AI development and the real harm we have already seen it cause to independent artists and their livelihoods, we have made the decision not to incorporate AI into our product until we are confident it will be genuinely beneficial.
+            </p>
+            <p>
+              And if that day comes, it will always be{' '}
+              <strong className="text-white">opt-out. Never opt-in by default.</strong>
+            </p>
+            <p>
+              We want you to feel safe here. Safe with your data. Safe with your art. Trust is not a feature for us — it is the foundation. If anything ever makes you feel unsafe, we want to know. Reach out and we will build toward something better together.
+            </p>
+          </div>
+
+          {/* Voxxy AI, Inc. callout */}
+          <div className="my-10 rounded-2xl border border-white/10 bg-white/6 p-8 backdrop-blur-sm">
+            <p className="text-[16px] leading-relaxed text-white/70">
+              You might notice our legal entity is{' '}
+              <strong className="text-white">Voxxy AI, Inc.</strong>{' '}
+              We will be honest with you about that. Early in our journey, AI was central to our product vision. After deep learning and harder conversations with our community, we stripped it out. We found no value in it for artists and found mostly harm. Changing a legal name is expensive and slow, but our values moved faster than our paperwork.
+            </p>
+          </div>
+
+          <div className="space-y-6 text-[16px] leading-relaxed text-white/70">
+            <p>
+              Things could change. We are not naive enough to say never forever. But we will always put the safety and wellbeing of our artists before any trend, any pressure, or any shortcut.
+            </p>
+            <p>
+              One more thing:{' '}
+              <strong className="text-white">we do not use AI-generated art and it will never appear on our platform. Ever.</strong>
+            </p>
+            <p>
+              If you see anything on Voxxy that feels contradictory to this statement, please call us out. Seriously.
+            </p>
+          </div>
+
+          <div className="mt-10">
+            <a
+              href="mailto:team@heyvoxxy.com"
+              className="text-[16px] font-semibold text-voxxy-pink transition-colors hover:text-white"
+            >
+              team@heyvoxxy.com
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="border-y border-white/10 voxxy-gradient-marketing-hero py-24 px-6 md:px-12">
         <div className="container mx-auto max-w-4xl text-center">
@@ -130,7 +200,7 @@ export default function AboutPage() {
             Want to learn more?
           </h2>
           <p className="mb-10 text-[18px] text-white/70">
-            We'd love to hear about your events.
+            We'd love to hear about your shows.
           </p>
           <TrackedLink
             to="/contact"
